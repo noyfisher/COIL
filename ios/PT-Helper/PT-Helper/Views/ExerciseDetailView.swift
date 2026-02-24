@@ -9,6 +9,7 @@ struct ExerciseDetailView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     demonstrationIcon
+                    positionGuide
                     exerciseInfo
                     formTips
                     contraindications
@@ -22,10 +23,21 @@ struct ExerciseDetailView: View {
     }
 
     private var demonstrationIcon: some View {
-        ExerciseIllustrationView(
-            iconName: exercise.demonstrationIcon,
-            difficulty: exercise.difficulty
-        )
+        ExerciseImageView(exercise: exercise)
+    }
+
+    private var positionGuide: some View {
+        Group {
+            if exercise.startPosition != nil || exercise.movement != nil || exercise.endPosition != nil {
+                CardSection(icon: "figure.walk.motion", color: .blue, title: "How to Do It") {
+                    ExercisePositionGuideView(
+                        startPosition: exercise.startPosition,
+                        movement: exercise.movement,
+                        endPosition: exercise.endPosition
+                    )
+                }
+            }
+        }
     }
 
     private var exerciseInfo: some View {

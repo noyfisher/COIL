@@ -86,7 +86,7 @@ struct BasicInfoStepView: View {
                                 .padding(AppSpacing.md)
                                 .background(AppColors.inputBackground)
                                 .cornerRadius(AppCorners.medium)
-                                .onChange(of: weightText) { newValue in
+                                .onChange(of: weightText) { _, newValue in
                                     if let val = Double(newValue) {
                                         viewModel.userProfile.weight = val
                                     } else if newValue.isEmpty {
@@ -117,7 +117,7 @@ struct BasicInfoStepView: View {
                 weightText = String(Int(viewModel.userProfile.weight))
             }
         }
-        .onChange(of: viewModel.currentStep) { _ in
+        .onChange(of: viewModel.currentStep) { _, _ in
             // Show validation hints when user tries to move away from step 1
             if !hasInteracted {
                 hasInteracted = true

@@ -189,12 +189,8 @@ struct RehabPlanView: View {
 
     private func exerciseCard(for exercise: RehabExercise) -> some View {
         HStack(spacing: AppSpacing.lg) {
-            // Compact exercise illustration
-            ExerciseIllustrationView(
-                iconName: exercise.demonstrationIcon,
-                difficulty: exercise.difficulty,
-                isCompact: true
-            )
+            // Compact exercise image with SF Symbol fallback
+            ExerciseImageView(exercise: exercise, isCompact: true)
 
             // Exercise info
             VStack(alignment: .leading, spacing: 6) {
@@ -206,6 +202,15 @@ struct RehabPlanView: View {
                 Text("Target: \(exercise.targetArea)")
                     .font(.caption)
                     .foregroundColor(.secondary)
+
+                // Position preview teaser
+                if let start = exercise.startPosition {
+                    Text(start)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                        .italic()
+                }
 
                 HStack(spacing: AppSpacing.sm) {
                     Text("\(exercise.sets) sets \u{00D7} \(exercise.reps)")

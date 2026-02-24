@@ -24,7 +24,7 @@ class WorkoutViewModel: ObservableObject {
                     guard let self = self else { return }
                     self.isLoading = false
                     if let error = error {
-                        print("Error fetching workout sessions: \(error.localizedDescription)")
+                        AppLogger.data.error("Error fetching workout sessions: \(error.localizedDescription)")
                         self.loadError = "Unable to load your workouts. Pull down to retry."
                         return
                     }
@@ -67,7 +67,7 @@ class WorkoutViewModel: ObservableObject {
             .document(session.id.uuidString)
             .setData(sessionData) { error in
                 if let error = error {
-                    print("Error saving workout session: \(error.localizedDescription)")
+                    AppLogger.data.error("Error saving workout session: \(error.localizedDescription)")
                 }
             }
     }

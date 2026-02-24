@@ -139,7 +139,7 @@ class ClaudeAPIService {
             throw ClaudeAPIError.rateLimited
         default:
             let errorBody = String(data: data, encoding: .utf8) ?? "No error details"
-            print("Claude Proxy Error (\(httpResponse.statusCode)): \(errorBody)")
+            AppLogger.api.error("Claude Proxy Error (\(httpResponse.statusCode)): \(errorBody)")
             throw ClaudeAPIError.invalidResponse(httpResponse.statusCode, errorBody)
         }
 

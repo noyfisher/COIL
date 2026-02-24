@@ -24,7 +24,7 @@ class OnboardingViewModel: ObservableObject {
 
     func saveProfile(completion: @escaping (Bool) -> Void) {
         guard let uid = Auth.auth().currentUser?.uid else {
-            print("Error saving profile: no authenticated user")
+            AppLogger.auth.error("Error saving profile: no authenticated user")
             completion(false)
             return
         }
@@ -69,7 +69,7 @@ class OnboardingViewModel: ObservableObject {
             .setData(profileData) { error in
                 DispatchQueue.main.async {
                     if let error = error {
-                        print("Error saving profile: \(error.localizedDescription)")
+                        AppLogger.data.error("Error saving profile: \(error.localizedDescription)")
                         completion(false)
                     } else {
                         completion(true)
@@ -86,7 +86,7 @@ class OnboardingViewModel: ObservableObject {
         db.collection("users").document(uid).collection("profile").document("health").getDocument { snapshot, error in
             DispatchQueue.main.async {
                 if let error = error {
-                    print("Error loading profile: \(error.localizedDescription)")
+                    AppLogger.data.error("Error loading profile: \(error.localizedDescription)")
                     completion(false)
                 } else if let snapshot = snapshot, snapshot.exists, let data = snapshot.data() {
                     // Parse manually to match our manual save format

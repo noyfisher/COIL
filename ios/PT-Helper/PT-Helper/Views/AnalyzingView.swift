@@ -11,18 +11,6 @@ struct AnalyzingView: View {
         ZStack {
             AppColors.pageBackground.ignoresSafeArea()
 
-            // Navigate to results — only when user-driven flag is set
-            NavigationLink(
-                destination: AnalysisResultView(analysisResult: viewModel.analysisResult ?? AnalysisResult(
-                    id: UUID(), assessments: [], conditions: [],
-                    overallSummary: "", disclaimerText: "",
-                    generatedDate: Date(), userProfileSnapshot: viewModel.userProfile
-                )),
-                isActive: $navigateToResults
-            ) {
-                EmptyView()
-            }
-
             if let error = viewModel.analysisError {
                 errorView(error)
             } else {
@@ -56,17 +44,24 @@ struct AnalyzingView: View {
             timer?.invalidate()
             timer = nil
         }
-        .onChange(of: viewModel.isAnalyzing) { isAnalyzing in
+        .onChange(of: viewModel.isAnalyzing) { _, isAnalyzing in
             // When analysis finishes and we have a result, navigate forward
             if !isAnalyzing && viewModel.analysisResult != nil {
                 navigateToResults = true
             }
         }
-        .onChange(of: navigateToResults) { newValue in
+        .onChange(of: navigateToResults) { _, newValue in
             // When user navigates back from results, clean up so they can re-analyze
             if !newValue {
                 viewModel.analysisResult = nil
             }
+        }
+        .navigationDestination(isPresented: $navigateToResults) {
+            AnalysisResultView(analysisResult: viewModel.analysisResult ?? AnalysisResult(
+                id: UUID(), assessments: [], conditions: [],
+                overallSummary: "", disclaimerText: "",
+                generatedDate: Date(), userProfileSnapshot: viewModel.userProfile
+            ))
         }
     }
 

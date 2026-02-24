@@ -27,7 +27,7 @@ struct AnalysisResultView: View {
         .navigationTitle("Analysis Results")
         .navigationBarBackButtonHidden(true)
         .sheet(isPresented: $showRehabPlan) {
-            NavigationView {
+            NavigationStack {
                 RehabPlanView(analysisResult: analysisResult)
             }
         }

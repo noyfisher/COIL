@@ -120,18 +120,6 @@ struct BodyMapView: View {
                         }
                     }
 
-                    NavigationLink(
-                        destination: PainDetailView(
-                            viewModel: InjuryAnalysisViewModel(
-                                userProfile: viewModel.userProfile,
-                                selectedRegions: viewModel.selectedRegions
-                            )
-                        ),
-                        isActive: $navigateToPainDetail
-                    ) {
-                        EmptyView()
-                    }
-
                     Button(action: { navigateToPainDetail = true }) {
                         HStack(spacing: AppSpacing.sm) {
                             Text("Continue")
@@ -148,5 +136,13 @@ struct BodyMapView: View {
         }
         .navigationTitle("Body Map")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $navigateToPainDetail) {
+            PainDetailView(
+                viewModel: InjuryAnalysisViewModel(
+                    userProfile: viewModel.userProfile,
+                    selectedRegions: viewModel.selectedRegions
+                )
+            )
+        }
     }
 }

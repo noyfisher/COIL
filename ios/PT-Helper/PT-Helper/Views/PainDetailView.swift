@@ -17,14 +17,6 @@ struct PainDetailView: View {
         ZStack {
             Color(.systemGroupedBackground).ignoresSafeArea()
 
-            // Hidden navigation link — activates when analysis starts, routes to loading screen
-            NavigationLink(
-                destination: AnalyzingView(viewModel: viewModel),
-                isActive: $viewModel.showAnalyzingScreen
-            ) {
-                EmptyView()
-            }
-
             ScrollView {
                 VStack(spacing: AppSpacing.lg) {
                     // Progress indicator
@@ -67,7 +59,7 @@ struct PainDetailView: View {
         }
         .navigationTitle("Pain Assessment")
         .navigationBarTitleDisplayMode(.inline)
-        .onChange(of: viewModel.currentRegionIndex) { _ in
+        .onChange(of: viewModel.currentRegionIndex) { _, _ in
             restoreFormState()
         }
         .onAppear {
@@ -81,15 +73,19 @@ struct PainDetailView: View {
                 viewModel.resetAnalysisState()
             }
         }
+        .navigationDestination(isPresented: $viewModel.showAnalyzingScreen) {
+            AnalyzingView(viewModel: viewModel)
+        }
     }
 
     // MARK: - Form State Management
 
     /// Build a PainAssessment from the current form values.
-    private func buildAssessment() -> PainAssessment {
-        PainAssessment(
+    private func buildAssessment() -> PainAssessment? {
+        guard let region = viewModel.currentRegion else { return nil }
+        return PainAssessment(
             id: UUID(),
-            selectedRegion: viewModel.currentRegion!,
+            selectedRegion: region,
             painType: selectedPainType,
             painIntensity: Int(painIntensity),
             painDuration: selectedPainDuration,
@@ -463,7 +459,8 @@ struct PainDetailView: View {
         HStack(spacing: AppSpacing.md) {
             if viewModel.currentRegionIndex > 0 {
                 Button(action: {
-                    viewModel.saveAndGoBack(buildAssessment())
+                    guard let assessment = buildAssessment() else { return }
+                    viewModel.saveAndGoBack(assessment)
                 }) {
                     HStack(spacing: AppSpacing.xs) {
                         Image(systemName: "chevron.left")
@@ -476,7 +473,8 @@ struct PainDetailView: View {
 
             if viewModel.isLastRegion {
                 Button(action: {
-                    viewModel.saveAndAnalyze(buildAssessment())
+                    guard let assessment = buildAssessment() else { return }
+                    viewModel.saveAndAnalyze(assessment)
                 }) {
                     HStack(spacing: AppSpacing.sm) {
                         Image(systemName: "sparkles")
@@ -486,7 +484,8 @@ struct PainDetailView: View {
                 .buttonStyle(PrimaryButtonStyle())
             } else {
                 Button(action: {
-                    viewModel.saveAndAdvance(buildAssessment())
+                    guard let assessment = buildAssessment() else { return }
+                    viewModel.saveAndAdvance(assessment)
                 }) {
                     HStack(spacing: AppSpacing.sm) {
                         Text("Next")

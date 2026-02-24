@@ -140,7 +140,7 @@ class BodyMapViewModel: ObservableObject {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         db.collection("users").document(uid).collection("profile").document("health").getDocument { snapshot, error in
             if let error = error {
-                print("Error loading user profile: \(error.localizedDescription)")
+                AppLogger.data.error("Error loading user profile: \(error.localizedDescription)")
             } else if let snapshot = snapshot, snapshot.exists, let data = snapshot.data() {
                 DispatchQueue.main.async {
                     var profile = UserProfile(

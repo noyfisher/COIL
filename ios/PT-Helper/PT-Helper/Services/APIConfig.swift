@@ -6,5 +6,6 @@ enum APIConfig {
 
     // Model configuration (sent to proxy, which forwards to Anthropic)
     static let anthropicModel = "claude-haiku-4-5-20251001"
-    static let maxTokens = 2048
+    static let maxTokens = 4096
 }
+

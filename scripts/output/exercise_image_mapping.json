@@ -1,0 +1,896 @@
+{
+  "quad-sets": {
+    "name": "Quad Sets",
+    "filename": "quad-sets.png",
+    "category": "strength",
+    "target_area": "Knee"
+  },
+  "straight-leg-raises": {
+    "name": "Straight Leg Raises",
+    "filename": "straight-leg-raises.png",
+    "category": "strength",
+    "target_area": "Knee"
+  },
+  "wall-sits": {
+    "name": "Wall Sits",
+    "filename": "wall-sits.png",
+    "category": "strength",
+    "target_area": "Knee"
+  },
+  "clamshells": {
+    "name": "Clamshells",
+    "filename": "clamshells.png",
+    "category": "strength",
+    "target_area": "Hip/Knee"
+  },
+  "heel-slides": {
+    "name": "Heel Slides",
+    "filename": "heel-slides.png",
+    "category": "mobility",
+    "target_area": "Knee"
+  },
+  "step-ups": {
+    "name": "Step-Ups",
+    "filename": "step-ups.png",
+    "category": "strength",
+    "target_area": "Knee"
+  },
+  "pendulum-swings": {
+    "name": "Pendulum Swings",
+    "filename": "pendulum-swings.png",
+    "category": "mobility",
+    "target_area": "Shoulder"
+  },
+  "external-rotation": {
+    "name": "External Rotation",
+    "filename": "external-rotation.png",
+    "category": "strength",
+    "target_area": "Shoulder"
+  },
+  "scapular-squeezes": {
+    "name": "Scapular Squeezes",
+    "filename": "scapular-squeezes.png",
+    "category": "strength",
+    "target_area": "Upper Back/Shoulder"
+  },
+  "wall-slides": {
+    "name": "Wall Slides",
+    "filename": "wall-slides.png",
+    "category": "mobility",
+    "target_area": "Shoulder"
+  },
+  "cat-cow-stretch": {
+    "name": "Cat-Cow Stretch",
+    "filename": "cat-cow-stretch.png",
+    "category": "stretch",
+    "target_area": "Back"
+  },
+  "glute-bridges": {
+    "name": "Glute Bridges",
+    "filename": "glute-bridges.png",
+    "category": "strength",
+    "target_area": "Back/Glutes"
+  },
+  "bird-dog": {
+    "name": "Bird Dog",
+    "filename": "bird-dog.png",
+    "category": "core",
+    "target_area": "Core/Back"
+  },
+  "childs-pose": {
+    "name": "Child's Pose",
+    "filename": "childs-pose.png",
+    "category": "stretch",
+    "target_area": "Lower Back"
+  },
+  "doorway-stretch": {
+    "name": "Doorway Stretch",
+    "filename": "doorway-stretch.png",
+    "category": "stretch",
+    "target_area": "Chest/Shoulder"
+  },
+  "hamstring-curls": {
+    "name": "Hamstring Curls",
+    "filename": "hamstring-curls.png",
+    "category": "strength",
+    "target_area": "Knee/Hamstring"
+  },
+  "gentle-stretching": {
+    "name": "Gentle Stretching",
+    "filename": "gentle-stretching.png",
+    "category": "stretch",
+    "target_area": "Full Body"
+  },
+  "walking": {
+    "name": "Walking",
+    "filename": "walking.png",
+    "category": "walking",
+    "target_area": "General"
+  },
+  "seated-hamstring-stretch": {
+    "name": "Seated Hamstring Stretch",
+    "filename": "seated-hamstring-stretch.png",
+    "category": "stretch",
+    "target_area": "Hamstring"
+  },
+  "standing-calf-raises": {
+    "name": "Standing Calf Raises",
+    "filename": "standing-calf-raises.png",
+    "category": "strength",
+    "target_area": "Calf"
+  },
+  "ankle-circles": {
+    "name": "Ankle Circles",
+    "filename": "ankle-circles.png",
+    "category": "mobility",
+    "target_area": "Ankle"
+  },
+  "towel-curls": {
+    "name": "Towel Curls",
+    "filename": "towel-curls.png",
+    "category": "strength",
+    "target_area": "Foot/Ankle"
+  },
+  "ankle-alphabet": {
+    "name": "Ankle Alphabet",
+    "filename": "ankle-alphabet.png",
+    "category": "mobility",
+    "target_area": "Ankle"
+  },
+  "single-leg-balance": {
+    "name": "Single Leg Balance",
+    "filename": "single-leg-balance.png",
+    "category": "balance",
+    "target_area": "Ankle/Knee"
+  },
+  "resistance-band-ankle-eversion": {
+    "name": "Resistance Band Ankle Eversion",
+    "filename": "resistance-band-ankle-eversion.png",
+    "category": "strength",
+    "target_area": "Ankle"
+  },
+  "resistance-band-ankle-inversion": {
+    "name": "Resistance Band Ankle Inversion",
+    "filename": "resistance-band-ankle-inversion.png",
+    "category": "strength",
+    "target_area": "Ankle"
+  },
+  "heel-toe-walking": {
+    "name": "Heel-Toe Walking",
+    "filename": "heel-toe-walking.png",
+    "category": "balance",
+    "target_area": "Ankle/Balance"
+  },
+  "standing-hip-abduction": {
+    "name": "Standing Hip Abduction",
+    "filename": "standing-hip-abduction.png",
+    "category": "strength",
+    "target_area": "Hip"
+  },
+  "standing-hip-adduction": {
+    "name": "Standing Hip Adduction",
+    "filename": "standing-hip-adduction.png",
+    "category": "strength",
+    "target_area": "Hip"
+  },
+  "hip-flexor-stretch": {
+    "name": "Hip Flexor Stretch",
+    "filename": "hip-flexor-stretch.png",
+    "category": "stretch",
+    "target_area": "Hip"
+  },
+  "piriformis-stretch": {
+    "name": "Piriformis Stretch",
+    "filename": "piriformis-stretch.png",
+    "category": "stretch",
+    "target_area": "Hip/Glute"
+  },
+  "it-band-stretch": {
+    "name": "IT Band Stretch",
+    "filename": "it-band-stretch.png",
+    "category": "stretch",
+    "target_area": "Hip/Knee"
+  },
+  "side-lying-hip-abduction": {
+    "name": "Side-Lying Hip Abduction",
+    "filename": "side-lying-hip-abduction.png",
+    "category": "strength",
+    "target_area": "Hip"
+  },
+  "fire-hydrants": {
+    "name": "Fire Hydrants",
+    "filename": "fire-hydrants.png",
+    "category": "strength",
+    "target_area": "Hip/Glute"
+  },
+  "monster-walks": {
+    "name": "Monster Walks",
+    "filename": "monster-walks.png",
+    "category": "strength",
+    "target_area": "Hip/Glute"
+  },
+  "hip-circles": {
+    "name": "Hip Circles",
+    "filename": "hip-circles.png",
+    "category": "mobility",
+    "target_area": "Hip"
+  },
+  "seated-figure-four-stretch": {
+    "name": "Seated Figure Four Stretch",
+    "filename": "seated-figure-four-stretch.png",
+    "category": "stretch",
+    "target_area": "Hip/Glute"
+  },
+  "supine-hamstring-stretch": {
+    "name": "Supine Hamstring Stretch",
+    "filename": "supine-hamstring-stretch.png",
+    "category": "stretch",
+    "target_area": "Hamstring"
+  },
+  "standing-quad-stretch": {
+    "name": "Standing Quad Stretch",
+    "filename": "standing-quad-stretch.png",
+    "category": "stretch",
+    "target_area": "Quadriceps"
+  },
+  "mini-squats": {
+    "name": "Mini Squats",
+    "filename": "mini-squats.png",
+    "category": "strength",
+    "target_area": "Knee/Quadriceps"
+  },
+  "terminal-knee-extension": {
+    "name": "Terminal Knee Extension",
+    "filename": "terminal-knee-extension.png",
+    "category": "strength",
+    "target_area": "Knee"
+  },
+  "knee-flexion-rom": {
+    "name": "Knee Flexion ROM",
+    "filename": "knee-flexion-rom.png",
+    "category": "mobility",
+    "target_area": "Knee"
+  },
+  "prone-knee-flexion": {
+    "name": "Prone Knee Flexion",
+    "filename": "prone-knee-flexion.png",
+    "category": "mobility",
+    "target_area": "Knee"
+  },
+  "lateral-step-ups": {
+    "name": "Lateral Step-Ups",
+    "filename": "lateral-step-ups.png",
+    "category": "strength",
+    "target_area": "Knee/Hip"
+  },
+  "internal-rotation": {
+    "name": "Internal Rotation",
+    "filename": "internal-rotation.png",
+    "category": "strength",
+    "target_area": "Shoulder"
+  },
+  "shoulder-flexion": {
+    "name": "Shoulder Flexion",
+    "filename": "shoulder-flexion.png",
+    "category": "mobility",
+    "target_area": "Shoulder"
+  },
+  "shoulder-abduction": {
+    "name": "Shoulder Abduction",
+    "filename": "shoulder-abduction.png",
+    "category": "mobility",
+    "target_area": "Shoulder"
+  },
+  "sleeper-stretch": {
+    "name": "Sleeper Stretch",
+    "filename": "sleeper-stretch.png",
+    "category": "stretch",
+    "target_area": "Shoulder"
+  },
+  "cross-body-stretch": {
+    "name": "Cross-Body Stretch",
+    "filename": "cross-body-stretch.png",
+    "category": "stretch",
+    "target_area": "Shoulder"
+  },
+  "prone-y-raises": {
+    "name": "Prone Y Raises",
+    "filename": "prone-y-raises.png",
+    "category": "strength",
+    "target_area": "Shoulder/Upper Back"
+  },
+  "prone-t-raises": {
+    "name": "Prone T Raises",
+    "filename": "prone-t-raises.png",
+    "category": "strength",
+    "target_area": "Shoulder/Upper Back"
+  },
+  "shoulder-shrugs": {
+    "name": "Shoulder Shrugs",
+    "filename": "shoulder-shrugs.png",
+    "category": "strength",
+    "target_area": "Shoulder/Neck"
+  },
+  "resistance-band-pull-apart": {
+    "name": "Resistance Band Pull-Apart",
+    "filename": "resistance-band-pull-apart.png",
+    "category": "strength",
+    "target_area": "Upper Back/Shoulder"
+  },
+  "chin-tucks": {
+    "name": "Chin Tucks",
+    "filename": "chin-tucks.png",
+    "category": "strength",
+    "target_area": "Neck"
+  },
+  "neck-rotations": {
+    "name": "Neck Rotations",
+    "filename": "neck-rotations.png",
+    "category": "mobility",
+    "target_area": "Neck"
+  },
+  "neck-side-bends": {
+    "name": "Neck Side Bends",
+    "filename": "neck-side-bends.png",
+    "category": "stretch",
+    "target_area": "Neck"
+  },
+  "upper-trapezius-stretch": {
+    "name": "Upper Trapezius Stretch",
+    "filename": "upper-trapezius-stretch.png",
+    "category": "stretch",
+    "target_area": "Neck/Shoulder"
+  },
+  "levator-scapulae-stretch": {
+    "name": "Levator Scapulae Stretch",
+    "filename": "levator-scapulae-stretch.png",
+    "category": "stretch",
+    "target_area": "Neck/Shoulder"
+  },
+  "prone-press-up": {
+    "name": "Prone Press-Up",
+    "filename": "prone-press-up.png",
+    "category": "mobility",
+    "target_area": "Lower Back"
+  },
+  "knee-to-chest-stretch": {
+    "name": "Knee-to-Chest Stretch",
+    "filename": "knee-to-chest-stretch.png",
+    "category": "stretch",
+    "target_area": "Lower Back"
+  },
+  "double-knee-to-chest": {
+    "name": "Double Knee-to-Chest",
+    "filename": "double-knee-to-chest.png",
+    "category": "stretch",
+    "target_area": "Lower Back"
+  },
+  "lumbar-rotation-stretch": {
+    "name": "Lumbar Rotation Stretch",
+    "filename": "lumbar-rotation-stretch.png",
+    "category": "stretch",
+    "target_area": "Lower Back"
+  },
+  "dead-bug": {
+    "name": "Dead Bug",
+    "filename": "dead-bug.png",
+    "category": "core",
+    "target_area": "Core"
+  },
+  "plank": {
+    "name": "Plank",
+    "filename": "plank.png",
+    "category": "core",
+    "target_area": "Core"
+  },
+  "side-plank": {
+    "name": "Side Plank",
+    "filename": "side-plank.png",
+    "category": "core",
+    "target_area": "Core/Obliques"
+  },
+  "abdominal-bracing": {
+    "name": "Abdominal Bracing",
+    "filename": "abdominal-bracing.png",
+    "category": "core",
+    "target_area": "Core"
+  },
+  "supine-marching": {
+    "name": "Supine Marching",
+    "filename": "supine-marching.png",
+    "category": "core",
+    "target_area": "Core/Hip"
+  },
+  "seated-spinal-twist": {
+    "name": "Seated Spinal Twist",
+    "filename": "seated-spinal-twist.png",
+    "category": "stretch",
+    "target_area": "Spine"
+  },
+  "thread-the-needle": {
+    "name": "Thread the Needle",
+    "filename": "thread-the-needle.png",
+    "category": "stretch",
+    "target_area": "Thoracic Spine"
+  },
+  "thoracic-extension": {
+    "name": "Thoracic Extension",
+    "filename": "thoracic-extension.png",
+    "category": "mobility",
+    "target_area": "Thoracic Spine"
+  },
+  "wrist-flexor-stretch": {
+    "name": "Wrist Flexor Stretch",
+    "filename": "wrist-flexor-stretch.png",
+    "category": "stretch",
+    "target_area": "Wrist/Forearm"
+  },
+  "wrist-extensor-stretch": {
+    "name": "Wrist Extensor Stretch",
+    "filename": "wrist-extensor-stretch.png",
+    "category": "stretch",
+    "target_area": "Wrist/Forearm"
+  },
+  "grip-strengthening": {
+    "name": "Grip Strengthening",
+    "filename": "grip-strengthening.png",
+    "category": "strength",
+    "target_area": "Hand/Forearm"
+  },
+  "finger-tendon-glides": {
+    "name": "Finger Tendon Glides",
+    "filename": "finger-tendon-glides.png",
+    "category": "mobility",
+    "target_area": "Hand"
+  },
+  "wrist-circles": {
+    "name": "Wrist Circles",
+    "filename": "wrist-circles.png",
+    "category": "mobility",
+    "target_area": "Wrist"
+  },
+  "tennis-ball-roll": {
+    "name": "Tennis Ball Roll",
+    "filename": "tennis-ball-roll.png",
+    "category": "mobility",
+    "target_area": "Foot"
+  },
+  "toe-raises": {
+    "name": "Toe Raises",
+    "filename": "toe-raises.png",
+    "category": "strength",
+    "target_area": "Foot/Ankle"
+  },
+  "marble-pickup": {
+    "name": "Marble Pickup",
+    "filename": "marble-pickup.png",
+    "category": "strength",
+    "target_area": "Foot"
+  },
+  "calf-stretch-on-step": {
+    "name": "Calf Stretch on Step",
+    "filename": "calf-stretch-on-step.png",
+    "category": "stretch",
+    "target_area": "Calf"
+  },
+  "soleus-stretch": {
+    "name": "Soleus Stretch",
+    "filename": "soleus-stretch.png",
+    "category": "stretch",
+    "target_area": "Calf"
+  },
+  "seated-calf-raises": {
+    "name": "Seated Calf Raises",
+    "filename": "seated-calf-raises.png",
+    "category": "strength",
+    "target_area": "Calf"
+  },
+  "wall-push-ups": {
+    "name": "Wall Push-Ups",
+    "filename": "wall-push-ups.png",
+    "category": "strength",
+    "target_area": "Chest/Shoulder"
+  },
+  "isometric-shoulder-external-rotation": {
+    "name": "Isometric Shoulder External Rotation",
+    "filename": "isometric-shoulder-external-rotation.png",
+    "category": "strength",
+    "target_area": "Shoulder"
+  },
+  "isometric-shoulder-internal-rotation": {
+    "name": "Isometric Shoulder Internal Rotation",
+    "filename": "isometric-shoulder-internal-rotation.png",
+    "category": "strength",
+    "target_area": "Shoulder"
+  },
+  "bicep-curls": {
+    "name": "Bicep Curls",
+    "filename": "bicep-curls.png",
+    "category": "strength",
+    "target_area": "Arm"
+  },
+  "tricep-extensions": {
+    "name": "Tricep Extensions",
+    "filename": "tricep-extensions.png",
+    "category": "strength",
+    "target_area": "Arm"
+  },
+  "wrist-curls": {
+    "name": "Wrist Curls",
+    "filename": "wrist-curls.png",
+    "category": "strength",
+    "target_area": "Forearm"
+  },
+  "reverse-wrist-curls": {
+    "name": "Reverse Wrist Curls",
+    "filename": "reverse-wrist-curls.png",
+    "category": "strength",
+    "target_area": "Forearm"
+  },
+  "foam-roller-thoracic-extension": {
+    "name": "Foam Roller Thoracic Extension",
+    "filename": "foam-roller-thoracic-extension.png",
+    "category": "mobility",
+    "target_area": "Thoracic Spine"
+  },
+  "foam-roller-it-band": {
+    "name": "Foam Roller IT Band",
+    "filename": "foam-roller-it-band.png",
+    "category": "mobility",
+    "target_area": "Hip/Knee"
+  },
+  "foam-roller-quad": {
+    "name": "Foam Roller Quad",
+    "filename": "foam-roller-quad.png",
+    "category": "mobility",
+    "target_area": "Quadriceps"
+  },
+  "foam-roller-calf": {
+    "name": "Foam Roller Calf",
+    "filename": "foam-roller-calf.png",
+    "category": "mobility",
+    "target_area": "Calf"
+  },
+  "seated-row-with-band": {
+    "name": "Seated Row with Band",
+    "filename": "seated-row-with-band.png",
+    "category": "strength",
+    "target_area": "Upper Back"
+  },
+  "lat-pulldown-with-band": {
+    "name": "Lat Pulldown with Band",
+    "filename": "lat-pulldown-with-band.png",
+    "category": "strength",
+    "target_area": "Upper Back"
+  },
+  "standing-row-with-band": {
+    "name": "Standing Row with Band",
+    "filename": "standing-row-with-band.png",
+    "category": "strength",
+    "target_area": "Upper Back"
+  },
+  "resisted-ankle-dorsiflexion": {
+    "name": "Resisted Ankle Dorsiflexion",
+    "filename": "resisted-ankle-dorsiflexion.png",
+    "category": "strength",
+    "target_area": "Ankle"
+  },
+  "resisted-ankle-plantarflexion": {
+    "name": "Resisted Ankle Plantarflexion",
+    "filename": "resisted-ankle-plantarflexion.png",
+    "category": "strength",
+    "target_area": "Ankle"
+  },
+  "prone-hip-extension": {
+    "name": "Prone Hip Extension",
+    "filename": "prone-hip-extension.png",
+    "category": "strength",
+    "target_area": "Hip/Glute"
+  },
+  "supine-hip-flexion": {
+    "name": "Supine Hip Flexion",
+    "filename": "supine-hip-flexion.png",
+    "category": "mobility",
+    "target_area": "Hip"
+  },
+  "seated-knee-extension": {
+    "name": "Seated Knee Extension",
+    "filename": "seated-knee-extension.png",
+    "category": "strength",
+    "target_area": "Knee"
+  },
+  "hamstring-stretch-with-strap": {
+    "name": "Hamstring Stretch with Strap",
+    "filename": "hamstring-stretch-with-strap.png",
+    "category": "stretch",
+    "target_area": "Hamstring"
+  },
+  "wall-angel": {
+    "name": "Wall Angel",
+    "filename": "wall-angel.png",
+    "category": "mobility",
+    "target_area": "Shoulder/Upper Back"
+  },
+  "chest-stretch-corner": {
+    "name": "Chest Stretch Corner",
+    "filename": "chest-stretch-corner.png",
+    "category": "stretch",
+    "target_area": "Chest"
+  },
+  "isometric-quad-contraction": {
+    "name": "Isometric Quad Contraction",
+    "filename": "isometric-quad-contraction.png",
+    "category": "strength",
+    "target_area": "Knee"
+  },
+  "heel-drops": {
+    "name": "Heel Drops",
+    "filename": "heel-drops.png",
+    "category": "strength",
+    "target_area": "Achilles/Calf"
+  },
+  "eccentric-calf-lowering": {
+    "name": "Eccentric Calf Lowering",
+    "filename": "eccentric-calf-lowering.png",
+    "category": "strength",
+    "target_area": "Calf"
+  },
+  "supine-piriformis-stretch": {
+    "name": "Supine Piriformis Stretch",
+    "filename": "supine-piriformis-stretch.png",
+    "category": "stretch",
+    "target_area": "Hip/Glute"
+  },
+  "seated-long-sitting-stretch": {
+    "name": "Seated Long Sitting Stretch",
+    "filename": "seated-long-sitting-stretch.png",
+    "category": "stretch",
+    "target_area": "Hamstring/Back"
+  },
+  "sciatic-nerve-glide": {
+    "name": "Sciatic Nerve Glide",
+    "filename": "sciatic-nerve-glide.png",
+    "category": "mobility",
+    "target_area": "Leg/Back"
+  },
+  "median-nerve-glide": {
+    "name": "Median Nerve Glide",
+    "filename": "median-nerve-glide.png",
+    "category": "mobility",
+    "target_area": "Arm/Hand"
+  },
+  "ulnar-nerve-glide": {
+    "name": "Ulnar Nerve Glide",
+    "filename": "ulnar-nerve-glide.png",
+    "category": "mobility",
+    "target_area": "Arm/Hand"
+  },
+  "prone-shoulder-flexion": {
+    "name": "Prone Shoulder Flexion",
+    "filename": "prone-shoulder-flexion.png",
+    "category": "strength",
+    "target_area": "Shoulder"
+  },
+  "side-lying-external-rotation": {
+    "name": "Side-Lying External Rotation",
+    "filename": "side-lying-external-rotation.png",
+    "category": "strength",
+    "target_area": "Shoulder"
+  },
+  "standing-hip-flexion": {
+    "name": "Standing Hip Flexion",
+    "filename": "standing-hip-flexion.png",
+    "category": "strength",
+    "target_area": "Hip"
+  },
+  "standing-hip-extension": {
+    "name": "Standing Hip Extension",
+    "filename": "standing-hip-extension.png",
+    "category": "strength",
+    "target_area": "Hip/Glute"
+  },
+  "seated-ankle-pumps": {
+    "name": "Seated Ankle Pumps",
+    "filename": "seated-ankle-pumps.png",
+    "category": "mobility",
+    "target_area": "Ankle"
+  },
+  "short-arc-quads": {
+    "name": "Short Arc Quads",
+    "filename": "short-arc-quads.png",
+    "category": "strength",
+    "target_area": "Knee"
+  },
+  "long-arc-quads": {
+    "name": "Long Arc Quads",
+    "filename": "long-arc-quads.png",
+    "category": "strength",
+    "target_area": "Knee"
+  },
+  "supine-hip-internal-rotation": {
+    "name": "Supine Hip Internal Rotation",
+    "filename": "supine-hip-internal-rotation.png",
+    "category": "mobility",
+    "target_area": "Hip"
+  },
+  "supine-hip-external-rotation": {
+    "name": "Supine Hip External Rotation",
+    "filename": "supine-hip-external-rotation.png",
+    "category": "mobility",
+    "target_area": "Hip"
+  },
+  "bosu-ball-balance": {
+    "name": "BOSU Ball Balance",
+    "filename": "bosu-ball-balance.png",
+    "category": "balance",
+    "target_area": "Ankle/Knee"
+  },
+  "single-leg-deadlift": {
+    "name": "Single Leg Deadlift",
+    "filename": "single-leg-deadlift.png",
+    "category": "strength",
+    "target_area": "Hip/Hamstring"
+  },
+  "bulgarian-split-squat": {
+    "name": "Bulgarian Split Squat",
+    "filename": "bulgarian-split-squat.png",
+    "category": "strength",
+    "target_area": "Knee/Hip"
+  },
+  "lateral-band-walks": {
+    "name": "Lateral Band Walks",
+    "filename": "lateral-band-walks.png",
+    "category": "strength",
+    "target_area": "Hip/Glute"
+  },
+  "seated-shoulder-press": {
+    "name": "Seated Shoulder Press",
+    "filename": "seated-shoulder-press.png",
+    "category": "strength",
+    "target_area": "Shoulder"
+  },
+  "overhead-tricep-stretch": {
+    "name": "Overhead Tricep Stretch",
+    "filename": "overhead-tricep-stretch.png",
+    "category": "stretch",
+    "target_area": "Tricep/Shoulder"
+  },
+  "standing-chest-fly-with-band": {
+    "name": "Standing Chest Fly with Band",
+    "filename": "standing-chest-fly-with-band.png",
+    "category": "strength",
+    "target_area": "Chest"
+  },
+  "diaphragmatic-breathing": {
+    "name": "Diaphragmatic Breathing",
+    "filename": "diaphragmatic-breathing.png",
+    "category": "core",
+    "target_area": "Core/Respiratory"
+  },
+  "pec-stretch": {
+    "name": "Pec Stretch",
+    "filename": "pec-stretch.png",
+    "category": "stretch",
+    "target_area": "Chest"
+  },
+  "double-leg-calf-raise": {
+    "name": "Double Leg Calf Raise",
+    "filename": "double-leg-calf-raise.png",
+    "category": "strength",
+    "target_area": "Calf"
+  },
+  "single-leg-calf-raise": {
+    "name": "Single Leg Calf Raise",
+    "filename": "single-leg-calf-raise.png",
+    "category": "strength",
+    "target_area": "Calf"
+  },
+  "seated-toe-taps": {
+    "name": "Seated Toe Taps",
+    "filename": "seated-toe-taps.png",
+    "category": "mobility",
+    "target_area": "Ankle/Foot"
+  },
+  "standing-hamstring-curl": {
+    "name": "Standing Hamstring Curl",
+    "filename": "standing-hamstring-curl.png",
+    "category": "strength",
+    "target_area": "Hamstring"
+  },
+  "prone-hamstring-curl": {
+    "name": "Prone Hamstring Curl",
+    "filename": "prone-hamstring-curl.png",
+    "category": "strength",
+    "target_area": "Hamstring"
+  },
+  "wall-squat-with-ball": {
+    "name": "Wall Squat with Ball",
+    "filename": "wall-squat-with-ball.png",
+    "category": "strength",
+    "target_area": "Knee/Quadriceps"
+  },
+  "hip-hinge": {
+    "name": "Hip Hinge",
+    "filename": "hip-hinge.png",
+    "category": "mobility",
+    "target_area": "Hip/Back"
+  },
+  "quadruped-rocking": {
+    "name": "Quadruped Rocking",
+    "filename": "quadruped-rocking.png",
+    "category": "mobility",
+    "target_area": "Hip/Back"
+  },
+  "seated-trunk-rotation": {
+    "name": "Seated Trunk Rotation",
+    "filename": "seated-trunk-rotation.png",
+    "category": "mobility",
+    "target_area": "Spine"
+  },
+  "standing-back-extension": {
+    "name": "Standing Back Extension",
+    "filename": "standing-back-extension.png",
+    "category": "mobility",
+    "target_area": "Lower Back"
+  },
+  "prone-scapular-retraction": {
+    "name": "Prone Scapular Retraction",
+    "filename": "prone-scapular-retraction.png",
+    "category": "strength",
+    "target_area": "Upper Back"
+  },
+  "seated-cervical-retraction": {
+    "name": "Seated Cervical Retraction",
+    "filename": "seated-cervical-retraction.png",
+    "category": "strength",
+    "target_area": "Neck"
+  },
+  "isometric-cervical-extension": {
+    "name": "Isometric Cervical Extension",
+    "filename": "isometric-cervical-extension.png",
+    "category": "strength",
+    "target_area": "Neck"
+  },
+  "isometric-cervical-flexion": {
+    "name": "Isometric Cervical Flexion",
+    "filename": "isometric-cervical-flexion.png",
+    "category": "strength",
+    "target_area": "Neck"
+  },
+  "wrist-pronation-supination": {
+    "name": "Wrist Pronation and Supination",
+    "filename": "wrist-pronation-supination.png",
+    "category": "mobility",
+    "target_area": "Forearm/Wrist"
+  },
+  "open-book-stretch": {
+    "name": "Open Book Stretch",
+    "filename": "open-book-stretch.png",
+    "category": "stretch",
+    "target_area": "Thoracic Spine"
+  },
+  "prayer-stretch": {
+    "name": "Prayer Stretch",
+    "filename": "prayer-stretch.png",
+    "category": "stretch",
+    "target_area": "Lower Back"
+  },
+  "superman-exercise": {
+    "name": "Superman Exercise",
+    "filename": "superman-exercise.png",
+    "category": "strength",
+    "target_area": "Lower Back/Core"
+  },
+  "swimmers-exercise": {
+    "name": "Swimmers Exercise",
+    "filename": "swimmers-exercise.png",
+    "category": "strength",
+    "target_area": "Back/Core"
+  },
+  "pelvic-tilts": {
+    "name": "Pelvic Tilts",
+    "filename": "pelvic-tilts.png",
+    "category": "core",
+    "target_area": "Lower Back"
+  }
+}

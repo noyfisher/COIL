@@ -24,7 +24,7 @@ class SavedPlansViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self.isLoading = false
                 if let error = error {
-                    print("Error fetching rehab plans: \(error.localizedDescription)")
+                    AppLogger.data.error("Error fetching rehab plans: \(error.localizedDescription)")
                     self.loadError = "Unable to load your rehab plans. Please pull down to retry."
                     return
                 }
@@ -59,7 +59,12 @@ class SavedPlansViewModel: ObservableObject {
                             difficulty: difficulty,
                             demonstrationIcon: e["demonstrationIcon"] as? String ?? "figure.flexibility",
                             tips: e["tips"] as? [String] ?? [],
-                            contraindications: e["contraindications"] as? [String] ?? []
+                            contraindications: e["contraindications"] as? [String] ?? [],
+                            startPosition: e["startPosition"] as? String,
+                            movement: e["movement"] as? String,
+                            endPosition: e["endPosition"] as? String,
+                            exerciseCategory: e["exerciseCategory"] as? String,
+                            imageFileName: e["imageFileName"] as? String
                         )
                     }
 
@@ -108,7 +113,7 @@ class SavedPlansViewModel: ObservableObject {
             .document(planId)
             .delete { error in
                 if let error = error {
-                    print("Error deleting plan: \(error.localizedDescription)")
+                    AppLogger.data.error("Error deleting plan: \(error.localizedDescription)")
                     // Re-fetch to restore consistent state
                     self.fetchRehabPlans()
                 }

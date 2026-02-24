@@ -68,7 +68,7 @@ struct RootView: View {
         let db = Firestore.firestore()
         db.collection("users").document(uid).collection("profile").document("health").getDocument { snapshot, error in
             if let error = error {
-                print("Error checking profile: \(error.localizedDescription)")
+                AppLogger.auth.error("Error checking profile: \(error.localizedDescription)")
                 errorMessage = "We couldn't load your profile. Please check your internet connection and try again."
                 showError = true
                 isCheckingProfile = false

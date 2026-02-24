@@ -14,7 +14,7 @@ struct ContentView: View {
     @State private var signOutErrorMessage = ""
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
                 Color(.systemGroupedBackground)
                     .ignoresSafeArea()
@@ -259,7 +259,7 @@ struct ContentView: View {
         let db = Firestore.firestore()
         db.collection("users").document(uid).collection("profile").document("health").getDocument { snapshot, error in
             if let error = error {
-                print("Error fetching user name: \(error.localizedDescription)")
+                AppLogger.data.error("Error fetching user name: \(error.localizedDescription)")
             } else if let snapshot = snapshot, let data = snapshot.data() {
                 let first = data["firstName"] as? String ?? ""
                 userName = first.isEmpty ? (data["name"] as? String ?? "") : first

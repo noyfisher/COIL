@@ -159,6 +159,57 @@ struct ExerciseIllustrationView: View {
     }
 }
 
+// MARK: - Exercise Position Guide
+
+/// Shows structured start → movement → return instructions as a numbered step sequence.
+/// Only renders when at least one position field is present.
+struct ExercisePositionGuideView: View {
+    let startPosition: String?
+    let movement: String?
+    let endPosition: String?
+
+    var body: some View {
+        if startPosition != nil || movement != nil || endPosition != nil {
+            VStack(alignment: .leading, spacing: 16) {
+                if let start = startPosition {
+                    positionStep(number: 1, label: "Starting Position", text: start, color: .green)
+                }
+                if let move = movement {
+                    positionStep(number: 2, label: "Movement", text: move, color: .blue)
+                }
+                if let end = endPosition {
+                    positionStep(number: 3, label: "Return", text: end, color: .purple)
+                }
+            }
+        }
+    }
+
+    private func positionStep(number: Int, label: String, text: String, color: Color) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(color.opacity(0.15))
+                    .frame(width: 32, height: 32)
+                Text("\(number)")
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .foregroundColor(color)
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(label)
+                    .font(.caption.weight(.semibold))
+                    .foregroundColor(color)
+                Text(text)
+                    .font(.subheadline)
+                    .foregroundColor(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Step \(number), \(label): \(text)")
+    }
+}
+
 // MARK: - Difficulty Badge (standalone)
 
 /// A small colored pill showing exercise difficulty level.
