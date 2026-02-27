@@ -39,12 +39,16 @@ class WorkoutViewModel: ObservableObject {
                         let duration = data["duration"] as? TimeInterval ?? 0
                         let painLevel = data["painLevel"] as? Double ?? 0
                         let isCompleted = data["isCompleted"] as? Bool ?? false
+                        let exercisesPerformed = data["exercisesPerformed"] as? [String] ?? []
+                        let notes = data["notes"] as? String
                         return WorkoutSession(
                             id: id,
                             date: date,
                             duration: duration,
                             painLevel: painLevel,
-                            isCompleted: isCompleted
+                            isCompleted: isCompleted,
+                            exercisesPerformed: exercisesPerformed,
+                            notes: notes
                         )
                     } ?? []
                 }
@@ -56,13 +60,17 @@ class WorkoutViewModel: ObservableObject {
 
         // Persist to Firestore
         guard let uid = Auth.auth().currentUser?.uid else { return }
-        let sessionData: [String: Any] = [
+        var sessionData: [String: Any] = [
             "id": session.id.uuidString,
             "date": Timestamp(date: session.date),
             "duration": session.duration,
             "painLevel": session.painLevel,
-            "isCompleted": session.isCompleted
+            "isCompleted": session.isCompleted,
+            "exercisesPerformed": session.exercisesPerformed
         ]
+        if let notes = session.notes {
+            sessionData["notes"] = notes
+        }
         db.collection("users").document(uid).collection("workoutSessions")
             .document(session.id.uuidString)
             .setData(sessionData) { error in

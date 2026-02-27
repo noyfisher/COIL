@@ -132,6 +132,7 @@ final class InjuryAnalysisViewModelTests: XCTestCase {
             id: UUID(),
             selectedRegion: region,
             painType: .sharp,
+            customPainDescription: nil,
             painIntensity: 7,
             painDuration: .twoToFourWeeks,
             painFrequency: .onlyWithActivity,

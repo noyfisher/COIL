@@ -198,7 +198,7 @@ final class BodyRegionTests: XCTestCase {
 final class PainAssessmentEnumTests: XCTestCase {
 
     func testPainTypeCount() {
-        XCTAssertEqual(PainAssessment.PainType.allCases.count, 7)
+        XCTAssertEqual(PainAssessment.PainType.allCases.count, 8)
     }
 
     func testPainTypeDisplayNames() {
@@ -209,6 +209,7 @@ final class PainAssessmentEnumTests: XCTestCase {
         XCTAssertEqual(PainAssessment.PainType.aching.displayName, "Aching")
         XCTAssertEqual(PainAssessment.PainType.stabbing.displayName, "Stabbing")
         XCTAssertEqual(PainAssessment.PainType.tingling.displayName, "Tingling")
+        XCTAssertEqual(PainAssessment.PainType.tightness.displayName, "Tightness")
     }
 
     func testPainDurationCount() {
@@ -581,6 +582,7 @@ final class AnalysisResultTests: XCTestCase {
             id: UUID(),
             selectedRegion: region,
             painType: .sharp,
+            customPainDescription: nil,
             painIntensity: 7,
             painDuration: .twoToFourWeeks,
             painFrequency: .onlyWithActivity,

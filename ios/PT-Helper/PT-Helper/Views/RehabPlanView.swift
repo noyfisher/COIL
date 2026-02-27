@@ -143,9 +143,17 @@ struct RehabPlanView: View {
                 Text("Duration: \(plan.totalWeeks) weeks")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
-                Text("Start Date: \(plan.createdDate.formatted(date: .abbreviated, time: .omitted))")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                HStack {
+                    Text("Start Date:")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    DatePicker("", selection: Binding(
+                        get: { viewModel.rehabPlan?.createdDate ?? Date() },
+                        set: { viewModel.rehabPlan?.createdDate = $0 }
+                    ), displayedComponents: .date)
+                    .labelsHidden()
+                    .datePickerStyle(.compact)
+                }
                 if let notes = plan.notes, !notes.isEmpty {
                     Text(notes)
                         .font(.caption)

@@ -25,7 +25,6 @@ struct AnalysisResultView: View {
             }
         }
         .navigationTitle("Analysis Results")
-        .navigationBarBackButtonHidden(true)
         .sheet(isPresented: $showRehabPlan) {
             NavigationStack {
                 RehabPlanView(analysisResult: analysisResult)
@@ -63,7 +62,7 @@ struct AnalysisResultView: View {
                     .font(.title3.weight(.bold))
                     .foregroundColor(.primary)
                 Text(condition.conditionName)
-                    .font(.caption)
+                    .font(.subheadline)
                     .foregroundColor(.secondary)
                 HStack(spacing: 8) {
                     ProgressView(value: condition.confidence, total: 100)
@@ -86,16 +85,16 @@ struct AnalysisResultView: View {
             // Explanation
             VStack(alignment: .leading, spacing: AppSpacing.md) {
                 Text(condition.explanation)
-                    .font(.subheadline)
+                    .font(.body)
                     .foregroundColor(.primary)
-                    .lineSpacing(2)
+                    .lineSpacing(3)
 
                 if condition.isRedFlag {
                     HStack(spacing: 6) {
                         Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.subheadline)
+                            .font(.body)
                         Text(condition.redFlagMessage ?? "Seek immediate medical attention")
-                            .font(.subheadline.weight(.medium))
+                            .font(.body.weight(.medium))
                     }
                     .foregroundColor(.white)
                     .padding(AppSpacing.md)
@@ -105,40 +104,29 @@ struct AnalysisResultView: View {
                 }
 
                 // What's happening in your body
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: 8) {
                     Label("What's happening", systemImage: "figure.stand")
-                        .font(.subheadline.weight(.semibold))
+                        .font(.body.weight(.semibold))
                         .foregroundColor(.blue)
                     Text(condition.whatItMeans)
-                        .font(.subheadline)
+                        .font(.body)
                         .foregroundColor(.secondary)
-                        .lineSpacing(2)
-                }
-
-                // What you can do right now
-                VStack(alignment: .leading, spacing: 6) {
-                    Label("What you can do", systemImage: "hand.thumbsup.fill")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundColor(.green)
-                    Text(condition.howToManage)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .lineSpacing(2)
+                        .lineSpacing(3)
                 }
 
                 // Next steps
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: 8) {
                     Label("Recommended next steps", systemImage: "list.number")
-                        .font(.subheadline.weight(.semibold))
+                        .font(.body.weight(.semibold))
                         .foregroundColor(.purple)
                     ForEach(Array(condition.nextSteps.enumerated()), id: \.offset) { index, step in
                         HStack(alignment: .top, spacing: 8) {
                             Text("\(index + 1).")
-                                .font(.subheadline.weight(.semibold))
+                                .font(.body.weight(.semibold))
                                 .foregroundColor(.purple)
                                 .frame(width: 20, alignment: .leading)
                             Text(step)
-                                .font(.subheadline)
+                                .font(.body)
                                 .foregroundColor(.secondary)
                         }
                     }
@@ -199,11 +187,11 @@ struct AnalysisResultView: View {
 
     private var startNewAssessmentButton: some View {
         Button(action: {
-            NotificationCenter.default.post(name: .popToRoot, object: nil)
+            dismiss()
         }) {
             HStack(spacing: AppSpacing.sm) {
-                Image(systemName: "arrow.counterclockwise")
-                Text("Start New Assessment")
+                Image(systemName: "chevron.left")
+                Text("Back")
             }
         }
         .buttonStyle(SecondaryButtonStyle())

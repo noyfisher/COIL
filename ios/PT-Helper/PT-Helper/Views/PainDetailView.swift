@@ -3,6 +3,7 @@ import SwiftUI
 struct PainDetailView: View {
     @ObservedObject var viewModel: InjuryAnalysisViewModel
     @State private var selectedPainType: PainAssessment.PainType = .sharp
+    @State private var customPainDescription: String = ""
     @State private var painIntensity: Double = 5
     @State private var selectedPainDuration: PainAssessment.PainDuration = .today
     @State private var selectedPainFrequency: PainAssessment.PainFrequency = .constant
@@ -37,6 +38,7 @@ struct PainDetailView: View {
                         CardSection(icon: "figure.walk", color: .blue, title: "Assessing: \(currentRegion.name)") {
                             VStack(alignment: .leading, spacing: AppSpacing.xl) {
                                 painTypeSelection
+                                customPainDescriptionField
                                 painIntensitySlider
                                 painDurationPicker
                                 painFrequencyPicker
@@ -83,10 +85,12 @@ struct PainDetailView: View {
     /// Build a PainAssessment from the current form values.
     private func buildAssessment() -> PainAssessment? {
         guard let region = viewModel.currentRegion else { return nil }
+        let trimmedDescription = customPainDescription.trimmingCharacters(in: .whitespaces)
         return PainAssessment(
             id: UUID(),
             selectedRegion: region,
             painType: selectedPainType,
+            customPainDescription: trimmedDescription.isEmpty ? nil : trimmedDescription,
             painIntensity: Int(painIntensity),
             painDuration: selectedPainDuration,
             painFrequency: selectedPainFrequency,
@@ -101,6 +105,7 @@ struct PainDetailView: View {
     private func restoreFormState() {
         if let saved = viewModel.currentAssessment {
             selectedPainType = saved.painType
+            customPainDescription = saved.customPainDescription ?? ""
             painIntensity = Double(saved.painIntensity)
             selectedPainDuration = saved.painDuration
             selectedPainFrequency = saved.painFrequency
@@ -110,6 +115,7 @@ struct PainDetailView: View {
             additionalNotes = saved.additionalNotes ?? ""
         } else {
             selectedPainType = .sharp
+            customPainDescription = ""
             painIntensity = 5
             selectedPainDuration = .today
             selectedPainFrequency = .constant
@@ -500,6 +506,21 @@ struct PainDetailView: View {
 
     // MARK: - Helpers
 
+    private var customPainDescriptionField: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            Text("Describe Your Pain")
+                .font(.headline)
+            Text("Optional — describe what your pain feels like in your own words")
+                .font(.caption)
+                .foregroundColor(.secondary)
+            TextField("e.g., feels like pressure, stiffness in the morning...", text: $customPainDescription, axis: .vertical)
+                .lineLimit(2...3)
+                .padding(AppSpacing.md)
+                .background(AppColors.inputBackground)
+                .cornerRadius(AppCorners.medium)
+        }
+    }
+
     private func iconName(for type: PainAssessment.PainType) -> String {
         switch type {
         case .sharp: return "bolt.fill"
@@ -509,6 +530,7 @@ struct PainDetailView: View {
         case .aching: return "tortoise.fill"
         case .stabbing: return "scissors"
         case .tingling: return "sparkles"
+        case .tightness: return "arrow.up.left.and.arrow.down.right"
         }
     }
 

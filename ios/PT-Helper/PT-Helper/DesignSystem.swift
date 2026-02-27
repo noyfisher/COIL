@@ -123,6 +123,7 @@ struct CardSection<Content: View>: View {
     let icon: String
     let color: Color
     let title: String
+    var required: Bool = false
     @ViewBuilder let content: Content
 
     var body: some View {
@@ -137,6 +138,11 @@ struct CardSection<Content: View>: View {
                 Text(title)
                     .font(.subheadline.weight(.semibold))
                     .foregroundColor(.secondary)
+                if required {
+                    Text("Required")
+                        .font(.caption2.weight(.medium))
+                        .foregroundColor(.red.opacity(0.8))
+                }
             }
             content
         }

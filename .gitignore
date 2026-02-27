@@ -1,26 +1,13 @@
-# Xcode
-build/
-DerivedData/
-*.xcuserstate
-*.xcscmblueprint
-xcuserdata/
+# Firebase credentials
+*service-account*.json
+
+# Python
+__pycache__/
+*.pyc
 
 # macOS
 .DS_Store
-*.swp
-*~
 
-# CocoaPods
-Pods/
-
-# SPM
-.build/
-Package.resolved
-
-# Firebase
-GoogleService-Info.plist
-.firebase/
-
-# Firebase Functions
-functions/lib/
-functions/node_modules/
+# Xcode user data
+xcuserdata/
+*.xcuserstate

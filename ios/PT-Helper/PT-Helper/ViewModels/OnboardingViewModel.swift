@@ -160,9 +160,16 @@ class OnboardingViewModel: ObservableObject {
         }
     }
 
+    /// Set to true when the user attempts to proceed but validation fails.
+    /// Views observe this to show inline error messages.
+    @Published var showValidationErrors = false
+
     func nextStep() {
         if currentStep < 6 && canProceedFromCurrentStep {
+            showValidationErrors = false
             currentStep += 1
+        } else {
+            showValidationErrors = true
         }
     }
 

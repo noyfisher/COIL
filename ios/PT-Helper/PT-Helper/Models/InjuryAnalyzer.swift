@@ -49,11 +49,11 @@ class InjuryAnalyzer {
         - Return top 3 possible conditions with confidence 0-100
         - "conditionName": the medical/clinical name (e.g. "Patellofemoral Pain Syndrome")
         - "commonName": a plain English name anyone would understand (e.g. "Runner's Knee" or "Kneecap Pain")
-        - "explanation": 2-3 sentences in simple everyday language about what this condition is and why you think it matches. Avoid medical terms — if you must use one, explain it in parentheses
-        - "whatItMeans": 2-3 sentences explaining what's actually happening inside their body in plain terms. Think of it like explaining to someone with no medical background (e.g. "The cushion under your kneecap is getting irritated because it's not tracking properly when you bend your knee")
-        - "howToManage": 2-3 sentences of practical advice they can start doing at home right now. Be specific and actionable (e.g. "Avoid going up and down stairs more than you need to. When sitting for a long time, straighten your leg out every 20 minutes. Icing for 15 minutes after activity can help with the pain")
-        - "nextSteps": 3-5 concrete, actionable steps written plainly (e.g. "Try icing the area for 15 minutes twice a day" instead of "Apply cryotherapy")
-        - "overallSummary": Write 2-3 sentences summarizing the situation as if talking to the person directly. Be reassuring but honest. Use "you/your" language
+        - "explanation": 1-2 SHORT sentences about what this condition is and why it matches. Keep it brief — no walls of text
+        - "whatItMeans": 1-2 SHORT sentences about what's happening in their body. Plain terms, no jargon (e.g. "The cushion under your kneecap is getting irritated from not tracking properly")
+        - "howToManage": Keep this very brief — 1 sentence max. Save detailed advice for the rehab plan
+        - "nextSteps": 2-3 short, concrete steps (e.g. "Ice the area for 15 minutes twice a day")
+        - "overallSummary": 1-2 sentences summarizing the situation directly to the person. Be reassuring but concise
         - Flag red flags: cauda equina, fractures, infections, spinal cord issues, night pain without relief, sudden weakness, chest pain. Write the redFlagMessage in urgent but clear language
 
         Respond ONLY with valid JSON (no markdown fences):
@@ -105,6 +105,14 @@ class InjuryAnalyzer {
 
             --- Region \(index + 1): \(assessment.selectedRegion.name) ---
             - Pain Type: \(assessment.painType.displayName)
+            """
+
+            if let customDesc = assessment.customPainDescription, !customDesc.isEmpty {
+                message += "\n- Patient's Description: \(customDesc)"
+            }
+
+            message += """
+
             - Pain Intensity: \(assessment.painIntensity)/10
             - Duration: \(assessment.painDuration.displayName)
             - Frequency: \(assessment.painFrequency.displayName)

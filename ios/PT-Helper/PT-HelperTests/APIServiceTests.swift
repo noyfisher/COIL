@@ -190,6 +190,7 @@ final class InjuryAnalyzerPromptTests: XCTestCase {
             id: UUID(),
             selectedRegion: region,
             painType: .sharp,
+            customPainDescription: nil,
             painIntensity: 8,
             painDuration: .twoToFourWeeks,
             painFrequency: .onlyWithActivity,

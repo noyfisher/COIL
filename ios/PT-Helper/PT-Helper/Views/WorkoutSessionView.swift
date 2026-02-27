@@ -2,9 +2,12 @@ import SwiftUI
 
 struct WorkoutSessionView: View {
     @StateObject private var viewModel = WorkoutViewModel()
+    @StateObject private var savedPlansVM = SavedPlansViewModel()
     @State private var painLevel: Double = 5
     @State private var durationMinutes: Double = 30
     @State private var notes: String = ""
+    @State private var selectedExercises: Set<String> = []
+    @State private var customExercise: String = ""
     @State private var showSavedConfirmation = false
 
     var body: some View {
@@ -81,6 +84,60 @@ struct WorkoutSessionView: View {
                         }
                     }
 
+                    // Exercises performed
+                    CardSection(icon: "figure.strengthtraining.traditional", color: .green, title: "Exercises Performed") {
+                        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                            if !availableExercises.isEmpty {
+                                Text("From your rehab plans:")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                ForEach(availableExercises, id: \.self) { name in
+                                    Button(action: {
+                                        if selectedExercises.contains(name) {
+                                            selectedExercises.remove(name)
+                                        } else {
+                                            selectedExercises.insert(name)
+                                        }
+                                    }) {
+                                        HStack(spacing: AppSpacing.sm) {
+                                            Image(systemName: selectedExercises.contains(name) ? "checkmark.circle.fill" : "circle")
+                                                .foregroundColor(selectedExercises.contains(name) ? .green : .secondary)
+                                            Text(name)
+                                                .font(.subheadline)
+                                                .foregroundColor(.primary)
+                                            Spacer()
+                                        }
+                                        .padding(.vertical, AppSpacing.xs)
+                                    }
+                                }
+                            }
+
+                            // Custom exercise input
+                            HStack(spacing: AppSpacing.sm) {
+                                TextField("Add other exercise...", text: $customExercise)
+                                    .font(.subheadline)
+                                    .padding(.horizontal, AppSpacing.md)
+                                    .padding(.vertical, AppSpacing.sm)
+                                    .background(AppColors.inputBackground)
+                                    .cornerRadius(AppCorners.small)
+                                    .submitLabel(.done)
+                                    .onSubmit { addCustomExercise() }
+                                Button(action: addCustomExercise) {
+                                    Image(systemName: "plus.circle.fill")
+                                        .font(.title3)
+                                        .foregroundColor(customExercise.trimmingCharacters(in: .whitespaces).isEmpty ? .gray : .green)
+                                }
+                                .disabled(customExercise.trimmingCharacters(in: .whitespaces).isEmpty)
+                            }
+
+                            if !selectedExercises.isEmpty {
+                                Text("\(selectedExercises.count) exercise(s) selected")
+                                    .font(.caption)
+                                    .foregroundColor(.green)
+                            }
+                        }
+                    }
+
                     // Notes
                     CardSection(icon: "note.text", color: .purple, title: "Session Notes") {
                         TextField("How did the session go?", text: $notes, axis: .vertical)
@@ -136,7 +193,9 @@ struct WorkoutSessionView: View {
             date: Date(),
             duration: durationMinutes * 60,
             painLevel: painLevel,
-            isCompleted: true
+            isCompleted: true,
+            exercisesPerformed: Array(selectedExercises),
+            notes: notes.trimmingCharacters(in: .whitespaces).isEmpty ? nil : notes
         )
         viewModel.addSession(session: session)
 
@@ -154,6 +213,20 @@ struct WorkoutSessionView: View {
         painLevel = 5
         durationMinutes = 30
         notes = ""
+        selectedExercises = []
+    }
+
+    private func addCustomExercise() {
+        let trimmed = customExercise.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else { return }
+        selectedExercises.insert(trimmed)
+        customExercise = ""
+    }
+
+    /// Unique exercise names from all saved rehab plans
+    private var availableExercises: [String] {
+        let allNames = savedPlansVM.rehabPlans.flatMap { $0.exercises.map { $0.name } }
+        return Array(Set(allNames)).sorted()
     }
 
     private var painColor: Color {
@@ -192,6 +265,12 @@ struct WorkoutSessionView: View {
                 Text("\(Int(session.duration / 60)) minutes")
                     .font(.caption)
                     .foregroundColor(.secondary)
+                if !session.exercisesPerformed.isEmpty {
+                    Text(session.exercisesPerformed.joined(separator: ", "))
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                }
             }
 
             Spacer()

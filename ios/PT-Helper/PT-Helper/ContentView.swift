@@ -363,16 +363,17 @@ struct OnboardingEditView: View {
                         }
 
                         if viewModel.currentStep < 6 {
-                            Button(action: { viewModel.nextStep() }) {
+                            Button(action: {
+                                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                                viewModel.nextStep()
+                            }) {
                                 HStack(spacing: AppSpacing.xs) {
                                     Text("Continue")
                                     Image(systemName: "chevron.right")
                                         .font(.system(size: 13, weight: .bold))
                                 }
                             }
-                            .buttonStyle(PrimaryButtonStyle())
-                            .disabled(!viewModel.canProceedFromCurrentStep)
-                            .opacity(viewModel.canProceedFromCurrentStep ? 1.0 : 0.5)
+                            .buttonStyle(PrimaryButtonStyle(isDisabled: !viewModel.canProceedFromCurrentStep))
                         }
                     }
                     .padding(.horizontal, AppSpacing.xl)

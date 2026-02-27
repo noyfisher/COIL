@@ -7,7 +7,7 @@ struct RehabPlan: Codable, Identifiable {
     let exercises: [RehabExercise]
     let weeklySchedule: [[String]]
     let totalWeeks: Int
-    let createdDate: Date
+    var createdDate: Date
     let notes: String?
 }
 
