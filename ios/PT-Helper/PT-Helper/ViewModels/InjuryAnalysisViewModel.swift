@@ -5,6 +5,8 @@ class InjuryAnalysisViewModel: ObservableObject {
     @Published var assessments: [PainAssessment?]
     @Published var currentRegionIndex: Int = 0
     @Published var analysisResult: AnalysisResult?
+    @Published var validationWarnings: [ValidationWarning] = []
+    @Published var redFlagAlerts: [ValidationWarning] = []
     @Published var isAnalyzing: Bool = false
     @Published var analysisError: String? = nil
     @Published var showAnalyzingScreen: Bool = false
@@ -82,12 +84,14 @@ class InjuryAnalysisViewModel: ObservableObject {
 
         analysisTask = Task { @MainActor in
             do {
-                let result = try await InjuryAnalyzer.analyze(
+                let validated = try await InjuryAnalyzer.analyze(
                     assessments: completed,
                     profile: userProfile
                 )
                 guard !Task.isCancelled else { return }
-                self.analysisResult = result
+                self.analysisResult = validated.result
+                self.validationWarnings = validated.validation.warnings
+                self.redFlagAlerts = validated.redFlagAlerts
                 self.isAnalyzing = false
             } catch {
                 guard !Task.isCancelled else { return }

@@ -24,8 +24,15 @@ private struct AIConditionResult: Decodable {
 
 class InjuryAnalyzer {
 
-    /// Analyze pain assessments using the Claude AI API
-    static func analyze(assessments: [PainAssessment], profile: UserProfile) async throws -> AnalysisResult {
+    /// Result of a validated analysis including any safety warnings.
+    struct ValidatedAnalysis {
+        let result: AnalysisResult
+        let validation: ValidationResult
+        let redFlagAlerts: [ValidationWarning]
+    }
+
+    /// Analyze pain assessments using the Claude AI API, then validate the response.
+    static func analyze(assessments: [PainAssessment], profile: UserProfile) async throws -> ValidatedAnalysis {
         let systemPrompt = buildSystemPrompt()
         let userMessage = buildUserMessage(assessments: assessments, profile: profile)
 
@@ -34,7 +41,19 @@ class InjuryAnalyzer {
             userMessage: userMessage
         )
 
-        return try parseAnalysisResponse(responseText, assessments: assessments, profile: profile)
+        let rawResult = try parseAnalysisResponse(responseText, assessments: assessments, profile: profile)
+
+        // Run validation pipeline
+        let (validatedResult, validation, redFlags) = ResponseValidationPipeline.validateAnalysis(
+            rawResult,
+            assessments: assessments
+        )
+
+        return ValidatedAnalysis(
+            result: validatedResult,
+            validation: validation,
+            redFlagAlerts: redFlags
+        )
     }
 
     // MARK: - System Prompt

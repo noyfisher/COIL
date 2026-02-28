@@ -1,0 +1,16 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // User profile and sub-collections (assessments, rehabPlans, workoutSessions, notes)
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Missing exercise images — any authenticated user can log missing images
+    match /missingExerciseImages/{docId} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

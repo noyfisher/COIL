@@ -51,17 +51,22 @@ struct AnalyzingView: View {
             }
         }
         .onChange(of: navigateToResults) { _, newValue in
-            // When user navigates back from results, clean up so they can re-analyze
+            // When user navigates back from results, also pop back to PainDetailView
             if !newValue {
                 viewModel.analysisResult = nil
+                viewModel.showAnalyzingScreen = false
             }
         }
         .navigationDestination(isPresented: $navigateToResults) {
-            AnalysisResultView(analysisResult: viewModel.analysisResult ?? AnalysisResult(
-                id: UUID(), assessments: [], conditions: [],
-                overallSummary: "", disclaimerText: "",
-                generatedDate: Date(), userProfileSnapshot: viewModel.userProfile
-            ))
+            AnalysisResultView(
+                analysisResult: viewModel.analysisResult ?? AnalysisResult(
+                    id: UUID(), assessments: [], conditions: [],
+                    overallSummary: "", disclaimerText: "",
+                    generatedDate: Date(), userProfileSnapshot: viewModel.userProfile
+                ),
+                validationWarnings: viewModel.validationWarnings,
+                redFlagAlerts: viewModel.redFlagAlerts
+            )
         }
     }
 

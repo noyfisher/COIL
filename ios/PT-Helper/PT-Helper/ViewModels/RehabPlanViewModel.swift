@@ -33,6 +33,7 @@ private struct AIRehabExercise: Decodable {
 @MainActor
 class RehabPlanViewModel: ObservableObject {
     @Published var rehabPlan: RehabPlan?
+    @Published var rehabPlanWarnings: [ValidationWarning] = []
     @Published var isSaving = false
     @Published var showSaveSuccess = false
     @Published var saveError: String? = nil
@@ -86,7 +87,14 @@ class RehabPlanViewModel: ObservableObject {
         Task {
             do {
                 let plan = try await generateAIRehabPlan(from: analysisResult)
-                self.rehabPlan = plan
+                // Validate the plan
+                let (validatedPlan, warnings) = ResponseValidationPipeline.validateRehabPlan(
+                    plan,
+                    conditions: conditions,
+                    userProfile: analysisResult.userProfileSnapshot
+                )
+                self.rehabPlan = validatedPlan
+                self.rehabPlanWarnings = warnings
                 self.isGenerating = false
                 // Preload exercise images in background
                 ExerciseImageService.shared.preloadImages(for: plan.exercises)
@@ -113,7 +121,14 @@ class RehabPlanViewModel: ObservableObject {
                     createdDate: Date(),
                     notes: nil
                 )
-                self.rehabPlan = fallbackPlan
+                // Validate fallback plan too
+                let (validatedFallback, warnings) = ResponseValidationPipeline.validateRehabPlan(
+                    fallbackPlan,
+                    conditions: conditions,
+                    userProfile: analysisResult.userProfileSnapshot
+                )
+                self.rehabPlan = validatedFallback
+                self.rehabPlanWarnings = warnings
                 self.isGenerating = false
                 // Preload exercise images in background
                 ExerciseImageService.shared.preloadImages(for: finalExercises)
@@ -347,7 +362,6 @@ class RehabPlanViewModel: ObservableObject {
 
                 do {
                     let docRef = db.collection("missingExerciseImages").document(normalizedKey)
-                    // Set firstSeen only if document doesn't exist yet
                     let snapshot = try? await docRef.getDocument()
                     if snapshot?.exists != true {
                         data["firstSeen"] = FieldValue.serverTimestamp()

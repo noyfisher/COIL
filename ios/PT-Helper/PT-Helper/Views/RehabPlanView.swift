@@ -17,11 +17,16 @@ struct RehabPlanView: View {
             } else if let plan = viewModel.rehabPlan {
                 ScrollView {
                     VStack(spacing: 16) {
+                        // Safety warnings from validation pipeline
+                        if !viewModel.rehabPlanWarnings.isEmpty {
+                            rehabWarningsBanner
+                        }
                         planHeader(plan: plan)
                         weeklyCalendar(plan: plan)
                         exerciseList(for: plan)
                         if analysisResult != nil {
                             savePlanButton
+                            homeButton
                         }
                     }
                     .padding(20)
@@ -31,16 +36,6 @@ struct RehabPlanView: View {
             }
         }
         .navigationTitle("Rehab Plan")
-        .toolbar {
-            if analysisResult != nil {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                    .fontWeight(.semibold)
-                }
-            }
-        }
         .onAppear {
             if viewModel.rehabPlan == nil && !viewModel.isGenerating {
                 if let existing = existingPlan {
@@ -288,6 +283,60 @@ struct RehabPlanView: View {
                 .disabled(viewModel.isSaving)
             }
         }
+    }
+
+    private var rehabWarningsBanner: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            let urgentWarnings = viewModel.rehabPlanWarnings.filter { $0.severity == .urgent }
+            let cautionWarnings = viewModel.rehabPlanWarnings.filter { $0.severity == .caution }
+
+            if !urgentWarnings.isEmpty {
+                HStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundColor(.white)
+                    Text("Safety Notice")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.white)
+                }
+                ForEach(Array(urgentWarnings.enumerated()), id: \.offset) { _, warning in
+                    Text("• \(warning.message)")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.95))
+                }
+            }
+
+            if !cautionWarnings.isEmpty {
+                if urgentWarnings.isEmpty {
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.circle.fill")
+                            .foregroundColor(urgentWarnings.isEmpty ? .orange : .white)
+                        Text("Things to Keep in Mind")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundColor(urgentWarnings.isEmpty ? .primary : .white)
+                    }
+                }
+                ForEach(Array(cautionWarnings.enumerated()), id: \.offset) { _, warning in
+                    Text("• \(warning.message)")
+                        .font(.caption)
+                        .foregroundColor(urgentWarnings.isEmpty ? .secondary : .white.opacity(0.9))
+                }
+            }
+        }
+        .padding()
+        .background(viewModel.rehabPlanWarnings.contains(where: { $0.severity == .urgent }) ? Color.red : Color.orange.opacity(0.08))
+        .cornerRadius(AppCorners.card)
+    }
+
+    private var homeButton: some View {
+        Button(action: {
+            NotificationCenter.default.post(name: .popToRoot, object: nil)
+        }) {
+            HStack(spacing: AppSpacing.sm) {
+                Image(systemName: "house")
+                Text("Home")
+            }
+        }
+        .buttonStyle(SecondaryButtonStyle())
     }
 
     private var emptyState: some View {

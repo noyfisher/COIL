@@ -18,52 +18,58 @@ struct PainDetailView: View {
         ZStack {
             Color(.systemGroupedBackground).ignoresSafeArea()
 
-            ScrollView {
-                VStack(spacing: AppSpacing.lg) {
-                    // Progress indicator
-                    if !viewModel.selectedRegionNames.isEmpty {
-                        HStack {
-                            Text("Region \(viewModel.currentRegionIndex + 1) of \(viewModel.totalRegions)")
-                                .font(.caption.weight(.semibold))
-                                .foregroundColor(.white)
-                                .padding(.horizontal, AppSpacing.md)
-                                .padding(.vertical, AppSpacing.xs)
-                                .background(Color.blue)
-                                .cornerRadius(AppCorners.medium)
-                            Spacer()
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: AppSpacing.lg) {
+                        // Progress indicator
+                        if !viewModel.selectedRegionNames.isEmpty {
+                            HStack {
+                                Text("Region \(viewModel.currentRegionIndex + 1) of \(viewModel.totalRegions)")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, AppSpacing.md)
+                                    .padding(.vertical, AppSpacing.xs)
+                                    .background(Color.blue)
+                                    .cornerRadius(AppCorners.medium)
+                                Spacer()
+                            }
+                            .id("top")
+                        }
+
+                        if let currentRegion = viewModel.currentRegion {
+                            CardSection(icon: "figure.walk", color: .blue, title: "Assessing: \(currentRegion.name)") {
+                                VStack(alignment: .leading, spacing: AppSpacing.xl) {
+                                    painTypeSelection
+                                    customPainDescriptionField
+                                    painIntensitySlider
+                                    painDurationPicker
+                                    painFrequencyPicker
+                                    painOnsetPicker
+                                    aggravatingFactorsSelection
+                                    relievingFactorsSelection
+                                    additionalNotesField
+                                }
+                            }
+                            navigationButtons
+                        } else {
+                            Text("No region selected")
+                                .foregroundColor(.secondary)
                         }
                     }
-
-                    if let currentRegion = viewModel.currentRegion {
-                        CardSection(icon: "figure.walk", color: .blue, title: "Assessing: \(currentRegion.name)") {
-                            VStack(alignment: .leading, spacing: AppSpacing.xl) {
-                                painTypeSelection
-                                customPainDescriptionField
-                                painIntensitySlider
-                                painDurationPicker
-                                painFrequencyPicker
-                                painOnsetPicker
-                                aggravatingFactorsSelection
-                                relievingFactorsSelection
-                                additionalNotesField
-                            }
-                        }
-                        navigationButtons
-                    } else {
-                        Text("No region selected")
-                            .foregroundColor(.secondary)
+                    .padding(.horizontal, AppSpacing.xl)
+                    .padding(.vertical, AppSpacing.md)
+                }
+                .scrollDismissesKeyboard(.interactively)
+                .onChange(of: viewModel.currentRegionIndex) { _, _ in
+                    restoreFormState()
+                    withAnimation {
+                        proxy.scrollTo("top", anchor: .top)
                     }
                 }
-                .padding(.horizontal, AppSpacing.xl)
-                .padding(.vertical, AppSpacing.md)
             }
-            .scrollDismissesKeyboard(.interactively)
         }
         .navigationTitle("Pain Assessment")
         .navigationBarTitleDisplayMode(.inline)
-        .onChange(of: viewModel.currentRegionIndex) { _, _ in
-            restoreFormState()
-        }
         .onAppear {
             restoreFormState()
         }

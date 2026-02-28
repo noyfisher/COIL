@@ -2,6 +2,8 @@ import SwiftUI
 
 struct AnalysisResultView: View {
     let analysisResult: AnalysisResult
+    var validationWarnings: [ValidationWarning] = []
+    var redFlagAlerts: [ValidationWarning] = []
     @State private var showRehabPlan = false
     @Environment(\.dismiss) private var dismiss
 
@@ -10,27 +12,43 @@ struct AnalysisResultView: View {
             Color(.systemGroupedBackground).ignoresSafeArea()
             ScrollView {
                 VStack(spacing: 16) {
+                    // App-detected red flags (from validation pipeline)
+                    if !redFlagAlerts.isEmpty {
+                        appRedFlagAlert
+                    }
+                    // AI-detected red flags
                     if analysisResult.conditions.contains(where: { $0.isRedFlag }) {
-                        redFlagAlert
+                        aiRedFlagAlert
                     }
                     disclaimerBanner
+                    // Validation cautions (if any)
+                    if !cautionWarnings.isEmpty {
+                        validationCautionBanner
+                    }
                     overallSummaryCard
                     ForEach(Array(analysisResult.conditions.prefix(3))) { condition in
                         conditionCard(for: condition)
                     }
                     buildRehabPlanButton
-                    startNewAssessmentButton
+                    navigationButtons
                 }
                 .padding(20)
             }
         }
         .navigationTitle("Analysis Results")
-        .sheet(isPresented: $showRehabPlan) {
-            NavigationStack {
-                RehabPlanView(analysisResult: analysisResult)
-            }
+        .navigationDestination(isPresented: $showRehabPlan) {
+            RehabPlanView(analysisResult: analysisResult)
         }
     }
+
+    // MARK: - Filtered Warnings
+
+    /// Caution-level warnings from validation (not red flags)
+    private var cautionWarnings: [ValidationWarning] {
+        validationWarnings.filter { $0.severity == .caution }
+    }
+
+    // MARK: - Disclaimer
 
     private var disclaimerBanner: some View {
         HStack(spacing: 10) {
@@ -45,6 +63,30 @@ struct AnalysisResultView: View {
         .cornerRadius(AppCorners.card)
     }
 
+    // MARK: - Validation Caution Banner
+
+    private var validationCautionBanner: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: "exclamationmark.circle.fill")
+                    .foregroundColor(.orange)
+                Text("Things to Keep in Mind")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundColor(.primary)
+            }
+            ForEach(Array(cautionWarnings.enumerated()), id: \.offset) { _, warning in
+                Text("• \(warning.message)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding()
+        .background(Color.orange.opacity(0.08))
+        .cornerRadius(AppCorners.card)
+    }
+
+    // MARK: - Summary
+
     private var overallSummaryCard: some View {
         CardSection(icon: "heart.text.clipboard", color: .blue, title: "What We Found") {
             Text(analysisResult.overallSummary)
@@ -54,9 +96,14 @@ struct AnalysisResultView: View {
         }
     }
 
+    // MARK: - Condition Card
+
     private func conditionCard(for condition: ConditionResult) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Header with common name and confidence
+        let strength = ConfidenceCalibrator.matchStrength(for: condition.confidence)
+        let calibrated = ConfidenceCalibrator.calibrate(condition.confidence)
+
+        return VStack(alignment: .leading, spacing: 0) {
+            // Header with common name and match strength
             VStack(alignment: .leading, spacing: 4) {
                 Text(condition.commonName)
                     .font(.title3.weight(.bold))
@@ -65,16 +112,16 @@ struct AnalysisResultView: View {
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                 HStack(spacing: 8) {
-                    ProgressView(value: condition.confidence, total: 100)
-                        .progressViewStyle(LinearProgressViewStyle(tint: confidenceColor(condition.confidence)))
+                    ProgressView(value: calibrated, total: 100)
+                        .progressViewStyle(LinearProgressViewStyle(tint: matchColor(strength)))
                         .frame(width: 80)
                         .accessibilityHidden(true)
-                    Text("\(Int(condition.confidence))% match")
+                    Text(strength.rawValue)
                         .font(.caption.weight(.medium))
-                        .foregroundColor(confidenceColor(condition.confidence))
+                        .foregroundColor(matchColor(strength))
                 }
                 .accessibilityElement(children: .combine)
-                .accessibilityLabel("\(condition.commonName), \(Int(condition.confidence)) percent match")
+                .accessibilityLabel("\(condition.commonName), \(strength.rawValue)")
             }
             .padding(AppSpacing.lg)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -114,9 +161,9 @@ struct AnalysisResultView: View {
                         .lineSpacing(3)
                 }
 
-                // Next steps
+                // Suggested next steps
                 VStack(alignment: .leading, spacing: 8) {
-                    Label("Recommended next steps", systemImage: "list.number")
+                    Label("Suggested next steps", systemImage: "list.number")
                         .font(.body.weight(.semibold))
                         .foregroundColor(.purple)
                     ForEach(Array(condition.nextSteps.enumerated()), id: \.offset) { index, step in
@@ -139,15 +186,46 @@ struct AnalysisResultView: View {
         .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
     }
 
-    private func confidenceColor(_ confidence: Double) -> Color {
-        switch confidence {
-        case 70...: return .green
-        case 40...: return .orange
-        default: return .red
+    private func matchColor(_ strength: MatchStrength) -> Color {
+        switch strength {
+        case .strong: return .green
+        case .moderate: return .orange
+        case .weak: return .gray
         }
     }
 
-    private var redFlagAlert: some View {
+    // MARK: - App-Detected Red Flag Alert
+
+    private var appRedFlagAlert: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 10) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.title2)
+                    .foregroundColor(.white)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Important Safety Notice")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                    Text("Based on what you reported, please read this carefully")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.9))
+                }
+                Spacer()
+            }
+            ForEach(Array(redFlagAlerts.enumerated()), id: \.offset) { _, alert in
+                Text(alert.message)
+                    .font(.subheadline)
+                    .foregroundColor(.white.opacity(0.95))
+            }
+        }
+        .padding()
+        .background(Color.red)
+        .cornerRadius(AppCorners.card)
+    }
+
+    // MARK: - AI-Detected Red Flag Alert
+
+    private var aiRedFlagAlert: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 10) {
                 Image(systemName: "exclamationmark.triangle.fill")
@@ -170,9 +248,11 @@ struct AnalysisResultView: View {
             }
         }
         .padding()
-        .background(Color.red)
+        .background(Color.red.opacity(0.85))
         .cornerRadius(AppCorners.card)
     }
+
+    // MARK: - Buttons
 
     private var buildRehabPlanButton: some View {
         Button(action: { showRehabPlan = true }) {
@@ -185,15 +265,27 @@ struct AnalysisResultView: View {
         .padding(.top, AppSpacing.lg)
     }
 
-    private var startNewAssessmentButton: some View {
-        Button(action: {
-            dismiss()
-        }) {
-            HStack(spacing: AppSpacing.sm) {
-                Image(systemName: "chevron.left")
-                Text("Back")
+    private var navigationButtons: some View {
+        VStack(spacing: AppSpacing.md) {
+            Button(action: {
+                dismiss()
+            }) {
+                HStack(spacing: AppSpacing.sm) {
+                    Image(systemName: "chevron.left")
+                    Text("Back to Assessment")
+                }
             }
+            .buttonStyle(SecondaryButtonStyle())
+
+            Button(action: {
+                NotificationCenter.default.post(name: .popToRoot, object: nil)
+            }) {
+                HStack(spacing: AppSpacing.sm) {
+                    Image(systemName: "house")
+                    Text("Home")
+                }
+            }
+            .buttonStyle(SecondaryButtonStyle())
         }
-        .buttonStyle(SecondaryButtonStyle())
     }
 }

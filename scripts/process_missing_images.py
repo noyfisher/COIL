@@ -467,9 +467,12 @@ def main():
         return
 
     # Step 5: Update mapping
-    print("\n[5/7] Updating mapping files...")
-    mapping = update_mapping(mapping, succeeded)
-    update_master_exercise_list(succeeded)
+    if args.dry_run:
+        print("\n[5/7] Skipping mapping update (dry run).")
+    else:
+        print("\n[5/7] Updating mapping files...")
+        mapping = update_mapping(mapping, succeeded)
+        update_master_exercise_list(succeeded)
 
     # Step 6: Upload to Firebase Storage
     if args.skip_upload or args.dry_run:
