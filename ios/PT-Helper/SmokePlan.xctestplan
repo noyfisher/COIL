@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "9A1B2C3D-4E5F-6789-ABCD-EF0123456789",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true,
+    "defaultTestExecutionTimeAllowance" : 60
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:PT-Helper.xcodeproj",
+        "identifier" : "7A071B032E8236EE00497F94",
+        "name" : "PT-HelperTests"
+      },
+      "selectedTests" : [
+        "UserProfileTests\/testDefaultUserProfile()",
+        "BodyRegionTests\/testInitDefaults()",
+        "BodyMapViewModelTests\/testRegionsAreLoaded()",
+        "BodyMapViewModelTests\/testToggleSelection()",
+        "InjuryAnalysisViewModelTests\/testInitialState_SingleRegion()",
+        "InjuryAnalysisViewModelTests\/testSaveAndAdvance()",
+        "RehabPlanTests\/testRehabPlanCreation()",
+        "RehabPlanViewModelTests\/testInitialState()",
+        "APIConfigTests\/testProxyURLIsValid()",
+        "OnboardingViewModelTests\/testNextStep_AdvancesWithValidData()",
+        "PainAssessmentEnumTests\/testPainTypeCount()"
+      ]
+    }
+  ],
+  "version" : 1
+}

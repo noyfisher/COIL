@@ -12,7 +12,6 @@
 		7A071B272E823C9C00497F94 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 7A071B262E823C9C00497F94 /* FirebaseAuth */; };
 		7A071B292E823C9C00497F94 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 7A071B282E823C9C00497F94 /* FirebaseCore */; };
 		7A071B2B2E823C9C00497F94 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 7A071B2A2E823C9C00497F94 /* FirebaseFirestore */; };
-		7A071B2D2E823C9C00497F94 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 7A071B2C2E823C9C00497F94 /* FirebaseMessaging */; };
 		7A071B2F2E823C9C00497F94 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 7A071B2E2E823C9C00497F94 /* FirebaseStorage */; };
 /* End PBXBuildFile section */
 
@@ -65,7 +64,6 @@
 			files = (
 				7A071B252E823C9C00497F94 /* FirebaseAnalytics in Frameworks */,
 				7A071B2B2E823C9C00497F94 /* FirebaseFirestore in Frameworks */,
-				7A071B2D2E823C9C00497F94 /* FirebaseMessaging in Frameworks */,
 				7A071B292E823C9C00497F94 /* FirebaseCore in Frameworks */,
 				7A071B272E823C9C00497F94 /* FirebaseAuth in Frameworks */,
 				7A071B2F2E823C9C00497F94 /* FirebaseStorage in Frameworks */,
@@ -134,7 +132,6 @@
 				7A071B262E823C9C00497F94 /* FirebaseAuth */,
 				7A071B282E823C9C00497F94 /* FirebaseCore */,
 				7A071B2A2E823C9C00497F94 /* FirebaseFirestore */,
-				7A071B2C2E823C9C00497F94 /* FirebaseMessaging */,
 				7A071B2E2E823C9C00497F94 /* FirebaseStorage */,
 			);
 			productName = "PT-Helper";
@@ -428,6 +425,7 @@
 				DEVELOPMENT_TEAM = AU2F3537YZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "PT Helper";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -458,6 +456,7 @@
 				DEVELOPMENT_TEAM = AU2F3537YZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "PT Helper";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -620,11 +619,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7A071B232E823C9C00497F94 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
-		};
-		7A071B2C2E823C9C00497F94 /* FirebaseMessaging */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 7A071B232E823C9C00497F94 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseMessaging;
 		};
 		7A071B2E2E823C9C00497F94 /* FirebaseStorage */ = {
 			isa = XCSwiftPackageProductDependency;
