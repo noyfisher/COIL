@@ -923,6 +923,150 @@
       "normalized_filename": "quadruped-shoulder-taps",
       "category": "core",
       "target_area": "Rotator Cuff, Core & Scapular Stabilizers"
+    },
+    {
+      "name": "Bird Dog Hold with Scapular Punch",
+      "normalized_filename": "bird-dog-hold-with-scapular-punch",
+      "category": "core",
+      "target_area": "Core Stability, Rotator Cuff & Scapular Control"
+    },
+    {
+      "name": "Bird Dog with Core Stability Focus",
+      "normalized_filename": "bird-dog-with-core-stability-focus",
+      "category": "core",
+      "target_area": "Core stabilizers, hip extensors, lower back endurance"
+    },
+    {
+      "name": "Dead Bug with Shoulder Reach",
+      "normalized_filename": "dead-bug-with-shoulder-reach",
+      "category": "core",
+      "target_area": "Core Stability, Lower Back & Shoulder Integration"
+    },
+    {
+      "name": "Glute Bridge",
+      "normalized_filename": "glute-bridge",
+      "category": "lying",
+      "target_area": "Gluteus Maximus, Lower Back Stabilizers"
+    },
+    {
+      "name": "Glute Bridge with Isometric Hold",
+      "normalized_filename": "glute-bridge-with-isometric-hold",
+      "category": "strength",
+      "target_area": "Gluteal muscles, hip extensors, lower back"
+    },
+    {
+      "name": "Half-Kneeling Pallof Press",
+      "normalized_filename": "half-kneeling-pallof-press",
+      "category": "core",
+      "target_area": "Core, Lower Back Stabilization & Rotational Control"
+    },
+    {
+      "name": "Lateral Side-Lying Clam Shell",
+      "normalized_filename": "lateral-side-lying-clam-shell",
+      "category": "standing",
+      "target_area": "Gluteus medius, hip external rotators, trochanteric bursa"
+    },
+    {
+      "name": "Lying Hip Flexor Stretch",
+      "normalized_filename": "lying-hip-flexor-stretch",
+      "category": "stretch",
+      "target_area": "Iliopsoas, Rectus Femoris"
+    },
+    {
+      "name": "Prone Glute Squeeze Holds",
+      "normalized_filename": "prone-glute-squeeze-holds",
+      "category": "lying",
+      "target_area": "Gluteus Maximus, Lower Back Support"
+    },
+    {
+      "name": "Prone Hip Extension Pulse",
+      "normalized_filename": "prone-hip-extension-pulse",
+      "category": "strength",
+      "target_area": "Gluteus maximus, lower back extensors"
+    },
+    {
+      "name": "Prone I-Y-T Shoulder Activation",
+      "normalized_filename": "prone-i-y-t-shoulder-activation",
+      "category": "strength",
+      "target_area": "Rotator Cuff & Posterior Deltoid"
+    },
+    {
+      "name": "Quadruped Hip Flexor March",
+      "normalized_filename": "quadruped-hip-flexor-march",
+      "category": "core",
+      "target_area": "Hip flexors, core stabilizers, lower back"
+    },
+    {
+      "name": "Quadruped Pelvic Tilts",
+      "normalized_filename": "quadruped-pelvic-tilts",
+      "category": "core",
+      "target_area": "Lower Back, Core Stabilizers, Iliopsoas"
+    },
+    {
+      "name": "Resistance Band External Rotation at 90/90",
+      "normalized_filename": "resistance-band-external-rotation-at-90-90",
+      "category": "strength",
+      "target_area": "Rotator Cuff (Infraspinatus & Teres Minor) & Shoulder Stability"
+    },
+    {
+      "name": "Single-Leg Balance with Hip Activation",
+      "normalized_filename": "single-leg-balance-with-hip-activation",
+      "category": "standing",
+      "target_area": "Hip Stabilizers, Gluteus Medius, Proprioception"
+    },
+    {
+      "name": "Standing Single-Leg Balance with Hip Stability",
+      "normalized_filename": "standing-single-leg-balance-with-hip-stability",
+      "category": "balance",
+      "target_area": "Hip stabilizers, gluteus medius, proprioception, lower back"
+    },
+    {
+      "name": "Supine Figure-4 Stretch with Pelvic Mobilization",
+      "normalized_filename": "supine-figure-4-stretch-with-pelvic-mobilization",
+      "category": "stretch",
+      "target_area": "Piriformis, gluteal muscles, hip external rotators"
+    },
+    {
+      "name": "Supine Iliopsoas Stretch",
+      "normalized_filename": "supine-iliopsoas-stretch",
+      "category": "stretch",
+      "target_area": "Hip flexors, lower back"
+    },
+    {
+      "name": "Supported Cat-Cow Stretch",
+      "normalized_filename": "supported-cat-cow-stretch",
+      "category": "yoga",
+      "target_area": "Lower Back, Thoracic Spine & Shoulder Mobility"
+    },
+    {
+      "name": "Quadruped Thoracic Rotation",
+      "normalized_filename": "quadruped-thoracic-rotation",
+      "category": "mobility",
+      "target_area": "Intercostal muscles, thoracic spine, obliques, chest"
+    },
+    {
+      "name": "Pallof Press",
+      "normalized_filename": "pallof-press",
+      "category": "core",
+      "target_area": "Obliques, transverse abdominis, anti-rotation core stability"
+    },
+    {
+      "name": "Glute Bridge Hold",
+      "normalized_filename": "glute-bridge-hold",
+      "category": "strength",
+      "target_area": "Glutes, lower back extensors, core stabilizers"
+    },
+    {
+      "name": "Child's Pose with Side Reach",
+      "normalized_filename": "childs-pose-with-side-reach",
+      "category": "stretch",
+      "target_area": "Lower back, intercostal muscles, latissimus dorsi"
+    },
+    {
+      "name": "Banded Shoulder Stabilizer Series",
+      "normalized_filename": "banded-shoulder-stabilizer-series",
+      "category": "strength",
+      "target_area": "Rotator cuff, scapular stabilizers, core"
     }
   ]
 }

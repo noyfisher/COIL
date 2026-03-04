@@ -21,8 +21,27 @@ enum AppColors {
         endPoint: .bottomTrailing
     )
 
+    // Brand gradients
+    static let warmGradient = LinearGradient(
+        colors: [Color(red: 1.0, green: 0.42, blue: 0.42), Color(red: 0.93, green: 0.35, blue: 0.14)],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+    static let coolGradient = LinearGradient(
+        colors: [Color(red: 0.04, green: 0.74, blue: 0.89), Color(red: 0.12, green: 0.56, blue: 1.0)],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+    static let healingGradient = LinearGradient(
+        colors: [Color(red: 0.0, green: 0.72, blue: 0.58), Color(red: 0.0, green: 0.81, blue: 0.79)],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    // Surface colors
     static let cardBackground = Color(.systemBackground)
     static let pageBackground = Color(.systemGroupedBackground)
+    static let elevatedSurface = Color(.secondarySystemGroupedBackground)
     static let inputBackground = Color(.systemGray6)
     static let subtleBorder = Color(.systemGray5)
 }
@@ -34,6 +53,7 @@ enum AppSpacing {
     static let lg: CGFloat = 16
     static let xl: CGFloat = 20
     static let xxl: CGFloat = 30
+    static let xxxl: CGFloat = 40
 }
 
 enum AppCorners {
@@ -41,23 +61,86 @@ enum AppCorners {
     static let medium: CGFloat = 10
     static let card: CGFloat = 14
     static let large: CGFloat = 16
+    static let xl: CGFloat = 20
+    static let xxl: CGFloat = 24
+    static let pill: CGFloat = 100
+}
+
+// MARK: - Typography Presets
+
+enum AppFonts {
+    static let heroTitle = Font.system(size: 34, weight: .bold, design: .rounded)
+    static let sectionTitle = Font.title3.weight(.bold)
+    static let cardTitle = Font.body.weight(.semibold)
+    static let statNumber = Font.system(size: 28, weight: .bold, design: .rounded)
+    static let badge = Font.caption2.weight(.semibold)
+}
+
+// MARK: - Animation Presets
+
+enum AppAnimations {
+    static let springy = Animation.spring(response: 0.35, dampingFraction: 0.7)
+    static let smooth = Animation.easeInOut(duration: 0.25)
+    static let bouncy = Animation.spring(response: 0.4, dampingFraction: 0.6, blendDuration: 0.1)
 }
 
 // MARK: - View Modifiers
 
 struct CardStyle: ViewModifier {
+    enum Elevation {
+        case flat, subtle, raised, hero
+    }
+
+    var elevation: Elevation = .subtle
+
     func body(content: Content) -> some View {
         content
             .padding(AppSpacing.lg)
             .background(AppColors.cardBackground)
-            .cornerRadius(AppCorners.card)
-            .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+            .cornerRadius(cornerRadius)
+            .shadow(color: shadowColor, radius: shadowRadius, y: shadowY)
+    }
+
+    private var cornerRadius: CGFloat {
+        switch elevation {
+        case .flat: return AppCorners.card
+        case .subtle: return AppCorners.card
+        case .raised: return AppCorners.large
+        case .hero: return AppCorners.xl
+        }
+    }
+
+    private var shadowColor: Color {
+        switch elevation {
+        case .flat: return .clear
+        case .subtle: return .black.opacity(0.04)
+        case .raised: return .black.opacity(0.08)
+        case .hero: return .black.opacity(0.12)
+        }
+    }
+
+    private var shadowRadius: CGFloat {
+        switch elevation {
+        case .flat: return 0
+        case .subtle: return 8
+        case .raised: return 12
+        case .hero: return 16
+        }
+    }
+
+    private var shadowY: CGFloat {
+        switch elevation {
+        case .flat: return 0
+        case .subtle: return 2
+        case .raised: return 4
+        case .hero: return 6
+        }
     }
 }
 
 extension View {
-    func cardStyle() -> some View {
-        modifier(CardStyle())
+    func cardStyle(_ elevation: CardStyle.Elevation = .subtle) -> some View {
+        modifier(CardStyle(elevation: elevation))
     }
 }
 
@@ -166,22 +249,42 @@ struct EmptyStateView: View {
     let icon: String
     let title: String
     let subtitle: String
+    var actionTitle: String? = nil
+    var action: (() -> Void)? = nil
 
     var body: some View {
-        VStack(spacing: AppSpacing.md) {
+        VStack(spacing: AppSpacing.lg) {
             Image(systemName: icon)
-                .font(.system(size: 44))
-                .foregroundColor(.secondary.opacity(0.5))
-            Text(title)
-                .font(.body.weight(.semibold))
-                .foregroundColor(.secondary)
-            Text(subtitle)
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
+                .font(.system(size: 48))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [.blue.opacity(0.6), .purple.opacity(0.4)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+
+            VStack(spacing: AppSpacing.sm) {
+                Text(title)
+                    .font(AppFonts.cardTitle)
+                    .foregroundColor(.primary)
+                Text(subtitle)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, AppSpacing.lg)
+            }
+
+            if let actionTitle = actionTitle, let action = action {
+                Button(action: action) {
+                    Text(actionTitle)
+                }
+                .buttonStyle(SecondaryButtonStyle())
+                .padding(.horizontal, AppSpacing.xxl)
+            }
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 24)
+        .padding(.vertical, AppSpacing.xxl)
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.large)
         .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
@@ -311,5 +414,88 @@ struct SectionHeader: View {
                 .foregroundColor(.secondary)
             Spacer()
         }
+    }
+}
+
+// MARK: - Session Logging
+
+struct SessionLoggingModifier: ViewModifier {
+    let screenName: String
+
+    func body(content: Content) -> some View {
+        content
+            .onAppear {
+                SessionLogger.shared.logNavigation(.screenAppeared, screen: screenName)
+            }
+            .onDisappear {
+                SessionLogger.shared.logNavigation(.screenDisappeared, screen: screenName)
+            }
+    }
+}
+
+extension View {
+    func trackScreen(_ name: String) -> some View {
+        modifier(SessionLoggingModifier(screenName: name))
+    }
+}
+
+// MARK: - Shimmer Loading Effect
+
+struct ShimmerModifier: ViewModifier {
+    @State private var phase: CGFloat = 0
+
+    func body(content: Content) -> some View {
+        content
+            .overlay(
+                GeometryReader { geometry in
+                    LinearGradient(
+                        colors: [
+                            .clear,
+                            .white.opacity(0.4),
+                            .clear
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                    .frame(width: geometry.size.width * 0.6)
+                    .offset(x: -geometry.size.width * 0.3 + phase * geometry.size.width * 1.6)
+                    .allowsHitTesting(false)
+                }
+            )
+            .clipped()
+            .onAppear {
+                withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: false)) {
+                    phase = 1
+                }
+            }
+    }
+}
+
+extension View {
+    func shimmer() -> some View {
+        modifier(ShimmerModifier())
+    }
+}
+
+// MARK: - Celebration Overlay
+
+struct CelebrationOverlay: View {
+    let icon: String
+    let message: String
+    var iconColor: Color = AppColors.success
+
+    var body: some View {
+        VStack(spacing: AppSpacing.md) {
+            Image(systemName: icon)
+                .font(.system(size: 48))
+                .foregroundColor(iconColor)
+            Text(message)
+                .font(.headline)
+                .foregroundColor(.primary)
+        }
+        .padding(AppSpacing.xxl)
+        .background(.ultraThinMaterial)
+        .cornerRadius(AppCorners.xl)
+        .transition(.scale.combined(with: .opacity))
     }
 }

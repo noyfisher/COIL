@@ -47,10 +47,14 @@ enum ClaudeAPIError: LocalizedError {
 
 // MARK: - API Request/Response Models
 
-struct ClaudeRequest: Encodable {
-    let model: String
-    let max_tokens: Int
-    let system: String
+/// Request type determines which server-side system prompt and model config to use
+enum AIRequestType: String, Encodable {
+    case analysis
+    case rehab_plan
+}
+
+struct ClaudeProxyRequest: Encodable {
+    let requestType: AIRequestType
     let messages: [ClaudeMessage]
 }
 
@@ -76,8 +80,9 @@ class ClaudeAPIService {
 
     private init() {}
 
-    /// Send a message to the Claude API via the Firebase proxy and return the text response
-    func sendMessage(systemPrompt: String, userMessage: String) async throws -> String {
+    /// Send a message to the Claude API via the Firebase proxy and return the text response.
+    /// The system prompt, model, and max_tokens are controlled server-side for security.
+    func sendMessage(requestType: AIRequestType, userMessage: String) async throws -> String {
         guard let url = URL(string: APIConfig.claudeProxyURL) else {
             throw ClaudeAPIError.invalidURL
         }
@@ -99,15 +104,13 @@ class ClaudeAPIService {
         request.httpMethod = "POST"
         request.timeoutInterval = 90
 
-        // Set headers — Bearer token instead of API key
+        // Set headers — Bearer token for auth
         request.setValue("Bearer \(idToken)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        // Build the request body (same format — proxy forwards to Anthropic)
-        let requestBody = ClaudeRequest(
-            model: APIConfig.anthropicModel,
-            max_tokens: APIConfig.maxTokens,
-            system: systemPrompt,
+        // Build the request body — only requestType + user message (prompt is server-side)
+        let requestBody = ClaudeProxyRequest(
+            requestType: requestType,
             messages: [
                 ClaudeMessage(role: "user", content: userMessage)
             ]
@@ -117,11 +120,21 @@ class ClaudeAPIService {
         request.httpBody = try encoder.encode(requestBody)
 
         // Make the API call
+        await MainActor.run {
+            SessionLogger.shared.logAPI(.apiCallStarted, endpoint: "claudeProxy",
+                                         metadata: ["requestType": requestType.rawValue])
+        }
+
         let data: Data
         let response: URLResponse
         do {
             (data, response) = try await URLSession.shared.data(for: request)
         } catch {
+            await MainActor.run {
+                SessionLogger.shared.logAPI(.apiCallFailed, endpoint: "claudeProxy",
+                                             metadata: ["requestType": requestType.rawValue,
+                                                         "error": error.localizedDescription])
+            }
             throw ClaudeAPIError.networkError(error)
         }
 
@@ -134,12 +147,27 @@ class ClaudeAPIService {
         case 200:
             break // Success
         case 401:
+            await MainActor.run {
+                SessionLogger.shared.logAPI(.apiCallFailed, endpoint: "claudeProxy",
+                                             metadata: ["requestType": requestType.rawValue,
+                                                         "statusCode": "401", "error": "authRequired"])
+            }
             throw ClaudeAPIError.authenticationRequired
         case 429:
+            await MainActor.run {
+                SessionLogger.shared.logAPI(.apiCallFailed, endpoint: "claudeProxy",
+                                             metadata: ["requestType": requestType.rawValue,
+                                                         "statusCode": "429", "error": "rateLimited"])
+            }
             throw ClaudeAPIError.rateLimited
         default:
             let errorBody = String(data: data, encoding: .utf8) ?? "No error details"
             AppLogger.api.error("Claude Proxy Error (\(httpResponse.statusCode)): \(errorBody)")
+            await MainActor.run {
+                SessionLogger.shared.logAPI(.apiCallFailed, endpoint: "claudeProxy",
+                                             metadata: ["requestType": requestType.rawValue,
+                                                         "statusCode": "\(httpResponse.statusCode)"])
+            }
             throw ClaudeAPIError.invalidResponse(httpResponse.statusCode, errorBody)
         }
 
@@ -155,6 +183,13 @@ class ClaudeAPIService {
         guard let textBlock = claudeResponse.content.first(where: { $0.type == "text" }),
               let text = textBlock.text, !text.isEmpty else {
             throw ClaudeAPIError.noContent
+        }
+
+        await MainActor.run {
+            SessionLogger.shared.logAPI(.apiCallSucceeded, endpoint: "claudeProxy",
+                                         metadata: ["requestType": requestType.rawValue,
+                                                     "statusCode": "200",
+                                                     "responseLength": "\(text.count)"])
         }
 
         // Clean up the response — strip markdown code fences if present

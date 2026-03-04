@@ -566,6 +566,7 @@ final class OnboardingViewModelTests: XCTestCase {
 
 // MARK: - BodyMapViewModel Tests (non-Firebase parts)
 
+@MainActor
 final class BodyMapViewModelTests: XCTestCase {
 
     // Note: BodyMapViewModel calls Firebase in init(), so we test
@@ -579,8 +580,8 @@ final class BodyMapViewModelTests: XCTestCase {
     func testRegionsAreLoaded() {
         let vm = BodyMapViewModel()
         XCTAssertFalse(vm.regions.isEmpty, "Regions should be loaded on init")
-        // We know the body map has 17 regions from the source
-        XCTAssertEqual(vm.regions.count, 17, "Should have 17 body regions")
+        // We know the body map has 30 regions from the source (6 center + 12 bilateral × 2)
+        XCTAssertEqual(vm.regions.count, 30, "Should have 30 body regions")
     }
 
     func testAllRegionsStartUnselected() {

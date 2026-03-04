@@ -23,15 +23,37 @@ struct PainDetailView: View {
                     VStack(spacing: AppSpacing.lg) {
                         // Progress indicator
                         if !viewModel.selectedRegionNames.isEmpty {
-                            HStack {
-                                Text("Region \(viewModel.currentRegionIndex + 1) of \(viewModel.totalRegions)")
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, AppSpacing.md)
-                                    .padding(.vertical, AppSpacing.xs)
-                                    .background(Color.blue)
-                                    .cornerRadius(AppCorners.medium)
-                                Spacer()
+                            VStack(spacing: AppSpacing.sm) {
+                                HStack {
+                                    Text("Region \(viewModel.currentRegionIndex + 1) of \(viewModel.totalRegions)")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, AppSpacing.md)
+                                        .padding(.vertical, AppSpacing.xs)
+                                        .background(Color.blue)
+                                        .cornerRadius(AppCorners.medium)
+                                    Spacer()
+                                    // Encouraging micro-copy
+                                    Text(encouragingText)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                        .transition(.opacity)
+                                        .animation(AppAnimations.smooth, value: formCompletionFields)
+                                }
+
+                                // Form completion mini-bar
+                                GeometryReader { geo in
+                                    ZStack(alignment: .leading) {
+                                        Capsule()
+                                            .fill(Color(.systemGray5))
+                                            .frame(height: 3)
+                                        Capsule()
+                                            .fill(Color.blue)
+                                            .frame(width: geo.size.width * formCompletionProgress, height: 3)
+                                            .animation(AppAnimations.smooth, value: formCompletionProgress)
+                                    }
+                                }
+                                .frame(height: 3)
                             }
                             .id("top")
                         }
@@ -84,6 +106,7 @@ struct PainDetailView: View {
         .navigationDestination(isPresented: $viewModel.showAnalyzingScreen) {
             AnalyzingView(viewModel: viewModel)
         }
+        .trackScreen("PainDetail")
     }
 
     // MARK: - Form State Management
@@ -129,6 +152,39 @@ struct PainDetailView: View {
             aggravatingFactors = []
             relievingFactors = []
             additionalNotes = ""
+        }
+    }
+
+    // MARK: - Form Completion Tracking
+
+    private var formCompletionFields: Int {
+        var count = 0
+        if painIntensity != 5 { count += 1 }  // intensity changed from default
+        if !aggravatingFactors.isEmpty { count += 1 }
+        if !relievingFactors.isEmpty { count += 1 }
+        if !additionalNotes.trimmingCharacters(in: .whitespaces).isEmpty { count += 1 }
+        if !customPainDescription.trimmingCharacters(in: .whitespaces).isEmpty { count += 1 }
+        count += 1 // pain type always selected
+        count += 1 // duration always selected
+        count += 1 // frequency always selected
+        count += 1 // onset always selected
+        return count
+    }
+
+    private var formCompletionProgress: CGFloat {
+        CGFloat(formCompletionFields) / 9.0  // 9 total fields
+    }
+
+    private var encouragingText: String {
+        let factorCount = aggravatingFactors.count + relievingFactors.count
+        if viewModel.currentRegionIndex == viewModel.totalRegions - 1 && viewModel.totalRegions > 1 {
+            return "Last one!"
+        } else if factorCount >= 4 {
+            return "Great detail!"
+        } else if formCompletionFields >= 7 {
+            return "Almost done!"
+        } else {
+            return ""
         }
     }
 
@@ -392,7 +448,9 @@ struct PainDetailView: View {
             return ["Walking", "Sitting", "Lifting", "Running"]
         }
         switch region.zoneKey {
-        case "head_neck":
+        case "head":
+            return ["Looking at screens", "Bright lights", "Stress/tension", "Lack of sleep", "Bending forward", "Physical exertion", "Concentrating"]
+        case "neck":
             return ["Turning head", "Looking up", "Looking down", "Sitting at desk", "Driving", "Sleeping position", "Stress/tension"]
         case "chest":
             return ["Deep breathing", "Coughing", "Pushing", "Lifting", "Reaching forward", "Lying flat", "Twisting torso"]
@@ -400,18 +458,30 @@ struct PainDetailView: View {
             return ["Bending forward", "Coughing", "Lifting", "Sitting up", "Eating", "Twisting", "Standing long"]
         case "left_shoulder", "right_shoulder":
             return ["Reaching overhead", "Reaching behind back", "Throwing", "Pushing", "Pulling", "Sleeping on side", "Carrying bags", "Lifting"]
+        case "left_upper_arm", "right_upper_arm":
+            return ["Lifting", "Pushing", "Pulling", "Carrying", "Reaching overhead", "Throwing", "Push-ups"]
         case "left_elbow", "right_elbow":
             return ["Gripping", "Twisting forearm", "Lifting objects", "Typing", "Opening jars", "Pushing", "Pulling"]
+        case "left_forearm", "right_forearm":
+            return ["Gripping", "Twisting forearm", "Typing", "Writing", "Lifting", "Using tools", "Opening jars"]
         case "left_wrist_hand", "right_wrist_hand":
             return ["Gripping", "Typing", "Writing", "Twisting motion", "Pushing up", "Carrying", "Opening jars", "Using phone"]
         case "upper_back":
             return ["Sitting at desk", "Slouching", "Deep breathing", "Twisting", "Lifting overhead", "Reaching forward", "Driving"]
         case "lower_back":
             return ["Bending forward", "Lifting", "Sitting long", "Standing long", "Twisting", "Getting out of bed", "Walking", "Coughing/sneezing"]
+        case "left_glute", "right_glute":
+            return ["Sitting long", "Walking uphill", "Climbing stairs", "Running", "Squatting", "Lunging", "Standing from chair"]
         case "left_hip", "right_hip":
             return ["Walking", "Climbing stairs", "Sitting long", "Standing from chair", "Crossing legs", "Running", "Squatting", "Lying on side"]
+        case "left_thigh", "right_thigh":
+            return ["Walking", "Running", "Squatting", "Climbing stairs", "Kicking", "Lunging", "Stretching", "Sitting long"]
+        case "left_hamstring", "right_hamstring":
+            return ["Running", "Sprinting", "Bending forward", "Stretching", "Kicking", "Climbing stairs", "Sitting long"]
         case "left_knee", "right_knee":
             return ["Walking", "Climbing stairs", "Squatting", "Kneeling", "Running", "Jumping", "Going downstairs", "Sitting long"]
+        case "left_calf_shin", "right_calf_shin":
+            return ["Walking", "Running", "Jumping", "Climbing stairs", "Standing long", "Pointing toes", "Pushing off"]
         case "left_ankle_foot", "right_ankle_foot":
             return ["Walking", "Running", "Standing long", "Going up stairs", "Uneven surfaces", "Wearing shoes", "First steps in morning"]
         default:
@@ -424,7 +494,9 @@ struct PainDetailView: View {
             return ["Rest", "Ice", "Heat", "Stretching", "Medication"]
         }
         switch region.zoneKey {
-        case "head_neck":
+        case "head":
+            return ["Rest", "Quiet dark room", "Medication", "Cold compress", "Hydration", "Sleep", "Reducing screen time"]
+        case "neck":
             return ["Rest", "Heat", "Gentle stretching", "Massage", "Medication", "Posture correction", "Neck support pillow"]
         case "chest":
             return ["Rest", "Ice", "Heat", "Medication", "Upright position", "Gentle breathing exercises"]
@@ -432,18 +504,30 @@ struct PainDetailView: View {
             return ["Rest", "Heat", "Lying down", "Medication", "Gentle movement", "Avoiding triggers"]
         case "left_shoulder", "right_shoulder":
             return ["Rest", "Ice", "Heat", "Gentle stretching", "Arm support/sling", "Medication", "Avoiding overhead reach"]
+        case "left_upper_arm", "right_upper_arm":
+            return ["Rest", "Ice", "Heat", "Gentle stretching", "Medication", "Compression", "Avoiding lifting"]
         case "left_elbow", "right_elbow":
             return ["Rest", "Ice", "Brace/strap", "Stretching forearm", "Medication", "Avoiding gripping"]
+        case "left_forearm", "right_forearm":
+            return ["Rest", "Ice", "Stretching", "Forearm brace", "Medication", "Ergonomic adjustments", "Avoiding repetitive motion"]
         case "left_wrist_hand", "right_wrist_hand":
             return ["Rest", "Ice", "Wrist brace/splint", "Stretching", "Medication", "Elevation", "Ergonomic adjustments"]
         case "upper_back":
             return ["Rest", "Heat", "Stretching", "Posture correction", "Massage", "Medication", "Foam rolling"]
         case "lower_back":
             return ["Rest", "Ice", "Heat", "Gentle stretching", "Walking short", "Medication", "Lying with knees bent", "Lumbar support"]
+        case "left_glute", "right_glute":
+            return ["Rest", "Heat", "Stretching", "Foam rolling", "Massage", "Medication", "Gentle walking"]
         case "left_hip", "right_hip":
             return ["Rest", "Ice", "Heat", "Stretching", "Gentle walking", "Medication", "Avoiding sitting long"]
+        case "left_thigh", "right_thigh":
+            return ["Rest", "Ice", "Compression", "Stretching", "Foam rolling", "Medication", "Gentle walking"]
+        case "left_hamstring", "right_hamstring":
+            return ["Rest", "Ice", "Gentle stretching", "Compression", "Foam rolling", "Medication", "Gentle walking"]
         case "left_knee", "right_knee":
             return ["Rest", "Ice", "Elevation", "Compression wrap", "Stretching", "Medication", "Knee brace", "Avoiding stairs"]
+        case "left_calf_shin", "right_calf_shin":
+            return ["Rest", "Ice", "Elevation", "Compression", "Stretching calves", "Foam rolling", "Medication", "Massage"]
         case "left_ankle_foot", "right_ankle_foot":
             return ["Rest", "Ice", "Elevation", "Compression wrap", "Supportive shoes", "Medication", "Ankle brace", "Stretching calves"]
         default:

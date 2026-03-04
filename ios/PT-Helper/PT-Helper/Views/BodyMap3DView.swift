@@ -1,5 +1,6 @@
 import SwiftUI
 import RealityKit
+import Combine
 
 /// 3D interactive body map using RealityKit.
 /// Users can tap body regions to select/deselect them,
@@ -24,11 +25,38 @@ struct BodyMap3DView: View {
     private let minScale: Float = 0.6
     private let maxScale: Float = 4.0
 
+    // Phase 1: Suppress drag during pinch
+    @State private var isPinching: Bool = false
+
+    // Phase 2: Direction lock — prevent accidental pan while rotating
+    private enum DragAxis { case horizontal, vertical }
+    @State private var dragAxis: DragAxis?
+    @State private var dragLockOrigin: CGSize = .zero
+    private let directionLockThreshold: CGFloat = 10
+
+    // Phase 3: Rotation momentum / inertia
+    @State private var rotationVelocity: Float = 0
+    @State private var momentumTimer: AnyCancellable?
+    @State private var lastDragTime: Date?
+    @State private var lastDragTranslationX: CGFloat = 0
+    private let momentumFriction: Float = 0.93
+    private let momentumStopThreshold: Float = 0.0001
+
+    // Phase 5: Double-tap zoom level
+    private let doubleTapZoomLevel: Float = 2.5
+
+    // Phase 6: Rubber-band overshoot factor
+    private let rubberBandFactor: Float = 0.3
+
     // Store original materials keyed by entity name
     @State private var originalMaterials: [String: [any RealityKit.Material]] = [:]
 
     // Brief region-name toast shown on tap
     @State private var lastTappedName: String?
+
+    // Stable ViewModel for injury analysis — created once when navigation starts,
+    // not inline in the navigationDestination closure.
+    @State private var injuryAnalysisVM: InjuryAnalysisViewModel?
 
     // Highlight color for selected body parts (vibrant red)
     private let highlightColor = UIColor(red: 0.95, green: 0.20, blue: 0.20, alpha: 1.0)
@@ -132,14 +160,25 @@ struct BodyMap3DView: View {
                 navigateToPainDetail = true
             })
         }
-        .navigationDestination(isPresented: $navigateToPainDetail) {
-            PainDetailView(
-                viewModel: InjuryAnalysisViewModel(
+        .onChange(of: navigateToPainDetail) { _, navigating in
+            if navigating {
+                // Create the VM once when navigation starts — prevents re-creation
+                // on parent re-renders while PainDetailView is pushed.
+                injuryAnalysisVM = InjuryAnalysisViewModel(
                     userProfile: viewModel.userProfile,
                     selectedRegions: viewModel.selectedRegions
                 )
-            )
+            } else {
+                // Clean up when navigation pops back
+                injuryAnalysisVM = nil
+            }
         }
+        .navigationDestination(isPresented: $navigateToPainDetail) {
+            if let vm = injuryAnalysisVM {
+                PainDetailView(viewModel: vm)
+            }
+        }
+        .trackScreen("BodyMap3D")
     }
 
     // MARK: - Header
@@ -296,6 +335,7 @@ struct BodyMap3DView: View {
                     AppLogger.data.error("Failed to load body model: \(error.localizedDescription)")
                 }
             }
+            .gesture(doubleTapGesture)
             .gesture(tapGesture)
             .gesture(rotateAndPanGesture)
             .simultaneousGesture(zoomGesture)
@@ -316,6 +356,41 @@ struct BodyMap3DView: View {
 
     // MARK: - Gestures
 
+    /// Double-tap to toggle zoom (Phase 5)
+    private var doubleTapGesture: some Gesture {
+        SpatialTapGesture(count: 2)
+            .targetedToAnyEntity()
+            .onEnded { _ in
+                guard let pivot = pivotEntity else { return }
+
+                // Cancel any running momentum
+                momentumTimer?.cancel()
+                momentumTimer = nil
+                rotationVelocity = 0
+
+                // Toggle zoom level
+                let targetScale: Float
+                if accumulatedScale > 1.5 {
+                    targetScale = 1.0
+                    accumulatedPanY = 0
+                } else {
+                    targetScale = doubleTapZoomLevel
+                }
+                accumulatedScale = targetScale
+
+                // Animate to target, preserving current rotation
+                var target = pivot.transform
+                target.scale = SIMD3<Float>(repeating: targetScale)
+                if targetScale <= 1.0 {
+                    target.translation.y = 0
+                }
+                pivot.move(to: target, relativeTo: pivot.parent,
+                           duration: 0.35, timingFunction: .easeInOut)
+
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            }
+    }
+
     /// Tap to select/deselect body parts
     private var tapGesture: some Gesture {
         SpatialTapGesture()
@@ -325,56 +400,141 @@ struct BodyMap3DView: View {
             }
     }
 
-    /// Single-finger drag: horizontal → rotate, vertical → pan up/down
+    /// Single-finger drag: direction-locked rotation OR pan (Phases 1-3, 6)
     private var rotateAndPanGesture: some Gesture {
         DragGesture()
             .onChanged { value in
+                // Phase 1: suppress drag while pinching
+                guard !isPinching else { return }
                 guard let pivot = pivotEntity else { return }
 
-                // ── Horizontal → rotation ─────────────────────────
-                let rotSensitivity: Float = 0.008
-                let dragAngle = Float(value.translation.width) * rotSensitivity
-                let totalAngle = accumulatedRotation + dragAngle
-                pivot.transform.rotation = simd_quatf(
-                    angle: totalAngle,
-                    axis: SIMD3<Float>(0, 1, 0)
+                // Phase 2: direction lock detection ──────────────
+                if dragAxis == nil {
+                    let dx = abs(value.translation.width)
+                    let dy = abs(value.translation.height)
+                    if max(dx, dy) < directionLockThreshold { return }
+
+                    dragAxis = dx > dy ? .horizontal : .vertical
+                    dragLockOrigin = value.translation
+
+                    // Phase 3: reset velocity tracking on lock
+                    lastDragTime = nil
+                    lastDragTranslationX = 0
+                    rotationVelocity = 0
+                    momentumTimer?.cancel()
+                    momentumTimer = nil
+                }
+
+                // Translation relative to lock origin (avoids jump)
+                let rel = CGSize(
+                    width: value.translation.width - dragLockOrigin.width,
+                    height: value.translation.height - dragLockOrigin.height
                 )
 
-                // ── Vertical → pan (useful when zoomed in) ───────
+                let rotSensitivity: Float = 0.008
                 let panSensitivity: Float = 0.003
-                let rawPanY = accumulatedPanY - Float(value.translation.height) * panSensitivity
 
-                // Pan range scales with zoom — no pan at 1x, full range at max zoom
-                let zoomFactor = max(accumulatedScale - 1.0, 0)
-                let maxPan: Float = zoomFactor * 1.0
-                let clampedPanY = min(max(rawPanY, -maxPan), maxPan)
+                if dragAxis == .horizontal {
+                    // ── Rotation ───────────────────────────────
+                    let dragAngle = Float(rel.width) * rotSensitivity
+                    pivot.transform.rotation = simd_quatf(
+                        angle: accumulatedRotation + dragAngle,
+                        axis: SIMD3<Float>(0, 1, 0)
+                    )
 
-                pivot.position.y = clampedPanY
+                    // Phase 3: track velocity for momentum
+                    let now = Date()
+                    if let last = lastDragTime {
+                        let dt = now.timeIntervalSince(last)
+                        if dt > 0.001 {
+                            let dx = Float(value.translation.width - lastDragTranslationX) * rotSensitivity
+                            rotationVelocity = dx / Float(dt) / 60.0
+                        }
+                    }
+                    lastDragTime = now
+                    lastDragTranslationX = value.translation.width
+
+                } else if dragAxis == .vertical {
+                    // ── Pan (with rubber-band, Phase 6) ───────
+                    let rawPanY = accumulatedPanY - Float(rel.height) * panSensitivity
+                    let zoomFactor = max(accumulatedScale - 1.0, 0)
+                    let maxPan: Float = zoomFactor * 1.0
+
+                    let clampedPanY: Float
+                    if rawPanY > maxPan {
+                        clampedPanY = maxPan + (rawPanY - maxPan) * rubberBandFactor
+                    } else if rawPanY < -maxPan {
+                        clampedPanY = -maxPan - (-maxPan - rawPanY) * rubberBandFactor
+                    } else {
+                        clampedPanY = rawPanY
+                    }
+                    pivot.position.y = clampedPanY
+                }
             }
             .onEnded { value in
-                // Commit rotation
-                let rotSensitivity: Float = 0.008
-                accumulatedRotation += Float(value.translation.width) * rotSensitivity
+                guard !isPinching else { return }
 
-                // Commit pan
+                let rel = CGSize(
+                    width: value.translation.width - dragLockOrigin.width,
+                    height: value.translation.height - dragLockOrigin.height
+                )
+
+                let rotSensitivity: Float = 0.008
                 let panSensitivity: Float = 0.003
-                let rawPanY = accumulatedPanY - Float(value.translation.height) * panSensitivity
-                let zoomFactor = max(accumulatedScale - 1.0, 0)
-                let maxPan: Float = zoomFactor * 1.0
-                accumulatedPanY = min(max(rawPanY, -maxPan), maxPan)
+
+                if dragAxis == .horizontal {
+                    accumulatedRotation += Float(rel.width) * rotSensitivity
+
+                    // Phase 3: start momentum if velocity is significant
+                    if abs(rotationVelocity) > momentumStopThreshold {
+                        startRotationMomentum()
+                    }
+
+                } else if dragAxis == .vertical {
+                    // Hard-clamp state
+                    let rawPanY = accumulatedPanY - Float(rel.height) * panSensitivity
+                    let zoomFactor = max(accumulatedScale - 1.0, 0)
+                    let maxPan: Float = zoomFactor * 1.0
+                    accumulatedPanY = min(max(rawPanY, -maxPan), maxPan)
+
+                    // Phase 6: spring back if visually overshot
+                    if let pivot = pivotEntity,
+                       pivot.position.y > maxPan + 0.001 || pivot.position.y < -maxPan - 0.001 {
+                        var target = pivot.transform
+                        target.translation.y = accumulatedPanY
+                        pivot.move(to: target, relativeTo: pivot.parent,
+                                   duration: 0.25, timingFunction: .easeInOut)
+                    }
+                }
+
+                // Reset direction lock for next gesture
+                dragAxis = nil
+                dragLockOrigin = .zero
+                lastDragTime = nil
+                lastDragTranslationX = 0
             }
     }
 
-    /// Pinch to zoom in/out
+    /// Pinch to zoom in/out (Phases 1, 6)
     private var zoomGesture: some Gesture {
         MagnifyGesture()
             .onChanged { value in
+                isPinching = true
                 guard let pivot = pivotEntity else { return }
 
                 let newScale = accumulatedScale * Float(value.magnification)
-                let clamped = min(max(newScale, minScale), maxScale)
 
-                pivot.scale = SIMD3<Float>(repeating: clamped)
+                // Phase 6: rubber-band at limits
+                let clamped: Float
+                if newScale < minScale {
+                    clamped = minScale - (minScale - newScale) * rubberBandFactor
+                } else if newScale > maxScale {
+                    clamped = maxScale + (newScale - maxScale) * rubberBandFactor
+                } else {
+                    clamped = newScale
+                }
+
+                pivot.scale = SIMD3<Float>(repeating: max(clamped, 0.4))
             }
             .onEnded { value in
                 let newScale = accumulatedScale * Float(value.magnification)
@@ -388,9 +548,54 @@ struct BodyMap3DView: View {
                 // If zoomed out to ~1x, snap pan back to center
                 if accumulatedScale < 1.1 {
                     accumulatedPanY = 0
-                    pivotEntity?.position.y = 0
                 }
 
+                // Phase 6: spring back if visually overshot limits
+                if let pivot = pivotEntity {
+                    let visualScale = pivot.scale.x
+                    if visualScale < minScale || visualScale > maxScale
+                        || accumulatedScale < 1.1 {
+                        var target = pivot.transform
+                        target.scale = SIMD3<Float>(repeating: accumulatedScale)
+                        target.translation.y = accumulatedPanY
+                        pivot.move(to: target, relativeTo: pivot.parent,
+                                   duration: 0.3, timingFunction: .easeInOut)
+                    }
+                }
+
+                isPinching = false
+            }
+    }
+
+    // MARK: - Rotation Momentum (Phase 3)
+
+    /// Start a 60fps timer that decelerates rotation after a flick.
+    private func startRotationMomentum() {
+        momentumTimer?.cancel()
+
+        momentumTimer = Timer.publish(every: 1.0 / 60.0, on: .main, in: .common)
+            .autoconnect()
+            .sink { _ in
+                guard let pivot = pivotEntity else {
+                    momentumTimer?.cancel()
+                    momentumTimer = nil
+                    return
+                }
+
+                rotationVelocity *= momentumFriction
+
+                if abs(rotationVelocity) < momentumStopThreshold {
+                    momentumTimer?.cancel()
+                    momentumTimer = nil
+                    rotationVelocity = 0
+                    return
+                }
+
+                accumulatedRotation += rotationVelocity
+                pivot.transform.rotation = simd_quatf(
+                    angle: accumulatedRotation,
+                    axis: SIMD3<Float>(0, 1, 0)
+                )
             }
     }
 
@@ -487,6 +692,10 @@ struct BodyMap3DView: View {
             viewModel.toggleSelection(for: region)
         }
 
+        SessionLogger.shared.logUserAction(wasSelected ? .regionDeselected : .regionSelected,
+                                            action: wasSelected ? "deselect" : "select",
+                                            metadata: ["region": region.name, "zoneKey": region.zoneKey])
+
         // Update 3D highlight
         if wasSelected {
             restoreMaterial(for: name)
@@ -543,15 +752,30 @@ struct BodyMap3DView: View {
         }
     }
 
-    /// Reset rotation, zoom, and pan to defaults
+    /// Reset rotation, zoom, and pan to defaults with smooth animation (Phase 4)
     private func resetView() {
         guard let pivot = pivotEntity else { return }
+
+        // Cancel momentum
+        momentumTimer?.cancel()
+        momentumTimer = nil
+        rotationVelocity = 0
+
+        // Reset state immediately (next gesture starts from defaults)
         accumulatedRotation = 0
         accumulatedScale = 1.0
         accumulatedPanY = 0
-        pivot.transform.rotation = simd_quatf(angle: 0, axis: SIMD3<Float>(0, 1, 0))
-        pivot.scale = SIMD3<Float>(repeating: 1.0)
-        pivot.position.y = 0
+        dragAxis = nil
+        dragLockOrigin = .zero
+
+        // Animate entity back to default transform
+        var target = Transform.identity
+        target.rotation = simd_quatf(angle: 0, axis: SIMD3<Float>(0, 1, 0))
+        target.scale = SIMD3<Float>(repeating: 1.0)
+        target.translation.y = 0
+
+        pivot.move(to: target, relativeTo: pivot.parent,
+                   duration: 0.4, timingFunction: .easeInOut)
     }
 
     // MARK: - Region Color Coding

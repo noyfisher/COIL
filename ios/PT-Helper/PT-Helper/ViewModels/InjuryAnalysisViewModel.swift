@@ -82,6 +82,11 @@ class InjuryAnalysisViewModel: ObservableObject {
         analysisError = nil
         showAnalyzingScreen = true
 
+        Task { @MainActor in
+            SessionLogger.shared.log(.loadingStarted, category: .stateChange, message: "Analysis started",
+                                      metadata: ["regionCount": "\(completed.count)"])
+        }
+
         analysisTask = Task { @MainActor in
             do {
                 let validated = try await InjuryAnalyzer.analyze(
@@ -93,10 +98,17 @@ class InjuryAnalysisViewModel: ObservableObject {
                 self.validationWarnings = validated.validation.warnings
                 self.redFlagAlerts = validated.redFlagAlerts
                 self.isAnalyzing = false
+
+                SessionLogger.shared.log(.loadingFinished, category: .stateChange, message: "Analysis completed",
+                                          metadata: ["conditionCount": "\(validated.result.conditions.count)",
+                                                      "hasRedFlags": "\(!validated.redFlagAlerts.isEmpty)",
+                                                      "warningCount": "\(validated.validation.warnings.count)"])
             } catch {
                 guard !Task.isCancelled else { return }
                 self.analysisError = error.localizedDescription
                 self.isAnalyzing = false
+
+                SessionLogger.shared.logError(error, context: "InjuryAnalysis")
             }
         }
     }

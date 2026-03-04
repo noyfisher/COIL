@@ -84,6 +84,9 @@ class RehabPlanViewModel: ObservableObject {
         isGenerating = true
         generationError = nil
 
+        SessionLogger.shared.log(.loadingStarted, category: .stateChange, message: "Rehab plan generation started",
+                                  metadata: ["conditionCount": "\(conditions.count)"])
+
         Task {
             do {
                 let plan = try await generateAIRehabPlan(from: analysisResult)
@@ -96,6 +99,11 @@ class RehabPlanViewModel: ObservableObject {
                 self.rehabPlan = validatedPlan
                 self.rehabPlanWarnings = warnings
                 self.isGenerating = false
+
+                SessionLogger.shared.log(.loadingFinished, category: .stateChange, message: "Rehab plan generated (AI)",
+                                          metadata: ["exerciseCount": "\(plan.exercises.count)",
+                                                      "source": "ai"])
+
                 // Preload exercise images in background
                 ExerciseImageService.shared.preloadImages(for: plan.exercises)
                 // Log exercises that don't have images yet
@@ -103,6 +111,8 @@ class RehabPlanViewModel: ObservableObject {
             } catch {
                 // Fallback to hardcoded database
                 AppLogger.rehab.warning("AI rehab generation failed, using fallback: \(error.localizedDescription)")
+                SessionLogger.shared.log(.stateUpdated, category: .stateChange, message: "Rehab plan using fallback",
+                                          metadata: ["source": "fallback", "reason": error.localizedDescription])
                 let exercises = conditions.flatMap { exerciseDatabase[$0] ?? [] }
                 let finalExercises = exercises.isEmpty ? getGeneralExercises() : exercises
 
@@ -141,11 +151,10 @@ class RehabPlanViewModel: ObservableObject {
     // MARK: - AI Rehab Plan Generation
 
     private func generateAIRehabPlan(from analysisResult: AnalysisResult) async throws -> RehabPlan {
-        let systemPrompt = buildRehabSystemPrompt()
         let userMessage = buildRehabUserMessage(from: analysisResult)
 
         let responseText = try await ClaudeAPIService.shared.sendMessage(
-            systemPrompt: systemPrompt,
+            requestType: .rehab_plan,
             userMessage: userMessage
         )
 
@@ -154,26 +163,6 @@ class RehabPlanViewModel: ObservableObject {
             conditions: analysisResult.conditions.map { $0.conditionName },
             activityLevel: analysisResult.userProfileSnapshot.activityLevel
         )
-    }
-
-    private func buildRehabSystemPrompt() -> String {
-        """
-        You are a PT rehabilitation specialist. Create personalized exercise plans for musculoskeletal conditions. Educational purposes only.
-
-        RULES:
-        - Create 4-8 exercises with clear instructions, sets, reps, rest periods
-        - Match difficulty to activity level: sedentary→beginner, moderate→beginner+intermediate, active→intermediate+advanced
-        - Use SF Symbol icons: "figure.flexibility", "figure.strengthtraining.traditional", "figure.cooldown", "figure.yoga", "figure.walk", "figure.stairs", "figure.core.training", "figure.run", "figure.stand", "figure.roll", "figure.seated.side", "figure.pool.swim", "figure.outdoor.cycle", "figure.mixed.cardio"
-        - Include 2-3 form tips and 1-2 contraindications per exercise
-        - For startPosition: describe exactly how to position your body BEFORE the movement (1-2 sentences, simple language a beginner can follow)
-        - For movement: describe the motion step by step (1-2 sentences, simple language)
-        - For endPosition: describe the end of the movement and how to return (1 sentence)
-        - For exerciseCategory: choose ONE of: "stretch", "strength", "balance", "cardio", "mobility", "core", "yoga", "walking", "seated", "lying", "standing", "stair"
-        - For imageFileName: create a normalized lowercase kebab-case filename for the exercise (e.g. "quad-sets", "glute-bridges", "cat-cow-stretch"). Use only lowercase letters, numbers, and hyphens.
-
-        Respond ONLY with valid JSON (no markdown):
-        {"planName":"string","exercises":[{"name":"string","targetArea":"string","description":"string","sets":number,"reps":"string","restSeconds":number,"difficulty":"beginner|intermediate|advanced","demonstrationIcon":"string","tips":["strings"],"contraindications":["strings"],"startPosition":"string","movement":"string","endPosition":"string","exerciseCategory":"string","imageFileName":"string"}],"totalWeeks":number(4-8),"notes":"string or null"}
-        """
     }
 
     private func buildRehabUserMessage(from analysisResult: AnalysisResult) -> String {
@@ -442,9 +431,12 @@ class RehabPlanViewModel: ObservableObject {
                     .setData(planData)
                 self.isSaving = false
                 self.showSaveSuccess = true
+                SessionLogger.shared.log(.firestoreWrite, category: .data, message: "Rehab plan saved",
+                                          metadata: ["planId": plan.id.uuidString])
             } catch {
                 self.isSaving = false
                 self.saveError = error.localizedDescription
+                SessionLogger.shared.logError(error, context: "RehabPlanSave")
             }
         }
     }

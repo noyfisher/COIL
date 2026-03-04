@@ -129,9 +129,9 @@ struct MedicalRedFlagDetector {
          nil,
          "Sudden weakness or numbness on one side could be signs of a stroke. Please call 911 immediately."),
 
-        // Meningitis
+        // Meningitis (keywords are specific enough — trigger regardless of selected region)
         (["severe headache", "stiff neck", "fever"],
-         "head_neck",
+         nil,
          "A severe headache with neck stiffness and fever could indicate meningitis. Seek emergency medical care."),
 
         // Cauda Equina Syndrome
@@ -308,23 +308,65 @@ struct AnatomicalRelevanceChecker {
 
     /// Maps body region zone keys to conditions that could reasonably occur there.
     private static let regionConditions: [String: Set<String>] = [
-        "head_neck": ["cervical", "neck", "headache", "migraine", "whiplash", "tension", "cervicogenic"],
-        "chest": ["costochondritis", "chest wall", "rib", "thoracic", "pectoral", "intercostal"],
-        "abdomen": ["abdominal", "core", "hernia", "oblique"],
-        "left_shoulder": ["shoulder", "rotator cuff", "impingement", "frozen", "labral", "ac joint", "bicep tendon"],
-        "right_shoulder": ["shoulder", "rotator cuff", "impingement", "frozen", "labral", "ac joint", "bicep tendon"],
-        "left_elbow": ["elbow", "tennis", "golfer", "epicondylitis", "ulnar", "olecranon"],
-        "right_elbow": ["elbow", "tennis", "golfer", "epicondylitis", "ulnar", "olecranon"],
-        "left_wrist_hand": ["wrist", "carpal tunnel", "de quervain", "ganglion", "hand", "finger", "trigger"],
-        "right_wrist_hand": ["wrist", "carpal tunnel", "de quervain", "ganglion", "hand", "finger", "trigger"],
-        "upper_back": ["thoracic", "upper back", "scapular", "trapezius", "rhomboid", "postural"],
-        "lower_back": ["lumbar", "lower back", "disc", "sciatica", "stenosis", "spondyl", "sacroiliac", "si joint", "piriformis"],
-        "left_hip": ["hip", "labral", "bursitis", "piriformis", "it band", "groin", "adductor", "flexor"],
-        "right_hip": ["hip", "labral", "bursitis", "piriformis", "it band", "groin", "adductor", "flexor"],
-        "left_knee": ["knee", "patellofemoral", "meniscus", "acl", "pcl", "mcl", "lcl", "patellar", "it band", "baker"],
-        "right_knee": ["knee", "patellofemoral", "meniscus", "acl", "pcl", "mcl", "lcl", "patellar", "it band", "baker"],
-        "left_ankle_foot": ["ankle", "foot", "achilles", "plantar", "sprain", "peroneal", "shin", "metatarsal"],
-        "right_ankle_foot": ["ankle", "foot", "achilles", "plantar", "sprain", "peroneal", "shin", "metatarsal"],
+        // ── Head & Neck (separate regions) ───────────────────────
+        "head": ["headache", "migraine", "tension", "concussion", "tmj", "jaw", "temporal", "occipital"],
+        "neck": ["cervical", "neck", "whiplash", "cervicogenic", "radiculopathy", "stinger", "torticollis", "disc"],
+
+        // ── Torso (front) ────────────────────────────────────────
+        "chest": ["costochondritis", "chest wall", "rib", "thoracic", "pectoral", "intercostal", "sternum"],
+        "abdomen": ["abdominal", "core", "hernia", "oblique", "rectus", "diastasis"],
+
+        // ── Torso (back) ─────────────────────────────────────────
+        "upper_back": ["thoracic", "upper back", "scapular", "trapezius", "rhomboid", "postural", "kyphosis", "latissimus"],
+        "lower_back": ["lumbar", "lower back", "disc", "sciatica", "stenosis", "spondyl", "sacroiliac", "si joint", "piriformis", "erector"],
+
+        // ── Shoulders ────────────────────────────────────────────
+        "left_shoulder": ["shoulder", "rotator cuff", "impingement", "frozen", "labral", "ac joint", "bicep tendon", "deltoid"],
+        "right_shoulder": ["shoulder", "rotator cuff", "impingement", "frozen", "labral", "ac joint", "bicep tendon", "deltoid"],
+
+        // ── Upper Arms ───────────────────────────────────────────
+        "left_upper_arm": ["bicep", "tricep", "upper arm", "humerus", "brachial"],
+        "right_upper_arm": ["bicep", "tricep", "upper arm", "humerus", "brachial"],
+
+        // ── Elbows ───────────────────────────────────────────────
+        "left_elbow": ["elbow", "tennis", "golfer", "epicondylitis", "ulnar", "olecranon", "bursitis"],
+        "right_elbow": ["elbow", "tennis", "golfer", "epicondylitis", "ulnar", "olecranon", "bursitis"],
+
+        // ── Forearms ─────────────────────────────────────────────
+        "left_forearm": ["forearm", "radial", "ulnar", "pronator", "supinator", "compartment"],
+        "right_forearm": ["forearm", "radial", "ulnar", "pronator", "supinator", "compartment"],
+
+        // ── Wrists & Hands ───────────────────────────────────────
+        "left_wrist_hand": ["wrist", "carpal tunnel", "de quervain", "ganglion", "hand", "finger", "trigger", "scaphoid"],
+        "right_wrist_hand": ["wrist", "carpal tunnel", "de quervain", "ganglion", "hand", "finger", "trigger", "scaphoid"],
+
+        // ── Glutes ───────────────────────────────────────────────
+        "left_glute": ["glute", "gluteal", "piriformis", "sciatica", "buttock", "deep gluteal"],
+        "right_glute": ["glute", "gluteal", "piriformis", "sciatica", "buttock", "deep gluteal"],
+
+        // ── Hips ─────────────────────────────────────────────────
+        "left_hip": ["hip", "labral", "bursitis", "groin", "flexor", "impingement", "snapping hip"],
+        "right_hip": ["hip", "labral", "bursitis", "groin", "flexor", "impingement", "snapping hip"],
+
+        // ── Thighs ───────────────────────────────────────────────
+        "left_thigh": ["quad", "thigh", "adductor", "it band", "femoral", "vastus", "sartorius", "groin"],
+        "right_thigh": ["quad", "thigh", "adductor", "it band", "femoral", "vastus", "sartorius", "groin"],
+
+        // ── Hamstrings ───────────────────────────────────────────
+        "left_hamstring": ["hamstring", "posterior thigh", "biceps femoris", "strain", "pull", "tear"],
+        "right_hamstring": ["hamstring", "posterior thigh", "biceps femoris", "strain", "pull", "tear"],
+
+        // ── Knees ────────────────────────────────────────────────
+        "left_knee": ["knee", "patellofemoral", "meniscus", "acl", "pcl", "mcl", "lcl", "patellar", "baker", "chondromalacia"],
+        "right_knee": ["knee", "patellofemoral", "meniscus", "acl", "pcl", "mcl", "lcl", "patellar", "baker", "chondromalacia"],
+
+        // ── Calves & Shins ───────────────────────────────────────
+        "left_calf_shin": ["calf", "shin", "achilles", "gastrocnemius", "soleus", "tibial", "compartment", "shin splint", "fibular"],
+        "right_calf_shin": ["calf", "shin", "achilles", "gastrocnemius", "soleus", "tibial", "compartment", "shin splint", "fibular"],
+
+        // ── Ankles & Feet ────────────────────────────────────────
+        "left_ankle_foot": ["ankle", "foot", "plantar", "sprain", "peroneal", "metatarsal", "bunion", "tarsal"],
+        "right_ankle_foot": ["ankle", "foot", "plantar", "sprain", "peroneal", "metatarsal", "bunion", "tarsal"],
     ]
 
     /// Check whether the AI-returned conditions are anatomically relevant to the assessed body regions.
@@ -432,6 +474,16 @@ struct ResponseValidationPipeline {
 
         // Log validation
         logger.info("Validation complete: \(allWarnings.count) warnings, \(allFixes.count) fixes, \(redFlagAlerts.count) red flags")
+        Task { @MainActor in
+            SessionLogger.shared.log(.stateUpdated, category: .stateChange, message: "Validation pipeline completed",
+                                      metadata: ["warnings": "\(allWarnings.count)",
+                                                  "fixes": "\(allFixes.count)",
+                                                  "redFlags": "\(redFlagAlerts.count)"])
+            if !redFlagAlerts.isEmpty {
+                // Auto-upload on red flags — this is a high-value flow to capture
+                await SessionLogger.shared.uploadToFirestore()
+            }
+        }
         for fix in allFixes {
             logger.debug("Fix applied: \(fix)")
         }

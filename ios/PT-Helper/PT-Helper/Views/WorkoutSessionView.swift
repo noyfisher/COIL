@@ -1,14 +1,17 @@
 import SwiftUI
 
 struct WorkoutSessionView: View {
-    @StateObject private var viewModel = WorkoutViewModel()
-    @StateObject private var savedPlansVM = SavedPlansViewModel()
+    @EnvironmentObject private var viewModel: WorkoutViewModel
+    @EnvironmentObject private var savedPlansVM: SavedPlansViewModel
     @State private var painLevel: Double = 5
     @State private var durationMinutes: Double = 30
     @State private var notes: String = ""
     @State private var selectedExercises: Set<String> = []
     @State private var customExercise: String = ""
     @State private var showSavedConfirmation = false
+    @State private var regionPainLevels: [String: Double] = [:]
+    @State private var sessionToDelete: WorkoutSession?
+    @State private var showDeleteConfirmation = false
 
     var body: some View {
         ZStack {
@@ -53,6 +56,12 @@ struct WorkoutSessionView: View {
                             }
                         }
                     }
+
+                    // Per-region pain tracking
+                    RegionPainInputView(
+                        regionPainLevels: $regionPainLevels,
+                        suggestedRegions: suggestedRegions
+                    )
 
                     // Duration
                     CardSection(icon: "timer", color: .orange, title: "Duration") {
@@ -168,6 +177,14 @@ struct WorkoutSessionView: View {
 
                         ForEach(viewModel.sessions.reversed(), id: \.id) { session in
                             sessionCard(for: session)
+                                .contextMenu {
+                                    Button(role: .destructive) {
+                                        sessionToDelete = session
+                                        showDeleteConfirmation = true
+                                    } label: {
+                                        Label("Delete Session", systemImage: "trash")
+                                    }
+                                }
                         }
                     }
                 }
@@ -183,6 +200,28 @@ struct WorkoutSessionView: View {
                 savedConfirmationOverlay
             }
         }
+        .confirmationDialog(
+            "Delete this workout session?",
+            isPresented: $showDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                if let session = sessionToDelete {
+                    withAnimation {
+                        viewModel.deleteSession(session)
+                    }
+                    sessionToDelete = nil
+                }
+            }
+            Button("Cancel", role: .cancel) {
+                sessionToDelete = nil
+            }
+        } message: {
+            if let session = sessionToDelete {
+                Text("This will permanently remove the session from \(session.date, style: .date). This action cannot be undone.")
+            }
+        }
+        .trackScreen("WorkoutSession")
     }
 
     // MARK: - Helpers
@@ -195,17 +234,18 @@ struct WorkoutSessionView: View {
             painLevel: painLevel,
             isCompleted: true,
             exercisesPerformed: Array(selectedExercises),
-            notes: notes.trimmingCharacters(in: .whitespaces).isEmpty ? nil : notes
+            notes: notes.trimmingCharacters(in: .whitespaces).isEmpty ? nil : notes,
+            regionPainLevels: regionPainLevels.isEmpty ? nil : regionPainLevels
         )
         viewModel.addSession(session: session)
 
         let notification = UINotificationFeedbackGenerator()
         notification.notificationOccurred(.success)
 
-        withAnimation(.spring(response: 0.3)) {
+        withAnimation(AppAnimations.bouncy) {
             showSavedConfirmation = true
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             withAnimation { showSavedConfirmation = false }
         }
 
@@ -214,6 +254,7 @@ struct WorkoutSessionView: View {
         durationMinutes = 30
         notes = ""
         selectedExercises = []
+        regionPainLevels = [:]
     }
 
     private func addCustomExercise() {
@@ -227,6 +268,12 @@ struct WorkoutSessionView: View {
     private var availableExercises: [String] {
         let allNames = savedPlansVM.rehabPlans.flatMap { $0.exercises.map { $0.name } }
         return Array(Set(allNames)).sorted()
+    }
+
+    /// Suggested body regions from saved plans' target areas
+    private var suggestedRegions: [String] {
+        let allTargets = savedPlansVM.rehabPlans.flatMap { $0.exercises.map { $0.targetArea.lowercased().replacingOccurrences(of: " ", with: "_") } }
+        return Array(Set(allTargets)).sorted()
     }
 
     private var painColor: Color {
@@ -290,17 +337,10 @@ struct WorkoutSessionView: View {
     }
 
     private var savedConfirmationOverlay: some View {
-        VStack(spacing: AppSpacing.sm) {
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 44))
-                .foregroundColor(.green)
-            Text("Session Saved!")
-                .font(.headline)
-                .foregroundColor(.primary)
-        }
-        .padding(AppSpacing.xxl)
-        .background(.ultraThinMaterial)
-        .cornerRadius(AppCorners.large)
-        .transition(.scale.combined(with: .opacity))
+        CelebrationOverlay(
+            icon: "checkmark.circle.fill",
+            message: "Session Saved!",
+            iconColor: AppColors.success
+        )
     }
 }

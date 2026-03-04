@@ -4,7 +4,16 @@ struct RehabPlanView: View {
     var analysisResult: AnalysisResult? = nil
     var existingPlan: RehabPlan? = nil
     @StateObject var viewModel = RehabPlanViewModel()
+    @EnvironmentObject private var savedPlansVM: SavedPlansViewModel
     @Environment(\.dismiss) private var dismiss
+    @State private var showEditSheet = false
+    @State private var showReAssessment = false
+    @State private var showReAssessmentComparison = false
+    @StateObject private var reAssessmentVM = ReAssessmentViewModel()
+    @State private var reAssessmentPain: Double = 3
+    @State private var reAssessmentRegionPain: [String: Double] = [:]
+    /// Cached PDF data to avoid regenerating on every view body evaluation
+    @State private var cachedPDFData: Data?
 
     var body: some View {
         ZStack {
@@ -21,9 +30,69 @@ struct RehabPlanView: View {
                         if !viewModel.rehabPlanWarnings.isEmpty {
                             rehabWarningsBanner
                         }
+
+                        // Week progress banner (for saved plans with startDate)
+                        if analysisResult == nil, let week = plan.currentWeek {
+                            weekProgressBanner(week: week, totalWeeks: plan.totalWeeks)
+                        }
+
+                        // Start Plan button (for saved plans not yet started)
+                        if analysisResult == nil && plan.startDate == nil {
+                            startPlanBanner
+                        }
+
+                        // Re-assessment prompt
+                        if analysisResult == nil,
+                           reAssessmentVM.shouldShowReAssessment(for: plan),
+                           let assessmentType = reAssessmentVM.assessmentType(for: plan) {
+                            ReAssessmentPromptView(
+                                plan: plan,
+                                assessmentType: assessmentType,
+                                onStartAssessment: { showReAssessment = true }
+                            )
+                        }
+
+                        // Show comparison if available
+                        if analysisResult == nil,
+                           let comparison = reAssessmentVM.comparison(for: plan.id) {
+                            NavigationLink(destination: ReAssessmentComparisonView(
+                                initial: comparison.initial,
+                                latest: comparison.latest
+                            )) {
+                                HStack(spacing: AppSpacing.sm) {
+                                    Image(systemName: "chart.bar.xaxis")
+                                    Text("View Progress Comparison")
+                                }
+                                .font(.subheadline.weight(.medium))
+                                .foregroundColor(.blue)
+                                .padding(AppSpacing.md)
+                                .frame(maxWidth: .infinity)
+                                .background(Color.blue.opacity(0.08))
+                                .cornerRadius(AppCorners.medium)
+                            }
+                        }
+
                         planHeader(plan: plan)
                         weeklyCalendar(plan: plan)
                         exerciseList(for: plan)
+
+                        // Guided workout button (only for saved plans, not during generation)
+                        if analysisResult == nil {
+                            NavigationLink(destination: GuidedWorkoutView(plan: plan)) {
+                                HStack(spacing: AppSpacing.sm) {
+                                    Image(systemName: "play.fill")
+                                    Text("Start Guided Workout")
+                                }
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 14)
+                                .background(AppColors.coolGradient)
+                                .cornerRadius(AppCorners.large)
+                                .shadow(color: .blue.opacity(0.2), radius: 8, y: 4)
+                            }
+                        }
+
                         if analysisResult != nil {
                             savePlanButton
                             homeButton
@@ -36,16 +105,145 @@ struct RehabPlanView: View {
             }
         }
         .navigationTitle("Rehab Plan")
+        .toolbar {
+            if analysisResult == nil, let plan = viewModel.rehabPlan {
+                ToolbarItem(placement: .topBarTrailing) {
+                    HStack(spacing: AppSpacing.sm) {
+                        if let pdfData = cachedPDFData {
+                            ShareLink(
+                                item: pdfData,
+                                preview: SharePreview(plan.planName, icon: "doc.fill")
+                            ) {
+                                Image(systemName: "square.and.arrow.up")
+                            }
+                        }
+
+                        Button(action: { showEditSheet = true }) {
+                            Image(systemName: "pencil.circle")
+                        }
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showEditSheet) {
+            if var plan = viewModel.rehabPlan {
+                EditRehabPlanView(
+                    plan: Binding(
+                        get: { viewModel.rehabPlan ?? plan },
+                        set: { viewModel.rehabPlan = $0 }
+                    ),
+                    onSave: { updatedPlan in
+                        viewModel.rehabPlan = updatedPlan
+                        savedPlansVM.updatePlan(updatedPlan)
+                        // Regenerate cached PDF after edits
+                        cachedPDFData = PDFExportService.generatePDF(for: updatedPlan)
+                    }
+                )
+            }
+        }
+        .sheet(isPresented: $showReAssessment) {
+            reAssessmentSheet
+        }
         .onAppear {
             if viewModel.rehabPlan == nil && !viewModel.isGenerating {
                 if let existing = existingPlan {
-                    // Viewing a saved plan — no generation needed
                     viewModel.rehabPlan = existing
                 } else if let analysis = analysisResult {
-                    // Generate a new AI-powered plan
                     viewModel.generateRehabPlan(from: analysis)
                 }
             }
+            Task { await reAssessmentVM.loadAssessments() }
+        }
+        .onChange(of: viewModel.rehabPlan?.id) { _, _ in
+            // Generate PDF once when plan becomes available (not on every render)
+            if analysisResult == nil, let plan = viewModel.rehabPlan {
+                cachedPDFData = PDFExportService.generatePDF(for: plan)
+            }
+        }
+        .trackScreen("RehabPlan")
+    }
+
+    // MARK: - Re-Assessment Sheet
+
+    private var reAssessmentSheet: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: AppSpacing.lg) {
+                    Text("Rate your current pain levels")
+                        .font(.headline)
+                        .padding(.top, AppSpacing.lg)
+
+                    // Overall pain
+                    CardSection(icon: "waveform.path.ecg", color: .blue, title: "Overall Pain") {
+                        VStack(spacing: AppSpacing.md) {
+                            HStack {
+                                Text("\(Int(reAssessmentPain))")
+                                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                                    .foregroundColor(reAssessmentPainColor)
+                                Text("/ 10").font(.title3).foregroundColor(.secondary)
+                                Spacer()
+                            }
+                            Slider(value: $reAssessmentPain, in: 0...10, step: 1)
+                                .tint(reAssessmentPainColor)
+                        }
+                    }
+
+                    // Per-region pain
+                    RegionPainInputView(
+                        regionPainLevels: $reAssessmentRegionPain,
+                        suggestedRegions: viewModel.rehabPlan?.exercises.map {
+                            $0.targetArea.lowercased().replacingOccurrences(of: " ", with: "_")
+                        } ?? []
+                    )
+
+                    // Save
+                    Button(action: saveReAssessment) {
+                        HStack(spacing: AppSpacing.sm) {
+                            Image(systemName: "checkmark.circle.fill")
+                            Text("Save Assessment")
+                        }
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                }
+                .padding(.horizontal, AppSpacing.xl)
+                .padding(.vertical, AppSpacing.md)
+            }
+            .navigationTitle("Re-Assessment")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") { showReAssessment = false }
+                }
+            }
+        }
+    }
+
+    private func saveReAssessment() {
+        guard let plan = viewModel.rehabPlan,
+              let assessmentType = reAssessmentVM.assessmentType(for: plan) else { return }
+
+        let snapshot = AssessmentSnapshot(
+            id: UUID(),
+            planId: plan.id,
+            assessmentType: assessmentType,
+            date: Date(),
+            regionPainLevels: reAssessmentRegionPain,
+            overallPain: reAssessmentPain
+        )
+
+        Task {
+            await reAssessmentVM.saveAssessment(snapshot)
+            showReAssessment = false
+            reAssessmentPain = 3
+            reAssessmentRegionPain = [:]
+        }
+    }
+
+    private var reAssessmentPainColor: Color {
+        switch Int(reAssessmentPain) {
+        case 0...3: return .green
+        case 4...6: return .orange
+        default: return .red
         }
     }
 
@@ -161,19 +359,59 @@ struct RehabPlanView: View {
 
     private func weeklyCalendar(plan: RehabPlan) -> some View {
         let dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-        return HStack(spacing: 8) {
-            ForEach(0..<7, id: \.self) { day in
-                VStack(spacing: 6) {
-                    Text(dayNames[day])
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+
+        return VStack(spacing: AppSpacing.md) {
+            HStack(spacing: 0) {
+                ForEach(0..<7, id: \.self) { day in
+                    let hasExercises = plan.weeklySchedule.indices.contains(day) && !plan.weeklySchedule[day].isEmpty
+                    let exerciseCount = hasExercises ? plan.weeklySchedule[day].count : 0
+
+                    VStack(spacing: AppSpacing.sm) {
+                        Text(dayNames[day])
+                            .font(.caption2.weight(.medium))
+                            .foregroundColor(.secondary)
+
+                        ZStack {
+                            Circle()
+                                .fill(hasExercises ? Color.blue.opacity(0.12) : Color.clear)
+                                .frame(width: 36, height: 36)
+
+                            if hasExercises {
+                                Text("\(exerciseCount)")
+                                    .font(.caption.weight(.bold))
+                                    .foregroundColor(.blue)
+                            } else {
+                                Text("-")
+                                    .font(.caption)
+                                    .foregroundColor(Color(.systemGray4))
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+
+            // Legend
+            HStack(spacing: AppSpacing.lg) {
+                HStack(spacing: AppSpacing.xs) {
                     Circle()
-                        .fill(plan.weeklySchedule.indices.contains(day) && !plan.weeklySchedule[day].isEmpty ? Color.blue : Color.gray.opacity(0.3))
+                        .fill(Color.blue.opacity(0.12))
                         .frame(width: 8, height: 8)
+                    Text("Exercise day")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+                HStack(spacing: AppSpacing.xs) {
+                    Text("-")
+                        .font(.caption2)
+                        .foregroundColor(Color(.systemGray4))
+                    Text("Rest day")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
                 }
             }
         }
-        .padding()
+        .padding(AppSpacing.lg)
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.card)
         .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
@@ -337,6 +575,65 @@ struct RehabPlanView: View {
             }
         }
         .buttonStyle(SecondaryButtonStyle())
+    }
+
+    // MARK: - Week Progress
+
+    private func weekProgressBanner(week: Int, totalWeeks: Int) -> some View {
+        VStack(spacing: AppSpacing.sm) {
+            HStack {
+                Image(systemName: "calendar.badge.clock")
+                    .foregroundColor(.blue)
+                Text("Week \(week) of \(totalWeeks)")
+                    .font(.headline)
+                Spacer()
+                if let note = ProgressionRule.progressionNote(week: week, totalWeeks: totalWeeks) {
+                    Text(note)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color.blue.opacity(0.15))
+                        .frame(height: 6)
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color.blue)
+                        .frame(width: geometry.size.width * CGFloat(week) / CGFloat(totalWeeks), height: 6)
+                }
+            }
+            .frame(height: 6)
+        }
+        .padding(AppSpacing.lg)
+        .background(AppColors.cardBackground)
+        .cornerRadius(AppCorners.card)
+        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+    }
+
+    private var startPlanBanner: some View {
+        Button(action: {
+            if var plan = viewModel.rehabPlan {
+                plan.startDate = Date()
+                viewModel.rehabPlan = plan
+                savedPlansVM.updatePlan(plan)
+            }
+        }) {
+            HStack(spacing: AppSpacing.sm) {
+                Image(systemName: "flag.fill")
+                Text("Start This Plan")
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+                Text("Track your weekly progress")
+                    .font(.caption)
+                    .foregroundColor(.white.opacity(0.8))
+            }
+            .foregroundColor(.white)
+            .padding(AppSpacing.lg)
+            .background(AppColors.healingGradient)
+            .cornerRadius(AppCorners.card)
+        }
     }
 
     private var emptyState: some View {

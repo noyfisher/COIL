@@ -222,9 +222,9 @@
     "target_area": "Hip"
   },
   "hip-hinge": {
-    "category": "mobility",
-    "filename": "hip-hinge.png",
     "name": "Hip Hinge",
+    "filename": "hip-hinge.png",
+    "category": "mobility",
     "target_area": "Hip/Back"
   },
   "internal-rotation": {
@@ -234,15 +234,15 @@
     "target_area": "Shoulder"
   },
   "isometric-cervical-extension": {
-    "category": "strength",
-    "filename": "isometric-cervical-extension.png",
     "name": "Isometric Cervical Extension",
+    "filename": "isometric-cervical-extension.png",
+    "category": "strength",
     "target_area": "Neck"
   },
   "isometric-cervical-flexion": {
-    "category": "strength",
-    "filename": "isometric-cervical-flexion.png",
     "name": "Isometric Cervical Flexion",
+    "filename": "isometric-cervical-flexion.png",
+    "category": "strength",
     "target_area": "Neck"
   },
   "isometric-quad-contraction": {
@@ -354,9 +354,9 @@
     "target_area": "Neck"
   },
   "open-book-stretch": {
-    "category": "stretch",
-    "filename": "open-book-stretch.png",
     "name": "Open Book Stretch",
+    "filename": "open-book-stretch.png",
+    "category": "stretch",
     "target_area": "Thoracic Spine"
   },
   "overhead-tricep-stretch": {
@@ -396,9 +396,9 @@
     "target_area": "Core"
   },
   "prayer-stretch": {
-    "category": "stretch",
-    "filename": "prayer-stretch.png",
     "name": "Prayer Stretch",
+    "filename": "prayer-stretch.png",
+    "category": "stretch",
     "target_area": "Lower Back"
   },
   "prone-hamstring-curl": {
@@ -426,9 +426,9 @@
     "target_area": "Lower Back"
   },
   "prone-scapular-retraction": {
-    "category": "strength",
-    "filename": "prone-scapular-retraction.png",
     "name": "Prone Scapular Retraction",
+    "filename": "prone-scapular-retraction.png",
+    "category": "strength",
     "target_area": "Upper Back"
   },
   "prone-shoulder-flexion": {
@@ -456,9 +456,9 @@
     "target_area": "Knee"
   },
   "quadruped-rocking": {
-    "category": "mobility",
-    "filename": "quadruped-rocking.png",
     "name": "Quadruped Rocking",
+    "filename": "quadruped-rocking.png",
+    "category": "mobility",
     "target_area": "Hip/Back"
   },
   "resistance-band-ankle-eversion": {
@@ -522,9 +522,9 @@
     "target_area": "Calf"
   },
   "seated-cervical-retraction": {
-    "category": "strength",
-    "filename": "seated-cervical-retraction.png",
     "name": "Seated Cervical Retraction",
+    "filename": "seated-cervical-retraction.png",
+    "category": "strength",
     "target_area": "Neck"
   },
   "seated-figure-four-stretch": {
@@ -576,9 +576,9 @@
     "target_area": "Ankle/Foot"
   },
   "seated-trunk-rotation": {
-    "category": "mobility",
-    "filename": "seated-trunk-rotation.png",
     "name": "Seated Trunk Rotation",
+    "filename": "seated-trunk-rotation.png",
+    "category": "mobility",
     "target_area": "Spine"
   },
   "short-arc-quads": {
@@ -654,9 +654,9 @@
     "target_area": "Calf"
   },
   "standing-back-extension": {
-    "category": "mobility",
-    "filename": "standing-back-extension.png",
     "name": "Standing Back Extension",
+    "filename": "standing-back-extension.png",
+    "category": "mobility",
     "target_area": "Lower Back"
   },
   "standing-calf-raises": {
@@ -726,9 +726,9 @@
     "target_area": "Knee"
   },
   "superman-exercise": {
-    "category": "strength",
-    "filename": "superman-exercise.png",
     "name": "Superman Exercise",
+    "filename": "superman-exercise.png",
+    "category": "strength",
     "target_area": "Lower Back/Core"
   },
   "supine-hamstring-stretch": {
@@ -768,9 +768,9 @@
     "target_area": "Hip/Glute"
   },
   "swimmers-exercise": {
-    "category": "strength",
-    "filename": "swimmers-exercise.png",
     "name": "Swimmers Exercise",
+    "filename": "swimmers-exercise.png",
+    "category": "strength",
     "target_area": "Back/Core"
   },
   "tennis-ball-roll": {
@@ -888,9 +888,9 @@
     "target_area": "Wrist/Forearm"
   },
   "wrist-pronation-supination": {
-    "category": "mobility",
-    "filename": "wrist-pronation-supination.png",
     "name": "Wrist Pronation and Supination",
+    "filename": "wrist-pronation-supination.png",
+    "category": "mobility",
     "target_area": "Forearm/Wrist"
   },
   "band-pull-aparts": {
@@ -922,5 +922,149 @@
     "filename": "quadruped-shoulder-taps.png",
     "category": "core",
     "target_area": "Rotator Cuff, Core & Scapular Stabilizers"
+  },
+  "bird-dog-hold-with-scapular-punch": {
+    "name": "Bird Dog Hold with Scapular Punch",
+    "filename": "bird-dog-hold-with-scapular-punch.png",
+    "category": "core",
+    "target_area": "Core Stability, Rotator Cuff & Scapular Control"
+  },
+  "bird-dog-with-core-stability-focus": {
+    "name": "Bird Dog with Core Stability Focus",
+    "filename": "bird-dog-with-core-stability-focus.png",
+    "category": "core",
+    "target_area": "Core stabilizers, hip extensors, lower back endurance"
+  },
+  "dead-bug-with-shoulder-reach": {
+    "name": "Dead Bug with Shoulder Reach",
+    "filename": "dead-bug-with-shoulder-reach.png",
+    "category": "core",
+    "target_area": "Core Stability, Lower Back & Shoulder Integration"
+  },
+  "glute-bridge": {
+    "name": "Glute Bridge",
+    "filename": "glute-bridge.png",
+    "category": "lying",
+    "target_area": "Gluteus Maximus, Lower Back Stabilizers"
+  },
+  "glute-bridge-with-isometric-hold": {
+    "name": "Glute Bridge with Isometric Hold",
+    "filename": "glute-bridge-with-isometric-hold.png",
+    "category": "strength",
+    "target_area": "Gluteal muscles, hip extensors, lower back"
+  },
+  "half-kneeling-pallof-press": {
+    "name": "Half-Kneeling Pallof Press",
+    "filename": "half-kneeling-pallof-press.png",
+    "category": "core",
+    "target_area": "Core, Lower Back Stabilization & Rotational Control"
+  },
+  "lateral-side-lying-clam-shell": {
+    "name": "Lateral Side-Lying Clam Shell",
+    "filename": "lateral-side-lying-clam-shell.png",
+    "category": "standing",
+    "target_area": "Gluteus medius, hip external rotators, trochanteric bursa"
+  },
+  "lying-hip-flexor-stretch": {
+    "name": "Lying Hip Flexor Stretch",
+    "filename": "lying-hip-flexor-stretch.png",
+    "category": "stretch",
+    "target_area": "Iliopsoas, Rectus Femoris"
+  },
+  "prone-glute-squeeze-holds": {
+    "name": "Prone Glute Squeeze Holds",
+    "filename": "prone-glute-squeeze-holds.png",
+    "category": "lying",
+    "target_area": "Gluteus Maximus, Lower Back Support"
+  },
+  "prone-hip-extension-pulse": {
+    "name": "Prone Hip Extension Pulse",
+    "filename": "prone-hip-extension-pulse.png",
+    "category": "strength",
+    "target_area": "Gluteus maximus, lower back extensors"
+  },
+  "prone-i-y-t-shoulder-activation": {
+    "name": "Prone I-Y-T Shoulder Activation",
+    "filename": "prone-i-y-t-shoulder-activation.png",
+    "category": "strength",
+    "target_area": "Rotator Cuff & Posterior Deltoid"
+  },
+  "quadruped-hip-flexor-march": {
+    "name": "Quadruped Hip Flexor March",
+    "filename": "quadruped-hip-flexor-march.png",
+    "category": "core",
+    "target_area": "Hip flexors, core stabilizers, lower back"
+  },
+  "quadruped-pelvic-tilts": {
+    "name": "Quadruped Pelvic Tilts",
+    "filename": "quadruped-pelvic-tilts.png",
+    "category": "core",
+    "target_area": "Lower Back, Core Stabilizers, Iliopsoas"
+  },
+  "resistance-band-external-rotation-at-90-90": {
+    "name": "Resistance Band External Rotation at 90/90",
+    "filename": "resistance-band-external-rotation-at-90-90.png",
+    "category": "strength",
+    "target_area": "Rotator Cuff (Infraspinatus & Teres Minor) & Shoulder Stability"
+  },
+  "single-leg-balance-with-hip-activation": {
+    "name": "Single-Leg Balance with Hip Activation",
+    "filename": "single-leg-balance-with-hip-activation.png",
+    "category": "standing",
+    "target_area": "Hip Stabilizers, Gluteus Medius, Proprioception"
+  },
+  "standing-single-leg-balance-with-hip-stability": {
+    "name": "Standing Single-Leg Balance with Hip Stability",
+    "filename": "standing-single-leg-balance-with-hip-stability.png",
+    "category": "balance",
+    "target_area": "Hip stabilizers, gluteus medius, proprioception, lower back"
+  },
+  "supine-figure-4-stretch-with-pelvic-mobilization": {
+    "name": "Supine Figure-4 Stretch with Pelvic Mobilization",
+    "filename": "supine-figure-4-stretch-with-pelvic-mobilization.png",
+    "category": "stretch",
+    "target_area": "Piriformis, gluteal muscles, hip external rotators"
+  },
+  "supine-iliopsoas-stretch": {
+    "name": "Supine Iliopsoas Stretch",
+    "filename": "supine-iliopsoas-stretch.png",
+    "category": "stretch",
+    "target_area": "Hip flexors, lower back"
+  },
+  "supported-cat-cow-stretch": {
+    "name": "Supported Cat-Cow Stretch",
+    "filename": "supported-cat-cow-stretch.png",
+    "category": "yoga",
+    "target_area": "Lower Back, Thoracic Spine & Shoulder Mobility"
+  },
+  "quadruped-thoracic-rotation": {
+    "name": "Quadruped Thoracic Rotation",
+    "filename": "quadruped-thoracic-rotation.png",
+    "category": "mobility",
+    "target_area": "Intercostal muscles, thoracic spine, obliques, chest"
+  },
+  "pallof-press": {
+    "name": "Pallof Press",
+    "filename": "pallof-press.png",
+    "category": "core",
+    "target_area": "Obliques, transverse abdominis, anti-rotation core stability"
+  },
+  "glute-bridge-hold": {
+    "name": "Glute Bridge Hold",
+    "filename": "glute-bridge-hold.png",
+    "category": "strength",
+    "target_area": "Glutes, lower back extensors, core stabilizers"
+  },
+  "childs-pose-with-side-reach": {
+    "name": "Child's Pose with Side Reach",
+    "filename": "childs-pose-with-side-reach.png",
+    "category": "stretch",
+    "target_area": "Lower back, intercostal muscles, latissimus dorsi"
+  },
+  "banded-shoulder-stabilizer-series": {
+    "name": "Banded Shoulder Stabilizer Series",
+    "filename": "banded-shoulder-stabilizer-series.png",
+    "category": "strength",
+    "target_area": "Rotator cuff, scapular stabilizers, core"
   }
 }

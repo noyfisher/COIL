@@ -33,11 +33,10 @@ class InjuryAnalyzer {
 
     /// Analyze pain assessments using the Claude AI API, then validate the response.
     static func analyze(assessments: [PainAssessment], profile: UserProfile) async throws -> ValidatedAnalysis {
-        let systemPrompt = buildSystemPrompt()
         let userMessage = buildUserMessage(assessments: assessments, profile: profile)
 
         let responseText = try await ClaudeAPIService.shared.sendMessage(
-            systemPrompt: systemPrompt,
+            requestType: .analysis,
             userMessage: userMessage
         )
 
@@ -54,30 +53,6 @@ class InjuryAnalyzer {
             validation: validation,
             redFlagAlerts: redFlags
         )
-    }
-
-    // MARK: - System Prompt
-
-    private static func buildSystemPrompt() -> String {
-        """
-        You are a friendly health guide helping everyday people understand their pain. Write like you're explaining to a friend — no medical jargon. This is educational only, not a diagnosis.
-
-        YOUR AUDIENCE: Regular people who may not be able to see a doctor right away. They need to understand what might be going on with their body in plain, simple language.
-
-        RULES:
-        - Return top 3 possible conditions with confidence 0-100
-        - "conditionName": the medical/clinical name (e.g. "Patellofemoral Pain Syndrome")
-        - "commonName": a plain English name anyone would understand (e.g. "Runner's Knee" or "Kneecap Pain")
-        - "explanation": 1-2 SHORT sentences about what this condition is and why it matches. Keep it brief — no walls of text
-        - "whatItMeans": 1-2 SHORT sentences about what's happening in their body. Plain terms, no jargon (e.g. "The cushion under your kneecap is getting irritated from not tracking properly")
-        - "howToManage": Keep this very brief — 1 sentence max. Save detailed advice for the rehab plan
-        - "nextSteps": 2-3 short, concrete steps (e.g. "Ice the area for 15 minutes twice a day")
-        - "overallSummary": 1-2 sentences summarizing the situation directly to the person. Be reassuring but concise
-        - Flag red flags: cauda equina, fractures, infections, spinal cord issues, night pain without relief, sudden weakness, chest pain. Write the redFlagMessage in urgent but clear language
-
-        Respond ONLY with valid JSON (no markdown fences):
-        {"conditions":[{"conditionName":"string","commonName":"string","confidence":number,"explanation":"string","whatItMeans":"string","howToManage":"string","isRedFlag":boolean,"redFlagMessage":"string or null","nextSteps":["strings"]}],"overallSummary":"string","disclaimerText":"This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."}
-        """
     }
 
     // MARK: - User Message Construction
@@ -101,18 +76,18 @@ class InjuryAnalyzer {
         }
 
         if let other = profile.otherMedicalConditions, !other.isEmpty {
-            message += "\n- Other Medical Conditions: \(other)"
+            message += "\n- Other Medical Conditions: \(InputSanitizer.sanitize(other))"
         }
 
         if !profile.surgeries.isEmpty {
-            let surgeryList = profile.surgeries.map { "\($0.name) (\($0.year))" }.joined(separator: ", ")
+            let surgeryList = profile.surgeries.map { "\(InputSanitizer.sanitize($0.name)) (\($0.year))" }.joined(separator: ", ")
             message += "\n- Past Surgeries: \(surgeryList)"
         }
 
         if !profile.injuries.isEmpty {
             let injuryList = profile.injuries.map { injury in
                 let status = injury.isCurrent ? "current" : "past"
-                return "\(injury.bodyArea): \(injury.description) (\(status))"
+                return "\(InputSanitizer.sanitize(injury.bodyArea)): \(InputSanitizer.sanitize(injury.description)) (\(status))"
             }.joined(separator: "; ")
             message += "\n- Injuries: \(injuryList)"
         }
@@ -127,7 +102,7 @@ class InjuryAnalyzer {
             """
 
             if let customDesc = assessment.customPainDescription, !customDesc.isEmpty {
-                message += "\n- Patient's Description: \(customDesc)"
+                message += "\n- Patient's Description: \(InputSanitizer.sanitize(customDesc))"
             }
 
             message += """
@@ -147,7 +122,7 @@ class InjuryAnalyzer {
             }
 
             if let notes = assessment.additionalNotes, !notes.isEmpty {
-                message += "\n- Additional Notes: \(notes)"
+                message += "\n- Additional Notes: \(InputSanitizer.sanitize(notes))"
             }
         }
 

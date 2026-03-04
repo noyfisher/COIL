@@ -8,25 +8,104 @@ struct LoginView: View {
     var onSignedIn: () -> Void
     @StateObject private var vm = LoginVM()
     @Environment(\.colorScheme) private var colorScheme
+    @State private var appeared = false
 
     var body: some View {
-        VStack(spacing: 20) {
-            Text("Welcome to PT Helper").font(.title2)
+        ZStack {
+            // Background
+            AppColors.pageBackground.ignoresSafeArea()
 
-            SignInWithAppleButton(.signIn) { req in
-                vm.prepare(req)                   // add scopes + nonce
-            } onCompletion: { result in
-                vm.handle(result) { onSignedIn() } // sign into Firebase
-            }
-            .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
-            .frame(height: 50)
-            .padding(.horizontal, 32)
+            VStack(spacing: 0) {
+                // Top gradient section with branding
+                ZStack {
+                    // Gradient background
+                    RoundedRectangle(cornerRadius: AppCorners.xxl)
+                        .fill(AppColors.coolGradient)
+                        .ignoresSafeArea(edges: .top)
 
-            if let msg = vm.msg {
-                Text(msg).font(.footnote).foregroundColor(.secondary)
+                    VStack(spacing: AppSpacing.lg) {
+                        Spacer()
+
+                        // App icon
+                        Image(systemName: "figure.run.circle.fill")
+                            .font(.system(size: 72))
+                            .foregroundStyle(.white)
+                            .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
+
+                        VStack(spacing: AppSpacing.sm) {
+                            Text("PT Helper")
+                                .font(AppFonts.heroTitle)
+                                .foregroundColor(.white)
+
+                            Text("Your personal recovery companion")
+                                .font(.subheadline)
+                                .foregroundColor(.white.opacity(0.85))
+                        }
+
+                        Spacer()
+                    }
+                    .padding(.bottom, AppSpacing.xxl)
+                }
+                .frame(height: UIScreen.main.bounds.height * 0.42)
+
+                Spacer().frame(height: AppSpacing.xxl)
+
+                // Feature highlights
+                HStack(spacing: AppSpacing.lg) {
+                    featurePill(icon: "brain.head.profile", text: "AI Analysis")
+                    featurePill(icon: "list.clipboard", text: "Custom Plans")
+                    featurePill(icon: "chart.line.uptrend.xyaxis", text: "Track Progress")
+                }
+                .padding(.horizontal, AppSpacing.xl)
+
+                Spacer()
+
+                // Sign in section
+                VStack(spacing: AppSpacing.lg) {
+                    SignInWithAppleButton(.signIn) { req in
+                        vm.prepare(req)
+                    } onCompletion: { result in
+                        vm.handle(result) { onSignedIn() }
+                    }
+                    .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
+                    .frame(height: 52)
+                    .cornerRadius(AppCorners.card)
+
+                    if let msg = vm.msg {
+                        Text(msg)
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                            .transition(.opacity)
+                    }
+                }
+                .padding(.horizontal, AppSpacing.xxl)
+
+                Spacer().frame(height: AppSpacing.xxxl)
             }
         }
-        .padding()
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 20)
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.6)) {
+                appeared = true
+            }
+        }
+    }
+
+    private func featurePill(icon: String, text: String) -> some View {
+        VStack(spacing: AppSpacing.sm) {
+            Image(systemName: icon)
+                .font(.system(size: 20, weight: .medium))
+                .foregroundColor(.blue)
+                .frame(width: 40, height: 40)
+                .background(Color.blue.opacity(0.1))
+                .clipShape(Circle())
+
+            Text(text)
+                .font(AppFonts.badge)
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -40,12 +119,17 @@ final class LoginVM: NSObject, ObservableObject {
         req.requestedScopes = [.fullName, .email]
         req.nonce = sha256(n)
         msg = "Preparing sign in…"
+        Task { @MainActor in SessionLogger.shared.log(.signInStarted, category: .auth, message: "Apple sign-in started") }
     }
 
     func handle(_ result: Result<ASAuthorization, Error>, onSuccess: @escaping () -> Void) {
         switch result {
         case .failure(let e):
             msg = "Apple error: \(e.localizedDescription)"
+            Task { @MainActor in
+                SessionLogger.shared.log(.signInFailed, category: .auth, message: "Apple sign-in failed",
+                                          metadata: ["error": e.localizedDescription])
+            }
 
         case .success(let auth):
             guard
@@ -61,8 +145,18 @@ final class LoginVM: NSObject, ObservableObject {
 
 
             Auth.auth().signIn(with: fcred) { res, err in
-                if let err = err { self.msg = "Firebase error: \(err.localizedDescription)"; return }
+                if let err = err {
+                    self.msg = "Firebase error: \(err.localizedDescription)"
+                    Task { @MainActor in
+                        SessionLogger.shared.log(.signInFailed, category: .auth, message: "Firebase sign-in failed",
+                                                  metadata: ["error": err.localizedDescription])
+                    }
+                    return
+                }
                 self.msg = "Signed in ✅"
+                Task { @MainActor in
+                    SessionLogger.shared.log(.signInSucceeded, category: .auth, message: "Sign-in succeeded")
+                }
 
                 if let uid = res?.user.uid {
                     self.ensureUser(uid: uid,

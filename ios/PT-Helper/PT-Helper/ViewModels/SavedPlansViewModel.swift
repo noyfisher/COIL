@@ -25,10 +25,15 @@ class SavedPlansViewModel: ObservableObject {
                 self.isLoading = false
                 if let error = error {
                     AppLogger.data.error("Error fetching rehab plans: \(error.localizedDescription)")
+                    Task { @MainActor in SessionLogger.shared.logError(error, context: "RehabPlansFetch") }
                     self.loadError = "Unable to load your rehab plans. Please pull down to retry."
                     return
                 }
                 self.loadError = nil
+                Task { @MainActor in
+                    SessionLogger.shared.log(.firestoreRead, category: .data, message: "Fetched rehab plans",
+                                              metadata: ["count": "\(snapshot?.documents.count ?? 0)"])
+                }
                 self.rehabPlans = snapshot?.documents.compactMap { document -> RehabPlan? in
                     let data = document.data()
                     guard let idString = data["id"] as? String,
@@ -94,16 +99,85 @@ class SavedPlansViewModel: ObservableObject {
                         weeklySchedule: weeklySchedule,
                         totalWeeks: data["totalWeeks"] as? Int ?? 4,
                         createdDate: (data["createdDate"] as? Timestamp)?.dateValue() ?? Date(),
-                        notes: data["notes"] as? String
+                        notes: data["notes"] as? String,
+                        startDate: (data["startDate"] as? Timestamp)?.dateValue(),
+                        lastModifiedDate: (data["lastModifiedDate"] as? Timestamp)?.dateValue()
                     )
                 } ?? []
             }
         }
     }
 
+    /// Update an existing plan in Firestore (for edits, startDate changes, etc.)
+    func updatePlan(_ plan: RehabPlan) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+
+        // Update locally first
+        if let index = rehabPlans.firstIndex(where: { $0.id == plan.id }) {
+            rehabPlans[index] = plan
+        }
+
+        // Serialize exercises
+        let exercisesData: [[String: Any]] = plan.exercises.map { e in
+            var dict: [String: Any] = [
+                "id": e.id.uuidString,
+                "name": e.name,
+                "targetArea": e.targetArea,
+                "description": e.description,
+                "sets": e.sets,
+                "reps": e.reps,
+                "restSeconds": e.restSeconds,
+                "difficulty": e.difficulty.rawValue,
+                "demonstrationIcon": e.demonstrationIcon,
+                "tips": e.tips,
+                "contraindications": e.contraindications
+            ]
+            if let sp = e.startPosition { dict["startPosition"] = sp }
+            if let mv = e.movement { dict["movement"] = mv }
+            if let ep = e.endPosition { dict["endPosition"] = ep }
+            if let ec = e.exerciseCategory { dict["exerciseCategory"] = ec }
+            if let img = e.imageFileName { dict["imageFileName"] = img }
+            return dict
+        }
+
+        // Serialize weeklySchedule as dictionary format
+        var scheduleDict: [String: [String]] = [:]
+        for (index, day) in plan.weeklySchedule.enumerated() {
+            if !day.isEmpty {
+                scheduleDict["\(index)"] = day
+            }
+        }
+
+        var planData: [String: Any] = [
+            "id": plan.id.uuidString,
+            "planName": plan.planName,
+            "conditions": plan.conditions,
+            "exercises": exercisesData,
+            "weeklySchedule": scheduleDict,
+            "totalWeeks": plan.totalWeeks,
+            "createdDate": Timestamp(date: plan.createdDate)
+        ]
+        if let notes = plan.notes { planData["notes"] = notes }
+        if let startDate = plan.startDate { planData["startDate"] = Timestamp(date: startDate) }
+        if let lastMod = plan.lastModifiedDate { planData["lastModifiedDate"] = Timestamp(date: lastMod) }
+
+        db.collection("users").document(uid).collection("rehabPlans")
+            .document(plan.id.uuidString)
+            .setData(planData) { error in
+                if let error = error {
+                    AppLogger.data.error("Error updating plan: \(error.localizedDescription)")
+                }
+            }
+    }
+
     func deletePlan(_ plan: RehabPlan) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         let planId = plan.id.uuidString
+
+        Task { @MainActor in
+            SessionLogger.shared.log(.firestoreDelete, category: .data, message: "Rehab plan deleted",
+                                      metadata: ["planId": planId])
+        }
 
         // Remove locally first for instant UI feedback
         rehabPlans.removeAll { $0.id == plan.id }

@@ -5,6 +5,7 @@ struct AnalysisResultView: View {
     var validationWarnings: [ValidationWarning] = []
     var redFlagAlerts: [ValidationWarning] = []
     @State private var showRehabPlan = false
+    @State private var expandedConditions: Set<String> = []
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -39,6 +40,7 @@ struct AnalysisResultView: View {
         .navigationDestination(isPresented: $showRehabPlan) {
             RehabPlanView(analysisResult: analysisResult)
         }
+        .trackScreen("AnalysisResult")
     }
 
     // MARK: - Filtered Warnings
@@ -100,90 +102,146 @@ struct AnalysisResultView: View {
 
     private func conditionCard(for condition: ConditionResult) -> some View {
         let strength = ConfidenceCalibrator.matchStrength(for: condition.confidence)
-        let calibrated = ConfidenceCalibrator.calibrate(condition.confidence)
+        let isExpanded = expandedConditions.contains(condition.id.uuidString)
 
-        return VStack(alignment: .leading, spacing: 0) {
-            // Header with common name and match strength
-            VStack(alignment: .leading, spacing: 4) {
-                Text(condition.commonName)
-                    .font(.title3.weight(.bold))
-                    .foregroundColor(.primary)
-                Text(condition.conditionName)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                HStack(spacing: 8) {
-                    ProgressView(value: calibrated, total: 100)
-                        .progressViewStyle(LinearProgressViewStyle(tint: matchColor(strength)))
-                        .frame(width: 80)
-                        .accessibilityHidden(true)
-                    Text(strength.rawValue)
-                        .font(.caption.weight(.medium))
-                        .foregroundColor(matchColor(strength))
-                }
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel("\(condition.commonName), \(strength.rawValue)")
-            }
-            .padding(AppSpacing.lg)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(.systemBackground))
+        return HStack(spacing: 0) {
+            // Colored accent bar
+            RoundedRectangle(cornerRadius: 2)
+                .fill(matchColor(strength))
+                .frame(width: 4)
+                .padding(.vertical, AppSpacing.sm)
 
-            Divider()
-
-            // Explanation
-            VStack(alignment: .leading, spacing: AppSpacing.md) {
-                Text(condition.explanation)
-                    .font(.body)
-                    .foregroundColor(.primary)
-                    .lineSpacing(3)
-
-                if condition.isRedFlag {
-                    HStack(spacing: 6) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.body)
-                        Text(condition.redFlagMessage ?? "Seek immediate medical attention")
-                            .font(.body.weight(.medium))
-                    }
-                    .foregroundColor(.white)
-                    .padding(AppSpacing.md)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.red)
-                    .cornerRadius(AppCorners.small)
-                }
-
-                // What's happening in your body
-                VStack(alignment: .leading, spacing: 8) {
-                    Label("What's happening", systemImage: "figure.stand")
-                        .font(.body.weight(.semibold))
-                        .foregroundColor(.blue)
-                    Text(condition.whatItMeans)
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                        .lineSpacing(3)
-                }
-
-                // Suggested next steps
-                VStack(alignment: .leading, spacing: 8) {
-                    Label("Suggested next steps", systemImage: "list.number")
-                        .font(.body.weight(.semibold))
-                        .foregroundColor(.purple)
-                    ForEach(Array(condition.nextSteps.enumerated()), id: \.offset) { index, step in
-                        HStack(alignment: .top, spacing: 8) {
-                            Text("\(index + 1).")
-                                .font(.body.weight(.semibold))
-                                .foregroundColor(.purple)
-                                .frame(width: 20, alignment: .leading)
-                            Text(step)
-                                .font(.body)
-                                .foregroundColor(.secondary)
+            VStack(alignment: .leading, spacing: 0) {
+                // Header — always visible
+                Button(action: {
+                    withAnimation(AppAnimations.springy) {
+                        if isExpanded {
+                            expandedConditions.remove(condition.id.uuidString)
+                        } else {
+                            expandedConditions.insert(condition.id.uuidString)
                         }
                     }
+                }) {
+                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(condition.commonName)
+                                    .font(AppFonts.sectionTitle)
+                                    .foregroundColor(.primary)
+                                Text(condition.conditionName)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(.secondary)
+                        }
+
+                        // Match strength indicator
+                        HStack(spacing: AppSpacing.sm) {
+                            matchStrengthDots(strength)
+                            Text(strength.rawValue)
+                                .font(.caption.weight(.medium))
+                                .foregroundColor(matchColor(strength))
+                        }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel("\(condition.commonName), \(strength.rawValue)")
+
+                        // Red flag inline warning
+                        if condition.isRedFlag {
+                            HStack(spacing: 6) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .font(.caption)
+                                Text(condition.redFlagMessage ?? "Seek immediate medical attention")
+                                    .font(.caption.weight(.medium))
+                            }
+                            .foregroundColor(.white)
+                            .padding(AppSpacing.sm)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.red)
+                            .cornerRadius(AppCorners.small)
+                        }
+                    }
+                    .padding(AppSpacing.lg)
+                }
+                .buttonStyle(.plain)
+
+                // Expandable details
+                if isExpanded {
+                    VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                        // Thin separator
+                        Rectangle()
+                            .fill(Color(.systemGray5))
+                            .frame(height: 1)
+                            .padding(.horizontal, AppSpacing.lg)
+
+                        // Explanation
+                        Text(condition.explanation)
+                            .font(.body)
+                            .foregroundColor(.primary)
+                            .lineSpacing(3)
+                            .padding(.horizontal, AppSpacing.lg)
+
+                        // What's happening
+                        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                            Label("What's happening", systemImage: "figure.stand")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundColor(.blue)
+                            Text(condition.whatItMeans)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .lineSpacing(3)
+                        }
+                        .padding(.horizontal, AppSpacing.lg)
+
+                        // Next steps
+                        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                            Label("Suggested next steps", systemImage: "list.number")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundColor(.purple)
+                            ForEach(Array(condition.nextSteps.enumerated()), id: \.offset) { index, step in
+                                HStack(alignment: .top, spacing: AppSpacing.sm) {
+                                    Text("\(index + 1).")
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundColor(.purple)
+                                        .frame(width: 20, alignment: .leading)
+                                    Text(step)
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                        }
+                        .padding(.horizontal, AppSpacing.lg)
+                    }
+                    .padding(.bottom, AppSpacing.lg)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
                 }
             }
-            .padding(AppSpacing.lg)
         }
         .background(AppColors.cardBackground)
-        .cornerRadius(AppCorners.card)
-        .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
+        .cornerRadius(AppCorners.xl)
+        .shadow(color: .black.opacity(0.06), radius: 10, y: 3)
+    }
+
+    private func matchStrengthDots(_ strength: MatchStrength) -> some View {
+        HStack(spacing: 4) {
+            ForEach(0..<3, id: \.self) { index in
+                Circle()
+                    .fill(dotColor(for: index, strength: strength))
+                    .frame(width: 8, height: 8)
+            }
+        }
+    }
+
+    private func dotColor(for index: Int, strength: MatchStrength) -> Color {
+        let filledCount: Int
+        switch strength {
+        case .strong: filledCount = 3
+        case .moderate: filledCount = 2
+        case .weak: filledCount = 1
+        }
+        return index < filledCount ? matchColor(strength) : Color(.systemGray5)
     }
 
     private func matchColor(_ strength: MatchStrength) -> Color {

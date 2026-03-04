@@ -6,6 +6,7 @@ struct AnalyzingView: View {
     @State private var navigateToResults = false
     @State private var elapsedSeconds: Int = 0
     @State private var timer: Timer?
+    @State private var showCompletionFlash = false
 
     var body: some View {
         ZStack {
@@ -15,6 +16,19 @@ struct AnalyzingView: View {
                 errorView(error)
             } else {
                 loadingView
+            }
+
+            // Completion flash overlay
+            if showCompletionFlash {
+                Color.black.opacity(0.15)
+                    .ignoresSafeArea()
+                    .transition(.opacity)
+
+                CelebrationOverlay(
+                    icon: "checkmark.circle.fill",
+                    message: "Analysis Complete!",
+                    iconColor: AppColors.success
+                )
             }
         }
         .navigationTitle("Analyzing")
@@ -45,16 +59,28 @@ struct AnalyzingView: View {
             timer = nil
         }
         .onChange(of: viewModel.isAnalyzing) { _, isAnalyzing in
-            // When analysis finishes and we have a result, navigate forward
+            // When analysis finishes and we have a result, show flash then navigate
             if !isAnalyzing && viewModel.analysisResult != nil {
-                navigateToResults = true
+                let notification = UINotificationFeedbackGenerator()
+                notification.notificationOccurred(.success)
+                withAnimation(AppAnimations.bouncy) {
+                    showCompletionFlash = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                    showCompletionFlash = false
+                    navigateToResults = true
+                }
             }
         }
         .onChange(of: navigateToResults) { _, newValue in
-            // When user navigates back from results, also pop back to PainDetailView
+            // When user navigates back from results, also pop back to PainDetailView.
+            // IMPORTANT: Delay the second dismissal to avoid simultaneous navigation
+            // state mutations, which crash NavigationStack.
             if !newValue {
                 viewModel.analysisResult = nil
-                viewModel.showAnalyzingScreen = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    viewModel.showAnalyzingScreen = false
+                }
             }
         }
         .navigationDestination(isPresented: $navigateToResults) {
@@ -68,6 +94,7 @@ struct AnalyzingView: View {
                 redFlagAlerts: viewModel.redFlagAlerts
             )
         }
+        .trackScreen("Analyzing")
     }
 
     // MARK: - Loading View

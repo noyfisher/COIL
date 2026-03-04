@@ -6,8 +6,10 @@ struct ProfileReviewStepView: View {
     @State private var isSaving = false
     @State private var showSuccess = false
     @State private var showError = false
+    @State private var showCelebration = false
 
     var body: some View {
+        ZStack {
         ScrollView {
             VStack(spacing: AppSpacing.lg) {
                 // Basic info
@@ -83,7 +85,12 @@ struct ProfileReviewStepView: View {
                         isSaving = false
                         if success {
                             showSuccess = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                            let notification = UINotificationFeedbackGenerator()
+                            notification.notificationOccurred(.success)
+                            withAnimation(AppAnimations.bouncy) {
+                                showCelebration = true
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                                 onComplete?()
                             }
                         } else {
@@ -117,6 +124,20 @@ struct ProfileReviewStepView: View {
             .padding(.horizontal, AppSpacing.xl)
             .padding(.vertical, AppSpacing.md)
         }
+
+        // Celebration overlay
+        if showCelebration {
+            Color.black.opacity(0.2)
+                .ignoresSafeArea()
+                .transition(.opacity)
+
+            CelebrationOverlay(
+                icon: "checkmark.circle.fill",
+                message: "Profile Saved!",
+                iconColor: AppColors.success
+            )
+        }
+        } // ZStack
     }
 }
 

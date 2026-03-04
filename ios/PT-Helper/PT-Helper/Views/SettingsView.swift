@@ -1,0 +1,336 @@
+import SwiftUI
+import FirebaseAuth
+import FirebaseFirestore
+
+struct SettingsView: View {
+    let userName: String
+    var onEditProfile: () -> Void
+    @Environment(\.dismiss) private var dismiss
+    @StateObject private var notificationService = NotificationService.shared
+    @State private var showSignOutConfirmation = false
+    @State private var showSignOutError = false
+    @State private var signOutErrorMessage = ""
+    @State private var showDeleteConfirmation = false
+    @State private var isDeletingAccount = false
+    @State private var deleteError: String?
+    @State private var showDeleteError = false
+    @State private var reminderDate = Date()
+    @State private var shareURL: URL?
+    @State private var showShareSheet = false
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                AppColors.pageBackground
+                    .ignoresSafeArea()
+
+                ScrollView {
+                    VStack(spacing: AppSpacing.lg) {
+                        // Profile card
+                        VStack(spacing: AppSpacing.lg) {
+                            // Avatar
+                            Text(initials)
+                                .font(.system(size: 28, weight: .bold, design: .rounded))
+                                .foregroundColor(.white)
+                                .frame(width: 72, height: 72)
+                                .background(
+                                    Circle()
+                                        .fill(AppColors.coolGradient)
+                                )
+
+                            Text(userName.isEmpty ? "User" : userName)
+                                .font(AppFonts.sectionTitle)
+                                .foregroundColor(.primary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, AppSpacing.xl)
+                        .background(AppColors.cardBackground)
+                        .cornerRadius(AppCorners.xl)
+                        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+
+                        // Notifications
+                        VStack(spacing: 0) {
+                            HStack(spacing: AppSpacing.md) {
+                                Image(systemName: "bell.badge")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.orange)
+                                    .frame(width: 32, height: 32)
+                                    .background(Color.orange.opacity(0.12))
+                                    .cornerRadius(AppCorners.small)
+
+                                Text("Reminders")
+                                    .font(.body)
+
+                                Spacer()
+
+                                Toggle("", isOn: $notificationService.isEnabled)
+                                    .labelsHidden()
+                                    .onChange(of: notificationService.isEnabled) { _, enabled in
+                                        if enabled && !notificationService.isAuthorized {
+                                            Task { await notificationService.requestPermission() }
+                                        }
+                                    }
+                            }
+                            .padding(.horizontal, AppSpacing.lg)
+                            .padding(.vertical, AppSpacing.md)
+
+                            if notificationService.isEnabled {
+                                Divider().padding(.leading, 52)
+
+                                HStack(spacing: AppSpacing.md) {
+                                    Image(systemName: "clock")
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(.blue)
+                                        .frame(width: 32, height: 32)
+                                        .background(Color.blue.opacity(0.12))
+                                        .cornerRadius(AppCorners.small)
+
+                                    Text("Reminder Time")
+                                        .font(.body)
+
+                                    Spacer()
+
+                                    DatePicker("", selection: $reminderDate, displayedComponents: .hourAndMinute)
+                                        .labelsHidden()
+                                        .onChange(of: reminderDate) { _, newDate in
+                                            let components = Calendar.current.dateComponents([.hour, .minute], from: newDate)
+                                            notificationService.reminderHour = components.hour ?? 9
+                                            notificationService.reminderMinute = components.minute ?? 0
+                                        }
+                                }
+                                .padding(.horizontal, AppSpacing.lg)
+                                .padding(.vertical, AppSpacing.md)
+                            }
+                        }
+                        .background(AppColors.cardBackground)
+                        .cornerRadius(AppCorners.large)
+                        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+
+                        // Debug & Feedback
+                        VStack(spacing: 0) {
+                            settingsRow(icon: "ladybug", color: .purple, title: "Export Debug Log") {
+                                if let url = SessionLogger.shared.exportAsShareableFile() {
+                                    shareURL = url
+                                    showShareSheet = true
+                                }
+                            }
+
+                            Divider().padding(.leading, 52)
+
+                            HStack(spacing: AppSpacing.md) {
+                                Image(systemName: "doc.text.magnifyingglass")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.teal)
+                                    .frame(width: 32, height: 32)
+                                    .background(Color.teal.opacity(0.12))
+                                    .cornerRadius(AppCorners.small)
+
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Session Events")
+                                        .font(.body)
+                                    Text("\(SessionLogger.shared.eventCount) events this session")
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                }
+
+                                Spacer()
+                            }
+                            .padding(.horizontal, AppSpacing.lg)
+                            .padding(.vertical, AppSpacing.md)
+                        }
+                        .background(AppColors.cardBackground)
+                        .cornerRadius(AppCorners.large)
+                        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+
+                        // Actions
+                        VStack(spacing: 0) {
+                            settingsRow(icon: "heart.text.clipboard", color: .blue, title: "Update Health Info") {
+                                dismiss()
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                    onEditProfile()
+                                }
+                            }
+
+                            Divider().padding(.leading, 52)
+
+                            settingsRow(icon: "rectangle.portrait.and.arrow.right", color: .red, title: "Sign Out") {
+                                showSignOutConfirmation = true
+                            }
+                        }
+                        .background(AppColors.cardBackground)
+                        .cornerRadius(AppCorners.large)
+                        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+
+                        // Danger zone
+                        VStack(spacing: 0) {
+                            settingsRow(icon: "trash", color: .red, title: "Delete Account") {
+                                showDeleteConfirmation = true
+                            }
+                        }
+                        .background(AppColors.cardBackground)
+                        .cornerRadius(AppCorners.large)
+                        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+
+                        // App version
+                        Text(appVersionText)
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .padding(.top, AppSpacing.lg)
+                    }
+                    .padding(.horizontal, AppSpacing.xl)
+                    .padding(.vertical, AppSpacing.md)
+                }
+            }
+            .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { dismiss() }
+                }
+            }
+            .confirmationDialog("Sign Out", isPresented: $showSignOutConfirmation, titleVisibility: .visible) {
+                Button("Sign Out", role: .destructive) {
+                    do {
+                        try Auth.auth().signOut()
+                    } catch {
+                        signOutErrorMessage = error.localizedDescription
+                        showSignOutError = true
+                    }
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Are you sure you want to sign out?")
+            }
+            .alert("Sign Out Failed", isPresented: $showSignOutError) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(signOutErrorMessage)
+            }
+            .confirmationDialog("Delete Account", isPresented: $showDeleteConfirmation, titleVisibility: .visible) {
+                Button("Delete Everything", role: .destructive) {
+                    deleteAccount()
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This will permanently delete your account, all health data, rehab plans, and workout history. This cannot be undone.")
+            }
+            .alert("Delete Failed", isPresented: $showDeleteError) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(deleteError ?? "An unknown error occurred.")
+            }
+            .overlay {
+                if isDeletingAccount {
+                    ZStack {
+                        Color.black.opacity(0.4).ignoresSafeArea()
+                        VStack(spacing: AppSpacing.md) {
+                            ProgressView()
+                                .scaleEffect(1.3)
+                                .tint(.white)
+                            Text("Deleting account...")
+                                .font(.subheadline)
+                                .foregroundColor(.white)
+                        }
+                        .padding(AppSpacing.xxl)
+                        .background(.ultraThinMaterial)
+                        .cornerRadius(AppCorners.large)
+                    }
+                }
+            }
+        }
+        .trackScreen("Settings")
+        .sheet(isPresented: $showShareSheet) {
+            if let url = shareURL {
+                ShareSheet(activityItems: [url])
+            }
+        }
+    }
+
+    // MARK: - Account Deletion
+
+    private func deleteAccount() {
+        guard let user = Auth.auth().currentUser else { return }
+        let uid = user.uid
+        let db = Firestore.firestore()
+
+        isDeletingAccount = true
+
+        Task {
+            do {
+                // 1. Delete Firestore user data (subcollections)
+                let subcollections = ["profile", "rehabPlans", "workoutSessions", "notes"]
+                for subcollection in subcollections {
+                    let snapshot = try await db.collection("users").document(uid)
+                        .collection(subcollection).getDocuments()
+                    for doc in snapshot.documents {
+                        try await doc.reference.delete()
+                    }
+                }
+
+                // 2. Delete the user document itself
+                try await db.collection("users").document(uid).delete()
+
+                // 3. Clear local caches
+                await MainActor.run {
+                    UserProfileService.shared.clear()
+                    DisclaimerManager.reset()
+                }
+
+                // 4. Delete the Firebase Auth account
+                try await user.delete()
+
+                await MainActor.run {
+                    isDeletingAccount = false
+                    dismiss()
+                }
+            } catch {
+                await MainActor.run {
+                    isDeletingAccount = false
+                    deleteError = error.localizedDescription
+                    showDeleteError = true
+                }
+            }
+        }
+    }
+
+    // MARK: - Helpers
+
+    private var initials: String {
+        let parts = userName.split(separator: " ")
+        if parts.count >= 2 {
+            return String(parts[0].prefix(1) + parts[1].prefix(1)).uppercased()
+        }
+        return String(userName.prefix(2)).uppercased()
+    }
+
+    private var appVersionText: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+        return "PT Helper v\(version) (\(build))"
+    }
+
+    private func settingsRow(icon: String, color: Color, title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: AppSpacing.md) {
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(color)
+                    .frame(width: 32, height: 32)
+                    .background(color.opacity(0.12))
+                    .cornerRadius(AppCorners.small)
+
+                Text(title)
+                    .font(.body)
+                    .foregroundColor(title == "Sign Out" ? .red : .primary)
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(.gray)
+            }
+            .padding(.horizontal, AppSpacing.lg)
+            .padding(.vertical, AppSpacing.md)
+        }
+    }
+}

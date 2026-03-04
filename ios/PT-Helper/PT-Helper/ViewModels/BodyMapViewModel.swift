@@ -1,25 +1,26 @@
 import SwiftUI
-import FirebaseFirestore
 import FirebaseAuth
 
+@MainActor
 class BodyMapViewModel: ObservableObject {
     @Published var regions: [BodyRegion] = []
     @Published var currentSide: BodySide = .front
-    @Published var userProfile = UserProfile(
-        userId: Auth.auth().currentUser?.uid ?? "",
-        firstName: "", lastName: "",
-        dateOfBirth: Date(), sex: "",
-        heightFeet: 0, heightInches: 0, weight: 0.0,
-        medicalConditions: [], otherMedicalConditions: nil,
-        surgeries: [], injuries: [],
-        activityLevel: "", primarySport: nil
-    )
 
-    private let db = Firestore.firestore()
+    /// User profile sourced from the shared UserProfileService (single Firestore read).
+    var userProfile: UserProfile {
+        UserProfileService.shared.profile ?? UserProfile(
+            userId: Auth.auth().currentUser?.uid ?? "",
+            firstName: "", lastName: "",
+            dateOfBirth: Date(), sex: "",
+            heightFeet: 0, heightInches: 0, weight: 0.0,
+            medicalConditions: [], otherMedicalConditions: nil,
+            surgeries: [], injuries: [],
+            activityLevel: "", primarySport: nil
+        )
+    }
 
     init() {
         loadRegions()
-        loadUserProfile()
     }
 
     func toggleSelection(for region: BodyRegion) {
@@ -46,74 +47,139 @@ class BodyMapViewModel: ObservableObject {
 
     private func loadRegions() {
         regions = [
-            // ── Front-only regions ──────────────────────────────
-            BodyRegion(name: "Head/Neck", zoneKey: "head_neck",
+            // ── Head & Neck ───────────────────────────────────
+            BodyRegion(name: "Head", zoneKey: "head",
                        sides: [.front],
-                       frontPosition: CGPoint(x: 0.5, y: 0.08),
+                       frontPosition: CGPoint(x: 0.5, y: 0.05),
                        backPosition: nil),
 
+            BodyRegion(name: "Neck", zoneKey: "neck",
+                       sides: [.front, .back],
+                       frontPosition: CGPoint(x: 0.5, y: 0.12),
+                       backPosition: CGPoint(x: 0.5, y: 0.10)),
+
+            // ── Torso (front) ─────────────────────────────────
             BodyRegion(name: "Chest", zoneKey: "chest",
                        sides: [.front],
-                       frontPosition: CGPoint(x: 0.5, y: 0.25),
+                       frontPosition: CGPoint(x: 0.5, y: 0.22),
                        backPosition: nil),
 
             BodyRegion(name: "Abdomen", zoneKey: "abdomen",
                        sides: [.front],
-                       frontPosition: CGPoint(x: 0.5, y: 0.42),
+                       frontPosition: CGPoint(x: 0.5, y: 0.38),
                        backPosition: nil),
 
-            // ── Back-only regions ───────────────────────────────
+            // ── Torso (back) ──────────────────────────────────
             BodyRegion(name: "Upper Back", zoneKey: "upper_back",
                        sides: [.back],
                        frontPosition: nil,
-                       backPosition: CGPoint(x: 0.5, y: 0.25)),
+                       backPosition: CGPoint(x: 0.5, y: 0.22)),
 
             BodyRegion(name: "Lower Back", zoneKey: "lower_back",
                        sides: [.back],
                        frontPosition: nil,
-                       backPosition: CGPoint(x: 0.5, y: 0.42)),
+                       backPosition: CGPoint(x: 0.5, y: 0.38)),
 
-            // ── Both-side regions (mirrored x on back) ─────────
+            // ── Shoulders ─────────────────────────────────────
             BodyRegion(name: "Left Shoulder", zoneKey: "left_shoulder",
                        sides: [.front, .back],
-                       frontPosition: CGPoint(x: 0.3, y: 0.2),
-                       backPosition: CGPoint(x: 0.7, y: 0.2)),
+                       frontPosition: CGPoint(x: 0.28, y: 0.18),
+                       backPosition: CGPoint(x: 0.72, y: 0.18)),
 
             BodyRegion(name: "Right Shoulder", zoneKey: "right_shoulder",
                        sides: [.front, .back],
-                       frontPosition: CGPoint(x: 0.7, y: 0.2),
-                       backPosition: CGPoint(x: 0.3, y: 0.2)),
+                       frontPosition: CGPoint(x: 0.72, y: 0.18),
+                       backPosition: CGPoint(x: 0.28, y: 0.18)),
 
+            // ── Upper Arms ────────────────────────────────────
+            BodyRegion(name: "Left Upper Arm", zoneKey: "left_upper_arm",
+                       sides: [.front, .back],
+                       frontPosition: CGPoint(x: 0.2, y: 0.28),
+                       backPosition: CGPoint(x: 0.8, y: 0.28)),
+
+            BodyRegion(name: "Right Upper Arm", zoneKey: "right_upper_arm",
+                       sides: [.front, .back],
+                       frontPosition: CGPoint(x: 0.8, y: 0.28),
+                       backPosition: CGPoint(x: 0.2, y: 0.28)),
+
+            // ── Elbows ───────────────────────────────────────
             BodyRegion(name: "Left Elbow", zoneKey: "left_elbow",
                        sides: [.front, .back],
-                       frontPosition: CGPoint(x: 0.2, y: 0.38),
-                       backPosition: CGPoint(x: 0.8, y: 0.38)),
+                       frontPosition: CGPoint(x: 0.18, y: 0.34),
+                       backPosition: CGPoint(x: 0.82, y: 0.34)),
 
             BodyRegion(name: "Right Elbow", zoneKey: "right_elbow",
                        sides: [.front, .back],
-                       frontPosition: CGPoint(x: 0.8, y: 0.38),
-                       backPosition: CGPoint(x: 0.2, y: 0.38)),
+                       frontPosition: CGPoint(x: 0.82, y: 0.34),
+                       backPosition: CGPoint(x: 0.18, y: 0.34)),
 
+            // ── Forearms ──────────────────────────────────────
+            BodyRegion(name: "Left Forearm", zoneKey: "left_forearm",
+                       sides: [.front, .back],
+                       frontPosition: CGPoint(x: 0.15, y: 0.40),
+                       backPosition: CGPoint(x: 0.85, y: 0.40)),
+
+            BodyRegion(name: "Right Forearm", zoneKey: "right_forearm",
+                       sides: [.front, .back],
+                       frontPosition: CGPoint(x: 0.85, y: 0.40),
+                       backPosition: CGPoint(x: 0.15, y: 0.40)),
+
+            // ── Wrists & Hands ────────────────────────────────
             BodyRegion(name: "Left Wrist/Hand", zoneKey: "left_wrist_hand",
                        sides: [.front, .back],
-                       frontPosition: CGPoint(x: 0.15, y: 0.52),
-                       backPosition: CGPoint(x: 0.85, y: 0.52)),
+                       frontPosition: CGPoint(x: 0.12, y: 0.52),
+                       backPosition: CGPoint(x: 0.88, y: 0.52)),
 
             BodyRegion(name: "Right Wrist/Hand", zoneKey: "right_wrist_hand",
                        sides: [.front, .back],
-                       frontPosition: CGPoint(x: 0.85, y: 0.52),
-                       backPosition: CGPoint(x: 0.15, y: 0.52)),
+                       frontPosition: CGPoint(x: 0.88, y: 0.52),
+                       backPosition: CGPoint(x: 0.12, y: 0.52)),
 
+            // ── Glutes ────────────────────────────────────────
+            BodyRegion(name: "Left Glute", zoneKey: "left_glute",
+                       sides: [.back],
+                       frontPosition: nil,
+                       backPosition: CGPoint(x: 0.62, y: 0.50)),
+
+            BodyRegion(name: "Right Glute", zoneKey: "right_glute",
+                       sides: [.back],
+                       frontPosition: nil,
+                       backPosition: CGPoint(x: 0.38, y: 0.50)),
+
+            // ── Hips ──────────────────────────────────────────
             BodyRegion(name: "Left Hip", zoneKey: "left_hip",
                        sides: [.front, .back],
-                       frontPosition: CGPoint(x: 0.38, y: 0.55),
-                       backPosition: CGPoint(x: 0.62, y: 0.55)),
+                       frontPosition: CGPoint(x: 0.38, y: 0.50),
+                       backPosition: CGPoint(x: 0.62, y: 0.52)),
 
             BodyRegion(name: "Right Hip", zoneKey: "right_hip",
                        sides: [.front, .back],
-                       frontPosition: CGPoint(x: 0.62, y: 0.55),
-                       backPosition: CGPoint(x: 0.38, y: 0.55)),
+                       frontPosition: CGPoint(x: 0.62, y: 0.50),
+                       backPosition: CGPoint(x: 0.38, y: 0.52)),
 
+            // ── Thighs (quads, adductors, IT band) ───────────
+            BodyRegion(name: "Left Thigh", zoneKey: "left_thigh",
+                       sides: [.front, .back],
+                       frontPosition: CGPoint(x: 0.38, y: 0.60),
+                       backPosition: CGPoint(x: 0.62, y: 0.60)),
+
+            BodyRegion(name: "Right Thigh", zoneKey: "right_thigh",
+                       sides: [.front, .back],
+                       frontPosition: CGPoint(x: 0.62, y: 0.60),
+                       backPosition: CGPoint(x: 0.38, y: 0.60)),
+
+            // ── Hamstrings ────────────────────────────────────
+            BodyRegion(name: "Left Hamstring", zoneKey: "left_hamstring",
+                       sides: [.back],
+                       frontPosition: nil,
+                       backPosition: CGPoint(x: 0.62, y: 0.62)),
+
+            BodyRegion(name: "Right Hamstring", zoneKey: "right_hamstring",
+                       sides: [.back],
+                       frontPosition: nil,
+                       backPosition: CGPoint(x: 0.38, y: 0.62)),
+
+            // ── Knees ─────────────────────────────────────────
             BodyRegion(name: "Left Knee", zoneKey: "left_knee",
                        sides: [.front, .back],
                        frontPosition: CGPoint(x: 0.38, y: 0.72),
@@ -124,63 +190,28 @@ class BodyMapViewModel: ObservableObject {
                        frontPosition: CGPoint(x: 0.62, y: 0.72),
                        backPosition: CGPoint(x: 0.38, y: 0.72)),
 
+            // ── Calves & Shins ────────────────────────────────
+            BodyRegion(name: "Left Calf/Shin", zoneKey: "left_calf_shin",
+                       sides: [.front, .back],
+                       frontPosition: CGPoint(x: 0.38, y: 0.80),
+                       backPosition: CGPoint(x: 0.62, y: 0.80)),
+
+            BodyRegion(name: "Right Calf/Shin", zoneKey: "right_calf_shin",
+                       sides: [.front, .back],
+                       frontPosition: CGPoint(x: 0.62, y: 0.80),
+                       backPosition: CGPoint(x: 0.38, y: 0.80)),
+
+            // ── Ankles & Feet ─────────────────────────────────
             BodyRegion(name: "Left Ankle/Foot", zoneKey: "left_ankle_foot",
                        sides: [.front, .back],
-                       frontPosition: CGPoint(x: 0.35, y: 0.9),
-                       backPosition: CGPoint(x: 0.65, y: 0.9)),
+                       frontPosition: CGPoint(x: 0.38, y: 0.92),
+                       backPosition: CGPoint(x: 0.62, y: 0.92)),
 
             BodyRegion(name: "Right Ankle/Foot", zoneKey: "right_ankle_foot",
                        sides: [.front, .back],
-                       frontPosition: CGPoint(x: 0.65, y: 0.9),
-                       backPosition: CGPoint(x: 0.35, y: 0.9))
+                       frontPosition: CGPoint(x: 0.62, y: 0.92),
+                       backPosition: CGPoint(x: 0.38, y: 0.92)),
         ]
     }
 
-    private func loadUserProfile() {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
-        db.collection("users").document(uid).collection("profile").document("health").getDocument { snapshot, error in
-            if let error = error {
-                AppLogger.data.error("Error loading user profile: \(error.localizedDescription)")
-            } else if let snapshot = snapshot, snapshot.exists, let data = snapshot.data() {
-                DispatchQueue.main.async {
-                    var profile = UserProfile(
-                        userId: data["userId"] as? String ?? uid,
-                        firstName: data["firstName"] as? String ?? "",
-                        lastName: data["lastName"] as? String ?? "",
-                        dateOfBirth: (data["dateOfBirth"] as? Timestamp)?.dateValue() ?? Date(),
-                        sex: data["sex"] as? String ?? "",
-                        heightFeet: data["heightFeet"] as? Int ?? 0,
-                        heightInches: data["heightInches"] as? Int ?? 0,
-                        weight: data["weight"] as? Double ?? 0.0,
-                        medicalConditions: data["medicalConditions"] as? [String] ?? [],
-                        otherMedicalConditions: data["otherMedicalConditions"] as? String,
-                        surgeries: [],
-                        injuries: [],
-                        activityLevel: data["activityLevel"] as? String ?? "",
-                        primarySport: data["primarySport"] as? String
-                    )
-                    if let surgeriesData = data["surgeries"] as? [[String: Any]] {
-                        profile.surgeries = surgeriesData.map { s in
-                            UserProfile.Surgery(
-                                id: UUID(uuidString: s["id"] as? String ?? "") ?? UUID(),
-                                name: s["name"] as? String ?? "",
-                                year: s["year"] as? Int ?? 2024
-                            )
-                        }
-                    }
-                    if let injuriesData = data["injuries"] as? [[String: Any]] {
-                        profile.injuries = injuriesData.map { i in
-                            UserProfile.Injury(
-                                id: UUID(uuidString: i["id"] as? String ?? "") ?? UUID(),
-                                bodyArea: i["bodyArea"] as? String ?? "",
-                                description: i["description"] as? String ?? "",
-                                isCurrent: i["isCurrent"] as? Bool ?? false
-                            )
-                        }
-                    }
-                    self.userProfile = profile
-                }
-            }
-        }
-    }
 }

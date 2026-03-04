@@ -2,24 +2,35 @@ import Foundation
 
 struct RehabPlan: Codable, Identifiable {
     let id: UUID
-    let planName: String
+    var planName: String
     let conditions: [String]
-    let exercises: [RehabExercise]
-    let weeklySchedule: [[String]]
+    var exercises: [RehabExercise]
+    var weeklySchedule: [[String]]
     let totalWeeks: Int
     var createdDate: Date
     let notes: String?
+    /// When the user started following this plan (nil = not started yet)
+    var startDate: Date?
+    /// Timestamp of last user edit (nil = never edited)
+    var lastModifiedDate: Date?
+
+    /// Current week number (1-based) based on startDate, or nil if not started
+    var currentWeek: Int? {
+        guard let start = startDate else { return nil }
+        let days = Calendar.current.dateComponents([.day], from: start, to: Date()).day ?? 0
+        return min(max(days / 7 + 1, 1), totalWeeks)
+    }
 }
 
 struct RehabExercise: Codable, Identifiable {
     let id: UUID
-    let name: String
-    let targetArea: String
-    let description: String
-    let sets: Int
-    let reps: String
-    let restSeconds: Int
-    let difficulty: Difficulty
+    var name: String
+    var targetArea: String
+    var description: String
+    var sets: Int
+    var reps: String
+    var restSeconds: Int
+    var difficulty: Difficulty
     let demonstrationIcon: String
     let tips: [String]
     let contraindications: [String]

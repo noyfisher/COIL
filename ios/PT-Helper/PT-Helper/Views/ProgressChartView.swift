@@ -2,7 +2,8 @@ import SwiftUI
 import Charts
 
 struct ProgressChartView: View {
-    @StateObject private var viewModel = WorkoutViewModel()
+    @EnvironmentObject private var viewModel: WorkoutViewModel
+    @State private var selectedRegion: String? = nil
 
     var body: some View {
         ZStack {
@@ -19,6 +20,7 @@ struct ProgressChartView: View {
             } else {
                 ScrollView {
                     VStack(spacing: AppSpacing.lg) {
+                        regionFilterPicker
                         painTrendChart
                         summaryStats
                     }
@@ -29,16 +31,72 @@ struct ProgressChartView: View {
         }
         .navigationTitle("Progress")
         .navigationBarTitleDisplayMode(.inline)
+        .trackScreen("ProgressChart")
+    }
+
+    // MARK: - Region Filter
+
+    private var regionFilterPicker: some View {
+        let regions = availableRegions
+        if regions.isEmpty {
+            return AnyView(EmptyView())
+        }
+        return AnyView(
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: AppSpacing.sm) {
+                    filterChip(label: "Overall", isSelected: selectedRegion == nil) {
+                        selectedRegion = nil
+                    }
+                    ForEach(regions, id: \.self) { region in
+                        filterChip(
+                            label: RegionPainInputView.displayName(for: region),
+                            isSelected: selectedRegion == region
+                        ) {
+                            selectedRegion = region
+                        }
+                    }
+                }
+                .padding(.horizontal, AppSpacing.xs)
+            }
+        )
+    }
+
+    private func filterChip(label: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(label)
+                .font(.caption.weight(.medium))
+                .padding(.horizontal, AppSpacing.md)
+                .padding(.vertical, AppSpacing.sm)
+                .background(isSelected ? Color.blue : Color(.systemGray5))
+                .foregroundColor(isSelected ? .white : .primary)
+                .cornerRadius(AppCorners.medium)
+        }
+    }
+
+    /// All unique region keys across sessions that have per-region data
+    private var availableRegions: [String] {
+        var regions = Set<String>()
+        for session in viewModel.sessions {
+            if let regionPain = session.regionPainLevels {
+                regions.formUnion(regionPain.keys)
+            }
+        }
+        return regions.sorted()
     }
 
     // MARK: - Pain Trend Chart
 
     private var painTrendChart: some View {
-        CardSection(icon: "chart.line.uptrend.xyaxis", color: .blue, title: "Pain Trend") {
-            Chart(viewModel.sessions, id: \.id) { session in
+        let chartTitle = selectedRegion != nil
+            ? "\(RegionPainInputView.displayName(for: selectedRegion!)) Pain"
+            : "Pain Trend"
+
+        return CardSection(icon: "chart.line.uptrend.xyaxis", color: .blue, title: chartTitle) {
+            Chart(filteredChartData, id: \.id) { session in
+                let painValue = painValueForChart(session)
                 LineMark(
                     x: .value("Date", session.date),
-                    y: .value("Pain", session.painLevel)
+                    y: .value("Pain", painValue)
                 )
                 .foregroundStyle(
                     LinearGradient(
@@ -51,7 +109,7 @@ struct ProgressChartView: View {
 
                 AreaMark(
                     x: .value("Date", session.date),
-                    y: .value("Pain", session.painLevel)
+                    y: .value("Pain", painValue)
                 )
                 .foregroundStyle(
                     LinearGradient(
@@ -63,7 +121,7 @@ struct ProgressChartView: View {
 
                 PointMark(
                     x: .value("Date", session.date),
-                    y: .value("Pain", session.painLevel)
+                    y: .value("Pain", painValue)
                 )
                 .foregroundStyle(.blue)
                 .symbolSize(30)
@@ -85,6 +143,22 @@ struct ProgressChartView: View {
             }
             .frame(height: 220)
         }
+    }
+
+    /// Sessions filtered by selected region (or all if no region selected)
+    private var filteredChartData: [WorkoutSession] {
+        guard let region = selectedRegion else {
+            return viewModel.sessions
+        }
+        return viewModel.sessions.filter { $0.regionPainLevels?[region] != nil }
+    }
+
+    /// Get the pain value for chart based on selected region filter
+    private func painValueForChart(_ session: WorkoutSession) -> Double {
+        if let region = selectedRegion, let regionPain = session.regionPainLevels?[region] {
+            return regionPain
+        }
+        return session.painLevel
     }
 
     // MARK: - Summary Stats

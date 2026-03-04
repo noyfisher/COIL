@@ -3,6 +3,7 @@ import SwiftUI
 struct BodyMapView: View {
     @StateObject private var viewModel = BodyMapViewModel()
     @State private var navigateToPainDetail = false
+    @State private var showPulseHint = true
 
     var body: some View {
         ZStack {
@@ -63,29 +64,46 @@ struct BodyMapView: View {
                                 )
 
                                 Button(action: {
-                                    let impact = UIImpactFeedbackGenerator(style: .light)
+                                    let style: UIImpactFeedbackGenerator.FeedbackStyle = region.isSelected ? .soft : .light
+                                    let impact = UIImpactFeedbackGenerator(style: style)
                                     impact.impactOccurred()
                                     withAnimation(.spring(response: 0.3)) {
                                         viewModel.toggleSelection(for: region)
                                     }
+                                    showPulseHint = false
                                 }) {
                                     VStack(spacing: 2) {
-                                        Circle()
-                                            .fill(region.isSelected ? Color.blue : Color.blue.opacity(0.15))
-                                            .frame(width: 44, height: 44)
-                                            .overlay(
+                                        ZStack {
+                                            // Pulse ring hint for unselected on first view
+                                            if showPulseHint && !region.isSelected {
                                                 Circle()
-                                                    .stroke(Color.blue, lineWidth: region.isSelected ? 0 : 1.5)
-                                            )
-                                            .overlay(
-                                                Image(systemName: region.isSelected ? "checkmark" : "plus")
-                                                    .font(.system(size: 14, weight: .bold))
-                                                    .foregroundColor(region.isSelected ? .white : .blue)
-                                            )
-                                            .scaleEffect(region.isSelected ? 1.1 : 1.0)
+                                                    .stroke(Color.blue.opacity(0.3), lineWidth: 2)
+                                                    .frame(width: 56, height: 56)
+                                                    .scaleEffect(showPulseHint ? 1.15 : 1.0)
+                                                    .opacity(showPulseHint ? 0.6 : 0)
+                                                    .animation(
+                                                        .easeInOut(duration: 1.2).repeatCount(3, autoreverses: true),
+                                                        value: showPulseHint
+                                                    )
+                                            }
+
+                                            Circle()
+                                                .fill(region.isSelected ? Color.blue : Color.blue.opacity(0.15))
+                                                .frame(width: 48, height: 48)
+                                                .overlay(
+                                                    Circle()
+                                                        .stroke(Color.blue, lineWidth: region.isSelected ? 0 : 1.5)
+                                                )
+                                                .overlay(
+                                                    Image(systemName: region.isSelected ? "checkmark" : "plus")
+                                                        .font(.system(size: 15, weight: .bold))
+                                                        .foregroundColor(region.isSelected ? .white : .blue)
+                                                )
+                                                .scaleEffect(region.isSelected ? 1.1 : 1.0)
+                                        }
 
                                         Text(region.name)
-                                            .font(.system(size: 8, weight: .medium))
+                                            .font(.system(size: 9, weight: .medium))
                                             .foregroundColor(region.isSelected ? .blue : .secondary)
                                             .lineLimit(1)
                                     }

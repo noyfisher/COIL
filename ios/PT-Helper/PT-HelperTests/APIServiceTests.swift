@@ -15,13 +15,9 @@ final class APIConfigTests: XCTestCase {
         )
     }
 
-    func testModelNameIsNotEmpty() {
-        XCTAssertFalse(APIConfig.anthropicModel.isEmpty)
-    }
-
-    func testMaxTokensIsReasonable() {
-        XCTAssertGreaterThan(APIConfig.maxTokens, 0)
-        XCTAssertLessThanOrEqual(APIConfig.maxTokens, 4096)
+    func testConfigHasOnlyProxyURL() {
+        // After security hardening, model and max_tokens are server-side only
+        XCTAssertFalse(APIConfig.claudeProxyURL.isEmpty, "Proxy URL must be configured")
     }
 }
 
@@ -98,25 +94,36 @@ final class ClaudeAPIErrorTests: XCTestCase {
 
 final class ClaudeModelsTests: XCTestCase {
 
-    func testClaudeRequestEncoding() throws {
-        let request = ClaudeRequest(
-            model: "claude-haiku-4-5-20251001",
-            max_tokens: 4096,
-            system: "You are a PT assistant.",
+    func testClaudeProxyRequestEncoding() throws {
+        let request = ClaudeProxyRequest(
+            requestType: .analysis,
             messages: [ClaudeMessage(role: "user", content: "Analyze knee pain")]
         )
 
         let data = try JSONEncoder().encode(request)
         let json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
 
-        XCTAssertEqual(json["model"] as? String, "claude-haiku-4-5-20251001")
-        XCTAssertEqual(json["max_tokens"] as? Int, 4096)
-        XCTAssertEqual(json["system"] as? String, "You are a PT assistant.")
+        XCTAssertEqual(json["requestType"] as? String, "analysis", "Should encode request type")
+        XCTAssertNil(json["model"], "Model should NOT be in client request (server-side only)")
+        XCTAssertNil(json["max_tokens"], "max_tokens should NOT be in client request (server-side only)")
+        XCTAssertNil(json["system"], "System prompt should NOT be in client request (server-side only)")
 
         let messages = json["messages"] as! [[String: String]]
         XCTAssertEqual(messages.count, 1)
         XCTAssertEqual(messages[0]["role"], "user")
         XCTAssertEqual(messages[0]["content"], "Analyze knee pain")
+    }
+
+    func testClaudeProxyRequestEncoding_RehabPlan() throws {
+        let request = ClaudeProxyRequest(
+            requestType: .rehab_plan,
+            messages: [ClaudeMessage(role: "user", content: "Build a rehab plan")]
+        )
+
+        let data = try JSONEncoder().encode(request)
+        let json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+
+        XCTAssertEqual(json["requestType"] as? String, "rehab_plan")
     }
 
     func testClaudeResponseDecoding() throws {

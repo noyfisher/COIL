@@ -1,6 +1,5 @@
 import SwiftUI
 import FirebaseAuth
-import FirebaseFirestore
 
 struct RootView: View {
     @State private var signedIn = (Auth.auth().currentUser != nil)
@@ -8,25 +7,29 @@ struct RootView: View {
     @State private var isCheckingProfile = true
     @State private var showError = false
     @State private var errorMessage = ""
+    @StateObject private var profileService = UserProfileService.shared
 
     var body: some View {
         Group {
             if signedIn {
                 if isCheckingProfile {
-                    // Loading state while checking profile
+                    // Branded loading state
                     ZStack {
-                        Color(.systemGroupedBackground)
+                        AppColors.pageBackground
                             .ignoresSafeArea()
-                        VStack(spacing: 12) {
-                            ProgressView()
-                                .scaleEffect(1.2)
-                            Text("Loading...")
+                        VStack(spacing: AppSpacing.xl) {
+                            Image(systemName: "figure.run.circle.fill")
+                                .font(.system(size: 56))
+                                .foregroundStyle(AppColors.coolGradient)
+                                .symbolEffect(.pulse.byLayer, options: .repeating)
+
+                            Text("Loading your profile...")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
                     }
                 } else if profileCompleted {
-                    ContentView()
+                    MainTabView()
                 } else {
                     OnboardingView(onComplete: {
                         profileCompleted = true
@@ -48,34 +51,30 @@ struct RootView: View {
             Text(errorMessage)
         }
         .onAppear {
-            Auth.auth().addStateDidChangeListener { _, user in
+            _ = Auth.auth().addStateDidChangeListener { _, user in
                 signedIn = (user != nil)
-                if signedIn {
+                if let user = user {
+                    SessionLogger.shared.startSession(userId: user.uid)
                     checkProfileCompletion()
                 } else {
+                    SessionLogger.shared.log(.signedOut, category: .auth, message: "User signed out")
                     profileCompleted = false
                     isCheckingProfile = true
+                    profileService.clear()
                 }
             }
         }
     }
 
     private func checkProfileCompletion() {
-        guard let uid = Auth.auth().currentUser?.uid else {
-            isCheckingProfile = false
-            return
-        }
-        let db = Firestore.firestore()
-        db.collection("users").document(uid).collection("profile").document("health").getDocument { snapshot, error in
-            if let error = error {
-                AppLogger.auth.error("Error checking profile: \(error.localizedDescription)")
-                errorMessage = "We couldn't load your profile. Please check your internet connection and try again."
+        Task {
+            let exists = await profileService.checkProfileExists()
+            if let error = profileService.loadError {
+                errorMessage = error
                 showError = true
-                isCheckingProfile = false
-            } else {
-                profileCompleted = snapshot?.exists ?? false
-                isCheckingProfile = false
             }
+            profileCompleted = exists
+            isCheckingProfile = false
         }
     }
 }

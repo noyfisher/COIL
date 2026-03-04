@@ -5,8 +5,8 @@ import FirebaseStorage
 
 /// Loads, caches, and serves AI-generated exercise illustration images.
 /// Falls back gracefully when no image is available (the view layer shows an SF Symbol instead).
-@MainActor
-final class ExerciseImageService {
+/// Not @MainActor — disk I/O runs off the main thread.
+final class ExerciseImageService: @unchecked Sendable {
     static let shared = ExerciseImageService()
 
     // MARK: - Mapping
@@ -90,6 +90,30 @@ final class ExerciseImageService {
     /// Useful for logging which exercises still need images generated.
     func exercisesWithoutImages(in exercises: [RehabExercise]) -> [RehabExercise] {
         exercises.filter { imageKey(for: $0) == nil }
+    }
+
+    /// Load animated image data (GIF/APNG) from cache or Firebase Storage.
+    /// Returns raw Data so the caller can create an animated UIImageView.
+    func loadAnimatedImageData(named filename: String) async -> Data? {
+        // Check disk cache
+        let diskPath = diskCacheURL.appendingPathComponent(filename)
+        if let data = try? Data(contentsOf: diskPath) {
+            return data
+        }
+
+        // Try Firebase Storage
+        let animRef = storageRef.child(filename)
+        let maxSize: Int64 = 5 * 1024 * 1024 // 5 MB for animations
+
+        do {
+            let data = try await animRef.data(maxSize: maxSize)
+            // Cache to disk
+            try? data.write(to: diskPath, options: .atomic)
+            return data
+        } catch {
+            // No animated version available — that's fine
+            return nil
+        }
     }
 
     // MARK: - Key Resolution

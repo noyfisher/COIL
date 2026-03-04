@@ -1,54 +1,43 @@
 import SwiftUI
 import FirebaseAuth
-import FirebaseFirestore
 
-struct ContentView: View {
-    @StateObject private var savedPlansViewModel = SavedPlansViewModel()
-    @State private var userName: String = ""
+struct HomeTab: View {
+    @EnvironmentObject private var savedPlansViewModel: SavedPlansViewModel
+    @EnvironmentObject private var workoutViewModel: WorkoutViewModel
+    @EnvironmentObject private var tabSelection: TabSelection
+    @ObservedObject private var streakService = StreakService.shared
     @State private var showOnboarding = false
-    @State private var navigationId = UUID()
-    @State private var planToDelete: RehabPlan? = nil
-    @State private var showDeleteConfirmation = false
-    @State private var showSignOutConfirmation = false
-    @State private var showSignOutError = false
-    @State private var signOutErrorMessage = ""
+    @State private var showSettings = false
+    @State private var animateEntrance = false
 
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(.systemGroupedBackground)
+                AppColors.pageBackground
                     .ignoresSafeArea()
 
                 ScrollView {
                     VStack(spacing: AppSpacing.xl) {
-                        // Welcome header
-                        VStack(spacing: 6) {
-                            Text(greetingText)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
+                        // Hero greeting card
+                        heroGreeting
+                            .padding(.horizontal, AppSpacing.xl)
+                            .opacity(animateEntrance ? 1 : 0)
+                            .offset(y: animateEntrance ? 0 : 20)
 
-                            Text(userName.isEmpty ? "Welcome!" : "Hi, \(userName)!")
-                                .font(.largeTitle)
-                                .fontWeight(.bold)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.top, AppSpacing.xl)
-                        .padding(.bottom, AppSpacing.sm)
+                        // At-a-glance stats
+                        statsRow
+                            .padding(.horizontal, AppSpacing.xl)
+                            .opacity(animateEntrance ? 1 : 0)
+                            .offset(y: animateEntrance ? 0 : 20)
+                            .animation(AppAnimations.smooth.delay(0.1), value: animateEntrance)
 
-                        // Quick Actions header
+                        // Quick Actions
                         SectionHeader(icon: "bolt.fill", color: .blue, title: "Quick Actions")
                             .padding(.horizontal, AppSpacing.xl)
+                            .opacity(animateEntrance ? 1 : 0)
+                            .animation(AppAnimations.smooth.delay(0.2), value: animateEntrance)
 
-                        // Quick actions
                         VStack(spacing: AppSpacing.md) {
-                            QuickActionCard(
-                                icon: "figure.run.circle",
-                                gradientColors: [.red, .orange],
-                                title: "Injury Analysis",
-                                subtitle: "Assess pain and get guidance",
-                                destination: BodyMapView()
-                            )
-
                             QuickActionButton(
                                 icon: "heart.text.clipboard",
                                 gradientColors: [.blue, .cyan],
@@ -56,6 +45,9 @@ struct ContentView: View {
                                 subtitle: "Review or update your health profile",
                                 action: { showOnboarding = true }
                             )
+                            .opacity(animateEntrance ? 1 : 0)
+                            .offset(y: animateEntrance ? 0 : 15)
+                            .animation(AppAnimations.smooth.delay(0.25), value: animateEntrance)
 
                             QuickActionCard(
                                 icon: "note.text",
@@ -64,6 +56,9 @@ struct ContentView: View {
                                 subtitle: "Track your recovery journey",
                                 destination: NotesView()
                             )
+                            .opacity(animateEntrance ? 1 : 0)
+                            .offset(y: animateEntrance ? 0 : 15)
+                            .animation(AppAnimations.smooth.delay(0.35), value: animateEntrance)
 
                             QuickActionCard(
                                 icon: "figure.strengthtraining.traditional",
@@ -72,171 +67,212 @@ struct ContentView: View {
                                 subtitle: "Record a workout session",
                                 destination: WorkoutSessionView()
                             )
-
-                            QuickActionCard(
-                                icon: "chart.line.uptrend.xyaxis",
-                                gradientColors: [.teal, .blue],
-                                title: "Progress",
-                                subtitle: "View your pain trends and stats",
-                                destination: ProgressChartView()
-                            )
+                            .opacity(animateEntrance ? 1 : 0)
+                            .offset(y: animateEntrance ? 0 : 15)
+                            .animation(AppAnimations.smooth.delay(0.45), value: animateEntrance)
                         }
                         .padding(.horizontal, AppSpacing.xl)
 
-                        // My Rehab Plans section
-                        myRehabPlansSection
-                            .padding(.horizontal, AppSpacing.xl)
+                        // Recent Plans preview (compact)
+                        if !savedPlansViewModel.rehabPlans.isEmpty {
+                            recentPlansPreview
+                                .padding(.horizontal, AppSpacing.xl)
+                                .opacity(animateEntrance ? 1 : 0)
+                                .offset(y: animateEntrance ? 0 : 15)
+                                .animation(AppAnimations.smooth.delay(0.55), value: animateEntrance)
+                        }
 
                         Spacer(minLength: 40)
-
-                        // Sign out
-                        Button(action: {
-                            showSignOutConfirmation = true
-                        }) {
-                            HStack(spacing: 6) {
-                                Image(systemName: "rectangle.portrait.and.arrow.right")
-                                Text("Sign Out")
-                            }
-                        }
-                        .buttonStyle(DestructiveButtonStyle())
-
-                        // App version
-                        Text(appVersionText)
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, AppSpacing.xxl)
                     }
+                    .padding(.top, AppSpacing.md)
                 }
                 .refreshable {
                     savedPlansViewModel.fetchRehabPlans()
-                    fetchUserName()
+                    await UserProfileService.shared.reload()
+                    let haptic = UINotificationFeedbackGenerator()
+                    haptic.notificationOccurred(.success)
                 }
             }
             .navigationTitle("PT Helper")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: { showSettings = true }) {
+                        // Profile avatar
+                        Text(avatarInitials)
+                            .font(.system(size: 12, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+                            .frame(width: 32, height: 32)
+                            .background(
+                                Circle()
+                                    .fill(AppColors.coolGradient)
+                            )
+                    }
+                }
+            }
             .onAppear {
-                fetchUserName()
+                withAnimation(AppAnimations.smooth) {
+                    animateEntrance = true
+                }
             }
             .fullScreenCover(isPresented: $showOnboarding) {
                 OnboardingEditView()
             }
-            .onReceive(NotificationCenter.default.publisher(for: .popToRoot)) { _ in
-                navigationId = UUID()
-            }
-            .confirmationDialog("Sign Out", isPresented: $showSignOutConfirmation, titleVisibility: .visible) {
-                Button("Sign Out", role: .destructive) {
-                    do {
-                        try Auth.auth().signOut()
-                    } catch {
-                        signOutErrorMessage = error.localizedDescription
-                        showSignOutError = true
-                    }
-                }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("Are you sure you want to sign out?")
-            }
-            .alert("Sign Out Failed", isPresented: $showSignOutError) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(signOutErrorMessage)
+            .sheet(isPresented: $showSettings) {
+                SettingsView(
+                    userName: profileName,
+                    onEditProfile: { showOnboarding = true }
+                )
             }
         }
-        .id(navigationId)
+        .id(tabSelection.homeNavigationId)
+        .trackScreen("Home")
     }
 
-    // MARK: - My Rehab Plans
+    // MARK: - Hero Greeting
 
-    private var myRehabPlansSection: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.md) {
-            SectionHeader(icon: "list.clipboard.fill", color: .purple, title: "My Rehab Plans")
-
-            if savedPlansViewModel.isLoading {
-                HStack {
-                    Spacer()
-                    ProgressView()
-                    Spacer()
-                }
-                .padding(.vertical, AppSpacing.xl)
-            } else if let error = savedPlansViewModel.loadError {
-                VStack(spacing: AppSpacing.md) {
-                    Image(systemName: "wifi.exclamationmark")
-                        .font(.title2)
-                        .foregroundColor(.orange)
-                    Text(error)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                    Button("Retry") {
-                        savedPlansViewModel.fetchRehabPlans()
-                    }
-                    .buttonStyle(SecondaryButtonStyle())
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, AppSpacing.xl)
-            } else if savedPlansViewModel.rehabPlans.isEmpty {
-                EmptyStateView(
-                    icon: "figure.run",
-                    title: "No Rehab Plans Yet",
-                    subtitle: "Complete an injury analysis to get a personalized plan"
-                )
-            } else {
-                ForEach(savedPlansViewModel.rehabPlans) { plan in
-                    NavigationLink(destination: RehabPlanView(existingPlan: plan)) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                                Text(plan.planName)
-                                    .font(.body.weight(.semibold))
-                                    .foregroundColor(.primary)
-                                HStack(spacing: 6) {
-                                    ForEach(plan.conditions, id: \.self) { condition in
-                                        Text(condition)
-                                            .font(.caption2)
-                                            .padding(.horizontal, AppSpacing.sm)
-                                            .padding(.vertical, 3)
-                                            .background(Color.blue.opacity(0.1))
-                                            .foregroundColor(.blue)
-                                            .cornerRadius(AppCorners.small)
-                                    }
-                                }
-                                Text(plan.createdDate.formatted(date: .abbreviated, time: .omitted))
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            Spacer()
-                            Button {
-                                planToDelete = plan
-                                showDeleteConfirmation = true
-                            } label: {
-                                Image(systemName: "trash")
-                                    .font(.body)
-                                    .foregroundColor(.red.opacity(0.7))
-                                    .padding(AppSpacing.sm)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .cardStyle()
-                    }
-                }
-            }
+    private var heroGreeting: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            Text(greetingText)
+                .font(.subheadline)
+                .foregroundColor(.white.opacity(0.8))
+            Text(profileName.isEmpty ? "Welcome!" : "Hi, \(profileName)!")
+                .font(AppFonts.heroTitle)
+                .foregroundColor(.white)
         }
-        .alert("Delete Plan", isPresented: $showDeleteConfirmation) {
-            Button("Cancel", role: .cancel) {
-                planToDelete = nil
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(AppSpacing.xl)
+        .padding(.vertical, AppSpacing.sm)
+        .background(
+            RoundedRectangle(cornerRadius: AppCorners.xl)
+                .fill(AppColors.coolGradient)
+        )
+        .shadow(color: .blue.opacity(0.15), radius: 12, y: 6)
+    }
+
+    // MARK: - Stats Row
+
+    private var statsRow: some View {
+        HStack(spacing: AppSpacing.md) {
+            miniStatCard(
+                icon: "list.clipboard.fill",
+                color: .purple,
+                value: "\(savedPlansViewModel.rehabPlans.count)",
+                label: "Active Plans"
+            )
+
+            miniStatCard(
+                icon: "waveform.path.ecg",
+                color: lastPainColor,
+                value: lastPainText,
+                label: "Last Pain"
+            )
+
+            NavigationLink(destination: AchievementsView(streakService: streakService)) {
+                StreakBadgeView(streakService: streakService)
             }
-            Button("Delete", role: .destructive) {
-                if let plan = planToDelete {
-                    savedPlansViewModel.deletePlan(plan)
-                    planToDelete = nil
+            .buttonStyle(.plain)
+        }
+    }
+
+    private func miniStatCard(icon: String, color: Color, value: String, label: String) -> some View {
+        VStack(spacing: AppSpacing.sm) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(color)
+                .frame(width: 28, height: 28)
+                .background(color.opacity(0.12))
+                .clipShape(Circle())
+
+            Text(value)
+                .font(AppFonts.statNumber)
+                .foregroundColor(.primary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+
+            Text(label)
+                .font(.caption2)
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, AppSpacing.lg)
+        .background(AppColors.cardBackground)
+        .cornerRadius(AppCorners.card)
+        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+    }
+
+    private var lastPainText: String {
+        guard let lastSession = workoutViewModel.sessions.last else { return "-" }
+        return "\(Int(lastSession.painLevel))"
+    }
+
+    private var lastPainColor: Color {
+        guard let lastSession = workoutViewModel.sessions.last else { return .secondary }
+        switch Int(lastSession.painLevel) {
+        case 0...3: return .green
+        case 4...6: return .orange
+        default: return .red
+        }
+    }
+
+    private var sessionsThisWeek: Int {
+        let calendar = Calendar.current
+        let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date())) ?? Date()
+        return workoutViewModel.sessions.filter { $0.date >= startOfWeek }.count
+    }
+
+    // MARK: - Recent Plans Preview
+
+    private var recentPlansPreview: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
+            HStack {
+                SectionHeader(icon: "list.clipboard.fill", color: .purple, title: "Recent Plans")
+                Button("See All") {
+                    tabSelection.selectedTab = 2
+                }
+                .font(.caption.weight(.medium))
+                .foregroundColor(.blue)
+            }
+
+            ForEach(savedPlansViewModel.rehabPlans.prefix(2)) { plan in
+                NavigationLink(destination: RehabPlanView(existingPlan: plan)) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                            Text(plan.planName)
+                                .font(AppFonts.cardTitle)
+                                .foregroundColor(.primary)
+                            Text("\(plan.exercises.count) exercises")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(.gray)
+                    }
+                    .padding(AppSpacing.lg)
+                    .background(AppColors.cardBackground)
+                    .cornerRadius(AppCorners.card)
+                    .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
                 }
             }
-        } message: {
-            Text("Are you sure you want to delete \"\(planToDelete?.planName ?? "this plan")\"? This cannot be undone.")
         }
     }
 
     // MARK: - Helpers
+
+    /// User's display name from the shared profile service (no extra Firestore read)
+    private var profileName: String {
+        UserProfileService.shared.firstName
+    }
+
+    private var avatarInitials: String {
+        let parts = profileName.split(separator: " ")
+        if parts.count >= 2 {
+            return String(parts[0].prefix(1) + parts[1].prefix(1)).uppercased()
+        }
+        return profileName.isEmpty ? "PT" : String(profileName.prefix(2)).uppercased()
+    }
 
     private var greetingText: String {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -245,25 +281,6 @@ struct ContentView: View {
         case 12..<17: return "Good afternoon"
         case 17..<22: return "Good evening"
         default: return "Good night"
-        }
-    }
-
-    private var appVersionText: String {
-        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
-        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
-        return "PT Helper v\(version) (\(build))"
-    }
-
-    private func fetchUserName() {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
-        let db = Firestore.firestore()
-        db.collection("users").document(uid).collection("profile").document("health").getDocument { snapshot, error in
-            if let error = error {
-                AppLogger.data.error("Error fetching user name: \(error.localizedDescription)")
-            } else if let snapshot = snapshot, let data = snapshot.data() {
-                let first = data["firstName"] as? String ?? ""
-                userName = first.isEmpty ? (data["name"] as? String ?? "") : first
-            }
         }
     }
 }
