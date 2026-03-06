@@ -13,6 +13,7 @@
 		7A071B292E823C9C00497F94 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 7A071B282E823C9C00497F94 /* FirebaseCore */; };
 		7A071B2B2E823C9C00497F94 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 7A071B2A2E823C9C00497F94 /* FirebaseFirestore */; };
 		7A071B2F2E823C9C00497F94 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 7A071B2E2E823C9C00497F94 /* FirebaseStorage */; };
+		7A071B312E823C9C00497F94 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 7A071B302E823C9C00497F94 /* FirebaseCrashlytics */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +68,7 @@
 				7A071B292E823C9C00497F94 /* FirebaseCore in Frameworks */,
 				7A071B272E823C9C00497F94 /* FirebaseAuth in Frameworks */,
 				7A071B2F2E823C9C00497F94 /* FirebaseStorage in Frameworks */,
+				7A071B312E823C9C00497F94 /* FirebaseCrashlytics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,6 +120,7 @@
 				7A071AF02E8236EC00497F94 /* Sources */,
 				7A071AF12E8236EC00497F94 /* Frameworks */,
 				7A071AF22E8236EC00497F94 /* Resources */,
+				7A071B322E823C9C00497F94 /* Upload Crashlytics dSYMs */,
 			);
 			buildRules = (
 			);
@@ -133,6 +136,7 @@
 				7A071B282E823C9C00497F94 /* FirebaseCore */,
 				7A071B2A2E823C9C00497F94 /* FirebaseFirestore */,
 				7A071B2E2E823C9C00497F94 /* FirebaseStorage */,
+				7A071B302E823C9C00497F94 /* FirebaseCrashlytics */,
 			);
 			productName = "PT-Helper";
 			productReference = 7A071AF42E8236EC00497F94 /* PT-Helper.app */;
@@ -256,6 +260,31 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		7A071B322E823C9C00497F94 /* Upload Crashlytics dSYMs */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "Upload Crashlytics dSYMs";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		7A071AF02E8236EC00497F94 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -331,7 +360,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -394,7 +423,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -624,6 +653,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7A071B232E823C9C00497F94 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
+		};
+		7A071B302E823C9C00497F94 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7A071B232E823C9C00497F94 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
