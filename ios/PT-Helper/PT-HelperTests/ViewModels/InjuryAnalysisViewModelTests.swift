@@ -209,4 +209,122 @@ final class InjuryAnalysisViewModelTests: XCTestCase {
         XCTAssertNotNil(vm.currentAssessment)
         XCTAssertEqual(vm.currentAssessment?.painIntensity, 7)
     }
+
+    // MARK: - Apply to All Regions
+
+    func testIsFirstRegion() {
+        let regions = [makeRegion(name: "A"), makeRegion(name: "B")]
+        let vm = InjuryAnalysisViewModel(userProfile: makeProfile(), selectedRegions: regions)
+
+        XCTAssertTrue(vm.isFirstRegion)
+
+        vm.saveAndAdvance(makeAssessment(region: regions[0]))
+        XCTAssertFalse(vm.isFirstRegion)
+    }
+
+    func testHasMultipleRegions() {
+        let singleVM = InjuryAnalysisViewModel(
+            userProfile: makeProfile(),
+            selectedRegions: [makeRegion(name: "A")]
+        )
+        XCTAssertFalse(singleVM.hasMultipleRegions)
+
+        let multiVM = InjuryAnalysisViewModel(
+            userProfile: makeProfile(),
+            selectedRegions: [makeRegion(name: "A"), makeRegion(name: "B")]
+        )
+        XCTAssertTrue(multiVM.hasMultipleRegions)
+    }
+
+    func testApplyToAllRegions_FillsAllAssessments() {
+        let r1 = makeRegion(name: "Knee")
+        let r2 = makeRegion(name: "Back")
+        let r3 = makeRegion(name: "Shoulder")
+        let vm = InjuryAnalysisViewModel(
+            userProfile: makeProfile(),
+            selectedRegions: [r1, r2, r3]
+        )
+
+        let template = makeAssessment(region: r1)
+        vm.applyToAllRegionsAndAnalyze(template)
+
+        XCTAssertEqual(vm.assessments.compactMap { $0 }.count, 3)
+    }
+
+    func testApplyToAllRegions_PreservesRegionIdentity() {
+        let r1 = makeRegion(name: "Knee")
+        let r2 = makeRegion(name: "Back")
+        let vm = InjuryAnalysisViewModel(
+            userProfile: makeProfile(),
+            selectedRegions: [r1, r2]
+        )
+
+        let template = makeAssessment(region: r1)
+        vm.applyToAllRegionsAndAnalyze(template)
+
+        XCTAssertEqual(vm.assessments[0]?.selectedRegion.name, "Knee")
+        XCTAssertEqual(vm.assessments[1]?.selectedRegion.name, "Back")
+    }
+
+    func testApplyToAllRegions_CopiesPainData() {
+        let r1 = makeRegion(name: "Knee")
+        let r2 = makeRegion(name: "Back")
+        let vm = InjuryAnalysisViewModel(
+            userProfile: makeProfile(),
+            selectedRegions: [r1, r2]
+        )
+
+        let template = makeAssessment(region: r1)
+        vm.applyToAllRegionsAndAnalyze(template)
+
+        XCTAssertEqual(vm.assessments[1]?.painType, template.painType)
+        XCTAssertEqual(vm.assessments[1]?.painIntensity, template.painIntensity)
+        XCTAssertEqual(vm.assessments[1]?.painDuration, template.painDuration)
+        XCTAssertEqual(vm.assessments[1]?.painFrequency, template.painFrequency)
+        XCTAssertEqual(vm.assessments[1]?.painOnset, template.painOnset)
+        XCTAssertEqual(vm.assessments[1]?.aggravatingFactors, template.aggravatingFactors)
+        XCTAssertEqual(vm.assessments[1]?.relievingFactors, template.relievingFactors)
+    }
+
+    func testApplyToAllRegions_UniqueIDs() {
+        let r1 = makeRegion(name: "Knee")
+        let r2 = makeRegion(name: "Back")
+        let r3 = makeRegion(name: "Shoulder")
+        let vm = InjuryAnalysisViewModel(
+            userProfile: makeProfile(),
+            selectedRegions: [r1, r2, r3]
+        )
+
+        vm.applyToAllRegionsAndAnalyze(makeAssessment(region: r1))
+
+        let ids = vm.assessments.compactMap { $0?.id }
+        XCTAssertEqual(Set(ids).count, 3, "Each assessment should have a unique ID")
+    }
+
+    func testApplyToAllRegions_TriggersAnalysis() {
+        let r1 = makeRegion(name: "Knee")
+        let r2 = makeRegion(name: "Back")
+        let vm = InjuryAnalysisViewModel(
+            userProfile: makeProfile(),
+            selectedRegions: [r1, r2]
+        )
+
+        vm.applyToAllRegionsAndAnalyze(makeAssessment(region: r1))
+
+        XCTAssertTrue(vm.isAnalyzing)
+        XCTAssertTrue(vm.showAnalyzingScreen)
+    }
+
+    func testApplyToAllRegions_DoesNotChangeIndex() {
+        let r1 = makeRegion(name: "Knee")
+        let r2 = makeRegion(name: "Back")
+        let vm = InjuryAnalysisViewModel(
+            userProfile: makeProfile(),
+            selectedRegions: [r1, r2]
+        )
+
+        vm.applyToAllRegionsAndAnalyze(makeAssessment(region: r1))
+
+        XCTAssertEqual(vm.currentRegionIndex, 0, "Index should remain at 0 after apply-to-all")
+    }
 }

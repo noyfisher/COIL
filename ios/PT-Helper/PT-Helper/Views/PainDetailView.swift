@@ -13,6 +13,7 @@ struct PainDetailView: View {
     @State private var customAggravating: String = ""
     @State private var customRelieving: String = ""
     @State private var additionalNotes: String = ""
+    @State private var showApplyToAllConfirmation: Bool = false
 
     var body: some View {
         ZStack {
@@ -107,6 +108,18 @@ struct PainDetailView: View {
             AnalyzingView(viewModel: viewModel)
         }
         .trackScreen("PainDetail")
+        .alert(
+            "Apply to All Regions?",
+            isPresented: $showApplyToAllConfirmation
+        ) {
+            Button("Cancel", role: .cancel) {}
+            Button("Apply to All") {
+                guard let assessment = buildAssessment() else { return }
+                viewModel.applyToAllRegionsAndAnalyze(assessment)
+            }
+        } message: {
+            Text("This will copy your current pain details to all \(viewModel.totalRegions) selected regions and start analysis.")
+        }
     }
 
     // MARK: - Form State Management
@@ -552,44 +565,60 @@ struct PainDetailView: View {
     // MARK: - Navigation
 
     private var navigationButtons: some View {
-        HStack(spacing: AppSpacing.md) {
-            if viewModel.currentRegionIndex > 0 {
+        VStack(spacing: AppSpacing.sm) {
+            // "Apply to All Regions" — only on first region when multiple exist
+            if viewModel.isFirstRegion && viewModel.hasMultipleRegions {
                 Button(action: {
-                    guard let assessment = buildAssessment() else { return }
-                    viewModel.saveAndGoBack(assessment)
+                    showApplyToAllConfirmation = true
                 }) {
-                    HStack(spacing: AppSpacing.xs) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 13, weight: .bold))
-                        Text("Back")
+                    HStack(spacing: AppSpacing.sm) {
+                        Image(systemName: "doc.on.doc")
+                        Text("Apply to All \(viewModel.totalRegions) Regions")
                     }
                 }
                 .buttonStyle(SecondaryButtonStyle())
             }
 
-            if viewModel.isLastRegion {
-                Button(action: {
-                    guard let assessment = buildAssessment() else { return }
-                    viewModel.saveAndAnalyze(assessment)
-                }) {
-                    HStack(spacing: AppSpacing.sm) {
-                        Image(systemName: "sparkles")
-                        Text("Review & Analyze")
+            // Existing navigation row
+            HStack(spacing: AppSpacing.md) {
+                if viewModel.currentRegionIndex > 0 {
+                    Button(action: {
+                        guard let assessment = buildAssessment() else { return }
+                        viewModel.saveAndGoBack(assessment)
+                    }) {
+                        HStack(spacing: AppSpacing.xs) {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 13, weight: .bold))
+                            Text("Back")
+                        }
                     }
+                    .buttonStyle(SecondaryButtonStyle())
                 }
-                .buttonStyle(PrimaryButtonStyle())
-            } else {
-                Button(action: {
-                    guard let assessment = buildAssessment() else { return }
-                    viewModel.saveAndAdvance(assessment)
-                }) {
-                    HStack(spacing: AppSpacing.sm) {
-                        Text("Next")
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 13, weight: .bold))
+
+                if viewModel.isLastRegion {
+                    Button(action: {
+                        guard let assessment = buildAssessment() else { return }
+                        viewModel.saveAndAnalyze(assessment)
+                    }) {
+                        HStack(spacing: AppSpacing.sm) {
+                            Image(systemName: "sparkles")
+                            Text("Review & Analyze")
+                        }
                     }
+                    .buttonStyle(PrimaryButtonStyle())
+                } else {
+                    Button(action: {
+                        guard let assessment = buildAssessment() else { return }
+                        viewModel.saveAndAdvance(assessment)
+                    }) {
+                        HStack(spacing: AppSpacing.sm) {
+                            Text("Next")
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 13, weight: .bold))
+                        }
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
                 }
-                .buttonStyle(PrimaryButtonStyle())
             }
         }
     }

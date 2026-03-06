@@ -50,6 +50,26 @@ class InjuryAnalysisViewModel: ObservableObject {
         startAnalysis()
     }
 
+    /// Apply the given assessment's pain data to all regions, then trigger analysis.
+    func applyToAllRegionsAndAnalyze(_ template: PainAssessment) {
+        for (index, region) in selectedRegions.enumerated() {
+            assessments[index] = PainAssessment(
+                id: UUID(),
+                selectedRegion: region,
+                painType: template.painType,
+                customPainDescription: template.customPainDescription,
+                painIntensity: template.painIntensity,
+                painDuration: template.painDuration,
+                painFrequency: template.painFrequency,
+                painOnset: template.painOnset,
+                aggravatingFactors: template.aggravatingFactors,
+                relievingFactors: template.relievingFactors,
+                additionalNotes: template.additionalNotes
+            )
+        }
+        startAnalysis()
+    }
+
     /// Retry analysis after an error.
     func retryAnalysis() {
         startAnalysis()
@@ -126,6 +146,14 @@ class InjuryAnalysisViewModel: ObservableObject {
 
     var isLastRegion: Bool {
         return currentRegionIndex == selectedRegions.count - 1
+    }
+
+    var isFirstRegion: Bool {
+        return currentRegionIndex == 0
+    }
+
+    var hasMultipleRegions: Bool {
+        return selectedRegions.count > 1
     }
 
     var totalRegions: Int {
