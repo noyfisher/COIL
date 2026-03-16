@@ -13,8 +13,10 @@ class StreakService: ObservableObject {
 
     private let db = Firestore.firestore()
 
-    private init() {
-        Task { await loadFromFirestore() }
+    init(skipFirebaseLoad: Bool = false) {
+        if !skipFirebaseLoad {
+            Task { await loadFromFirestore() }
+        }
     }
 
     // MARK: - Streak Update
@@ -123,7 +125,10 @@ class StreakService: ObservableObject {
         // Save earned achievements
         let earnedAchievements: [[String: Any]] = achievements
             .filter { $0.isEarned }
-            .map { ["id": $0.id, "dateEarned": Timestamp(date: $0.dateEarned!)] }
+            .compactMap { achievement in
+                guard let dateEarned = achievement.dateEarned else { return nil }
+                return ["id": achievement.id, "dateEarned": Timestamp(date: dateEarned)]
+            }
         data["achievements"] = earnedAchievements
 
         do {

@@ -2,18 +2,28 @@ import SwiftUI
 
 struct PainDetailView: View {
     @ObservedObject var viewModel: InjuryAnalysisViewModel
-    @State private var selectedPainType: PainAssessment.PainType = .sharp
+    @State private var painTypes: [String] = []
+    @State private var customPainType: String = ""
     @State private var customPainDescription: String = ""
     @State private var painIntensity: Double = 5
-    @State private var selectedPainDuration: PainAssessment.PainDuration = .today
-    @State private var selectedPainFrequency: PainAssessment.PainFrequency = .constant
-    @State private var selectedPainOnset: PainAssessment.PainOnset = .sudden
+    @State private var painDurations: [String] = []
+    @State private var painFrequencies: [String] = []
+    @State private var customFrequency: String = ""
+    @State private var painOnsets: [String] = []
+    @State private var customOnset: String = ""
     @State private var aggravatingFactors: [String] = []
     @State private var relievingFactors: [String] = []
     @State private var customAggravating: String = ""
     @State private var customRelieving: String = ""
     @State private var additionalNotes: String = ""
     @State private var showApplyToAllConfirmation: Bool = false
+    // Treatment history state
+    @State private var hasSeenDoctor: Bool = false
+    @State private var imagingDone: [String] = []
+    @State private var hasDiagnosis: Bool = false
+    @State private var diagnosisText: String = ""
+    @State private var currentlyReceivingTreatment: Bool = false
+    @State private var treatmentDetails: String = ""
 
     var body: some View {
         ZStack {
@@ -70,6 +80,7 @@ struct PainDetailView: View {
                                     painOnsetPicker
                                     aggravatingFactorsSelection
                                     relievingFactorsSelection
+                                    treatmentHistorySection
                                     additionalNotesField
                                 }
                             }
@@ -128,43 +139,78 @@ struct PainDetailView: View {
     private func buildAssessment() -> PainAssessment? {
         guard let region = viewModel.currentRegion else { return nil }
         let trimmedDescription = customPainDescription.trimmingCharacters(in: .whitespaces)
+        let trimmedDiagnosis = diagnosisText.trimmingCharacters(in: .whitespaces)
+        let trimmedTreatment = treatmentDetails.trimmingCharacters(in: .whitespaces)
+
+        // Only include treatment if any data was entered
+        let treatment: CurrentTreatment? = hasSeenDoctor || currentlyReceivingTreatment
+            ? CurrentTreatment(
+                hasSeenDoctor: hasSeenDoctor,
+                imagingDone: imagingDone,
+                hasDiagnosis: hasDiagnosis,
+                diagnosisText: trimmedDiagnosis.isEmpty ? nil : trimmedDiagnosis,
+                currentlyReceivingTreatment: currentlyReceivingTreatment,
+                treatmentDetails: trimmedTreatment.isEmpty ? nil : trimmedTreatment
+            )
+            : nil
+
         return PainAssessment(
             id: UUID(),
             selectedRegion: region,
-            painType: selectedPainType,
+            painTypes: painTypes,
             customPainDescription: trimmedDescription.isEmpty ? nil : trimmedDescription,
             painIntensity: Int(painIntensity),
-            painDuration: selectedPainDuration,
-            painFrequency: selectedPainFrequency,
-            painOnset: selectedPainOnset,
+            painDurations: painDurations,
+            painFrequencies: painFrequencies,
+            painOnsets: painOnsets,
             aggravatingFactors: aggravatingFactors,
             relievingFactors: relievingFactors,
-            additionalNotes: additionalNotes
+            additionalNotes: additionalNotes,
+            currentTreatment: treatment
         )
     }
 
     /// Restore form fields from a previously saved assessment, or reset to defaults.
     private func restoreFormState() {
         if let saved = viewModel.currentAssessment {
-            selectedPainType = saved.painType
+            painTypes = saved.painTypes
+            customPainType = ""
             customPainDescription = saved.customPainDescription ?? ""
             painIntensity = Double(saved.painIntensity)
-            selectedPainDuration = saved.painDuration
-            selectedPainFrequency = saved.painFrequency
-            selectedPainOnset = saved.painOnset
+            painDurations = saved.painDurations
+            painFrequencies = saved.painFrequencies
+            customFrequency = ""
+            painOnsets = saved.painOnsets
+            customOnset = ""
             aggravatingFactors = saved.aggravatingFactors
             relievingFactors = saved.relievingFactors
             additionalNotes = saved.additionalNotes ?? ""
+            // Treatment history
+            hasSeenDoctor = saved.currentTreatment?.hasSeenDoctor ?? false
+            imagingDone = saved.currentTreatment?.imagingDone ?? []
+            hasDiagnosis = saved.currentTreatment?.hasDiagnosis ?? false
+            diagnosisText = saved.currentTreatment?.diagnosisText ?? ""
+            currentlyReceivingTreatment = saved.currentTreatment?.currentlyReceivingTreatment ?? false
+            treatmentDetails = saved.currentTreatment?.treatmentDetails ?? ""
         } else {
-            selectedPainType = .sharp
+            painTypes = []
+            customPainType = ""
             customPainDescription = ""
             painIntensity = 5
-            selectedPainDuration = .today
-            selectedPainFrequency = .constant
-            selectedPainOnset = .sudden
+            painDurations = []
+            painFrequencies = []
+            customFrequency = ""
+            painOnsets = []
+            customOnset = ""
             aggravatingFactors = []
             relievingFactors = []
             additionalNotes = ""
+            hasSeenDoctor = false
+            imagingDone = []
+            hasDiagnosis = false
+            diagnosisText = ""
+            currentlyReceivingTreatment = false
+            treatmentDetails = ""
         }
     }
 
@@ -172,15 +218,15 @@ struct PainDetailView: View {
 
     private var formCompletionFields: Int {
         var count = 0
+        if !painTypes.isEmpty { count += 1 }
         if painIntensity != 5 { count += 1 }  // intensity changed from default
+        if !painDurations.isEmpty { count += 1 }
+        if !painFrequencies.isEmpty { count += 1 }
+        if !painOnsets.isEmpty { count += 1 }
         if !aggravatingFactors.isEmpty { count += 1 }
         if !relievingFactors.isEmpty { count += 1 }
         if !additionalNotes.trimmingCharacters(in: .whitespaces).isEmpty { count += 1 }
         if !customPainDescription.trimmingCharacters(in: .whitespaces).isEmpty { count += 1 }
-        count += 1 // pain type always selected
-        count += 1 // duration always selected
-        count += 1 // frequency always selected
-        count += 1 // onset always selected
         return count
     }
 
@@ -201,37 +247,64 @@ struct PainDetailView: View {
         }
     }
 
-    // MARK: - Pain Type (grid of icon+label chips)
+    // MARK: - Pain Type (multi-select chips + custom)
+
+    private var painTypeOptions: [String] {
+        PainAssessment.PainType.allCases.map { $0.displayName }
+    }
+
+    private var customPainTypeEntries: [String] {
+        painTypes.filter { !painTypeOptions.contains($0) }
+    }
+
+    private func addCustomPainType() {
+        let trimmed = customPainType.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty, !painTypes.contains(trimmed) else { return }
+        painTypes.append(trimmed)
+        customPainType = ""
+    }
 
     private var painTypeSelection: some View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text("Pain Type")
                 .font(.headline)
-
-            LazyVGrid(columns: [
-                GridItem(.flexible()),
-                GridItem(.flexible()),
-                GridItem(.flexible()),
-                GridItem(.flexible())
-            ], spacing: AppSpacing.sm) {
-                ForEach(PainAssessment.PainType.allCases, id: \.self) { type in
-                    let isSelected = selectedPainType == type
-                    Button(action: { selectedPainType = type }) {
-                        VStack(spacing: AppSpacing.xs) {
-                            Image(systemName: iconName(for: type))
-                                .font(.system(size: 18))
-                            Text(type.displayName)
-                                .font(.caption2)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.8)
+            FlowLayout(spacing: AppSpacing.sm) {
+                ForEach(painTypeOptions, id: \.self) { type in
+                    ChipButton(
+                        label: type,
+                        isSelected: painTypes.contains(type),
+                        action: {
+                            if painTypes.contains(type) {
+                                painTypes.removeAll { $0 == type }
+                            } else {
+                                painTypes.append(type)
+                            }
                         }
-                        .foregroundColor(isSelected ? .white : .blue)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, AppSpacing.sm)
-                        .background(isSelected ? Color.blue : Color.blue.opacity(0.1))
-                        .cornerRadius(AppCorners.small)
-                    }
+                    )
                 }
+                ForEach(customPainTypeEntries, id: \.self) { entry in
+                    ChipButton(
+                        label: "✕ " + entry,
+                        isSelected: true,
+                        action: { painTypes.removeAll { $0 == entry } }
+                    )
+                }
+            }
+            HStack(spacing: AppSpacing.sm) {
+                TextField("Add your own...", text: $customPainType)
+                    .font(.subheadline)
+                    .padding(.horizontal, AppSpacing.md)
+                    .padding(.vertical, AppSpacing.sm)
+                    .background(AppColors.inputBackground)
+                    .cornerRadius(AppCorners.small)
+                    .submitLabel(.done)
+                    .onSubmit { addCustomPainType() }
+                Button(action: addCustomPainType) {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(customPainType.trimmingCharacters(in: .whitespaces).isEmpty ? .gray : .blue)
+                }
+                .disabled(customPainType.trimmingCharacters(in: .whitespaces).isEmpty)
             }
         }
     }
@@ -272,56 +345,154 @@ struct PainDetailView: View {
         }
     }
 
-    // MARK: - Pain Duration (chip selector)
+    // MARK: - Pain Duration (single-select chips)
+
+    private var painDurationOptions: [String] {
+        PainAssessment.PainDuration.allCases.map { $0.displayName }
+    }
 
     private var painDurationPicker: some View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text("Pain Duration")
                 .font(.headline)
             FlowLayout(spacing: AppSpacing.sm) {
-                ForEach(PainAssessment.PainDuration.allCases, id: \.self) { duration in
+                ForEach(painDurationOptions, id: \.self) { duration in
                     ChipButton(
-                        label: duration.displayName,
-                        isSelected: selectedPainDuration == duration,
-                        action: { selectedPainDuration = duration }
+                        label: duration,
+                        isSelected: painDurations.contains(duration),
+                        action: {
+                            if painDurations.contains(duration) {
+                                painDurations = []
+                            } else {
+                                painDurations = [duration]
+                            }
+                        }
                     )
                 }
             }
         }
     }
 
-    // MARK: - Pain Frequency (chip selector)
+    // MARK: - Pain Frequency (multi-select chips + custom)
+
+    private var painFrequencyOptions: [String] {
+        PainAssessment.PainFrequency.allCases.map { $0.displayName }
+    }
+
+    private var customFrequencyEntries: [String] {
+        painFrequencies.filter { !painFrequencyOptions.contains($0) }
+    }
+
+    private func addCustomFrequency() {
+        let trimmed = customFrequency.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty, !painFrequencies.contains(trimmed) else { return }
+        painFrequencies.append(trimmed)
+        customFrequency = ""
+    }
 
     private var painFrequencyPicker: some View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text("Pain Frequency")
                 .font(.headline)
             FlowLayout(spacing: AppSpacing.sm) {
-                ForEach(PainAssessment.PainFrequency.allCases, id: \.self) { frequency in
+                ForEach(painFrequencyOptions, id: \.self) { frequency in
                     ChipButton(
-                        label: frequency.displayName,
-                        isSelected: selectedPainFrequency == frequency,
-                        action: { selectedPainFrequency = frequency }
+                        label: frequency,
+                        isSelected: painFrequencies.contains(frequency),
+                        action: {
+                            if painFrequencies.contains(frequency) {
+                                painFrequencies.removeAll { $0 == frequency }
+                            } else {
+                                painFrequencies.append(frequency)
+                            }
+                        }
                     )
                 }
+                ForEach(customFrequencyEntries, id: \.self) { entry in
+                    ChipButton(
+                        label: "✕ " + entry,
+                        isSelected: true,
+                        action: { painFrequencies.removeAll { $0 == entry } }
+                    )
+                }
+            }
+            HStack(spacing: AppSpacing.sm) {
+                TextField("Add your own...", text: $customFrequency)
+                    .font(.subheadline)
+                    .padding(.horizontal, AppSpacing.md)
+                    .padding(.vertical, AppSpacing.sm)
+                    .background(AppColors.inputBackground)
+                    .cornerRadius(AppCorners.small)
+                    .submitLabel(.done)
+                    .onSubmit { addCustomFrequency() }
+                Button(action: addCustomFrequency) {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(customFrequency.trimmingCharacters(in: .whitespaces).isEmpty ? .gray : .blue)
+                }
+                .disabled(customFrequency.trimmingCharacters(in: .whitespaces).isEmpty)
             }
         }
     }
 
-    // MARK: - Pain Onset (chip selector)
+    // MARK: - Pain Onset (multi-select chips + custom)
+
+    private var painOnsetOptions: [String] {
+        PainAssessment.PainOnset.allCases.map { $0.displayName }
+    }
+
+    private var customOnsetEntries: [String] {
+        painOnsets.filter { !painOnsetOptions.contains($0) }
+    }
+
+    private func addCustomOnset() {
+        let trimmed = customOnset.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty, !painOnsets.contains(trimmed) else { return }
+        painOnsets.append(trimmed)
+        customOnset = ""
+    }
 
     private var painOnsetPicker: some View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text("Pain Onset")
                 .font(.headline)
             FlowLayout(spacing: AppSpacing.sm) {
-                ForEach(PainAssessment.PainOnset.allCases, id: \.self) { onset in
+                ForEach(painOnsetOptions, id: \.self) { onset in
                     ChipButton(
-                        label: onset.displayName,
-                        isSelected: selectedPainOnset == onset,
-                        action: { selectedPainOnset = onset }
+                        label: onset,
+                        isSelected: painOnsets.contains(onset),
+                        action: {
+                            if painOnsets.contains(onset) {
+                                painOnsets.removeAll { $0 == onset }
+                            } else {
+                                painOnsets.append(onset)
+                            }
+                        }
                     )
                 }
+                ForEach(customOnsetEntries, id: \.self) { entry in
+                    ChipButton(
+                        label: "✕ " + entry,
+                        isSelected: true,
+                        action: { painOnsets.removeAll { $0 == entry } }
+                    )
+                }
+            }
+            HStack(spacing: AppSpacing.sm) {
+                TextField("Add your own...", text: $customOnset)
+                    .font(.subheadline)
+                    .padding(.horizontal, AppSpacing.md)
+                    .padding(.vertical, AppSpacing.sm)
+                    .background(AppColors.inputBackground)
+                    .cornerRadius(AppCorners.small)
+                    .submitLabel(.done)
+                    .onSubmit { addCustomOnset() }
+                Button(action: addCustomOnset) {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(customOnset.trimmingCharacters(in: .whitespaces).isEmpty ? .gray : .blue)
+                }
+                .disabled(customOnset.trimmingCharacters(in: .whitespaces).isEmpty)
             }
         }
     }
@@ -548,6 +719,76 @@ struct PainDetailView: View {
         }
     }
 
+    // MARK: - Treatment History
+
+    private let imagingOptions = ["X-ray", "MRI", "CT Scan", "Ultrasound"]
+
+    private var treatmentHistorySection: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
+            Text("Treatment History")
+                .font(.headline)
+            Text("Optional — helps provide better recommendations")
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            // Seen a doctor toggle
+            Toggle("Have you seen a doctor for this pain?", isOn: $hasSeenDoctor)
+                .font(.subheadline)
+                .tint(.blue)
+
+            if hasSeenDoctor {
+                // Imaging
+                VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                    Text("Imaging done")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    FlowLayout(spacing: AppSpacing.sm) {
+                        ForEach(imagingOptions, id: \.self) { option in
+                            ChipButton(
+                                label: option,
+                                isSelected: imagingDone.contains(option),
+                                action: {
+                                    if imagingDone.contains(option) {
+                                        imagingDone.removeAll { $0 == option }
+                                    } else {
+                                        imagingDone.append(option)
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
+
+                // Diagnosis
+                Toggle("Were you given a diagnosis?", isOn: $hasDiagnosis)
+                    .font(.subheadline)
+                    .tint(.blue)
+
+                if hasDiagnosis {
+                    TextField("What was the diagnosis?", text: $diagnosisText)
+                        .font(.subheadline)
+                        .padding(AppSpacing.md)
+                        .background(AppColors.inputBackground)
+                        .cornerRadius(AppCorners.medium)
+                }
+            }
+
+            // Currently receiving treatment
+            Toggle("Currently receiving treatment?", isOn: $currentlyReceivingTreatment)
+                .font(.subheadline)
+                .tint(.blue)
+
+            if currentlyReceivingTreatment {
+                TextField("Describe your current treatment", text: $treatmentDetails, axis: .vertical)
+                    .lineLimit(2...3)
+                    .font(.subheadline)
+                    .padding(AppSpacing.md)
+                    .background(AppColors.inputBackground)
+                    .cornerRadius(AppCorners.medium)
+            }
+        }
+    }
+
     // MARK: - Additional Notes
 
     private var additionalNotesField: some View {
@@ -671,84 +912,4 @@ struct PainDetailView: View {
     }
 }
 
-// MARK: - Chip Button
-
-private struct ChipButton: View {
-    let label: String
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Text(label)
-                .font(.subheadline.weight(.medium))
-                .foregroundColor(isSelected ? .white : .primary)
-                .padding(.horizontal, AppSpacing.md)
-                .padding(.vertical, AppSpacing.sm)
-                .background(isSelected ? Color.blue : AppColors.inputBackground)
-                .cornerRadius(AppCorners.small)
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppCorners.small)
-                        .stroke(isSelected ? Color.clear : AppColors.subtleBorder, lineWidth: 1)
-                )
-        }
-    }
-}
-
-// MARK: - Flow Layout (wrapping horizontal layout)
-
-private struct FlowLayout: Layout {
-    var spacing: CGFloat = 8
-
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let result = arrangeSubviews(proposal: proposal, subviews: subviews)
-        return result.size
-    }
-
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let result = arrangeSubviews(proposal: ProposedViewSize(width: bounds.width, height: bounds.height), subviews: subviews)
-        for (index, position) in result.positions.enumerated() {
-            subviews[index].place(
-                at: CGPoint(x: bounds.minX + position.x, y: bounds.minY + position.y),
-                proposal: ProposedViewSize(result.sizes[index])
-            )
-        }
-    }
-
-    private func arrangeSubviews(proposal: ProposedViewSize, subviews: Subviews) -> ArrangementResult {
-        let maxWidth = proposal.width ?? .infinity
-        var positions: [CGPoint] = []
-        var sizes: [CGSize] = []
-        var currentX: CGFloat = 0
-        var currentY: CGFloat = 0
-        var rowHeight: CGFloat = 0
-
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            sizes.append(size)
-
-            if currentX + size.width > maxWidth && currentX > 0 {
-                currentX = 0
-                currentY += rowHeight + spacing
-                rowHeight = 0
-            }
-
-            positions.append(CGPoint(x: currentX, y: currentY))
-            rowHeight = max(rowHeight, size.height)
-            currentX += size.width + spacing
-        }
-
-        let totalHeight = currentY + rowHeight
-        return ArrangementResult(
-            size: CGSize(width: maxWidth, height: totalHeight),
-            positions: positions,
-            sizes: sizes
-        )
-    }
-
-    private struct ArrangementResult {
-        let size: CGSize
-        let positions: [CGPoint]
-        let sizes: [CGSize]
-    }
-}
+// ChipButton and FlowLayout moved to DesignSystem.swift

@@ -1,0 +1,417 @@
+{
+  "version": "1.0",
+  "conditions": {
+    "patellofemoral-pain-syndrome": {
+      "names": ["patellofemoral pain syndrome", "runner's knee", "pfps", "kneecap pain", "anterior knee pain", "chondromalacia patella"],
+      "icd10": "M22.2X9",
+      "bodyRegions": ["knee"],
+      "safeExercises": [
+        "quad-sets", "straight-leg-raises", "wall-sits", "clamshells", "heel-slides",
+        "step-ups", "hamstring-curls", "seated-knee-extension", "isometric-quad-contraction",
+        "short-arc-quads", "terminal-knee-extension", "long-arc-quads", "mini-squats",
+        "wall-squat-with-ball", "hamstring-stretch-with-strap", "seated-hamstring-stretch",
+        "supine-hamstring-stretch", "hip-flexor-stretch", "glute-bridges", "lateral-band-walks",
+        "side-lying-hip-abduction", "standing-hip-abduction", "foam-roller-quad",
+        "standing-quad-stretch", "walking"
+      ],
+      "unsafeExercises": [
+        "bulgarian-split-squat", "single-leg-deadlift"
+      ],
+      "redFlags": ["knee locking", "inability to bear weight", "acute swelling within 2 hours", "giving way"],
+      "referIfPresent": ["symptoms > 8 weeks without improvement", "mechanical locking", "recurrent effusion"]
+    },
+    "meniscus-tear": {
+      "names": ["meniscus tear", "meniscal tear", "torn meniscus", "knee cartilage tear", "medial meniscus tear", "lateral meniscus tear"],
+      "icd10": "S83.200A",
+      "bodyRegions": ["knee"],
+      "safeExercises": [
+        "quad-sets", "straight-leg-raises", "heel-slides", "knee-flexion-rom",
+        "isometric-quad-contraction", "short-arc-quads", "hamstring-curls",
+        "seated-knee-extension", "step-ups", "clamshells", "glute-bridges",
+        "terminal-knee-extension", "walking", "seated-hamstring-stretch",
+        "standing-quad-stretch"
+      ],
+      "unsafeExercises": [
+        "bulgarian-split-squat", "single-leg-deadlift"
+      ],
+      "redFlags": ["locked knee unable to straighten", "acute swelling within hours", "inability to bear weight"],
+      "referIfPresent": ["mechanical locking episodes", "persistent effusion", "inability to fully extend knee"]
+    },
+    "acl-sprain": {
+      "names": ["acl sprain", "acl tear", "anterior cruciate ligament", "acl injury", "acl rupture"],
+      "icd10": "S83.519A",
+      "bodyRegions": ["knee"],
+      "safeExercises": [
+        "quad-sets", "straight-leg-raises", "hamstring-curls", "heel-slides",
+        "isometric-quad-contraction", "clamshells", "glute-bridges",
+        "standing-hip-abduction", "side-lying-hip-abduction", "short-arc-quads",
+        "terminal-knee-extension", "prone-hamstring-curl", "walking",
+        "seated-knee-extension"
+      ],
+      "unsafeExercises": [
+        "bulgarian-split-squat", "single-leg-deadlift", "lateral-step-ups"
+      ],
+      "redFlags": ["acute instability with giving way", "large effusion", "inability to bear weight"],
+      "referIfPresent": ["recurrent instability episodes", "associated meniscal symptoms", "desire to return to cutting/pivoting sports"]
+    },
+    "patellar-tendinitis": {
+      "names": ["patellar tendinitis", "patellar tendinopathy", "jumper's knee", "patellar tendon pain"],
+      "icd10": "M76.50",
+      "bodyRegions": ["knee"],
+      "safeExercises": [
+        "quad-sets", "straight-leg-raises", "wall-sits", "isometric-quad-contraction",
+        "hamstring-stretch-with-strap", "foam-roller-quad", "standing-quad-stretch",
+        "short-arc-quads", "seated-knee-extension", "clamshells", "glute-bridges",
+        "hip-flexor-stretch", "walking"
+      ],
+      "unsafeExercises": [
+        "bulgarian-split-squat"
+      ],
+      "redFlags": ["complete inability to extend knee against gravity", "palpable gap in tendon"],
+      "referIfPresent": ["symptoms > 12 weeks with conservative treatment", "inability to perform daily activities"]
+    },
+    "it-band-syndrome": {
+      "names": ["it band syndrome", "iliotibial band syndrome", "itbs", "it band friction syndrome", "runner's knee lateral"],
+      "icd10": "M76.30",
+      "bodyRegions": ["knee", "hip"],
+      "safeExercises": [
+        "foam-roller-it-band", "it-band-stretch", "clamshells", "side-lying-hip-abduction",
+        "lateral-band-walks", "glute-bridges", "hip-flexor-stretch", "piriformis-stretch",
+        "standing-hip-abduction", "monster-walks", "fire-hydrants",
+        "standing-quad-stretch", "walking"
+      ],
+      "unsafeExercises": [],
+      "redFlags": ["swelling over lateral knee", "pain at rest"],
+      "referIfPresent": ["symptoms > 6 weeks despite rest", "pain with walking"]
+    },
+    "rotator-cuff-tendinopathy": {
+      "names": ["rotator cuff tendinopathy", "rotator cuff tendinitis", "rotator cuff strain", "rotator cuff tear", "supraspinatus tendinitis", "shoulder tendinitis"],
+      "icd10": "M75.10",
+      "bodyRegions": ["shoulder"],
+      "safeExercises": [
+        "pendulum-swings", "external-rotation", "internal-rotation",
+        "isometric-shoulder-external-rotation", "isometric-shoulder-internal-rotation",
+        "side-lying-external-rotation", "scapular-squeezes", "wall-slides",
+        "cross-body-stretch", "prone-t-raises", "prone-y-raises", "band-pull-aparts",
+        "resistance-band-pull-apart", "doorway-stretch", "prone-scapular-retraction",
+        "wall-angel", "pec-stretch", "prone-i-y-t-raises",
+        "prone-i-y-t-shoulder-activation", "sleeper-stretch",
+        "banded-shoulder-stabilizer-series", "resistance-band-external-rotation-at-90-90"
+      ],
+      "unsafeExercises": [
+        "seated-shoulder-press", "lat-pulldown-with-band", "wall-push-ups"
+      ],
+      "redFlags": ["acute trauma with inability to raise arm", "night pain unresponsive to position"],
+      "referIfPresent": ["suspected full-thickness tear", "significant weakness in external rotation", "symptoms > 12 weeks"]
+    },
+    "shoulder-impingement": {
+      "names": ["shoulder impingement", "impingement syndrome", "subacromial impingement", "shoulder bursitis"],
+      "icd10": "M75.40",
+      "bodyRegions": ["shoulder"],
+      "safeExercises": [
+        "pendulum-swings", "external-rotation", "internal-rotation",
+        "scapular-squeezes", "doorway-stretch", "cross-body-stretch",
+        "wall-slides", "sleeper-stretch", "prone-t-raises", "prone-y-raises",
+        "band-pull-aparts", "resistance-band-pull-apart", "wall-angel",
+        "prone-scapular-retraction", "isometric-shoulder-external-rotation",
+        "isometric-shoulder-internal-rotation", "side-lying-external-rotation",
+        "pec-stretch", "chest-stretch-corner", "prone-i-y-t-raises"
+      ],
+      "unsafeExercises": [
+        "seated-shoulder-press", "shoulder-shrugs"
+      ],
+      "redFlags": ["acute trauma with inability to raise arm", "night pain unrelieved by position"],
+      "referIfPresent": ["persistent symptoms > 8 weeks", "significant arc of pain 60-120 degrees"]
+    },
+    "frozen-shoulder": {
+      "names": ["frozen shoulder", "adhesive capsulitis", "stiff shoulder"],
+      "icd10": "M75.00",
+      "bodyRegions": ["shoulder"],
+      "safeExercises": [
+        "pendulum-swings", "shoulder-flexion", "shoulder-abduction",
+        "wall-slides", "cross-body-stretch", "external-rotation",
+        "internal-rotation", "doorway-stretch", "walking"
+      ],
+      "unsafeExercises": [
+        "seated-shoulder-press", "lat-pulldown-with-band", "wall-push-ups",
+        "standing-chest-fly-with-band"
+      ],
+      "redFlags": ["trauma preceding stiffness", "fever with shoulder pain"],
+      "referIfPresent": ["global restriction > 50% in all planes", "no improvement after 4 weeks of stretching"]
+    },
+    "biceps-tendinitis": {
+      "names": ["biceps tendinitis", "biceps tendinopathy", "bicipital tendinitis", "long head biceps tendinitis"],
+      "icd10": "M75.20",
+      "bodyRegions": ["shoulder"],
+      "safeExercises": [
+        "pendulum-swings", "external-rotation", "internal-rotation",
+        "scapular-squeezes", "cross-body-stretch", "bicep-curls",
+        "isometric-shoulder-external-rotation", "band-pull-aparts",
+        "doorway-stretch", "wall-slides"
+      ],
+      "unsafeExercises": [
+        "seated-shoulder-press"
+      ],
+      "redFlags": ["palpable defect in bicep", "bruising in upper arm after popping sensation"],
+      "referIfPresent": ["suspected biceps tendon rupture", "persistent anterior shoulder pain > 8 weeks"]
+    },
+    "lumbar-strain": {
+      "names": ["lumbar strain", "lower back strain", "lumbar sprain", "back muscle strain", "pulled back muscle", "mechanical low back pain"],
+      "icd10": "S39.012A",
+      "bodyRegions": ["lower_back"],
+      "safeExercises": [
+        "pelvic-tilts", "cat-cow-stretch", "knee-to-chest-stretch",
+        "double-knee-to-chest", "childs-pose", "glute-bridges", "bird-dog",
+        "dead-bug", "abdominal-bracing", "walking", "prayer-stretch",
+        "lumbar-rotation-stretch", "quadruped-rocking", "childs-pose-with-side-reach",
+        "supported-cat-cow-stretch", "glute-bridge-hold", "glute-bridge-with-isometric-hold",
+        "diaphragmatic-breathing"
+      ],
+      "unsafeExercises": [
+        "superman-exercise", "prone-press-up", "standing-back-extension", "plank"
+      ],
+      "redFlags": ["saddle anesthesia", "bladder or bowel changes", "bilateral leg weakness", "fever with back pain"],
+      "referIfPresent": ["radiating leg pain below knee", "progressive neurological deficit", "night pain unrelieved by rest"]
+    },
+    "herniated-disc": {
+      "names": ["herniated disc", "disc herniation", "bulging disc", "slipped disc", "disc protrusion", "lumbar disc herniation"],
+      "icd10": "M51.16",
+      "bodyRegions": ["lower_back"],
+      "safeExercises": [
+        "pelvic-tilts", "prone-press-up", "standing-back-extension",
+        "walking", "abdominal-bracing", "glute-bridges", "bird-dog",
+        "dead-bug", "cat-cow-stretch", "diaphragmatic-breathing"
+      ],
+      "unsafeExercises": [
+        "superman-exercise", "lumbar-rotation-stretch", "seated-long-sitting-stretch",
+        "seated-spinal-twist"
+      ],
+      "redFlags": ["saddle anesthesia", "bladder or bowel dysfunction", "bilateral leg symptoms", "progressive weakness"],
+      "referIfPresent": ["cauda equina symptoms", "progressive neurological deficit", "severe radiculopathy unresponsive to 6 weeks conservative care"]
+    },
+    "sciatica": {
+      "names": ["sciatica", "sciatic nerve pain", "lumbar radiculopathy", "piriformis-related sciatica"],
+      "icd10": "M54.30",
+      "bodyRegions": ["lower_back", "hip", "leg"],
+      "safeExercises": [
+        "sciatic-nerve-glide", "prone-press-up", "pelvic-tilts",
+        "cat-cow-stretch", "glute-bridges", "piriformis-stretch",
+        "supine-piriformis-stretch", "walking", "knee-to-chest-stretch",
+        "bird-dog", "dead-bug", "abdominal-bracing",
+        "seated-figure-four-stretch", "diaphragmatic-breathing"
+      ],
+      "unsafeExercises": [
+        "seated-long-sitting-stretch", "superman-exercise"
+      ],
+      "redFlags": ["saddle anesthesia", "bladder dysfunction", "bilateral leg symptoms", "progressive foot drop"],
+      "referIfPresent": ["progressive weakness", "symptoms > 12 weeks", "bowel or bladder changes"]
+    },
+    "spinal-stenosis": {
+      "names": ["spinal stenosis", "lumbar stenosis", "lumbar spinal stenosis", "neurogenic claudication"],
+      "icd10": "M48.06",
+      "bodyRegions": ["lower_back"],
+      "safeExercises": [
+        "pelvic-tilts", "knee-to-chest-stretch", "double-knee-to-chest",
+        "cat-cow-stretch", "walking", "abdominal-bracing", "dead-bug",
+        "seated-spinal-twist", "childs-pose", "prayer-stretch",
+        "bird-dog", "diaphragmatic-breathing"
+      ],
+      "unsafeExercises": [
+        "prone-press-up", "standing-back-extension", "superman-exercise"
+      ],
+      "redFlags": ["rapidly progressive weakness", "bowel or bladder dysfunction", "saddle anesthesia"],
+      "referIfPresent": ["walking distance < 1 block", "progressive neurological deficit", "bilateral symptoms"]
+    },
+    "cervical-strain": {
+      "names": ["cervical strain", "neck strain", "neck sprain", "whiplash", "neck pain", "cervical sprain"],
+      "icd10": "S13.4XXA",
+      "bodyRegions": ["neck"],
+      "safeExercises": [
+        "chin-tucks", "neck-rotations", "neck-side-bends",
+        "isometric-cervical-flexion", "isometric-cervical-extension",
+        "upper-trapezius-stretch", "levator-scapulae-stretch",
+        "seated-cervical-retraction", "shoulder-shrugs", "walking",
+        "diaphragmatic-breathing"
+      ],
+      "unsafeExercises": [
+        "seated-shoulder-press"
+      ],
+      "redFlags": ["trauma with midline tenderness", "progressive arm weakness", "difficulty walking"],
+      "referIfPresent": ["radicular arm symptoms", "persistent symptoms > 6 weeks", "neurological signs"]
+    },
+    "cervical-radiculopathy": {
+      "names": ["cervical radiculopathy", "pinched nerve neck", "cervical nerve root compression", "neck radiculopathy"],
+      "icd10": "M54.12",
+      "bodyRegions": ["neck"],
+      "safeExercises": [
+        "chin-tucks", "seated-cervical-retraction", "isometric-cervical-flexion",
+        "isometric-cervical-extension", "upper-trapezius-stretch",
+        "median-nerve-glide", "ulnar-nerve-glide", "walking",
+        "diaphragmatic-breathing", "scapular-squeezes"
+      ],
+      "unsafeExercises": [
+        "seated-shoulder-press", "shoulder-shrugs"
+      ],
+      "redFlags": ["progressive arm or hand weakness", "difficulty with fine motor tasks", "gait disturbance"],
+      "referIfPresent": ["myelopathy signs", "progressive neurological deficit", "bilateral arm symptoms"]
+    },
+    "lateral-ankle-sprain": {
+      "names": ["lateral ankle sprain", "ankle sprain", "inversion ankle sprain", "rolled ankle", "twisted ankle", "atfl sprain"],
+      "icd10": "S93.401A",
+      "bodyRegions": ["ankle"],
+      "safeExercises": [
+        "ankle-alphabet", "ankle-circles", "seated-ankle-pumps",
+        "resistance-band-ankle-eversion", "resistance-band-ankle-inversion",
+        "resisted-ankle-dorsiflexion", "resisted-ankle-plantarflexion",
+        "single-leg-balance", "heel-toe-walking", "towel-curls",
+        "toe-raises", "calf-stretch-on-step", "double-leg-calf-raise",
+        "seated-calf-raises", "walking", "bosu-ball-balance",
+        "seated-toe-taps"
+      ],
+      "unsafeExercises": [],
+      "redFlags": ["inability to bear weight", "bony tenderness at malleoli", "severe swelling with deformity"],
+      "referIfPresent": ["Ottawa Ankle Rules positive", "persistent instability > 6 weeks", "inability to walk 4 steps"]
+    },
+    "plantar-fasciitis": {
+      "names": ["plantar fasciitis", "plantar fasciopathy", "heel pain", "plantar heel pain", "heel spur syndrome"],
+      "icd10": "M72.2",
+      "bodyRegions": ["ankle", "foot"],
+      "safeExercises": [
+        "tennis-ball-roll", "towel-curls", "calf-stretch-on-step",
+        "soleus-stretch", "standing-calf-raises", "seated-calf-raises",
+        "marble-pickup", "toe-raises", "ankle-circles",
+        "walking", "seated-toe-taps"
+      ],
+      "unsafeExercises": [],
+      "redFlags": ["pain at rest that does not improve", "numbness or tingling in foot", "swelling with redness and warmth"],
+      "referIfPresent": ["symptoms > 6 months despite conservative treatment", "severe first-step pain limiting daily activities"]
+    },
+    "achilles-tendinopathy": {
+      "names": ["achilles tendinopathy", "achilles tendinitis", "achilles tendon pain", "achilles tendinosis"],
+      "icd10": "M76.60",
+      "bodyRegions": ["ankle", "calf"],
+      "safeExercises": [
+        "eccentric-calf-lowering", "calf-stretch-on-step", "soleus-stretch",
+        "seated-calf-raises", "heel-drops", "ankle-circles",
+        "walking", "double-leg-calf-raise", "foam-roller-calf",
+        "seated-ankle-pumps"
+      ],
+      "unsafeExercises": [
+        "single-leg-calf-raise"
+      ],
+      "redFlags": ["sudden pop with acute pain and inability to push off", "palpable gap in tendon"],
+      "referIfPresent": ["suspected tendon rupture", "persistent symptoms > 12 weeks", "progressive weakness in plantarflexion"]
+    },
+    "hip-bursitis": {
+      "names": ["hip bursitis", "trochanteric bursitis", "greater trochanteric pain syndrome", "lateral hip pain"],
+      "icd10": "M70.60",
+      "bodyRegions": ["hip"],
+      "safeExercises": [
+        "hip-flexor-stretch", "standing-hip-abduction", "side-lying-hip-abduction",
+        "clamshells", "glute-bridges", "piriformis-stretch", "hip-circles",
+        "walking", "standing-hip-flexion", "standing-hip-extension",
+        "supine-hip-flexion", "fire-hydrants", "lateral-band-walks",
+        "hip-hinge", "glute-bridge-hold"
+      ],
+      "unsafeExercises": [
+        "foam-roller-it-band"
+      ],
+      "redFlags": ["groin pain with fever", "inability to bear weight after fall"],
+      "referIfPresent": ["persistent lateral hip pain > 8 weeks", "pain at rest", "night pain"]
+    },
+    "piriformis-syndrome": {
+      "names": ["piriformis syndrome", "deep buttock pain", "piriformis tightness"],
+      "icd10": "G57.00",
+      "bodyRegions": ["hip", "glute"],
+      "safeExercises": [
+        "piriformis-stretch", "supine-piriformis-stretch", "seated-figure-four-stretch",
+        "hip-circles", "supine-hip-external-rotation", "supine-hip-internal-rotation",
+        "glute-bridges", "clamshells", "walking", "supine-figure-4-stretch-with-pelvic-mobilization",
+        "hip-flexor-stretch", "sciatic-nerve-glide"
+      ],
+      "unsafeExercises": [],
+      "redFlags": ["progressive leg weakness", "bowel or bladder changes", "numbness in saddle area"],
+      "referIfPresent": ["symptoms > 8 weeks despite stretching", "radiating pain below knee"]
+    },
+    "lateral-epicondylitis": {
+      "names": ["lateral epicondylitis", "tennis elbow", "lateral elbow pain", "extensor tendinopathy"],
+      "icd10": "M77.10",
+      "bodyRegions": ["elbow"],
+      "safeExercises": [
+        "wrist-extensor-stretch", "wrist-flexor-stretch", "wrist-circles",
+        "reverse-wrist-curls", "wrist-pronation-supination", "grip-strengthening"
+      ],
+      "unsafeExercises": [
+        "wrist-curls", "bicep-curls", "lat-pulldown-with-band",
+        "seated-row-with-band", "standing-row-with-band"
+      ],
+      "redFlags": ["locking or catching of elbow", "significant swelling"],
+      "referIfPresent": ["symptoms > 12 weeks", "weakness in grip affecting daily tasks", "prior cortisone injections > 2"]
+    },
+    "medial-epicondylitis": {
+      "names": ["medial epicondylitis", "golfer's elbow", "medial elbow pain", "flexor tendinopathy"],
+      "icd10": "M77.00",
+      "bodyRegions": ["elbow"],
+      "safeExercises": [
+        "wrist-flexor-stretch", "wrist-extensor-stretch", "wrist-circles",
+        "wrist-curls", "wrist-pronation-supination", "grip-strengthening"
+      ],
+      "unsafeExercises": [
+        "bicep-curls", "lat-pulldown-with-band"
+      ],
+      "redFlags": ["numbness or tingling in ring and little finger", "elbow instability"],
+      "referIfPresent": ["symptoms > 12 weeks", "ulnar nerve symptoms", "weakness in grip"]
+    },
+    "hamstring-strain": {
+      "names": ["hamstring strain", "hamstring tear", "pulled hamstring", "hamstring injury", "acute hamstring strain", "hamstring muscle strain", "hamstring pull"],
+      "icd10": "S76.319A",
+      "bodyRegions": ["thigh", "hamstring"],
+      "safeExercises": [
+        "prone-hamstring-curl", "hamstring-curls", "hamstring-stretch-with-strap",
+        "supine-hamstring-stretch", "seated-hamstring-stretch", "glute-bridges",
+        "pelvic-tilts", "hip-flexor-stretch", "walking", "heel-slides",
+        "quad-sets", "straight-leg-raises", "clamshells", "bird-dog",
+        "hip-hinge", "cat-cow-stretch", "quadruped-rocking"
+      ],
+      "unsafeExercises": [
+        "bulgarian-split-squat", "single-leg-deadlift", "nordic-hamstring-curl"
+      ],
+      "redFlags": ["complete inability to bear weight", "large palpable defect in muscle", "significant bruising extending to knee or calf"],
+      "referIfPresent": ["suspected complete tear (grade 3)", "persistent pain > 6 weeks", "recurrent strains at same site", "proximal tendon avulsion"]
+    },
+    "hamstring-tendinopathy": {
+      "names": ["hamstring tendinopathy", "hamstring tendinitis", "high hamstring tendinopathy", "proximal hamstring tendinopathy", "hamstring tendon pain", "ischial tuberosity pain"],
+      "icd10": "M76.899",
+      "bodyRegions": ["thigh", "hamstring", "hip"],
+      "safeExercises": [
+        "hamstring-stretch-with-strap", "supine-hamstring-stretch", "seated-hamstring-stretch",
+        "glute-bridges", "hip-hinge", "pelvic-tilts", "walking",
+        "prone-hamstring-curl", "hamstring-curls", "bird-dog",
+        "clamshells", "hip-flexor-stretch", "piriformis-stretch",
+        "cat-cow-stretch", "quadruped-rocking"
+      ],
+      "unsafeExercises": [
+        "bulgarian-split-squat", "single-leg-deadlift"
+      ],
+      "redFlags": ["complete inability to sit without pain", "acute onset after specific injury", "numbness in back of thigh"],
+      "referIfPresent": ["symptoms > 12 weeks despite conservative treatment", "inability to participate in sport", "sciatic nerve involvement suspected"]
+    },
+    "referred-pain-lower-back": {
+      "names": ["referred pain from lower back", "nerve irritation lower back", "referred pain from lower back / nerve irritation", "lumbar referred pain", "lower back nerve irritation", "radicular pain"],
+      "icd10": "M54.5",
+      "bodyRegions": ["lower back", "thigh", "leg"],
+      "safeExercises": [
+        "pelvic-tilts", "cat-cow-stretch", "bird-dog", "glute-bridges",
+        "piriformis-stretch", "sciatic-nerve-glide", "walking",
+        "hip-flexor-stretch", "quadruped-rocking", "childs-pose",
+        "seated-hamstring-stretch", "supine-hamstring-stretch",
+        "prone-press-up", "lumbar-rotation-stretch"
+      ],
+      "unsafeExercises": [
+        "standing-toe-touch", "seated-forward-fold"
+      ],
+      "redFlags": ["bowel or bladder dysfunction", "progressive weakness in legs", "saddle area numbness", "bilateral leg symptoms"],
+      "referIfPresent": ["progressive neurological symptoms", "symptoms > 6 weeks", "significant functional limitation"]
+    }
+  }
+}

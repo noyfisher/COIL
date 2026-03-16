@@ -40,7 +40,24 @@ class RehabPlanViewModel: ObservableObject {
     @Published var isGenerating: Bool = false
     @Published var generationError: String? = nil
 
+    // MARK: - Exercise Verification State
+    /// Verification status for each exercise (keyed by exercise name)
+    @Published var exerciseVerifications: [String: ExerciseVerificationStatus] = [:]
+    /// Whether cross-model verification is in progress
+    @Published var isVerifyingUnknowns: Bool = false
+    /// Whether all verification (graph + cross-model) is complete
+    @Published var verificationComplete: Bool = false
+    /// Summary counts for UI display
+    var verifiedCount: Int { exerciseVerifications.values.filter { $0 == .verified || $0 == .crossModelVerified }.count }
+    var flaggedCount: Int { exerciseVerifications.values.filter { if case .crossModelFlagged = $0 { return true }; return false }.count }
+    var totalExerciseCount: Int { rehabPlan?.exercises.count ?? 0 }
+
+    let apiService: ClaudeAPIServiceProtocol
     private let db = Firestore.firestore()
+
+    init(apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.shared) {
+        self.apiService = apiService
+    }
 
     // Fallback exercise database organized by condition name
     private let exerciseDatabase: [String: [RehabExercise]] = [
@@ -84,14 +101,23 @@ class RehabPlanViewModel: ObservableObject {
         isGenerating = true
         generationError = nil
 
+        AppLogger.rehab.info("Starting rehab plan generation for \(conditions.count) condition(s): \(conditions.joined(separator: ", "))")
         SessionLogger.shared.log(.loadingStarted, category: .stateChange, message: "Rehab plan generation started",
-                                  metadata: ["conditionCount": "\(conditions.count)"])
+                                  metadata: [
+                                    "conditionCount": "\(conditions.count)",
+                                    "conditions": conditions.joined(separator: ", "),
+                                    "activityLevel": analysisResult.userProfileSnapshot.activityLevel
+                                  ])
 
         Task {
             do {
+                AppLogger.rehab.info("Calling AI for rehab plan...")
                 let plan = try await generateAIRehabPlan(from: analysisResult)
-                // Validate the plan
-                let (validatedPlan, warnings) = ResponseValidationPipeline.validateRehabPlan(
+                AppLogger.rehab.info("AI returned plan '\(plan.planName)' with \(plan.exercises.count) exercises, \(plan.totalWeeks) weeks")
+
+                // Validate the plan (includes knowledge graph check)
+                AppLogger.rehab.info("Validating AI rehab plan...")
+                let (validatedPlan, warnings, graphVerification) = ResponseValidationPipeline.validateRehabPlan(
                     plan,
                     conditions: conditions,
                     userProfile: analysisResult.userProfileSnapshot
@@ -100,9 +126,32 @@ class RehabPlanViewModel: ObservableObject {
                 self.rehabPlanWarnings = warnings
                 self.isGenerating = false
 
+                // Set initial verification statuses from knowledge graph
+                if let graphResult = graphVerification {
+                    applyGraphVerification(graphResult)
+                }
+
+                let exerciseNames = plan.exercises.map { $0.name }
+                AppLogger.rehab.info("Rehab plan finalized: \(exerciseNames.joined(separator: ", "))")
                 SessionLogger.shared.log(.loadingFinished, category: .stateChange, message: "Rehab plan generated (AI)",
-                                          metadata: ["exerciseCount": "\(plan.exercises.count)",
-                                                      "source": "ai"])
+                                          metadata: [
+                                            "exerciseCount": "\(plan.exercises.count)",
+                                            "exercises": exerciseNames.prefix(5).joined(separator: ", "),
+                                            "totalWeeks": "\(plan.totalWeeks)",
+                                            "warningCount": "\(warnings.count)",
+                                            "source": "ai"
+                                          ])
+
+                // Trigger cross-model verification for unverified exercises (async, background)
+                if let graphResult = graphVerification, !graphResult.unverifiedExercises.isEmpty {
+                    await performCrossModelVerification(
+                        unverified: graphResult.unverifiedExercises,
+                        conditions: conditions,
+                        profile: analysisResult.userProfileSnapshot
+                    )
+                } else {
+                    verificationComplete = true
+                }
 
                 // Preload exercise images in background
                 ExerciseImageService.shared.preloadImages(for: plan.exercises)
@@ -113,8 +162,24 @@ class RehabPlanViewModel: ObservableObject {
                 AppLogger.rehab.warning("AI rehab generation failed, using fallback: \(error.localizedDescription)")
                 SessionLogger.shared.log(.stateUpdated, category: .stateChange, message: "Rehab plan using fallback",
                                           metadata: ["source": "fallback", "reason": error.localizedDescription])
+
                 let exercises = conditions.flatMap { exerciseDatabase[$0] ?? [] }
-                let finalExercises = exercises.isEmpty ? getGeneralExercises() : exercises
+                let matchedConditions = conditions.filter { exerciseDatabase[$0] != nil }
+                let unmatchedConditions = conditions.filter { exerciseDatabase[$0] == nil }
+
+                if !unmatchedConditions.isEmpty {
+                    AppLogger.rehab.info("No fallback exercises for: \(unmatchedConditions.joined(separator: ", "))")
+                }
+
+                let finalExercises: [RehabExercise]
+                if exercises.isEmpty {
+                    AppLogger.rehab.info("No condition-specific exercises found, using region-aware fallback")
+                    finalExercises = getRegionAwareExercises(conditions: conditions)
+                } else {
+                    finalExercises = exercises
+                }
+
+                AppLogger.rehab.info("Fallback plan: \(finalExercises.count) exercises from \(matchedConditions.count) matched condition(s)")
 
                 let weeklySchedule = createWeeklySchedule(
                     for: finalExercises,
@@ -132,7 +197,7 @@ class RehabPlanViewModel: ObservableObject {
                     notes: nil
                 )
                 // Validate fallback plan too
-                let (validatedFallback, warnings) = ResponseValidationPipeline.validateRehabPlan(
+                let (validatedFallback, warnings, _) = ResponseValidationPipeline.validateRehabPlan(
                     fallbackPlan,
                     conditions: conditions,
                     userProfile: analysisResult.userProfileSnapshot
@@ -140,6 +205,20 @@ class RehabPlanViewModel: ObservableObject {
                 self.rehabPlan = validatedFallback
                 self.rehabPlanWarnings = warnings
                 self.isGenerating = false
+                // Fallback exercises are curated — mark all as verified, skip cross-model
+                for exercise in validatedFallback.exercises {
+                    exerciseVerifications[exercise.name] = .verified
+                }
+                verificationComplete = true
+
+                SessionLogger.shared.log(.loadingFinished, category: .stateChange, message: "Rehab plan generated (fallback)",
+                                          metadata: [
+                                            "exerciseCount": "\(finalExercises.count)",
+                                            "source": "fallback",
+                                            "matchedConditions": matchedConditions.joined(separator: ", "),
+                                            "unmatchedConditions": unmatchedConditions.joined(separator: ", ")
+                                          ])
+
                 // Preload exercise images in background
                 ExerciseImageService.shared.preloadImages(for: finalExercises)
                 // Log exercises that don't have images yet
@@ -148,12 +227,95 @@ class RehabPlanViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Knowledge Graph & Cross-Model Verification
+
+    /// Apply knowledge graph verification results to the exerciseVerifications dictionary.
+    private func applyGraphVerification(_ result: PlanVerificationResult) {
+        for (exercise, tier) in result.exerciseResults {
+            switch tier {
+            case .verified:
+                exerciseVerifications[exercise.name] = .verified
+            case .contraindicated(let reason):
+                exerciseVerifications[exercise.name] = .contraindicated(reason: reason)
+            case .unverified:
+                exerciseVerifications[exercise.name] = .checking
+            }
+        }
+    }
+
+    /// Perform cross-model verification for exercises the knowledge graph doesn't cover.
+    private func performCrossModelVerification(
+        unverified: [RehabExercise],
+        conditions: [String],
+        profile: UserProfile
+    ) async {
+        isVerifyingUnknowns = true
+        AppLogger.rehab.info("Starting cross-model verification for \(unverified.count) unverified exercise(s)")
+
+        let exercisePairs = unverified.flatMap { exercise in
+            conditions.map { condition in
+                (name: exercise.name, condition: condition)
+            }
+        }
+
+        let patientContext = "\(profile.age)-year-old \(profile.sex.lowercased()), \(profile.activityLevel.lowercased()) activity level"
+
+        do {
+            let results = try await CrossModelVerificationService.shared.verify(
+                exercises: exercisePairs,
+                patientContext: patientContext
+            )
+
+            // Group results by exercise name and determine overall safety
+            var exerciseSafety: [String: (safe: Bool, concerns: [String])] = [:]
+            for result in results {
+                let current = exerciseSafety[result.exerciseName]
+                if let existing = current {
+                    // If any condition flags it unsafe, it's unsafe overall
+                    exerciseSafety[result.exerciseName] = (
+                        safe: existing.safe && result.isSafe,
+                        concerns: existing.concerns + result.concerns
+                    )
+                } else {
+                    exerciseSafety[result.exerciseName] = (safe: result.isSafe, concerns: result.concerns)
+                }
+            }
+
+            // Update verification statuses
+            for (exerciseName, safety) in exerciseSafety {
+                if safety.safe {
+                    exerciseVerifications[exerciseName] = .crossModelVerified
+                } else {
+                    exerciseVerifications[exerciseName] = .crossModelFlagged(concerns: safety.concerns)
+                }
+            }
+
+            // Any unverified exercises not in results get marked as failed
+            for exercise in unverified {
+                if exerciseSafety[exercise.name] == nil {
+                    exerciseVerifications[exercise.name] = .crossModelFailed
+                }
+            }
+
+            AppLogger.rehab.info("Cross-model verification complete: \(exerciseSafety.filter { $0.value.safe }.count) safe, \(exerciseSafety.filter { !$0.value.safe }.count) flagged")
+        } catch {
+            AppLogger.rehab.warning("Cross-model verification failed: \(error.localizedDescription)")
+            // Graceful degradation — mark all as failed, don't block the plan
+            for exercise in unverified {
+                exerciseVerifications[exercise.name] = .crossModelFailed
+            }
+        }
+
+        isVerifyingUnknowns = false
+        verificationComplete = true
+    }
+
     // MARK: - AI Rehab Plan Generation
 
     private func generateAIRehabPlan(from analysisResult: AnalysisResult) async throws -> RehabPlan {
         let userMessage = buildRehabUserMessage(from: analysisResult)
 
-        let responseText = try await ClaudeAPIService.shared.sendMessage(
+        let responseText = try await apiService.sendMessage(
             requestType: .rehab_plan,
             userMessage: userMessage
         )
@@ -165,8 +327,9 @@ class RehabPlanViewModel: ObservableObject {
         )
     }
 
-    private func buildRehabUserMessage(from analysisResult: AnalysisResult) -> String {
+    func buildRehabUserMessage(from analysisResult: AnalysisResult) -> String {
         let profile = analysisResult.userProfileSnapshot
+        let assessedRegions = analysisResult.assessments.map { $0.selectedRegion }
 
         var message = """
         PATIENT PROFILE:
@@ -185,17 +348,83 @@ class RehabPlanViewModel: ObservableObject {
             message += "\n- Medical Conditions: \(profile.medicalConditions.joined(separator: ", "))"
         }
 
-        if !profile.surgeries.isEmpty {
-            let surgeryList = profile.surgeries.map { "\($0.name) (\($0.year))" }.joined(separator: ", ")
-            message += "\n- Past Surgeries: \(surgeryList)"
+        if let side = profile.dominantSide {
+            message += "\n- Dominant Side: \(side)"
         }
 
+        if let meds = profile.medications, !meds.isEmpty {
+            message += "\n- Current Medications: \(meds.joined(separator: ", "))"
+        }
+
+        // Medication change history
+        if let history = profile.medicationHistory, !history.isEmpty {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateStyle = .medium
+            let recentChanges = history.suffix(10)
+            message += "\n\nMEDICATION HISTORY:"
+            for change in recentChanges {
+                message += "\n- \(change.action.capitalized) \(change.medication) on \(dateFormatter.string(from: change.date))"
+            }
+        }
+
+        // Relevance-sorted surgical history
+        if !profile.surgeries.isEmpty {
+            let classified = HistoryRelevanceFilter.classify(surgeries: profile.surgeries, assessedRegions: assessedRegions)
+            let relevant = classified.filter { $0.relevance >= .possiblyRelevant }
+            let background = classified.filter { $0.relevance == .backgroundOnly }
+
+            if !relevant.isEmpty {
+                message += "\n\nRELEVANT SURGICAL HISTORY:"
+                for item in relevant {
+                    let s = item.surgery
+                    var line = "\n- \(s.name) (\(s.year))"
+                    if let area = s.bodyArea, !area.isEmpty { line += ", \(area)" }
+                    if let surgeryType = s.surgeryType, !surgeryType.isEmpty { line += " [Type: \(surgeryType)]" }
+                    if let causingInjury = s.causingInjury, !causingInjury.isEmpty { line += " [Caused by: \(causingInjury)]" }
+                    if let status = s.recoveryStatus { line += " — \(status)" }
+                    if let restrictions = s.restrictions, !restrictions.isEmpty { line += " [Restrictions: \(restrictions)]" }
+                    if let hasHardware = s.hasHardware {
+                        if hasHardware {
+                            let details = s.hardwareDetails.flatMap { !$0.isEmpty && $0 != "__not_sure__" ? $0 : nil } ?? "details unknown"
+                            line += " [Hardware present: \(details)]"
+                        } else {
+                            line += " [No hardware]"
+                        }
+                    }
+                    message += line
+                }
+            }
+
+            // Active restrictions get their own section for rehab
+            let withRestrictions = profile.surgeries.filter { $0.restrictions != nil && !($0.restrictions?.isEmpty ?? true) }
+            if !withRestrictions.isEmpty {
+                message += "\n\nACTIVE POST-SURGICAL RESTRICTIONS:"
+                for s in withRestrictions {
+                    message += "\n- \(s.name): \(s.restrictions!)"
+                }
+            }
+
+            if !background.isEmpty {
+                let condensed = background.map { "\($0.surgery.name) (\($0.surgery.year))" }.joined(separator: ", ")
+                message += "\n\nOTHER SURGICAL HISTORY: \(condensed)"
+            }
+        }
+
+        // Relevance-sorted injury history
         if !profile.injuries.isEmpty {
-            let injuryList = profile.injuries.map { injury in
-                let status = injury.isCurrent ? "current" : "past"
-                return "\(injury.bodyArea): \(injury.description) (\(status))"
-            }.joined(separator: "; ")
-            message += "\n- Injuries: \(injuryList)"
+            let classified = HistoryRelevanceFilter.classify(injuries: profile.injuries, assessedRegions: assessedRegions)
+            let relevant = classified.filter { $0.relevance >= .possiblyRelevant }
+
+            if !relevant.isEmpty {
+                message += "\n\nRELEVANT INJURY HISTORY:"
+                for item in relevant {
+                    let i = item.injury
+                    let status = i.isCurrent ? "current" : "past"
+                    var line = "\n- \(i.bodyArea): \(i.description) (\(status))"
+                    if let recovery = i.recoveryStatus { line += " — \(recovery)" }
+                    message += line
+                }
+            }
         }
 
         message += "\n\nIDENTIFIED CONDITIONS:\n"
@@ -212,28 +441,46 @@ class RehabPlanViewModel: ObservableObject {
 
     private func parseRehabPlanResponse(_ text: String, conditions: [String], activityLevel: String) throws -> RehabPlan {
         guard let jsonData = text.data(using: .utf8) else {
+            AppLogger.rehab.error("Rehab response could not be converted to UTF-8 data")
             throw ClaudeAPIError.decodingError(NSError(domain: "RehabPlan", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response encoding"]))
         }
+
+        AppLogger.rehab.info("Parsing rehab plan response: \(text.count) characters")
 
         let aiResponse: AIRehabResponse
         do {
             aiResponse = try JSONDecoder().decode(AIRehabResponse.self, from: jsonData)
-        } catch {
+            AppLogger.rehab.info("Direct JSON decode succeeded for rehab plan")
+        } catch let directError {
+            AppLogger.rehab.warning("Direct rehab JSON decode failed: \(directError.localizedDescription). Attempting fallback...")
             // Fallback: extract JSON between { and }
             if let startIndex = text.firstIndex(of: "{"),
                let endIndex = text.lastIndex(of: "}") {
                 let jsonSubstring = String(text[startIndex...endIndex])
+                AppLogger.rehab.info("Extracted rehab JSON: \(jsonSubstring.count) chars (trimmed \(text.count - jsonSubstring.count))")
                 if let fallbackData = jsonSubstring.data(using: .utf8) {
                     do {
                         aiResponse = try JSONDecoder().decode(AIRehabResponse.self, from: fallbackData)
-                    } catch {
-                        throw ClaudeAPIError.decodingError(error)
+                        AppLogger.rehab.info("Fallback rehab JSON decode succeeded")
+                        SessionLogger.shared.log(.stateUpdated, category: .api, message: "Rehab plan used fallback JSON extraction",
+                                                  metadata: ["trimmedChars": "\(text.count - jsonSubstring.count)"])
+                    } catch let fallbackError {
+                        AppLogger.rehab.error("Fallback rehab JSON decode also failed: \(fallbackError.localizedDescription)")
+                        let preview = String(jsonSubstring.prefix(300))
+                        AppLogger.rehab.error("Rehab response preview: \(preview)")
+                        SessionLogger.shared.logError(fallbackError, context: "RehabPlan.parseResponse.fallback")
+                        throw ClaudeAPIError.decodingError(fallbackError)
                     }
                 } else {
-                    throw ClaudeAPIError.decodingError(error)
+                    AppLogger.rehab.error("Fallback rehab JSON substring could not be converted to UTF-8")
+                    throw ClaudeAPIError.decodingError(directError)
                 }
             } else {
-                throw ClaudeAPIError.decodingError(error)
+                AppLogger.rehab.error("No JSON object found in rehab response")
+                let preview = String(text.prefix(300))
+                AppLogger.rehab.error("Rehab response preview: \(preview)")
+                SessionLogger.shared.logError(directError, context: "RehabPlan.parseResponse.noJSON")
+                throw ClaudeAPIError.decodingError(directError)
             }
         }
 
@@ -282,7 +529,7 @@ class RehabPlanViewModel: ObservableObject {
 
     // MARK: - Schedule & Fallback
 
-    private func createWeeklySchedule(for exercises: [RehabExercise], activityLevel: String) -> [[String]] {
+    func createWeeklySchedule(for exercises: [RehabExercise], activityLevel: String) -> [[String]] {
         let exerciseDays: Int
         switch activityLevel.lowercased() {
         case "sedentary", "lightly active":
@@ -314,11 +561,65 @@ class RehabPlanViewModel: ObservableObject {
         return schedule
     }
 
-    private func getGeneralExercises() -> [RehabExercise] {
-        [
-            RehabExercise(id: UUID(), name: "Gentle Stretching", targetArea: "Full Body", description: "Perform gentle full-body stretches, holding each for 15-30 seconds. Focus on areas of tightness.", sets: 1, reps: "5-10 minutes", restSeconds: 0, difficulty: .beginner, demonstrationIcon: "figure.flexibility", tips: ["Never bounce while stretching.", "Breathe deeply.", "Stop if you feel sharp pain."], contraindications: ["Avoid stretching acutely injured areas."], startPosition: "Stand upright with feet shoulder-width apart, arms relaxed at your sides", movement: "Slowly reach overhead, then gently bend to each side. Reach for your toes. Hold each stretch for 15-30 seconds", endPosition: "Return to standing upright and shake out your arms and legs", exerciseCategory: "stretch", imageFileName: "gentle-stretching"),
+    /// Produce fallback exercises targeted to the affected body regions.
+    /// Falls back to general exercises when no region can be inferred.
+    private func getRegionAwareExercises(conditions: [String]) -> [RehabExercise] {
+        var exercises: [RehabExercise] = []
+        let joined = conditions.joined(separator: " ").lowercased()
+
+        // Determine the affected region from condition names
+        let isLowerBody = ["knee", "ankle", "foot", "hip", "leg", "hamstring", "quad", "calf", "shin", "thigh", "groin", "acl", "mcl", "meniscus", "patella"].contains(where: { joined.contains($0) })
+        let isUpperBody = ["shoulder", "elbow", "wrist", "hand", "arm", "rotator", "bicep", "tricep", "forearm"].contains(where: { joined.contains($0) })
+        let isBack = ["back", "spine", "disc", "lumbar", "thoracic", "cervical", "sciatica"].contains(where: { joined.contains($0) })
+        let isNeck = ["neck", "cervical"].contains(where: { joined.contains($0) })
+
+        if isLowerBody {
+            exercises.append(contentsOf: [
+                RehabExercise(id: UUID(), name: "Gentle Leg Stretching", targetArea: "Lower Body", description: "Gently stretch your quadriceps, hamstrings, and calves. Hold each stretch for 15-30 seconds.", sets: 2, reps: "5 each side", restSeconds: 15, difficulty: .beginner, demonstrationIcon: "figure.flexibility", tips: ["Never bounce.", "Stretch to mild tension, not pain.", "Breathe deeply throughout."], contraindications: ["Stop if sharp pain occurs."], startPosition: "Stand upright holding a wall or chair for balance", movement: "Gently stretch each major muscle group of the lower body: pull heel to glute for quads, reach for toes for hamstrings, press heel down on a step for calves. Hold each 15-30 seconds", endPosition: "Return to standing and gently shake out each leg", exerciseCategory: "stretch", imageFileName: "gentle-stretching"),
+                RehabExercise(id: UUID(), name: "Straight Leg Raises", targetArea: "Lower Body", description: "Lie on your back with one knee bent. Keeping the other leg straight, tighten the quad and lift the leg to 45 degrees. Hold 2 seconds, lower slowly.", sets: 3, reps: "10-12", restSeconds: 30, difficulty: .beginner, demonstrationIcon: "figure.strengthtraining.traditional", tips: ["Keep your core engaged.", "Lift slowly and with control.", "Don't arch your back."], contraindications: ["Avoid if hip pain worsens."], startPosition: "Lie on your back with one knee bent and foot flat on the floor. Keep the other leg straight", movement: "Tighten your quad, then slowly lift the straight leg to about 45 degrees. Hold for 2 seconds", endPosition: "Lower the leg slowly back to the floor with control", exerciseCategory: "strength", imageFileName: "straight-leg-raises"),
+                RehabExercise(id: UUID(), name: "Ankle Circles", targetArea: "Lower Body", description: "Sit with one leg extended or elevated. Slowly rotate your ankle in circles, then reverse direction.", sets: 2, reps: "10 each direction", restSeconds: 15, difficulty: .beginner, demonstrationIcon: "figure.flexibility", tips: ["Move slowly and deliberately.", "Make the circles as large as comfortable.", "Keep the rest of your leg still."], contraindications: ["Stop if you feel grinding or sharp pain."], startPosition: "Sit in a chair with one foot slightly off the floor", movement: "Slowly rotate your ankle clockwise for 10 circles, then counterclockwise for 10 circles", endPosition: "Place your foot back on the floor and switch to the other side", exerciseCategory: "mobility", imageFileName: "ankle-circles"),
+                RehabExercise(id: UUID(), name: "Glute Bridges", targetArea: "Lower Body", description: "Lie on your back with knees bent. Squeeze your glutes and lift your hips toward the ceiling. Hold 2 seconds at the top.", sets: 3, reps: "12-15", restSeconds: 30, difficulty: .beginner, demonstrationIcon: "figure.strengthtraining.traditional", tips: ["Don't arch your lower back excessively.", "Squeeze glutes at the top.", "Keep your core engaged."], contraindications: ["Avoid if acute back spasm is present."], startPosition: "Lie on your back with knees bent, feet flat on the floor hip-width apart, arms at your sides", movement: "Squeeze your glutes and press through your heels to lift your hips toward the ceiling until your body forms a straight line from shoulders to knees. Hold for 2 seconds", endPosition: "Lower your hips slowly back to the floor", exerciseCategory: "strength", imageFileName: "glute-bridges")
+            ])
+        }
+
+        if isUpperBody {
+            exercises.append(contentsOf: [
+                RehabExercise(id: UUID(), name: "Pendulum Swings", targetArea: "Upper Body", description: "Lean forward with your unaffected hand on a table. Let your affected arm hang down and swing in small circles.", sets: 2, reps: "30 seconds each direction", restSeconds: 30, difficulty: .beginner, demonstrationIcon: "figure.cooldown", tips: ["Keep your arm relaxed.", "Let gravity do the work.", "Gradually increase the circle size."], contraindications: ["Avoid if severe pain is present."], startPosition: "Lean forward at the waist, supporting yourself with your unaffected hand on a table. Let your affected arm hang straight down", movement: "Gently swing your arm in small circles clockwise, then counterclockwise, then forward and back", endPosition: "Let your arm come to rest hanging straight down", exerciseCategory: "mobility", imageFileName: "pendulum-swings"),
+                RehabExercise(id: UUID(), name: "Wrist Flexion & Extension", targetArea: "Upper Body", description: "Rest your forearm on a table with your hand over the edge. Slowly bend your wrist up and down through a comfortable range.", sets: 2, reps: "10-12", restSeconds: 20, difficulty: .beginner, demonstrationIcon: "figure.flexibility", tips: ["Move slowly.", "Keep your forearm flat on the surface.", "Only go through pain-free range."], contraindications: ["Stop if numbness or tingling occurs."], startPosition: "Sit with your forearm resting on a table, hand hanging over the edge", movement: "Slowly bend your wrist upward as far as comfortable, hold briefly, then slowly bend it downward", endPosition: "Return to neutral wrist position", exerciseCategory: "mobility", imageFileName: "wrist-flexion"),
+                RehabExercise(id: UUID(), name: "Scapular Squeezes", targetArea: "Upper Body", description: "Sit or stand with arms at your sides. Squeeze your shoulder blades together as if pinching a pencil between them. Hold 5 seconds.", sets: 3, reps: "10-12", restSeconds: 30, difficulty: .beginner, demonstrationIcon: "figure.cooldown", tips: ["Keep shoulders down, away from ears.", "Don't shrug.", "Breathe normally while holding."], contraindications: ["Avoid if thoracic spine pain increases."], startPosition: "Sit or stand upright with arms relaxed at your sides, shoulders down", movement: "Squeeze your shoulder blades together as if pinching a pencil between them. Hold for 5 seconds", endPosition: "Slowly release and let your shoulders return to a relaxed position", exerciseCategory: "strength", imageFileName: "scapular-squeezes")
+            ])
+        }
+
+        if isBack {
+            exercises.append(contentsOf: [
+                RehabExercise(id: UUID(), name: "Cat-Cow Stretch", targetArea: "Back", description: "On hands and knees, alternate between arching your back up (cat) and letting it sag down (cow). Move slowly with your breath.", sets: 2, reps: "10", restSeconds: 20, difficulty: .beginner, demonstrationIcon: "figure.flexibility", tips: ["Inhale on cow, exhale on cat.", "Move through each position slowly.", "Keep your core lightly engaged."], contraindications: ["Avoid if back pain significantly worsens."], startPosition: "Get on your hands and knees with wrists under shoulders and knees under hips", movement: "Exhale and round your back up toward the ceiling (cat). Then inhale and let your belly drop toward the floor, lifting your head (cow)", endPosition: "Return to a flat-back neutral position on hands and knees", exerciseCategory: "stretch", imageFileName: "cat-cow-stretch"),
+                RehabExercise(id: UUID(), name: "Pelvic Tilts", targetArea: "Back", description: "Lie on your back with knees bent. Flatten your lower back against the floor by tilting your pelvis. Hold 5 seconds.", sets: 3, reps: "10-12", restSeconds: 20, difficulty: .beginner, demonstrationIcon: "figure.flexibility", tips: ["Think of pulling your belly button to your spine.", "Breathe normally.", "The movement is subtle."], contraindications: ["Stop if radiating leg pain worsens."], startPosition: "Lie on your back with knees bent, feet flat on the floor, arms at your sides", movement: "Gently flatten your lower back against the floor by tilting your pelvis upward. Hold for 5 seconds", endPosition: "Relax and let your back return to its natural position", exerciseCategory: "core", imageFileName: "pelvic-tilts"),
+                RehabExercise(id: UUID(), name: "Bird Dog", targetArea: "Back", description: "On hands and knees, extend one arm forward and the opposite leg backward. Hold for 3 seconds, return, and switch sides.", sets: 3, reps: "8 each side", restSeconds: 30, difficulty: .intermediate, demonstrationIcon: "figure.yoga", tips: ["Keep your back flat like a table.", "Don't rotate your hips.", "Engage your core throughout."], contraindications: ["Modify if shoulder or hip pain occurs."], startPosition: "Get on your hands and knees with a flat back, wrists under shoulders and knees under hips", movement: "Extend your right arm straight forward and your left leg straight back at the same time. Hold for 3 seconds", endPosition: "Return your arm and leg to the floor. Repeat on the opposite side", exerciseCategory: "core", imageFileName: "bird-dog")
+            ])
+        }
+
+        if isNeck {
+            exercises.append(contentsOf: [
+                RehabExercise(id: UUID(), name: "Neck Tilts", targetArea: "Neck", description: "Slowly tilt your head to one side, bringing your ear toward your shoulder. Hold 15 seconds, then switch sides.", sets: 2, reps: "5 each side", restSeconds: 10, difficulty: .beginner, demonstrationIcon: "figure.flexibility", tips: ["Move slowly and gently.", "Don't force the stretch.", "Keep your shoulders relaxed and down."], contraindications: ["Stop if dizziness or numbness occurs."], startPosition: "Sit or stand upright with your head in a neutral position, looking straight ahead", movement: "Slowly tilt your head to one side, bringing your ear toward your shoulder. Hold for 15 seconds", endPosition: "Slowly return your head to the neutral position. Repeat on the other side", exerciseCategory: "stretch", imageFileName: "neck-tilts"),
+                RehabExercise(id: UUID(), name: "Chin Tucks", targetArea: "Neck", description: "Gently pull your chin straight back, creating a 'double chin.' Hold for 5 seconds. This strengthens deep neck flexors.", sets: 3, reps: "10", restSeconds: 15, difficulty: .beginner, demonstrationIcon: "figure.cooldown", tips: ["Keep your eyes level, don't tilt your head.", "Think of sliding your head straight back.", "You should feel a stretch at the base of your skull."], contraindications: ["Stop if pain radiates down your arms."], startPosition: "Sit or stand upright with your head in a neutral position", movement: "Gently draw your chin straight back as if making a double chin, keeping your eyes level. Hold for 5 seconds", endPosition: "Relax and let your head return to its natural position", exerciseCategory: "strength", imageFileName: "chin-tucks")
+            ])
+        }
+
+        // If no region matched or exercises is still empty, add universal exercises
+        if exercises.isEmpty {
+            exercises.append(contentsOf: [
+                RehabExercise(id: UUID(), name: "Gentle Stretching", targetArea: "Full Body", description: "Perform gentle full-body stretches, holding each for 15-30 seconds. Focus on areas of tightness.", sets: 1, reps: "5-10 minutes", restSeconds: 0, difficulty: .beginner, demonstrationIcon: "figure.flexibility", tips: ["Never bounce while stretching.", "Breathe deeply.", "Stop if you feel sharp pain."], contraindications: ["Avoid stretching acutely injured areas."], startPosition: "Stand upright with feet shoulder-width apart, arms relaxed at your sides", movement: "Slowly reach overhead, then gently bend to each side. Reach for your toes. Hold each stretch for 15-30 seconds", endPosition: "Return to standing upright and shake out your arms and legs", exerciseCategory: "stretch", imageFileName: "gentle-stretching"),
+                RehabExercise(id: UUID(), name: "Glute Bridges", targetArea: "Core/Glutes", description: "Lie on your back with knees bent. Squeeze your glutes and lift your hips toward the ceiling. Hold 2 seconds at the top.", sets: 3, reps: "12-15", restSeconds: 30, difficulty: .beginner, demonstrationIcon: "figure.strengthtraining.traditional", tips: ["Don't arch your lower back excessively.", "Squeeze glutes at the top.", "Keep your core engaged."], contraindications: ["Avoid if acute back spasm is present."], startPosition: "Lie on your back with knees bent, feet flat on the floor hip-width apart, arms at your sides", movement: "Squeeze your glutes and press through your heels to lift your hips toward the ceiling until your body forms a straight line from shoulders to knees. Hold for 2 seconds", endPosition: "Lower your hips slowly back to the floor", exerciseCategory: "strength", imageFileName: "glute-bridges"),
+                RehabExercise(id: UUID(), name: "Cat-Cow Stretch", targetArea: "Back", description: "On hands and knees, alternate between arching your back up (cat) and letting it sag down (cow). Move slowly with your breath.", sets: 2, reps: "10", restSeconds: 20, difficulty: .beginner, demonstrationIcon: "figure.flexibility", tips: ["Inhale on cow, exhale on cat.", "Move through each position slowly.", "Keep your core lightly engaged."], contraindications: ["Avoid if back pain significantly worsens."], startPosition: "Get on your hands and knees with wrists under shoulders and knees under hips", movement: "Exhale and round your back up toward the ceiling (cat). Then inhale and let your belly drop toward the floor, lifting your head (cow)", endPosition: "Return to a flat-back neutral position on hands and knees", exerciseCategory: "stretch", imageFileName: "cat-cow-stretch")
+            ])
+        }
+
+        // Always include walking as a baseline exercise
+        exercises.append(
             RehabExercise(id: UUID(), name: "Walking", targetArea: "General", description: "Walk at a comfortable pace. Start with 10 minutes and gradually increase duration.", sets: 1, reps: "10-20 minutes", restSeconds: 0, difficulty: .beginner, demonstrationIcon: "figure.walk", tips: ["Wear supportive shoes.", "Walk on flat surfaces.", "Maintain good posture."], contraindications: ["Avoid if weight-bearing causes significant pain."], startPosition: "Stand upright with good posture, shoulders back, wearing supportive shoes", movement: "Walk at a comfortable pace on a flat surface. Swing your arms naturally and breathe evenly", endPosition: "Gradually slow your pace and come to a gentle stop", exerciseCategory: "walking", imageFileName: "walking")
-        ]
+        )
+
+        return exercises
     }
 
     // MARK: - Missing Image Logging
@@ -368,13 +669,20 @@ class RehabPlanViewModel: ObservableObject {
     func savePlanToFirestore() {
         guard let userId = Auth.auth().currentUser?.uid else {
             saveError = "Not signed in"
+            AppLogger.rehab.error("Cannot save plan: user not signed in")
+            SessionLogger.shared.logError(
+                NSError(domain: "RehabPlan", code: -2, userInfo: [NSLocalizedDescriptionKey: "User not signed in"]),
+                context: "RehabPlan.savePlanToFirestore"
+            )
             return
         }
         guard let plan = rehabPlan else {
             saveError = "No plan to save"
+            AppLogger.rehab.error("Cannot save plan: rehabPlan is nil")
             return
         }
 
+        AppLogger.rehab.info("Saving rehab plan '\(plan.planName)' to Firestore (\(plan.exercises.count) exercises)")
         isSaving = true
         saveError = nil
 

@@ -34,15 +34,16 @@ final class InjuryAnalyzerPromptTests: XCTestCase {
         return PainAssessment(
             id: UUID(),
             selectedRegion: region,
-            painType: .sharp,
+            painTypes: ["Sharp"],
             customPainDescription: nil,
             painIntensity: 8,
-            painDuration: .twoToFourWeeks,
-            painFrequency: .onlyWithActivity,
-            painOnset: .gradual,
+            painDurations: ["2-4 Weeks"],
+            painFrequencies: ["Only with Activity"],
+            painOnsets: ["Gradual"],
             aggravatingFactors: ["Running", "Stairs", "Squatting"],
             relievingFactors: ["Rest", "Ice"],
-            additionalNotes: "Pain worse going downstairs"
+            additionalNotes: "Pain worse going downstairs",
+            currentTreatment: nil
         )
     }
 
@@ -212,5 +213,126 @@ final class InjuryAnalyzerPromptTests: XCTestCase {
         } else {
             XCTFail("Should find JSON in messy response")
         }
+    }
+
+    // MARK: - New Health Fields in Prompt
+
+    func testBuildUserMessage_includesDominantSide() {
+        let profile = TestFixtures.makeProfile(dominantSide: "Left")
+        let assessment = TestFixtures.makeAssessment()
+
+        let message = InjuryAnalyzer.buildUserMessage(assessments: [assessment], profile: profile)
+
+        XCTAssertTrue(message.contains("Dominant Side: Left"))
+    }
+
+    func testBuildUserMessage_noDominantSide_omitted() {
+        let profile = TestFixtures.makeProfile(dominantSide: nil)
+        let assessment = TestFixtures.makeAssessment()
+
+        let message = InjuryAnalyzer.buildUserMessage(assessments: [assessment], profile: profile)
+
+        XCTAssertFalse(message.contains("Dominant Side"))
+    }
+
+    func testBuildUserMessage_includesMedicationHistory() {
+        let changes = [
+            TestFixtures.makeMedicationChange(medication: "Ibuprofen", action: "started"),
+            TestFixtures.makeMedicationChange(medication: "Blood Thinners", action: "stopped")
+        ]
+        let profile = TestFixtures.makeProfile(medicationHistory: changes)
+        let assessment = TestFixtures.makeAssessment()
+
+        let message = InjuryAnalyzer.buildUserMessage(assessments: [assessment], profile: profile)
+
+        XCTAssertTrue(message.contains("MEDICATION HISTORY:"))
+        XCTAssertTrue(message.contains("Started Ibuprofen"))
+        XCTAssertTrue(message.contains("Stopped Blood Thinners"))
+    }
+
+    func testBuildUserMessage_noMedicationHistory_omitted() {
+        let profile = TestFixtures.makeProfile(medicationHistory: nil)
+        let assessment = TestFixtures.makeAssessment()
+
+        let message = InjuryAnalyzer.buildUserMessage(assessments: [assessment], profile: profile)
+
+        XCTAssertFalse(message.contains("MEDICATION HISTORY:"))
+    }
+
+    func testBuildUserMessage_includesSurgeryType() {
+        let surgery = TestFixtures.makeSurgery(
+            name: "ACL Repair",
+            surgeryType: "Arthroscopic meniscus repair"
+        )
+        let profile = TestFixtures.makeProfile(surgeries: [surgery])
+        let assessment = TestFixtures.makeAssessment(
+            region: TestFixtures.makeRegion(name: "Right Knee", zoneKey: "right_knee")
+        )
+
+        let message = InjuryAnalyzer.buildUserMessage(assessments: [assessment], profile: profile)
+
+        XCTAssertTrue(message.contains("[Type: Arthroscopic meniscus repair]"))
+    }
+
+    func testBuildUserMessage_includesCausingInjury() {
+        let surgery = TestFixtures.makeSurgery(
+            name: "ACL Repair",
+            causingInjury: "Torn ACL from soccer"
+        )
+        let profile = TestFixtures.makeProfile(surgeries: [surgery])
+        let assessment = TestFixtures.makeAssessment(
+            region: TestFixtures.makeRegion(name: "Right Knee", zoneKey: "right_knee")
+        )
+
+        let message = InjuryAnalyzer.buildUserMessage(assessments: [assessment], profile: profile)
+
+        XCTAssertTrue(message.contains("[Caused by: Torn ACL from soccer]"))
+    }
+
+    func testBuildUserMessage_includesHardwarePresent() {
+        let surgery = TestFixtures.makeSurgery(
+            name: "ACL Repair",
+            hasHardware: true,
+            hardwareDetails: "Two titanium screws"
+        )
+        let profile = TestFixtures.makeProfile(surgeries: [surgery])
+        let assessment = TestFixtures.makeAssessment(
+            region: TestFixtures.makeRegion(name: "Right Knee", zoneKey: "right_knee")
+        )
+
+        let message = InjuryAnalyzer.buildUserMessage(assessments: [assessment], profile: profile)
+
+        XCTAssertTrue(message.contains("[Hardware present: Two titanium screws]"))
+    }
+
+    func testBuildUserMessage_includesNoHardware() {
+        let surgery = TestFixtures.makeSurgery(
+            name: "ACL Repair",
+            hasHardware: false
+        )
+        let profile = TestFixtures.makeProfile(surgeries: [surgery])
+        let assessment = TestFixtures.makeAssessment(
+            region: TestFixtures.makeRegion(name: "Right Knee", zoneKey: "right_knee")
+        )
+
+        let message = InjuryAnalyzer.buildUserMessage(assessments: [assessment], profile: profile)
+
+        XCTAssertTrue(message.contains("[No hardware]"))
+    }
+
+    func testBuildUserMessage_hardwareUnknownDetails_saysDetailsUnknown() {
+        let surgery = TestFixtures.makeSurgery(
+            name: "ACL Repair",
+            hasHardware: true,
+            hardwareDetails: nil
+        )
+        let profile = TestFixtures.makeProfile(surgeries: [surgery])
+        let assessment = TestFixtures.makeAssessment(
+            region: TestFixtures.makeRegion(name: "Right Knee", zoneKey: "right_knee")
+        )
+
+        let message = InjuryAnalyzer.buildUserMessage(assessments: [assessment], profile: profile)
+
+        XCTAssertTrue(message.contains("[Hardware present: details unknown]"))
     }
 }

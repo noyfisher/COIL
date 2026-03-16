@@ -53,6 +53,22 @@ struct BasicInfoStepView: View {
                     }
                 }
 
+                CardSection(icon: "hand.raised.fill", color: .indigo, title: "Dominant Side") {
+                    HStack(spacing: AppSpacing.sm) {
+                        ForEach(["Left", "Right", "Ambidextrous"], id: \.self) { option in
+                            Button(action: { viewModel.userProfile.dominantSide = option }) {
+                                Text(option)
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundColor(viewModel.userProfile.dominantSide == option ? .white : .primary)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, AppSpacing.md)
+                                    .background(viewModel.userProfile.dominantSide == option ? Color.indigo : AppColors.subtleBorder)
+                                    .cornerRadius(AppCorners.medium)
+                            }
+                        }
+                    }
+                }
+
                 CardSection(icon: "ruler", color: .green, title: "Height") {
                     HStack(spacing: AppSpacing.md) {
                         Menu {

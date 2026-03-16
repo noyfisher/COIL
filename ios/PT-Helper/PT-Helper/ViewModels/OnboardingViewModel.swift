@@ -42,19 +42,32 @@ class OnboardingViewModel: ObservableObject {
             "weight": userProfile.weight,
             "medicalConditions": userProfile.medicalConditions,
             "surgeries": userProfile.surgeries.map { surgery -> [String: Any] in
-                [
+                var dict: [String: Any] = [
                     "id": surgery.id.uuidString,
                     "name": surgery.name,
                     "year": surgery.year
                 ]
+                if let bodyArea = surgery.bodyArea { dict["bodyArea"] = bodyArea }
+                if let status = surgery.recoveryStatus { dict["recoveryStatus"] = status }
+                if let restrictions = surgery.restrictions { dict["restrictions"] = restrictions }
+                if let surgeryType = surgery.surgeryType { dict["surgeryType"] = surgeryType }
+                if let causingInjury = surgery.causingInjury { dict["causingInjury"] = causingInjury }
+                if let hasHardware = surgery.hasHardware { dict["hasHardware"] = hasHardware }
+                if let hardwareDetails = surgery.hardwareDetails { dict["hardwareDetails"] = hardwareDetails }
+                return dict
             },
             "injuries": userProfile.injuries.map { injury -> [String: Any] in
-                [
+                var dict: [String: Any] = [
                     "id": injury.id.uuidString,
                     "bodyArea": injury.bodyArea,
                     "description": injury.description,
                     "isCurrent": injury.isCurrent
                 ]
+                if let year = injury.year { dict["year"] = year }
+                if let saw = injury.sawDoctor { dict["sawDoctor"] = saw }
+                if let pt = injury.hadPhysicalTherapy { dict["hadPhysicalTherapy"] = pt }
+                if let status = injury.recoveryStatus { dict["recoveryStatus"] = status }
+                return dict
             },
             "activityLevel": userProfile.activityLevel
         ]
@@ -63,6 +76,24 @@ class OnboardingViewModel: ObservableObject {
         }
         if let sport = userProfile.primarySport {
             profileData["primarySport"] = sport
+        }
+        if let meds = userProfile.medications, !meds.isEmpty {
+            profileData["medications"] = meds
+        }
+        if let side = userProfile.dominantSide {
+            profileData["dominantSide"] = side
+        }
+
+        // Medication history: merge existing history with any new changes
+        let isoFormatter = ISO8601DateFormatter()
+        if let history = userProfile.medicationHistory, !history.isEmpty {
+            profileData["medicationHistory"] = history.map { change -> [String: Any] in
+                [
+                    "medication": change.medication,
+                    "action": change.action,
+                    "date": isoFormatter.string(from: change.date)
+                ]
+            }
         }
 
         db.collection("users").document(uid).collection("profile").document("health")
@@ -107,13 +138,42 @@ class OnboardingViewModel: ObservableObject {
                         primarySport: data["primarySport"] as? String
                     )
 
+                    profile.medications = data["medications"] as? [String]
+                    profile.dominantSide = data["dominantSide"] as? String
+
+                    // Parse medication history
+                    if let historyData = data["medicationHistory"] as? [[String: Any]] {
+                        let isoFormatter = ISO8601DateFormatter()
+                        profile.medicationHistory = historyData.compactMap { entry in
+                            guard let medication = entry["medication"] as? String,
+                                  let action = entry["action"] as? String else { return nil }
+                            let date: Date
+                            if let dateString = entry["date"] as? String,
+                               let parsed = isoFormatter.date(from: dateString) {
+                                date = parsed
+                            } else if let timestamp = entry["date"] as? Timestamp {
+                                date = timestamp.dateValue()
+                            } else {
+                                date = Date()
+                            }
+                            return UserProfile.MedicationChange(medication: medication, action: action, date: date)
+                        }
+                    }
+
                     // Parse surgeries
                     if let surgeriesData = data["surgeries"] as? [[String: Any]] {
                         profile.surgeries = surgeriesData.map { s in
                             UserProfile.Surgery(
                                 id: UUID(uuidString: s["id"] as? String ?? "") ?? UUID(),
                                 name: s["name"] as? String ?? "",
-                                year: s["year"] as? Int ?? 2024
+                                year: s["year"] as? Int ?? 2024,
+                                bodyArea: s["bodyArea"] as? String,
+                                recoveryStatus: s["recoveryStatus"] as? String,
+                                restrictions: s["restrictions"] as? String,
+                                surgeryType: s["surgeryType"] as? String,
+                                causingInjury: s["causingInjury"] as? String,
+                                hasHardware: s["hasHardware"] as? Bool,
+                                hardwareDetails: s["hardwareDetails"] as? String
                             )
                         }
                     }
@@ -125,7 +185,11 @@ class OnboardingViewModel: ObservableObject {
                                 id: UUID(uuidString: i["id"] as? String ?? "") ?? UUID(),
                                 bodyArea: i["bodyArea"] as? String ?? "",
                                 description: i["description"] as? String ?? "",
-                                isCurrent: i["isCurrent"] as? Bool ?? false
+                                isCurrent: i["isCurrent"] as? Bool ?? false,
+                                year: i["year"] as? Int,
+                                sawDoctor: i["sawDoctor"] as? Bool,
+                                hadPhysicalTherapy: i["hadPhysicalTherapy"] as? Bool,
+                                recoveryStatus: i["recoveryStatus"] as? String
                             )
                         }
                     }
@@ -177,5 +241,29 @@ class OnboardingViewModel: ObservableObject {
         if currentStep > 1 {
             currentStep -= 1
         }
+    }
+
+    // MARK: - Medication Diff Tracking
+
+    /// Computes medication changes between previous and current medications,
+    /// appends them to the existing medication history.
+    func updateMedicationHistory(previousMedications: [String]?) {
+        let oldMeds = Set(previousMedications ?? [])
+        let newMeds = Set(userProfile.medications ?? [])
+
+        let now = Date()
+        var changes: [UserProfile.MedicationChange] = userProfile.medicationHistory ?? []
+
+        // Newly added medications
+        for med in newMeds.subtracting(oldMeds) {
+            changes.append(UserProfile.MedicationChange(medication: med, action: "started", date: now))
+        }
+
+        // Removed medications
+        for med in oldMeds.subtracting(newMeds) {
+            changes.append(UserProfile.MedicationChange(medication: med, action: "stopped", date: now))
+        }
+
+        userProfile.medicationHistory = changes
     }
 }

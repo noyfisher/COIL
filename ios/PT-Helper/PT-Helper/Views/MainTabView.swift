@@ -38,6 +38,20 @@ struct MainTabView: View {
     @StateObject private var savedPlansViewModel = SavedPlansViewModel()
     @StateObject private var workoutViewModel = WorkoutViewModel()
 
+    // Health check state for inactivity detection
+    @State private var showHealthCheck = false
+    @State private var showQuickUpdate = false
+    @State private var healthCheckDismissed = false
+
+    /// Whether the Analyze tab should show the health check prompt instead of the body map
+    private var needsHealthCheck: Bool {
+        guard !healthCheckDismissed else { return false }
+        if let months = UserProfileService.shared.monthsSinceLastActivity(), months >= 3 {
+            return true
+        }
+        return false
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             // Offline banner
@@ -61,10 +75,30 @@ struct MainTabView: View {
                     }
                     .tag(0)
 
-                NavigationStack {
-                    BodyMap3DView()
+                Group {
+                    if needsHealthCheck {
+                        HealthCheckPromptView(
+                            onUpdateProfile: {
+                                showQuickUpdate = true
+                            },
+                            onContinue: {
+                                healthCheckDismissed = true
+                                UserProfileService.shared.recordActivity()
+                            }
+                        )
+                        .fullScreenCover(isPresented: $showQuickUpdate) {
+                            QuickHealthUpdateView {
+                                showQuickUpdate = false
+                                healthCheckDismissed = true
+                            }
+                        }
+                    } else {
+                        NavigationStack {
+                            BodyMap3DView()
+                        }
+                        .id(tabSelection.analyzeNavigationId)
+                    }
                 }
-                .id(tabSelection.analyzeNavigationId)
                 .tabItem {
                     Label("Analyze", systemImage: "figure.run.circle")
                 }

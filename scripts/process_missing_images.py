@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
 Automated pipeline: Fetch missing exercise images from Firestore,
-generate them via Gemini, upload to Firebase Storage, and update mappings.
+generate them via FLUX Kontext Pro, upload to Firebase Storage,
+and update mappings.
 
 Usage:
-    python scripts/process_missing_images.py --google-api-key YOUR_KEY --dry-run
-    python scripts/process_missing_images.py --google-api-key YOUR_KEY --limit 5
-    python scripts/process_missing_images.py --google-api-key YOUR_KEY --min-count 2
+    python scripts/process_missing_images.py --api-key YOUR_BFL_KEY --dry-run
+    python scripts/process_missing_images.py --api-key YOUR_BFL_KEY --limit 5
+    python scripts/process_missing_images.py --api-key YOUR_BFL_KEY --min-count 2
 
 Prerequisites:
     pip install -r scripts/requirements.txt
@@ -42,7 +43,7 @@ BUCKET = "gs://pt-helper-dev.firebasestorage.app"
 STORAGE_PATH = "exercise-images"
 
 # ---------------------------------------------------------------------------
-# Import image generation functions from existing script
+# Import generation functions from the main script
 # ---------------------------------------------------------------------------
 sys.path.insert(0, str(SCRIPT_DIR))
 from generate_exercise_images import (
@@ -152,12 +153,14 @@ def fetch_missing_exercises(
                 "normalized_filename": normalized_key,
                 "category": data.get("exerciseCategory", "general"),
                 "target_area": data.get("targetArea", "General"),
+                "pose_description": data.get("poseDescription", ""),
+                "body_position": data.get("bodyPosition", ""),
                 "count": count,
                 "firestore_doc_id": doc.id,
             }
         )
 
-    # Sort by count descending — most requested exercises first
+    # Sort by count descending -- most requested exercises first
     exercises.sort(key=lambda x: x["count"], reverse=True)
 
     print(f"Firestore query results:")
@@ -170,7 +173,7 @@ def fetch_missing_exercises(
 
 
 # ---------------------------------------------------------------------------
-# Generate images using existing Gemini functions
+# Generate images using FLUX Kontext Pro
 # ---------------------------------------------------------------------------
 def generate_missing_images(
     exercises: list[dict],
@@ -181,16 +184,15 @@ def generate_missing_images(
     """
     Generate images for the given exercises.
 
+    Parameters
+    ----------
+    exercises : list of exercise dicts
+    api_key : BFL API key
+    dry_run : skip API calls if True
+    limit : max images to generate (0 = no limit)
+
     Returns (succeeded, failed) lists.
     """
-    try:
-        from google import genai
-    except ImportError:
-        print("ERROR: google-genai package not installed.")
-        print("Run: pip install google-genai")
-        sys.exit(1)
-
-    client = genai.Client(api_key=api_key)
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     succeeded = []
@@ -208,16 +210,19 @@ def generate_missing_images(
         filename = exercise["normalized_filename"]
         filepath = OUTPUT_DIR / f"{filename}.png"
 
-        print(f"[{i + 1}/{total}] {name} (requested {exercise['count']}x)", end="")
+        print(f"[{i + 1}/{total}] {name} (requested {exercise.get('count', 'N/A')}x)", end="")
 
         # Skip if image already exists on disk
         if filepath.exists():
-            print(" — SKIPPED (file already exists)")
+            print(" -- SKIPPED (exists)")
             succeeded.append(exercise)
             continue
 
-        # Generate
-        image_data = generate_image(client, exercise, dry_run=dry_run)
+        # Generate image
+        image_data = generate_image(
+            None, exercise, dry_run=dry_run,
+            api_key=api_key,
+        )
 
         if dry_run:
             print(f"  [DRY RUN] Would generate: {name}")
@@ -226,10 +231,10 @@ def generate_missing_images(
 
         if image_data and save_image(image_data, filepath):
             file_size = filepath.stat().st_size / 1024
-            print(f" — OK ({file_size:.0f} KB)")
+            print(f" -- OK ({file_size:.0f} KB)")
             succeeded.append(exercise)
         else:
-            print(" — FAILED")
+            print(" -- FAILED")
             failed.append(exercise)
 
         # Rate limiting between requests
@@ -255,8 +260,8 @@ def update_mapping(mapping: dict, succeeded: list[dict]) -> dict:
         mapping[key] = {
             "name": exercise["name"],
             "filename": f"{key}.png",
-            "category": exercise["category"],
-            "target_area": exercise["target_area"],
+            "category": exercise.get("category", "general"),
+            "target_area": exercise.get("target_area", "General"),
         }
 
     # Write to scripts/output/
@@ -290,14 +295,19 @@ def update_master_exercise_list(succeeded: list[dict]):
     added = 0
     for exercise in succeeded:
         if exercise["normalized_filename"] not in existing_keys:
-            data["exercises"].append(
-                {
-                    "name": exercise["name"],
-                    "normalized_filename": exercise["normalized_filename"],
-                    "category": exercise["category"],
-                    "target_area": exercise["target_area"],
-                }
-            )
+            new_entry = {
+                "name": exercise["name"],
+                "normalized_filename": exercise["normalized_filename"],
+                "category": exercise.get("category", "general"),
+                "target_area": exercise.get("target_area", "General"),
+            }
+            # Include optional fields if present
+            if exercise.get("pose_description"):
+                new_entry["pose_description"] = exercise["pose_description"]
+            if exercise.get("body_position"):
+                new_entry["body_position"] = exercise["body_position"]
+
+            data["exercises"].append(new_entry)
             added += 1
 
     if added > 0:
@@ -376,7 +386,7 @@ def mark_as_generated(db, succeeded: list[dict]):
             }
         )
 
-    print(f"  Done — {len(succeeded)} documents updated.")
+    print(f"  Done -- {len(succeeded)} documents updated.")
 
 
 # ---------------------------------------------------------------------------
@@ -384,17 +394,17 @@ def mark_as_generated(db, succeeded: list[dict]):
 # ---------------------------------------------------------------------------
 def main():
     parser = argparse.ArgumentParser(
-        description="Fetch missing exercise images from Firestore, generate via Gemini, and upload to Firebase Storage"
+        description="Fetch missing exercise images from Firestore, generate via FLUX Kontext Pro, and upload to Firebase Storage"
     )
     parser.add_argument(
-        "--google-api-key",
+        "--api-key",
         required=True,
-        help="Google AI Studio API key for Gemini image generation",
+        help="BFL (Black Forest Labs) API key for FLUX Kontext Pro image generation",
     )
     parser.add_argument(
         "--service-account",
         default=None,
-        help="Path to Firebase service account JSON (optional — falls back to gcloud ADC)",
+        help="Path to Firebase service account JSON (optional -- falls back to gcloud ADC)",
     )
     parser.add_argument(
         "--dry-run",
@@ -426,16 +436,16 @@ def main():
     args = parser.parse_args()
 
     print("=" * 60)
-    print("  Missing Exercise Image Pipeline")
+    print("  Missing Exercise Image Pipeline (FLUX Kontext Pro)")
     print("=" * 60)
 
     # Step 1: Initialize Firebase
-    print("\n[1/7] Connecting to Firestore...")
+    print("\n[1/6] Connecting to Firestore...")
     db = init_firebase(args.service_account)
     print("  Connected.")
 
     # Step 2: Load existing mapping
-    print("\n[2/7] Loading existing image mapping...")
+    print("\n[2/6] Loading existing image mapping...")
     mapping = {}
     if MAPPING_FILE.exists():
         with open(MAPPING_FILE, "r") as f:
@@ -443,7 +453,7 @@ def main():
     print(f"  {len(mapping)} exercises currently in mapping.")
 
     # Step 3: Fetch missing exercises
-    print("\n[3/7] Fetching missing exercises from Firestore...")
+    print("\n[3/6] Fetching missing exercises from Firestore...")
     missing = fetch_missing_exercises(
         db, min_count=args.min_count, existing_mapping=mapping
     )
@@ -454,12 +464,13 @@ def main():
 
     print(f"\nExercises to generate:")
     for ex in missing:
-        print(f"  - {ex['name']} ({ex['normalized_filename']}) — {ex['count']}x requests")
+        print(f"  - {ex['name']} ({ex['normalized_filename']}) -- {ex.get('count', 'N/A')}x requests")
 
     # Step 4: Generate images
-    print("\n[4/7] Generating images via Gemini...")
+    print(f"\n[4/6] Generating images via FLUX Kontext Pro...")
     succeeded, failed = generate_missing_images(
-        missing, args.google_api_key, dry_run=args.dry_run, limit=args.limit
+        missing, args.api_key,
+        dry_run=args.dry_run, limit=args.limit,
     )
 
     if not succeeded:
@@ -468,24 +479,22 @@ def main():
 
     # Step 5: Update mapping
     if args.dry_run:
-        print("\n[5/7] Skipping mapping update (dry run).")
+        print("\n[5/6] Skipping mapping update (dry run).")
     else:
-        print("\n[5/7] Updating mapping files...")
+        print("\n[5/6] Updating mapping files...")
         mapping = update_mapping(mapping, succeeded)
         update_master_exercise_list(succeeded)
 
     # Step 6: Upload to Firebase Storage
     if args.skip_upload or args.dry_run:
-        print("\n[6/7] Skipping Firebase Storage upload.")
+        print("\n[6/6] Skipping Firebase Storage upload.")
     else:
-        print("\n[6/7] Uploading to Firebase Storage...")
+        print("\n[6/6] Uploading to Firebase Storage...")
         upload_to_storage(succeeded, dry_run=args.dry_run)
 
-    # Step 7: Mark Firestore docs as processed
-    if args.skip_cleanup or args.dry_run:
-        print("\n[7/7] Skipping Firestore cleanup.")
-    else:
-        print("\n[7/7] Updating Firestore documents...")
+    # Mark Firestore docs as processed
+    if not args.skip_cleanup and not args.dry_run:
+        print("\nUpdating Firestore documents...")
         mark_as_generated(db, succeeded)
 
     # Summary

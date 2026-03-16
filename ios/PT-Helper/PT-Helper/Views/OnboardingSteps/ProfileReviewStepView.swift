@@ -19,6 +19,9 @@ struct ProfileReviewStepView: View {
                     ReviewRow(label: "Sex", value: viewModel.userProfile.sex)
                     ReviewRow(label: "Height", value: "\(viewModel.userProfile.heightFeet)' \(viewModel.userProfile.heightInches)\"")
                     ReviewRow(label: "Weight", value: "\(Int(viewModel.userProfile.weight)) lbs")
+                    if let side = viewModel.userProfile.dominantSide {
+                        ReviewRow(label: "Dominant Side", value: side)
+                    }
                 }
 
                 // Medical
@@ -31,6 +34,9 @@ struct ProfileReviewStepView: View {
                     if let other = viewModel.userProfile.otherMedicalConditions, !other.isEmpty {
                         ReviewRow(label: "Other", value: other)
                     }
+                    if let meds = viewModel.userProfile.medications, !meds.isEmpty {
+                        ReviewRow(label: "Medications", value: meds.joined(separator: ", "))
+                    }
                 }
 
                 // Surgeries
@@ -39,7 +45,30 @@ struct ProfileReviewStepView: View {
                         ReviewRow(label: "", value: "No surgeries reported")
                     } else {
                         ForEach(viewModel.userProfile.surgeries) { surgery in
-                            ReviewRow(label: surgery.name, value: "\(surgery.year)")
+                            VStack(alignment: .leading, spacing: 2) {
+                                ReviewRow(label: surgery.name, value: "\(surgery.year)")
+                                if let area = surgery.bodyArea, !area.isEmpty {
+                                    ReviewRow(label: "Area", value: area)
+                                }
+                                if let status = surgery.recoveryStatus {
+                                    ReviewRow(label: "Status", value: status)
+                                }
+                                if let restrictions = surgery.restrictions, !restrictions.isEmpty {
+                                    ReviewRow(label: "Restrictions", value: restrictions)
+                                }
+                                if let surgeryType = surgery.surgeryType, !surgeryType.isEmpty {
+                                    ReviewRow(label: "Type", value: surgeryType)
+                                }
+                                if let causingInjury = surgery.causingInjury, !causingInjury.isEmpty {
+                                    ReviewRow(label: "Caused By", value: causingInjury)
+                                }
+                                if let hasHardware = surgery.hasHardware {
+                                    ReviewRow(label: "Hardware", value: hasHardware ? "Yes" : "No")
+                                    if hasHardware, let details = surgery.hardwareDetails, !details.isEmpty {
+                                        ReviewRow(label: "Hardware Details", value: details)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -50,7 +79,15 @@ struct ProfileReviewStepView: View {
                         ReviewRow(label: "", value: "No injuries reported")
                     } else {
                         ForEach(viewModel.userProfile.injuries) { injury in
-                            ReviewRow(label: "\(injury.bodyArea) (\(injury.isCurrent ? "Current" : "Past"))", value: injury.description)
+                            VStack(alignment: .leading, spacing: 2) {
+                                ReviewRow(label: "\(injury.bodyArea) (\(injury.isCurrent ? "Current" : "Past"))", value: injury.description)
+                                if let year = injury.year {
+                                    ReviewRow(label: "Year", value: "\(year)")
+                                }
+                                if let status = injury.recoveryStatus {
+                                    ReviewRow(label: "Recovery", value: status)
+                                }
+                            }
                         }
                     }
                 }

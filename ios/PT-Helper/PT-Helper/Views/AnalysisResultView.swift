@@ -7,6 +7,8 @@ struct AnalysisResultView: View {
     @State private var showRehabPlan = false
     @State private var expandedConditions: Set<String> = []
     @Environment(\.dismiss) private var dismiss
+    /// Prefetched rehab plan VM — generation starts as soon as this view appears
+    @StateObject private var rehabVM = RehabPlanViewModel()
 
     var body: some View {
         ZStack {
@@ -38,7 +40,12 @@ struct AnalysisResultView: View {
         }
         .navigationTitle("Analysis Results")
         .navigationDestination(isPresented: $showRehabPlan) {
-            RehabPlanView(analysisResult: analysisResult)
+            RehabPlanView(viewModel: rehabVM, analysisResult: analysisResult)
+        }
+        .onAppear {
+            // Start generating the rehab plan in the background while the user
+            // reads their analysis results — eliminates the second wait.
+            rehabVM.generateRehabPlan(from: analysisResult)
         }
         .trackScreen("AnalysisResult")
     }

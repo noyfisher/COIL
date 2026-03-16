@@ -91,12 +91,13 @@ struct BodyMap3DView: View {
     private let proxyRadii: [String: Float] = [
         "knee": 0.025,
         "elbow": 0.018,
-        "ankle_foot": 0.020,
+        "ankle_foot": 0.035,
         "wrist_hand": 0.018,
         "neck": 0.025,
         "shoulder": 0.022,
     ]
     private let proxyForwardBias: Float = 0.02
+    private let ankleProxyLateralBias: Float = 0.015
 
     // Scale factor so the body fills the viewport on load
     private let modelScale: Float = 3.5
@@ -307,20 +308,44 @@ struct BodyMap3DView: View {
                         var proxyZ = center.z
                         if baseKey == "knee" {
                             proxyZ = bounds.min.z + bounds.extents.z * 0.2
+                        } else if baseKey == "ankle_foot" {
+                            // Center capsule on the ankle zone
+                            proxyZ = center.z
+                        }
+
+                        // Push ankle proxy laterally outward so it protrudes past
+                        // the calf convex hull when viewed from the side
+                        var proxyX = center.x
+                        if baseKey == "ankle_foot" {
+                            if zoneKey.hasPrefix("left_") {
+                                proxyX = center.x - ankleProxyLateralBias
+                            } else if zoneKey.hasPrefix("right_") {
+                                proxyX = center.x + ankleProxyLateralBias
+                            }
                         }
 
                         let proxy = Entity()
                         proxy.name = proxyPrefix + zoneKey
-                        // Push sphere anterior (negative Y = toward camera from front)
+                        // Push proxy anterior (negative Y = toward camera from front)
                         // past neighboring thigh/calf collision surfaces
                         proxy.position = SIMD3<Float>(
-                            center.x,
+                            proxyX,
                             bounds.min.y - proxyForwardBias,
                             proxyZ
                         )
 
-                        let shape = ShapeResource.generateSphere(radius: radius)
-                        proxy.components.set(CollisionComponent(shapes: [shape]))
+                        if baseKey == "ankle_foot" {
+                            // Vertical capsule covering full foot-to-ankle zone
+                            let capsuleHeight = bounds.extents.z * 0.5
+                            let shape = ShapeResource.generateCapsule(height: capsuleHeight, radius: radius)
+                            proxy.components.set(CollisionComponent(shapes: [shape]))
+                            // Rotate capsule from Y-aligned to Z-aligned (vertical in local space)
+                            proxy.orientation = simd_quatf(angle: .pi / 2, axis: SIMD3<Float>(1, 0, 0))
+                        } else {
+                            let shape = ShapeResource.generateSphere(radius: radius)
+                            proxy.components.set(CollisionComponent(shapes: [shape]))
+                        }
+
                         proxy.components.set(InputTargetComponent(allowedInputTypes: .indirect))
 
                         entity.addChild(proxy)

@@ -68,6 +68,24 @@ class UserProfileService: ObservableObject {
         loadError = nil
     }
 
+    // MARK: - Activity Tracking
+
+    private static let lastActivityKey = "lastActivityDate"
+
+    /// Records the current date as the last activity date.
+    func recordActivity() {
+        UserDefaults.standard.set(Date(), forKey: Self.lastActivityKey)
+    }
+
+    /// Returns the number of months since the last recorded activity, or nil if no activity recorded.
+    func monthsSinceLastActivity() -> Int? {
+        guard let lastDate = UserDefaults.standard.object(forKey: Self.lastActivityKey) as? Date else {
+            return nil
+        }
+        let components = Calendar.current.dateComponents([.month], from: lastDate, to: Date())
+        return components.month
+    }
+
     // MARK: - Private
 
     private func load() async {
@@ -81,6 +99,7 @@ class UserProfileService: ObservableObject {
                 .collection("profile").document("health").getDocument()
             if let data = snapshot.data() {
                 self.profile = UserProfile.from(firestoreData: data)
+                self.recordActivity()
             }
             self.loadError = nil
             self.isLoaded = true

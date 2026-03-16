@@ -3,7 +3,7 @@ import SwiftUI
 struct RehabPlanView: View {
     var analysisResult: AnalysisResult? = nil
     var existingPlan: RehabPlan? = nil
-    @StateObject var viewModel = RehabPlanViewModel()
+    @ObservedObject var viewModel: RehabPlanViewModel
     @EnvironmentObject private var savedPlansVM: SavedPlansViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var showEditSheet = false
@@ -14,6 +14,22 @@ struct RehabPlanView: View {
     @State private var reAssessmentRegionPain: [String: Double] = [:]
     /// Cached PDF data to avoid regenerating on every view body evaluation
     @State private var cachedPDFData: Data?
+
+    /// Init for analysis flow — accepts a prefetched ViewModel (generation already in progress)
+    init(viewModel: RehabPlanViewModel, analysisResult: AnalysisResult) {
+        self.analysisResult = analysisResult
+        self.existingPlan = nil
+        self._viewModel = ObservedObject(wrappedValue: viewModel)
+    }
+
+    /// Init for saved plans — loads an existing plan without API call
+    init(existingPlan: RehabPlan) {
+        self.existingPlan = existingPlan
+        self.analysisResult = nil
+        let vm = RehabPlanViewModel()
+        vm.rehabPlan = existingPlan
+        self._viewModel = ObservedObject(wrappedValue: vm)
+    }
 
     var body: some View {
         ZStack {
@@ -419,6 +435,11 @@ struct RehabPlanView: View {
 
     private func exerciseList(for plan: RehabPlan) -> some View {
         VStack(spacing: 16) {
+            // Verification summary banner (only show if verification has been performed)
+            if !viewModel.exerciseVerifications.isEmpty {
+                verificationSummaryBanner
+            }
+
             ForEach(plan.exercises) { exercise in
                 NavigationLink(destination: ExerciseDetailView(exercise: exercise)) {
                     exerciseCard(for: exercise)
@@ -435,10 +456,19 @@ struct RehabPlanView: View {
 
             // Exercise info
             VStack(alignment: .leading, spacing: 6) {
-                Text(exercise.name)
-                    .font(.body.weight(.semibold))
-                    .foregroundColor(.primary)
-                    .lineLimit(2)
+                HStack(spacing: AppSpacing.xs) {
+                    Text(exercise.name)
+                        .font(.body.weight(.semibold))
+                        .foregroundColor(.primary)
+                        .lineLimit(2)
+
+                    Spacer()
+
+                    // Verification badge
+                    if let status = viewModel.exerciseVerifications[exercise.name] {
+                        verificationBadge(for: status)
+                    }
+                }
 
                 Text("Target: \(exercise.targetArea)")
                     .font(.caption)
@@ -462,6 +492,16 @@ struct RehabPlanView: View {
 
                     DifficultyBadge(difficulty: exercise.difficulty)
                 }
+
+                // Show concern text for flagged exercises
+                if let status = viewModel.exerciseVerifications[exercise.name],
+                   case .crossModelFlagged(let concerns) = status,
+                   let firstConcern = concerns.first {
+                    Text(firstConcern)
+                        .font(.caption2)
+                        .foregroundColor(.orange)
+                        .lineLimit(2)
+                }
             }
 
             Image(systemName: "chevron.right")
@@ -472,6 +512,80 @@ struct RehabPlanView: View {
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.card)
         .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+    }
+
+    // MARK: - Verification UI
+
+    @ViewBuilder
+    private func verificationBadge(for status: ExerciseVerificationStatus) -> some View {
+        switch status {
+        case .verified:
+            Label("Verified", systemImage: "checkmark.seal.fill")
+                .font(.caption2.weight(.medium))
+                .foregroundColor(.green)
+        case .contraindicated:
+            Label("Warning", systemImage: "xmark.octagon.fill")
+                .font(.caption2.weight(.medium))
+                .foregroundColor(.red)
+        case .crossModelVerified:
+            Label("Checked", systemImage: "checkmark.seal")
+                .font(.caption2.weight(.medium))
+                .foregroundColor(.blue)
+        case .crossModelFlagged:
+            Label("Review", systemImage: "exclamationmark.triangle.fill")
+                .font(.caption2.weight(.medium))
+                .foregroundColor(.orange)
+        case .crossModelFailed:
+            Label("Unreviewed", systemImage: "questionmark.circle")
+                .font(.caption2.weight(.medium))
+                .foregroundColor(.gray)
+        case .checking:
+            HStack(spacing: 4) {
+                ProgressView()
+                    .scaleEffect(0.6)
+                Text("Checking...")
+                    .font(.caption2)
+                    .foregroundColor(.gray)
+            }
+        }
+    }
+
+    private var verificationSummaryBanner: some View {
+        HStack(spacing: AppSpacing.sm) {
+            Image(systemName: viewModel.isVerifyingUnknowns ? "arrow.triangle.2.circlepath" : "checkmark.shield")
+                .foregroundColor(viewModel.flaggedCount > 0 ? .orange : .green)
+                .font(.subheadline)
+
+            if viewModel.isVerifyingUnknowns {
+                Text("Verifying exercises...")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                ProgressView()
+                    .scaleEffect(0.7)
+            } else {
+                let verified = viewModel.verifiedCount
+                let flagged = viewModel.flaggedCount
+                let total = viewModel.totalExerciseCount
+
+                if flagged > 0 {
+                    Text("\(verified) of \(total) verified \u{2022} \(flagged) flagged for review")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } else {
+                    Text("\(verified) of \(total) exercises verified")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+
+            Spacer()
+        }
+        .padding(AppSpacing.md)
+        .background(
+            (viewModel.flaggedCount > 0 ? Color.orange : Color.green)
+                .opacity(0.08)
+        )
+        .cornerRadius(AppCorners.medium)
     }
 
     private var savePlanButton: some View {
@@ -601,7 +715,7 @@ struct RehabPlanView: View {
                         .frame(height: 6)
                     RoundedRectangle(cornerRadius: 4)
                         .fill(Color.blue)
-                        .frame(width: geometry.size.width * CGFloat(week) / CGFloat(totalWeeks), height: 6)
+                        .frame(width: geometry.size.width * CGFloat(week) / CGFloat(max(totalWeeks, 1)), height: 6)
                 }
             }
             .frame(height: 6)

@@ -3,6 +3,11 @@ import SwiftUI
 struct InjuryHistoryStepView: View {
     @ObservedObject var viewModel: OnboardingViewModel
 
+    private var yearRange: [Int] {
+        let currentYear = Calendar.current.component(.year, from: Date())
+        return Array((1950...currentYear).reversed())
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: AppSpacing.lg) {
@@ -71,6 +76,73 @@ struct InjuryHistoryStepView: View {
                                 }
                             }
                         }
+
+                        // Year picker
+                        HStack {
+                            Text("Year")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Picker("Year", selection: Binding(
+                                get: { viewModel.userProfile.injuries[safe: index]?.year ?? Calendar.current.component(.year, from: Date()) },
+                                set: { if index < viewModel.userProfile.injuries.count { viewModel.userProfile.injuries[index].year = $0 } }
+                            )) {
+                                ForEach(yearRange, id: \.self) { year in
+                                    Text(String(year)).tag(year)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .tint(.red)
+                        }
+                        .padding(AppSpacing.md)
+                        .background(AppColors.inputBackground)
+                        .cornerRadius(AppCorners.medium)
+
+                        // Saw doctor / Did PT toggles
+                        HStack(spacing: AppSpacing.md) {
+                            yesNoToggle(
+                                label: "Saw a doctor?",
+                                value: Binding(
+                                    get: { viewModel.userProfile.injuries[safe: index]?.sawDoctor },
+                                    set: { if index < viewModel.userProfile.injuries.count { viewModel.userProfile.injuries[index].sawDoctor = $0 } }
+                                )
+                            )
+                            yesNoToggle(
+                                label: "Did PT?",
+                                value: Binding(
+                                    get: { viewModel.userProfile.injuries[safe: index]?.hadPhysicalTherapy },
+                                    set: { if index < viewModel.userProfile.injuries.count { viewModel.userProfile.injuries[index].hadPhysicalTherapy = $0 } }
+                                )
+                            )
+                        }
+
+                        // Recovery status (only for past injuries)
+                        if !(viewModel.userProfile.injuries[safe: index]?.isCurrent ?? true) {
+                            VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                                Text("Recovery")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                HStack(spacing: AppSpacing.sm) {
+                                    ForEach(["Fully recovered", "Mostly recovered", "Still dealing with it"], id: \.self) { status in
+                                        let isSelected = viewModel.userProfile.injuries[safe: index]?.recoveryStatus == status
+                                        Button(action: {
+                                            if index < viewModel.userProfile.injuries.count {
+                                                viewModel.userProfile.injuries[index].recoveryStatus = isSelected ? nil : status
+                                            }
+                                        }) {
+                                            Text(status)
+                                                .font(.caption.weight(.medium))
+                                                .foregroundColor(isSelected ? .white : .primary)
+                                                .padding(.horizontal, AppSpacing.sm)
+                                                .padding(.vertical, AppSpacing.xs)
+                                                .frame(maxWidth: .infinity)
+                                                .background(isSelected ? Color.red.opacity(0.7) : AppColors.inputBackground)
+                                                .cornerRadius(AppCorners.small)
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     .padding(AppSpacing.lg)
                     .background(AppColors.cardBackground)
@@ -100,6 +172,31 @@ struct InjuryHistoryStepView: View {
         .scrollDismissesKeyboard(.interactively)
         .onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        }
+    }
+
+    private func yesNoToggle(label: String, value: Binding<Bool?>) -> some View {
+        VStack(alignment: .leading, spacing: AppSpacing.xs) {
+            Text(label)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            HStack(spacing: AppSpacing.sm) {
+                ForEach(["Yes", "No"], id: \.self) { option in
+                    let isYes = option == "Yes"
+                    let isSelected = value.wrappedValue == isYes
+                    Button(action: {
+                        value.wrappedValue = isSelected ? nil : isYes
+                    }) {
+                        Text(option)
+                            .font(.caption.weight(.medium))
+                            .foregroundColor(isSelected ? .white : .primary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, AppSpacing.xs)
+                            .background(isSelected ? Color.red.opacity(0.7) : AppColors.inputBackground)
+                            .cornerRadius(AppCorners.small)
+                    }
+                }
+            }
         }
     }
 }

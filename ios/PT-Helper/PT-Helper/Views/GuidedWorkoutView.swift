@@ -15,13 +15,17 @@ struct GuidedWorkoutView: View {
         ZStack {
             AppColors.pageBackground.ignoresSafeArea()
 
-            switch vm.phase {
-            case .exercise:
-                exercisePhaseView
-            case .rest:
-                restPhaseView
-            case .complete:
-                GuidedWorkoutSummaryView(vm: vm)
+            if vm.totalExercises == 0 {
+                emptyExercisesView
+            } else {
+                switch vm.phase {
+                case .exercise:
+                    exercisePhaseView
+                case .rest:
+                    restPhaseView
+                case .complete:
+                    GuidedWorkoutSummaryView(vm: vm)
+                }
             }
         }
         .navigationTitle("Guided Workout")
@@ -208,6 +212,42 @@ struct GuidedWorkoutView: View {
             .padding(.horizontal, AppSpacing.xl)
             .padding(.bottom, AppSpacing.xxl)
         }
+    }
+
+    // MARK: - Empty State
+
+    private var emptyExercisesView: some View {
+        VStack(spacing: AppSpacing.xl) {
+            Spacer()
+
+            Image(systemName: "figure.walk.motion")
+                .font(.system(size: 50))
+                .foregroundColor(.secondary)
+
+            VStack(spacing: AppSpacing.sm) {
+                Text("No Exercises Available")
+                    .font(.title3.weight(.bold))
+
+                Text("This plan doesn't have any exercises yet. Please go back and regenerate the plan.")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, AppSpacing.lg)
+            }
+
+            Button(action: { dismiss() }) {
+                HStack(spacing: AppSpacing.sm) {
+                    Image(systemName: "chevron.left")
+                    Text("Go Back")
+                }
+            }
+            .buttonStyle(PrimaryButtonStyle())
+            .padding(.horizontal, AppSpacing.xxl)
+
+            Spacer()
+            Spacer()
+        }
+        .padding(AppSpacing.xl)
     }
 
     // MARK: - Helpers

@@ -27,15 +27,16 @@ final class AnalysisResultTests: XCTestCase {
         return PainAssessment(
             id: UUID(),
             selectedRegion: region,
-            painType: .sharp,
+            painTypes: ["Sharp"],
             customPainDescription: nil,
             painIntensity: 7,
-            painDuration: .twoToFourWeeks,
-            painFrequency: .onlyWithActivity,
-            painOnset: .gradual,
+            painDurations: ["2-4 Weeks"],
+            painFrequencies: ["Only with Activity"],
+            painOnsets: ["Gradual"],
             aggravatingFactors: ["Running"],
             relievingFactors: ["Rest"],
-            additionalNotes: nil
+            additionalNotes: nil,
+            currentTreatment: nil
         )
     }
 

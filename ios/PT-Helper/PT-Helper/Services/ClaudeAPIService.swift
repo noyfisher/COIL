@@ -50,6 +50,7 @@ enum ClaudeAPIError: LocalizedError {
 /// Request type determines which server-side system prompt and model config to use
 enum AIRequestType: String, Encodable {
     case analysis
+    case analysis_verify
     case rehab_plan
 }
 
@@ -73,9 +74,15 @@ struct ClaudeResponse: Decodable {
     }
 }
 
+// MARK: - Protocol for Dependency Injection
+
+protocol ClaudeAPIServiceProtocol {
+    func sendMessage(requestType: AIRequestType, userMessage: String) async throws -> String
+}
+
 // MARK: - Claude API Service
 
-class ClaudeAPIService {
+class ClaudeAPIService: ClaudeAPIServiceProtocol {
     static let shared = ClaudeAPIService()
 
     private init() {}
@@ -193,11 +200,11 @@ class ClaudeAPIService {
         }
 
         // Clean up the response — strip markdown code fences if present
-        return cleanJSONResponse(text)
+        return ClaudeAPIService.cleanJSONResponse(text)
     }
 
     /// Strip markdown code fences from the response
-    private func cleanJSONResponse(_ text: String) -> String {
+    static func cleanJSONResponse(_ text: String) -> String {
         var cleaned = text.trimmingCharacters(in: .whitespacesAndNewlines)
 
         // Remove ```json ... ``` wrapping

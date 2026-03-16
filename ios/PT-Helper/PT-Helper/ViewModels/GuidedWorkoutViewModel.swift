@@ -29,7 +29,10 @@ class GuidedWorkoutViewModel: ObservableObject {
 
     private var timerSubscription: AnyCancellable?
     private var elapsedSubscription: AnyCancellable?
-    private let startTime = Date()
+    /// Accumulated elapsed time from completed (pre-pause) segments.
+    private var accumulatedTime: TimeInterval = 0
+    /// Reference point for the current active segment (reset on each resume).
+    private var lastResumeTime = Date()
 
     // MARK: - Computed Properties
 
@@ -118,11 +121,15 @@ class GuidedWorkoutViewModel: ObservableObject {
     func togglePause() {
         isPaused.toggle()
         if isPaused {
+            // Save elapsed time from the current active segment before pausing
+            accumulatedTime += Date().timeIntervalSince(lastResumeTime)
             timerSubscription?.cancel()
             timerSubscription = nil
             elapsedSubscription?.cancel()
             elapsedSubscription = nil
         } else {
+            // Reset reference point so the next segment starts fresh
+            lastResumeTime = Date()
             if phase == .rest && timeRemaining > 0 {
                 resumeRestTimer()
             }
@@ -159,6 +166,11 @@ class GuidedWorkoutViewModel: ObservableObject {
     }
 
     private func finishWorkout() {
+        // Capture final elapsed time before stopping timers
+        if !isPaused {
+            accumulatedTime += Date().timeIntervalSince(lastResumeTime)
+        }
+        totalElapsedTime = accumulatedTime
         stopTimer()
         elapsedSubscription?.cancel()
         elapsedSubscription = nil
@@ -216,7 +228,7 @@ class GuidedWorkoutViewModel: ObservableObject {
             .autoconnect()
             .sink { [weak self] _ in
                 guard let self = self, !self.isPaused else { return }
-                self.totalElapsedTime = Date().timeIntervalSince(self.startTime)
+                self.totalElapsedTime = self.accumulatedTime + Date().timeIntervalSince(self.lastResumeTime)
             }
     }
 }

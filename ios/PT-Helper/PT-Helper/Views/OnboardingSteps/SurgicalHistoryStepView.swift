@@ -51,6 +51,11 @@ struct SurgicalHistoryStepView: View {
                             set: { if index < viewModel.userProfile.surgeries.count { viewModel.userProfile.surgeries[index].name = $0 } }
                         ))
 
+                        StyledTextField(placeholder: "Body area (e.g. Left Knee)", text: Binding(
+                            get: { viewModel.userProfile.surgeries[safe: index]?.bodyArea ?? "" },
+                            set: { if index < viewModel.userProfile.surgeries.count { viewModel.userProfile.surgeries[index].bodyArea = $0.isEmpty ? nil : $0 } }
+                        ))
+
                         // Year picker
                         HStack {
                             Text("Year")
@@ -71,6 +76,116 @@ struct SurgicalHistoryStepView: View {
                         .padding(AppSpacing.md)
                         .background(AppColors.inputBackground)
                         .cornerRadius(AppCorners.medium)
+
+                        // Recovery status
+                        VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                            Text("Recovery Status")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            HStack(spacing: AppSpacing.sm) {
+                                ForEach(["Fully recovered", "Still recovering", "Have restrictions"], id: \.self) { status in
+                                    let isSelected = viewModel.userProfile.surgeries[safe: index]?.recoveryStatus == status
+                                    Button(action: {
+                                        if index < viewModel.userProfile.surgeries.count {
+                                            viewModel.userProfile.surgeries[index].recoveryStatus = isSelected ? nil : status
+                                            if status != "Have restrictions" {
+                                                viewModel.userProfile.surgeries[index].restrictions = nil
+                                            }
+                                        }
+                                    }) {
+                                        Text(status)
+                                            .font(.caption.weight(.medium))
+                                            .foregroundColor(isSelected ? .white : .primary)
+                                            .padding(.horizontal, AppSpacing.sm)
+                                            .padding(.vertical, AppSpacing.xs)
+                                            .frame(maxWidth: .infinity)
+                                            .background(isSelected ? Color.orange.opacity(0.8) : AppColors.inputBackground)
+                                            .cornerRadius(AppCorners.small)
+                                    }
+                                }
+                            }
+                        }
+
+                        // Restrictions text (only when "Have restrictions" selected)
+                        if viewModel.userProfile.surgeries[safe: index]?.recoveryStatus == "Have restrictions" {
+                            StyledTextField(placeholder: "Describe restrictions", text: Binding(
+                                get: { viewModel.userProfile.surgeries[safe: index]?.restrictions ?? "" },
+                                set: { if index < viewModel.userProfile.surgeries.count { viewModel.userProfile.surgeries[index].restrictions = $0.isEmpty ? nil : $0 } }
+                            ))
+                        }
+
+                        Divider()
+                            .padding(.vertical, AppSpacing.xs)
+
+                        // Surgery type
+                        StyledTextField(placeholder: "What kind of surgery was it? (name or description)", text: Binding(
+                            get: { viewModel.userProfile.surgeries[safe: index]?.surgeryType ?? "" },
+                            set: { if index < viewModel.userProfile.surgeries.count { viewModel.userProfile.surgeries[index].surgeryType = $0.isEmpty ? nil : $0 } }
+                        ))
+
+                        // Causing injury
+                        StyledTextField(placeholder: "What injury led to this surgery?", text: Binding(
+                            get: { viewModel.userProfile.surgeries[safe: index]?.causingInjury ?? "" },
+                            set: { if index < viewModel.userProfile.surgeries.count { viewModel.userProfile.surgeries[index].causingInjury = $0.isEmpty ? nil : $0 } }
+                        ))
+
+                        // Hardware toggle
+                        VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                            Text("Did surgery leave pins, screws, or plates?")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            HStack(spacing: AppSpacing.sm) {
+                                ForEach(["Yes", "No", "Not Sure"], id: \.self) { option in
+                                    let currentValue: String? = {
+                                        guard let has = viewModel.userProfile.surgeries[safe: index]?.hasHardware else { return nil }
+                                        switch has {
+                                        case true: return "Yes"
+                                        case false: return "No"
+                                        }
+                                    }()
+                                    // "Not Sure" matches when hasHardware is nil but was explicitly set
+                                    let isSelected: Bool = {
+                                        if option == "Not Sure" {
+                                            return viewModel.userProfile.surgeries[safe: index]?.hasHardware == nil
+                                                && viewModel.userProfile.surgeries[safe: index]?.hardwareDetails == "__not_sure__"
+                                        }
+                                        return currentValue == option
+                                    }()
+                                    Button(action: {
+                                        if index < viewModel.userProfile.surgeries.count {
+                                            switch option {
+                                            case "Yes":
+                                                viewModel.userProfile.surgeries[index].hasHardware = true
+                                                viewModel.userProfile.surgeries[index].hardwareDetails = nil
+                                            case "No":
+                                                viewModel.userProfile.surgeries[index].hasHardware = false
+                                                viewModel.userProfile.surgeries[index].hardwareDetails = nil
+                                            default: // Not Sure
+                                                viewModel.userProfile.surgeries[index].hasHardware = nil
+                                                viewModel.userProfile.surgeries[index].hardwareDetails = "__not_sure__"
+                                            }
+                                        }
+                                    }) {
+                                        Text(option)
+                                            .font(.caption.weight(.medium))
+                                            .foregroundColor(isSelected ? .white : .primary)
+                                            .padding(.horizontal, AppSpacing.sm)
+                                            .padding(.vertical, AppSpacing.xs)
+                                            .frame(maxWidth: .infinity)
+                                            .background(isSelected ? Color.orange.opacity(0.8) : AppColors.inputBackground)
+                                            .cornerRadius(AppCorners.small)
+                                    }
+                                }
+                            }
+                        }
+
+                        // Hardware details (only when "Yes" selected)
+                        if viewModel.userProfile.surgeries[safe: index]?.hasHardware == true {
+                            StyledTextField(placeholder: "Describe the hardware (e.g. two titanium screws)", text: Binding(
+                                get: { viewModel.userProfile.surgeries[safe: index]?.hardwareDetails ?? "" },
+                                set: { if index < viewModel.userProfile.surgeries.count { viewModel.userProfile.surgeries[index].hardwareDetails = $0.isEmpty ? nil : $0 } }
+                            ))
+                        }
                     }
                     .padding(AppSpacing.lg)
                     .background(AppColors.cardBackground)

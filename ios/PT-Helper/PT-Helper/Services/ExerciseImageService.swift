@@ -29,7 +29,8 @@ final class ExerciseImageService: @unchecked Sendable {
 
     /// Disk cache directory: Library/Caches/exercise-images/
     private let diskCacheURL: URL = {
-        let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first
+            ?? FileManager.default.temporaryDirectory
         return caches.appendingPathComponent("exercise-images", isDirectory: true)
     }()
 
@@ -118,8 +119,84 @@ final class ExerciseImageService: @unchecked Sendable {
 
     // MARK: - Key Resolution
 
+    /// Alias map: AI-generated exercise name variants → canonical image key.
+    /// The AI often generates more specific exercise names (e.g., "Calf Raises (Bilateral, Eccentric Focus)")
+    /// that don't exactly match our 178-exercise image set. This maps them to the closest image.
+    private static let aliasMap: [String: String] = [
+        // Calf raise variants → closest image
+        "calf-raises-bilateral-eccentric-focus": "double-leg-calf-raise",
+        "calf-raises-bilateral-to-single-leg-progression": "double-leg-calf-raise",
+        "calf-raises-double-leg-eccentric-emphasis": "double-leg-calf-raise",
+        // Band pull-apart variants
+        "band-pull-apart": "band-pull-aparts",
+        "half-kneeling-band-pull-aparts": "band-pull-aparts",
+        // Bird dog variants
+        "bird-dog-core-stabilizer": "bird-dog",
+        // Child's pose variants
+        "childs-pose-with-shoulder-reach": "childs-pose-with-side-reach",
+        // Cat-cow variants
+        "cat-cow-stretch-modified-for-lower-back-relief": "cat-cow-stretch",
+        // Dead bug variants
+        "dead-bug-modified-for-core-stability-and-l4-protection": "dead-bug",
+        "dead-bug-core-stability-for-lower-back-support": "dead-bug",
+        // Glute bridge variants
+        "glute-bridge-with-core-hold": "glute-bridge-with-isometric-hold",
+        "supine-glute-bridge-with-hamstring-activation": "glute-bridge",
+        // Hamstring stretch variants
+        "hamstring-and-calf-stretch-supine-strap-assist": "hamstring-stretch-with-strap",
+        "supine-hamstring-stretch-with-strap": "hamstring-stretch-with-strap",
+        "seated-forward-fold-hamstring-stretch": "seated-hamstring-stretch",
+        "lying-hamstring-and-hip-flexor-stretch-modified": "lying-hip-flexor-stretch",
+        // Lateral band walk variants
+        "lateral-band-walk-glute-medius-hip-stability": "lateral-band-walks",
+        // Monster walk variants
+        "monster-walks-resistance-band": "monster-walks",
+        // Pendulum variants
+        "pendulum-shoulder-circles": "pendulum-swings",
+        // Plantar/soleus stretch variants
+        "plantar-fascia-and-soleus-stretch": "soleus-stretch",
+        // Prone variants
+        "prone-hamstring-isometric-hold": "prone-hamstring-curl",
+        "prone-hip-extension-single-leg-for-glute-activation": "prone-hip-extension",
+        "prone-shoulder-external-rotation-with-elbow-support": "side-lying-external-rotation",
+        "prone-shoulder-i-y-t-raises": "prone-i-y-t-raises",
+        "lower-back-quadriceps-tightness---prone-quad-stretch": "standing-quad-stretch",
+        // Quad sets variants
+        "quad-sets-with-glute-activation": "quad-sets",
+        "quad-sets-with-vmo-focus": "quad-sets",
+        "quadriceps-sets-isometric": "quad-sets",
+        "quadriceps-sets-with-vmo-focus": "quad-sets",
+        "quadriceps-and-patellar-tendon-eccentric-stretch": "standing-quad-stretch",
+        // Quadruped cat-cow variants
+        "quadruped-cat-cow-stretch": "cat-cow-stretch",
+        "thoracic-spine-rotation-quadruped-cat-cow": "quadruped-thoracic-rotation",
+        // External rotation variants
+        "external-rotation-with-elbow-bent-90-90-position": "external-rotation",
+        // Scapular push-up variants
+        "scapular-push-up-hold": "wall-push-ups",
+        "scapular-push-up-plus": "wall-push-ups",
+        "scapular-push-up-plus-modified": "wall-push-ups",
+        "serratus-anterior-push-up-plus": "wall-push-ups",
+        // Single leg balance/deadlift variants
+        "single-leg-stance-on-firm-surface": "single-leg-balance",
+        "single-leg-romanian-deadlift-light-load": "single-leg-deadlift",
+        // Standing hamstring curl variants
+        "standing-hamstring-curl-progressive": "standing-hamstring-curl",
+        // Straight leg raise variants
+        "straight-leg-raise-slr---supine": "straight-leg-raises",
+        // Supine stretch variants
+        "supine-lower-back-stretch": "knee-to-chest-stretch",
+        "supine-shoulder-external-rotation-90-90-position": "external-rotation",
+        "supine-shoulder-external-rotation-with-towel-roll": "external-rotation",
+        "supine-shoulder-flexion-with-dowel-or-pvc-pipe": "shoulder-flexion",
+        // Nerve glide variants
+        "sural-nerve-glide-neural-mobility-for-sural-nerve-irritation": "sciatic-nerve-glide",
+        // Terminal knee extension variants
+        "terminal-knee-extensions-tke": "terminal-knee-extension",
+    ]
+
     /// Resolve the mapping key for an exercise.
-    /// Priority: imageFileName field → normalized exercise name → nil.
+    /// Priority: imageFileName field → normalized exercise name → alias → nil.
     func imageKey(for exercise: RehabExercise) -> String? {
         // 1. Explicit imageFileName from AI / Firestore
         if let fileName = exercise.imageFileName, mapping[fileName] != nil {
@@ -130,6 +207,11 @@ final class ExerciseImageService: @unchecked Sendable {
         let normalized = normalizeName(exercise.name)
         if mapping[normalized] != nil {
             return normalized
+        }
+
+        // 3. Check alias map for AI-generated name variants
+        if let alias = Self.aliasMap[normalized], mapping[alias] != nil {
+            return alias
         }
 
         return nil

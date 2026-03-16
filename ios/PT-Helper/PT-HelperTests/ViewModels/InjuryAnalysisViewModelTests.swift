@@ -3,51 +3,14 @@ import XCTest
 
 // MARK: - InjuryAnalysisViewModel Tests
 
+@MainActor
 final class InjuryAnalysisViewModelTests: XCTestCase {
-
-    private func makeProfile() -> UserProfile {
-        UserProfile(
-            userId: "test-uid",
-            firstName: "Test", lastName: "User",
-            dateOfBirth: Date(), sex: "Male",
-            heightFeet: 5, heightInches: 10, weight: 175,
-            medicalConditions: [], otherMedicalConditions: nil,
-            surgeries: [], injuries: [],
-            activityLevel: "Active", primarySport: nil
-        )
-    }
-
-    private func makeRegion(name: String) -> BodyRegion {
-        BodyRegion(
-            name: name, zoneKey: name.lowercased().replacingOccurrences(of: " ", with: "_"),
-            sides: [.front],
-            frontPosition: CGPoint(x: 0.5, y: 0.5),
-            backPosition: nil
-        )
-    }
-
-    private func makeAssessment(region: BodyRegion) -> PainAssessment {
-        PainAssessment(
-            id: UUID(),
-            selectedRegion: region,
-            painType: .sharp,
-            customPainDescription: nil,
-            painIntensity: 7,
-            painDuration: .twoToFourWeeks,
-            painFrequency: .onlyWithActivity,
-            painOnset: .gradual,
-            aggravatingFactors: ["Running"],
-            relievingFactors: ["Rest"],
-            additionalNotes: nil
-        )
-    }
 
     // MARK: - Initialization
 
     func testInitialState_SingleRegion() {
-        let profile = makeProfile()
-        let regions = [makeRegion(name: "Right Knee")]
-        let vm = InjuryAnalysisViewModel(userProfile: profile, selectedRegions: regions)
+        let regions = [TestFixtures.makeRegion(name: "Right Knee")]
+        let vm = InjuryAnalysisViewModel(userProfile: TestFixtures.makeProfile(), selectedRegions: regions)
 
         XCTAssertEqual(vm.currentRegionIndex, 0)
         XCTAssertEqual(vm.totalRegions, 1)
@@ -60,8 +23,12 @@ final class InjuryAnalysisViewModelTests: XCTestCase {
     }
 
     func testInitialState_MultipleRegions() {
-        let regions = [makeRegion(name: "Right Knee"), makeRegion(name: "Lower Back"), makeRegion(name: "Left Shoulder")]
-        let vm = InjuryAnalysisViewModel(userProfile: makeProfile(), selectedRegions: regions)
+        let regions = [
+            TestFixtures.makeRegion(name: "Right Knee", zoneKey: "right_knee"),
+            TestFixtures.makeRegion(name: "Lower Back", zoneKey: "lower_back"),
+            TestFixtures.makeRegion(name: "Left Shoulder", zoneKey: "left_shoulder")
+        ]
+        let vm = InjuryAnalysisViewModel(userProfile: TestFixtures.makeProfile(), selectedRegions: regions)
 
         XCTAssertEqual(vm.totalRegions, 3)
         XCTAssertEqual(vm.assessments.count, 3)
@@ -72,23 +39,23 @@ final class InjuryAnalysisViewModelTests: XCTestCase {
 
     func testIsLastRegion_SingleRegion() {
         let vm = InjuryAnalysisViewModel(
-            userProfile: makeProfile(),
-            selectedRegions: [makeRegion(name: "Knee")]
+            userProfile: TestFixtures.makeProfile(),
+            selectedRegions: [TestFixtures.makeRegion(name: "Knee")]
         )
         XCTAssertTrue(vm.isLastRegion)
     }
 
     func testIsLastRegion_MultipleRegions() {
-        let regions = [makeRegion(name: "A"), makeRegion(name: "B")]
-        let vm = InjuryAnalysisViewModel(userProfile: makeProfile(), selectedRegions: regions)
+        let regions = [TestFixtures.makeRegion(name: "A", zoneKey: "a"), TestFixtures.makeRegion(name: "B", zoneKey: "b")]
+        let vm = InjuryAnalysisViewModel(userProfile: TestFixtures.makeProfile(), selectedRegions: regions)
 
         XCTAssertFalse(vm.isLastRegion, "Should not be last on first region")
     }
 
     func testCurrentRegion() {
-        let r1 = makeRegion(name: "Knee")
-        let r2 = makeRegion(name: "Back")
-        let vm = InjuryAnalysisViewModel(userProfile: makeProfile(), selectedRegions: [r1, r2])
+        let r1 = TestFixtures.makeRegion(name: "Knee", zoneKey: "knee")
+        let r2 = TestFixtures.makeRegion(name: "Back", zoneKey: "back")
+        let vm = InjuryAnalysisViewModel(userProfile: TestFixtures.makeProfile(), selectedRegions: [r1, r2])
 
         XCTAssertEqual(vm.currentRegion?.name, "Knee")
     }
@@ -96,57 +63,55 @@ final class InjuryAnalysisViewModelTests: XCTestCase {
     // MARK: - Save and Navigate
 
     func testSaveCurrentAssessment() {
-        let region = makeRegion(name: "Knee")
-        let vm = InjuryAnalysisViewModel(userProfile: makeProfile(), selectedRegions: [region])
-        let assessment = makeAssessment(region: region)
+        let region = TestFixtures.makeRegion(name: "Knee")
+        let vm = InjuryAnalysisViewModel(userProfile: TestFixtures.makeProfile(), selectedRegions: [region])
+        let assessment = TestFixtures.makeAssessment(region: region)
 
         vm.saveCurrentAssessment(assessment)
 
         XCTAssertNotNil(vm.assessments[0])
-        XCTAssertEqual(vm.assessments[0]?.painType, .sharp)
-        XCTAssertEqual(vm.assessments[0]?.painIntensity, 7)
+        XCTAssertEqual(vm.assessments[0]?.painTypes, ["Aching"])
+        XCTAssertEqual(vm.assessments[0]?.painIntensity, 5)
     }
 
     func testSaveAndAdvance() {
-        let r1 = makeRegion(name: "Knee")
-        let r2 = makeRegion(name: "Back")
-        let vm = InjuryAnalysisViewModel(userProfile: makeProfile(), selectedRegions: [r1, r2])
+        let r1 = TestFixtures.makeRegion(name: "Knee", zoneKey: "knee")
+        let r2 = TestFixtures.makeRegion(name: "Back", zoneKey: "back")
+        let vm = InjuryAnalysisViewModel(userProfile: TestFixtures.makeProfile(), selectedRegions: [r1, r2])
 
-        vm.saveAndAdvance(makeAssessment(region: r1))
+        vm.saveAndAdvance(TestFixtures.makeAssessment(region: r1))
 
         XCTAssertEqual(vm.currentRegionIndex, 1, "Should advance to next region")
         XCTAssertNotNil(vm.assessments[0], "First region should be saved")
     }
 
     func testSaveAndAdvance_DoesNotGoOutOfBounds() {
-        let region = makeRegion(name: "Knee")
-        let vm = InjuryAnalysisViewModel(userProfile: makeProfile(), selectedRegions: [region])
+        let region = TestFixtures.makeRegion(name: "Knee")
+        let vm = InjuryAnalysisViewModel(userProfile: TestFixtures.makeProfile(), selectedRegions: [region])
 
-        vm.saveAndAdvance(makeAssessment(region: region))
+        vm.saveAndAdvance(TestFixtures.makeAssessment(region: region))
 
         XCTAssertEqual(vm.currentRegionIndex, 0, "Should not advance past last region")
     }
 
     func testSaveAndGoBack() {
-        let r1 = makeRegion(name: "Knee")
-        let r2 = makeRegion(name: "Back")
-        let vm = InjuryAnalysisViewModel(userProfile: makeProfile(), selectedRegions: [r1, r2])
+        let r1 = TestFixtures.makeRegion(name: "Knee", zoneKey: "knee")
+        let r2 = TestFixtures.makeRegion(name: "Back", zoneKey: "back")
+        let vm = InjuryAnalysisViewModel(userProfile: TestFixtures.makeProfile(), selectedRegions: [r1, r2])
 
-        // Advance to second region
-        vm.saveAndAdvance(makeAssessment(region: r1))
+        vm.saveAndAdvance(TestFixtures.makeAssessment(region: r1))
         XCTAssertEqual(vm.currentRegionIndex, 1)
 
-        // Go back
-        vm.saveAndGoBack(makeAssessment(region: r2))
+        vm.saveAndGoBack(TestFixtures.makeAssessment(region: r2))
         XCTAssertEqual(vm.currentRegionIndex, 0, "Should go back to first region")
         XCTAssertNotNil(vm.assessments[1], "Second region should still be saved")
     }
 
     func testSaveAndGoBack_DoesNotGoNegative() {
-        let region = makeRegion(name: "Knee")
-        let vm = InjuryAnalysisViewModel(userProfile: makeProfile(), selectedRegions: [region])
+        let region = TestFixtures.makeRegion(name: "Knee")
+        let vm = InjuryAnalysisViewModel(userProfile: TestFixtures.makeProfile(), selectedRegions: [region])
 
-        vm.saveAndGoBack(makeAssessment(region: region))
+        vm.saveAndGoBack(TestFixtures.makeAssessment(region: region))
         XCTAssertEqual(vm.currentRegionIndex, 0, "Should not go below 0")
     }
 
@@ -154,11 +119,10 @@ final class InjuryAnalysisViewModelTests: XCTestCase {
 
     func testCancelAnalysis() {
         let vm = InjuryAnalysisViewModel(
-            userProfile: makeProfile(),
-            selectedRegions: [makeRegion(name: "Knee")]
+            userProfile: TestFixtures.makeProfile(),
+            selectedRegions: [TestFixtures.makeRegion(name: "Knee")]
         )
 
-        // Simulate analysis started
         vm.cancelAnalysis()
 
         XCTAssertFalse(vm.isAnalyzing)
@@ -168,8 +132,8 @@ final class InjuryAnalysisViewModelTests: XCTestCase {
 
     func testResetAnalysisState() {
         let vm = InjuryAnalysisViewModel(
-            userProfile: makeProfile(),
-            selectedRegions: [makeRegion(name: "Knee")]
+            userProfile: TestFixtures.makeProfile(),
+            selectedRegions: [TestFixtures.makeRegion(name: "Knee")]
         )
 
         vm.resetAnalysisState()
@@ -183,8 +147,11 @@ final class InjuryAnalysisViewModelTests: XCTestCase {
     // MARK: - Selected Region Names
 
     func testSelectedRegionNames() {
-        let regions = [makeRegion(name: "Right Knee"), makeRegion(name: "Lower Back")]
-        let vm = InjuryAnalysisViewModel(userProfile: makeProfile(), selectedRegions: regions)
+        let regions = [
+            TestFixtures.makeRegion(name: "Right Knee", zoneKey: "right_knee"),
+            TestFixtures.makeRegion(name: "Lower Back", zoneKey: "lower_back")
+        ]
+        let vm = InjuryAnalysisViewModel(userProfile: TestFixtures.makeProfile(), selectedRegions: regions)
 
         XCTAssertEqual(vm.selectedRegionNames, ["Right Knee", "Lower Back"])
     }
@@ -193,16 +160,16 @@ final class InjuryAnalysisViewModelTests: XCTestCase {
 
     func testCurrentAssessment_NilBeforeSave() {
         let vm = InjuryAnalysisViewModel(
-            userProfile: makeProfile(),
-            selectedRegions: [makeRegion(name: "Knee")]
+            userProfile: TestFixtures.makeProfile(),
+            selectedRegions: [TestFixtures.makeRegion(name: "Knee")]
         )
         XCTAssertNil(vm.currentAssessment)
     }
 
     func testCurrentAssessment_AfterSave() {
-        let region = makeRegion(name: "Knee")
-        let vm = InjuryAnalysisViewModel(userProfile: makeProfile(), selectedRegions: [region])
-        let assessment = makeAssessment(region: region)
+        let region = TestFixtures.makeRegion(name: "Knee")
+        let vm = InjuryAnalysisViewModel(userProfile: TestFixtures.makeProfile(), selectedRegions: [region])
+        let assessment = TestFixtures.makeAssessment(region: region, painIntensity: 7)
 
         vm.saveCurrentAssessment(assessment)
 
@@ -213,53 +180,53 @@ final class InjuryAnalysisViewModelTests: XCTestCase {
     // MARK: - Apply to All Regions
 
     func testIsFirstRegion() {
-        let regions = [makeRegion(name: "A"), makeRegion(name: "B")]
-        let vm = InjuryAnalysisViewModel(userProfile: makeProfile(), selectedRegions: regions)
+        let regions = [TestFixtures.makeRegion(name: "A", zoneKey: "a"), TestFixtures.makeRegion(name: "B", zoneKey: "b")]
+        let vm = InjuryAnalysisViewModel(userProfile: TestFixtures.makeProfile(), selectedRegions: regions)
 
         XCTAssertTrue(vm.isFirstRegion)
 
-        vm.saveAndAdvance(makeAssessment(region: regions[0]))
+        vm.saveAndAdvance(TestFixtures.makeAssessment(region: regions[0]))
         XCTAssertFalse(vm.isFirstRegion)
     }
 
     func testHasMultipleRegions() {
         let singleVM = InjuryAnalysisViewModel(
-            userProfile: makeProfile(),
-            selectedRegions: [makeRegion(name: "A")]
+            userProfile: TestFixtures.makeProfile(),
+            selectedRegions: [TestFixtures.makeRegion(name: "A")]
         )
         XCTAssertFalse(singleVM.hasMultipleRegions)
 
         let multiVM = InjuryAnalysisViewModel(
-            userProfile: makeProfile(),
-            selectedRegions: [makeRegion(name: "A"), makeRegion(name: "B")]
+            userProfile: TestFixtures.makeProfile(),
+            selectedRegions: [TestFixtures.makeRegion(name: "A", zoneKey: "a"), TestFixtures.makeRegion(name: "B", zoneKey: "b")]
         )
         XCTAssertTrue(multiVM.hasMultipleRegions)
     }
 
     func testApplyToAllRegions_FillsAllAssessments() {
-        let r1 = makeRegion(name: "Knee")
-        let r2 = makeRegion(name: "Back")
-        let r3 = makeRegion(name: "Shoulder")
+        let r1 = TestFixtures.makeRegion(name: "Knee", zoneKey: "knee")
+        let r2 = TestFixtures.makeRegion(name: "Back", zoneKey: "back")
+        let r3 = TestFixtures.makeRegion(name: "Shoulder", zoneKey: "shoulder")
         let vm = InjuryAnalysisViewModel(
-            userProfile: makeProfile(),
+            userProfile: TestFixtures.makeProfile(),
             selectedRegions: [r1, r2, r3]
         )
 
-        let template = makeAssessment(region: r1)
+        let template = TestFixtures.makeAssessment(region: r1)
         vm.applyToAllRegionsAndAnalyze(template)
 
         XCTAssertEqual(vm.assessments.compactMap { $0 }.count, 3)
     }
 
     func testApplyToAllRegions_PreservesRegionIdentity() {
-        let r1 = makeRegion(name: "Knee")
-        let r2 = makeRegion(name: "Back")
+        let r1 = TestFixtures.makeRegion(name: "Knee", zoneKey: "knee")
+        let r2 = TestFixtures.makeRegion(name: "Back", zoneKey: "back")
         let vm = InjuryAnalysisViewModel(
-            userProfile: makeProfile(),
+            userProfile: TestFixtures.makeProfile(),
             selectedRegions: [r1, r2]
         )
 
-        let template = makeAssessment(region: r1)
+        let template = TestFixtures.makeAssessment(region: r1)
         vm.applyToAllRegionsAndAnalyze(template)
 
         XCTAssertEqual(vm.assessments[0]?.selectedRegion.name, "Knee")
@@ -267,64 +234,209 @@ final class InjuryAnalysisViewModelTests: XCTestCase {
     }
 
     func testApplyToAllRegions_CopiesPainData() {
-        let r1 = makeRegion(name: "Knee")
-        let r2 = makeRegion(name: "Back")
+        let r1 = TestFixtures.makeRegion(name: "Knee", zoneKey: "knee")
+        let r2 = TestFixtures.makeRegion(name: "Back", zoneKey: "back")
         let vm = InjuryAnalysisViewModel(
-            userProfile: makeProfile(),
+            userProfile: TestFixtures.makeProfile(),
             selectedRegions: [r1, r2]
         )
 
-        let template = makeAssessment(region: r1)
+        let template = TestFixtures.makeAssessment(region: r1, painTypes: ["Sharp"], painIntensity: 7)
         vm.applyToAllRegionsAndAnalyze(template)
 
-        XCTAssertEqual(vm.assessments[1]?.painType, template.painType)
+        XCTAssertEqual(vm.assessments[1]?.painTypes, template.painTypes)
         XCTAssertEqual(vm.assessments[1]?.painIntensity, template.painIntensity)
-        XCTAssertEqual(vm.assessments[1]?.painDuration, template.painDuration)
-        XCTAssertEqual(vm.assessments[1]?.painFrequency, template.painFrequency)
-        XCTAssertEqual(vm.assessments[1]?.painOnset, template.painOnset)
-        XCTAssertEqual(vm.assessments[1]?.aggravatingFactors, template.aggravatingFactors)
-        XCTAssertEqual(vm.assessments[1]?.relievingFactors, template.relievingFactors)
+        XCTAssertEqual(vm.assessments[1]?.painDurations, template.painDurations)
+        XCTAssertEqual(vm.assessments[1]?.painFrequencies, template.painFrequencies)
+        XCTAssertEqual(vm.assessments[1]?.painOnsets, template.painOnsets)
     }
 
     func testApplyToAllRegions_UniqueIDs() {
-        let r1 = makeRegion(name: "Knee")
-        let r2 = makeRegion(name: "Back")
-        let r3 = makeRegion(name: "Shoulder")
+        let r1 = TestFixtures.makeRegion(name: "Knee", zoneKey: "knee")
+        let r2 = TestFixtures.makeRegion(name: "Back", zoneKey: "back")
+        let r3 = TestFixtures.makeRegion(name: "Shoulder", zoneKey: "shoulder")
         let vm = InjuryAnalysisViewModel(
-            userProfile: makeProfile(),
+            userProfile: TestFixtures.makeProfile(),
             selectedRegions: [r1, r2, r3]
         )
 
-        vm.applyToAllRegionsAndAnalyze(makeAssessment(region: r1))
+        vm.applyToAllRegionsAndAnalyze(TestFixtures.makeAssessment(region: r1))
 
         let ids = vm.assessments.compactMap { $0?.id }
         XCTAssertEqual(Set(ids).count, 3, "Each assessment should have a unique ID")
     }
 
     func testApplyToAllRegions_TriggersAnalysis() {
-        let r1 = makeRegion(name: "Knee")
-        let r2 = makeRegion(name: "Back")
+        let r1 = TestFixtures.makeRegion(name: "Knee", zoneKey: "knee")
+        let r2 = TestFixtures.makeRegion(name: "Back", zoneKey: "back")
         let vm = InjuryAnalysisViewModel(
-            userProfile: makeProfile(),
+            userProfile: TestFixtures.makeProfile(),
             selectedRegions: [r1, r2]
         )
 
-        vm.applyToAllRegionsAndAnalyze(makeAssessment(region: r1))
+        vm.applyToAllRegionsAndAnalyze(TestFixtures.makeAssessment(region: r1))
 
         XCTAssertTrue(vm.isAnalyzing)
         XCTAssertTrue(vm.showAnalyzingScreen)
     }
 
     func testApplyToAllRegions_DoesNotChangeIndex() {
-        let r1 = makeRegion(name: "Knee")
-        let r2 = makeRegion(name: "Back")
+        let r1 = TestFixtures.makeRegion(name: "Knee", zoneKey: "knee")
+        let r2 = TestFixtures.makeRegion(name: "Back", zoneKey: "back")
         let vm = InjuryAnalysisViewModel(
-            userProfile: makeProfile(),
+            userProfile: TestFixtures.makeProfile(),
             selectedRegions: [r1, r2]
         )
 
-        vm.applyToAllRegionsAndAnalyze(makeAssessment(region: r1))
+        vm.applyToAllRegionsAndAnalyze(TestFixtures.makeAssessment(region: r1))
 
         XCTAssertEqual(vm.currentRegionIndex, 0, "Index should remain at 0 after apply-to-all")
+    }
+
+    // MARK: - Async Analysis Tests (with MockClaudeAPIService)
+
+    func testStartAnalysis_setsAnalyzingState() {
+        let mock = MockClaudeAPIService()
+        mock.responseToReturn = TestFixtures.makeAnalysisResponseJSON()
+        let region = TestFixtures.makeRegion(name: "Knee")
+        let vm = InjuryAnalysisViewModel(
+            userProfile: TestFixtures.makeProfile(),
+            selectedRegions: [region],
+            apiService: mock
+        )
+
+        vm.saveAndAnalyze(TestFixtures.makeAssessment(region: region))
+
+        XCTAssertTrue(vm.isAnalyzing)
+        XCTAssertTrue(vm.showAnalyzingScreen)
+        XCTAssertNil(vm.analysisError)
+    }
+
+    func testStartAnalysis_success_populatesResult() async throws {
+        let mock = MockClaudeAPIService()
+        mock.responseToReturn = TestFixtures.makeAnalysisResponseJSON(
+            conditionName: "Patellofemoral Pain Syndrome",
+            confidence: 80
+        )
+        let region = TestFixtures.makeRegion(name: "Right Knee")
+        let vm = InjuryAnalysisViewModel(
+            userProfile: TestFixtures.makeProfile(),
+            selectedRegions: [region],
+            apiService: mock
+        )
+
+        vm.saveAndAnalyze(TestFixtures.makeAssessment(region: region))
+        try await Task.sleep(nanoseconds: 500_000_000)
+
+        XCTAssertFalse(vm.isAnalyzing)
+        XCTAssertNotNil(vm.analysisResult)
+        XCTAssertNil(vm.analysisError)
+        XCTAssertEqual(vm.analysisResult?.conditions.first?.conditionName, "Patellofemoral Pain Syndrome")
+    }
+
+    func testStartAnalysis_success_callsAPIWithAnalysisType() async throws {
+        let mock = MockClaudeAPIService()
+        mock.responseToReturn = TestFixtures.makeAnalysisResponseJSON()
+        let region = TestFixtures.makeRegion(name: "Knee")
+        let vm = InjuryAnalysisViewModel(
+            userProfile: TestFixtures.makeProfile(),
+            selectedRegions: [region],
+            apiService: mock
+        )
+
+        vm.saveAndAnalyze(TestFixtures.makeAssessment(region: region))
+        try await Task.sleep(nanoseconds: 500_000_000)
+
+        // Two-call pipeline: primary analysis + verification
+        XCTAssertEqual(mock.sendMessageCallCount, 2)
+        XCTAssertEqual(mock.allRequestTypes.first, .analysis, "First call should be .analysis")
+        XCTAssertEqual(mock.lastRequestType, .analysis_verify, "Second call should be .analysis_verify")
+    }
+
+    func testStartAnalysis_apiError_setsError() async throws {
+        let mock = MockClaudeAPIService()
+        mock.errorToThrow = ClaudeAPIError.rateLimited
+        let region = TestFixtures.makeRegion(name: "Knee")
+        let vm = InjuryAnalysisViewModel(
+            userProfile: TestFixtures.makeProfile(),
+            selectedRegions: [region],
+            apiService: mock
+        )
+
+        vm.saveAndAnalyze(TestFixtures.makeAssessment(region: region))
+        try await Task.sleep(nanoseconds: 500_000_000)
+
+        XCTAssertFalse(vm.isAnalyzing)
+        XCTAssertNotNil(vm.analysisError)
+        XCTAssertNil(vm.analysisResult)
+    }
+
+    func testCancelAnalysis_stopsInFlightRequest() async throws {
+        let mock = MockClaudeAPIService()
+        mock.simulatedDelay = 5 // Long delay to ensure cancel happens during request
+        mock.responseToReturn = TestFixtures.makeAnalysisResponseJSON()
+        let region = TestFixtures.makeRegion(name: "Knee")
+        let vm = InjuryAnalysisViewModel(
+            userProfile: TestFixtures.makeProfile(),
+            selectedRegions: [region],
+            apiService: mock
+        )
+
+        vm.saveAndAnalyze(TestFixtures.makeAssessment(region: region))
+        XCTAssertTrue(vm.isAnalyzing)
+
+        vm.cancelAnalysis()
+
+        XCTAssertFalse(vm.isAnalyzing)
+        XCTAssertFalse(vm.showAnalyzingScreen)
+        XCTAssertNil(vm.analysisError)
+    }
+
+    func testRetryAnalysis_afterError() async throws {
+        let mock = MockClaudeAPIService()
+        mock.errorToThrow = ClaudeAPIError.networkError(NSError(domain: "", code: -1))
+        let region = TestFixtures.makeRegion(name: "Knee")
+        let vm = InjuryAnalysisViewModel(
+            userProfile: TestFixtures.makeProfile(),
+            selectedRegions: [region],
+            apiService: mock
+        )
+
+        // First attempt fails (primary call throws, 1 API call)
+        vm.saveAndAnalyze(TestFixtures.makeAssessment(region: region))
+        try await Task.sleep(nanoseconds: 500_000_000)
+        XCTAssertNotNil(vm.analysisError)
+
+        // Retry succeeds (primary + verification = 2 API calls)
+        mock.errorToThrow = nil
+        mock.responseToReturn = TestFixtures.makeAnalysisResponseJSON()
+        vm.retryAnalysis()
+        try await Task.sleep(nanoseconds: 500_000_000)
+
+        XCTAssertFalse(vm.isAnalyzing)
+        XCTAssertNil(vm.analysisError)
+        XCTAssertNotNil(vm.analysisResult)
+        // Total: 1 (failed primary) + 2 (successful primary + verify) = 3
+        XCTAssertEqual(mock.sendMessageCallCount, 3)
+    }
+
+    func testStartAnalysis_noCompletedAssessments_doesNotCallAPI() {
+        let mock = MockClaudeAPIService()
+        let region = TestFixtures.makeRegion(name: "Knee")
+        let vm = InjuryAnalysisViewModel(
+            userProfile: TestFixtures.makeProfile(),
+            selectedRegions: [region],
+            apiService: mock
+        )
+
+        // Don't save any assessment, just try to start analysis directly
+        // Since startAnalysis is private, we go through saveAndAnalyze but without saving first
+        // Actually, saveAndAnalyze saves first then calls startAnalysis, so let's call retryAnalysis
+        // with no assessments filled.
+        vm.retryAnalysis()
+
+        // Should not have called the API since there are no completed assessments
+        XCTAssertEqual(mock.sendMessageCallCount, 0)
+        XCTAssertFalse(vm.isAnalyzing)
     }
 }

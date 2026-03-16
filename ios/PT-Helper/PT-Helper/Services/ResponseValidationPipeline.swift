@@ -167,7 +167,7 @@ struct MedicalRedFlagDetector {
 
         // High pain intensity check
         for assessment in assessments {
-            if assessment.painIntensity >= 9 && assessment.painOnset == .sudden {
+            if assessment.painIntensity >= 9 && assessment.painOnsets.contains("Sudden") {
                 alerts.append(ValidationWarning(
                     severity: .urgent,
                     message: "You reported very severe (\(assessment.painIntensity)/10) pain in your \(assessment.selectedRegion.name) with sudden onset. With pain this severe, we strongly recommend seeing a healthcare provider before starting any exercise program."
@@ -192,7 +192,12 @@ struct MedicalRedFlagDetector {
 
         for pattern in symptomPatterns {
             let allKeywordsMatch = pattern.keywords.allSatisfy { allText.contains($0) }
-            let regionMatches = pattern.region == nil || regionKeys.contains(where: { $0.contains(pattern.region!) })
+            let regionMatches: Bool
+            if let region = pattern.region {
+                regionMatches = regionKeys.contains(where: { $0.contains(region) })
+            } else {
+                regionMatches = true
+            }
 
             if allKeywordsMatch && regionMatches {
                 alerts.append(ValidationWarning(severity: .urgent, message: pattern.message))
@@ -399,6 +404,55 @@ struct AnatomicalRelevanceChecker {
     }
 }
 
+// MARK: - Knowledge Graph Validator
+
+struct KnowledgeGraphValidator {
+
+    /// Validate exercises against the medical knowledge graph.
+    /// Returns warnings for contraindicated exercises and the full verification result.
+    static func validate(
+        exercises: [RehabExercise],
+        conditions: [String],
+        knowledgeGraph: KnowledgeGraphService = .shared
+    ) -> (warnings: [ValidationWarning], verification: PlanVerificationResult) {
+        let plan = RehabPlan(
+            id: UUID(),
+            planName: "",
+            conditions: conditions,
+            exercises: exercises,
+            weeklySchedule: [],
+            totalWeeks: 0,
+            createdDate: Date(),
+            notes: nil
+        )
+
+        let verification = knowledgeGraph.verifyPlan(plan, conditions: conditions)
+        var warnings: [ValidationWarning] = []
+
+        // Add warnings for contraindicated exercises
+        for (exercise, reason) in verification.contraindicatedExercises {
+            warnings.append(ValidationWarning(
+                severity: .caution,
+                message: reason
+            ))
+        }
+
+        // Add warnings for conditions with red flags from the knowledge graph
+        for condition in conditions {
+            if let redFlags = knowledgeGraph.redFlags(forCondition: condition) {
+                for flag in redFlags {
+                    warnings.append(ValidationWarning(
+                        severity: .info,
+                        message: "Knowledge base note for your condition: \(flag)"
+                    ))
+                }
+            }
+        }
+
+        return (warnings, verification)
+    }
+}
+
 // MARK: - Full Validation Pipeline
 
 struct ResponseValidationPipeline {
@@ -415,25 +469,36 @@ struct ResponseValidationPipeline {
         var allWarnings: [ValidationWarning] = []
         var allFixes: [String] = []
 
+        logger.info("Starting analysis validation pipeline for \(result.conditions.count) condition(s), \(assessments.count) assessment(s)")
+
         // 1. Content validation
+        logger.debug("[1/6] Running content validation...")
         let contentValidation = AnalysisContentValidator.validate(result)
         allWarnings.append(contentsOf: contentValidation.warnings)
         allFixes.append(contentsOf: contentValidation.appliedFixes)
+        logger.debug("[1/6] Content validation: \(contentValidation.warnings.count) warnings, \(contentValidation.appliedFixes.count) fixes")
 
         // 2. Red flag detection from symptoms
+        logger.debug("[2/6] Checking symptom red flags...")
         let symptomRedFlags = MedicalRedFlagDetector.check(assessments: assessments)
         var redFlagAlerts = symptomRedFlags.alerts
+        logger.debug("[2/6] Symptom red flags: \(symptomRedFlags.alerts.count)")
 
         // 3. Red flag detection from conditions
+        logger.debug("[3/6] Checking condition red flags...")
         let conditionRedFlags = MedicalRedFlagDetector.checkConditions(result.conditions)
         redFlagAlerts.append(contentsOf: conditionRedFlags)
+        logger.debug("[3/6] Condition red flags: \(conditionRedFlags.count)")
 
         // 4. Anatomical relevance check
+        logger.debug("[4/6] Checking anatomical relevance...")
         let regions = assessments.map { $0.selectedRegion }
         let anatomicalWarnings = AnatomicalRelevanceChecker.validate(conditions: result.conditions, assessedRegions: regions)
         allWarnings.append(contentsOf: anatomicalWarnings)
+        logger.debug("[4/6] Anatomical warnings: \(anatomicalWarnings.count)")
 
         // 5. Calibrate confidence scores and cap at maximum
+        logger.debug("[5/6] Calibrating confidence scores...")
         let calibratedConditions = result.conditions.prefix(3).map { condition in
             ConditionResult(
                 id: condition.id,
@@ -450,6 +515,7 @@ struct ResponseValidationPipeline {
         }
 
         // 6. Deduplicate conditions
+        logger.debug("[6/6] Deduplicating conditions...")
         var seen = Set<String>()
         let uniqueConditions = calibratedConditions.filter { condition in
             let key = condition.conditionName.lowercased()
@@ -498,20 +564,39 @@ struct ResponseValidationPipeline {
     }
 
     /// Run validation on a rehab plan.
+    /// Returns the plan, warnings, and an optional knowledge graph verification result.
     static func validateRehabPlan(
         _ plan: RehabPlan,
         conditions: [String],
         userProfile: UserProfile
-    ) -> (plan: RehabPlan, warnings: [ValidationWarning]) {
+    ) -> (plan: RehabPlan, warnings: [ValidationWarning], graphVerification: PlanVerificationResult?) {
 
         var warnings: [ValidationWarning] = []
+        var graphVerification: PlanVerificationResult?
 
-        // 1. Exercise contraindication check
+        logger.info("Starting rehab plan validation: \(plan.exercises.count) exercises, \(conditions.count) conditions")
+
+        // 1. Exercise contraindication check (hardcoded rules — safety net)
+        logger.debug("[Rehab 1/7] Checking hardcoded contraindications...")
         let contraindicationWarnings = ExerciseContraindicationChecker.validate(
             exercises: plan.exercises,
             conditions: conditions
         )
         warnings.append(contentsOf: contraindicationWarnings)
+        logger.debug("[Rehab 1/7] Contraindication warnings: \(contraindicationWarnings.count)")
+
+        // 1.5. Knowledge graph validation (comprehensive, deterministic)
+        logger.debug("[Rehab 1.5/7] Running knowledge graph validation...")
+        let graphResult = KnowledgeGraphValidator.validate(
+            exercises: plan.exercises,
+            conditions: conditions
+        )
+        warnings.append(contentsOf: graphResult.warnings)
+        graphVerification = graphResult.verification
+        let verified = graphResult.verification.exerciseResults.filter { $0.tier == .verified }.count
+        let unverified = graphResult.verification.unverifiedExercises.count
+        let contraindicated = graphResult.verification.contraindicatedExercises.count
+        logger.debug("[Rehab 1.5/7] Knowledge graph: \(verified) verified, \(contraindicated) contraindicated, \(unverified) unverified")
 
         // 2. Parameter range validation
         let paramFixes = ExerciseContraindicationChecker.validateParameters(plan.exercises)
@@ -563,8 +648,51 @@ struct ResponseValidationPipeline {
             ))
         }
 
+        // 7. Medication-aware safety checks
+        let meds = userProfile.medications ?? []
+        let medsLower = Set(meds.map { $0.lowercased() })
+
+        if medsLower.contains("blood thinners") {
+            let hasImpactOrFall = plan.exercises.contains(where: {
+                let n = $0.name.lowercased()
+                return n.contains("jump") || n.contains("plyometric") || n.contains("balance") || n.contains("single-leg")
+            })
+            if hasImpactOrFall {
+                warnings.append(ValidationWarning(
+                    severity: .caution,
+                    message: "You take blood thinners. Be extra cautious with balance and impact exercises to avoid falls or bruising. Consider performing these near a wall or support."
+                ))
+            }
+        }
+
+        if medsLower.contains("corticosteroids") {
+            warnings.append(ValidationWarning(
+                severity: .info,
+                message: "Long-term corticosteroid use can weaken tendons. Start with lower resistance and increase gradually."
+            ))
+        }
+
+        if medsLower.contains("beta blockers") {
+            warnings.append(ValidationWarning(
+                severity: .info,
+                message: "Beta blockers affect heart rate response. Use how you feel (perceived exertion) rather than heart rate to gauge exercise intensity."
+            ))
+        }
+
+        // 8. Post-surgical restriction checks
+        let activeSurgeries = userProfile.surgeries.filter {
+            $0.recoveryStatus == "Still recovering" || $0.recoveryStatus == "Have restrictions"
+        }
+        if !activeSurgeries.isEmpty {
+            let surgeryNames = activeSurgeries.map { $0.name }.joined(separator: ", ")
+            warnings.append(ValidationWarning(
+                severity: .caution,
+                message: "You have active surgical recovery (\(surgeryNames)). Follow your surgeon's guidelines and avoid exercises that conflict with your restrictions."
+            ))
+        }
+
         logger.info("Rehab plan validation: \(warnings.count) warnings for \(plan.exercises.count) exercises")
 
-        return (plan, warnings)
+        return (plan, warnings, graphVerification)
     }
 }

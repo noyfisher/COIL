@@ -56,15 +56,25 @@ struct PainAssessment: Codable, Identifiable {
 
     let id: UUID
     let selectedRegion: BodyRegion
-    let painType: PainType
+    let painTypes: [String]
     let customPainDescription: String?
     let painIntensity: Int
-    let painDuration: PainDuration
-    let painFrequency: PainFrequency
-    let painOnset: PainOnset
+    let painDurations: [String]
+    let painFrequencies: [String]
+    let painOnsets: [String]
     let aggravatingFactors: [String]
     let relievingFactors: [String]
     let additionalNotes: String?
+    let currentTreatment: CurrentTreatment?
+}
+
+struct CurrentTreatment: Codable {
+    var hasSeenDoctor: Bool = false
+    var imagingDone: [String] = []       // "X-ray", "MRI", "CT Scan", "Ultrasound"
+    var hasDiagnosis: Bool = false
+    var diagnosisText: String?
+    var currentlyReceivingTreatment: Bool = false
+    var treatmentDetails: String?
 }
 
 struct ConditionResult: Codable, Identifiable {

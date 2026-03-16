@@ -4,1069 +4,1425 @@
       "name": "Quad Sets",
       "normalized_filename": "quad-sets",
       "category": "strength",
-      "target_area": "Knee"
+      "target_area": "Knee",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with BOTH legs fully extended straight along the ground, a small rolled towel under one knee. The quadriceps on one leg is visibly flexed and tight. Arms resting at sides, toes pointing up."
     },
     {
       "name": "Straight Leg Raises",
       "normalized_filename": "straight-leg-raises",
       "category": "strength",
-      "target_area": "Knee"
+      "target_area": "Knee",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with one knee bent and foot flat on the floor for support. The other leg is lifted straight off the ground to approximately 45 degrees with the knee fully locked and toes pointed toward the ceiling. Arms rest at sides, and the lower back maintains contact with the floor."
     },
     {
       "name": "Wall Sits",
       "normalized_filename": "wall-sits",
       "category": "strength",
-      "target_area": "Knee"
+      "target_area": "Knee",
+      "body_position": "wall_sit",
+      "pose_description": "Doing a wall sit exercise: back flat against a wall, knees bent at 90 degrees in a deep squat, thighs parallel to the floor, like sitting in an invisible chair. Feet flat on the floor shoulder-width apart. Arms at sides. The hips are at the same height as the knees, NOT on the ground."
     },
     {
       "name": "Clamshells",
       "normalized_filename": "clamshells",
       "category": "strength",
-      "target_area": "Hip/Knee"
+      "target_area": "Hip/Knee",
+      "body_position": "side_lying",
+      "pose_description": "Side-lying hip exercise. The man is on his side like a sleeping position, facing the viewer. Head propped on bottom arm. Both knees are bent. The top leg's knee is raised up toward the ceiling while feet stay together. View from front showing the side-lying body clearly."
     },
     {
       "name": "Heel Slides",
       "normalized_filename": "heel-slides",
       "category": "mobility",
-      "target_area": "Knee"
+      "target_area": "Knee",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back, viewed from the side. One leg is straight on the ground. The other knee is bent with the foot flat on the floor near the buttocks, heel touching the ground. Arms at sides."
     },
     {
       "name": "Step-Ups",
       "normalized_filename": "step-ups",
       "category": "strength",
-      "target_area": "Knee"
+      "target_area": "Knee",
+      "body_position": "standing",
+      "pose_description": "Standing upright facing a low step or platform approximately 6 to 8 inches high. One foot is placed entirely on the step, and the body is driven upward by pressing through that foot until standing tall on the step with both feet. Arms may be at sides or held at the waist for balance."
     },
     {
       "name": "Pendulum Swings",
       "normalized_filename": "pendulum-swings",
       "category": "mobility",
-      "target_area": "Shoulder"
+      "target_area": "Shoulder",
+      "body_position": "standing",
+      "pose_description": "Standing with feet shoulder-width apart, bending forward at the waist approximately 45 to 60 degrees. The non-working arm rests on a table or chair for support. The affected arm hangs straight down like a pendulum and swings gently in small circles or back and forth, completely relaxed with no active muscle contraction."
     },
     {
       "name": "External Rotation",
       "normalized_filename": "external-rotation",
       "category": "strength",
-      "target_area": "Shoulder"
+      "target_area": "Shoulder",
+      "body_position": "standing",
+      "pose_description": "Standing upright with the working arm bent at 90 degrees at the elbow, elbow pinned to the side of the body. A resistance band or light dumbbell is held in the hand. The forearm rotates outward away from the body while keeping the elbow firmly against the torso, moving through approximately 45 degrees of external rotation."
     },
     {
       "name": "Scapular Squeezes",
       "normalized_filename": "scapular-squeezes",
       "category": "strength",
-      "target_area": "Upper Back/Shoulder"
+      "target_area": "Upper Back/Shoulder",
+      "body_position": "standing",
+      "pose_description": "Standing or seated upright with good posture, shoulders relaxed and arms at sides. The shoulder blades are actively squeezed together toward the spine, pulling the shoulders back and opening the chest. The chin is slightly tucked and the head remains in a neutral position throughout the movement."
     },
     {
       "name": "Wall Slides",
       "normalized_filename": "wall-slides",
       "category": "mobility",
-      "target_area": "Shoulder"
+      "target_area": "Shoulder",
+      "body_position": "wall_sit",
+      "pose_description": "Standing with back flat against a wall. Both arms are raised in a goalpost or W shape with elbows bent at 90 degrees, backs of hands and forearms touching the wall. Feet are close to the wall. This is NOT a pull-up \u2014 there is no bar. The person is standing against a flat wall with arms in a W shape."
     },
     {
       "name": "Cat-Cow Stretch",
       "normalized_filename": "cat-cow-stretch",
       "category": "stretch",
-      "target_area": "Back"
+      "target_area": "Back",
+      "body_position": "quadruped",
+      "pose_description": "On hands and knees in tabletop position, wrists under shoulders, knees under hips. The spine is arched upward like a cat, rounding toward the ceiling, head tucked down. Wearing a gray t-shirt and dark shorts."
     },
     {
       "name": "Glute Bridges",
       "normalized_filename": "glute-bridges",
       "category": "strength",
-      "target_area": "Back/Glutes"
+      "target_area": "Back/Glutes",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with knees bent at approximately 90 degrees, feet flat on the floor hip-width apart, arms resting at sides. Hips are lifted high off the ground forming a straight line from shoulders to knees, with glutes fully squeezed at the top."
     },
     {
       "name": "Bird Dog",
       "normalized_filename": "bird-dog",
       "category": "core",
-      "target_area": "Core/Back"
+      "target_area": "Core/Back",
+      "body_position": "quadruped",
+      "pose_description": "Balancing on the left hand and right knee. The RIGHT arm reaches straight out in front, parallel to the ground, and the LEFT leg extends straight behind, also parallel to the ground. The body forms a straight line from fingertips to toes."
     },
     {
       "name": "Pelvic Tilts",
       "normalized_filename": "pelvic-tilts",
       "category": "core",
-      "target_area": "Lower Back"
+      "target_area": "Lower Back",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with knees bent and feet flat on the floor hip-width apart. The lower back is gently pressed into the floor by engaging the abdominal muscles and tilting the pelvis posteriorly, flattening the natural lumbar curve. Arms rest at sides and shoulders remain relaxed on the floor."
     },
     {
       "name": "Child's Pose",
       "normalized_filename": "childs-pose",
       "category": "stretch",
-      "target_area": "Lower Back"
+      "target_area": "Lower Back",
+      "body_position": "kneeling",
+      "pose_description": "A yoga child's pose: sitting back on the heels with the body folded completely forward and down, forehead on the ground, arms extended straight forward along the floor. The back is rounded and the person looks like they are bowing down."
     },
     {
       "name": "Doorway Stretch",
       "normalized_filename": "doorway-stretch",
       "category": "stretch",
-      "target_area": "Chest/Shoulder"
+      "target_area": "Chest/Shoulder",
+      "body_position": "standing",
+      "pose_description": "Standing in a doorway facing through it. Both arms are raised to shoulder height with elbows bent at 90 degrees, forearms pressed against each side of the door frame. The body leans forward through the doorway to stretch the chest. One foot is slightly ahead of the other."
     },
     {
       "name": "Hamstring Curls",
       "normalized_filename": "hamstring-curls",
       "category": "strength",
-      "target_area": "Knee/Hamstring"
+      "target_area": "Knee/Hamstring",
+      "body_position": "standing",
+      "pose_description": "Standing upright holding onto a chair or counter for balance. One foot is lifted behind the body by bending the knee, bringing the heel toward the buttock while keeping the thighs parallel. The standing leg remains straight with a slight knee bend, and the torso stays upright."
     },
     {
       "name": "Gentle Stretching",
       "normalized_filename": "gentle-stretching",
       "category": "stretch",
-      "target_area": "Full Body"
+      "target_area": "Full Body",
+      "body_position": "standing",
+      "pose_description": "Standing upright with feet shoulder-width apart. Both arms are raised straight overhead with fingers interlaced, palms facing the ceiling, stretching tall. Wearing a gray t-shirt and dark shorts. White background."
     },
     {
       "name": "Walking",
       "normalized_filename": "walking",
       "category": "walking",
-      "target_area": "General"
+      "target_area": "General",
+      "body_position": "standing",
+      "pose_description": "Standing upright with good posture, chin level, shoulders relaxed, and arms swinging naturally at sides. One foot is stepping forward in a natural heel-to-toe gait pattern, with the opposite arm swinging forward for counterbalance. The core is engaged and the gaze is directed forward."
     },
     {
       "name": "Seated Hamstring Stretch",
       "normalized_filename": "seated-hamstring-stretch",
       "category": "stretch",
-      "target_area": "Hamstring"
+      "target_area": "Hamstring",
+      "body_position": "seated",
+      "pose_description": "Sitting on the ground (NOT on a chair or bench) with one leg extended straight forward. The other knee is bent to the side. The person bends forward at the waist reaching both hands toward the foot of the straight leg to stretch the hamstring."
     },
     {
       "name": "Standing Calf Raises",
       "normalized_filename": "standing-calf-raises",
       "category": "strength",
-      "target_area": "Calf"
+      "target_area": "Calf",
+      "body_position": "standing",
+      "pose_description": "Standing upright with feet hip-width apart, lightly holding a wall or chair for balance. Both heels are raised off the floor as high as possible by pushing up onto the balls of the feet, fully contracting the calf muscles. The body remains tall and straight with knees extended."
     },
     {
       "name": "Ankle Circles",
       "normalized_filename": "ankle-circles",
       "category": "mobility",
-      "target_area": "Ankle"
+      "target_area": "Ankle",
+      "body_position": "standing",
+      "pose_description": "Standing on one leg with light support from a chair or wall for balance. The opposite foot is lifted slightly off the ground and the ankle draws slow, controlled circles in the air, moving through full dorsiflexion, inversion, plantarflexion, and eversion. The knee of the circling leg remains relatively still."
     },
     {
       "name": "Towel Curls",
       "normalized_filename": "towel-curls",
       "category": "strength",
-      "target_area": "Foot/Ankle"
+      "target_area": "Foot/Ankle",
+      "body_position": "seated",
+      "pose_description": "Seated in a chair with feet flat on the floor and a small towel laid flat beneath the toes. The toes scrunch and grip the towel, pulling it toward the heel in a curling motion. The heel remains firmly on the floor throughout, and the ankle does not move \u2014 only the toes actively work to gather the towel."
     },
     {
       "name": "Ankle Alphabet",
       "normalized_filename": "ankle-alphabet",
       "category": "mobility",
-      "target_area": "Ankle"
+      "target_area": "Ankle",
+      "body_position": "standing",
+      "pose_description": "Standing on one leg or seated with one leg crossed over the other. The foot of the elevated leg traces the letters of the alphabet in the air using ankle movements only, moving through all planes of motion. The lower leg remains still while the foot moves deliberately through each letter shape."
     },
     {
       "name": "Single Leg Balance",
       "normalized_filename": "single-leg-balance",
       "category": "balance",
-      "target_area": "Ankle/Knee"
+      "target_area": "Ankle/Knee",
+      "body_position": "standing",
+      "pose_description": "Standing upright on one leg with the standing knee slightly soft, not locked. The opposite foot is lifted a few inches off the ground with the knee bent. Arms can be at sides or extended for balance, torso is upright, and the gaze is directed forward at a fixed point."
     },
     {
       "name": "Resistance Band Ankle Eversion",
       "normalized_filename": "resistance-band-ankle-eversion",
       "category": "strength",
-      "target_area": "Ankle"
+      "target_area": "Ankle",
+      "body_position": "standing",
+      "pose_description": "Standing or seated with a resistance band looped around the outside of the forefoot, anchored to a fixed point on the opposite side. The foot pushes outward against the band resistance, turning the sole of the foot away from the midline of the body. The lower leg remains stationary and the movement occurs purely at the ankle joint."
     },
     {
       "name": "Resistance Band Ankle Inversion",
       "normalized_filename": "resistance-band-ankle-inversion",
       "category": "strength",
-      "target_area": "Ankle"
+      "target_area": "Ankle",
+      "body_position": "standing",
+      "pose_description": "Standing or seated with a resistance band looped around the inside of the forefoot, anchored to a fixed point on the same side. The foot pulls inward against the band resistance, turning the sole of the foot toward the midline of the body. The lower leg remains stationary and the movement occurs purely at the ankle joint."
     },
     {
       "name": "Heel-Toe Walking",
       "normalized_filename": "heel-toe-walking",
       "category": "balance",
-      "target_area": "Ankle/Balance"
+      "target_area": "Ankle/Balance",
+      "body_position": "standing",
+      "pose_description": "Standing upright and walking forward in a straight line by placing the heel of one foot directly in front of the toes of the other foot with each step, creating a tandem gait pattern. Arms may be extended to the sides for balance. The gaze is directed forward and the body remains tall and erect."
     },
     {
       "name": "Standing Hip Abduction",
       "normalized_filename": "standing-hip-abduction",
       "category": "strength",
-      "target_area": "Hip"
+      "target_area": "Hip",
+      "body_position": "standing",
+      "pose_description": "Standing upright holding onto a chair or wall for balance with one hand. The outside leg lifts straight out to the side away from the body to approximately 30 to 45 degrees while keeping the toes pointed forward and the knee straight. The standing leg remains stable and the torso does not lean to the opposite side."
     },
     {
       "name": "Standing Hip Adduction",
       "normalized_filename": "standing-hip-adduction",
       "category": "strength",
-      "target_area": "Hip"
+      "target_area": "Hip",
+      "body_position": "standing",
+      "pose_description": "Standing upright holding onto a chair or wall for balance. The inside leg crosses in front of the standing leg, sweeping inward across the body against resistance from a band or gravity. The torso remains upright and the pelvis stays level without tilting."
     },
     {
       "name": "Hip Flexor Stretch",
       "normalized_filename": "hip-flexor-stretch",
       "category": "stretch",
-      "target_area": "Hip"
+      "target_area": "Hip",
+      "body_position": "kneeling",
+      "pose_description": "In a half-kneeling lunge position with the right knee on the floor directly under the right hip, and the left foot flat on the floor in front with the left knee bent at 90 degrees. The torso is tall and upright, hips are pressed gently forward, and a deep stretch is felt in the front of the right hip and thigh. Hands rest on the front knee or at the waist."
     },
     {
       "name": "Piriformis Stretch",
       "normalized_filename": "piriformis-stretch",
       "category": "stretch",
-      "target_area": "Hip/Glute"
+      "target_area": "Hip/Glute",
+      "body_position": "seated",
+      "pose_description": "From a kneeling or seated position, one leg is crossed in front with the shin on the floor in a figure-four configuration. The torso leans forward over the crossed leg, bringing the chest toward the floor while keeping the hips squared. A deep stretch is felt in the outer hip and buttock of the front leg. Hands are placed on the floor in front for support."
     },
     {
       "name": "IT Band Stretch",
       "normalized_filename": "it-band-stretch",
       "category": "stretch",
-      "target_area": "Hip/Knee"
+      "target_area": "Hip/Knee",
+      "body_position": "standing",
+      "pose_description": "Standing upright with legs crossed, the back leg crossing behind the front leg. The body leans to the side of the front leg, pushing the hip of the back leg outward while reaching the arm overhead toward the opposite side. A stretch is felt along the outer thigh and hip of the back leg."
     },
     {
       "name": "Side-Lying Hip Abduction",
       "normalized_filename": "side-lying-hip-abduction",
       "category": "strength",
-      "target_area": "Hip"
+      "target_area": "Hip",
+      "body_position": "side_lying",
+      "pose_description": "Lying on one side with the body in a straight line, bottom arm extended under the head for support. The top leg lifts straight upward toward the ceiling to approximately 30 to 45 degrees while keeping the knee straight and toes pointed forward. The hips remain stacked and do not roll forward or backward."
     },
     {
       "name": "Fire Hydrants",
       "normalized_filename": "fire-hydrants",
       "category": "strength",
-      "target_area": "Hip/Glute"
+      "target_area": "Hip/Glute",
+      "body_position": "quadruped",
+      "pose_description": "On hands and knees in tabletop position with wrists under shoulders and knees under hips. One knee remains bent at 90 degrees and lifts out to the side, opening the hip like a fire hydrant, to approximately hip height. The spine stays neutral, the core is braced, and the pelvis does not rotate or shift."
     },
     {
       "name": "Monster Walks",
       "normalized_filename": "monster-walks",
       "category": "strength",
-      "target_area": "Hip/Glute"
+      "target_area": "Hip/Glute",
+      "body_position": "standing",
+      "pose_description": "Standing in a quarter-squat position with a resistance band looped around the ankles or just above the knees. Feet are shoulder-width apart, knees slightly bent, and the torso is slightly hinged forward at the hips. Steps are taken diagonally forward and outward, maintaining tension on the band throughout, like a monster walking."
     },
     {
       "name": "Hip Circles",
       "normalized_filename": "hip-circles",
       "category": "mobility",
-      "target_area": "Hip"
+      "target_area": "Hip",
+      "body_position": "standing",
+      "pose_description": "Standing upright with hands on hips and feet shoulder-width apart. The hips draw large, smooth circles in a clockwise or counterclockwise direction, rotating through flexion, lateral tilt, extension, and the opposite lateral tilt. The upper body remains as still as possible and the knees stay slightly soft."
     },
     {
       "name": "Seated Figure Four Stretch",
       "normalized_filename": "seated-figure-four-stretch",
       "category": "stretch",
-      "target_area": "Hip/Glute"
+      "target_area": "Hip/Glute",
+      "body_position": "seated",
+      "pose_description": "Seated in a chair with good posture. One ankle is crossed over the opposite knee in a figure-four position, with the crossed knee dropping open to the side. The torso leans gently forward from the hips until a stretch is felt in the outer hip and glute of the crossed leg. Hands may rest on the shin of the crossed leg."
     },
     {
       "name": "Supine Hamstring Stretch",
       "normalized_filename": "supine-hamstring-stretch",
       "category": "stretch",
-      "target_area": "Hamstring"
+      "target_area": "Hamstring",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with one leg extended on the floor. The other leg is raised straight up toward the ceiling with the knee as straight as possible, hands clasped behind the thigh or a strap looped around the foot to assist the stretch. The hips remain flat on the floor and the lower back maintains a neutral position."
     },
     {
       "name": "Standing Quad Stretch",
       "normalized_filename": "standing-quad-stretch",
       "category": "stretch",
-      "target_area": "Quadriceps"
+      "target_area": "Quadriceps",
+      "body_position": "standing",
+      "pose_description": "Standing upright on one leg, holding a wall or chair for balance with one hand. The opposite foot is grasped behind the body with the same-side hand, pulling the heel toward the buttock. Both knees remain close together, the pelvis is tucked slightly under, and the torso stays tall."
     },
     {
       "name": "Mini Squats",
       "normalized_filename": "mini-squats",
       "category": "strength",
-      "target_area": "Knee/Quadriceps"
+      "target_area": "Knee/Quadriceps",
+      "body_position": "standing",
+      "pose_description": "Standing upright with feet shoulder-width apart. The hips push back and the knees bend to approximately 30 to 45 degrees in a partial squat, as if beginning to sit in a tall chair. Arms extend forward for counterbalance, the chest stays lifted, and the knees track over the toes without caving inward."
     },
     {
       "name": "Terminal Knee Extension",
       "normalized_filename": "terminal-knee-extension",
       "category": "strength",
-      "target_area": "Knee"
+      "target_area": "Knee",
+      "body_position": "standing",
+      "pose_description": "Standing with a resistance band looped behind the knee, anchored to a fixed point behind the body. The knee starts in a slightly bent position, approximately 20 to 30 degrees of flexion. The leg presses forward and straightens fully against the band resistance, achieving complete knee extension. The standing leg and torso remain upright."
     },
     {
       "name": "Knee Flexion ROM",
       "normalized_filename": "knee-flexion-rom",
       "category": "mobility",
-      "target_area": "Knee"
+      "target_area": "Knee",
+      "body_position": "seated",
+      "pose_description": "Seated on the edge of a chair with the working foot on the floor. The heel slides backward under the chair, bending the knee as far as comfortably possible to increase range of motion. The opposite foot remains flat on the floor, and the hands may rest on the thighs or grip the chair seat for stability."
     },
     {
       "name": "Prone Knee Flexion",
       "normalized_filename": "prone-knee-flexion",
       "category": "mobility",
-      "target_area": "Knee"
+      "target_area": "Knee",
+      "body_position": "prone",
+      "pose_description": "Lying face down with legs extended straight and arms at sides or folded under the forehead. One knee bends, bringing the heel toward the buttock as far as comfortably possible. The hips remain pressed flat against the floor and the thigh of the bending leg does not lift off the surface."
     },
     {
       "name": "Lateral Step-Ups",
       "normalized_filename": "lateral-step-ups",
       "category": "strength",
-      "target_area": "Knee/Hip"
+      "target_area": "Knee/Hip",
+      "body_position": "standing",
+      "pose_description": "Standing beside a low step or platform with feet parallel. The foot closest to the step is placed on top of the step, and the body is driven upward by pressing through that foot until standing tall on the step. The movement is lateral rather than forward, and the arms may be held at the waist for balance."
     },
     {
       "name": "Internal Rotation",
       "normalized_filename": "internal-rotation",
       "category": "strength",
-      "target_area": "Shoulder"
+      "target_area": "Shoulder",
+      "body_position": "standing",
+      "pose_description": "Standing upright with the working arm bent at 90 degrees at the elbow, elbow pinned to the side of the body. A resistance band or cable is held in the hand. The forearm rotates inward across the body toward the stomach, working the internal rotators of the shoulder. The elbow stays firmly at the side throughout the movement."
     },
     {
       "name": "Shoulder Flexion",
       "normalized_filename": "shoulder-flexion",
       "category": "mobility",
-      "target_area": "Shoulder"
+      "target_area": "Shoulder",
+      "body_position": "standing",
+      "pose_description": "Standing upright with arms at sides, holding a light weight or no weight. One arm lifts straight forward and upward in front of the body with the elbow straight, palm facing down, reaching toward the ceiling in full shoulder flexion. The torso stays upright without arching the back, and the shoulder blade glides naturally along the ribcage."
     },
     {
       "name": "Shoulder Abduction",
       "normalized_filename": "shoulder-abduction",
       "category": "mobility",
-      "target_area": "Shoulder"
+      "target_area": "Shoulder",
+      "body_position": "standing",
+      "pose_description": "Standing upright with arms at sides. One arm lifts straight out to the side, away from the body, with the elbow straight and palm facing down, rising to shoulder height or above. The torso remains tall and does not lean to the opposite side, and the shoulder does not shrug upward."
     },
     {
       "name": "Sleeper Stretch",
       "normalized_filename": "sleeper-stretch",
       "category": "stretch",
-      "target_area": "Shoulder"
+      "target_area": "Shoulder",
+      "body_position": "side_lying",
+      "pose_description": "Lying on the involved side with the shoulder and elbow each bent to 90 degrees, forearm pointing toward the ceiling. The opposite hand gently pushes the forearm of the bottom arm downward toward the floor, internally rotating the shoulder. The elbow remains at shoulder height and the body stays on its side without rolling backward."
     },
     {
       "name": "Cross-Body Stretch",
       "normalized_filename": "cross-body-stretch",
       "category": "stretch",
-      "target_area": "Shoulder"
+      "target_area": "Shoulder",
+      "body_position": "standing",
+      "pose_description": "Standing upright with one arm extended straight across the chest at shoulder height. The opposite hand cups the elbow or upper arm and gently pulls it closer to the body, creating a stretch across the posterior shoulder and upper back. The shoulders remain level and the torso does not twist."
     },
     {
       "name": "Prone Y Raises",
       "normalized_filename": "prone-y-raises",
       "category": "strength",
-      "target_area": "Shoulder/Upper Back"
+      "target_area": "Shoulder/Upper Back",
+      "body_position": "prone",
+      "pose_description": "Lying face down on the floor or a bench with arms hanging down or resting on the floor. Both arms lift upward and outward at approximately 45 degrees from the head, forming a Y shape, with thumbs pointing toward the ceiling. The forehead rests on the floor, the shoulder blades squeeze together, and the arms lift to approximately ear height."
     },
     {
       "name": "Prone T Raises",
       "normalized_filename": "prone-t-raises",
       "category": "strength",
-      "target_area": "Shoulder/Upper Back"
+      "target_area": "Shoulder/Upper Back",
+      "body_position": "prone",
+      "pose_description": "Lying face down on the floor or a bench with arms hanging down or resting on the floor. Both arms lift straight out to the sides at 90 degrees from the torso, forming a T shape, with thumbs pointing toward the ceiling. The shoulder blades squeeze firmly together and the arms lift to body height. The forehead rests on the floor."
     },
     {
       "name": "Shoulder Shrugs",
       "normalized_filename": "shoulder-shrugs",
       "category": "strength",
-      "target_area": "Shoulder/Neck"
+      "target_area": "Shoulder/Neck",
+      "body_position": "standing",
+      "pose_description": "Standing upright with arms hanging at sides, holding light dumbbells or no weight. Both shoulders elevate straight upward toward the ears as high as possible, squeezing the upper trapezius at the top. The arms remain straight, the head stays neutral, and there is no head movement or neck rotation."
     },
     {
       "name": "Resistance Band Pull-Apart",
       "normalized_filename": "resistance-band-pull-apart",
       "category": "strength",
-      "target_area": "Upper Back/Shoulder"
+      "target_area": "Upper Back/Shoulder",
+      "body_position": "standing",
+      "pose_description": "Standing upright with arms extended straight in front at shoulder height, holding a resistance band with both hands about shoulder-width apart. The hands pull the band apart horizontally by squeezing the shoulder blades together, stretching the band across the chest until the arms are out to the sides. The elbows remain straight throughout."
     },
     {
       "name": "Chin Tucks",
       "normalized_filename": "chin-tucks",
       "category": "strength",
-      "target_area": "Neck"
+      "target_area": "Neck",
+      "body_position": "standing",
+      "pose_description": "Standing or seated upright with the spine tall and shoulders relaxed. The chin draws straight backward, creating a double chin, as if pushing the back of the head against an imaginary wall. The eyes remain level, the head does not tilt up or down, and the movement is purely a horizontal retraction of the cervical spine."
     },
     {
       "name": "Neck Rotations",
       "normalized_filename": "neck-rotations",
       "category": "mobility",
-      "target_area": "Neck"
+      "target_area": "Neck",
+      "body_position": "standing",
+      "pose_description": "Standing or seated upright with the spine tall and shoulders relaxed. The head turns slowly to one side, bringing the chin toward the shoulder, then returns to center and rotates to the opposite side. The shoulders remain still and level, and the movement is a smooth, controlled rotation of the cervical spine."
     },
     {
       "name": "Neck Side Bends",
       "normalized_filename": "neck-side-bends",
       "category": "stretch",
-      "target_area": "Neck"
+      "target_area": "Neck",
+      "body_position": "standing",
+      "pose_description": "Standing or seated upright with the spine tall and shoulders relaxed. The head tilts to one side, bringing the ear toward the shoulder while the opposite shoulder remains depressed. One hand may gently assist the stretch by resting on top of the head. The face continues to point straight ahead without rotation."
     },
     {
       "name": "Upper Trapezius Stretch",
       "normalized_filename": "upper-trapezius-stretch",
       "category": "stretch",
-      "target_area": "Neck/Shoulder"
+      "target_area": "Neck/Shoulder",
+      "body_position": "standing",
+      "pose_description": "Standing or seated upright. One hand reaches behind the back or holds the seat of a chair to depress that shoulder. The head tilts toward the opposite side, bringing the ear toward the shoulder, and the free hand may gently rest on the head to add a mild overpressure. A stretch is felt along the side of the neck and upper trapezius."
     },
     {
       "name": "Levator Scapulae Stretch",
       "normalized_filename": "levator-scapulae-stretch",
       "category": "stretch",
-      "target_area": "Neck/Shoulder"
+      "target_area": "Neck/Shoulder",
+      "body_position": "standing",
+      "pose_description": "Standing or seated upright. The head rotates approximately 45 degrees to one side, then the chin tucks downward toward the armpit, looking diagonally down. The hand on the same side as the rotation gently assists by pulling the head further into the stretch. The opposite shoulder remains depressed, and a stretch is felt along the back of the neck on the opposite side."
     },
     {
       "name": "Prone Press-Up",
       "normalized_filename": "prone-press-up",
       "category": "mobility",
-      "target_area": "Lower Back"
+      "target_area": "Lower Back",
+      "body_position": "prone",
+      "pose_description": "Lying face down with hands positioned under the shoulders as if preparing for a push-up. The upper body presses upward by straightening the arms, lifting the chest off the floor while the hips and pelvis remain in contact with the floor. The lower back extends into a gentle arch, and the head looks forward. The arms may be fully or partially extended depending on comfort."
     },
     {
       "name": "Knee-to-Chest Stretch",
       "normalized_filename": "knee-to-chest-stretch",
       "category": "stretch",
-      "target_area": "Lower Back"
+      "target_area": "Lower Back",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with one knee pulled up toward the chest, both hands clasping below the kneecap or behind the thigh. The opposite leg remains extended flat on the floor. The lower back relaxes and rounds gently into the floor, and the head and shoulders remain on the ground."
     },
     {
       "name": "Double Knee-to-Chest",
       "normalized_filename": "double-knee-to-chest",
       "category": "stretch",
-      "target_area": "Lower Back"
+      "target_area": "Lower Back",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with both knees pulled up toward the chest simultaneously. Both hands wrap around the shins or behind the thighs, hugging the knees close. The lower back rounds gently into the floor, the tailbone lifts slightly, and the head and shoulders remain relaxed on the ground."
     },
     {
       "name": "Lumbar Rotation Stretch",
       "normalized_filename": "lumbar-rotation-stretch",
       "category": "stretch",
-      "target_area": "Lower Back"
+      "target_area": "Lower Back",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with both knees bent and feet flat on the floor. Both knees drop together to one side toward the floor while the shoulders and upper back remain flat on the ground. The arms are extended out to the sides in a T position for stability. The head may turn to look toward the opposite side of the knees."
     },
     {
       "name": "Dead Bug",
       "normalized_filename": "dead-bug",
       "category": "core",
-      "target_area": "Core"
+      "target_area": "Core",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with arms extended straight toward the ceiling above the shoulders and both hips and knees bent to 90 degrees in a tabletop position. One arm reaches overhead toward the floor behind while the opposite leg extends straight out, lowering toward the floor without touching. The lower back remains pressed firmly into the ground throughout."
     },
     {
       "name": "Plank",
       "normalized_filename": "plank",
       "category": "core",
-      "target_area": "Core"
+      "target_area": "Core",
+      "body_position": "prone",
+      "pose_description": "Body supported on forearms and toes in a straight line from head to heels. Elbows directly under shoulders, forearms flat on floor, core tight, hips level \u2014 not sagging or piking."
     },
     {
       "name": "Side Plank",
       "normalized_filename": "side-plank",
       "category": "core",
-      "target_area": "Core/Obliques"
+      "target_area": "Core/Obliques",
+      "body_position": "side_lying",
+      "pose_description": "Body supported on one forearm and the side of the bottom foot, forming a straight line from head to feet. The supporting elbow is directly under the shoulder, the top arm rests on the hip or extends toward the ceiling. The hips are lifted high and do not sag toward the floor, and the core is fully engaged."
     },
     {
       "name": "Abdominal Bracing",
       "normalized_filename": "abdominal-bracing",
       "category": "core",
-      "target_area": "Core"
+      "target_area": "Core",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with knees bent and feet flat on the floor. The abdominal muscles are contracted as if bracing for a punch to the stomach, creating a rigid cylinder around the midsection. The spine maintains its natural curve, the ribs do not flare, and breathing continues normally while the brace is held."
     },
     {
       "name": "Supine Marching",
       "normalized_filename": "supine-marching",
       "category": "core",
-      "target_area": "Core/Hip"
+      "target_area": "Core/Hip",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with knees bent and feet flat on the floor. One knee lifts toward the chest to approximately 90 degrees of hip flexion while the opposite foot remains on the floor. The legs alternate in a slow marching motion, and the lower back stays pressed against the floor with the core engaged throughout."
     },
     {
       "name": "Seated Spinal Twist",
       "normalized_filename": "seated-spinal-twist",
       "category": "stretch",
-      "target_area": "Spine"
+      "target_area": "Spine",
+      "body_position": "seated",
+      "pose_description": "Seated on the floor with one leg extended straight and the other leg crossed over with the foot flat on the floor outside the opposite knee. The torso rotates toward the bent knee, and the opposite elbow hooks outside the bent knee for leverage. The sitting bones remain grounded, the spine stays tall, and the rotation comes from the thoracic and lumbar spine."
     },
     {
       "name": "Thread the Needle",
       "normalized_filename": "thread-the-needle",
       "category": "stretch",
-      "target_area": "Thoracic Spine"
+      "target_area": "Thoracic Spine",
+      "body_position": "quadruped",
+      "pose_description": "On hands and knees in tabletop position. One arm threads underneath the body, reaching through the space between the opposite arm and knee, with the shoulder and temple resting on the floor. The hips remain over the knees, and the supporting arm may stay straight or bend slightly. A deep rotation stretch is felt through the thoracic spine and shoulder."
     },
     {
       "name": "Thoracic Extension",
       "normalized_filename": "thoracic-extension",
       "category": "mobility",
-      "target_area": "Thoracic Spine"
+      "target_area": "Thoracic Spine",
+      "body_position": "standing",
+      "pose_description": "Standing upright or seated in a chair with hands clasped behind the head. The upper back gently arches backward, extending through the thoracic spine while the lumbar spine stays relatively neutral. The elbows pull back and the chest lifts toward the ceiling, opening the front of the body. The movement is controlled and focused on the mid-back region."
     },
     {
       "name": "Wrist Flexor Stretch",
       "normalized_filename": "wrist-flexor-stretch",
       "category": "stretch",
-      "target_area": "Wrist/Forearm"
+      "target_area": "Wrist/Forearm",
+      "body_position": "standing",
+      "pose_description": "Standing or seated with one arm extended straight in front at shoulder height, palm facing up. The opposite hand grasps the fingers and gently pulls them downward and back toward the body, extending the wrist. A stretch is felt along the inner forearm and wrist flexor muscles. The elbow of the stretching arm remains straight."
     },
     {
       "name": "Wrist Extensor Stretch",
       "normalized_filename": "wrist-extensor-stretch",
       "category": "stretch",
-      "target_area": "Wrist/Forearm"
+      "target_area": "Wrist/Forearm",
+      "body_position": "standing",
+      "pose_description": "Standing or seated with one arm extended straight in front at shoulder height, palm facing down. The opposite hand grasps the back of the hand and gently pulls it downward, flexing the wrist. A stretch is felt along the outer forearm and wrist extensor muscles. The elbow of the stretching arm remains straight."
     },
     {
       "name": "Grip Strengthening",
       "normalized_filename": "grip-strengthening",
       "category": "strength",
-      "target_area": "Hand/Forearm"
+      "target_area": "Hand/Forearm",
+      "body_position": "standing",
+      "pose_description": "Standing or seated with the arm at the side or supported on a surface. The hand squeezes a grip strengthener, stress ball, or tennis ball, closing all fingers firmly around the object with maximum contraction. The wrist remains in a neutral position, and the forearm muscles visibly contract during the squeeze."
     },
     {
       "name": "Finger Tendon Glides",
       "normalized_filename": "finger-tendon-glides",
       "category": "mobility",
-      "target_area": "Hand"
+      "target_area": "Hand",
+      "body_position": "standing",
+      "pose_description": "Standing or seated with one hand extended in front, palm facing away. The fingers move through a series of positions: straight extension, hook fist (tips bent to pads), full fist, straight fist (fingers curled at knuckles only), and tabletop (fingers bent at knuckles to 90 degrees with fingertips pointing forward). Each position is held briefly before transitioning."
     },
     {
       "name": "Wrist Circles",
       "normalized_filename": "wrist-circles",
       "category": "mobility",
-      "target_area": "Wrist"
+      "target_area": "Wrist",
+      "body_position": "standing",
+      "pose_description": "Standing or seated with the forearm supported or the arm extended in front. The hand draws slow circles in the air by rotating at the wrist joint, moving through flexion, radial deviation, extension, and ulnar deviation in a smooth continuous motion. The forearm remains still and the movement is isolated to the wrist."
     },
     {
       "name": "Tennis Ball Roll",
       "normalized_filename": "tennis-ball-roll",
       "category": "mobility",
-      "target_area": "Foot"
+      "target_area": "Foot",
+      "body_position": "seated",
+      "pose_description": "Seated in a chair with one foot resting on a tennis ball placed on the floor. Gentle downward pressure is applied through the foot as it rolls the ball from the toes to the heel and across the arch, massaging the plantar fascia. The opposite foot remains flat on the floor, and the body weight shifts slightly to increase or decrease pressure."
     },
     {
       "name": "Toe Raises",
       "normalized_filename": "toe-raises",
       "category": "strength",
-      "target_area": "Foot/Ankle"
+      "target_area": "Foot/Ankle",
+      "body_position": "standing",
+      "pose_description": "Standing upright with feet hip-width apart, lightly holding a wall or chair for balance. The toes and forefoot lift off the ground while the heels remain planted, dorsiflexing the ankles and engaging the tibialis anterior. The body weight shifts slightly back onto the heels, and the torso stays upright."
     },
     {
       "name": "Marble Pickup",
       "normalized_filename": "marble-pickup",
       "category": "strength",
-      "target_area": "Foot"
+      "target_area": "Foot",
+      "body_position": "seated",
+      "pose_description": "Seated in a chair with one foot bare and marbles or small objects scattered on the floor. The toes grip and pick up individual marbles, transferring them to a cup or different location. The heel remains on the floor, and the foot flexors work to curl the toes around each marble."
     },
     {
       "name": "Calf Stretch on Step",
       "normalized_filename": "calf-stretch-on-step",
       "category": "stretch",
-      "target_area": "Calf"
+      "target_area": "Calf",
+      "body_position": "standing",
+      "pose_description": "Standing on the edge of a step with the balls of the feet on the step and the heels hanging off the back edge. One or both heels drop below the level of the step, creating a deep stretch in the calf muscles. Hands hold a railing or wall for balance, and the knees are straight to target the gastrocnemius."
     },
     {
       "name": "Soleus Stretch",
       "normalized_filename": "soleus-stretch",
       "category": "stretch",
-      "target_area": "Calf"
+      "target_area": "Calf",
+      "body_position": "standing",
+      "pose_description": "Standing facing a wall with hands placed on the wall at shoulder height. One foot is positioned behind the other in a staggered stance. The back knee bends while keeping the heel on the floor, creating a stretch in the lower calf (soleus) of the back leg. The front knee is also slightly bent and the torso leans slightly forward."
     },
     {
       "name": "Seated Calf Raises",
       "normalized_filename": "seated-calf-raises",
       "category": "strength",
-      "target_area": "Calf"
+      "target_area": "Calf",
+      "body_position": "seated",
+      "pose_description": "Seated in a chair with feet flat on the floor and knees bent at 90 degrees. The heels lift off the ground as high as possible, pushing up onto the balls of the feet while the toes remain on the floor. Additional weight may be placed on the knees for resistance. The movement is controlled up and down."
     },
     {
       "name": "Wall Push-Ups",
       "normalized_filename": "wall-push-ups",
       "category": "strength",
-      "target_area": "Chest/Shoulder"
+      "target_area": "Chest/Shoulder",
+      "body_position": "standing",
+      "pose_description": "Standing approximately arm's length from a wall with hands placed flat on the wall at shoulder height and shoulder-width apart. The body leans forward toward the wall by bending the elbows, then pushes back to the starting position. The body maintains a straight line from head to heels, with the core engaged and heels slightly lifted."
     },
     {
       "name": "Isometric Shoulder External Rotation",
       "normalized_filename": "isometric-shoulder-external-rotation",
       "category": "strength",
-      "target_area": "Shoulder"
+      "target_area": "Shoulder",
+      "body_position": "standing",
+      "pose_description": "Standing next to a wall or doorframe with the elbow bent at 90 degrees and pinned against the side. The back of the wrist or hand presses outward into the wall or doorframe with sustained effort, as if trying to externally rotate the shoulder. No visible movement occurs \u2014 the contraction is purely isometric. The torso remains upright."
     },
     {
       "name": "Isometric Shoulder Internal Rotation",
       "normalized_filename": "isometric-shoulder-internal-rotation",
       "category": "strength",
-      "target_area": "Shoulder"
+      "target_area": "Shoulder",
+      "body_position": "standing",
+      "pose_description": "Standing next to a wall or doorframe with the elbow bent at 90 degrees and pinned against the side. The palm or front of the wrist presses inward into the wall or doorframe with sustained effort, as if trying to internally rotate the shoulder. No visible movement occurs \u2014 the contraction is purely isometric. The torso remains upright."
     },
     {
       "name": "Bicep Curls",
       "normalized_filename": "bicep-curls",
       "category": "strength",
-      "target_area": "Arm"
+      "target_area": "Arm",
+      "body_position": "standing",
+      "pose_description": "Standing upright with a dumbbell or resistance band in each hand, arms at sides with palms facing forward. The forearms curl upward by bending the elbows, bringing the weights toward the shoulders while keeping the elbows pinned at the sides. The torso remains still without swaying, and the upper arms do not move."
     },
     {
       "name": "Tricep Extensions",
       "normalized_filename": "tricep-extensions",
       "category": "strength",
-      "target_area": "Arm"
+      "target_area": "Arm",
+      "body_position": "standing",
+      "pose_description": "Standing upright holding a dumbbell or resistance band overhead with both hands or one hand. The elbow points toward the ceiling and the forearm lowers behind the head by bending at the elbow, then extends back to full lockout overhead. The upper arm remains stationary next to the ear, and the core is braced."
     },
     {
       "name": "Wrist Curls",
       "normalized_filename": "wrist-curls",
       "category": "strength",
-      "target_area": "Forearm"
+      "target_area": "Forearm",
+      "body_position": "standing",
+      "pose_description": "Seated or standing with the forearm resting on a table or thigh, palm facing up, holding a light dumbbell. The wrist curls upward, lifting the weight by flexing the wrist while the forearm remains stationary. The fingers may open slightly at the bottom and close at the top to increase range of motion."
     },
     {
       "name": "Reverse Wrist Curls",
       "normalized_filename": "reverse-wrist-curls",
       "category": "strength",
-      "target_area": "Forearm"
+      "target_area": "Forearm",
+      "body_position": "seated",
+      "pose_description": "Seated or standing with the forearm resting on a table or thigh, palm facing down, holding a light dumbbell. The wrist extends upward, lifting the back of the hand toward the ceiling while the forearm remains stationary. The movement is small and controlled, targeting the wrist extensors."
     },
     {
       "name": "Foam Roller Thoracic Extension",
       "normalized_filename": "foam-roller-thoracic-extension",
       "category": "mobility",
-      "target_area": "Thoracic Spine"
+      "target_area": "Thoracic Spine",
+      "body_position": "foam_roller",
+      "pose_description": "Lying on back with a foam roller positioned horizontally under the mid-back at the level of the shoulder blades. Knees are bent with feet flat on the floor, and hands are clasped behind the head to support the neck. The upper back gently arches over the roller, extending the thoracic spine while the hips remain on the floor."
     },
     {
       "name": "Foam Roller IT Band",
       "normalized_filename": "foam-roller-it-band",
       "category": "mobility",
-      "target_area": "Hip/Knee"
+      "target_area": "Hip/Knee",
+      "body_position": "foam_roller",
+      "pose_description": "Lying on one side with a foam roller positioned under the outer thigh between the hip and the knee. The bottom leg is extended straight, and the top leg may cross over in front with the foot flat on the floor for support and pressure control. The hands and forearms support the upper body off the ground as the body rolls slowly up and down the roller along the IT band."
     },
     {
       "name": "Foam Roller Quad",
       "normalized_filename": "foam-roller-quad",
       "category": "mobility",
-      "target_area": "Quadriceps"
+      "target_area": "Quadriceps",
+      "body_position": "foam_roller",
+      "pose_description": "Lying face down in a modified plank position with a foam roller positioned under the front of both thighs. The forearms support the upper body, and the toes may be off the ground. The body rolls slowly forward and backward, moving the roller from just above the kneecaps to the hip flexors, applying pressure to the quadriceps."
     },
     {
       "name": "Foam Roller Calf",
       "normalized_filename": "foam-roller-calf",
       "category": "mobility",
-      "target_area": "Calf"
+      "target_area": "Calf",
+      "body_position": "foam_roller",
+      "pose_description": "Seated on the floor with legs extended and a foam roller positioned under both calves. Hands are placed behind the hips on the floor, lifting the buttocks slightly off the ground. The body rolls forward and backward, moving the roller from just above the ankles to below the knees, applying pressure along the calf muscles."
     },
     {
       "name": "Seated Row with Band",
       "normalized_filename": "seated-row-with-band",
       "category": "strength",
-      "target_area": "Upper Back"
+      "target_area": "Upper Back",
+      "body_position": "seated",
+      "pose_description": "Seated on the floor with legs extended straight in front and a resistance band looped around the feet. Both hands grip the band with palms facing each other. The elbows pull straight back, squeezing the shoulder blades together, drawing the hands toward the lower ribs. The torso remains upright and does not lean backward."
     },
     {
       "name": "Lat Pulldown with Band",
       "normalized_filename": "lat-pulldown-with-band",
       "category": "strength",
-      "target_area": "Upper Back"
+      "target_area": "Upper Back",
+      "body_position": "seated",
+      "pose_description": "Seated in a chair or on the floor with a resistance band anchored overhead. Both hands grip the band wider than shoulder-width with palms facing forward. The elbows pull downward and back, driving the band toward the upper chest while squeezing the shoulder blades together. The torso remains upright and the core stays engaged."
     },
     {
       "name": "Standing Row with Band",
       "normalized_filename": "standing-row-with-band",
       "category": "strength",
-      "target_area": "Upper Back"
+      "target_area": "Upper Back",
+      "body_position": "standing",
+      "pose_description": "Standing upright with a resistance band anchored in front at chest height. Both hands grip the band with arms extended forward. The elbows pull straight back past the torso, squeezing the shoulder blades together and drawing the hands toward the lower ribs. The feet are staggered for stability and the torso stays tall."
     },
     {
       "name": "Resisted Ankle Dorsiflexion",
       "normalized_filename": "resisted-ankle-dorsiflexion",
       "category": "strength",
-      "target_area": "Ankle"
+      "target_area": "Ankle",
+      "body_position": "standing",
+      "pose_description": "Seated or standing with a resistance band looped around the top of the forefoot, anchored to a fixed point in front. The foot pulls upward against the band resistance, dorsiflexing the ankle and bringing the toes toward the shin. The heel remains on the floor and the lower leg stays stationary."
     },
     {
       "name": "Resisted Ankle Plantarflexion",
       "normalized_filename": "resisted-ankle-plantarflexion",
       "category": "strength",
-      "target_area": "Ankle"
+      "target_area": "Ankle",
+      "body_position": "standing",
+      "pose_description": "Seated or standing with a resistance band looped around the ball of the foot, anchored behind the body or held in the hands. The foot pushes downward against the band resistance, plantarflexing the ankle and pointing the toes. The lower leg stays stationary and the movement occurs purely at the ankle."
     },
     {
       "name": "Prone Hip Extension",
       "normalized_filename": "prone-hip-extension",
       "category": "strength",
-      "target_area": "Hip/Glute"
+      "target_area": "Hip/Glute",
+      "body_position": "prone",
+      "pose_description": "Lying face down with legs extended straight and arms folded under the chin or at sides. One leg lifts straight off the floor behind the body, squeezing the glute to drive the movement, while the knee remains straight. The hips and pelvis stay pressed into the floor, and the leg lifts to approximately 15 to 20 degrees."
     },
     {
       "name": "Supine Hip Flexion",
       "normalized_filename": "supine-hip-flexion",
       "category": "mobility",
-      "target_area": "Hip"
+      "target_area": "Hip",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with both legs extended. One knee bends and lifts toward the chest, driven by the hip flexors, bringing the thigh to approximately 90 degrees of hip flexion. The opposite leg remains flat on the floor, the lower back stays neutral, and the hands may gently guide the knee."
     },
     {
       "name": "Seated Knee Extension",
       "normalized_filename": "seated-knee-extension",
       "category": "strength",
-      "target_area": "Knee"
+      "target_area": "Knee",
+      "body_position": "seated",
+      "pose_description": "Seated in a chair with feet flat on the floor and knees bent at 90 degrees. One leg extends straight out in front by straightening the knee until the leg is parallel with the floor, engaging the quadriceps. The thigh remains on the seat, the back stays against the chair, and the movement is controlled both up and down."
     },
     {
       "name": "Hamstring Stretch with Strap",
       "normalized_filename": "hamstring-stretch-with-strap",
       "category": "stretch",
-      "target_area": "Hamstring"
+      "target_area": "Hamstring",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with one leg extended on the floor. A strap, towel, or belt is looped around the foot of the other leg, which is raised straight up toward the ceiling with the knee as straight as possible. Both hands hold the ends of the strap and gently pull the leg closer, deepening the hamstring stretch. The hips remain flat on the floor."
     },
     {
       "name": "Wall Angel",
       "normalized_filename": "wall-angel",
       "category": "mobility",
-      "target_area": "Shoulder/Upper Back"
+      "target_area": "Shoulder/Upper Back",
+      "body_position": "standing",
+      "pose_description": "Standing with the back, head, and buttocks flat against a wall. Arms are raised with the backs of the hands, wrists, and elbows pressed against the wall in a goalpost position. The arms slide upward along the wall toward full overhead extension and back down, maintaining constant contact between the arms and the wall throughout the arc of movement."
     },
     {
       "name": "Chest Stretch Corner",
       "normalized_filename": "chest-stretch-corner",
       "category": "stretch",
-      "target_area": "Chest"
+      "target_area": "Chest",
+      "body_position": "standing",
+      "pose_description": "Standing facing a corner of a room with one foot slightly forward. Both forearms are placed on the adjoining walls at approximately shoulder height with elbows bent at 90 degrees. The body leans into the corner until a stretch is felt across the chest and front of the shoulders. The core is engaged and the lower back does not arch excessively."
     },
     {
       "name": "Isometric Quad Contraction",
       "normalized_filename": "isometric-quad-contraction",
       "category": "strength",
-      "target_area": "Knee"
+      "target_area": "Knee",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with a small rolled towel or bolster placed under one knee. The knee presses downward into the towel, tightening the quadriceps and lifting the heel slightly off the floor. The contraction is held isometrically, the ankle is dorsiflexed, and the opposite leg rests extended on the floor."
     },
     {
       "name": "Heel Drops",
       "normalized_filename": "heel-drops",
       "category": "strength",
-      "target_area": "Achilles/Calf"
+      "target_area": "Achilles/Calf",
+      "body_position": "standing",
+      "pose_description": "Standing on the edge of a step with the balls of the feet on the step, heels hanging off the back. Starting from a raised calf raise position on both feet, the weight shifts to one foot and the heel slowly lowers below the level of the step in a controlled eccentric motion. Hands hold a railing for balance."
     },
     {
       "name": "Eccentric Calf Lowering",
       "normalized_filename": "eccentric-calf-lowering",
       "category": "strength",
-      "target_area": "Calf"
+      "target_area": "Calf",
+      "body_position": "standing",
+      "pose_description": "Standing on the edge of a step with the balls of both feet on the step. Starting from a full calf raise on both feet, the weight transfers to one leg, and that heel slowly lowers below the step level over three to five seconds. The knee remains straight, and the opposite foot assists for the return to the top position."
     },
     {
       "name": "Supine Piriformis Stretch",
       "normalized_filename": "supine-piriformis-stretch",
       "category": "stretch",
-      "target_area": "Hip/Glute"
+      "target_area": "Hip/Glute",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with both knees bent and feet flat on the floor. One ankle crosses over the opposite knee in a figure-four position. Both hands reach through the gap and clasp behind the thigh of the bottom leg, pulling it toward the chest. A deep stretch is felt in the outer hip and glute of the crossed leg."
     },
     {
       "name": "Seated Long Sitting Stretch",
       "normalized_filename": "seated-long-sitting-stretch",
       "category": "stretch",
-      "target_area": "Hamstring/Back"
+      "target_area": "Hamstring/Back",
+      "body_position": "seated",
+      "pose_description": "Seated on the floor with both legs extended straight in front, feet together and toes pointing up. The torso hinges forward from the hips, reaching both hands toward the toes while keeping the back as flat as possible. The knees remain pressed into the floor, and the stretch is felt along the hamstrings and lower back."
     },
     {
       "name": "Sciatic Nerve Glide",
       "normalized_filename": "sciatic-nerve-glide",
       "category": "mobility",
-      "target_area": "Leg/Back"
+      "target_area": "Leg/Back",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with one hip and knee bent to 90 degrees, hands clasping behind the thigh. The knee slowly straightens, extending the foot toward the ceiling while the ankle alternates between dorsiflexion and plantarflexion to glide the sciatic nerve. The opposite leg remains flat on the floor, and the movement is smooth and pain-free."
     },
     {
       "name": "Median Nerve Glide",
       "normalized_filename": "median-nerve-glide",
       "category": "mobility",
-      "target_area": "Arm/Hand"
+      "target_area": "Arm/Hand",
+      "body_position": "standing",
+      "pose_description": "Standing upright with the affected arm extended out to the side at shoulder height. Starting with the wrist flexed and fingers curled toward the palm, the wrist gradually extends and the fingers straighten while the head tilts away from the outstretched arm. The movement alternates fluidly between the tensioned and relaxed positions to glide the median nerve."
     },
     {
       "name": "Ulnar Nerve Glide",
       "normalized_filename": "ulnar-nerve-glide",
       "category": "mobility",
-      "target_area": "Arm/Hand"
+      "target_area": "Arm/Hand",
+      "body_position": "standing",
+      "pose_description": "Standing upright with the affected arm at the side. The elbow bends to bring the hand toward the shoulder with the wrist extended and fingers pointing outward, then the arm extends outward to the side while the wrist curls and the head tilts away. The movement alternates smoothly between bent and extended positions to glide the ulnar nerve along its path."
     },
     {
       "name": "Prone Shoulder Flexion",
       "normalized_filename": "prone-shoulder-flexion",
       "category": "strength",
-      "target_area": "Shoulder"
+      "target_area": "Shoulder",
+      "body_position": "prone",
+      "pose_description": "Lying face down with the forehead resting on the floor and arms extended overhead on the ground. One or both arms lift straight off the floor with thumbs pointing up, raising the arm as high as possible while keeping the forehead down and the rest of the body flat. The shoulder blade retracts and depresses as the arm lifts."
     },
     {
       "name": "Side-Lying External Rotation",
       "normalized_filename": "side-lying-external-rotation",
       "category": "strength",
-      "target_area": "Shoulder"
+      "target_area": "Shoulder",
+      "body_position": "side_lying",
+      "pose_description": "Lying on the uninvolved side with the working arm on top. The elbow of the top arm is bent to 90 degrees and pinned against the side with a small towel roll between the elbow and the ribcage. A light dumbbell is held in the hand, and the forearm rotates upward toward the ceiling, externally rotating the shoulder. The elbow remains stationary throughout."
     },
     {
       "name": "Standing Hip Flexion",
       "normalized_filename": "standing-hip-flexion",
       "category": "strength",
-      "target_area": "Hip"
+      "target_area": "Hip",
+      "body_position": "standing",
+      "pose_description": "Standing upright holding a wall or chair for balance. One knee lifts forward and upward in front of the body, bringing the thigh toward the chest until the hip reaches approximately 90 degrees of flexion. The knee is bent, the standing leg remains straight, and the torso stays tall without leaning backward."
     },
     {
       "name": "Standing Hip Extension",
       "normalized_filename": "standing-hip-extension",
       "category": "strength",
-      "target_area": "Hip/Glute"
+      "target_area": "Hip/Glute",
+      "body_position": "standing",
+      "pose_description": "Standing upright holding a wall or chair for balance. One leg extends straight behind the body, squeezing the glute to drive the movement, while the knee remains straight. The torso stays upright and does not lean forward excessively. The leg lifts to approximately 15 to 20 degrees of hip extension."
     },
     {
       "name": "Seated Ankle Pumps",
       "normalized_filename": "seated-ankle-pumps",
       "category": "mobility",
-      "target_area": "Ankle"
+      "target_area": "Ankle",
+      "body_position": "seated",
+      "pose_description": "Seated in a chair or on a bed with legs extended in front or feet hanging off the edge. The ankles alternately pump up and down, dorsiflexing to pull the toes toward the shins, then plantarflexing to point the toes away. The movement is rhythmic and continuous, promoting circulation and ankle mobility."
     },
     {
       "name": "Short Arc Quads",
       "normalized_filename": "short-arc-quads",
       "category": "strength",
-      "target_area": "Knee"
+      "target_area": "Knee",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with a bolster or rolled towel placed under one knee, supporting it in approximately 20 to 30 degrees of flexion. The lower leg straightens fully by extending the knee, lifting the foot off the floor while the thigh stays on the bolster. The quadriceps contract to lock the knee straight, and the ankle is dorsiflexed."
     },
     {
       "name": "Long Arc Quads",
       "normalized_filename": "long-arc-quads",
       "category": "strength",
-      "target_area": "Knee"
+      "target_area": "Knee",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back or seated on the edge of a high surface with the knee bent at 90 degrees. The lower leg extends fully by straightening the knee through the complete range of motion until the leg is horizontal. The quadriceps work through the full arc from bent to straight, and the movement is controlled in both directions."
     },
     {
       "name": "Supine Hip Internal Rotation",
       "normalized_filename": "supine-hip-internal-rotation",
       "category": "mobility",
-      "target_area": "Hip"
+      "target_area": "Hip",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with both knees bent and feet flat on the floor wider than hip-width apart. One knee drops inward toward the midline while the foot stays planted, internally rotating the hip. The opposite leg remains still, the pelvis stays level, and the movement is controlled through the available range of internal rotation."
     },
     {
       "name": "Supine Hip External Rotation",
       "normalized_filename": "supine-hip-external-rotation",
       "category": "mobility",
-      "target_area": "Hip"
+      "target_area": "Hip",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with both knees bent and feet flat on the floor. One knee drops outward away from the midline while the foot stays planted, externally rotating the hip. The opposite leg remains still, the pelvis stays level, and the movement is controlled through the available range of external rotation."
     },
     {
       "name": "BOSU Ball Balance",
       "normalized_filename": "bosu-ball-balance",
       "category": "balance",
-      "target_area": "Ankle/Knee"
+      "target_area": "Ankle/Knee",
+      "body_position": "standing",
+      "pose_description": "Standing on the dome side of a BOSU ball with feet hip-width apart or on a single leg. The knees are slightly bent, the core is engaged, and the arms are at sides or extended for balance. The body works to maintain equilibrium on the unstable surface while keeping the torso upright and the gaze directed forward at a fixed point."
     },
     {
       "name": "Single Leg Deadlift",
       "normalized_filename": "single-leg-deadlift",
       "category": "strength",
-      "target_area": "Hip/Hamstring"
+      "target_area": "Hip/Hamstring",
+      "body_position": "standing",
+      "pose_description": "Standing on one leg with a slight bend in the standing knee. The torso hinges forward at the hips while the non-standing leg extends straight behind, creating a T shape with the body. The arms hang down or hold a weight, the back remains flat, and the hips stay squared to the floor. The movement is a controlled hip hinge with the hamstrings and glutes of the standing leg working eccentrically."
     },
     {
       "name": "Bulgarian Split Squat",
       "normalized_filename": "bulgarian-split-squat",
       "category": "strength",
-      "target_area": "Knee/Hip"
+      "target_area": "Knee/Hip",
+      "body_position": "standing",
+      "pose_description": "Standing about two feet in front of a bench or elevated surface with the top of one foot resting on the bench behind. The front foot is flat on the floor. The body lowers by bending the front knee to approximately 90 degrees while the back knee drops toward the floor. The torso stays upright, and the front knee tracks over the toes."
     },
     {
       "name": "Lateral Band Walks",
       "normalized_filename": "lateral-band-walks",
       "category": "strength",
-      "target_area": "Hip/Glute"
+      "target_area": "Hip/Glute",
+      "body_position": "standing",
+      "pose_description": "Standing in a quarter-squat position with a resistance band looped around the ankles or just above the knees. Feet are shoulder-width apart with knees bent and hips hinged slightly. Steps are taken laterally, leading with one foot and following with the other, maintaining constant tension on the band. The torso stays upright and the knees do not cave inward."
     },
     {
       "name": "Seated Shoulder Press",
       "normalized_filename": "seated-shoulder-press",
       "category": "strength",
-      "target_area": "Shoulder"
+      "target_area": "Shoulder",
+      "body_position": "seated",
+      "pose_description": "Seated in a chair with back supported and feet flat on the floor. Dumbbells or a resistance band are held at shoulder height with elbows bent and palms facing forward. The arms press straight overhead until fully extended, then lower back to shoulder height. The back remains against the chair and the core is engaged."
     },
     {
       "name": "Overhead Tricep Stretch",
       "normalized_filename": "overhead-tricep-stretch",
       "category": "stretch",
-      "target_area": "Tricep/Shoulder"
+      "target_area": "Tricep/Shoulder",
+      "body_position": "standing",
+      "pose_description": "Standing upright with one arm raised overhead and the elbow bent, dropping the hand behind the head and between the shoulder blades. The opposite hand gently pushes the elbow further behind the head, deepening the stretch along the back of the upper arm. The torso remains tall and the head stays in a neutral position."
     },
     {
       "name": "Standing Chest Fly with Band",
       "normalized_filename": "standing-chest-fly-with-band",
       "category": "strength",
-      "target_area": "Chest"
+      "target_area": "Chest",
+      "body_position": "standing",
+      "pose_description": "Standing with a resistance band anchored behind at chest height, holding one end in each hand. Arms start extended out to the sides at shoulder height with a slight bend in the elbows. The arms sweep forward in an arc, bringing the hands together in front of the chest, squeezing the pectorals. The torso remains upright and stable."
     },
     {
       "name": "Diaphragmatic Breathing",
       "normalized_filename": "diaphragmatic-breathing",
       "category": "core",
-      "target_area": "Core/Respiratory"
+      "target_area": "Core/Respiratory",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with knees bent and feet flat on the floor. One hand rests on the upper chest and the other on the belly just below the ribcage. During inhalation, the belly rises prominently while the chest remains relatively still. During exhalation, the belly falls inward. The breathing is slow, deep, and controlled through the nose."
     },
     {
       "name": "Pec Stretch",
       "normalized_filename": "pec-stretch",
       "category": "stretch",
-      "target_area": "Chest"
+      "target_area": "Chest",
+      "body_position": "standing",
+      "pose_description": "Standing beside a doorframe or wall. One arm is placed against the surface with the elbow bent at 90 degrees at shoulder height. The body rotates away from the anchored arm, opening the chest until a stretch is felt across the pectoral muscle and front of the shoulder. The feet are staggered for stability."
     },
     {
       "name": "Double Leg Calf Raise",
       "normalized_filename": "double-leg-calf-raise",
       "category": "strength",
-      "target_area": "Calf"
+      "target_area": "Calf",
+      "body_position": "standing",
+      "pose_description": "Standing upright with feet hip-width apart, lightly holding a wall or railing for balance. Both heels rise simultaneously as high as possible, pushing up onto the balls of the feet. The knees remain straight, the body is tall, and the calf muscles fully contract at the top of the movement."
     },
     {
       "name": "Single Leg Calf Raise",
       "normalized_filename": "single-leg-calf-raise",
       "category": "strength",
-      "target_area": "Calf"
+      "target_area": "Calf",
+      "body_position": "standing",
+      "pose_description": "Standing on one leg with the other foot lifted off the ground, holding a wall or railing for balance. The heel of the standing foot rises as high as possible, pushing up onto the ball of the foot. The knee remains straight, the body stays tall, and the calf muscle fully contracts at the top."
     },
     {
       "name": "Seated Toe Taps",
       "normalized_filename": "seated-toe-taps",
       "category": "mobility",
-      "target_area": "Ankle/Foot"
+      "target_area": "Ankle/Foot",
+      "body_position": "seated",
+      "pose_description": "Seated in a chair with feet flat on the floor and knees bent at 90 degrees. The toes lift off the floor while the heels remain planted, then the toes tap back down. The movement alternates between feet or both feet tap simultaneously, working the tibialis anterior and ankle dorsiflexors in a rhythmic motion."
     },
     {
       "name": "Standing Hamstring Curl",
       "normalized_filename": "standing-hamstring-curl",
       "category": "strength",
-      "target_area": "Hamstring"
+      "target_area": "Hamstring",
+      "body_position": "standing",
+      "pose_description": "Standing upright holding onto a chair or counter for balance. One heel curls upward behind the body toward the buttock by bending the knee, engaging the hamstring. The thighs remain parallel, the standing leg is straight with a slight knee bend, and the torso stays upright without leaning forward."
     },
     {
       "name": "Prone Hamstring Curl",
       "normalized_filename": "prone-hamstring-curl",
       "category": "strength",
-      "target_area": "Hamstring"
+      "target_area": "Hamstring",
+      "body_position": "prone",
+      "pose_description": "Lying face down with legs extended straight and arms folded under the chin. One heel curls toward the buttock by bending the knee against resistance from an ankle weight or band. The hips remain pressed into the floor, the thigh does not lift, and the movement is controlled in both the curling and lowering phases."
     },
     {
       "name": "Wall Squat with Ball",
       "normalized_filename": "wall-squat-with-ball",
       "category": "strength",
-      "target_area": "Knee/Quadriceps"
+      "target_area": "Knee/Quadriceps",
+      "body_position": "standing",
+      "pose_description": "Standing with an exercise ball or stability ball placed between the mid-back and a wall. Feet are shoulder-width apart, positioned about two feet in front of the body. The body lowers into a squat by bending the knees to approximately 90 degrees while the ball rolls along the wall. The back stays pressed into the ball and the knees track over the toes."
     },
     {
       "name": "Hip Hinge",
       "normalized_filename": "hip-hinge",
       "category": "mobility",
-      "target_area": "Hip/Back"
+      "target_area": "Hip/Back",
+      "body_position": "standing",
+      "pose_description": "Standing upright with feet hip-width apart and knees slightly bent. The torso hinges forward from the hips, pushing the buttocks backward while keeping the back flat and chest proud. The arms hang naturally or a dowel rod is held along the spine to maintain spinal alignment. The movement stops when the torso reaches approximately parallel to the floor."
     },
     {
       "name": "Quadruped Rocking",
       "normalized_filename": "quadruped-rocking",
       "category": "mobility",
-      "target_area": "Hip/Back"
+      "target_area": "Hip/Back",
+      "body_position": "quadruped",
+      "pose_description": "On hands and knees in tabletop position with wrists under shoulders and knees under hips. The hips push backward toward the heels in a rocking motion, sitting back as far as comfortably possible while the hands remain on the floor. The spine stays neutral and the movement is slow and rhythmic, stretching the hips and lower back."
     },
     {
       "name": "Seated Trunk Rotation",
       "normalized_filename": "seated-trunk-rotation",
       "category": "mobility",
-      "target_area": "Spine"
+      "target_area": "Spine",
+      "body_position": "seated",
+      "pose_description": "Seated in a chair with feet flat on the floor and knees bent at 90 degrees. A stick, band, or the arms crossed over the chest provide a reference. The torso rotates to one side as far as comfortably possible, then returns to center and rotates to the other side. The hips and knees remain fixed forward while the rotation comes from the thoracic and lumbar spine."
     },
     {
       "name": "Standing Back Extension",
       "normalized_filename": "standing-back-extension",
       "category": "mobility",
-      "target_area": "Lower Back"
+      "target_area": "Lower Back",
+      "body_position": "standing",
+      "pose_description": "Standing upright with feet hip-width apart and hands placed on the lower back for support. The torso gently leans backward, extending the lumbar spine while the hips push slightly forward. The head follows the natural curve of the spine, looking upward, and the knees remain straight. The movement is slow and controlled."
     },
     {
       "name": "Prone Scapular Retraction",
       "normalized_filename": "prone-scapular-retraction",
       "category": "strength",
-      "target_area": "Upper Back"
+      "target_area": "Upper Back",
+      "body_position": "prone",
+      "pose_description": "Lying face down with arms at sides, palms facing down toward the thighs. The shoulder blades squeeze firmly together and downward, lifting the chest slightly off the floor. The forehead may remain on the floor or lift slightly, and the arms lift a few inches off the ground as the scapulae retract. The lower body stays relaxed."
     },
     {
       "name": "Seated Cervical Retraction",
       "normalized_filename": "seated-cervical-retraction",
       "category": "strength",
-      "target_area": "Neck"
+      "target_area": "Neck",
+      "body_position": "seated",
+      "pose_description": "Seated in a chair with good upright posture, shoulders relaxed, and feet flat on the floor. The chin draws straight backward in a horizontal motion, creating a double chin, without tilting the head up or down. The movement retracts the cervical spine, strengthening the deep neck flexors. The gaze remains level throughout."
     },
     {
       "name": "Isometric Cervical Extension",
       "normalized_filename": "isometric-cervical-extension",
       "category": "strength",
-      "target_area": "Neck"
+      "target_area": "Neck",
+      "body_position": "standing",
+      "pose_description": "Standing or seated upright with one or both hands clasped behind the head. The head pushes backward into the hands with sustained effort while the hands resist the movement, creating an isometric contraction of the neck extensors. No visible movement occurs, the spine remains tall, and the eyes look straight ahead."
     },
     {
       "name": "Isometric Cervical Flexion",
       "normalized_filename": "isometric-cervical-flexion",
       "category": "strength",
-      "target_area": "Neck"
+      "target_area": "Neck",
+      "body_position": "standing",
+      "pose_description": "Standing or seated upright with one hand placed on the forehead. The head pushes forward into the hand with sustained effort while the hand resists the movement, creating an isometric contraction of the deep neck flexors. No visible movement occurs, the spine remains tall, and the chin stays level."
     },
     {
       "name": "Wrist Pronation and Supination",
       "normalized_filename": "wrist-pronation-supination",
       "category": "mobility",
-      "target_area": "Forearm/Wrist"
+      "target_area": "Forearm/Wrist",
+      "body_position": "standing",
+      "pose_description": "Seated or standing with the elbow bent at 90 degrees and held at the side, or the forearm resting on a table. Holding a light hammer or weight, the forearm rotates so the palm turns face down (pronation) and then face up (supination). The elbow remains stationary and the movement is isolated to the forearm rotation."
     },
     {
       "name": "Open Book Stretch",
       "normalized_filename": "open-book-stretch",
       "category": "stretch",
-      "target_area": "Thoracic Spine"
+      "target_area": "Thoracic Spine",
+      "body_position": "side_lying",
+      "pose_description": "Lying on one side with hips and knees bent to approximately 90 degrees stacked on top of each other. Both arms start extended in front at shoulder height, palms together. The top arm opens upward and rotates across the body like a book opening, reaching toward the floor on the opposite side while the knees remain stacked. The gaze follows the moving hand, creating a deep thoracic rotation."
     },
     {
       "name": "Prayer Stretch",
       "normalized_filename": "prayer-stretch",
       "category": "stretch",
-      "target_area": "Lower Back"
+      "target_area": "Lower Back",
+      "body_position": "kneeling",
+      "pose_description": "Kneeling on the floor, sitting back on the heels with the torso folded forward and the chest resting on the thighs. Arms extend forward on the floor overhead with palms down, and the forehead rests on the floor. The hips stay pressed back toward the heels, creating a long stretch through the lower back, lats, and shoulders."
     },
     {
       "name": "Superman Exercise",
       "normalized_filename": "superman-exercise",
       "category": "strength",
-      "target_area": "Lower Back/Core"
+      "target_area": "Lower Back/Core",
+      "body_position": "prone",
+      "pose_description": "Lying face down with arms extended overhead on the floor and legs straight behind. Both arms and both legs simultaneously lift off the floor, arching the back and engaging the erector spinae and glutes. The head lifts with the chest and the gaze is directed at the floor. The position is held briefly at the top with the body forming a shallow U shape."
     },
     {
       "name": "Swimmers Exercise",
       "normalized_filename": "swimmers-exercise",
       "category": "strength",
-      "target_area": "Back/Core"
+      "target_area": "Back/Core",
+      "body_position": "prone",
+      "pose_description": "Lying face down with arms extended overhead and legs straight behind. The opposite arm and leg lift simultaneously \u2014 right arm with left leg, then left arm with right leg \u2014 in an alternating flutter motion as if swimming. The torso remains relatively still, the head stays in line with the spine, and the movements are small and controlled."
     },
     {
       "name": "Band Pull-Aparts",
       "normalized_filename": "band-pull-aparts",
       "category": "strength",
-      "target_area": "Rotator Cuff, Scapular Stabilizers & Posterior Shoulder"
+      "target_area": "Rotator Cuff, Scapular Stabilizers & Posterior Shoulder",
+      "body_position": "standing",
+      "pose_description": "Standing upright with arms extended in front at shoulder height, holding a resistance band with both hands slightly closer than shoulder-width apart. The hands pull the band apart by driving the arms outward and squeezing the shoulder blades together until the band touches the chest. The elbows stay straight and the shoulders remain depressed throughout."
     },
     {
       "name": "Half-Kneeling Shoulder Rotations with Band",
       "normalized_filename": "half-kneeling-shoulder-rotations-with-band",
       "category": "strength",
-      "target_area": "Rotator Cuff, External Rotators & Shoulder Stability"
+      "target_area": "Rotator Cuff, External Rotators & Shoulder Stability",
+      "body_position": "kneeling",
+      "pose_description": "In a half-kneeling position with one knee on the floor and the opposite foot flat in front, hip and knee at 90 degrees. A resistance band is anchored to the side, and the working arm is bent at 90 degrees at the elbow with the elbow at the side. The forearm rotates outward against the band and returns inward, training external rotation. The torso remains tall and the core is engaged."
     },
     {
       "name": "Lower Back Release Roll",
       "normalized_filename": "lower-back-release-roll",
       "category": "mobility",
-      "target_area": "Lower Back Muscles & Lumbar Fascia"
+      "target_area": "Lower Back Muscles & Lumbar Fascia",
+      "body_position": "foam_roller",
+      "pose_description": "Lying on back with a foam roller positioned horizontally under the lower back just above the pelvis. Knees are bent with feet flat on the floor. The body gently rolls the foam roller up and down over the lumbar muscles by bending and straightening the legs, applying moderate pressure. Hands may be behind the head or crossed on the chest."
     },
     {
       "name": "Prone I-Y-T Raises",
       "normalized_filename": "prone-i-y-t-raises",
       "category": "strength",
-      "target_area": "Rotator Cuff, Scapular Stabilizers & Lower Trapezius"
+      "target_area": "Rotator Cuff, Scapular Stabilizers & Lower Trapezius",
+      "body_position": "prone",
+      "pose_description": "Lying face down on the floor or a bench with arms hanging down. The exercise cycles through three arm positions: I (arms lift straight overhead in line with the body), Y (arms lift at 45 degrees forming a Y shape), and T (arms lift straight out to the sides at 90 degrees). Thumbs point up, shoulder blades squeeze together, and the forehead stays on the floor."
     },
     {
       "name": "Quadruped Shoulder Taps",
       "normalized_filename": "quadruped-shoulder-taps",
       "category": "core",
-      "target_area": "Rotator Cuff, Core & Scapular Stabilizers"
+      "target_area": "Rotator Cuff, Core & Scapular Stabilizers",
+      "body_position": "quadruped",
+      "pose_description": "On hands and knees in tabletop position with wrists under shoulders and knees under hips, or in a high plank position. One hand lifts off the floor and taps the opposite shoulder, then returns to the ground. The movement alternates sides. The hips remain level without rocking side to side, and the core is braced to prevent rotation."
     },
     {
       "name": "Bird Dog Hold with Scapular Punch",
       "normalized_filename": "bird-dog-hold-with-scapular-punch",
       "category": "core",
-      "target_area": "Core Stability, Rotator Cuff & Scapular Control"
+      "target_area": "Core Stability, Rotator Cuff & Scapular Control",
+      "body_position": "quadruped",
+      "pose_description": "On hands and knees with right arm extended forward and left leg extended behind, parallel to the floor, in a standard bird dog position. From this hold, the extended arm performs a scapular punch by protracting the shoulder blade forward, pushing the hand further away from the body, then retracting back. The spine remains neutral and the core is fully braced."
     },
     {
       "name": "Bird Dog with Core Stability Focus",
       "normalized_filename": "bird-dog-with-core-stability-focus",
       "category": "core",
-      "target_area": "Core stabilizers, hip extensors, lower back endurance"
+      "target_area": "Core stabilizers, hip extensors, lower back endurance",
+      "body_position": "quadruped",
+      "pose_description": "On hands and knees in tabletop position with wrists directly under shoulders and knees under hips. The right arm extends forward and the left leg extends behind, both parallel to the floor, with an emphasis on maintaining a perfectly level pelvis and neutral spine. The movement is slow and deliberate with a prolonged hold at full extension, core braced throughout."
     },
     {
       "name": "Dead Bug with Shoulder Reach",
       "normalized_filename": "dead-bug-with-shoulder-reach",
       "category": "core",
-      "target_area": "Core Stability, Lower Back & Shoulder Integration"
+      "target_area": "Core Stability, Lower Back & Shoulder Integration",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with arms extended straight toward the ceiling and both hips and knees bent to 90 degrees. As the opposite arm and leg extend outward (one arm overhead, opposite leg straight), the reaching arm pushes further toward the ceiling with a scapular protraction, adding a shoulder reach component. The lower back stays pressed firmly into the floor."
     },
     {
       "name": "Glute Bridge",
       "normalized_filename": "glute-bridge",
       "category": "lying",
-      "target_area": "Gluteus Maximus, Lower Back Stabilizers"
+      "target_area": "Gluteus Maximus, Lower Back Stabilizers",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with knees bent at approximately 90 degrees, feet flat on the floor hip-width apart, arms resting at sides with palms down. The hips press upward by squeezing the glutes until the body forms a straight line from shoulders to knees. The weight is driven through the heels, and the core remains engaged at the top."
     },
     {
       "name": "Glute Bridge with Isometric Hold",
       "normalized_filename": "glute-bridge-with-isometric-hold",
       "category": "strength",
-      "target_area": "Gluteal muscles, hip extensors, lower back"
+      "target_area": "Gluteal muscles, hip extensors, lower back",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with knees bent at approximately 90 degrees, feet flat on the floor hip-width apart, arms at sides. The hips are lifted to the top position forming a straight line from shoulders to knees, and this position is held isometrically for a sustained duration. The glutes are maximally squeezed, the core is braced, and the hips do not drop."
     },
     {
       "name": "Half-Kneeling Pallof Press",
       "normalized_filename": "half-kneeling-pallof-press",
       "category": "core",
-      "target_area": "Core, Lower Back Stabilization & Rotational Control"
+      "target_area": "Core, Lower Back Stabilization & Rotational Control",
+      "body_position": "kneeling",
+      "pose_description": "In a half-kneeling position with the inside knee down and the outside foot forward, positioned perpendicular to a cable or band anchor point. Both hands hold the band or cable handle at the chest. The arms press straight forward, extending fully away from the chest, resisting the rotational pull of the band. The torso remains perfectly upright and square, the core braces against rotation."
     },
     {
       "name": "Lateral Side-Lying Clam Shell",
       "normalized_filename": "lateral-side-lying-clam-shell",
       "category": "standing",
-      "target_area": "Gluteus medius, hip external rotators, trochanteric bursa"
+      "target_area": "Gluteus medius, hip external rotators, trochanteric bursa",
+      "body_position": "side_lying",
+      "pose_description": "Lying on one side with hips bent to approximately 45 degrees and knees bent to 90 degrees, feet stacked together. The bottom arm extends under the head, and the top hand rests on the hip. The top knee opens upward like a clamshell while the feet stay together and the pelvis remains stable without rolling backward. A resistance band may be placed just above the knees."
     },
     {
       "name": "Lying Hip Flexor Stretch",
       "normalized_filename": "lying-hip-flexor-stretch",
       "category": "stretch",
-      "target_area": "Iliopsoas, Rectus Femoris"
+      "target_area": "Iliopsoas, Rectus Femoris",
+      "body_position": "supine",
+      "pose_description": "Lying on back at the edge of a bed or table with both knees pulled to the chest. One knee remains hugged to the chest while the other leg lowers off the edge, hanging down toward the floor with the knee slightly bent. Gravity pulls the lowered thigh into extension, stretching the hip flexors and front of the thigh. The lower back stays flat on the surface."
     },
     {
       "name": "Prone Glute Squeeze Holds",
       "normalized_filename": "prone-glute-squeeze-holds",
       "category": "lying",
-      "target_area": "Gluteus Maximus, Lower Back Support"
+      "target_area": "Gluteus Maximus, Lower Back Support",
+      "body_position": "prone",
+      "pose_description": "Lying face down with legs extended straight and arms at sides or folded under the forehead. Both glute muscles are maximally squeezed together and held in a sustained isometric contraction. The legs remain on the floor, the hips press gently into the floor, and the contraction is held for several seconds before releasing."
     },
     {
       "name": "Prone Hip Extension Pulse",
       "normalized_filename": "prone-hip-extension-pulse",
       "category": "strength",
-      "target_area": "Gluteus maximus, lower back extensors"
+      "target_area": "Gluteus maximus, lower back extensors",
+      "body_position": "prone",
+      "pose_description": "Lying face down with legs extended straight and arms folded under the chin. One leg lifts a few inches off the floor with the knee straight, then performs small pulsing movements upward, rapidly contracting the glute at the top of each pulse. The hips remain pressed into the floor and the leg does not touch down between pulses."
     },
     {
       "name": "Prone I-Y-T Shoulder Activation",
       "normalized_filename": "prone-i-y-t-shoulder-activation",
       "category": "strength",
-      "target_area": "Rotator Cuff & Posterior Deltoid"
+      "target_area": "Rotator Cuff & Posterior Deltoid",
+      "body_position": "prone",
+      "pose_description": "Lying face down on the floor or an incline bench. The arms cycle through three positions with controlled holds: I (arms extended straight overhead close to the ears), Y (arms lifted at 45 degrees from the head), and T (arms lifted straight to the sides at 90 degrees). Thumbs point up, the shoulder blades squeeze together, and each position is held for a few seconds before transitioning."
     },
     {
       "name": "Quadruped Hip Flexor March",
       "normalized_filename": "quadruped-hip-flexor-march",
       "category": "core",
-      "target_area": "Hip flexors, core stabilizers, lower back"
+      "target_area": "Hip flexors, core stabilizers, lower back",
+      "body_position": "quadruped",
+      "pose_description": "On hands and knees in tabletop position with wrists under shoulders and knees under hips. One knee lifts slightly off the floor, driving the thigh upward in a marching motion while the hands remain planted. The movement alternates legs in a slow marching pattern. The spine remains neutral, the hips stay level, and the core is braced to prevent shifting."
     },
     {
       "name": "Quadruped Pelvic Tilts",
       "normalized_filename": "quadruped-pelvic-tilts",
       "category": "core",
-      "target_area": "Lower Back, Core Stabilizers, Iliopsoas"
+      "target_area": "Lower Back, Core Stabilizers, Iliopsoas",
+      "body_position": "quadruped",
+      "pose_description": "On hands and knees in tabletop position with wrists under shoulders and knees under hips. The pelvis tilts posteriorly by tucking the tailbone under and rounding the lower back slightly, then anteriorly by arching the lower back and tilting the tailbone upward. The movement is isolated to the lumbar spine and pelvis while the upper back and shoulders remain still."
     },
     {
       "name": "Resistance Band External Rotation at 90/90",
       "normalized_filename": "resistance-band-external-rotation-at-90-90",
       "category": "strength",
-      "target_area": "Rotator Cuff (Infraspinatus & Teres Minor) & Shoulder Stability"
+      "target_area": "Rotator Cuff (Infraspinatus & Teres Minor) & Shoulder Stability",
+      "body_position": "standing",
+      "pose_description": "Standing upright with the working arm abducted to 90 degrees and the elbow bent to 90 degrees, forming a goalpost position. A resistance band is anchored at elbow height. The forearm rotates upward from a position pointing down toward the floor to a position pointing toward the ceiling, externally rotating the shoulder while maintaining the 90/90 arm position. The elbow stays at shoulder height throughout."
     },
     {
       "name": "Single-Leg Balance with Hip Activation",
       "normalized_filename": "single-leg-balance-with-hip-activation",
       "category": "standing",
-      "target_area": "Hip Stabilizers, Gluteus Medius, Proprioception"
+      "target_area": "Hip Stabilizers, Gluteus Medius, Proprioception",
+      "body_position": "standing",
+      "pose_description": "Standing on one leg with the standing knee slightly soft and the hip of the standing leg actively engaged. The non-standing leg lifts with the knee bent and the hip moves through small ranges of flexion, extension, or abduction to challenge balance. Arms may be at sides or on hips, the torso is upright, and the gaze is fixed on a point ahead."
     },
     {
       "name": "Standing Single-Leg Balance with Hip Stability",
       "normalized_filename": "standing-single-leg-balance-with-hip-stability",
       "category": "balance",
-      "target_area": "Hip stabilizers, gluteus medius, proprioception, lower back"
+      "target_area": "Hip stabilizers, gluteus medius, proprioception, lower back",
+      "body_position": "standing",
+      "pose_description": "Standing on one leg with the standing knee slightly bent, focusing on keeping the pelvis level without dropping on the unsupported side. The non-standing leg is lifted with the knee bent to approximately 90 degrees of hip flexion. Arms are at sides or on hips, the torso is tall, and the gluteus medius of the standing leg is actively engaged to maintain pelvic stability."
     },
     {
       "name": "Supine Figure-4 Stretch with Pelvic Mobilization",
       "normalized_filename": "supine-figure-4-stretch-with-pelvic-mobilization",
       "category": "stretch",
-      "target_area": "Piriformis, gluteal muscles, hip external rotators"
+      "target_area": "Piriformis, gluteal muscles, hip external rotators",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with one ankle crossed over the opposite knee in a figure-four position. Both hands reach through and clasp behind the thigh of the bottom leg, pulling it toward the chest. Additionally, the pelvis gently rocks side to side in small mobilization movements, enhancing the stretch through the piriformis and outer hip of the crossed leg."
     },
     {
       "name": "Supine Iliopsoas Stretch",
       "normalized_filename": "supine-iliopsoas-stretch",
       "category": "stretch",
-      "target_area": "Hip flexors, lower back"
+      "target_area": "Hip flexors, lower back",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back at the edge of a bed or table. One knee is pulled to the chest and held with both hands, while the other leg hangs off the edge of the surface, allowing gravity to extend the hip and stretch the iliopsoas. The thigh of the hanging leg drops below the surface level, and the lower back remains flat."
     },
     {
       "name": "Supported Cat-Cow Stretch",
       "normalized_filename": "supported-cat-cow-stretch",
       "category": "yoga",
-      "target_area": "Lower Back, Thoracic Spine & Shoulder Mobility"
+      "target_area": "Lower Back, Thoracic Spine & Shoulder Mobility",
+      "body_position": "quadruped",
+      "pose_description": "On hands and knees with a yoga block or cushion under the hands for wrist support, or with forearms on a chair seat for reduced wrist loading. The spine alternates between arching downward with the chest lifting and belly dropping (cow) and rounding upward with the chin tucking and tailbone curling under (cat). The movements are slow and synchronized with breathing."
     },
     {
       "name": "Quadruped Thoracic Rotation",
       "normalized_filename": "quadruped-thoracic-rotation",
       "category": "mobility",
-      "target_area": "Intercostal muscles, thoracic spine, obliques, chest"
+      "target_area": "Intercostal muscles, thoracic spine, obliques, chest",
+      "body_position": "quadruped",
+      "pose_description": "On hands and knees in tabletop position. One hand is placed behind the head with the elbow pointing out to the side. The torso rotates, driving the elbow toward the opposite hand on the floor (closing), then rotates upward, driving the elbow toward the ceiling (opening). The hips remain square over the knees and the rotation occurs through the thoracic spine."
     },
     {
       "name": "Pallof Press",
       "normalized_filename": "pallof-press",
       "category": "core",
-      "target_area": "Obliques, transverse abdominis, anti-rotation core stability"
+      "target_area": "Obliques, transverse abdominis, anti-rotation core stability",
+      "body_position": "standing",
+      "pose_description": "Standing perpendicular to a cable machine or band anchor point with feet shoulder-width apart and knees slightly bent. Both hands hold the handle or band at the center of the chest. The arms press straight forward, extending fully, resisting the rotational pull of the band. The core is fully braced, the hips remain square, and the torso does not rotate."
     },
     {
       "name": "Glute Bridge Hold",
       "normalized_filename": "glute-bridge-hold",
       "category": "strength",
-      "target_area": "Glutes, lower back extensors, core stabilizers"
+      "target_area": "Glutes, lower back extensors, core stabilizers",
+      "body_position": "supine",
+      "pose_description": "Lying flat on back with knees bent at approximately 90 degrees, feet flat on the floor hip-width apart, arms at sides. The hips are pressed upward into the bridge position, forming a straight line from shoulders to knees, and this position is sustained for the prescribed duration. The glutes remain fully contracted, the core is braced, and the hips do not drop throughout the hold."
     },
     {
       "name": "Child's Pose with Side Reach",
       "normalized_filename": "childs-pose-with-side-reach",
       "category": "stretch",
-      "target_area": "Lower back, intercostal muscles, latissimus dorsi"
+      "target_area": "Lower back, intercostal muscles, latissimus dorsi",
+      "body_position": "kneeling",
+      "pose_description": "Kneeling with the torso folded forward in a child's pose position, forehead resting on or near the floor. Both arms are extended forward on the floor, then both hands walk to one side, creating a lateral stretch through the side of the torso, lats, and intercostals. The hips stay pressed back toward the heels, and the stretch is felt along the opposite side of the body."
     },
     {
       "name": "Banded Shoulder Stabilizer Series",
       "normalized_filename": "banded-shoulder-stabilizer-series",
       "category": "strength",
-      "target_area": "Rotator cuff, scapular stabilizers, core"
+      "target_area": "Rotator cuff, scapular stabilizers, core",
+      "body_position": "standing",
+      "pose_description": "Standing upright holding a resistance band with both hands. The exercise cycles through multiple positions: band pull-aparts at chest height, external rotation with elbows at sides, overhead press against band tension, and diagonal patterns. Throughout each movement, the shoulder blades are actively set down and back, the core is engaged, and the posture remains tall and aligned."
     }
   ]
 }

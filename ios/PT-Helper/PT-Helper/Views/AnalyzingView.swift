@@ -74,11 +74,16 @@ struct AnalyzingView: View {
         }
         .onChange(of: navigateToResults) { _, newValue in
             // When user navigates back from results, also pop back to PainDetailView.
-            // IMPORTANT: Delay the second dismissal to avoid simultaneous navigation
-            // state mutations, which crash NavigationStack.
+            // Use Task + yield to let NavigationStack complete its transition before
+            // mutating the second navigation binding. This avoids the simultaneous
+            // navigation state mutation crash that a fixed-delay asyncAfter can cause.
             if !newValue {
                 viewModel.analysisResult = nil
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                Task { @MainActor in
+                    // Yield twice to let the NavigationStack pop animation settle
+                    await Task.yield()
+                    await Task.yield()
+                    try? await Task.sleep(for: .milliseconds(50))
                     viewModel.showAnalyzingScreen = false
                 }
             }
@@ -152,6 +157,12 @@ struct AnalyzingView: View {
                     isActive: animateSteps
                 )
                 AnalysisStepRow(
+                    icon: "checkmark.shield.fill",
+                    text: "Verifying results...",
+                    isCompleted: false,
+                    isActive: false
+                )
+                AnalysisStepRow(
                     icon: "list.bullet.clipboard.fill",
                     text: "Generating recommendations",
                     isCompleted: false,
@@ -173,8 +184,8 @@ struct AnalyzingView: View {
     private var elapsedTimeText: String {
         if elapsedSeconds < 5 {
             return ""
-        } else if elapsedSeconds < 15 {
-            return "\(elapsedSeconds)s — this usually takes 5–15 seconds"
+        } else if elapsedSeconds < 20 {
+            return "\(elapsedSeconds)s — this usually takes 10–20 seconds"
         } else {
             return "\(elapsedSeconds)s — almost there..."
         }

@@ -31,11 +31,13 @@ class SessionLogger: ObservableObject {
     }()
 
     private var currentLogURL: URL {
-        let docs = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let docs = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
+            ?? fileManager.temporaryDirectory
         return docs.appendingPathComponent("session_log_current.json")
     }
     private var previousLogURL: URL {
-        let docs = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let docs = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
+            ?? fileManager.temporaryDirectory
         return docs.appendingPathComponent("session_log_previous.json")
     }
 
