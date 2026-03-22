@@ -1,5 +1,9 @@
 import SwiftUI
 
+/// Feature flag for the experimental data-driven dashboard UI (Manus Concept 2).
+/// Set to `true` to enable the dark 3-tab dashboard, `false` for original 4-tab UI.
+let useDashboardUI = true
+
 /// Observable class to allow any child view to switch tabs or pop to root
 class TabSelection: ObservableObject {
     @Published var selectedTab: Int = 0
@@ -37,6 +41,7 @@ struct MainTabView: View {
     // Shared ViewModels — created once, injected into all tabs that need them
     @StateObject private var savedPlansViewModel = SavedPlansViewModel()
     @StateObject private var workoutViewModel = WorkoutViewModel()
+    @StateObject private var recoveryInsightsViewModel = RecoveryInsightsViewModel()
 
     // Health check state for inactivity detection
     @State private var showHealthCheck = false
@@ -53,6 +58,14 @@ struct MainTabView: View {
     }
 
     var body: some View {
+        if useDashboardUI {
+            DashboardMainTabView()
+        } else {
+            existingTabView
+        }
+    }
+
+    private var existingTabView: some View {
         VStack(spacing: 0) {
             // Offline banner
             if !networkMonitor.isConnected {
@@ -124,6 +137,7 @@ struct MainTabView: View {
         .environmentObject(savedPlansViewModel)
         .environmentObject(workoutViewModel)
         .environmentObject(networkMonitor)
+        .environmentObject(recoveryInsightsViewModel)
         .onChange(of: tabSelection.selectedTab) { _, newTab in
             let tabNames = ["Home", "Analyze", "Plans", "Progress"]
             let name = newTab < tabNames.count ? tabNames[newTab] : "Unknown"

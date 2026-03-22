@@ -70,7 +70,16 @@ All API calls go through `ClaudeAPIService` → Firebase Cloud Function proxy (`
 - **backgroundOnly** — Old, unrelated history (included as context only)
 
 ### RealityKit 3D Body Map
-`BodyMap3DView` uses RealityKit for interactive body region selection. Invisible proxy entities handle occluded regions (lower back, back of head, etc.). Collision tests in `BodyMapCollisionTests` (excluded from UnitPlan, included in FullPlan).
+`BodyMap3DView` uses RealityKit for interactive body region selection. Invisible proxy entities handle occluded regions (lower back, back of head, etc.). Collision tests in `BodyMapCollisionTests` (excluded from UnitPlan, included in FullPlan). First-time users see a coach mark overlay (persisted via `@AppStorage("hasSeenBodyMapCoach")`).
+
+### Guided Workout Checkpointing
+`GuidedWorkoutViewModel` saves workout state to `UserDefaults` (`GuidedWorkoutCheckpoint`) on every set completion and exercise skip. On relaunch, `GuidedWorkoutView` detects incomplete sessions and offers a "Resume Workout?" prompt. Checkpoints expire after 24 hours. The "End" button shows a confirmation dialog before ending early.
+
+### Rehab Plan Preferences
+Before generating a rehab plan, `AnalysisResultView` shows a preferences sheet where users select equipment (none/bands/dumbbells/gym), session length (15/30/45 min), and difficulty (gentle/moderate/challenging). These are stored in `RehabPlanPreferences` on `RehabPlanViewModel` and included in the AI prompt.
+
+### Pain Assessment Collapsible Form
+`PainDetailView` splits fields into essential (always visible: pain type, intensity, duration, frequency, onset, aggravating/relieving factors) and optional (collapsed by default: description, treatment history, notes). The "Apply to All Regions & Analyze" button is shown on every region when multiple are selected.
 
 ### Firestore Data Structure
 - `users/{uid}/profile/health` — UserProfile document

@@ -47,17 +47,25 @@ struct PlansTab: View {
     // MARK: - Plans List
 
     private var plansList: some View {
-        ScrollView {
-            VStack(spacing: AppSpacing.md) {
-                ForEach(savedPlansViewModel.rehabPlans) { plan in
-                    NavigationLink(destination: RehabPlanView(existingPlan: plan)) {
-                        planCard(for: plan)
+        List {
+            ForEach(savedPlansViewModel.rehabPlans) { plan in
+                NavigationLink(destination: RehabPlanView(existingPlan: plan)) {
+                    planCard(for: plan)
+                }
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button(role: .destructive) {
+                        planToDelete = plan
+                        showDeleteConfirmation = true
+                    } label: {
+                        Label("Delete", systemImage: "trash")
                     }
                 }
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: AppSpacing.xs, leading: AppSpacing.xl, bottom: AppSpacing.xs, trailing: AppSpacing.xl))
             }
-            .padding(.horizontal, AppSpacing.xl)
-            .padding(.vertical, AppSpacing.md)
         }
+        .listStyle(.plain)
     }
 
     private func planCard(for plan: RehabPlan) -> some View {
@@ -94,17 +102,6 @@ struct PlansTab: View {
                     .font(.title2)
                     .foregroundColor(.blue)
                     .padding(AppSpacing.xs)
-            }
-            .buttonStyle(.plain)
-
-            Button {
-                planToDelete = plan
-                showDeleteConfirmation = true
-            } label: {
-                Image(systemName: "trash")
-                    .font(.body)
-                    .foregroundColor(.red.opacity(0.7))
-                    .padding(AppSpacing.sm)
             }
             .buttonStyle(.plain)
         }

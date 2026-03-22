@@ -6,6 +6,21 @@ import Combine
 @MainActor
 class GuidedWorkoutViewModel: ObservableObject {
 
+    // MARK: - Checkpoint Keys
+
+    private static let checkpointKey = "GuidedWorkoutCheckpoint"
+
+    struct WorkoutCheckpoint: Codable {
+        let planId: String
+        let currentExerciseIndex: Int
+        let currentSet: Int
+        let completedExercises: [String]
+        let skippedExercises: [String]
+        let substitutedExercises: [String: String]
+        let accumulatedTime: TimeInterval
+        let savedAt: Date
+    }
+
     // MARK: - Published State
 
     @Published var plan: RehabPlan
@@ -18,6 +33,7 @@ class GuidedWorkoutViewModel: ObservableObject {
     @Published var completedExercises: [String] = []
     @Published var skippedExercises: [String] = []
     @Published var isPaused: Bool = false
+    @Published var substitutedExercises: [String: String] = [:] // original name → new name
 
     enum WorkoutPhase: Equatable {
         case exercise
@@ -84,6 +100,7 @@ class GuidedWorkoutViewModel: ObservableObject {
         if currentSet >= exercise.sets {
             // All sets done for this exercise
             completedExercises.append(exercise.name)
+            saveCheckpoint()
 
             if currentExerciseIndex < totalExercises - 1 {
                 // Start rest before next exercise
@@ -95,6 +112,7 @@ class GuidedWorkoutViewModel: ObservableObject {
         } else {
             // More sets to do — brief inter-set rest
             currentSet += 1
+            saveCheckpoint()
             let interSetRest = min(exercise.restSeconds, 60)
             startRestTimer(seconds: interSetRest)
         }
@@ -106,6 +124,7 @@ class GuidedWorkoutViewModel: ObservableObject {
         SessionLogger.shared.logUserAction(.buttonTapped, action: "skipExercise",
                                             metadata: ["exercise": exercise.name])
         skippedExercises.append(exercise.name)
+        saveCheckpoint()
         moveToNextExercise()
     }
 
@@ -152,6 +171,79 @@ class GuidedWorkoutViewModel: ObservableObject {
         )
     }
 
+    /// End the workout early, marking remaining exercises as skipped.
+    func endWorkoutEarly() {
+        // Mark all remaining exercises (including current) as skipped
+        for i in currentExerciseIndex..<totalExercises {
+            let name = plan.exercises[i].name
+            if !completedExercises.contains(name) && !skippedExercises.contains(name) {
+                skippedExercises.append(name)
+            }
+        }
+        SessionLogger.shared.logUserAction(.buttonTapped, action: "endWorkoutEarly",
+                                            metadata: ["completed": "\(completedExercises.count)",
+                                                        "skipped": "\(skippedExercises.count)"])
+        finishWorkout()
+    }
+
+    /// Replace the current exercise with a substitute, updating the plan in-place.
+    func swapCurrentExercise(with substitute: RehabExercise, updatedPlan: RehabPlan) {
+        let originalName = currentExercise?.name ?? "Unknown"
+        self.plan = updatedPlan
+        substitutedExercises[originalName] = substitute.name
+        // Reset set counter since this is a new exercise
+        currentSet = 1
+    }
+
+    // MARK: - Checkpointing
+
+    /// Save current workout state so it can be resumed after a crash or interruption.
+    func saveCheckpoint() {
+        let checkpoint = WorkoutCheckpoint(
+            planId: plan.id.uuidString,
+            currentExerciseIndex: currentExerciseIndex,
+            currentSet: currentSet,
+            completedExercises: completedExercises,
+            skippedExercises: skippedExercises,
+            substitutedExercises: substitutedExercises,
+            accumulatedTime: isPaused ? accumulatedTime : accumulatedTime + Date().timeIntervalSince(lastResumeTime),
+            savedAt: Date()
+        )
+        if let data = try? JSONEncoder().encode(checkpoint) {
+            UserDefaults.standard.set(data, forKey: Self.checkpointKey)
+        }
+    }
+
+    /// Clear saved checkpoint (called on workout completion or discard).
+    func clearCheckpoint() {
+        UserDefaults.standard.removeObject(forKey: Self.checkpointKey)
+    }
+
+    /// Check if a saved checkpoint exists for the given plan.
+    static func savedCheckpoint(forPlanId planId: String) -> WorkoutCheckpoint? {
+        guard let data = UserDefaults.standard.data(forKey: checkpointKey),
+              let checkpoint = try? JSONDecoder().decode(WorkoutCheckpoint.self, from: data),
+              checkpoint.planId == planId,
+              // Discard checkpoints older than 24 hours
+              Date().timeIntervalSince(checkpoint.savedAt) < 86400 else {
+            return nil
+        }
+        return checkpoint
+    }
+
+    /// Restore state from a checkpoint.
+    func restoreFromCheckpoint(_ checkpoint: WorkoutCheckpoint) {
+        currentExerciseIndex = min(checkpoint.currentExerciseIndex, totalExercises - 1)
+        currentSet = checkpoint.currentSet
+        completedExercises = checkpoint.completedExercises
+        skippedExercises = checkpoint.skippedExercises
+        substitutedExercises = checkpoint.substitutedExercises
+        accumulatedTime = checkpoint.accumulatedTime
+        totalElapsedTime = accumulatedTime
+        lastResumeTime = Date()
+        phase = .exercise
+    }
+
     // MARK: - Private
 
     private func moveToNextExercise() {
@@ -174,6 +266,7 @@ class GuidedWorkoutViewModel: ObservableObject {
         stopTimer()
         elapsedSubscription?.cancel()
         elapsedSubscription = nil
+        clearCheckpoint()
         phase = .complete
 
         SessionLogger.shared.log(.stateUpdated, category: .stateChange, message: "Guided workout completed",

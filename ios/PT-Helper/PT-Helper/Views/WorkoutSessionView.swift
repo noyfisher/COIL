@@ -174,22 +174,31 @@ struct WorkoutSessionView: View {
                         )
                     } else {
                         SectionHeader(icon: "clock.arrow.circlepath", color: .blue, title: "Recent Sessions")
-
-                        ForEach(viewModel.sessions.reversed(), id: \.id) { session in
-                            sessionCard(for: session)
-                                .contextMenu {
-                                    Button(role: .destructive) {
-                                        sessionToDelete = session
-                                        showDeleteConfirmation = true
-                                    } label: {
-                                        Label("Delete Session", systemImage: "trash")
-                                    }
-                                }
-                        }
                     }
                 }
                 .padding(.horizontal, AppSpacing.xl)
                 .padding(.vertical, AppSpacing.md)
+
+                if !viewModel.sessions.isEmpty {
+                    List {
+                        ForEach(viewModel.sessions.reversed(), id: \.id) { session in
+                            sessionCard(for: session)
+                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                    Button(role: .destructive) {
+                                        sessionToDelete = session
+                                        showDeleteConfirmation = true
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
+                                }
+                                .listRowBackground(Color.clear)
+                                .listRowSeparator(.hidden)
+                                .listRowInsets(EdgeInsets(top: AppSpacing.xs, leading: AppSpacing.xl, bottom: AppSpacing.xs, trailing: AppSpacing.xl))
+                        }
+                    }
+                    .listStyle(.plain)
+                    .frame(minHeight: CGFloat(viewModel.sessions.count) * 90)
+                }
             }
             .scrollDismissesKeyboard(.interactively)
         }
@@ -200,11 +209,10 @@ struct WorkoutSessionView: View {
                 savedConfirmationOverlay
             }
         }
-        .confirmationDialog(
-            "Delete this workout session?",
-            isPresented: $showDeleteConfirmation,
-            titleVisibility: .visible
-        ) {
+        .alert("Delete Session", isPresented: $showDeleteConfirmation) {
+            Button("Cancel", role: .cancel) {
+                sessionToDelete = nil
+            }
             Button("Delete", role: .destructive) {
                 if let session = sessionToDelete {
                     withAnimation {
@@ -213,13 +221,8 @@ struct WorkoutSessionView: View {
                     sessionToDelete = nil
                 }
             }
-            Button("Cancel", role: .cancel) {
-                sessionToDelete = nil
-            }
         } message: {
-            if let session = sessionToDelete {
-                Text("This will permanently remove the session from \(session.date, style: .date). This action cannot be undone.")
-            }
+            Text("Are you sure you want to delete this workout session? This cannot be undone.")
         }
         .trackScreen("WorkoutSession")
     }

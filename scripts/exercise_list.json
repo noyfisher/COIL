@@ -1423,6 +1423,30 @@
       "target_area": "Rotator cuff, scapular stabilizers, core",
       "body_position": "standing",
       "pose_description": "Standing upright holding a resistance band with both hands. The exercise cycles through multiple positions: band pull-aparts at chest height, external rotation with elbows at sides, overhead press against band tension, and diagonal patterns. Throughout each movement, the shoulder blades are actively set down and back, the core is engaged, and the posture remains tall and aligned."
+    },
+    {
+      "name": "Downward Facing Dog",
+      "normalized_filename": "downward-facing-dog",
+      "category": "yoga",
+      "target_area": "Shoulders, Back, Hamstrings",
+      "body_position": "quadruped",
+      "pose_description": "Starting from hands and knees, the figure pushes hips up and back into an inverted V shape. Arms are straight and extended overhead pressing into the floor, head between the upper arms looking toward the feet. Legs are straight with heels pressing toward the ground. Back is flat forming a straight line from hands to hips."
+    },
+    {
+      "name": "Lat Stretches",
+      "normalized_filename": "lat-stretches",
+      "category": "stretch",
+      "target_area": "Upper Back, Lats",
+      "body_position": "standing",
+      "pose_description": "Standing upright, the figure reaches one arm overhead and leans to the opposite side, creating a long stretch along the side of the torso from hip to fingertips. The other arm hangs naturally at the side. Feet are shoulder-width apart with a slight lateral bend in the torso."
+    },
+    {
+      "name": "Lateral Lunge with Reach",
+      "normalized_filename": "lateral-lunge-with-reach",
+      "category": "mobility",
+      "target_area": "Hips, Inner Thigh, Core",
+      "body_position": "standing",
+      "pose_description": "The figure takes a wide step to one side, bending that knee while keeping the other leg straight. The torso leans slightly forward and the opposite arm reaches toward the bent knee foot. The straight leg inner thigh is stretched. Weight is on the bent leg with the foot flat on the ground."
     }
   ]
 }

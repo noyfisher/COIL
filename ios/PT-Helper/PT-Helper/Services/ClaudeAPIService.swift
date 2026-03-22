@@ -52,6 +52,8 @@ enum AIRequestType: String, Encodable {
     case analysis
     case analysis_verify
     case rehab_plan
+    case exercise_substitute
+    case recovery_insights
 }
 
 struct ClaudeProxyRequest: Encodable {
@@ -183,6 +185,8 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
         do {
             claudeResponse = try JSONDecoder().decode(ClaudeResponse.self, from: data)
         } catch {
+            let rawBody = String(data: data, encoding: .utf8) ?? "<non-UTF8>"
+            AppLogger.api.error("ClaudeResponse decode failed. Raw body (\(data.count) bytes): \(rawBody.prefix(500))")
             throw ClaudeAPIError.decodingError(error)
         }
 

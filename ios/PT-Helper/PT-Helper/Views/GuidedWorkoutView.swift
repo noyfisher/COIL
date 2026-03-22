@@ -5,7 +5,12 @@ import SwiftUI
 struct GuidedWorkoutView: View {
     @StateObject private var vm: GuidedWorkoutViewModel
     @EnvironmentObject private var workoutViewModel: WorkoutViewModel
+    @EnvironmentObject private var savedPlansVM: SavedPlansViewModel
     @Environment(\.dismiss) private var dismiss
+    @State private var showSwapSheet = false
+    @State private var showEndConfirmation = false
+    @State private var showResumePrompt = false
+    @State private var savedCheckpoint: GuidedWorkoutViewModel.WorkoutCheckpoint?
 
     init(plan: RehabPlan) {
         _vm = StateObject(wrappedValue: GuidedWorkoutViewModel(plan: plan))
@@ -35,7 +40,7 @@ struct GuidedWorkoutView: View {
             if vm.phase != .complete {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("End") {
-                        vm.skipExercise() // ends current, will cascade to complete if last
+                        showEndConfirmation = true
                     }
                     .foregroundColor(.red)
                 }
@@ -48,6 +53,42 @@ struct GuidedWorkoutView: View {
             }
         }
         .trackScreen("GuidedWorkout")
+        .onAppear {
+            if let checkpoint = GuidedWorkoutViewModel.savedCheckpoint(forPlanId: vm.plan.id.uuidString) {
+                savedCheckpoint = checkpoint
+                showResumePrompt = true
+            }
+        }
+        .alert("Resume Workout?", isPresented: $showResumePrompt) {
+            Button("Resume") {
+                if let checkpoint = savedCheckpoint {
+                    vm.restoreFromCheckpoint(checkpoint)
+                }
+            }
+            Button("Start Fresh", role: .destructive) {
+                vm.clearCheckpoint()
+            }
+        } message: {
+            if let checkpoint = savedCheckpoint {
+                Text("You have an incomplete workout with \(checkpoint.completedExercises.count) exercise(s) completed. Would you like to continue where you left off?")
+            }
+        }
+        .alert("End Workout?", isPresented: $showEndConfirmation) {
+            Button("End & Save", role: .destructive) {
+                vm.endWorkoutEarly()
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("Your completed exercises will be saved. This cannot be undone.")
+        }
+        .sheet(isPresented: $showSwapSheet) {
+            if let exercise = vm.currentExercise {
+                ExerciseSwapSheet(exercise: exercise, plan: vm.plan) { substitute, updatedPlan in
+                    vm.swapCurrentExercise(with: substitute, updatedPlan: updatedPlan)
+                    showSwapSheet = false
+                }
+            }
+        }
     }
 
     // MARK: - Exercise Phase
@@ -123,6 +164,14 @@ struct GuidedWorkoutView: View {
                             }
                         }
                         .buttonStyle(PrimaryButtonStyle())
+
+                        Button(action: { showSwapSheet = true }) {
+                            HStack(spacing: AppSpacing.sm) {
+                                Image(systemName: "arrow.triangle.2.circlepath")
+                                Text("Swap Exercise")
+                            }
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
 
                         Button(action: {
                             vm.skipExercise()

@@ -30,6 +30,33 @@ private struct AIRehabExercise: Decodable {
     let imageFileName: String?
 }
 
+// MARK: - Rehab Plan Preferences
+
+struct RehabPlanPreferences {
+    enum Equipment: String, CaseIterable {
+        case none = "No equipment"
+        case bands = "Resistance bands"
+        case dumbbells = "Dumbbells"
+        case fullGym = "Full gym"
+    }
+
+    enum SessionLength: String, CaseIterable {
+        case short = "15 min"
+        case medium = "30 min"
+        case long = "45 min"
+    }
+
+    enum DifficultyPreference: String, CaseIterable {
+        case gentle = "Gentle"
+        case moderate = "Moderate"
+        case challenging = "Challenging"
+    }
+
+    var equipment: Equipment = .none
+    var sessionLength: SessionLength = .medium
+    var difficulty: DifficultyPreference = .moderate
+}
+
 @MainActor
 class RehabPlanViewModel: ObservableObject {
     @Published var rehabPlan: RehabPlan?
@@ -39,6 +66,7 @@ class RehabPlanViewModel: ObservableObject {
     @Published var saveError: String? = nil
     @Published var isGenerating: Bool = false
     @Published var generationError: String? = nil
+    @Published var preferences = RehabPlanPreferences()
 
     // MARK: - Exercise Verification State
     /// Verification status for each exercise (keyed by exercise name)
@@ -96,6 +124,7 @@ class RehabPlanViewModel: ObservableObject {
 
     /// Generate a rehab plan using AI, with fallback to hardcoded database
     func generateRehabPlan(from analysisResult: AnalysisResult) {
+        guard !isGenerating else { return }
         let conditions = analysisResult.conditions.map { $0.conditionName }
 
         isGenerating = true
@@ -434,7 +463,13 @@ class RehabPlanViewModel: ObservableObject {
             message += "  Explanation: \(condition.explanation)\n"
         }
 
-        message += "\nPlease create a personalized rehabilitation exercise plan for this patient."
+        // User preferences
+        message += "\nPATIENT PREFERENCES:"
+        message += "\n- Available Equipment: \(preferences.equipment.rawValue)"
+        message += "\n- Preferred Session Length: \(preferences.sessionLength.rawValue)"
+        message += "\n- Difficulty Preference: \(preferences.difficulty.rawValue)"
+
+        message += "\nPlease create a personalized rehabilitation exercise plan for this patient, taking into account their equipment availability, preferred session length, and difficulty preference."
 
         return message
     }

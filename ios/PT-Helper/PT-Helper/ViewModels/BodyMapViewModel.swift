@@ -5,6 +5,7 @@ import FirebaseAuth
 class BodyMapViewModel: ObservableObject {
     @Published var regions: [BodyRegion] = []
     @Published var currentSide: BodySide = .front
+    @Published var activeZone: BodyZone?
 
     /// User profile sourced from the shared UserProfileService (single Firestore read).
     var userProfile: UserProfile {
@@ -43,6 +44,17 @@ class BodyMapViewModel: ObservableObject {
     /// All selected regions across both sides (passed to PainDetailView).
     var selectedRegions: [BodyRegion] {
         regions.filter { $0.isSelected }
+    }
+
+    /// Regions belonging to a specific zone.
+    func regions(in zone: BodyZone) -> [BodyRegion] {
+        let keys = Set(zone.regionZoneKeys)
+        return regions.filter { keys.contains($0.zoneKey) }
+    }
+
+    /// Count of selected regions within a zone.
+    func selectedCount(in zone: BodyZone) -> Int {
+        regions(in: zone).filter(\.isSelected).count
     }
 
     private func loadRegions() {

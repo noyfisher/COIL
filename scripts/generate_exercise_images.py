@@ -346,6 +346,31 @@ _CUSTOM_VISUAL_PROMPTS = {
         ),
         "angle": "side profile",
     },
+    "downward-facing-dog": {
+        "description": (
+            "His body forms an inverted V shape, like an upside-down letter V. "
+            "His hands are flat on the floor shoulder-width apart, arms straight. "
+            "His hips are pushed high up toward the ceiling, the highest point of "
+            "his body. His legs are straight with heels pressing toward the floor. "
+            "His head hangs between his upper arms, looking back toward his feet. "
+            "His back is flat and straight from hands to hips. He is NOT on his "
+            "knees — his knees are straight and locked. Only his hands and feet "
+            "touch the ground."
+        ),
+        "angle": "side profile",
+    },
+    "lateral-lunge-with-reach": {
+        "description": (
+            "Standing with feet wide apart in a lateral side lunge. His right "
+            "foot is planted and his right knee is deeply bent, sitting his hips "
+            "back over the right foot. His left leg is completely straight, "
+            "extended out to his left side with the foot flat on the ground. "
+            "His torso leans forward and his left hand reaches down toward his "
+            "right foot. This is a SIDE lunge — his feet are spread to the "
+            "LEFT and RIGHT, not forward and backward."
+        ),
+        "angle": "front-facing",
+    },
 }
 
 

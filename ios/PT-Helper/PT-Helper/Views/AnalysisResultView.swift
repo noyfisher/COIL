@@ -6,6 +6,8 @@ struct AnalysisResultView: View {
     var redFlagAlerts: [ValidationWarning] = []
     @State private var showRehabPlan = false
     @State private var expandedConditions: Set<String> = []
+    @State private var showConfidenceInfo = false
+    @State private var showPreferencesSheet = false
     @Environment(\.dismiss) private var dismiss
     /// Prefetched rehab plan VM — generation starts as soon as this view appears
     @StateObject private var rehabVM = RehabPlanViewModel()
@@ -42,12 +44,18 @@ struct AnalysisResultView: View {
         .navigationDestination(isPresented: $showRehabPlan) {
             RehabPlanView(viewModel: rehabVM, analysisResult: analysisResult)
         }
-        .onAppear {
-            // Start generating the rehab plan in the background while the user
-            // reads their analysis results — eliminates the second wait.
-            rehabVM.generateRehabPlan(from: analysisResult)
+        .sheet(isPresented: $showPreferencesSheet) {
+            rehabPreferencesSheet
+        }
+        .alert("About Match Strength", isPresented: $showConfidenceInfo) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Match strength is capped at 85% because AI analysis should always be verified by a healthcare professional. A \"Strong\" match means your symptoms closely align with this condition.")
         }
         .trackScreen("AnalysisResult")
+        .onAppear {
+            AnalysisResultStore.shared.save(analysisResult)
+        }
     }
 
     // MARK: - Filtered Warnings
@@ -151,6 +159,12 @@ struct AnalysisResultView: View {
                             Text(strength.rawValue)
                                 .font(.caption.weight(.medium))
                                 .foregroundColor(matchColor(strength))
+
+                            Button(action: { showConfidenceInfo = true }) {
+                                Image(systemName: "info.circle")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
                         }
                         .accessibilityElement(children: .combine)
                         .accessibilityLabel("\(condition.commonName), \(strength.rawValue)")
@@ -320,7 +334,7 @@ struct AnalysisResultView: View {
     // MARK: - Buttons
 
     private var buildRehabPlanButton: some View {
-        Button(action: { showRehabPlan = true }) {
+        Button(action: { showPreferencesSheet = true }) {
             HStack(spacing: AppSpacing.sm) {
                 Image(systemName: "figure.run")
                 Text("Build Rehab Plan")
@@ -328,6 +342,80 @@ struct AnalysisResultView: View {
         }
         .buttonStyle(PrimaryButtonStyle())
         .padding(.top, AppSpacing.lg)
+    }
+
+    // MARK: - Preferences Sheet
+
+    private var rehabPreferencesSheet: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: AppSpacing.xl) {
+                    // Equipment
+                    CardSection(icon: "dumbbell.fill", color: .blue, title: "Available Equipment") {
+                        FlowLayout(spacing: AppSpacing.sm) {
+                            ForEach(RehabPlanPreferences.Equipment.allCases, id: \.self) { option in
+                                ChipButton(
+                                    label: option.rawValue,
+                                    isSelected: rehabVM.preferences.equipment == option,
+                                    action: { rehabVM.preferences.equipment = option }
+                                )
+                            }
+                        }
+                    }
+
+                    // Session length
+                    CardSection(icon: "clock.fill", color: .purple, title: "Session Length") {
+                        FlowLayout(spacing: AppSpacing.sm) {
+                            ForEach(RehabPlanPreferences.SessionLength.allCases, id: \.self) { option in
+                                ChipButton(
+                                    label: option.rawValue,
+                                    isSelected: rehabVM.preferences.sessionLength == option,
+                                    action: { rehabVM.preferences.sessionLength = option }
+                                )
+                            }
+                        }
+                    }
+
+                    // Difficulty
+                    CardSection(icon: "speedometer", color: .orange, title: "Difficulty Level") {
+                        FlowLayout(spacing: AppSpacing.sm) {
+                            ForEach(RehabPlanPreferences.DifficultyPreference.allCases, id: \.self) { option in
+                                ChipButton(
+                                    label: option.rawValue,
+                                    isSelected: rehabVM.preferences.difficulty == option,
+                                    action: { rehabVM.preferences.difficulty = option }
+                                )
+                            }
+                        }
+                    }
+
+                    Button(action: {
+                        showPreferencesSheet = false
+                        rehabVM.generateRehabPlan(from: analysisResult)
+                        showRehabPlan = true
+                    }) {
+                        HStack(spacing: AppSpacing.sm) {
+                            Image(systemName: "sparkles")
+                            Text("Generate Plan")
+                        }
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                }
+                .padding(.horizontal, AppSpacing.xl)
+                .padding(.vertical, AppSpacing.md)
+            }
+            .navigationTitle("Plan Preferences")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Skip") {
+                        showPreferencesSheet = false
+                        rehabVM.generateRehabPlan(from: analysisResult)
+                        showRehabPlan = true
+                    }
+                }
+            }
+        }
     }
 
     private var navigationButtons: some View {

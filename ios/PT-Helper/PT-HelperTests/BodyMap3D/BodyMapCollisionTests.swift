@@ -14,18 +14,11 @@ import RealityKit
 @MainActor
 final class BodyMapCollisionTests: XCTestCase {
 
-    // ── Proxy config (must match BodyMap3DView) ──────────────────────
-    private let proxyPrefix = "_proxy_"
-    private let proxyRadii: [String: Float] = [
-        "knee": 0.025,
-        "elbow": 0.018,
-        "ankle_foot": 0.035,
-        "wrist_hand": 0.018,
-        "neck": 0.025,
-        "shoulder": 0.022,
-    ]
-    private let proxyForwardBias: Float = 0.02
-    private let ankleProxyLateralBias: Float = 0.015
+    // ── Proxy config (shared via BodyMapConstants) ─────────────────
+    private let proxyPrefix = BodyMapConstants.proxyPrefix
+    private let proxyRadii = BodyMapConstants.proxyRadii
+    private let proxyForwardBias = BodyMapConstants.proxyForwardBias
+    private let ankleProxyLateralBias = BodyMapConstants.ankleProxyLateralBias
 
     // ── Test state ───────────────────────────────────────────────────
     private var bodyEntity: Entity!
@@ -87,9 +80,8 @@ final class BodyMapCollisionTests: XCTestCase {
 
             var proxyZ = center.z
             if baseKey == "knee" {
-                proxyZ = bounds.min.z + bounds.extents.z * 0.2
+                proxyZ = bounds.min.z + bounds.extents.z * BodyMapConstants.kneeCapHeightFraction
             } else if baseKey == "ankle_foot" {
-                // Center capsule on the ankle zone
                 proxyZ = center.z
             }
 
@@ -113,8 +105,7 @@ final class BodyMapCollisionTests: XCTestCase {
             )
 
             if baseKey == "ankle_foot" {
-                // Vertical capsule covering full foot-to-ankle zone
-                let capsuleHeight = bounds.extents.z * 0.5
+                let capsuleHeight = bounds.extents.z * BodyMapConstants.ankleCapsuleHeightFraction
                 let shape = ShapeResource.generateCapsule(height: capsuleHeight, radius: radius)
                 proxy.components.set(CollisionComponent(shapes: [shape]))
                 // Rotate capsule from Y-aligned to Z-aligned (vertical in local space)
@@ -131,9 +122,7 @@ final class BodyMapCollisionTests: XCTestCase {
     }
 
     private func regionBaseKey(_ zoneKey: String) -> String {
-        if zoneKey.hasPrefix("left_") { return String(zoneKey.dropFirst(5)) }
-        if zoneKey.hasPrefix("right_") { return String(zoneKey.dropFirst(6)) }
-        return zoneKey
+        BodyMapConstants.regionBaseKey(zoneKey)
     }
 
     // MARK: - Raycast Helpers (world space: X=left/right, Y=height, Z=depth)
@@ -241,7 +230,7 @@ final class BodyMapCollisionTests: XCTestCase {
         }
 
         let bounds = kneeEntity.visualBounds(relativeTo: bodyEntity)
-        let expectedZ = bounds.min.z + bounds.extents.z * 0.2
+        let expectedZ = bounds.min.z + bounds.extents.z * BodyMapConstants.kneeCapHeightFraction
         let proxyZ = proxy.position(relativeTo: bodyEntity).z
 
         let tolerance = bounds.extents.z * 0.15
@@ -375,7 +364,7 @@ final class BodyMapCollisionTests: XCTestCase {
         let bounds = ankleEntity.visualBounds(relativeTo: bodyEntity)
         let proxyZ = proxy.position(relativeTo: bodyEntity).z
         let radius = proxyRadii["ankle_foot"]!
-        let capsuleHeight = bounds.extents.z * 0.5
+        let capsuleHeight = bounds.extents.z * BodyMapConstants.ankleCapsuleHeightFraction
 
         // Capsule total coverage: center ± (capsuleHeight/2 + radius)
         let capsuleTop = proxyZ + capsuleHeight / 2 + radius

@@ -3,6 +3,7 @@ import Charts
 
 struct ProgressChartView: View {
     @EnvironmentObject private var viewModel: WorkoutViewModel
+    @EnvironmentObject private var insightsVM: RecoveryInsightsViewModel
     @State private var selectedRegion: String? = nil
 
     var body: some View {
@@ -23,6 +24,9 @@ struct ProgressChartView: View {
                         regionFilterPicker
                         painTrendChart
                         summaryStats
+
+                        // AI Recovery Insights
+                        RecoveryInsightsCardView(vm: insightsVM)
                     }
                     .padding(.horizontal, AppSpacing.xl)
                     .padding(.vertical, AppSpacing.md)

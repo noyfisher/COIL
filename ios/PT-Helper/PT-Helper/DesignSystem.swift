@@ -44,6 +44,23 @@ enum AppColors {
     static let elevatedSurface = Color(.secondarySystemGroupedBackground)
     static let inputBackground = Color(.systemGray6)
     static let subtleBorder = Color(.systemGray5)
+
+    // MARK: Dashboard Dark Theme
+    static let dashBackground = Color(red: 0.059, green: 0.078, blue: 0.098)       // #0F1419
+    static let dashSurface = Color(red: 0.102, green: 0.122, blue: 0.180)          // #1A1F2E
+    static let dashAccent = Color(red: 0.0, green: 0.831, blue: 1.0)               // #00D4FF
+    static let dashSecondaryAccent = Color(red: 0.0, green: 0.6, blue: 0.8)        // #0099CC
+    static let dashBorder = Color.white.opacity(0.08)
+    static let dashTextPrimary = Color.white
+    static let dashTextSecondary = Color.white.opacity(0.6)
+    static let dashSuccess = Color(red: 0.0, green: 0.88, blue: 0.46)              // #00E076
+    static let dashWarning = Color(red: 1.0, green: 0.76, blue: 0.0)               // #FFC200
+    static let dashDanger = Color(red: 1.0, green: 0.34, blue: 0.34)               // #FF5757
+    static let dashAccentGradient = LinearGradient(
+        colors: [Color(red: 0.0, green: 0.831, blue: 1.0), Color(red: 0.0, green: 0.6, blue: 0.8)],
+        startPoint: .leading,
+        endPoint: .trailing
+    )
 }
 
 enum AppSpacing {
@@ -74,6 +91,12 @@ enum AppFonts {
     static let cardTitle = Font.body.weight(.semibold)
     static let statNumber = Font.system(size: 28, weight: .bold, design: .rounded)
     static let badge = Font.caption2.weight(.semibold)
+
+    // MARK: Dashboard Data Typography (SF Mono)
+    static let dataLarge = Font.system(size: 28, weight: .bold, design: .monospaced)
+    static let dataMedium = Font.system(size: 18, weight: .semibold, design: .monospaced)
+    static let dataSmall = Font.system(size: 13, weight: .medium, design: .monospaced)
+    static let dashLabel = Font.system(size: 11, weight: .semibold)
 }
 
 // MARK: - Animation Presets

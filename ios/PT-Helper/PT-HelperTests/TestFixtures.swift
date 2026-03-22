@@ -289,6 +289,40 @@ enum TestFixtures {
         """
     }
 
+    // MARK: - Exercise Substitute Response
+
+    /// Returns a valid JSON string matching the expected AI exercise substitute response format.
+    static func makeSubstituteResponseJSON(count: Int = 2) -> String {
+        let subs = (0..<count).map { i in
+            """
+            {
+                "name": "Substitute Exercise \(i + 1)",
+                "targetArea": "Knee",
+                "description": "Alternative exercise \(i + 1) for knee rehab",
+                "sets": 3,
+                "reps": "10-12",
+                "restSeconds": 30,
+                "difficulty": "beginner",
+                "demonstrationIcon": "figure.cooldown",
+                "tips": ["Keep proper form", "Move slowly"],
+                "contraindications": ["Stop if pain increases"],
+                "startPosition": "Stand upright with feet shoulder-width apart",
+                "movement": "Slowly bend and straighten your knee",
+                "endPosition": "Return to standing position",
+                "exerciseCategory": "strength",
+                "imageFileName": "substitute-exercise-\(i + 1)",
+                "whyItHelps": "This targets the same muscles with less joint stress"
+            }
+            """
+        }.joined(separator: ",\n")
+
+        return """
+        {
+            "substitutes": [\(subs)]
+        }
+        """
+    }
+
     // MARK: - Knowledge Graph Test Data
 
     /// Creates a minimal KnowledgeGraph for unit tests.
@@ -346,6 +380,74 @@ enum TestFixtures {
                 )
             ]
         )
+    }
+
+    // MARK: - Workout Session
+
+    static func makeSession(
+        planId: UUID? = nil,
+        daysAgo: Int = 0,
+        painLevel: Double = 4.0,
+        exercisesPerformed: [String] = ["Wall Sits", "Quad Sets"],
+        isCompleted: Bool = true
+    ) -> WorkoutSession {
+        WorkoutSession(
+            id: UUID(),
+            date: Calendar.current.date(byAdding: .day, value: -daysAgo, to: Date())!,
+            duration: 1800,
+            painLevel: painLevel,
+            isCompleted: isCompleted,
+            exercisesPerformed: exercisesPerformed,
+            planId: planId
+        )
+    }
+
+    // MARK: - Recovery Insights Response
+
+    /// Returns a valid JSON string matching the expected AI recovery insights response format.
+    static func makeRecoveryInsightsResponseJSON(
+        headline: String = "Great Progress This Week",
+        trendDirection: String = "improving"
+    ) -> String {
+        """
+        {
+            "headline": "\(headline)",
+            "summary": "Your recovery is on track. Pain levels have decreased and you're maintaining good consistency.",
+            "painAnalysis": {
+                "trendDirection": "\(trendDirection)",
+                "trendDescription": "Pain dropped from 5.2 to 3.8 over the past 2 weeks",
+                "averagePain": 4.2,
+                "regionBreakdown": [
+                    {"region": "right_knee", "trend": "improving", "averagePain": 3.5}
+                ]
+            },
+            "adherenceAnalysis": {
+                "score": 85,
+                "sessionsCompleted": 5,
+                "sessionsExpected": 6,
+                "description": "You completed 5 of 6 expected sessions this period"
+            },
+            "keyWins": [
+                "Completed all exercises in 3 of 5 sessions",
+                "Pain decreased by 1.4 points on average"
+            ],
+            "focusAreas": [
+                "Try to maintain more consistent rest days between sessions"
+            ],
+            "recommendations": [
+                {
+                    "icon": "figure.cooldown",
+                    "title": "Add Cool-Down Stretches",
+                    "description": "Spending 5 minutes stretching after workouts can help reduce soreness"
+                },
+                {
+                    "icon": "drop.fill",
+                    "title": "Stay Hydrated",
+                    "description": "Drink water before, during, and after your sessions"
+                }
+            ]
+        }
+        """
     }
 
     /// Creates a mock cross-model verification response JSON string.

@@ -99,6 +99,7 @@ class InjuryAnalysisViewModel: ObservableObject {
     }
 
     private func startAnalysis() {
+        guard !isAnalyzing else { return }
         let completed = assessments.compactMap { $0 }
         guard !completed.isEmpty else {
             AppLogger.rehab.error("startAnalysis called with no completed assessments")

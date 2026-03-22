@@ -5,8 +5,11 @@ struct RehabPlanView: View {
     var existingPlan: RehabPlan? = nil
     @ObservedObject var viewModel: RehabPlanViewModel
     @EnvironmentObject private var savedPlansVM: SavedPlansViewModel
+    @EnvironmentObject private var workoutViewModel: WorkoutViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var showEditSheet = false
+    @State private var showSwapSheet = false
+    @State private var exerciseToSwap: RehabExercise?
     @State private var showReAssessment = false
     @State private var showReAssessmentComparison = false
     @StateObject private var reAssessmentVM = ReAssessmentViewModel()
@@ -14,6 +17,9 @@ struct RehabPlanView: View {
     @State private var reAssessmentRegionPain: [String: Double] = [:]
     /// Cached PDF data to avoid regenerating on every view body evaluation
     @State private var cachedPDFData: Data?
+    /// Adaptive progression recommendation
+    @State private var adaptiveRecommendation: ProgressionRecommendation?
+    @State private var showProgressionBanner = true
 
     /// Init for analysis flow — accepts a prefetched ViewModel (generation already in progress)
     init(viewModel: RehabPlanViewModel, analysisResult: AnalysisResult) {
@@ -50,6 +56,19 @@ struct RehabPlanView: View {
                         // Week progress banner (for saved plans with startDate)
                         if analysisResult == nil, let week = plan.currentWeek {
                             weekProgressBanner(week: week, totalWeeks: plan.totalWeeks)
+                        }
+
+                        // Adaptive progression recommendation
+                        if analysisResult == nil,
+                           plan.startDate != nil,
+                           showProgressionBanner,
+                           let recommendation = adaptiveRecommendation,
+                           recommendation.action != .insufficientData {
+                            AdaptiveProgressionBannerView(
+                                recommendation: recommendation,
+                                onApply: { applyProgression() },
+                                onDismiss: { withAnimation { showProgressionBanner = false } }
+                            )
                         }
 
                         // Start Plan button (for saved plans not yet started)
@@ -121,6 +140,9 @@ struct RehabPlanView: View {
             }
         }
         .navigationTitle("Rehab Plan")
+        .navigationBarBackButtonHidden(viewModel.isGenerating)
+        .interactiveDismissDisabled(viewModel.isGenerating)
+        .gesture(viewModel.isGenerating ? DragGesture() : nil)
         .toolbar {
             if analysisResult == nil, let plan = viewModel.rehabPlan {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -142,7 +164,7 @@ struct RehabPlanView: View {
             }
         }
         .sheet(isPresented: $showEditSheet) {
-            if var plan = viewModel.rehabPlan {
+            if let plan = viewModel.rehabPlan {
                 EditRehabPlanView(
                     plan: Binding(
                         get: { viewModel.rehabPlan ?? plan },
@@ -157,6 +179,16 @@ struct RehabPlanView: View {
                 )
             }
         }
+        .sheet(isPresented: $showSwapSheet) {
+            if let exercise = exerciseToSwap, let plan = viewModel.rehabPlan {
+                ExerciseSwapSheet(exercise: exercise, plan: plan) { _, updatedPlan in
+                    viewModel.rehabPlan = updatedPlan
+                    showSwapSheet = false
+                    // Regenerate cached PDF after swap
+                    cachedPDFData = PDFExportService.generatePDF(for: updatedPlan)
+                }
+            }
+        }
         .sheet(isPresented: $showReAssessment) {
             reAssessmentSheet
         }
@@ -169,6 +201,13 @@ struct RehabPlanView: View {
                 }
             }
             Task { await reAssessmentVM.loadAssessments() }
+            // Adaptive progression: analyze sessions for saved plans with a start date
+            if let plan = viewModel.rehabPlan, plan.startDate != nil, analysisResult == nil {
+                adaptiveRecommendation = AdaptiveProgressionAnalyzer.analyze(
+                    sessions: workoutViewModel.sessions,
+                    plan: plan
+                )
+            }
         }
         .onChange(of: viewModel.rehabPlan?.id) { _, _ in
             // Generate PDF once when plan becomes available (not on every render)
@@ -445,6 +484,14 @@ struct RehabPlanView: View {
                     exerciseCard(for: exercise)
                 }
                 .buttonStyle(.plain)
+                .contextMenu {
+                    Button(action: {
+                        exerciseToSwap = exercise
+                        showSwapSheet = true
+                    }) {
+                        Label("Swap Exercise", systemImage: "arrow.triangle.2.circlepath")
+                    }
+                }
             }
         }
     }
@@ -504,9 +551,27 @@ struct RehabPlanView: View {
                 }
             }
 
-            Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(.gray.opacity(0.5))
+            VStack(spacing: AppSpacing.sm) {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(.gray.opacity(0.5))
+
+                // Visible swap button (only for saved plans)
+                if analysisResult == nil {
+                    Button(action: {
+                        exerciseToSwap = exercise
+                        showSwapSheet = true
+                    }) {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                            .font(.caption)
+                            .foregroundColor(.blue)
+                            .frame(width: 28, height: 28)
+                            .background(Color.blue.opacity(0.1))
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
         }
         .padding(AppSpacing.lg)
         .background(AppColors.cardBackground)
@@ -689,6 +754,25 @@ struct RehabPlanView: View {
             }
         }
         .buttonStyle(SecondaryButtonStyle())
+    }
+
+    // MARK: - Adaptive Progression
+
+    private func applyProgression() {
+        guard let recommendation = adaptiveRecommendation,
+              var plan = viewModel.rehabPlan else { return }
+        plan = AdaptiveProgressionAnalyzer.applyProgression(recommendation.action, to: plan)
+        viewModel.rehabPlan = plan
+        savedPlansVM.updatePlan(plan)
+        cachedPDFData = PDFExportService.generatePDF(for: plan)
+        adaptiveRecommendation = nil
+
+        let impact = UIImpactFeedbackGenerator(style: .medium)
+        impact.impactOccurred()
+
+        SessionLogger.shared.logUserAction(.buttonTapped, action: "applyProgression",
+                                            metadata: ["action": recommendation.action.rawValue,
+                                                        "confidence": recommendation.confidence.rawValue])
     }
 
     // MARK: - Week Progress

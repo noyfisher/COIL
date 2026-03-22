@@ -10,6 +10,8 @@ struct GuidedWorkoutSummaryView: View {
     @State private var regionPainLevels: [String: Double] = [:]
     @State private var notes: String = ""
     @State private var showSavedConfirmation = false
+    @State private var isSaved = false
+    @State private var insightText: String?
 
     var body: some View {
         ScrollView {
@@ -19,6 +21,21 @@ struct GuidedWorkoutSummaryView: View {
 
                 // Workout stats
                 statsGrid
+
+                // Adaptive progression insight
+                if let insight = insightText {
+                    HStack(spacing: AppSpacing.sm) {
+                        Image(systemName: "lightbulb.fill")
+                            .foregroundColor(.yellow)
+                        Text(insight)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(AppSpacing.md)
+                    .background(Color.yellow.opacity(0.08))
+                    .cornerRadius(AppCorners.medium)
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+                }
 
                 // Pain input
                 CardSection(icon: "waveform.path.ecg", color: painColor, title: "How do you feel?") {
@@ -61,14 +78,24 @@ struct GuidedWorkoutSummaryView: View {
                         .cornerRadius(AppCorners.medium)
                 }
 
-                // Save button
-                Button(action: saveSession) {
-                    HStack(spacing: AppSpacing.sm) {
-                        Image(systemName: "checkmark.circle.fill")
-                        Text("Save & Done")
+                // Save / Done button
+                if isSaved {
+                    Button(action: { dismiss() }) {
+                        HStack(spacing: AppSpacing.sm) {
+                            Image(systemName: "checkmark.circle.fill")
+                            Text("Done")
+                        }
                     }
+                    .buttonStyle(PrimaryButtonStyle())
+                } else {
+                    Button(action: saveSession) {
+                        HStack(spacing: AppSpacing.sm) {
+                            Image(systemName: "checkmark.circle.fill")
+                            Text("Save & Done")
+                        }
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
                 }
-                .buttonStyle(PrimaryButtonStyle())
 
                 Spacer(minLength: 40)
             }
@@ -85,6 +112,25 @@ struct GuidedWorkoutSummaryView: View {
             }
         }
         .trackScreen("GuidedWorkoutSummary")
+        .onAppear {
+            // Compute trajectory insight from previous sessions for this plan
+            let planSessions = workoutViewModel.sessions
+                .filter { $0.planId == vm.plan.id }
+                .sorted { $0.date < $1.date }
+            guard planSessions.count >= 2 else { return }
+            let recentPain = planSessions.suffix(3).map(\.painLevel)
+            let avgPain = recentPain.reduce(0, +) / Double(recentPain.count)
+            if planSessions.count >= 3 {
+                let earlyPain = planSessions.prefix(min(3, planSessions.count / 2)).map(\.painLevel)
+                let earlyAvg = earlyPain.reduce(0, +) / Double(earlyPain.count)
+                let delta = avgPain - earlyAvg
+                if delta <= -1.0 {
+                    insightText = "Your recent pain is trending down (avg \(String(format: "%.1f", avgPain))/10). Great progress!"
+                } else if delta >= 1.0 {
+                    insightText = "Pain has been trending up recently (avg \(String(format: "%.1f", avgPain))/10). Listen to your body."
+                }
+            }
+        }
     }
 
     // MARK: - Celebration Header
@@ -170,6 +216,7 @@ struct GuidedWorkoutSummaryView: View {
             notes: notes
         )
         workoutViewModel.addSession(session: session)
+        isSaved = true
 
         let notification = UINotificationFeedbackGenerator()
         notification.notificationOccurred(.success)
@@ -177,8 +224,11 @@ struct GuidedWorkoutSummaryView: View {
         withAnimation(AppAnimations.bouncy) {
             showSavedConfirmation = true
         }
+        // Hide celebration overlay after 2 seconds, but keep user on screen
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            dismiss()
+            withAnimation {
+                showSavedConfirmation = false
+            }
         }
     }
 

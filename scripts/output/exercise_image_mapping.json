@@ -1060,5 +1060,23 @@
     "filename": "banded-shoulder-stabilizer-series.png",
     "category": "strength",
     "target_area": "Rotator cuff, scapular stabilizers, core"
+  },
+  "downward-facing-dog": {
+    "name": "Downward Facing Dog",
+    "filename": "downward-facing-dog.png",
+    "category": "yoga",
+    "target_area": "Shoulders, Back, Hamstrings"
+  },
+  "lat-stretches": {
+    "name": "Lat Stretches",
+    "filename": "lat-stretches.png",
+    "category": "stretch",
+    "target_area": "Upper Back, Lats"
+  },
+  "lateral-lunge-with-reach": {
+    "name": "Lateral Lunge with Reach",
+    "filename": "lateral-lunge-with-reach.png",
+    "category": "mobility",
+    "target_area": "Hips, Inner Thigh, Core"
   }
 }

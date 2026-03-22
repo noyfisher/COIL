@@ -109,7 +109,10 @@ RULES:
 - Flag red flags: cauda equina, fractures, infections, spinal cord issues, night pain without relief, sudden weakness, chest pain. Write the redFlagMessage in urgent but clear language
 - For redFlagMessage: use a clear urgent message if isRedFlag is true, or an empty string "" if false
 - disclaimerText must always be: "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
-${CLINICAL_KNOWLEDGE_BASE}`,
+${CLINICAL_KNOWLEDGE_BASE}
+
+RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure:
+{"conditions":[{"conditionName":"...","commonName":"...","confidence":0,"explanation":"...","whatItMeans":"...","howToManage":"...","isRedFlag":false,"redFlagMessage":"","nextSteps":["..."]}],"overallSummary":"...","disclaimerText":"..."}`,
 
   analysis_verify: `You are a clinical verification reviewer. You are given a patient's symptoms AND a primary analysis from another AI reviewer. Your job is to challenge, verify, and refine that analysis. Write like you're explaining to a friend — no medical jargon. This is educational only, not a diagnosis.
 
@@ -136,7 +139,10 @@ USING PATIENT HISTORY:
 FIELD GUIDANCE:
 - For redFlagMessage: use a clear urgent message if isRedFlag is true, or an empty string "" if false
 - disclaimerText must always be: "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
-${CLINICAL_KNOWLEDGE_BASE}`,
+${CLINICAL_KNOWLEDGE_BASE}
+
+RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure:
+{"conditions":[{"conditionName":"...","commonName":"...","confidence":0,"explanation":"...","whatItMeans":"...","howToManage":"...","isRedFlag":false,"redFlagMessage":"","nextSteps":["..."]}],"overallSummary":"...","disclaimerText":"..."}`,
 
   rehab_plan: `You are a PT rehabilitation specialist. Create personalized exercise plans for musculoskeletal conditions. Educational purposes only.
 
@@ -160,14 +166,63 @@ RULES:
 - For endPosition: describe the end of the movement and how to return (1 sentence)
 - For exerciseCategory: choose ONE of: "stretch", "strength", "balance", "cardio", "mobility", "core", "yoga", "walking", "seated", "lying", "standing", "stair"
 - For imageFileName: create a normalized lowercase kebab-case filename for the exercise (e.g. "quad-sets", "glute-bridges", "cat-cow-stretch"). Use only lowercase letters, numbers, and hyphens.
-- For optional fields (startPosition, movement, endPosition, exerciseCategory, imageFileName, notes): provide the value if applicable, or use an empty string "" if not applicable. Never use null.`,
+- For optional fields (startPosition, movement, endPosition, exerciseCategory, imageFileName, notes): provide the value if applicable, or use an empty string "" if not applicable. Never use null.
+
+RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure:
+{"planName":"...","exercises":[{"name":"...","targetArea":"...","description":"...","sets":3,"reps":"10","restSeconds":30,"difficulty":"beginner","demonstrationIcon":"figure.flexibility","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"stretch","imageFileName":"exercise-name"}],"totalWeeks":4,"notes":"..."}`,
+
+  exercise_substitute: `You are a PT rehabilitation specialist. The user cannot perform a specific exercise in their rehab plan and needs 2-3 substitute exercises that target the same muscle group and serve the same rehabilitation purpose. Educational purposes only.
+
+RULES:
+- Provide exactly 2-3 substitute exercises
+- Each substitute must target the same body area and serve the same rehab purpose as the original
+- Match or reduce the difficulty level — never suggest harder substitutes
+- If the reason is "Too Painful", suggest gentler alternatives (isometric, partial ROM, or different position)
+- If the reason is "No Equipment Available", suggest bodyweight-only alternatives
+- If the reason is "Too Difficult", suggest beginner-level progressions
+- Use SF Symbol icons: "figure.flexibility", "figure.strengthtraining.traditional", "figure.cooldown", "figure.yoga", "figure.walk", "figure.core.training", "figure.stand", "figure.roll", "figure.seated.side"
+- Include 2-3 form tips and 1-2 contraindications per exercise
+- For startPosition: describe exactly how to position your body BEFORE the movement (1-2 sentences, simple language)
+- For movement: describe the motion step by step (1-2 sentences, simple language)
+- For endPosition: describe the end of the movement and how to return (1 sentence)
+- For exerciseCategory: choose ONE of: "stretch", "strength", "balance", "mobility", "core", "yoga", "seated", "lying", "standing"
+- For imageFileName: create a normalized lowercase kebab-case filename for the exercise (e.g. "quad-sets", "glute-bridges"). Use only lowercase letters, numbers, and hyphens.
+- For optional fields (startPosition, movement, endPosition, exerciseCategory, imageFileName): provide the value if applicable, or use an empty string "" if not applicable. Never use null.
+- Do NOT suggest the same exercise that is being replaced
+- Do NOT suggest exercises already in the user's plan
+
+RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure:
+{"substitutes":[{"name":"...","targetArea":"...","description":"...","sets":3,"reps":"10","restSeconds":30,"difficulty":"beginner","demonstrationIcon":"figure.flexibility","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"stretch","imageFileName":"exercise-name","whyItHelps":"..."}]}`,
+
+  recovery_insights: `You are a supportive recovery coach for a physical therapy patient. Analyze their recent workout data and produce a personalized weekly recovery digest. Write like a friendly coach — encouraging, specific, and actionable. This is educational only, not medical advice.
+
+RULES:
+- Be specific about numbers and trends — reference actual data from the sessions, not vague generalities
+- "headline" should be a short (8 words max) encouraging or informative summary of the week
+- "summary" should be 2-3 sentences summarizing overall recovery trajectory
+- "painAnalysis.trendDirection" must be exactly one of: "improving", "stable", "worsening"
+- "painAnalysis.trendDescription" should reference specific numbers (e.g. "Pain dropped from 5.2 to 3.8")
+- "painAnalysis.regionBreakdown" should include entries only for regions that have per-region data. Use null if no region data available
+- "adherenceAnalysis.score" should be 0-100 based on sessions completed vs expected
+- "keyWins" should be 2-4 specific positive observations (e.g. "Completed all exercises in 3 of 4 sessions")
+- "focusAreas" should be 1-3 specific things to improve (e.g. "Try not to skip rest days between sessions")
+- "recommendations" should be 2-4 actionable tips with SF Symbol icon names
+- Use these SF Symbol icons for recommendations: "figure.walk", "bed.double", "drop.fill", "heart.circle", "clock", "figure.cooldown", "chart.line.uptrend.xyaxis", "exclamationmark.triangle"
+- If pain is worsening significantly, recommend consulting their healthcare provider in recommendations
+- Factor in the user's medical conditions and activity level when making recommendations
+- If expected sessions per week is "Not scheduled", base adherence on consistency (e.g. 3-4 sessions per week is ideal)
+
+RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure:
+{"headline":"...","summary":"...","painAnalysis":{"trendDirection":"improving|stable|worsening","trendDescription":"...","averagePain":0.0,"regionBreakdown":[{"region":"...","trend":"...","averagePain":0.0}]},"adherenceAnalysis":{"score":0,"sessionsCompleted":0,"sessionsExpected":0,"description":"..."},"keyWins":["..."],"focusAreas":["..."],"recommendations":[{"icon":"...","title":"...","description":"..."}]}`,
 };
 
 // Server-side model configuration (NOT client-controlled)
 const MODEL_CONFIG: Record<string, { model: string; max_tokens: number; temperature?: number }> = {
-  analysis: { model: "claude-3-haiku-20240307", max_tokens: 4096, temperature: 0.2 },
-  analysis_verify: { model: "claude-3-haiku-20240307", max_tokens: 4096, temperature: 0.2 },
-  rehab_plan: { model: "claude-3-haiku-20240307", max_tokens: 4096 },
+  analysis: { model: "claude-haiku-4-5-20251001", max_tokens: 4096, temperature: 0.2 },
+  analysis_verify: { model: "claude-haiku-4-5-20251001", max_tokens: 4096, temperature: 0.2 },
+  rehab_plan: { model: "claude-haiku-4-5-20251001", max_tokens: 4096 },
+  exercise_substitute: { model: "claude-haiku-4-5-20251001", max_tokens: 2048, temperature: 0.3 },
+  recovery_insights: { model: "claude-haiku-4-5-20251001", max_tokens: 2048, temperature: 0.3 },
 };
 
 // ---------------------------------------------------------------------------
@@ -291,16 +346,6 @@ interface ProxyRequestBody {
 export const claudeProxy = functions
   .runWith({ timeoutSeconds: 120, memory: "256MB", secrets: ["ANTHROPIC_API_KEY"] })
   .https.onRequest(async (req, res) => {
-    // CORS
-    res.set("Access-Control-Allow-Origin", "*");
-    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
-    if (req.method === "OPTIONS") {
-      res.status(204).send("");
-      return;
-    }
-
     if (req.method !== "POST") {
       res.status(405).json({ error: "Method not allowed" });
       return;
@@ -350,6 +395,13 @@ export const claudeProxy = functions
       res.status(400).json({
         error: `Invalid requestType. Allowed: ${[...ALLOWED_REQUEST_TYPES].join(", ")}`,
       });
+      return;
+    }
+
+    // Validate message roles — only "user" role is allowed from clients
+    const invalidRole = body.messages.find((m) => m.role !== "user");
+    if (invalidRole) {
+      res.status(400).json({ error: "Only 'user' role messages are allowed" });
       return;
     }
 
@@ -418,16 +470,6 @@ interface CrossVerifyRequestBody {
 export const crossVerify = functions
   .runWith({ timeoutSeconds: 30, memory: "256MB", secrets: ["ANTHROPIC_API_KEY", "OPENAI_API_KEY"] })
   .https.onRequest(async (req, res) => {
-    // CORS
-    res.set("Access-Control-Allow-Origin", "*");
-    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
-    if (req.method === "OPTIONS") {
-      res.status(204).send("");
-      return;
-    }
-
     if (req.method !== "POST") {
       res.status(405).json({ error: "Method not allowed" });
       return;

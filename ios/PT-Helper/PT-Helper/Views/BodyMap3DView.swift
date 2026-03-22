@@ -8,149 +8,106 @@ import Combine
 /// and pinch to zoom.
 struct BodyMap3DView: View {
     @StateObject private var viewModel = BodyMapViewModel()
+
+    // MARK: - Navigation State
+
     @State private var navigateToPainDetail = false
     @State private var showDisclaimer = false
-    @State private var pivotEntity: Entity?   // parent we rotate/zoom/pan
-    @State private var bodyEntity: Entity?     // actual model (child of pivot)
+    /// Stable ViewModel for injury analysis — created before navigation flag is set,
+    /// cleaned up via onChange when navigation pops back.
+    @State private var injuryAnalysisVM: InjuryAnalysisViewModel?
+
+    // MARK: - Model State
+
+    @State private var pivotEntity: Entity?
+    @State private var bodyEntity: Entity?
     @State private var isLoading = true
+    @State private var loadError: Error?
+    @State private var originalMaterials: [String: [any RealityKit.Material]] = [:]
 
-    // Free horizontal rotation — accumulates across drag gestures
+    // MARK: - Transform State
+
     @State private var accumulatedRotation: Float = 0
-
-    // Vertical pan — lets user scroll to head/feet when zoomed in
     @State private var accumulatedPanY: Float = 0
-
-    // Pinch-to-zoom — accumulates across magnify gestures
     @State private var accumulatedScale: Float = 1.0
-    private let minScale: Float = 0.6
-    private let maxScale: Float = 4.0
 
-    // Phase 1: Suppress drag during pinch
+    // MARK: - Gesture State
+
     @State private var isPinching: Bool = false
+    @State private var previousDragTranslation: CGSize = .zero
 
-    // Phase 2: Direction lock — prevent accidental pan while rotating
-    private enum DragAxis { case horizontal, vertical }
-    @State private var dragAxis: DragAxis?
-    @State private var dragLockOrigin: CGSize = .zero
-    private let directionLockThreshold: CGFloat = 10
+    // MARK: - Momentum State
 
-    // Phase 3: Rotation momentum / inertia
     @State private var rotationVelocity: Float = 0
     @State private var momentumTimer: AnyCancellable?
     @State private var lastDragTime: Date?
     @State private var lastDragTranslationX: CGFloat = 0
-    private let momentumFriction: Float = 0.93
-    private let momentumStopThreshold: Float = 0.0001
 
-    // Phase 5: Double-tap zoom level
-    private let doubleTapZoomLevel: Float = 2.5
+    // MARK: - Zone Drill-Down State
 
-    // Phase 6: Rubber-band overshoot factor
-    private let rubberBandFactor: Float = 0.3
+    @State private var activeZone: BodyZone?
+    /// Set of zoneKeys for entities hidden during drill-down.
+    @State private var hiddenEntityKeys: Set<String> = []
 
-    // Store original materials keyed by entity name
-    @State private var originalMaterials: [String: [any RealityKit.Material]] = [:]
+    // MARK: - UI State
 
-    // Brief region-name toast shown on tap
     @State private var lastTappedName: String?
+    @State private var showCoachMark = false
+    @AppStorage("hasSeenBodyMapCoach") private var hasSeenCoach = false
 
-    // Stable ViewModel for injury analysis — created once when navigation starts,
-    // not inline in the navigationDestination closure.
-    @State private var injuryAnalysisVM: InjuryAnalysisViewModel?
-
-    // Highlight color for selected body parts (vibrant red)
-    private let highlightColor = UIColor(red: 0.95, green: 0.20, blue: 0.20, alpha: 1.0)
-
-    // Color coding for each region group (bilateral pairs share a color)
-    private let regionColors: [String: UIColor] = [
-        "head":       UIColor(red: 0.45, green: 0.72, blue: 1.00, alpha: 1),  // light blue
-        "neck":       UIColor(red: 0.00, green: 0.75, blue: 0.70, alpha: 1),  // teal
-        "chest":      UIColor(red: 1.00, green: 0.60, blue: 0.22, alpha: 1),  // orange
-        "abdomen":    UIColor(red: 0.65, green: 0.85, blue: 0.25, alpha: 1),  // yellow-green
-        "upper_back": UIColor(red: 0.62, green: 0.35, blue: 0.82, alpha: 1),  // purple
-        "lower_back": UIColor(red: 0.35, green: 0.35, blue: 0.80, alpha: 1),  // indigo
-        "shoulder":   UIColor(red: 1.00, green: 0.50, blue: 0.50, alpha: 1),  // coral
-        "upper_arm":  UIColor(red: 0.30, green: 0.60, blue: 0.90, alpha: 1),  // sky blue
-        "elbow":      UIColor(red: 0.50, green: 0.88, blue: 0.35, alpha: 1),  // lime
-        "forearm":    UIColor(red: 0.92, green: 0.78, blue: 0.20, alpha: 1),  // gold
-        "wrist_hand": UIColor(red: 1.00, green: 0.42, blue: 0.70, alpha: 1),  // pink
-        "glute":      UIColor(red: 0.62, green: 0.42, blue: 0.24, alpha: 1),  // brown
-        "hip":        UIColor(red: 0.82, green: 0.32, blue: 0.72, alpha: 1),  // magenta
-        "thigh":      UIColor(red: 0.22, green: 0.65, blue: 0.35, alpha: 1),  // forest green
-        "hamstring":  UIColor(red: 0.55, green: 0.62, blue: 0.22, alpha: 1),  // olive
-        "knee":       UIColor(red: 0.00, green: 0.82, blue: 0.82, alpha: 1),  // cyan
-        "calf_shin":  UIColor(red: 0.70, green: 0.52, blue: 0.90, alpha: 1),  // lavender
-        "ankle_foot": UIColor(red: 1.00, green: 0.72, blue: 0.48, alpha: 1),  // peach
-    ]
-
-    // Proxy prefix for invisible tap targets
-    private let proxyPrefix = "_proxy_"
-
-    // Small regions that get forward-protruding invisible proxy spheres.
-    // Key = base region key, Value = sphere radius in model space.
-    private let proxyRadii: [String: Float] = [
-        "knee": 0.025,
-        "elbow": 0.018,
-        "ankle_foot": 0.035,
-        "wrist_hand": 0.018,
-        "neck": 0.025,
-        "shoulder": 0.022,
-    ]
-    private let proxyForwardBias: Float = 0.02
-    private let ankleProxyLateralBias: Float = 0.015
-
-    // Scale factor so the body fills the viewport on load
-    private let modelScale: Float = 3.5
+    // MARK: - Body
 
     var body: some View {
         ZStack {
-            // Dark background
-            Color(uiColor: UIColor(red: 0.08, green: 0.08, blue: 0.10, alpha: 1.0))
+            Color(uiColor: BodyMapConstants.sceneBackground)
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Header
                 headerSection
-
-                // Selected regions indicator
                 selectedRegionsPills
 
-                // 3D Model — always in view tree so RealityView can load
                 ZStack {
                     model3DSection
 
                     if isLoading {
-                        VStack(spacing: 16) {
-                            ProgressView()
-                                .scaleEffect(1.5)
-                                .tint(.white)
-                            Text("Loading 3D Model...")
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color(uiColor: UIColor(red: 0.08, green: 0.08, blue: 0.10, alpha: 0.95)))
+                        loadingOverlay
                     }
 
-                    // Region name toast on tap
+                    if let error = loadError {
+                        modelErrorView(error)
+                    }
+
                     if let name = lastTappedName {
-                        VStack {
-                            Text(name)
-                                .font(.caption.weight(.semibold))
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 8)
-                                .background(Color.black.opacity(0.75))
-                                .clipShape(Capsule())
-                                .transition(.opacity.combined(with: .scale))
-                            Spacer()
-                        }
-                        .padding(.top, 12)
+                        regionNameToast(name)
+                    }
+
+                    // First-time coach mark overlay
+                    if showCoachMark {
+                        coachMarkOverlay
                     }
                 }
 
-                // Bottom actions
+                // Zone sub-region panel (below 3D viewport, visible during drill-down)
+                if let zone = activeZone {
+                    zoneRegionStrip(zone: zone)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+
                 bottomActions
+            }
+        }
+        .onAppear {
+            if !hasSeenCoach && !isLoading {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    withAnimation { showCoachMark = true }
+                }
+            }
+        }
+        .onChange(of: isLoading) { _, newValue in
+            if !newValue && !hasSeenCoach {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    withAnimation { showCoachMark = true }
+                }
             }
         }
         .navigationTitle("Body Map")
@@ -158,19 +115,15 @@ struct BodyMap3DView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         .sheet(isPresented: $showDisclaimer) {
             DisclaimerView(onAccept: {
-                navigateToPainDetail = true
-            })
-        }
-        .onChange(of: navigateToPainDetail) { _, navigating in
-            if navigating {
-                // Create the VM once when navigation starts — prevents re-creation
-                // on parent re-renders while PainDetailView is pushed.
                 injuryAnalysisVM = InjuryAnalysisViewModel(
                     userProfile: viewModel.userProfile,
                     selectedRegions: viewModel.selectedRegions
                 )
-            } else {
-                // Clean up when navigation pops back
+                navigateToPainDetail = true
+            })
+        }
+        .onChange(of: navigateToPainDetail) { _, navigating in
+            if !navigating {
                 injuryAnalysisVM = nil
             }
         }
@@ -185,43 +138,78 @@ struct BodyMap3DView: View {
     // MARK: - Header
 
     private var headerSection: some View {
-        VStack(spacing: 6) {
-            Text("Where does it hurt?")
-                .font(.title2.weight(.bold))
-                .foregroundColor(.white)
-            Text("Tap areas • Drag to rotate • Pinch to zoom")
-                .font(.caption)
-                .foregroundColor(.gray)
-                .multilineTextAlignment(.center)
+        VStack(spacing: AppSpacing.sm) {
+            if let zone = activeZone {
+                // Drill-down header with back button and zone name
+                HStack {
+                    Button(action: exitDrillDown) {
+                        HStack(spacing: AppSpacing.xs) {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 12, weight: .bold))
+                            Text("Back")
+                                .font(.subheadline.weight(.medium))
+                        }
+                        .foregroundColor(.white.opacity(0.8))
+                    }
+
+                    Spacer()
+
+                    HStack(spacing: AppSpacing.sm) {
+                        Image(systemName: zone.iconName)
+                            .font(.system(size: 16))
+                        Text(zone.displayName)
+                            .font(AppFonts.sectionTitle)
+                    }
+                    .foregroundColor(.white)
+
+                    Spacer()
+
+                    // Invisible spacer to balance the back button
+                    Color.clear.frame(width: 60, height: 1)
+                }
+                Text("Tap regions to select specific areas")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            } else {
+                // Overview header
+                Text("Where does it hurt?")
+                    .font(AppFonts.sectionTitle)
+                    .foregroundColor(.white)
+                Text("Tap a body zone to zoom in")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
+            }
         }
-        .padding(.top, 16)
-        .padding(.horizontal, 20)
+        .padding(.top, AppSpacing.lg)
+        .padding(.horizontal, AppSpacing.xl)
+        .animation(.easeInOut(duration: 0.25), value: activeZone)
     }
 
     // MARK: - Selected Regions Pills
 
     private var selectedRegionsPills: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
+            HStack(spacing: AppSpacing.sm) {
                 if viewModel.selectedRegions.isEmpty {
                     Text("No areas selected")
                         .font(.caption)
                         .foregroundColor(.gray)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
+                        .padding(.horizontal, AppSpacing.md)
+                        .padding(.vertical, AppSpacing.sm)
                         .background(Color.white.opacity(0.1))
                         .clipShape(Capsule())
                 } else {
                     ForEach(viewModel.selectedRegions, id: \.id) { region in
-                        HStack(spacing: 4) {
+                        HStack(spacing: AppSpacing.xs) {
                             Circle()
-                                .fill(Color.red)
+                                .fill(Color(uiColor: BodyMapConstants.highlightColor))
                                 .frame(width: 8, height: 8)
                             Text(region.name)
                                 .font(.caption.weight(.medium))
                                 .foregroundColor(.white)
                             Button(action: {
-                                withAnimation(.spring(response: 0.3)) {
+                                withAnimation(AppAnimations.springy) {
                                     viewModel.toggleSelection(for: region)
                                 }
                                 restoreMaterial(for: region.zoneKey)
@@ -231,17 +219,17 @@ struct BodyMap3DView: View {
                                     .foregroundColor(.white.opacity(0.7))
                             }
                         }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Color.red.opacity(0.8))
+                        .padding(.horizontal, AppSpacing.md)
+                        .padding(.vertical, AppSpacing.sm)
+                        .background(Color(uiColor: BodyMapConstants.highlightColor).opacity(0.8))
                         .clipShape(Capsule())
                     }
                 }
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, AppSpacing.xl)
         }
         .frame(height: 40)
-        .padding(.top, 8)
+        .padding(.top, AppSpacing.sm)
     }
 
     // MARK: - 3D Model
@@ -252,104 +240,18 @@ struct BodyMap3DView: View {
                 content.camera = .virtual
 
                 do {
-                    // Load from cache (parsed once, cloned for each view instance)
                     let entity = try await BodyModelCache.shared.loadModel()
+                    entity.scale = SIMD3<Float>(repeating: BodyMapConstants.modelScale)
 
-                    // Scale up so the body fills the screen
-                    entity.scale = SIMD3<Float>(repeating: modelScale)
-
-                    // ── Pivot pattern ──────────────────────────────────
                     let pivot = Entity()
-
-                    // Offset: model origin at feet → shift down so torso
-                    // center aligns with the pivot origin
-                    let modelHalfHeight: Float = 0.85
-                    entity.position.y = -modelHalfHeight
-
+                    entity.position.y = -BodyMapConstants.modelHalfHeight
                     pivot.addChild(entity)
 
-                    // Configure each body-region child for tap interaction
                     let regionKeys = Set(viewModel.regions.map(\.zoneKey))
 
-                    // All regions use mesh-exact collision (color = boundary)
-                    @MainActor func configureChildren(of parent: Entity) {
-                        for child in parent.children {
-                            if regionKeys.contains(child.name),
-                               child.components[ModelComponent.self] != nil {
-                                child.components.set(InputTargetComponent(allowedInputTypes: .indirect))
-                                child.generateCollisionShapes(recursive: true)
+                    configureCollisionShapes(for: entity, regionKeys: regionKeys)
+                    createProxyEntities(for: entity, regionKeys: regionKeys)
 
-                                applyRegionColor(to: child)
-
-                                if let mc = child.components[ModelComponent.self] {
-                                    originalMaterials[child.name] = mc.materials
-                                }
-                            }
-                            configureChildren(of: child)
-                        }
-                    }
-                    configureChildren(of: entity)
-
-                    // Create invisible forward-protruding proxy entities for small regions.
-                    // These proxy spheres sit in front of neighboring mesh collision,
-                    // so SpatialTapGesture hits them first when the user taps the region.
-                    for zoneKey in regionKeys {
-                        let baseKey = regionBaseKey(zoneKey)
-                        guard let radius = proxyRadii[baseKey],
-                              let regionEntity = entity.findEntity(named: zoneKey) else { continue }
-
-                        let bounds = regionEntity.visualBounds(relativeTo: entity)
-                        let center = bounds.center
-
-                        // Model is Z-up: Z = height, Y = depth (negative = anterior).
-                        // Knee mesh includes long muscles (Sartorius from hip to shin)
-                        // so bounds.center.z is mid-thigh height. The kneecap is at
-                        // ~20% from the bottom of the Z range.
-                        var proxyZ = center.z
-                        if baseKey == "knee" {
-                            proxyZ = bounds.min.z + bounds.extents.z * 0.2
-                        } else if baseKey == "ankle_foot" {
-                            // Center capsule on the ankle zone
-                            proxyZ = center.z
-                        }
-
-                        // Push ankle proxy laterally outward so it protrudes past
-                        // the calf convex hull when viewed from the side
-                        var proxyX = center.x
-                        if baseKey == "ankle_foot" {
-                            if zoneKey.hasPrefix("left_") {
-                                proxyX = center.x - ankleProxyLateralBias
-                            } else if zoneKey.hasPrefix("right_") {
-                                proxyX = center.x + ankleProxyLateralBias
-                            }
-                        }
-
-                        let proxy = Entity()
-                        proxy.name = proxyPrefix + zoneKey
-                        // Push proxy anterior (negative Y = toward camera from front)
-                        // past neighboring thigh/calf collision surfaces
-                        proxy.position = SIMD3<Float>(
-                            proxyX,
-                            bounds.min.y - proxyForwardBias,
-                            proxyZ
-                        )
-
-                        if baseKey == "ankle_foot" {
-                            // Vertical capsule covering full foot-to-ankle zone
-                            let capsuleHeight = bounds.extents.z * 0.5
-                            let shape = ShapeResource.generateCapsule(height: capsuleHeight, radius: radius)
-                            proxy.components.set(CollisionComponent(shapes: [shape]))
-                            // Rotate capsule from Y-aligned to Z-aligned (vertical in local space)
-                            proxy.orientation = simd_quatf(angle: .pi / 2, axis: SIMD3<Float>(1, 0, 0))
-                        } else {
-                            let shape = ShapeResource.generateSphere(radius: radius)
-                            proxy.components.set(CollisionComponent(shapes: [shape]))
-                        }
-
-                        proxy.components.set(InputTargetComponent(allowedInputTypes: .indirect))
-
-                        entity.addChild(proxy)
-                    }
 
                     content.add(pivot)
                     pivotEntity = pivot
@@ -358,6 +260,8 @@ struct BodyMap3DView: View {
 
                 } catch {
                     AppLogger.data.error("Failed to load body model: \(error.localizedDescription)")
+                    isLoading = false
+                    loadError = error
                 }
             }
             .gesture(doubleTapGesture)
@@ -366,44 +270,180 @@ struct BodyMap3DView: View {
             .simultaneousGesture(zoomGesture)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            // Reset view button (bottom-right)
+            // Reset button (bottom-right)
             VStack {
                 Spacer()
                 HStack {
                     Spacer()
                     resetViewButton
-                        .padding(.trailing, 20)
-                        .padding(.bottom, 12)
+                        .padding(.trailing, AppSpacing.xl)
+                        .padding(.bottom, AppSpacing.md)
                 }
             }
+
         }
+    }
+
+    // MARK: - Loading & Error Overlays
+
+    private var loadingOverlay: some View {
+        VStack(spacing: AppSpacing.lg) {
+            ProgressView()
+                .scaleEffect(1.5)
+                .tint(.white)
+            Text("Loading 3D Model...")
+                .font(.subheadline)
+                .foregroundColor(.gray)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(uiColor: BodyMapConstants.loadingOverlayBackground))
+    }
+
+    private func modelErrorView(_ error: Error) -> some View {
+        VStack(spacing: AppSpacing.lg) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 48))
+                .foregroundColor(AppColors.warning)
+
+            VStack(spacing: AppSpacing.sm) {
+                Text("Unable to Load 3D Model")
+                    .font(AppFonts.cardTitle)
+                    .foregroundColor(.white)
+                Text("Please try again or restart the app.")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
+            }
+
+            Button(action: retryModelLoad) {
+                HStack(spacing: AppSpacing.sm) {
+                    Image(systemName: "arrow.clockwise")
+                    Text("Retry")
+                }
+                .font(.body.weight(.semibold))
+                .foregroundColor(.white)
+                .padding(.horizontal, AppSpacing.xxl)
+                .padding(.vertical, AppSpacing.md)
+                .background(AppColors.accent)
+                .cornerRadius(AppCorners.card)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(uiColor: BodyMapConstants.sceneBackground))
+    }
+
+    // MARK: - Coach Mark Overlay
+
+    private var coachMarkOverlay: some View {
+        VStack(spacing: AppSpacing.lg) {
+            Spacer()
+
+            VStack(spacing: AppSpacing.xl) {
+                HStack(spacing: AppSpacing.xxl) {
+                    VStack(spacing: AppSpacing.sm) {
+                        Image(systemName: "hand.tap.fill")
+                            .font(.system(size: 28))
+                            .foregroundColor(.white)
+                            .symbolEffect(.pulse, options: .repeating)
+                        Text("Tap to zoom in")
+                            .font(.caption.weight(.semibold))
+                            .foregroundColor(.white)
+                    }
+
+                    VStack(spacing: AppSpacing.sm) {
+                        Image(systemName: "hand.draw.fill")
+                            .font(.system(size: 28))
+                            .foregroundColor(.white)
+                            .symbolEffect(.pulse, options: .repeating)
+                        Text("Drag to rotate")
+                            .font(.caption.weight(.semibold))
+                            .foregroundColor(.white)
+                    }
+
+                    VStack(spacing: AppSpacing.sm) {
+                        Image(systemName: "arrow.up.left.and.arrow.down.right")
+                            .font(.system(size: 28))
+                            .foregroundColor(.white)
+                            .symbolEffect(.pulse, options: .repeating)
+                        Text("Pinch to zoom")
+                            .font(.caption.weight(.semibold))
+                            .foregroundColor(.white)
+                    }
+                }
+
+                Text("Tap a body zone, then select specific areas")
+                    .font(.caption)
+                    .foregroundColor(.white.opacity(0.8))
+
+                Button(action: {
+                    withAnimation { showCoachMark = false }
+                    hasSeenCoach = true
+                }) {
+                    Text("Got it")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.blue)
+                        .padding(.horizontal, AppSpacing.xxl)
+                        .padding(.vertical, AppSpacing.sm)
+                        .background(.white)
+                        .cornerRadius(AppCorners.pill)
+                }
+            }
+            .padding(AppSpacing.xl)
+            .background(.ultraThinMaterial)
+            .cornerRadius(AppCorners.xl)
+            .padding(.horizontal, AppSpacing.xl)
+            .padding(.bottom, AppSpacing.xxl)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.black.opacity(0.3))
+        .transition(.opacity)
+        .onTapGesture {
+            withAnimation { showCoachMark = false }
+            hasSeenCoach = true
+        }
+    }
+
+    private func regionNameToast(_ name: String) -> some View {
+        VStack {
+            Text(name)
+                .font(.caption.weight(.semibold))
+                .foregroundColor(.white)
+                .padding(.horizontal, AppSpacing.lg)
+                .padding(.vertical, AppSpacing.sm)
+                .background(Color.black.opacity(0.75))
+                .clipShape(Capsule())
+                .transition(.opacity.combined(with: .scale))
+            Spacer()
+        }
+        .padding(.top, AppSpacing.md)
     }
 
     // MARK: - Gestures
 
-    /// Double-tap to toggle zoom (Phase 5)
+    /// Double-tap: exit drill-down if active, otherwise toggle zoom
     private var doubleTapGesture: some Gesture {
         SpatialTapGesture(count: 2)
             .targetedToAnyEntity()
             .onEnded { _ in
+                // If in drill-down, double-tap exits back to overview
+                if activeZone != nil {
+                    exitDrillDown()
+                    return
+                }
+
                 guard let pivot = pivotEntity else { return }
 
-                // Cancel any running momentum
-                momentumTimer?.cancel()
-                momentumTimer = nil
-                rotationVelocity = 0
+                cancelMomentum()
 
-                // Toggle zoom level
                 let targetScale: Float
                 if accumulatedScale > 1.5 {
                     targetScale = 1.0
                     accumulatedPanY = 0
                 } else {
-                    targetScale = doubleTapZoomLevel
+                    targetScale = BodyMapConstants.doubleTapZoomLevel
                 }
                 accumulatedScale = targetScale
 
-                // Animate to target, preserving current rotation
                 var target = pivot.transform
                 target.scale = SIMD3<Float>(repeating: targetScale)
                 if targetScale <= 1.0 {
@@ -425,71 +465,53 @@ struct BodyMap3DView: View {
             }
     }
 
-    /// Single-finger drag: direction-locked rotation OR pan (Phases 1-3, 6)
+    /// Single-finger drag: omni-directional rotation + pan simultaneously
     private var rotateAndPanGesture: some Gesture {
         DragGesture()
             .onChanged { value in
-                // Phase 1: suppress drag while pinching
                 guard !isPinching else { return }
                 guard let pivot = pivotEntity else { return }
 
-                // Phase 2: direction lock detection ──────────────
-                if dragAxis == nil {
-                    let dx = abs(value.translation.width)
-                    let dy = abs(value.translation.height)
-                    if max(dx, dy) < directionLockThreshold { return }
+                // Delta since last frame (for velocity tracking)
+                let deltaX = value.translation.width - previousDragTranslation.width
+                previousDragTranslation = value.translation
 
-                    dragAxis = dx > dy ? .horizontal : .vertical
-                    dragLockOrigin = value.translation
-
-                    // Phase 3: reset velocity tracking on lock
-                    lastDragTime = nil
-                    lastDragTranslationX = 0
+                // Cancel momentum on first move
+                if lastDragTime == nil {
+                    cancelMomentum()
                     rotationVelocity = 0
-                    momentumTimer?.cancel()
-                    momentumTimer = nil
                 }
 
-                // Translation relative to lock origin (avoids jump)
-                let rel = CGSize(
-                    width: value.translation.width - dragLockOrigin.width,
-                    height: value.translation.height - dragLockOrigin.height
+                // Rotation from horizontal component (always active)
+                let dragAngle = Float(value.translation.width) * BodyMapConstants.rotationSensitivity
+                pivot.transform.rotation = simd_quatf(
+                    angle: accumulatedRotation + dragAngle,
+                    axis: SIMD3<Float>(0, 1, 0)
                 )
 
-                let rotSensitivity: Float = 0.008
-                let panSensitivity: Float = 0.003
-
-                if dragAxis == .horizontal {
-                    // ── Rotation ───────────────────────────────
-                    let dragAngle = Float(rel.width) * rotSensitivity
-                    pivot.transform.rotation = simd_quatf(
-                        angle: accumulatedRotation + dragAngle,
-                        axis: SIMD3<Float>(0, 1, 0)
-                    )
-
-                    // Phase 3: track velocity for momentum
-                    let now = Date()
-                    if let last = lastDragTime {
-                        let dt = now.timeIntervalSince(last)
-                        if dt > 0.001 {
-                            let dx = Float(value.translation.width - lastDragTranslationX) * rotSensitivity
-                            rotationVelocity = dx / Float(dt) / 60.0
-                        }
+                // Track velocity for momentum
+                let now = Date()
+                if let last = lastDragTime {
+                    let dt = now.timeIntervalSince(last)
+                    if dt > 0.001 {
+                        let dx = Float(deltaX) * BodyMapConstants.rotationSensitivity
+                        rotationVelocity = dx / Float(dt) / 60.0
                     }
-                    lastDragTime = now
-                    lastDragTranslationX = value.translation.width
+                }
+                lastDragTime = now
+                lastDragTranslationX = value.translation.width
 
-                } else if dragAxis == .vertical {
-                    // ── Pan (with rubber-band, Phase 6) ───────
-                    let rawPanY = accumulatedPanY - Float(rel.height) * panSensitivity
+                // Pan from vertical component (only when zoomed)
+                if accumulatedScale > 1.0 {
+                    let rawPanY = accumulatedPanY - Float(value.translation.height) * BodyMapConstants.panSensitivity
                     let zoomFactor = max(accumulatedScale - 1.0, 0)
                     let maxPan: Float = zoomFactor * 1.0
 
                     let clampedPanY: Float
                     if rawPanY > maxPan {
-                        clampedPanY = maxPan + (rawPanY - maxPan) * rubberBandFactor
+                        clampedPanY = maxPan + (rawPanY - maxPan) * BodyMapConstants.rubberBandFactor
                     } else if rawPanY < -maxPan {
-                        clampedPanY = -maxPan - (-maxPan - rawPanY) * rubberBandFactor
+                        clampedPanY = -maxPan - (-maxPan - rawPanY) * BodyMapConstants.rubberBandFactor
                     } else {
                         clampedPanY = rawPanY
                     }
@@ -499,30 +521,21 @@ struct BodyMap3DView: View {
             .onEnded { value in
                 guard !isPinching else { return }
 
-                let rel = CGSize(
-                    width: value.translation.width - dragLockOrigin.width,
-                    height: value.translation.height - dragLockOrigin.height
-                )
+                // Commit rotation
+                accumulatedRotation += Float(value.translation.width) * BodyMapConstants.rotationSensitivity
 
-                let rotSensitivity: Float = 0.008
-                let panSensitivity: Float = 0.003
+                // Start momentum if velocity is significant
+                if abs(rotationVelocity) > BodyMapConstants.momentumStopThreshold {
+                    startRotationMomentum()
+                }
 
-                if dragAxis == .horizontal {
-                    accumulatedRotation += Float(rel.width) * rotSensitivity
-
-                    // Phase 3: start momentum if velocity is significant
-                    if abs(rotationVelocity) > momentumStopThreshold {
-                        startRotationMomentum()
-                    }
-
-                } else if dragAxis == .vertical {
-                    // Hard-clamp state
-                    let rawPanY = accumulatedPanY - Float(rel.height) * panSensitivity
+                // Commit pan (clamp to bounds, spring back if overshot)
+                if accumulatedScale > 1.0 {
+                    let rawPanY = accumulatedPanY - Float(value.translation.height) * BodyMapConstants.panSensitivity
                     let zoomFactor = max(accumulatedScale - 1.0, 0)
                     let maxPan: Float = zoomFactor * 1.0
                     accumulatedPanY = min(max(rawPanY, -maxPan), maxPan)
 
-                    // Phase 6: spring back if visually overshot
                     if let pivot = pivotEntity,
                        pivot.position.y > maxPan + 0.001 || pivot.position.y < -maxPan - 0.001 {
                         var target = pivot.transform
@@ -532,11 +545,7 @@ struct BodyMap3DView: View {
                     }
                 }
 
-                // Reset direction lock for next gesture
-                dragAxis = nil
-                dragLockOrigin = .zero
-                lastDragTime = nil
-                lastDragTranslationX = 0
+                resetGestureTracking()
             }
     }
 
@@ -551,19 +560,19 @@ struct BodyMap3DView: View {
 
                 // Phase 6: rubber-band at limits
                 let clamped: Float
-                if newScale < minScale {
-                    clamped = minScale - (minScale - newScale) * rubberBandFactor
-                } else if newScale > maxScale {
-                    clamped = maxScale + (newScale - maxScale) * rubberBandFactor
+                if newScale < BodyMapConstants.minScale {
+                    clamped = BodyMapConstants.minScale - (BodyMapConstants.minScale - newScale) * BodyMapConstants.rubberBandFactor
+                } else if newScale > BodyMapConstants.maxScale {
+                    clamped = BodyMapConstants.maxScale + (newScale - BodyMapConstants.maxScale) * BodyMapConstants.rubberBandFactor
                 } else {
                     clamped = newScale
                 }
 
-                pivot.scale = SIMD3<Float>(repeating: max(clamped, 0.4))
+                pivot.scale = SIMD3<Float>(repeating: max(clamped, BodyMapConstants.absoluteMinScale))
             }
             .onEnded { value in
                 let newScale = accumulatedScale * Float(value.magnification)
-                accumulatedScale = min(max(newScale, minScale), maxScale)
+                accumulatedScale = min(max(newScale, BodyMapConstants.minScale), BodyMapConstants.maxScale)
 
                 // Clamp existing pan to new zoom's range
                 let zoomFactor = max(accumulatedScale - 1.0, 0)
@@ -571,15 +580,15 @@ struct BodyMap3DView: View {
                 accumulatedPanY = min(max(accumulatedPanY, -maxPan), maxPan)
 
                 // If zoomed out to ~1x, snap pan back to center
-                if accumulatedScale < 1.1 {
+                if accumulatedScale < BodyMapConstants.snapToCenterThreshold {
                     accumulatedPanY = 0
                 }
 
                 // Phase 6: spring back if visually overshot limits
                 if let pivot = pivotEntity {
                     let visualScale = pivot.scale.x
-                    if visualScale < minScale || visualScale > maxScale
-                        || accumulatedScale < 1.1 {
+                    if visualScale < BodyMapConstants.minScale || visualScale > BodyMapConstants.maxScale
+                        || accumulatedScale < BodyMapConstants.snapToCenterThreshold {
                         var target = pivot.transform
                         target.scale = SIMD3<Float>(repeating: accumulatedScale)
                         target.translation.y = accumulatedPanY
@@ -594,24 +603,21 @@ struct BodyMap3DView: View {
 
     // MARK: - Rotation Momentum (Phase 3)
 
-    /// Start a 60fps timer that decelerates rotation after a flick.
     private func startRotationMomentum() {
         momentumTimer?.cancel()
 
-        momentumTimer = Timer.publish(every: 1.0 / 60.0, on: .main, in: .common)
+        momentumTimer = Timer.publish(every: BodyMapConstants.momentumFPS, on: .main, in: .common)
             .autoconnect()
             .sink { _ in
                 guard let pivot = pivotEntity else {
-                    momentumTimer?.cancel()
-                    momentumTimer = nil
+                    cancelMomentum()
                     return
                 }
 
-                rotationVelocity *= momentumFriction
+                rotationVelocity *= BodyMapConstants.momentumFriction
 
-                if abs(rotationVelocity) < momentumStopThreshold {
-                    momentumTimer?.cancel()
-                    momentumTimer = nil
+                if abs(rotationVelocity) < BodyMapConstants.momentumStopThreshold {
+                    cancelMomentum()
                     rotationVelocity = 0
                     return
                 }
@@ -624,19 +630,30 @@ struct BodyMap3DView: View {
             }
     }
 
+    private func cancelMomentum() {
+        momentumTimer?.cancel()
+        momentumTimer = nil
+    }
+
+    private func resetGestureTracking() {
+        previousDragTranslation = .zero
+        lastDragTime = nil
+        lastDragTranslationX = 0
+    }
+
     // MARK: - Reset View Button
 
     private var resetViewButton: some View {
         Button(action: resetView) {
-            HStack(spacing: 6) {
+            HStack(spacing: AppSpacing.sm) {
                 Image(systemName: "arrow.counterclockwise")
                     .font(.system(size: 14, weight: .semibold))
                 Text("Reset")
                     .font(.caption.weight(.semibold))
             }
             .foregroundColor(.white)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
+            .padding(.horizontal, AppSpacing.lg)
+            .padding(.vertical, AppSpacing.md)
             .background(.ultraThinMaterial)
             .clipShape(Capsule())
         }
@@ -645,7 +662,7 @@ struct BodyMap3DView: View {
     // MARK: - Bottom Actions
 
     private var bottomActions: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: AppSpacing.md) {
             HStack {
                 Text("\(viewModel.selectedRegions.count) area(s) selected")
                     .font(.subheadline.weight(.medium))
@@ -655,13 +672,17 @@ struct BodyMap3DView: View {
                     Button(action: { clearAllSelections() }) {
                         Text("Clear All")
                             .font(.subheadline.weight(.medium))
-                            .foregroundColor(.red)
+                            .foregroundColor(AppColors.danger)
                     }
                 }
             }
 
             Button(action: {
                 if DisclaimerManager.hasAccepted {
+                    injuryAnalysisVM = InjuryAnalysisViewModel(
+                        userProfile: viewModel.userProfile,
+                        selectedRegions: viewModel.selectedRegions
+                    )
                     navigateToPainDetail = true
                 } else {
                     showDisclaimer = true
@@ -673,11 +694,11 @@ struct BodyMap3DView: View {
                         .font(.system(size: 13, weight: .bold))
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
+                .padding(.vertical, AppSpacing.lg)
                 .background(
                     viewModel.selectedRegions.isEmpty
                         ? Color.gray.opacity(0.3)
-                        : Color.blue
+                        : AppColors.accent
                 )
                 .foregroundColor(.white)
                 .font(.headline)
@@ -685,22 +706,128 @@ struct BodyMap3DView: View {
             }
             .disabled(viewModel.selectedRegions.isEmpty)
         }
-        .padding(.horizontal, 20)
-        .padding(.bottom, 30)
-        .padding(.top, 12)
+        .padding(.horizontal, AppSpacing.xl)
+        .padding(.bottom, AppSpacing.xxl)
+        .padding(.top, AppSpacing.md)
+    }
+
+    // MARK: - Model Setup Helpers
+
+    /// Configure each body-region child for tap interaction and apply region colors.
+    @MainActor
+    private func configureCollisionShapes(for parent: Entity, regionKeys: Set<String>) {
+        for child in parent.children {
+            if regionKeys.contains(child.name),
+               child.components[ModelComponent.self] != nil {
+                child.components.set(InputTargetComponent(allowedInputTypes: .indirect))
+
+                let baseKey = BodyMapConstants.regionBaseKey(child.name)
+                if baseKey == "forearm" {
+                    // Don't generate mesh collision for forearm — its convex hull overlaps
+                    // the wrist_hand entity and intercepts taps meant for the hand.
+                    // Forearm uses only its proxy sphere (defined in proxyRadii) for tap detection.
+                } else {
+                    child.generateCollisionShapes(recursive: true)
+                }
+
+                applyRegionColor(to: child)
+
+                if let mc = child.components[ModelComponent.self] {
+                    originalMaterials[child.name] = mc.materials
+                }
+            }
+            configureCollisionShapes(for: child, regionKeys: regionKeys)
+        }
+    }
+
+    /// Create invisible forward-protruding proxy entities for small regions.
+    @MainActor
+    private func createProxyEntities(for entity: Entity, regionKeys: Set<String>) {
+        for zoneKey in regionKeys {
+            let baseKey = BodyMapConstants.regionBaseKey(zoneKey)
+            guard let radius = BodyMapConstants.proxyRadii[baseKey],
+                  let regionEntity = entity.findEntity(named: zoneKey) else { continue }
+
+            let bounds = regionEntity.visualBounds(relativeTo: entity)
+            let center = bounds.center
+
+            var proxyZ = center.z
+            if baseKey == "knee" {
+                proxyZ = bounds.min.z + bounds.extents.z * BodyMapConstants.kneeCapHeightFraction
+            } else if baseKey == "ankle_foot" {
+                proxyZ = center.z
+            } else if baseKey == "head" {
+                // Push head proxy up toward the top of the skull, away from the neck
+                proxyZ = bounds.max.z - bounds.extents.z * 0.2
+            }
+
+            var proxyX = center.x
+            if baseKey == "ankle_foot" {
+                if zoneKey.hasPrefix("left_") {
+                    proxyX = center.x - BodyMapConstants.ankleProxyLateralBias
+                } else if zoneKey.hasPrefix("right_") {
+                    proxyX = center.x + BodyMapConstants.ankleProxyLateralBias
+                }
+            }
+
+            // Regions that need extra forward bias to sit in front of adjacent regions
+            let forwardBias: Float
+            switch baseKey {
+            case "hip": forwardBias = 0.05
+            case "head": forwardBias = 0.04
+            default: forwardBias = BodyMapConstants.proxyForwardBias
+            }
+
+            let proxy = Entity()
+            proxy.name = BodyMapConstants.proxyPrefix + zoneKey
+            proxy.position = SIMD3<Float>(
+                proxyX,
+                bounds.min.y - forwardBias,
+                proxyZ
+            )
+
+            if baseKey == "ankle_foot" {
+                let capsuleHeight = bounds.extents.z * BodyMapConstants.ankleCapsuleHeightFraction
+                let shape = ShapeResource.generateCapsule(height: capsuleHeight, radius: radius)
+                proxy.components.set(CollisionComponent(shapes: [shape]))
+                proxy.orientation = simd_quatf(angle: .pi / 2, axis: SIMD3<Float>(1, 0, 0))
+            } else {
+                let shape = ShapeResource.generateSphere(radius: radius)
+                proxy.components.set(CollisionComponent(shapes: [shape]))
+            }
+
+            proxy.components.set(InputTargetComponent(allowedInputTypes: .indirect))
+            entity.addChild(proxy)
+        }
     }
 
     // MARK: - Interaction Logic
 
     private func handleEntityTap(_ entity: Entity) {
-        // Resolve proxy entity names to the real region name
         let name: String
-        if entity.name.hasPrefix(proxyPrefix) {
-            name = String(entity.name.dropFirst(proxyPrefix.count))
+        if entity.name.hasPrefix(BodyMapConstants.proxyPrefix) {
+            name = String(entity.name.dropFirst(BodyMapConstants.proxyPrefix.count))
         } else {
             name = entity.name
         }
 
+        guard viewModel.regions.contains(where: { $0.zoneKey == name }) else {
+            return
+        }
+
+        if let zone = activeZone {
+            // Drill-down mode: only respond to taps within the active zone
+            guard zone.regionZoneKeys.contains(name) else { return }
+            selectRegion(named: name)
+        } else {
+            // Overview mode: drill into the tapped entity's zone
+            guard let zone = BodyZone.zone(for: name) else { return }
+            drillIntoZone(zone)
+        }
+    }
+
+    /// Toggle selection on a specific region (used in drill-down mode).
+    private func selectRegion(named name: String) {
         guard let regionIndex = viewModel.regions.firstIndex(where: { $0.zoneKey == name }) else {
             return
         }
@@ -708,12 +835,10 @@ struct BodyMap3DView: View {
         let region = viewModel.regions[regionIndex]
         let wasSelected = region.isSelected
 
-        // Haptic
         let impact = UIImpactFeedbackGenerator(style: wasSelected ? .soft : .light)
         impact.impactOccurred()
 
-        // Toggle
-        withAnimation(.spring(response: 0.3)) {
+        withAnimation(AppAnimations.springy) {
             viewModel.toggleSelection(for: region)
         }
 
@@ -721,14 +846,12 @@ struct BodyMap3DView: View {
                                             action: wasSelected ? "deselect" : "select",
                                             metadata: ["region": region.name, "zoneKey": region.zoneKey])
 
-        // Update 3D highlight
         if wasSelected {
             restoreMaterial(for: name)
         } else {
             applyHighlight(for: name)
         }
 
-        // Show region name toast briefly
         withAnimation(.easeOut(duration: 0.2)) {
             lastTappedName = region.name
         }
@@ -741,15 +864,147 @@ struct BodyMap3DView: View {
         }
     }
 
-    /// Apply a bright red highlight material to the selected body region
+    /// Toggle a region from the ZoneSelectionPanel (same logic, called via panel callback).
+    private func toggleRegionInDrillDown(_ region: BodyRegion) {
+        selectRegion(named: region.zoneKey)
+    }
+
+    // MARK: - Zone Drill-Down
+
+    private func drillIntoZone(_ zone: BodyZone) {
+        guard let pivot = pivotEntity else { return }
+
+        cancelMomentum()
+        rotationVelocity = 0
+
+        // Look up camera target
+        guard let target = BodyMapConstants.zoneCameraTargets[zone.rawValue] else { return }
+
+        // Update accumulated state to match the drill-down position
+        accumulatedScale = target.pivotScale
+        accumulatedPanY = target.pivotY
+        accumulatedRotation += target.rotation
+
+        // Animate pivot to frame the zone
+        var transform = pivot.transform
+        transform.scale = SIMD3<Float>(repeating: target.pivotScale)
+        transform.translation.x = target.pivotX
+        transform.translation.y = target.pivotY
+        transform.rotation = simd_quatf(angle: accumulatedRotation, axis: SIMD3<Float>(0, 1, 0))
+
+        pivot.move(to: transform, relativeTo: pivot.parent,
+                   duration: BodyMapConstants.zoneDrillDuration, timingFunction: .easeInOut)
+
+        // Dim non-zone entities
+        dimNonZoneEntities(zone: zone)
+
+        withAnimation(.easeInOut(duration: 0.3)) {
+            activeZone = zone
+            viewModel.activeZone = zone
+        }
+
+        // Show zone name toast
+        withAnimation(.easeOut(duration: 0.2)) {
+            lastTappedName = zone.displayName
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+            withAnimation(.easeIn(duration: 0.3)) {
+                if lastTappedName == zone.displayName {
+                    lastTappedName = nil
+                }
+            }
+        }
+
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+
+        SessionLogger.shared.logUserAction(.regionSelected,
+                                            action: "zone_drill_in",
+                                            metadata: ["zone": zone.rawValue])
+    }
+
+    private func exitDrillDown() {
+        guard let pivot = pivotEntity else { return }
+
+        cancelMomentum()
+        rotationVelocity = 0
+
+        // Undo zone rotation
+        if let zone = activeZone,
+           let target = BodyMapConstants.zoneCameraTargets[zone.rawValue] {
+            accumulatedRotation -= target.rotation
+        }
+
+        // Restore all dimmed entities
+        restoreAllDimmedEntities()
+
+        // Animate back to overview
+        accumulatedScale = 1.0
+        accumulatedPanY = 0
+
+        var transform = pivot.transform
+        transform.scale = SIMD3<Float>(repeating: 1.0)
+        transform.translation.x = 0
+        transform.translation.y = 0
+        transform.rotation = simd_quatf(angle: accumulatedRotation, axis: SIMD3<Float>(0, 1, 0))
+
+        pivot.move(to: transform, relativeTo: pivot.parent,
+                   duration: BodyMapConstants.zoneExitDuration, timingFunction: .easeInOut)
+
+        withAnimation(.easeInOut(duration: 0.3)) {
+            activeZone = nil
+            viewModel.activeZone = nil
+        }
+
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+
+        SessionLogger.shared.logUserAction(.regionDeselected,
+                                            action: "zone_drill_out",
+                                            metadata: [:])
+    }
+
+    // MARK: - Zone Dimming
+
+    /// Hide all entities that don't belong to the active zone using isEnabled.
+    private func dimNonZoneEntities(zone: BodyZone) {
+        guard let body = bodyEntity else { return }
+        let zoneKeys = Set(zone.regionZoneKeys)
+        let keysToHide = Set(viewModel.regions.map(\.zoneKey)).subtracting(zoneKeys)
+
+        hiddenEntityKeys = keysToHide
+        setEntitiesEnabled(in: body, keys: keysToHide, enabled: false)
+    }
+
+    /// Restore all hidden entities.
+    private func restoreAllDimmedEntities() {
+        guard let body = bodyEntity else { return }
+
+        setEntitiesEnabled(in: body, keys: hiddenEntityKeys, enabled: true)
+        hiddenEntityKeys.removeAll()
+    }
+
+    /// Recursively enable/disable entities and their proxies matching the given keys.
+    private func setEntitiesEnabled(in parent: Entity, keys: Set<String>, enabled: Bool) {
+        for child in parent.children {
+            if keys.contains(child.name) {
+                child.isEnabled = enabled
+            } else if child.name.hasPrefix(BodyMapConstants.proxyPrefix) {
+                let regionKey = String(child.name.dropFirst(BodyMapConstants.proxyPrefix.count))
+                if keys.contains(regionKey) {
+                    child.isEnabled = enabled
+                }
+            }
+            setEntitiesEnabled(in: child, keys: keys, enabled: enabled)
+        }
+    }
+
     private func applyHighlight(for entityName: String) {
         guard let body = bodyEntity,
               let entity = body.findEntity(named: entityName) else { return }
 
         var material = SimpleMaterial()
-        material.color = .init(tint: highlightColor)
-        material.roughness = .float(0.25)
-        material.metallic = .float(0.15)
+        material.color = .init(tint: BodyMapConstants.highlightColor)
+        material.roughness = .float(BodyMapConstants.highlightRoughness)
+        material.metallic = .float(BodyMapConstants.highlightMetallic)
 
         if var mc = entity.components[ModelComponent.self] {
             mc.materials = [material]
@@ -757,7 +1012,6 @@ struct BodyMap3DView: View {
         }
     }
 
-    /// Restore the original material when deselected
     private func restoreMaterial(for entityName: String) {
         guard let body = bodyEntity,
               let entity = body.findEntity(named: entityName),
@@ -772,28 +1026,27 @@ struct BodyMap3DView: View {
         for region in viewModel.selectedRegions {
             restoreMaterial(for: region.zoneKey)
         }
-        withAnimation(.spring(response: 0.3)) {
+        withAnimation(AppAnimations.springy) {
             viewModel.clearAll()
         }
     }
 
-    /// Reset rotation, zoom, and pan to defaults with smooth animation (Phase 4)
     private func resetView() {
+        // If in drill-down, exit first (which animates back to overview)
+        if activeZone != nil {
+            exitDrillDown()
+        }
+
         guard let pivot = pivotEntity else { return }
 
-        // Cancel momentum
-        momentumTimer?.cancel()
-        momentumTimer = nil
+        cancelMomentum()
         rotationVelocity = 0
 
-        // Reset state immediately (next gesture starts from defaults)
         accumulatedRotation = 0
         accumulatedScale = 1.0
         accumulatedPanY = 0
-        dragAxis = nil
-        dragLockOrigin = .zero
+        resetGestureTracking()
 
-        // Animate entity back to default transform
         var target = Transform.identity
         target.rotation = simd_quatf(angle: 0, axis: SIMD3<Float>(0, 1, 0))
         target.scale = SIMD3<Float>(repeating: 1.0)
@@ -803,29 +1056,72 @@ struct BodyMap3DView: View {
                    duration: 0.4, timingFunction: .easeInOut)
     }
 
-    // MARK: - Region Color Coding
-
-    /// Strip left_/right_ prefix to get the base region key for color lookup.
-    private func regionBaseKey(_ zoneKey: String) -> String {
-        if zoneKey.hasPrefix("left_") { return String(zoneKey.dropFirst(5)) }
-        if zoneKey.hasPrefix("right_") { return String(zoneKey.dropFirst(6)) }
-        return zoneKey
+    private func retryModelLoad() {
+        loadError = nil
+        isLoading = true
+        // RealityView will re-execute its content closure on next layout pass
     }
 
-    /// Apply a color-coded material to a region entity based on its zone key.
+    // MARK: - Zone Region Strip
+
+    /// Horizontal scrollable strip of sub-region toggle buttons, shown below the 3D viewport during drill-down.
+    private func zoneRegionStrip(zone: BodyZone) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: AppSpacing.sm) {
+                ForEach(viewModel.regions(in: zone), id: \.id) { region in
+                    Button(action: { toggleRegionInDrillDown(region) }) {
+                        HStack(spacing: AppSpacing.xs) {
+                            Circle()
+                                .fill(regionStripColor(for: region))
+                                .frame(width: 8, height: 8)
+                            Text(region.name)
+                                .font(.caption.weight(.medium))
+                                .foregroundColor(.white)
+                            if region.isSelected {
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundColor(Color(uiColor: BodyMapConstants.highlightColor))
+                            }
+                        }
+                        .padding(.horizontal, AppSpacing.md)
+                        .padding(.vertical, AppSpacing.sm)
+                        .background(
+                            region.isSelected
+                                ? Color(uiColor: BodyMapConstants.highlightColor).opacity(0.25)
+                                : Color.white.opacity(0.1)
+                        )
+                        .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, AppSpacing.xl)
+        }
+        .padding(.top, AppSpacing.sm)
+    }
+
+    private func regionStripColor(for region: BodyRegion) -> Color {
+        let baseKey = BodyMapConstants.regionBaseKey(region.zoneKey)
+        if let color = BodyMapConstants.regionColors[baseKey] {
+            return Color(uiColor: color)
+        }
+        return .gray
+    }
+
+    // MARK: - Region Color Coding
+
     private func applyRegionColor(to entity: Entity) {
-        let baseKey = regionBaseKey(entity.name)
-        guard let color = regionColors[baseKey] else { return }
+        let baseKey = BodyMapConstants.regionBaseKey(entity.name)
+        guard let color = BodyMapConstants.regionColors[baseKey] else { return }
 
         var material = SimpleMaterial()
         material.color = .init(tint: color)
-        material.roughness = .float(0.45)
-        material.metallic = .float(0.05)
+        material.roughness = .float(BodyMapConstants.regionRoughness)
+        material.metallic = .float(BodyMapConstants.regionMetallic)
 
         if var mc = entity.components[ModelComponent.self] {
             mc.materials = [material]
             entity.components[ModelComponent.self] = mc
         }
     }
-
 }

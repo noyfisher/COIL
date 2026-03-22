@@ -5,6 +5,7 @@ struct HomeTab: View {
     @EnvironmentObject private var savedPlansViewModel: SavedPlansViewModel
     @EnvironmentObject private var workoutViewModel: WorkoutViewModel
     @EnvironmentObject private var tabSelection: TabSelection
+    @EnvironmentObject private var insightsVM: RecoveryInsightsViewModel
     @ObservedObject private var streakService = StreakService.shared
     @State private var showOnboarding = false
     @State private var showSettings = false
@@ -70,6 +71,50 @@ struct HomeTab: View {
                             .opacity(animateEntrance ? 1 : 0)
                             .offset(y: animateEntrance ? 0 : 15)
                             .animation(AppAnimations.smooth.delay(0.45), value: animateEntrance)
+
+                            // Recovery Insights teaser (shown when not yet eligible)
+                            if insightsVM.insight == nil && !workoutViewModel.sessions.isEmpty {
+                                let recentCount = workoutViewModel.sessions.filter {
+                                    $0.date > Calendar.current.date(byAdding: .day, value: -14, to: Date()) ?? Date()
+                                }.count
+                                if recentCount < 3 {
+                                    HStack(spacing: AppSpacing.sm) {
+                                        Image(systemName: "brain.head.profile")
+                                            .font(.system(size: 14))
+                                            .foregroundColor(.purple)
+                                        Text("Complete \(3 - recentCount) more workout\(3 - recentCount == 1 ? "" : "s") to unlock AI Recovery Insights")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                        Spacer()
+                                        HStack(spacing: 4) {
+                                            ForEach(0..<3, id: \.self) { i in
+                                                Circle()
+                                                    .fill(i < recentCount ? Color.purple : Color(.systemGray4))
+                                                    .frame(width: 6, height: 6)
+                                            }
+                                        }
+                                    }
+                                    .padding(AppSpacing.md)
+                                    .background(Color.purple.opacity(0.06))
+                                    .cornerRadius(AppCorners.medium)
+                                    .opacity(animateEntrance ? 1 : 0)
+                                    .animation(AppAnimations.smooth.delay(0.55), value: animateEntrance)
+                                }
+                            }
+
+                            // Recovery Digest quick action (shown when insights are available)
+                            if insightsVM.insight != nil {
+                                QuickActionButton(
+                                    icon: "brain.head.profile",
+                                    gradientColors: [.purple, .pink],
+                                    title: "Recovery Digest",
+                                    subtitle: insightsVM.insight?.headline ?? "View your weekly insights",
+                                    action: { tabSelection.selectedTab = 3 }
+                                )
+                                .opacity(animateEntrance ? 1 : 0)
+                                .offset(y: animateEntrance ? 0 : 15)
+                                .animation(AppAnimations.smooth.delay(0.55), value: animateEntrance)
+                            }
                         }
                         .padding(.horizontal, AppSpacing.xl)
 
@@ -79,7 +124,7 @@ struct HomeTab: View {
                                 .padding(.horizontal, AppSpacing.xl)
                                 .opacity(animateEntrance ? 1 : 0)
                                 .offset(y: animateEntrance ? 0 : 15)
-                                .animation(AppAnimations.smooth.delay(0.55), value: animateEntrance)
+                                .animation(AppAnimations.smooth.delay(0.65), value: animateEntrance)
                         }
 
                         Spacer(minLength: 40)
@@ -421,9 +466,9 @@ struct OnboardingEditView: View {
     private var stepSubtitle: String {
         switch viewModel.currentStep {
         case 1: return "Let's start with some basic information"
-        case 2: return "Select any conditions that apply to you"
-        case 3: return "Tell us about any past surgical procedures"
-        case 4: return "Any current or previous injuries?"
+        case 2: return "Adding your medical history helps our AI provide safer, more accurate recommendations"
+        case 3: return "Past surgeries help us avoid exercises that could cause re-injury"
+        case 4: return "Current or past injuries help us tailor your rehab plan"
         case 5: return "How active are you day to day?"
         case 6: return "Make sure everything looks correct"
         default: return ""

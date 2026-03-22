@@ -40,6 +40,9 @@ final class ExerciseImageService: @unchecked Sendable {
     /// Track in-flight downloads to avoid duplicate network requests.
     private var activeDownloads: [String: Task<UIImage?, Never>] = [:]
 
+    /// Lock protecting mutable dictionaries from concurrent access.
+    private let lock = NSLock()
+
     // MARK: - Firebase Storage
 
     private let storageRef: StorageReference = {
@@ -127,76 +130,161 @@ final class ExerciseImageService: @unchecked Sendable {
         "calf-raises-bilateral-eccentric-focus": "double-leg-calf-raise",
         "calf-raises-bilateral-to-single-leg-progression": "double-leg-calf-raise",
         "calf-raises-double-leg-eccentric-emphasis": "double-leg-calf-raise",
+        "calf-raise-with-hamstring-co-activation-weeks-3-6": "double-leg-calf-raise",
+        "calf-raises-bilateral": "double-leg-calf-raise",
         // Band pull-apart variants
         "band-pull-apart": "band-pull-aparts",
         "half-kneeling-band-pull-aparts": "band-pull-aparts",
+        "band-pull-apart-external-rotation": "resistance-band-external-rotation-at-90-90",
         // Bird dog variants
         "bird-dog-core-stabilizer": "bird-dog",
+        "quadruped-bird-dog": "bird-dog",
+        "quadruped-spinal-extensions-bird-dogs": "bird-dog",
         // Child's pose variants
         "childs-pose-with-shoulder-reach": "childs-pose-with-side-reach",
         // Cat-cow variants
         "cat-cow-stretch-modified-for-lower-back-relief": "cat-cow-stretch",
+        "cat-cow-stretch-prone-hold-variation": "cat-cow-stretch",
+        "cat-cow-stretch-sequence": "cat-cow-stretch",
+        "cat-cow-stretch-spine-mobility": "cat-cow-stretch",
+        // Clamshell variants
+        "clamshells-left-side-emphasis": "clamshells",
+        "clamshells-side-lying-hip-abduction": "clamshells",
         // Dead bug variants
         "dead-bug-modified-for-core-stability-and-l4-protection": "dead-bug",
         "dead-bug-core-stability-for-lower-back-support": "dead-bug",
+        "dead-bug-core-stability-hamstring-protection": "dead-bug",
+        "dead-bug-modified": "dead-bug",
         // Glute bridge variants
         "glute-bridge-with-core-hold": "glute-bridge-with-isometric-hold",
         "supine-glute-bridge-with-hamstring-activation": "glute-bridge",
+        "glute-bridge-with-hamstring-engagement": "glute-bridge",
+        "glute-bridges-bilateral": "glute-bridges",
+        "supine-hip-bridge": "glute-bridge",
+        "banded-glute-kickbacks-standing-hip-extension": "standing-hip-extension",
         // Hamstring stretch variants
         "hamstring-and-calf-stretch-supine-strap-assist": "hamstring-stretch-with-strap",
         "supine-hamstring-stretch-with-strap": "hamstring-stretch-with-strap",
         "seated-forward-fold-hamstring-stretch": "seated-hamstring-stretch",
         "lying-hamstring-and-hip-flexor-stretch-modified": "lying-hip-flexor-stretch",
+        "hamstring-stretch": "supine-hamstring-stretch",
+        "supine-hamstring-stretch-with-towel-strap": "supine-hamstring-stretch",
+        "nordic-hamstring-curl-assisted-weeks-4-6": "hamstring-curls",
+        "standing-hamstring-flexibility-walk": "walking",
         // Lateral band walk variants
         "lateral-band-walk-glute-medius-hip-stability": "lateral-band-walks",
         // Monster walk variants
         "monster-walks-resistance-band": "monster-walks",
         // Pendulum variants
         "pendulum-shoulder-circles": "pendulum-swings",
+        "right-shoulder-pendulum-circles": "pendulum-swings",
+        "seated-shoulder-pendulum-circles": "pendulum-swings",
         // Plantar/soleus stretch variants
         "plantar-fascia-and-soleus-stretch": "soleus-stretch",
+        // Plank variants
+        "planks-modified-wall-or-incline": "plank",
+        "prone-plank-hold-beginner-progression": "plank",
+        "tall-plank-with-shoulder-blade-protraction": "plank",
         // Prone variants
         "prone-hamstring-isometric-hold": "prone-hamstring-curl",
         "prone-hip-extension-single-leg-for-glute-activation": "prone-hip-extension",
+        "prone-hip-extension-single-leg": "prone-hip-extension",
         "prone-shoulder-external-rotation-with-elbow-support": "side-lying-external-rotation",
         "prone-shoulder-i-y-t-raises": "prone-i-y-t-raises",
+        "prone-y-t-w-shoulder-activation": "prone-i-y-t-raises",
         "lower-back-quadriceps-tightness---prone-quad-stretch": "standing-quad-stretch",
+        "prone-cobra-modified-sphinx": "prone-press-up",
+        "prone-cobra-or-modified-sphinx-lower-back-extension": "prone-press-up",
+        "prone-sphinx-stretch": "prone-press-up",
+        "prone-scapular-squeeze": "prone-scapular-retraction",
+        "prone-hip-internal-rotation-piriformis-stretch": "supine-piriformis-stretch",
+        "prone-quadriceps-stretch": "standing-quad-stretch",
         // Quad sets variants
         "quad-sets-with-glute-activation": "quad-sets",
         "quad-sets-with-vmo-focus": "quad-sets",
         "quadriceps-sets-isometric": "quad-sets",
         "quadriceps-sets-with-vmo-focus": "quad-sets",
+        "quadriceps-sets-bilateral": "quad-sets",
+        "quadriceps-strengthening": "quad-sets",
         "quadriceps-and-patellar-tendon-eccentric-stretch": "standing-quad-stretch",
-        // Quadruped cat-cow variants
+        "quadriceps-eccentric-lowering-controlled-strength": "long-arc-quads",
+        "quadriceps-stretch": "standing-quad-stretch",
+        "quadriceps-stretch-standing": "standing-quad-stretch",
+        "quadriceps-hip-flexor-stretch-kneeling-lunge": "hip-flexor-stretch",
+        // Quadruped variants
         "quadruped-cat-cow-stretch": "cat-cow-stretch",
         "thoracic-spine-rotation-quadruped-cat-cow": "quadruped-thoracic-rotation",
+        "quadruped-glute-squeeze-activation-endurance": "prone-glute-squeeze-holds",
+        "quadruped-hip-extension-glute-activation": "fire-hydrants",
+        "quadruped-hip-shoulder-rocks": "quadruped-rocking",
+        "quadruped-rocking-with-spinal-extension": "quadruped-rocking",
         // External rotation variants
         "external-rotation-with-elbow-bent-90-90-position": "external-rotation",
-        // Scapular push-up variants
+        "right-shoulder-external-rotation-prone": "side-lying-external-rotation",
+        // Scapular variants
         "scapular-push-up-hold": "wall-push-ups",
         "scapular-push-up-plus": "wall-push-ups",
         "scapular-push-up-plus-modified": "wall-push-ups",
         "serratus-anterior-push-up-plus": "wall-push-ups",
+        "scapular-wall-slides": "wall-slides",
         // Single leg balance/deadlift variants
         "single-leg-stance-on-firm-surface": "single-leg-balance",
+        "single-leg-balance-left-leg-emphasis": "single-leg-balance",
         "single-leg-romanian-deadlift-light-load": "single-leg-deadlift",
-        // Standing hamstring curl variants
+        "standing-single-leg-balance-with-hip-hinge": "single-leg-deadlift",
+        // Standing variants
         "standing-hamstring-curl-progressive": "standing-hamstring-curl",
+        "standing-chest-doorway-stretch": "doorway-stretch",
+        "standing-hip-flexor-stretch": "hip-flexor-stretch",
+        // Shoulder variants
+        "shoulder-rolls": "shoulder-shrugs",
         // Straight leg raise variants
         "straight-leg-raise-slr---supine": "straight-leg-raises",
+        "straight-leg-raise-left-leg": "straight-leg-raises",
+        "straight-leg-raises-supine": "straight-leg-raises",
         // Supine stretch variants
         "supine-lower-back-stretch": "knee-to-chest-stretch",
+        "supine-lower-back-rotation-stretch": "lumbar-rotation-stretch",
+        "supine-lower-back-rotation-stretch-spinal-mobility": "lumbar-rotation-stretch",
         "supine-shoulder-external-rotation-90-90-position": "external-rotation",
         "supine-shoulder-external-rotation-with-towel-roll": "external-rotation",
         "supine-shoulder-flexion-with-dowel-or-pvc-pipe": "shoulder-flexion",
+        "supine-hip-flexor-stretch": "lying-hip-flexor-stretch",
+        "supine-figure-4-stretch-alternative-piriformis-stretch": "supine-figure-4-stretch-with-pelvic-mobilization",
+        // Seated variants
+        "seated-knee-extension-with-asthma-pacing": "seated-knee-extension",
+        // Wrist/forearm variants
+        "eccentric-wrist-extensor-curls": "reverse-wrist-curls",
+        "forearm-pronation-supination": "wrist-pronation-supination",
+        "isometric-wrist-extensions": "reverse-wrist-curls",
+        "isometric-wrist-strengthening-4-direction": "wrist-curls",
+        "wrist-flexor-extensor-stretches": "wrist-extensor-stretch",
+        "wrist-flexor-stretches": "wrist-flexor-stretch",
+        // Thoracic variants
+        "half-kneeling-thoracic-rotation-with-post": "quadruped-thoracic-rotation",
+        "thoracic-spine-extensions": "thoracic-extension",
+        // Pigeon pose → piriformis stretch
+        "pigeon-pose-deep-hip-flexor-piriformis-stretch": "piriformis-stretch",
         // Nerve glide variants
         "sural-nerve-glide-neural-mobility-for-sural-nerve-irritation": "sciatic-nerve-glide",
         // Terminal knee extension variants
         "terminal-knee-extensions-tke": "terminal-knee-extension",
     ]
 
+    /// Cache for fuzzy-matched keys to avoid redundant computation.
+    private var fuzzyMatchCache: [String: String?] = [:]
+
+    /// Body-part synonyms for token-level replacement.
+    private static let synonyms: [String: String] = [
+        "quadriceps": "quad",
+        "quadricep": "quad",
+        "hamstrings": "hamstring",
+        "calves": "calf",
+        "abdominals": "abdominal",
+    ]
+
     /// Resolve the mapping key for an exercise.
-    /// Priority: imageFileName field → normalized exercise name → alias → nil.
+    /// Priority: imageFileName → normalized name → alias → fuzzy match → nil.
     func imageKey(for exercise: RehabExercise) -> String? {
         // 1. Explicit imageFileName from AI / Firestore
         if let fileName = exercise.imageFileName, mapping[fileName] != nil {
@@ -214,7 +302,76 @@ final class ExerciseImageService: @unchecked Sendable {
             return alias
         }
 
+        // 4-7. Fuzzy matching (cached)
+        return lock.withLock {
+            if let cached = fuzzyMatchCache[normalized] {
+                return cached
+            }
+            let result = fuzzyMatch(normalized)
+            fuzzyMatchCache[normalized] = result
+            return result
+        }
+    }
+
+    // MARK: - Fuzzy Matching
+
+    /// Layers 4-7: progressively looser matching strategies.
+    private func fuzzyMatch(_ normalized: String) -> String? {
+        // Layer 4: Longest prefix match
+        // e.g. "cat-cow-stretch-modified-for-lower-back-relief" starts with "cat-cow-stretch-"
+        if let match = longestPrefixMatch(normalized) { return match }
+
+        // Layer 5: Suffix match — AI omits position prefix
+        // e.g. "calf-raises" is a suffix of "standing-calf-raises"
+        if let match = suffixMatch(normalized) { return match }
+
+        // Layer 6: Plural/singular toggle, then retry layers 4-5
+        let toggled = normalized.hasSuffix("s") ? String(normalized.dropLast()) : normalized + "s"
+        if mapping[toggled] != nil { return toggled }
+        if let match = longestPrefixMatch(toggled) { return match }
+        if let match = suffixMatch(toggled) { return match }
+
+        // Layer 7: Synonym expansion, then retry layers 2+4+5
+        let expanded = applySynonyms(normalized)
+        if expanded != normalized {
+            if mapping[expanded] != nil { return expanded }
+            if let match = longestPrefixMatch(expanded) { return match }
+            if let match = suffixMatch(expanded) { return match }
+            // Also try plural toggle on expanded form
+            let expandedToggled = expanded.hasSuffix("s") ? String(expanded.dropLast()) : expanded + "s"
+            if mapping[expandedToggled] != nil { return expandedToggled }
+            if let match = longestPrefixMatch(expandedToggled) { return match }
+            if let match = suffixMatch(expandedToggled) { return match }
+        }
+
         return nil
+    }
+
+    /// Find the longest mapping key that is a prefix of `name` at a hyphen boundary.
+    private func longestPrefixMatch(_ name: String) -> String? {
+        mapping.keys
+            .filter { name.hasPrefix($0 + "-") }
+            .max(by: { $0.count < $1.count })
+    }
+
+    /// Find a mapping key where `name` appears as a suffix at a hyphen boundary.
+    /// Prefers the shortest (least specialized) key on ambiguity.
+    private func suffixMatch(_ name: String) -> String? {
+        let matches = mapping.keys.filter { $0.hasSuffix("-" + name) }
+        return matches.min(by: { $0.count < $1.count })
+    }
+
+    /// Replace body-part synonym tokens in a hyphen-delimited name.
+    private func applySynonyms(_ name: String) -> String {
+        var tokens = name.split(separator: "-").map(String.init)
+        var changed = false
+        for i in tokens.indices {
+            if let replacement = Self.synonyms[tokens[i]] {
+                tokens[i] = replacement
+                changed = true
+            }
+        }
+        return changed ? tokens.joined(separator: "-") : name
     }
 
     // MARK: - Image Loading Pipeline
@@ -232,17 +389,21 @@ final class ExerciseImageService: @unchecked Sendable {
         }
 
         // 3. Download from Firebase Storage (deduplicate in-flight requests)
-        if let existingTask = activeDownloads[key] {
-            return await existingTask.value
+        let task: Task<UIImage?, Never> = lock.withLock {
+            if let existingTask = activeDownloads[key] {
+                return existingTask
+            }
+
+            let newTask = Task<UIImage?, Never> {
+                let image = await self.downloadFromStorage(key: key)
+                self.lock.withLock { self.activeDownloads.removeValue(forKey: key) }
+                return image
+            }
+
+            activeDownloads[key] = newTask
+            return newTask
         }
 
-        let task = Task<UIImage?, Never> {
-            let image = await downloadFromStorage(key: key)
-            activeDownloads.removeValue(forKey: key)
-            return image
-        }
-
-        activeDownloads[key] = task
         return await task.value
     }
 

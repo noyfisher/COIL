@@ -34,6 +34,8 @@ struct AnalyzingView: View {
         .navigationTitle("Analyzing")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        .interactiveDismissDisabled(viewModel.isAnalyzing)
+        .gesture(viewModel.isAnalyzing ? DragGesture() : nil)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 if viewModel.isAnalyzing {

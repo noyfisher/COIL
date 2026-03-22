@@ -17,6 +17,7 @@ struct PainDetailView: View {
     @State private var customRelieving: String = ""
     @State private var additionalNotes: String = ""
     @State private var showApplyToAllConfirmation: Bool = false
+    @State private var showMoreDetails: Bool = false
     // Treatment history state
     @State private var hasSeenDoctor: Bool = false
     @State private var imagingDone: [String] = []
@@ -72,16 +73,45 @@ struct PainDetailView: View {
                         if let currentRegion = viewModel.currentRegion {
                             CardSection(icon: "figure.walk", color: .blue, title: "Assessing: \(currentRegion.name)") {
                                 VStack(alignment: .leading, spacing: AppSpacing.xl) {
+                                    // Essential fields — always visible
                                     painTypeSelection
-                                    customPainDescriptionField
                                     painIntensitySlider
                                     painDurationPicker
                                     painFrequencyPicker
                                     painOnsetPicker
                                     aggravatingFactorsSelection
                                     relievingFactorsSelection
-                                    treatmentHistorySection
-                                    additionalNotesField
+
+                                    // Collapsible section for optional details
+                                    Button(action: {
+                                        withAnimation(AppAnimations.springy) {
+                                            showMoreDetails.toggle()
+                                        }
+                                    }) {
+                                        HStack {
+                                            Image(systemName: showMoreDetails ? "chevron.up.circle.fill" : "plus.circle.fill")
+                                                .foregroundColor(.blue)
+                                            Text(showMoreDetails ? "Hide Additional Details" : "Add More Details")
+                                                .font(.subheadline.weight(.medium))
+                                                .foregroundColor(.blue)
+                                            Spacer()
+                                            if !showMoreDetails && hasOptionalContent {
+                                                Text("Has content")
+                                                    .font(.caption2)
+                                                    .foregroundColor(.green)
+                                            }
+                                        }
+                                        .padding(AppSpacing.md)
+                                        .background(Color.blue.opacity(0.06))
+                                        .cornerRadius(AppCorners.medium)
+                                    }
+                                    .buttonStyle(.plain)
+
+                                    if showMoreDetails {
+                                        customPainDescriptionField
+                                        treatmentHistorySection
+                                        additionalNotesField
+                                    }
                                 }
                             }
                             navigationButtons
@@ -192,6 +222,11 @@ struct PainDetailView: View {
             diagnosisText = saved.currentTreatment?.diagnosisText ?? ""
             currentlyReceivingTreatment = saved.currentTreatment?.currentlyReceivingTreatment ?? false
             treatmentDetails = saved.currentTreatment?.treatmentDetails ?? ""
+            // Auto-expand if optional sections have content
+            showMoreDetails = !(saved.customPainDescription ?? "").isEmpty ||
+                (saved.currentTreatment?.hasSeenDoctor ?? false) ||
+                (saved.currentTreatment?.currentlyReceivingTreatment ?? false) ||
+                !(saved.additionalNotes ?? "").isEmpty
         } else {
             painTypes = []
             customPainType = ""
@@ -211,10 +246,18 @@ struct PainDetailView: View {
             diagnosisText = ""
             currentlyReceivingTreatment = false
             treatmentDetails = ""
+            showMoreDetails = false
         }
     }
 
     // MARK: - Form Completion Tracking
+
+    /// Whether any optional (collapsed) fields have content
+    private var hasOptionalContent: Bool {
+        !customPainDescription.trimmingCharacters(in: .whitespaces).isEmpty ||
+        hasSeenDoctor || currentlyReceivingTreatment ||
+        !additionalNotes.trimmingCharacters(in: .whitespaces).isEmpty
+    }
 
     private var formCompletionFields: Int {
         var count = 0
@@ -807,17 +850,22 @@ struct PainDetailView: View {
 
     private var navigationButtons: some View {
         VStack(spacing: AppSpacing.sm) {
-            // "Apply to All Regions" — only on first region when multiple exist
-            if viewModel.isFirstRegion && viewModel.hasMultipleRegions {
+            // "Apply to All Regions" — shown on every region when multiple exist
+            if viewModel.hasMultipleRegions {
                 Button(action: {
                     showApplyToAllConfirmation = true
                 }) {
                     HStack(spacing: AppSpacing.sm) {
                         Image(systemName: "doc.on.doc")
-                        Text("Apply to All \(viewModel.totalRegions) Regions")
+                        Text("Apply to All \(viewModel.totalRegions) Regions & Analyze")
                     }
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, AppSpacing.md)
+                    .background(AppColors.healingGradient)
+                    .cornerRadius(AppCorners.large)
                 }
-                .buttonStyle(SecondaryButtonStyle())
             }
 
             // Existing navigation row
