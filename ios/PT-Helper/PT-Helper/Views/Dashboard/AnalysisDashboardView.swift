@@ -156,6 +156,17 @@ struct AnalysisDashboardView: View {
             .buttonStyle(.plain)
             .accessibilityIdentifier("dashboard.newAnalysisButton")
 
+            NavigationLink(destination: FormCheckTab()) {
+                DashActionButton(
+                    icon: "video.badge.checkmark",
+                    title: "Form Check",
+                    subtitle: "Verify your exercise form with AI",
+                    iconColor: AppColors.dashWarning
+                )
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("dashboard.formCheckButton")
+
             Button {
                 tabSelection.selectedTab = 1
             } label: {

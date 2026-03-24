@@ -41,6 +41,7 @@ final class AnalyticsService {
         case pdfExported = "pdf_exported"
         case tabSwitched = "tab_switched"
         case workoutResumed = "workout_resumed"
+        case formAnalysisCompleted = "form_analysis_completed"
     }
 
     // MARK: - Logging

@@ -8,6 +8,7 @@ struct GuidedWorkoutView: View {
     @EnvironmentObject private var savedPlansVM: SavedPlansViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var showSwapSheet = false
+    @State private var showFormAnalysis = false
     @State private var showEndConfirmation = false
     @State private var showResumePrompt = false
     @State private var savedCheckpoint: GuidedWorkoutViewModel.WorkoutCheckpoint?
@@ -93,6 +94,11 @@ struct GuidedWorkoutView: View {
                 }
             }
         }
+        .sheet(isPresented: $showFormAnalysis) {
+            if let exercise = vm.currentExercise {
+                FormAnalysisView(exercise: exercise)
+            }
+        }
     }
 
     // MARK: - Exercise Phase
@@ -170,6 +176,15 @@ struct GuidedWorkoutView: View {
                         }
                         .buttonStyle(PrimaryButtonStyle())
                         .accessibilityIdentifier("workout.completeSetButton")
+
+                        Button(action: { showFormAnalysis = true }) {
+                            HStack(spacing: AppSpacing.sm) {
+                                Image(systemName: "video.fill")
+                                Text("Check My Form")
+                            }
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
+                        .accessibilityIdentifier("workout.formCheckButton")
 
                         Button(action: { showSwapSheet = true }) {
                             HStack(spacing: AppSpacing.sm) {

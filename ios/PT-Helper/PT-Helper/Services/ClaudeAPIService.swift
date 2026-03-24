@@ -54,6 +54,7 @@ enum AIRequestType: String, Encodable {
     case rehab_plan
     case exercise_substitute
     case recovery_insights
+    case form_analysis
 }
 
 struct ClaudeProxyRequest: Encodable {
