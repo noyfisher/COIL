@@ -24,6 +24,7 @@ struct DashboardMainTabView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, AppSpacing.sm)
                 .background(AppColors.dashDanger.opacity(0.8))
+                .accessibilityIdentifier("offlineBanner")
             }
 
             TabView(selection: $tabSelection.selectedTab) {
@@ -32,18 +33,21 @@ struct DashboardMainTabView: View {
                         Label("Dashboard", systemImage: "square.grid.2x2.fill")
                     }
                     .tag(0)
+                    .id(tabSelection.dashboardNavigationId)
 
                 RehabMetricsView()
                     .tabItem {
                         Label("Rehab", systemImage: "heart.text.clipboard.fill")
                     }
                     .tag(1)
+                    .id(tabSelection.rehabNavigationId)
 
                 DashProfileView()
                     .tabItem {
                         Label("Profile", systemImage: "person.fill")
                     }
                     .tag(2)
+                    .id(tabSelection.profileNavigationId)
             }
             .tint(AppColors.dashAccent)
         }
@@ -54,7 +58,11 @@ struct DashboardMainTabView: View {
         .environmentObject(networkMonitor)
         .environmentObject(recoveryInsightsViewModel)
         .environmentObject(analysisStore)
-        .onChange(of: tabSelection.selectedTab) { _, newTab in
+        .onChange(of: tabSelection.selectedTab) { oldTab, newTab in
+            // Re-tapping the same tab pops to root
+            if oldTab == newTab {
+                tabSelection.popToRootCurrentTab()
+            }
             let tabNames = ["Dashboard", "Rehab", "Profile"]
             let name = newTab < tabNames.count ? tabNames[newTab] : "Unknown"
             SessionLogger.shared.logNavigation(.tabSwitched, screen: name, metadata: ["tab": "\(newTab)"])

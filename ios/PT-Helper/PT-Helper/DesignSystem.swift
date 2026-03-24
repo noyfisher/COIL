@@ -449,6 +449,7 @@ struct SessionLoggingModifier: ViewModifier {
         content
             .onAppear {
                 SessionLogger.shared.logNavigation(.screenAppeared, screen: screenName)
+                AnalyticsService.shared.logScreenView(screenName)
             }
             .onDisappear {
                 SessionLogger.shared.logNavigation(.screenDisappeared, screen: screenName)

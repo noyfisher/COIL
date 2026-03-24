@@ -342,6 +342,7 @@ struct AnalysisResultView: View {
         }
         .buttonStyle(PrimaryButtonStyle())
         .padding(.top, AppSpacing.lg)
+        .accessibilityIdentifier("analysisResult.buildRehabPlanButton")
     }
 
     // MARK: - Preferences Sheet

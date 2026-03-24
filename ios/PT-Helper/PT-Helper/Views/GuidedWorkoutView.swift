@@ -43,17 +43,20 @@ struct GuidedWorkoutView: View {
                         showEndConfirmation = true
                     }
                     .foregroundColor(.red)
+                    .accessibilityIdentifier("workout.endButton")
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: { vm.togglePause() }) {
                         Image(systemName: vm.isPaused ? "play.fill" : "pause.fill")
                     }
+                    .accessibilityIdentifier("workout.pauseButton")
                 }
             }
         }
         .trackScreen("GuidedWorkout")
         .onAppear {
+            AnalyticsService.shared.log(.workoutStarted, parameters: ["exercise_count": vm.totalExercises])
             if let checkpoint = GuidedWorkoutViewModel.savedCheckpoint(forPlanId: vm.plan.id.uuidString) {
                 savedCheckpoint = checkpoint
                 showResumePrompt = true
@@ -63,6 +66,7 @@ struct GuidedWorkoutView: View {
             Button("Resume") {
                 if let checkpoint = savedCheckpoint {
                     vm.restoreFromCheckpoint(checkpoint)
+                    AnalyticsService.shared.log(.workoutResumed)
                 }
             }
             Button("Start Fresh", role: .destructive) {
@@ -111,6 +115,7 @@ struct GuidedWorkoutView: View {
                     VStack(alignment: .leading, spacing: AppSpacing.md) {
                         Text(exercise.name)
                             .font(.title3.weight(.bold))
+                            .accessibilityIdentifier("workout.exerciseName")
 
                         HStack(spacing: AppSpacing.md) {
                             infoBadge(icon: "arrow.triangle.2.circlepath", text: "Set \(vm.currentSet)/\(exercise.sets)")
@@ -164,6 +169,7 @@ struct GuidedWorkoutView: View {
                             }
                         }
                         .buttonStyle(PrimaryButtonStyle())
+                        .accessibilityIdentifier("workout.completeSetButton")
 
                         Button(action: { showSwapSheet = true }) {
                             HStack(spacing: AppSpacing.sm) {
@@ -172,6 +178,7 @@ struct GuidedWorkoutView: View {
                             }
                         }
                         .buttonStyle(SecondaryButtonStyle())
+                        .accessibilityIdentifier("workout.swapButton")
 
                         Button(action: {
                             vm.skipExercise()
@@ -182,6 +189,7 @@ struct GuidedWorkoutView: View {
                             }
                         }
                         .buttonStyle(SecondaryButtonStyle())
+                        .accessibilityIdentifier("workout.skipButton")
                     }
                 }
 

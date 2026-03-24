@@ -109,6 +109,7 @@ class RecoveryInsightsViewModel: ObservableObject {
             self.lastGeneratedDate = Date()
             self.isLoading = false
 
+            AnalyticsService.shared.log(.recoveryInsightsViewed)
             SessionLogger.shared.log(.loadingFinished, category: .stateChange,
                                       message: "Recovery insights generated",
                                       metadata: [

@@ -1,43 +1,105 @@
-//
-//  PT_HelperUITests.swift
-//  PT-HelperUITests
-//
-//  Created by Noy Fisher on 9/22/25.
-//
-
 import XCTest
 
-final class PT_HelperUITests: XCTestCase {
+// MARK: - Onboarding UI Tests
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+final class OnboardingUITests: UITestBase {
 
-        // In UI tests it is usually best to stop immediately when a failure occurs.
-        continueAfterFailure = false
-
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
+    override var skipOnboarding: Bool { false }
+    override var seedMockData: Bool { false }
 
     @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
-        app.launch()
+    func testFullFlow_CompletesAllSixSteps() throws {
+        // Step 1: Basic Info
+        assertExists("onboarding.stepIndicator")
+        XCTAssertTrue(staticText("Step 1 of 6").exists)
 
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
-
-    @MainActor
-    func testLaunchPerformance() throws {
-        if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
-            // This measures how long it takes to launch your application.
-            measure(metrics: [XCTApplicationLaunchMetric()]) {
-                XCUIApplication().launch()
-            }
+        // Fill basic info fields
+        let firstNameField = app.textFields["First Name"]
+        if firstNameField.waitForExistence(timeout: 3) {
+            firstNameField.tap()
+            firstNameField.typeText("Test")
         }
+
+        let lastNameField = app.textFields["Last Name"]
+        if lastNameField.exists {
+            lastNameField.tap()
+            lastNameField.typeText("User")
+        }
+
+        // Tap continue to advance
+        let continueButton = app.descendants(matching: .any)["onboarding.continueButton"]
+        if continueButton.waitForExistence(timeout: 3), continueButton.isEnabled {
+            continueButton.tap()
+        }
+
+        // Step 2: Medical History
+        XCTAssertTrue(staticText("Step 2 of 6").waitForExistence(timeout: 3))
+        if continueButton.exists, continueButton.isEnabled {
+            continueButton.tap()
+        }
+
+        // Step 3: Surgical History
+        XCTAssertTrue(staticText("Step 3 of 6").waitForExistence(timeout: 3))
+        if continueButton.exists, continueButton.isEnabled {
+            continueButton.tap()
+        }
+
+        // Step 4: Injuries
+        XCTAssertTrue(staticText("Step 4 of 6").waitForExistence(timeout: 3))
+        if continueButton.exists, continueButton.isEnabled {
+            continueButton.tap()
+        }
+
+        // Step 5: Activity Level
+        XCTAssertTrue(staticText("Step 5 of 6").waitForExistence(timeout: 3))
+        if continueButton.exists, continueButton.isEnabled {
+            continueButton.tap()
+        }
+
+        // Step 6: Review & Submit
+        XCTAssertTrue(staticText("Step 6 of 6").waitForExistence(timeout: 3))
+
+        captureScreenshot(name: "Onboarding-Step6-Review")
+    }
+
+    @MainActor
+    func testSkipButton_GoesToMainView() throws {
+        let skipButton = app.descendants(matching: .any)["onboarding.skipButton"]
+        XCTAssertTrue(skipButton.waitForExistence(timeout: 3))
+        skipButton.tap()
+
+        // Should land on the main tab view (Dashboard or legacy tabs)
+        let tabBar = app.tabBars.firstMatch
+        XCTAssertTrue(tabBar.waitForExistence(timeout: 5), "Tab bar should appear after skipping onboarding")
+    }
+
+    @MainActor
+    func testBackButton_NavigatesToPreviousStep() throws {
+        // Advance to step 3
+        let continueButton = app.descendants(matching: .any)["onboarding.continueButton"]
+        if continueButton.waitForExistence(timeout: 3) {
+            // Step 1 → 2
+            if continueButton.isEnabled { continueButton.tap() }
+            _ = staticText("Step 2 of 6").waitForExistence(timeout: 3)
+            // Step 2 → 3
+            if continueButton.isEnabled { continueButton.tap() }
+            _ = staticText("Step 3 of 6").waitForExistence(timeout: 3)
+        }
+
+        // Go back twice
+        let backButton = app.descendants(matching: .any)["onboarding.backButton"]
+        XCTAssertTrue(backButton.exists)
+        backButton.tap()
+        XCTAssertTrue(staticText("Step 2 of 6").waitForExistence(timeout: 3))
+        backButton.tap()
+        XCTAssertTrue(staticText("Step 1 of 6").waitForExistence(timeout: 3))
+    }
+
+    @MainActor
+    func testContinueDisabled_WhenRequiredFieldsMissing() throws {
+        // On step 1 with no fields filled, Continue should be disabled
+        let continueButton = app.descendants(matching: .any)["onboarding.continueButton"]
+        XCTAssertTrue(continueButton.waitForExistence(timeout: 3))
+        XCTAssertFalse(continueButton.isEnabled, "Continue should be disabled before required fields are filled")
     }
 }

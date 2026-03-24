@@ -154,6 +154,7 @@ struct AnalysisDashboardView: View {
                 )
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("dashboard.newAnalysisButton")
 
             Button {
                 tabSelection.selectedTab = 1

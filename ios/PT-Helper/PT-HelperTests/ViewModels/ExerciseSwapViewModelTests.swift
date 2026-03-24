@@ -22,6 +22,16 @@ final class ExerciseSwapViewModelTests: XCTestCase {
         )
     }
 
+    override func tearDown() {
+        // Clean up any persistent state that may have been written during tests
+        UserDefaults.standard.removeObject(forKey: "GuidedWorkoutCheckpoint")
+        UserDefaults.standard.removeObject(forKey: "dashboardLastAnalysisResult")
+        mockAPI = nil
+        exercise = nil
+        plan = nil
+        super.tearDown()
+    }
+
     // MARK: - SwapReason
 
     func testSwapReason_allCasesHaveDisplayNameAndIcon() {

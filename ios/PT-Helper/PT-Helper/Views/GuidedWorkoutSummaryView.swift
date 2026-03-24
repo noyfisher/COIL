@@ -87,6 +87,7 @@ struct GuidedWorkoutSummaryView: View {
                         }
                     }
                     .buttonStyle(PrimaryButtonStyle())
+                    .accessibilityIdentifier("workoutSummary.doneButton")
                 } else {
                     Button(action: saveSession) {
                         HStack(spacing: AppSpacing.sm) {
@@ -95,6 +96,7 @@ struct GuidedWorkoutSummaryView: View {
                         }
                     }
                     .buttonStyle(PrimaryButtonStyle())
+                    .accessibilityIdentifier("workoutSummary.saveButton")
                 }
 
                 Spacer(minLength: 40)

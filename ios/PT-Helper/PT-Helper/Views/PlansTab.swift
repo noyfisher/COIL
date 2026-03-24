@@ -18,6 +18,7 @@ struct PlansTab: View {
                     errorState(error)
                 } else if savedPlansViewModel.rehabPlans.isEmpty {
                     emptyState
+                        .accessibilityIdentifier("plansTab.emptyState")
                 } else {
                     plansList
                 }
@@ -107,6 +108,7 @@ struct PlansTab: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .cardStyle()
+        .accessibilityIdentifier("plansTab.planCard.\(plan.planName)")
     }
 
     // MARK: - Empty State

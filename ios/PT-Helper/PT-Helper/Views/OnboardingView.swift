@@ -15,11 +15,15 @@ struct OnboardingView: View {
                 HStack {
                     Spacer()
                     if let onSkip = onSkip {
-                        Button(action: onSkip) {
+                        Button(action: {
+                            AnalyticsService.shared.log(.onboardingSkipped, parameters: ["skipped_at_step": viewModel.currentStep])
+                            onSkip()
+                        }) {
                             Text("Skip")
                                 .font(.subheadline.weight(.medium))
                                 .foregroundColor(.secondary)
                         }
+                        .accessibilityIdentifier("onboarding.skipButton")
                     }
                 }
                 .padding(.horizontal, AppSpacing.xl)
@@ -35,6 +39,7 @@ struct OnboardingView: View {
                         .padding(.vertical, AppSpacing.xs)
                         .background(Color.blue)
                         .cornerRadius(AppCorners.medium)
+                        .accessibilityIdentifier("onboarding.stepIndicator")
 
                     HStack(spacing: 6) {
                         ForEach(1...6, id: \.self) { step in
@@ -81,6 +86,7 @@ struct OnboardingView: View {
                             }
                         }
                         .buttonStyle(SecondaryButtonStyle())
+                        .accessibilityIdentifier("onboarding.backButton")
                     }
 
                     if viewModel.currentStep < 6 {
@@ -95,6 +101,7 @@ struct OnboardingView: View {
                             }
                         }
                         .buttonStyle(PrimaryButtonStyle(isDisabled: !viewModel.canProceedFromCurrentStep))
+                        .accessibilityIdentifier("onboarding.continueButton")
                     }
                 }
                 .padding(.horizontal, AppSpacing.xl)

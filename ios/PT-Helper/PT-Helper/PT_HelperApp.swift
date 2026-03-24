@@ -26,11 +26,15 @@ struct PainPointApp: App {
                     switch newPhase {
                     case .active:
                         SessionLogger.shared.log(.appForegrounded, category: .lifecycle, message: "App foregrounded")
+                        AnalyticsService.shared.log(.appOpened)
                     case .background:
                         SessionLogger.shared.endSession()
                     default:
                         break
                     }
+                }
+                .task {
+                    TestDataSeeder.seedIfNeeded()
                 }
         }
     }

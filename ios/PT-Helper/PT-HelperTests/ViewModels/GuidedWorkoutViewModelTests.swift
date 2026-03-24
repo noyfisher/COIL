@@ -6,6 +6,12 @@ import XCTest
 @MainActor
 final class GuidedWorkoutViewModelTests: XCTestCase {
 
+    override func tearDown() {
+        // Clean up any workout checkpoints saved to UserDefaults during tests
+        UserDefaults.standard.removeObject(forKey: "GuidedWorkoutCheckpoint")
+        super.tearDown()
+    }
+
     // MARK: - Helpers
 
     private func makeExercise(

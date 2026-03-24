@@ -103,6 +103,7 @@ class OnboardingViewModel: ObservableObject {
                         AppLogger.data.error("Error saving profile: \(error.localizedDescription)")
                         completion(false)
                     } else {
+                        AnalyticsService.shared.log(.onboardingCompleted)
                         completion(true)
                     }
                 }
@@ -232,6 +233,7 @@ class OnboardingViewModel: ObservableObject {
         if currentStep < 6 && canProceedFromCurrentStep {
             showValidationErrors = false
             currentStep += 1
+            AnalyticsService.shared.log(.onboardingStepCompleted, parameters: ["step_number": currentStep - 1])
         } else {
             showValidationErrors = true
         }

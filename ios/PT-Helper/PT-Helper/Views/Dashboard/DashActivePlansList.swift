@@ -2,6 +2,9 @@ import SwiftUI
 
 struct DashActivePlansList: View {
     let plans: [RehabPlan]
+    @EnvironmentObject private var savedPlansVM: SavedPlansViewModel
+    @State private var planToDelete: RehabPlan?
+    @State private var showDeleteConfirmation = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
@@ -14,7 +17,7 @@ struct DashActivePlansList: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, AppSpacing.lg)
             } else {
-                ForEach(plans.prefix(3)) { plan in
+                ForEach(plans) { plan in
                     HStack(spacing: 0) {
                         NavigationLink(destination: RehabPlanView(existingPlan: plan)) {
                             planInfo(plan)
@@ -30,11 +33,38 @@ struct DashActivePlansList: View {
                                 .cornerRadius(AppCorners.pill)
                         }
                         .buttonStyle(.plain)
+
+                        Button {
+                            planToDelete = plan
+                            showDeleteConfirmation = true
+                        } label: {
+                            Image(systemName: "trash")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppColors.dashDanger.opacity(0.7))
+                                .frame(width: 32, height: 32)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.leading, AppSpacing.sm)
                     }
                 }
             }
         }
         .dashWidget()
+        .alert("Delete Plan", isPresented: $showDeleteConfirmation) {
+            Button("Cancel", role: .cancel) {
+                planToDelete = nil
+            }
+            Button("Delete", role: .destructive) {
+                if let plan = planToDelete {
+                    withAnimation {
+                        savedPlansVM.deletePlan(plan)
+                    }
+                    planToDelete = nil
+                }
+            }
+        } message: {
+            Text("Are you sure you want to delete \"\(planToDelete?.planName ?? "this plan")\"? This cannot be undone.")
+        }
     }
 
     private func planInfo(_ plan: RehabPlan) -> some View {

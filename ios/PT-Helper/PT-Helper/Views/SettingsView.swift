@@ -65,6 +65,7 @@ struct SettingsView: View {
 
                                 Toggle("", isOn: $notificationService.isEnabled)
                                     .labelsHidden()
+                                    .accessibilityIdentifier("settings.reminderToggle")
                                     .onChange(of: notificationService.isEnabled) { _, enabled in
                                         if enabled && !notificationService.isAuthorized {
                                             Task { await notificationService.requestPermission() }
@@ -150,12 +151,14 @@ struct SettingsView: View {
                                     onEditProfile()
                                 }
                             }
+                            .accessibilityIdentifier("settings.editProfileButton")
 
                             Divider().padding(.leading, 52)
 
                             settingsRow(icon: "rectangle.portrait.and.arrow.right", color: .red, title: "Sign Out") {
                                 showSignOutConfirmation = true
                             }
+                            .accessibilityIdentifier("settings.signOutButton")
                         }
                         .background(AppColors.cardBackground)
                         .cornerRadius(AppCorners.large)
@@ -166,6 +169,7 @@ struct SettingsView: View {
                             settingsRow(icon: "trash", color: .red, title: "Delete Account") {
                                 showDeleteConfirmation = true
                             }
+                            .accessibilityIdentifier("settings.deleteAccountButton")
                         }
                         .background(AppColors.cardBackground)
                         .cornerRadius(AppCorners.large)

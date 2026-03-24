@@ -121,6 +121,7 @@ class GuidedWorkoutViewModel: ObservableObject {
     /// Skip the current exercise entirely
     func skipExercise() {
         guard let exercise = currentExercise else { return }
+        AnalyticsService.shared.log(.exerciseSkipped)
         SessionLogger.shared.logUserAction(.buttonTapped, action: "skipExercise",
                                             metadata: ["exercise": exercise.name])
         skippedExercises.append(exercise.name)
@@ -180,6 +181,10 @@ class GuidedWorkoutViewModel: ObservableObject {
                 skippedExercises.append(name)
             }
         }
+        AnalyticsService.shared.log(.workoutEndedEarly, parameters: [
+            "completed_count": completedExercises.count,
+            "skipped_count": skippedExercises.count
+        ])
         SessionLogger.shared.logUserAction(.buttonTapped, action: "endWorkoutEarly",
                                             metadata: ["completed": "\(completedExercises.count)",
                                                         "skipped": "\(skippedExercises.count)"])
@@ -269,6 +274,11 @@ class GuidedWorkoutViewModel: ObservableObject {
         clearCheckpoint()
         phase = .complete
 
+        AnalyticsService.shared.log(.workoutCompleted, parameters: [
+            "duration_seconds": Int(totalElapsedTime),
+            "exercises_completed": completedExercises.count,
+            "exercises_skipped": skippedExercises.count
+        ])
         SessionLogger.shared.log(.stateUpdated, category: .stateChange, message: "Guided workout completed",
                                   metadata: ["completed": "\(completedExercises.count)",
                                               "skipped": "\(skippedExercises.count)",

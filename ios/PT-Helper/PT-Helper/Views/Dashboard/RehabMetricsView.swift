@@ -82,6 +82,10 @@ struct RehabMetricsView: View {
                             // Exercise table
                             DashExercisePerformanceTable(sessions: workoutVM.sessions)
                                 .entranceAnimation(animateEntrance, delay: 0.3)
+
+                            // Session history with delete
+                            DashSessionHistoryList()
+                                .entranceAnimation(animateEntrance, delay: 0.4)
                         }
                         .padding(.horizontal, AppSpacing.xl)
                         .padding(.vertical, AppSpacing.md)

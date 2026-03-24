@@ -11,7 +11,13 @@ class WorkoutViewModel: ObservableObject {
     private let db = Firestore.firestore()
 
     init() {
-        fetchSessions()
+        if TestDataSeeder.isUITesting && TestDataSeeder.shouldSeedMockData {
+            let plans = TestDataSeeder.makeMockPlans()
+            self.sessions = TestDataSeeder.makeMockSessions(planId: plans.first?.id ?? UUID())
+            self.isLoading = false
+        } else {
+            fetchSessions()
+        }
     }
 
     func fetchSessions() {

@@ -15,7 +15,12 @@ class SavedPlansViewModel: ObservableObject {
     nonisolated(unsafe) private var listenerRegistration: ListenerRegistration?
 
     init() {
-        startListening()
+        if TestDataSeeder.isUITesting && TestDataSeeder.shouldSeedMockData {
+            self.rehabPlans = TestDataSeeder.makeMockPlans()
+            self.isLoading = false
+        } else {
+            startListening()
+        }
     }
 
     deinit {

@@ -1,5 +1,6 @@
-import * as functions from "firebase-functions";
+import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
+import { onSchedule } from "firebase-functions/v2/scheduler";
 
 admin.initializeApp();
 
@@ -604,3 +605,49 @@ Return results in the same order as the exercises listed above.`;
       res.status(502).json({ error: "Failed to reach verification service" });
     }
   });
+
+// ---------------------------------------------------------------------------
+// Daily analytics aggregation (runs at 01:00 UTC)
+// Writes summary counts to analytics/dailyAggregates/{date}
+// No health data — behavioral counts only
+// ---------------------------------------------------------------------------
+export const aggregateDailyMetrics = onSchedule("every day 01:00", async () => {
+  const db = admin.firestore();
+  const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+
+  try {
+    // Count users with profiles
+    const usersSnap = await db.collectionGroup("health").count().get();
+    const totalUsers = usersSnap.data().count;
+
+    // Count total rehab plans
+    const plansSnap = await db.collectionGroup("rehabPlans").count().get();
+    const totalPlans = plansSnap.data().count;
+
+    // Count total workout sessions
+    const sessionsSnap = await db.collectionGroup("workoutSessions").count().get();
+    const totalWorkoutSessions = sessionsSnap.data().count;
+
+    // Count active plans (modified in last 14 days)
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+    const activePlansSnap = await db.collectionGroup("rehabPlans")
+      .where("lastModifiedDate", ">=", admin.firestore.Timestamp.fromDate(twoWeeksAgo))
+      .count()
+      .get();
+    const activePlansCount = activePlansSnap.data().count;
+
+    await db.collection("analytics").doc("dailyAggregates").collection("days").doc(today).set({
+      date: today,
+      totalUsers,
+      totalPlans,
+      totalWorkoutSessions,
+      activePlansCount,
+      generatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    console.log(`Daily metrics aggregated for ${today}: ${totalUsers} users, ${totalPlans} plans, ${totalWorkoutSessions} sessions`);
+  } catch (error) {
+    console.error("Error aggregating daily metrics:", error);
+  }
+});

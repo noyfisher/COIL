@@ -774,6 +774,9 @@ class RehabPlanViewModel: ObservableObject {
                     .setData(planData)
                 self.isSaving = false
                 self.showSaveSuccess = true
+                AnalyticsService.shared.log(.rehabPlanGenerated, parameters: [
+                    "exercise_count": plan.exercises.count
+                ])
                 SessionLogger.shared.log(.firestoreWrite, category: .data, message: "Rehab plan saved",
                                           metadata: ["planId": plan.id.uuidString])
             } catch {

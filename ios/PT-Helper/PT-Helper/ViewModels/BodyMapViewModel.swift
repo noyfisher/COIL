@@ -27,6 +27,10 @@ class BodyMapViewModel: ObservableObject {
     func toggleSelection(for region: BodyRegion) {
         if let index = regions.firstIndex(where: { $0.id == region.id }) {
             regions[index].isSelected.toggle()
+            if regions[index].isSelected {
+                let selectedCount = regions.filter { $0.isSelected }.count
+                AnalyticsService.shared.log(.regionsSelected, parameters: ["region_count": selectedCount])
+            }
         }
     }
 

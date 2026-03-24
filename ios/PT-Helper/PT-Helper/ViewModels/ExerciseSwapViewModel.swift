@@ -126,6 +126,9 @@ class ExerciseSwapViewModel: ObservableObject {
         updatedPlan.lastModifiedDate = Date()
         savedPlansVM.updatePlan(updatedPlan)
 
+        AnalyticsService.shared.log(.exerciseSwapped, parameters: [
+            "swap_reason": selectedReason?.rawValue ?? "unknown"
+        ])
         SessionLogger.shared.log(.buttonTapped, category: .userAction,
                                   message: "Exercise swapped",
                                   metadata: [

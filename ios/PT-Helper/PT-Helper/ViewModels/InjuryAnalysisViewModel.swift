@@ -125,6 +125,7 @@ class InjuryAnalysisViewModel: ObservableObject {
         analysisError = nil
         showAnalyzingScreen = true
 
+        AnalyticsService.shared.log(.assessmentCompleted, parameters: ["region_count": completed.count])
         AppLogger.rehab.info("Starting analysis: \(completed.count) region(s) — \(regionNames.joined(separator: ", "))")
         SessionLogger.shared.log(.loadingStarted, category: .stateChange, message: "Analysis started",
                                   metadata: [
@@ -149,6 +150,10 @@ class InjuryAnalysisViewModel: ObservableObject {
                 self.redFlagAlerts = validated.redFlagAlerts
                 self.isAnalyzing = false
 
+                AnalyticsService.shared.log(.analysisCompleted, parameters: [
+                    "condition_count": validated.result.conditions.count,
+                    "has_red_flags": !validated.redFlagAlerts.isEmpty
+                ])
                 let conditionNames = validated.result.conditions.map { "\($0.commonName)(\(Int($0.confidence))%)" }
                 AppLogger.rehab.info("Analysis completed: \(conditionNames.joined(separator: ", "))")
                 SessionLogger.shared.log(.loadingFinished, category: .stateChange, message: "Analysis completed",
@@ -170,6 +175,7 @@ class InjuryAnalysisViewModel: ObservableObject {
                 self.analysisError = error.localizedDescription
                 self.isAnalyzing = false
 
+                AnalyticsService.shared.log(.analysisFailed, parameters: ["error_type": String(describing: type(of: error))])
                 AppLogger.rehab.error("Analysis failed: \(error.localizedDescription)")
                 SessionLogger.shared.logError(error, context: "InjuryAnalysis.startAnalysis")
             }

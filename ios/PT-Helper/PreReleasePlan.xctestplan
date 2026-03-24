@@ -1,0 +1,33 @@
+{
+  "configurations" : [
+    {
+      "id" : "A1B2C3D4-E5F6-7890-ABCD-EF1234567890",
+      "name" : "Pre-Release",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverageEnabled" : true,
+    "testTimeoutsEnabled" : true,
+    "defaultTestExecutionTimeAllowance" : 600
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:PT-Helper.xcodeproj",
+        "identifier" : "7A071B032E8236EE00497F94",
+        "name" : "PT-HelperTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:PT-Helper.xcodeproj",
+        "identifier" : "7A071B0D2E8236EE00497F94",
+        "name" : "PT-HelperUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

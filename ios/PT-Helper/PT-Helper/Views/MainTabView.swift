@@ -2,7 +2,13 @@ import SwiftUI
 
 /// Feature flag for the experimental data-driven dashboard UI (Manus Concept 2).
 /// Set to `true` to enable the dark 3-tab dashboard, `false` for original 4-tab UI.
-let useDashboardUI = true
+/// In UI testing mode, `--use-legacy-ui` launch argument forces the legacy layout.
+var useDashboardUI: Bool {
+    if TestDataSeeder.isUITesting && TestDataSeeder.shouldUseLegacyUI {
+        return false
+    }
+    return true
+}
 
 /// Observable class to allow any child view to switch tabs or pop to root
 class TabSelection: ObservableObject {
@@ -12,25 +18,59 @@ class TabSelection: ObservableObject {
     @Published var plansNavigationId = UUID()
     @Published var progressNavigationId = UUID()
 
+    /// Navigation IDs for the 3-tab dashboard layout.
+    @Published var dashboardNavigationId = UUID()
+    @Published var rehabNavigationId = UUID()
+    @Published var profileNavigationId = UUID()
+
     func popToRootAndGoHome() {
         if selectedTab == 0 {
-            // Already on Home — just reset navigation to pop to root
+            // Already on Home/Dashboard — just reset navigation to pop to root
             homeNavigationId = UUID()
+            dashboardNavigationId = UUID()
             return
         }
 
         // Clean up the deep navigation state on the tab we're leaving
-        switch selectedTab {
-        case 1: analyzeNavigationId = UUID()
-        case 2: plansNavigationId = UUID()
-        case 3: progressNavigationId = UUID()
-        default: break
+        if useDashboardUI {
+            switch selectedTab {
+            case 1: rehabNavigationId = UUID()
+            case 2: profileNavigationId = UUID()
+            default: break
+            }
+        } else {
+            switch selectedTab {
+            case 1: analyzeNavigationId = UUID()
+            case 2: plansNavigationId = UUID()
+            case 3: progressNavigationId = UUID()
+            default: break
+            }
         }
 
         // Switch to Home (its NavigationStack is already at root,
         // so no need to also change homeNavigationId — doing both
         // in the same render pass can crash SwiftUI).
         selectedTab = 0
+    }
+
+    /// Pop to root on the current tab (used when re-tapping the active tab).
+    func popToRootCurrentTab() {
+        if useDashboardUI {
+            switch selectedTab {
+            case 0: dashboardNavigationId = UUID()
+            case 1: rehabNavigationId = UUID()
+            case 2: profileNavigationId = UUID()
+            default: break
+            }
+        } else {
+            switch selectedTab {
+            case 0: homeNavigationId = UUID()
+            case 1: analyzeNavigationId = UUID()
+            case 2: plansNavigationId = UUID()
+            case 3: progressNavigationId = UUID()
+            default: break
+            }
+        }
     }
 }
 
@@ -79,6 +119,7 @@ struct MainTabView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, AppSpacing.sm)
                 .background(Color.orange)
+                .accessibilityIdentifier("offlineBanner")
             }
 
             TabView(selection: $tabSelection.selectedTab) {
@@ -142,6 +183,7 @@ struct MainTabView: View {
             let tabNames = ["Home", "Analyze", "Plans", "Progress"]
             let name = newTab < tabNames.count ? tabNames[newTab] : "Unknown"
             SessionLogger.shared.logNavigation(.tabSwitched, screen: name, metadata: ["tab": "\(newTab)"])
+            AnalyticsService.shared.log(.tabSwitched, parameters: ["tab_index": newTab])
         }
         .onReceive(NotificationCenter.default.publisher(for: .popToRoot)) { _ in
             tabSelection.popToRootAndGoHome()

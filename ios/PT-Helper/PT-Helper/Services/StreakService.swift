@@ -77,6 +77,7 @@ class StreakService: ObservableObject {
             if earned {
                 achievements[i].dateEarned = Date()
                 newlyEarned = achievements[i]
+                AnalyticsService.shared.log(.achievementEarned, parameters: ["achievement_id": achievements[i].id])
             }
         }
     }

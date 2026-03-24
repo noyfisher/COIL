@@ -22,6 +22,10 @@ xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
 xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
   -scheme PT-Helper -testPlan FullPlan -destination 'platform=iOS Simulator,name=iPhone 16'
 
+# Run pre-release suite: all unit + UI tests with code coverage (600s timeout)
+xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
+  -scheme PT-Helper -testPlan PreReleasePlan -destination 'platform=iOS Simulator,name=iPhone 16'
+
 # Run a single test class
 xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
   -scheme PT-Helper -destination 'platform=iOS Simulator,name=iPhone 16' \
@@ -92,6 +96,21 @@ Before generating a rehab plan, `AnalysisResultView` shows a preferences sheet w
 - `SavedPlansViewModel` — Rehab plans (real-time Firestore listener)
 - `WorkoutViewModel` — Workout session tracking
 - `NetworkMonitor` — Connectivity status
+
+### UI Testing Infrastructure
+The app supports UI testing via launch arguments handled by `TestDataSeeder`:
+- `--uitesting` — Master flag; bypasses Firebase Auth in `RootView`
+- `--skip-onboarding` — Injects mock profile, skips to main app
+- `--seed-mock-data` — Populates plans, sessions, analysis result, streak data
+- `--simulate-offline` — Forces `NetworkMonitor.isConnected = false`
+- `--clear-coach-mark` — Resets body map coach mark
+- `--use-legacy-ui` — Forces 4-tab legacy layout
+
+Accessibility identifiers follow `screenName.elementName` convention (e.g., `workout.completeSetButton`).
+
+### Pre-Release Process
+See `ios/PT-Helper/docs/manual-qa-checklist.md` for the full manual QA checklist.
+Test plans: SmokePlan (11 tests), UnitPlan (all unit), FullPlan (all + collision + UI), PreReleasePlan (all + UI + coverage).
 
 ## Code Conventions
 
