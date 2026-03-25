@@ -267,6 +267,96 @@ RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown,
 {"overallScore":75,"verdict":"good","corrections":[{"bodyPart":"knees","issue":"Knees showing 8° inward collapse during descent","howToFix":"Focus on pushing your knees outward in line with your toes as you lower down.","severity":"moderate","dataReference":"symmetry.knee: 8.2° left-right difference"}],"positivePoints":["Good depth achieved on each rep","Consistent tempo throughout the set"],"safetyNotes":["Monitor for any knee pain during this movement"],"dataLimitations":["Only 3 reps detected — assessment based on limited data"]}
 
 The "verdict" field must be exactly one of: "excellent", "good", "needs_work", "concern".`,
+
+  wellness_analysis: `You are a friendly wellness and physical therapy guide helping everyday people improve their daily life through targeted exercises and habits. Write like you're explaining to a friend — no medical jargon. This is educational guidance, not a medical diagnosis.
+
+YOUR AUDIENCE: Regular people who want to improve specific aspects of their daily life — better sleep, better posture, less stiffness, more comfort during daily activities. They need practical, actionable guidance.
+
+USING PATIENT HISTORY:
+- The patient's surgical and injury history is provided in two sections: RELEVANT (same or connected body region) and OTHER (background context).
+- Prioritize RELEVANT history when forming recommendations — a prior back surgery is highly relevant to posture improvement goals.
+- Consider kinetic chain connections: hip problems affect posture, neck issues relate to sleep quality, lower back problems connect to sitting/standing comfort.
+- Medication context matters: patients on blood thinners should avoid high-impact activities, those on beta blockers need RPE-based intensity guidance.
+- If a patient has osteoporosis, be cautious with recommendations involving loaded spinal flexion.
+
+RULES:
+- For each wellness goal, provide a personalized recommendation
+- "goalCategory": the category key (e.g., "improve_posture")
+- "title": a friendly, specific title for their plan (e.g., "Your Desk Worker Posture Plan")
+- "currentStateAssessment": 2-3 sentences assessing where they are now based on their input. Be empathetic and specific to their situation
+- "rootCauses": 2-4 likely root causes of their issue based on their daily activities and habits, written in plain language
+- "expectedTimeline": realistic timeline for noticeable improvement (e.g., "Most people notice improvement in 2-3 weeks with consistent practice")
+- "keyInsight": one important thing they should understand about their situation (e.g., "Your posture issues are likely connected to your hip tightness — fixing one will help the other")
+- "priorityLevel": "high", "medium", or "low" based on impact level and how it affects their life
+- "relatedGoals": suggest 1-2 other wellness areas that would complement this goal
+- "overallSummary": Write 2-3 sentences summarizing across all their goals. Be encouraging but realistic. Use "you/your" language. If goals are related, point out the connections
+- disclaimerText must always be: "This is educational wellness guidance — not a medical diagnosis or treatment plan. If you have pain that's getting worse, numbness, or other concerning symptoms, please see a healthcare provider."
+
+RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure:
+{"recommendations":[{"goalCategory":"string","title":"string","currentStateAssessment":"string","rootCauses":["strings"],"expectedTimeline":"string","keyInsight":"string","priorityLevel":"string","relatedGoals":["strings"]}],"overallSummary":"string","disclaimerText":"This is educational wellness guidance — not a medical diagnosis or treatment plan. If you have pain that's getting worse, numbness, or other concerning symptoms, please see a healthcare provider."}`,
+
+  wellness_verify: `You are a wellness recommendation verification reviewer. You are given a patient's wellness goals, their profile, AND a primary analysis from another AI reviewer. Your job is to verify and refine the recommendations across three dimensions: feasibility, personalization, and safety. Write like you're explaining to a friend — no medical jargon. This is educational guidance only.
+
+VERIFICATION CHECKLIST (apply all of these):
+
+1. FEASIBILITY CHECK:
+- Are the recommendations realistic given the user's stated daily time commitment?
+- Do the recommendations match the user's activity level (sedentary users need gentler starting points)?
+- Are expected timelines honest and achievable, not overly optimistic?
+- If the user has tried things before (prior attempts), do the recommendations account for why those might not have worked?
+
+2. PERSONALIZATION REVIEW:
+- Are recommendations truly specific to this person's situation, or are they generic advice anyone could find online?
+- Do the recommendations reference the user's specific daily activities affected and current habits?
+- If the user selected multiple goals, are connections between goals identified and leveraged?
+- For custom goals, does the recommendation address the user's specific free-text description?
+
+3. SAFETY REVIEW:
+- Check all recommendations against the patient's medical conditions, surgeries, and medications
+- Patients with osteoporosis: flag any recommendations involving loaded spinal flexion or high-impact activities
+- Patients on blood thinners: flag high-impact or fall-risk activities
+- Patients with recent surgeries: ensure recommendations respect recovery status and restrictions
+- If relevant surgical/injury history exists, verify recommendations don't aggravate existing conditions
+- Add safety notes for any recommendation that could be problematic given the patient's history
+
+INSTRUCTIONS:
+- Review the primary analysis critically against the original patient data
+- Adjust priority levels if they seem incorrect
+- Refine recommendations that are too generic
+- Add safety caveats where the patient's medical history warrants them
+- Return your refined recommendations (same structure, adjusted as needed)
+
+RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure:
+{"recommendations":[{"goalCategory":"string","title":"string","currentStateAssessment":"string","rootCauses":["strings"],"expectedTimeline":"string","keyInsight":"string","priorityLevel":"string","relatedGoals":["strings"]}],"overallSummary":"string","disclaimerText":"This is educational wellness guidance — not a medical diagnosis or treatment plan. If you have pain that's getting worse, numbness, or other concerning symptoms, please see a healthcare provider."}`,
+
+  wellness_plan: `You are a PT wellness specialist. Create personalized exercise and habit plans for life improvement goals. These are not injury rehabilitation — they are proactive wellness protocols. Educational purposes only.
+
+USING PATIENT HISTORY:
+- Respect all POST-SURGICAL RESTRICTIONS listed — never prescribe exercises that violate stated restrictions.
+- If a patient is "Still recovering" from surgery, use conservative exercises for that region.
+- For patients on Blood Thinners: avoid high-impact exercises that risk bruising or falls.
+- For patients on Beta Blockers: use RPE for intensity, not heart rate targets.
+- For patients on Corticosteroids: be cautious with tendon-loading exercises, use lower resistance.
+- For patients with Osteoporosis: NO loaded spinal flexion (e.g. sit-ups, toe touches). Favor weight-bearing and balance exercises.
+
+RULES:
+- Create 4-8 exercises/habits with clear instructions, sets, reps, rest periods
+- Include a mix of exercises AND daily habits/micro-practices where appropriate
+- Match difficulty to activity level: sedentary→beginner, moderate→beginner+intermediate, active→intermediate+advanced
+- For sleep goals: include evening wind-down exercises and morning mobility
+- For posture goals: include both strengthening and awareness exercises
+- For comfort goals (sitting, standing, driving): include both preventive exercises and in-the-moment relief techniques
+- Use SF Symbol icons: "figure.flexibility", "figure.strengthtraining.traditional", "figure.cooldown", "figure.yoga", "figure.walk", "figure.stairs", "figure.core.training", "figure.run", "figure.stand", "figure.roll", "figure.seated.side"
+- Include 2-3 form tips and 1-2 contraindications per exercise
+- For startPosition: describe exactly how to position your body BEFORE the movement (1-2 sentences)
+- For movement: describe the motion step by step (1-2 sentences)
+- For endPosition: describe the end of the movement and how to return (1 sentence)
+- For exerciseCategory: choose ONE of: "stretch", "strength", "balance", "cardio", "mobility", "core", "yoga", "walking", "seated", "lying", "standing", "stair"
+- For imageFileName: create a normalized lowercase kebab-case filename (e.g. "cat-cow-stretch", "desk-shoulder-rolls")
+- For optional fields: provide the value if applicable, or use an empty string "" if not applicable. Never use null.
+
+RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure:
+{"planName":"...","exercises":[{"name":"...","targetArea":"...","description":"...","sets":3,"reps":"10","restSeconds":30,"difficulty":"beginner","demonstrationIcon":"figure.flexibility","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"stretch","imageFileName":"exercise-name"}],"totalWeeks":4,"notes":"..."}`,
 };
 
 // Server-side model configuration (NOT client-controlled)
@@ -276,7 +366,10 @@ const MODEL_CONFIG: Record<string, { model: string; max_tokens: number; temperat
   rehab_plan: { model: "claude-haiku-4-5-20251001", max_tokens: 4096 },
   exercise_substitute: { model: "claude-haiku-4-5-20251001", max_tokens: 2048, temperature: 0.3 },
   recovery_insights: { model: "claude-haiku-4-5-20251001", max_tokens: 2048, temperature: 0.3 },
-  form_analysis: { model: "claude-haiku-4-5-20251001", max_tokens: 2048, temperature: 0.3 },
+  form_analysis: { model: "claude-haiku-4-5-20251001", max_tokens: 4096, temperature: 0.3 },
+  wellness_analysis: { model: "claude-haiku-4-5-20251001", max_tokens: 4096, temperature: 0.2 },
+  wellness_verify: { model: "claude-haiku-4-5-20251001", max_tokens: 4096, temperature: 0.2 },
+  wellness_plan: { model: "claude-haiku-4-5-20251001", max_tokens: 4096 },
 };
 
 // ---------------------------------------------------------------------------
@@ -660,6 +753,55 @@ Return results in the same order as the exercises listed above.`;
       res.status(502).json({ error: "Failed to reach verification service" });
     }
   });
+
+// ---------------------------------------------------------------------------
+// Virtual User Auth — mint Firebase Custom Tokens for virtual test users
+// Only works for UIDs prefixed with "vuser-" and requires a shared secret.
+// ---------------------------------------------------------------------------
+export const createVirtualUserToken = functions.https.onRequest(async (req, res) => {
+  // CORS
+  res.set("Access-Control-Allow-Origin", "*");
+  if (req.method === "OPTIONS") {
+    res.set("Access-Control-Allow-Methods", "POST");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+    res.status(204).send("");
+    return;
+  }
+
+  if (req.method !== "POST") {
+    res.status(405).json({ error: "Method not allowed" });
+    return;
+  }
+
+  const { virtualUserId, secret } = req.body || {};
+
+  // Validate secret
+  const expectedSecret = process.env.VIRTUAL_USER_SECRET;
+  if (!expectedSecret) {
+    console.error("VIRTUAL_USER_SECRET not configured");
+    res.status(500).json({ error: "Server configuration error" });
+    return;
+  }
+
+  if (secret !== expectedSecret) {
+    res.status(403).json({ error: "Invalid secret" });
+    return;
+  }
+
+  // Safety: only allow vuser- prefixed UIDs
+  if (typeof virtualUserId !== "string" || !virtualUserId.startsWith("vuser-")) {
+    res.status(400).json({ error: "virtualUserId must start with 'vuser-'" });
+    return;
+  }
+
+  try {
+    const customToken = await admin.auth().createCustomToken(virtualUserId);
+    res.status(200).json({ token: customToken });
+  } catch (error) {
+    console.error("Error creating custom token:", error);
+    res.status(500).json({ error: "Failed to create custom token" });
+  }
+});
 
 // ---------------------------------------------------------------------------
 // Daily analytics aggregation (runs at 01:00 UTC)

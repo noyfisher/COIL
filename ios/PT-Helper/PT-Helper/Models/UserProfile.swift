@@ -28,6 +28,7 @@ struct UserProfile: Codable, Identifiable {
     var medications: [String]?
     var dominantSide: String?           // "Left" | "Right" | "Ambidextrous"
     var medicationHistory: [MedicationChange]?
+    var wellnessGoals: [WellnessGoal] = []
 
     struct Surgery: Codable, Identifiable {
         var id: UUID = UUID()
@@ -57,6 +58,14 @@ struct UserProfile: Codable, Identifiable {
         var sawDoctor: Bool?
         var hadPhysicalTherapy: Bool?
         var recoveryStatus: String?     // "Fully recovered" | "Mostly recovered" | "Still dealing with it"
+    }
+
+    struct WellnessGoal: Codable, Identifiable {
+        var id: UUID = UUID()
+        var category: GoalCategory
+        var customDescription: String?
+        var startDate: Date
+        var isActive: Bool
     }
 
     // MARK: - Firestore Parsing
@@ -132,6 +141,26 @@ struct UserProfile: Codable, Identifiable {
                     sawDoctor: i["sawDoctor"] as? Bool,
                     hadPhysicalTherapy: i["hadPhysicalTherapy"] as? Bool,
                     recoveryStatus: i["recoveryStatus"] as? String
+                )
+            }
+        }
+
+        if let goalsData = data["wellnessGoals"] as? [[String: Any]] {
+            profile.wellnessGoals = goalsData.compactMap { g in
+                guard let categoryRaw = g["category"] as? String,
+                      let category = GoalCategory(rawValue: categoryRaw) else { return nil }
+                let startDate: Date
+                if let ts = g["startDate"] as? Timestamp {
+                    startDate = ts.dateValue()
+                } else {
+                    startDate = Date()
+                }
+                return WellnessGoal(
+                    id: UUID(uuidString: g["id"] as? String ?? "") ?? UUID(),
+                    category: category,
+                    customDescription: g["customDescription"] as? String,
+                    startDate: startDate,
+                    isActive: g["isActive"] as? Bool ?? true
                 )
             }
         }

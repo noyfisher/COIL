@@ -1,6 +1,12 @@
 import Foundation
 
 struct RehabPlan: Codable, Identifiable {
+
+    enum PlanType: String, Codable {
+        case rehab
+        case wellness
+    }
+
     let id: UUID
     var planName: String
     let conditions: [String]
@@ -13,6 +19,10 @@ struct RehabPlan: Codable, Identifiable {
     var startDate: Date?
     /// Timestamp of last user edit (nil = never edited)
     var lastModifiedDate: Date?
+    /// Whether this is a rehab or wellness plan (defaults to .rehab for backward compatibility)
+    var planType: PlanType = .rehab
+    /// Wellness goal categories that generated this plan (nil for rehab plans)
+    var sourceGoalCategories: [String]?
 
     /// Current week number (1-based) based on startDate, or nil if not started
     var currentWeek: Int? {

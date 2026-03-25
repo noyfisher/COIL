@@ -140,22 +140,42 @@ struct AnalysisDashboardView: View {
         }
     }
 
-    // MARK: - Quick Actions
+    // MARK: - Quick Actions (Gateway + Secondary)
 
     private var quickActions: some View {
         VStack(spacing: AppSpacing.md) {
-            DashSectionHeader(title: "Quick Actions")
+            DashSectionHeader(title: "What Can We Help With?")
 
-            NavigationLink(destination: BodyMap3DView()) {
-                DashActionButton(
-                    icon: "figure.run.circle",
-                    title: "New Analysis",
-                    subtitle: "Analyze a new injury or pain"
-                )
+            // Gateway cards
+            HStack(spacing: AppSpacing.md) {
+                // "Something Hurts" gateway
+                NavigationLink(destination: BodyMap3DView()) {
+                    gatewayCard(
+                        icon: "figure.run.circle",
+                        title: "Something Hurts",
+                        subtitle: "Assess pain and get a recovery plan",
+                        gradientColors: [.red, .orange]
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("dashboard.somethingHurtsButton")
+
+                // "Improve My Life" gateway
+                if let profile = profileService.profile {
+                    NavigationLink(destination: WellnessGoalPickerView(userProfile: profile)) {
+                        gatewayCard(
+                            icon: "sparkles",
+                            title: "Improve My Life",
+                            subtitle: "Sleep, posture, mobility & more",
+                            gradientColors: [.teal, .green]
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("dashboard.improveLifeButton")
+                }
             }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier("dashboard.newAnalysisButton")
 
+            // Secondary actions
             NavigationLink(destination: FormCheckTab()) {
                 DashActionButton(
                     icon: "video.badge.checkmark",
@@ -181,28 +201,88 @@ struct AnalysisDashboardView: View {
         }
     }
 
+    private func gatewayCard(icon: String, title: String, subtitle: String, gradientColors: [Color]) -> some View {
+        VStack(spacing: AppSpacing.sm) {
+            Image(systemName: icon)
+                .font(.system(size: 28))
+                .foregroundStyle(
+                    LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                )
+                .frame(width: 50, height: 50)
+                .background(
+                    Circle()
+                        .fill(gradientColors[0].opacity(0.15))
+                )
+
+            Text(title)
+                .font(.subheadline.weight(.bold))
+                .foregroundColor(AppColors.dashTextPrimary)
+
+            Text(subtitle)
+                .font(.caption2)
+                .foregroundColor(AppColors.dashTextSecondary)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, AppSpacing.lg)
+        .padding(.horizontal, AppSpacing.sm)
+        .background(AppColors.dashSurface)
+        .cornerRadius(AppCorners.card)
+    }
+
     // MARK: - Empty State
 
+    @State private var navigateToWellness = false
+
     private var emptyView: some View {
-        VStack {
+        VStack(spacing: AppSpacing.xl) {
             Spacer()
             greetingHeader
                 .padding(.horizontal, AppSpacing.xl)
-                .padding(.bottom, AppSpacing.xxl)
 
-            DashEmptyStateView(
-                icon: "figure.run.circle",
-                title: "No Analysis Yet",
-                subtitle: "Start by selecting where you feel pain on the 3D body map",
-                actionTitle: "Start Analysis"
-            ) {
-                navigateToBodyMap = true
+            VStack(spacing: AppSpacing.lg) {
+                Text("How can we help?")
+                    .font(.headline)
+                    .foregroundColor(AppColors.dashTextPrimary)
+
+                HStack(spacing: AppSpacing.md) {
+                    // "Something Hurts" gateway
+                    Button { navigateToBodyMap = true } label: {
+                        gatewayCard(
+                            icon: "figure.run.circle",
+                            title: "Something Hurts",
+                            subtitle: "Assess pain and get a recovery plan",
+                            gradientColors: [.red, .orange]
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("dashboard.somethingHurtsButton")
+
+                    // "Improve My Life" gateway
+                    Button { navigateToWellness = true } label: {
+                        gatewayCard(
+                            icon: "sparkles",
+                            title: "Improve My Life",
+                            subtitle: "Sleep, posture, mobility & more",
+                            gradientColors: [.teal, .green]
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("dashboard.improveLifeButton")
+                }
             }
             .padding(.horizontal, AppSpacing.xl)
+
             Spacer()
         }
         .navigationDestination(isPresented: $navigateToBodyMap) {
             BodyMap3DView()
+        }
+        .navigationDestination(isPresented: $navigateToWellness) {
+            if let profile = profileService.profile {
+                WellnessGoalPickerView(userProfile: profile)
+            }
         }
     }
 }
