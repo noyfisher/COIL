@@ -12,7 +12,7 @@ struct DashboardMainTabView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Offline banner (dark-themed)
+            // Offline banner
             if !networkMonitor.isConnected {
                 HStack(spacing: AppSpacing.sm) {
                     Image(systemName: "wifi.slash")
@@ -23,7 +23,7 @@ struct DashboardMainTabView: View {
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, AppSpacing.sm)
-                .background(AppColors.dashDanger.opacity(0.8))
+                .background(AppColors.danger.opacity(0.8))
                 .accessibilityIdentifier("offlineBanner")
             }
 
@@ -35,23 +35,28 @@ struct DashboardMainTabView: View {
                     .tag(0)
                     .id(tabSelection.dashboardNavigationId)
 
+                FormCheckTab()
+                    .tabItem {
+                        Label("Form Check", systemImage: "figure.walk")
+                    }
+                    .tag(1)
+
                 RehabMetricsView()
                     .tabItem {
                         Label("Rehab", systemImage: "heart.text.clipboard.fill")
                     }
-                    .tag(1)
+                    .tag(2)
                     .id(tabSelection.rehabNavigationId)
 
                 DashProfileView()
                     .tabItem {
                         Label("Profile", systemImage: "person.fill")
                     }
-                    .tag(2)
+                    .tag(3)
                     .id(tabSelection.profileNavigationId)
             }
-            .tint(AppColors.dashAccent)
+            .tint(AppColors.accent)
         }
-        .preferredColorScheme(.dark)
         .environmentObject(tabSelection)
         .environmentObject(savedPlansViewModel)
         .environmentObject(workoutViewModel)
@@ -63,7 +68,7 @@ struct DashboardMainTabView: View {
             if oldTab == newTab {
                 tabSelection.popToRootCurrentTab()
             }
-            let tabNames = ["Dashboard", "Rehab", "Profile"]
+            let tabNames = ["Dashboard", "Form Check", "Rehab", "Profile"]
             let name = newTab < tabNames.count ? tabNames[newTab] : "Unknown"
             SessionLogger.shared.logNavigation(.tabSwitched, screen: name, metadata: ["tab": "\(newTab)"])
         }

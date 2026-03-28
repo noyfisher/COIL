@@ -118,7 +118,7 @@ struct MainTabView: View {
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, AppSpacing.sm)
-                .background(Color.orange)
+                .background(AppColors.danger)
                 .accessibilityIdentifier("offlineBanner")
             }
 

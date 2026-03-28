@@ -10,7 +10,7 @@ struct FormCheckTab: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                AppColors.pageBackground.ignoresSafeArea()
+                AppColors.bgGradient.ignoresSafeArea()
 
                 if savedPlansVM.rehabPlans.isEmpty {
                     emptyState
@@ -36,7 +36,7 @@ struct FormCheckTab: View {
                 VStack(alignment: .leading, spacing: AppSpacing.sm) {
                     Text("Select an exercise to check your form")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -45,7 +45,7 @@ struct FormCheckTab: View {
                     VStack(alignment: .leading, spacing: AppSpacing.md) {
                         Text(plan.planName)
                             .font(.caption.weight(.semibold))
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppColors.secondaryText)
                             .textCase(.uppercase)
 
                         ForEach(plan.exercises) { exercise in
@@ -66,30 +66,34 @@ struct FormCheckTab: View {
             HStack(spacing: AppSpacing.md) {
                 Image(systemName: "figure.mixed.cardio")
                     .font(.title3)
-                    .foregroundColor(.blue)
+                    .foregroundColor(AppColors.accent)
                     .frame(width: 40, height: 40)
-                    .background(Color.blue.opacity(0.1))
+                    .background(AppColors.accentTint)
                     .cornerRadius(AppCorners.medium)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(exercise.name)
                         .font(.subheadline.weight(.semibold))
-                        .foregroundColor(.primary)
+                        .foregroundColor(AppColors.primaryText)
                     Text("\(exercise.targetArea) • \(exercise.sets) sets × \(exercise.reps)")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                 }
 
                 Spacer()
 
                 Image(systemName: "video.fill")
                     .font(.system(size: 12))
-                    .foregroundColor(.blue)
+                    .foregroundColor(AppColors.accent)
             }
             .padding(AppSpacing.lg)
             .background(AppColors.cardBackground)
             .cornerRadius(AppCorners.card)
-            .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+            .overlay(
+                RoundedRectangle(cornerRadius: AppCorners.card)
+                    .stroke(AppColors.cardBorder, lineWidth: 1)
+            )
+            .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("formCheck.exercise.\(exercise.name)")
@@ -103,15 +107,16 @@ struct FormCheckTab: View {
 
             Image(systemName: "video.badge.checkmark")
                 .font(.system(size: 50))
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.mutedText)
 
             VStack(spacing: AppSpacing.sm) {
                 Text("No Exercises Available")
-                    .font(.title3.weight(.bold))
+                    .font(.system(.title3, design: .serif).weight(.bold))
+                    .foregroundColor(AppColors.primaryText)
 
                 Text("Create a rehab plan first, then you can check your form on any exercise.")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.lg)
             }

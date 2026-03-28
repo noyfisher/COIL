@@ -28,7 +28,7 @@ struct AnalysisDashboardView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                AppColors.dashBackground.ignoresSafeArea()
+                AppColors.bgGradient.ignoresSafeArea()
 
                 if let result = analysisStore.lastResult {
                     dataView(result: result)
@@ -40,11 +40,10 @@ struct AnalysisDashboardView: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("Dashboard")
-                        .font(.headline)
-                        .foregroundColor(AppColors.dashTextPrimary)
+                        .font(.system(.headline, design: .serif))
+                        .foregroundColor(AppColors.primaryText)
                 }
             }
-            .toolbarColorScheme(.dark, for: .navigationBar)
         }
         .onAppear {
             withAnimation(AppAnimations.smooth.delay(0.1)) {
@@ -93,11 +92,11 @@ struct AnalysisDashboardView: View {
     private var greetingHeader: some View {
         VStack(alignment: .leading, spacing: AppSpacing.xs) {
             Text("\(greeting), \(firstName)")
-                .font(.title2.weight(.bold))
-                .foregroundColor(AppColors.dashTextPrimary)
+                .font(.system(.title2, design: .serif).weight(.bold))
+                .foregroundColor(AppColors.primaryText)
             Text(Date(), style: .date)
                 .font(.subheadline)
-                .foregroundColor(AppColors.dashTextSecondary)
+                .foregroundColor(AppColors.secondaryText)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -154,7 +153,7 @@ struct AnalysisDashboardView: View {
                         icon: "figure.run.circle",
                         title: "Something Hurts",
                         subtitle: "Assess pain and get a recovery plan",
-                        gradientColors: [.red, .orange]
+                        accentColor: AppColors.danger
                     )
                 }
                 .buttonStyle(.plain)
@@ -167,7 +166,7 @@ struct AnalysisDashboardView: View {
                             icon: "sparkles",
                             title: "Improve My Life",
                             subtitle: "Sleep, posture, mobility & more",
-                            gradientColors: [.teal, .green]
+                            accentColor: AppColors.accent
                         )
                     }
                     .buttonStyle(.plain)
@@ -176,59 +175,64 @@ struct AnalysisDashboardView: View {
             }
 
             // Secondary actions
-            NavigationLink(destination: FormCheckTab()) {
+            Button {
+                tabSelection.selectedTab = 1
+            } label: {
                 DashActionButton(
                     icon: "video.badge.checkmark",
                     title: "Form Check",
                     subtitle: "Verify your exercise form with AI",
-                    iconColor: AppColors.dashWarning
+                    iconColor: AppColors.warning
                 )
             }
             .buttonStyle(.plain)
             .accessibilityIdentifier("dashboard.formCheckButton")
 
             Button {
-                tabSelection.selectedTab = 1
+                tabSelection.selectedTab = 2
             } label: {
                 DashActionButton(
                     icon: "heart.text.clipboard",
                     title: "View Rehab Plans",
                     subtitle: "See your active recovery plans",
-                    iconColor: AppColors.dashSuccess
+                    iconColor: AppColors.success
                 )
             }
             .buttonStyle(.plain)
         }
     }
 
-    private func gatewayCard(icon: String, title: String, subtitle: String, gradientColors: [Color]) -> some View {
+    private func gatewayCard(icon: String, title: String, subtitle: String, accentColor: Color) -> some View {
         VStack(spacing: AppSpacing.sm) {
             Image(systemName: icon)
                 .font(.system(size: 28))
-                .foregroundStyle(
-                    LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
-                )
+                .foregroundColor(accentColor)
                 .frame(width: 50, height: 50)
                 .background(
                     Circle()
-                        .fill(gradientColors[0].opacity(0.15))
+                        .fill(accentColor.opacity(0.10))
                 )
 
             Text(title)
-                .font(.subheadline.weight(.bold))
-                .foregroundColor(AppColors.dashTextPrimary)
+                .font(.system(.subheadline, design: .serif).weight(.bold))
+                .foregroundColor(AppColors.primaryText)
 
             Text(subtitle)
                 .font(.caption2)
-                .foregroundColor(AppColors.dashTextSecondary)
+                .foregroundColor(AppColors.secondaryText)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, AppSpacing.lg)
         .padding(.horizontal, AppSpacing.sm)
-        .background(AppColors.dashSurface)
+        .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.card)
+        .overlay(
+            RoundedRectangle(cornerRadius: AppCorners.card)
+                .stroke(AppColors.cardBorder, lineWidth: 1)
+        )
+        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 
     // MARK: - Empty State
@@ -243,8 +247,8 @@ struct AnalysisDashboardView: View {
 
             VStack(spacing: AppSpacing.lg) {
                 Text("How can we help?")
-                    .font(.headline)
-                    .foregroundColor(AppColors.dashTextPrimary)
+                    .font(.system(.headline, design: .serif))
+                    .foregroundColor(AppColors.primaryText)
 
                 HStack(spacing: AppSpacing.md) {
                     // "Something Hurts" gateway
@@ -253,7 +257,7 @@ struct AnalysisDashboardView: View {
                             icon: "figure.run.circle",
                             title: "Something Hurts",
                             subtitle: "Assess pain and get a recovery plan",
-                            gradientColors: [.red, .orange]
+                            accentColor: AppColors.danger
                         )
                     }
                     .buttonStyle(.plain)
@@ -265,7 +269,7 @@ struct AnalysisDashboardView: View {
                             icon: "sparkles",
                             title: "Improve My Life",
                             subtitle: "Sleep, posture, mobility & more",
-                            gradientColors: [.teal, .green]
+                            accentColor: AppColors.accent
                         )
                     }
                     .buttonStyle(.plain)
