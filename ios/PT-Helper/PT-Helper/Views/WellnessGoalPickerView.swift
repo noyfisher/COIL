@@ -34,7 +34,7 @@ struct WellnessGoalPickerView: View {
 
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground).ignoresSafeArea()
+            AppColors.bgGradient.ignoresSafeArea()
             ScrollView {
                 VStack(spacing: AppSpacing.xl) {
                     headerSection
@@ -60,7 +60,7 @@ struct WellnessGoalPickerView: View {
         VStack(spacing: AppSpacing.sm) {
             Text("Select one or more goals below, or describe your own.")
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
                 .multilineTextAlignment(.center)
         }
     }
@@ -99,7 +99,7 @@ struct WellnessGoalPickerView: View {
 
                 Text(category.displayName)
                     .font(.caption.weight(.medium))
-                    .foregroundColor(isSelected ? .primary : .secondary)
+                    .foregroundColor(isSelected ? AppColors.primaryText : AppColors.secondaryText)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
@@ -110,11 +110,11 @@ struct WellnessGoalPickerView: View {
             .background(
                 RoundedRectangle(cornerRadius: AppCorners.card)
                     .fill(AppColors.cardBackground)
-                    .shadow(color: .black.opacity(isSelected ? 0.08 : 0.04), radius: isSelected ? 8 : 4, y: 2)
+                    .shadow(color: AppColors.cardShadowColor, radius: isSelected ? 8 : 4, y: 2)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: AppCorners.card)
-                    .stroke(isSelected ? category.color : Color.clear, lineWidth: 2)
+                    .stroke(isSelected ? AppColors.accent : AppColors.cardBorder, lineWidth: isSelected ? 2 : 1)
             )
             .overlay(alignment: .topTrailing) {
                 if isSelected {
@@ -132,19 +132,19 @@ struct WellnessGoalPickerView: View {
     // MARK: - Custom Goal
 
     private var customGoalSection: some View {
-        CardSection(icon: "text.bubble.fill", color: .secondary, title: "Or Describe Your Own Goal") {
+        CardSection(icon: "text.bubble.fill", color: AppColors.secondaryText, title: "Or Describe Your Own Goal") {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 HStack(spacing: AppSpacing.xs) {
                     Image(systemName: "sparkles")
                         .font(.caption2)
-                        .foregroundColor(.blue)
+                        .foregroundColor(AppColors.accent)
                     Text("AI-powered")
                         .font(.caption2.weight(.medium))
-                        .foregroundColor(.blue)
+                        .foregroundColor(AppColors.accent)
                 }
                 .padding(.horizontal, AppSpacing.sm)
                 .padding(.vertical, 4)
-                .background(Color.blue.opacity(0.1))
+                .background(AppColors.accentTint)
                 .cornerRadius(AppCorners.small)
 
                 TextField("Describe what you'd like to improve...", text: $customGoalText, axis: .vertical)

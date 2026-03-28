@@ -10,7 +10,7 @@ struct WellnessResultView: View {
 
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground).ignoresSafeArea()
+            AppColors.bgGradient.ignoresSafeArea()
             ScrollView {
                 VStack(spacing: AppSpacing.lg) {
                     disclaimerBanner
@@ -46,14 +46,14 @@ struct WellnessResultView: View {
     private var disclaimerBanner: some View {
         HStack(spacing: AppSpacing.sm) {
             Image(systemName: "info.circle.fill")
-                .foregroundColor(.blue)
+                .foregroundColor(AppColors.accent)
             Text(viewModel.analysisResult?.disclaimerText ?? "This is educational wellness guidance — not a medical diagnosis or treatment plan.")
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
         }
         .padding(AppSpacing.md)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.blue.opacity(0.08))
+        .background(AppColors.accentTint)
         .cornerRadius(AppCorners.medium)
     }
 
@@ -72,7 +72,7 @@ struct WellnessResultView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.xl)
-        .shadow(color: .black.opacity(0.06), radius: 10, y: 3)
+        .shadow(color: AppColors.cardShadowColor, radius: 10, y: 3)
     }
 
     // MARK: - Recommendation Card
@@ -101,10 +101,10 @@ struct WellnessResultView: View {
                         HStack {
                             Text(rec.title)
                                 .font(AppFonts.sectionTitle)
-                                .foregroundColor(.primary)
+                                .foregroundColor(AppColors.primaryText)
                             Spacer()
                             Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.secondaryText)
                         }
 
                         HStack(spacing: AppSpacing.sm) {
@@ -140,7 +140,7 @@ struct WellnessResultView: View {
                             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                                 Label("Where you are now", systemImage: "location.fill")
                                     .font(.subheadline.weight(.semibold))
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(AppColors.accent)
                                 Text(rec.currentStateAssessment)
                                     .font(.subheadline)
                             }
@@ -150,7 +150,7 @@ struct WellnessResultView: View {
                                 VStack(alignment: .leading, spacing: AppSpacing.sm) {
                                     Label("Likely root causes", systemImage: "magnifyingglass")
                                         .font(.subheadline.weight(.semibold))
-                                        .foregroundColor(.orange)
+                                        .foregroundColor(AppColors.warning)
                                     ForEach(rec.rootCauses, id: \.self) { cause in
                                         HStack(alignment: .top, spacing: AppSpacing.sm) {
                                             Text("•")
@@ -180,7 +180,7 @@ struct WellnessResultView: View {
                                     .foregroundColor(.purple)
                                 Text(rec.expectedTimeline)
                                     .font(.subheadline)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(AppColors.secondaryText)
                             }
 
                             // Related goals
@@ -188,7 +188,7 @@ struct WellnessResultView: View {
                                 VStack(alignment: .leading, spacing: AppSpacing.sm) {
                                     Text("Related goals")
                                         .font(.caption.weight(.medium))
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(AppColors.secondaryText)
                                     FlowLayout(spacing: AppSpacing.sm) {
                                         ForEach(rec.relatedGoals, id: \.self) { goal in
                                             Text(goal)
@@ -211,15 +211,15 @@ struct WellnessResultView: View {
         }
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.xl)
-        .shadow(color: .black.opacity(0.06), radius: 10, y: 3)
+        .shadow(color: AppColors.cardShadowColor, radius: 10, y: 3)
     }
 
     private func priorityColor(for priority: String) -> Color {
         switch priority.lowercased() {
-        case "high": return .red
-        case "medium": return .orange
-        case "low": return .green
-        default: return .blue
+        case "high": return AppColors.danger
+        case "medium": return AppColors.warning
+        case "low": return AppColors.success
+        default: return AppColors.accent
         }
     }
 

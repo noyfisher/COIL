@@ -23,7 +23,7 @@ struct WellnessDetailView: View {
 
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground).ignoresSafeArea()
+            AppColors.bgGradient.ignoresSafeArea()
 
             if viewModel.showAnalyzingScreen {
                 WellnessAnalyzingView(viewModel: viewModel)
@@ -79,7 +79,7 @@ struct WellnessDetailView: View {
             if viewModel.hasMultipleGoals {
                 Text("Goal \(viewModel.currentGoalIndex + 1) of \(viewModel.totalGoals)")
                     .font(.caption.weight(.medium))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
 
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
@@ -87,7 +87,7 @@ struct WellnessDetailView: View {
                             .fill(Color(.systemGray5))
                             .frame(height: 3)
                         Capsule()
-                            .fill(Color.blue)
+                            .fill(AppColors.accent)
                             .frame(width: geo.size.width * CGFloat(viewModel.currentGoalIndex + 1) / CGFloat(viewModel.totalGoals), height: 3)
                             .animation(AppAnimations.smooth, value: viewModel.currentGoalIndex)
                     }
@@ -136,7 +136,7 @@ struct WellnessDetailView: View {
                         .font(.system(size: 28, weight: .bold, design: .rounded))
                         .foregroundColor(motivationColor)
                     Text("/ 10")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                     Spacer()
                     Text(motivationDescription)
                         .font(.caption.weight(.medium))
@@ -149,9 +149,9 @@ struct WellnessDetailView: View {
                 Slider(value: $motivationLevel, in: 1...10, step: 1)
                     .tint(motivationColor)
                 HStack {
-                    Text("Low").font(.caption2).foregroundColor(.secondary)
+                    Text("Low").font(.caption2).foregroundColor(AppColors.secondaryText)
                     Spacer()
-                    Text("Very High").font(.caption2).foregroundColor(.secondary)
+                    Text("Very High").font(.caption2).foregroundColor(AppColors.secondaryText)
                 }
             }
         }
@@ -159,9 +159,9 @@ struct WellnessDetailView: View {
 
     private var motivationColor: Color {
         switch Int(motivationLevel) {
-        case 1...3: return .red
-        case 4...6: return .orange
-        default: return .green
+        case 1...3: return AppColors.danger
+        case 4...6: return AppColors.warning
+        default: return AppColors.success
         }
     }
 
@@ -259,7 +259,7 @@ struct WellnessDetailView: View {
                         .onSubmit { addCustomActivity() }
                     Button(action: addCustomActivity) {
                         Image(systemName: "plus.circle.fill")
-                            .foregroundColor(.blue)
+                            .foregroundColor(AppColors.accent)
                     }
                     .disabled(customActivityText.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
@@ -304,7 +304,7 @@ struct WellnessDetailView: View {
                         .onSubmit { addCustomHabit() }
                     Button(action: addCustomHabit) {
                         Image(systemName: "plus.circle.fill")
-                            .foregroundColor(.blue)
+                            .foregroundColor(AppColors.accent)
                     }
                     .disabled(customHabitText.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
@@ -349,19 +349,19 @@ struct WellnessDetailView: View {
                 HStack(spacing: AppSpacing.xs) {
                     Image(systemName: "sparkles")
                         .font(.caption2)
-                        .foregroundColor(.blue)
+                        .foregroundColor(AppColors.accent)
                     Text("AI-powered")
                         .font(.caption2.weight(.medium))
-                        .foregroundColor(.blue)
+                        .foregroundColor(AppColors.accent)
                 }
                 .padding(.horizontal, AppSpacing.sm)
                 .padding(.vertical, 4)
-                .background(Color.blue.opacity(0.1))
+                .background(AppColors.accentTint)
                 .cornerRadius(AppCorners.small)
 
                 Text("What does a typical day look like? What would improvement mean for you? The more detail you provide, the better your personalized plan will be.")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
 
                 TextField("Share your story...", text: $specificContext, axis: .vertical)
                     .lineLimit(3...6)

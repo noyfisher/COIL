@@ -7,7 +7,7 @@ struct WellnessPlanView: View {
 
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground).ignoresSafeArea()
+            AppColors.bgGradient.ignoresSafeArea()
 
             if viewModel.isGenerating {
                 generatingView
@@ -42,10 +42,10 @@ struct WellnessPlanView: View {
 
             VStack(spacing: AppSpacing.sm) {
                 Text("Building Your Plan")
-                    .font(.title2.weight(.bold))
+                    .font(.system(.title2, design: .serif).weight(.bold))
                 Text("Creating personalized exercises and habits...")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
             }
 
             ProgressView()
@@ -64,10 +64,10 @@ struct WellnessPlanView: View {
                 // Plan header
                 VStack(spacing: AppSpacing.sm) {
                     Text(plan.planName)
-                        .font(.title3.weight(.bold))
+                        .font(.system(.title3, design: .serif).weight(.bold))
                     Text("\(plan.exercises.count) exercises · \(plan.totalWeeks) weeks")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                 }
                 .padding(.top, AppSpacing.md)
 
@@ -80,13 +80,13 @@ struct WellnessPlanView: View {
                 if let notes = plan.notes, !notes.isEmpty {
                     HStack(alignment: .top, spacing: AppSpacing.sm) {
                         Image(systemName: "info.circle.fill")
-                            .foregroundColor(.blue)
+                            .foregroundColor(AppColors.accent)
                         Text(notes)
                             .font(.subheadline)
                     }
                     .padding(AppSpacing.md)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.blue.opacity(0.08))
+                    .background(AppColors.accentTint)
                     .cornerRadius(AppCorners.medium)
                 }
 
@@ -124,7 +124,7 @@ struct WellnessPlanView: View {
                         .font(.headline)
                     Text(exercise.targetArea)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                     HStack(spacing: AppSpacing.sm) {
                         Text("\(exercise.sets) sets")
                         Text("·")
@@ -134,7 +134,7 @@ struct WellnessPlanView: View {
                             .foregroundColor(difficultyColor(exercise.difficulty))
                     }
                     .font(.caption2)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
                 }
 
                 Spacer()
@@ -147,7 +147,7 @@ struct WellnessPlanView: View {
 
             Text(exercise.description)
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
 
             // Tips
             if !exercise.tips.isEmpty {
@@ -161,7 +161,7 @@ struct WellnessPlanView: View {
                             Text(tip)
                         }
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                     }
                 }
             }
@@ -169,14 +169,14 @@ struct WellnessPlanView: View {
         .padding(AppSpacing.lg)
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.xl)
-        .shadow(color: .black.opacity(0.04), radius: 6, y: 2)
+        .shadow(color: AppColors.cardShadowColor, radius: 6, y: 2)
     }
 
     private func difficultyColor(_ difficulty: RehabExercise.Difficulty) -> Color {
         switch difficulty {
-        case .beginner: return .green
-        case .intermediate: return .orange
-        case .advanced: return .red
+        case .beginner: return AppColors.success
+        case .intermediate: return AppColors.warning
+        case .advanced: return AppColors.danger
         }
     }
 
@@ -185,22 +185,22 @@ struct WellnessPlanView: View {
         switch status {
         case .verified, .crossModelVerified:
             Image(systemName: "checkmark.seal.fill")
-                .foregroundColor(.green)
+                .foregroundColor(AppColors.success)
                 .font(.caption)
         case .contraindicated:
             Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundColor(.red)
+                .foregroundColor(AppColors.danger)
                 .font(.caption)
         case .crossModelFlagged:
             Image(systemName: "exclamationmark.circle.fill")
-                .foregroundColor(.orange)
+                .foregroundColor(AppColors.warning)
                 .font(.caption)
         case .checking:
             ProgressView()
                 .scaleEffect(0.6)
         case .crossModelFailed:
             Image(systemName: "questionmark.circle")
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
                 .font(.caption)
         }
     }
@@ -213,7 +213,7 @@ struct WellnessPlanView: View {
                 let warning = viewModel.rehabPlanWarnings[index]
                 HStack(alignment: .top, spacing: AppSpacing.sm) {
                     Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundColor(.orange)
+                        .foregroundColor(AppColors.warning)
                         .font(.caption)
                     Text(warning.message)
                         .font(.caption)
@@ -222,7 +222,7 @@ struct WellnessPlanView: View {
         }
         .padding(AppSpacing.md)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.orange.opacity(0.1))
+        .background(AppColors.warning.opacity(0.1))
         .cornerRadius(AppCorners.medium)
     }
 
@@ -255,10 +255,10 @@ struct WellnessPlanView: View {
                 .font(.system(size: 60))
                 .foregroundColor(AppColors.warning)
             Text("Plan Generation Failed")
-                .font(.title2.weight(.bold))
+                .font(.system(.title2, design: .serif).weight(.bold))
             Text(message)
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
             Button(action: {
                 viewModel.generateWellnessPlan(from: wellnessResult)
             }) {

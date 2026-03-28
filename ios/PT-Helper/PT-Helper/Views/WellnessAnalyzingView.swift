@@ -9,7 +9,7 @@ struct WellnessAnalyzingView: View {
 
     var body: some View {
         ZStack {
-            AppColors.pageBackground.ignoresSafeArea()
+            AppColors.bgGradient.ignoresSafeArea()
 
             if let error = viewModel.analysisError {
                 errorView(error)
@@ -37,7 +37,7 @@ struct WellnessAnalyzingView: View {
                     Button("Cancel") {
                         viewModel.cancelAnalysis()
                     }
-                    .foregroundColor(.red)
+                    .foregroundColor(AppColors.danger)
                 }
             }
         }
@@ -70,17 +70,16 @@ struct WellnessAnalyzingView: View {
 
             Image(systemName: "sparkles")
                 .font(.system(size: 70))
-                .foregroundStyle(
-                    LinearGradient(colors: [.teal, .green], startPoint: .topLeading, endPoint: .bottomTrailing)
-                )
+                .foregroundColor(AppColors.accent)
                 .symbolEffect(.pulse.byLayer, options: .repeating)
 
             VStack(spacing: AppSpacing.sm) {
                 Text("Analyzing Your Goals")
-                    .font(.title2.weight(.bold))
+                    .font(.system(.title2, design: .serif).weight(.bold))
+                    .foregroundColor(AppColors.primaryText)
                 Text("Our AI is building your personalized wellness plan...")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
                     .multilineTextAlignment(.center)
             }
 
@@ -91,7 +90,7 @@ struct WellnessAnalyzingView: View {
                 Text(elapsedTimeText)
                     .font(.caption)
                     .monospacedDigit()
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
             }
 
             VStack(alignment: .leading, spacing: AppSpacing.lg) {
@@ -121,10 +120,11 @@ struct WellnessAnalyzingView: View {
 
             VStack(spacing: AppSpacing.sm) {
                 Text("Analysis Failed")
-                    .font(.title2.weight(.bold))
+                    .font(.system(.title2, design: .serif).weight(.bold))
+                    .foregroundColor(AppColors.primaryText)
                 Text(message)
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
                     .multilineTextAlignment(.center)
             }
 
@@ -172,7 +172,7 @@ struct WellnessAnalyzingView: View {
                 .frame(width: 24)
             Text(text)
                 .font(.subheadline.weight(isActive ? .medium : .regular))
-                .foregroundColor(isActive ? .primary : .secondary)
+                .foregroundColor(isActive ? AppColors.primaryText : AppColors.mutedText)
         }
     }
 }
