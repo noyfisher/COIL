@@ -7,7 +7,7 @@ struct OnboardingView: View {
 
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground)
+            AppColors.bgGradient
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -21,7 +21,7 @@ struct OnboardingView: View {
                         }) {
                             Text("Skip")
                                 .font(.subheadline.weight(.medium))
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.secondaryText)
                         }
                         .accessibilityIdentifier("onboarding.skipButton")
                     }
@@ -34,17 +34,17 @@ struct OnboardingView: View {
                     Text("Step \(viewModel.currentStep) of 6")
                         .font(.caption)
                         .fontWeight(.semibold)
-                        .foregroundColor(.white)
+                        .foregroundColor(AppColors.ctaText)
                         .padding(.horizontal, AppSpacing.md)
                         .padding(.vertical, AppSpacing.xs)
-                        .background(Color.blue)
-                        .cornerRadius(AppCorners.medium)
+                        .background(AppColors.accent)
+                        .clipShape(Capsule())
                         .accessibilityIdentifier("onboarding.stepIndicator")
 
                     HStack(spacing: 6) {
                         ForEach(1...6, id: \.self) { step in
                             Capsule()
-                                .fill(step <= viewModel.currentStep ? Color.blue : Color.gray.opacity(0.25))
+                                .fill(step <= viewModel.currentStep ? AppColors.accent : AppColors.elevatedSurface)
                                 .frame(height: 5)
                                 .animation(.spring(response: 0.35), value: viewModel.currentStep)
                         }
@@ -52,12 +52,12 @@ struct OnboardingView: View {
                     .padding(.horizontal, 32)
 
                     Text(stepTitle)
-                        .font(.title2)
-                        .fontWeight(.bold)
+                        .font(AppFonts.sectionTitle)
+                        .foregroundColor(AppColors.primaryText)
 
                     Text(stepSubtitle)
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 32)
                 }

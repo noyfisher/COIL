@@ -73,17 +73,17 @@ struct RootView: View {
         if signedIn {
             if isCheckingProfile {
                 ZStack {
-                    AppColors.pageBackground
+                    AppColors.bgGradient
                         .ignoresSafeArea()
                     VStack(spacing: AppSpacing.xl) {
                         Image(systemName: "figure.run.circle.fill")
                             .font(.system(size: 56))
-                            .foregroundStyle(AppColors.coolGradient)
+                            .foregroundColor(AppColors.accent)
                             .symbolEffect(.pulse.byLayer, options: .repeating)
 
                         Text("Loading your profile...")
                             .font(.subheadline)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppColors.secondaryText)
                     }
                 }
             } else if profileCompleted {

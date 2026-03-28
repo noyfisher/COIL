@@ -12,43 +12,43 @@ struct LoginView: View {
 
     var body: some View {
         ZStack {
-            // Background
-            AppColors.pageBackground.ignoresSafeArea()
+            AppColors.bgGradient.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Top gradient section with branding
-                ZStack {
-                    // Gradient background
-                    RoundedRectangle(cornerRadius: AppCorners.xxl)
-                        .fill(AppColors.coolGradient)
-                        .ignoresSafeArea(edges: .top)
+                Spacer()
 
-                    VStack(spacing: AppSpacing.lg) {
-                        Spacer()
+                // Branding
+                VStack(spacing: AppSpacing.xl) {
+                    // Pill badge
+                    Text("PT Helper")
+                        .font(AppFonts.badge)
+                        .foregroundColor(AppColors.accent)
+                        .padding(.horizontal, AppSpacing.lg)
+                        .padding(.vertical, AppSpacing.xs)
+                        .background(AppColors.accentTint)
+                        .clipShape(Capsule())
 
-                        // App icon
-                        Image(systemName: "figure.run.circle.fill")
-                            .font(.system(size: 72))
-                            .foregroundStyle(.white)
-                            .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
+                    // App icon
+                    Image(systemName: "figure.run.circle.fill")
+                        .font(.system(size: 72))
+                        .foregroundColor(AppColors.accent)
 
-                        VStack(spacing: AppSpacing.sm) {
-                            Text("PT Helper")
-                                .font(AppFonts.heroTitle)
-                                .foregroundColor(.white)
+                    // Motivational headline
+                    VStack(spacing: AppSpacing.sm) {
+                        (Text("Your body has ")
+                            + Text("goals").italic()
+                            + Text(",\nnot just problems."))
+                            .font(AppFonts.heroTitle)
+                            .foregroundColor(AppColors.primaryText)
+                            .multilineTextAlignment(.center)
 
-                            Text("Your personal recovery companion")
-                                .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.85))
-                        }
-
-                        Spacer()
+                        Text("AI-powered recovery, personalized for you")
+                            .font(.subheadline)
+                            .foregroundColor(AppColors.secondaryText)
                     }
-                    .padding(.bottom, AppSpacing.xxl)
                 }
-                .frame(height: UIScreen.main.bounds.height * 0.42)
 
-                Spacer().frame(height: AppSpacing.xxl)
+                Spacer().frame(height: AppSpacing.xxxl)
 
                 // Feature highlights
                 HStack(spacing: AppSpacing.lg) {
@@ -67,14 +67,14 @@ struct LoginView: View {
                     } onCompletion: { result in
                         vm.handle(result) { onSignedIn() }
                     }
-                    .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
+                    .signInWithAppleButtonStyle(.black)
                     .frame(height: 52)
-                    .cornerRadius(AppCorners.card)
+                    .clipShape(Capsule())
 
                     if let msg = vm.msg {
                         Text(msg)
                             .font(.footnote)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppColors.secondaryText)
                             .transition(.opacity)
                     }
                 }
@@ -96,14 +96,14 @@ struct LoginView: View {
         VStack(spacing: AppSpacing.sm) {
             Image(systemName: icon)
                 .font(.system(size: 20, weight: .medium))
-                .foregroundColor(.blue)
+                .foregroundColor(AppColors.accent)
                 .frame(width: 40, height: 40)
-                .background(Color.blue.opacity(0.1))
+                .background(AppColors.accentTint)
                 .clipShape(Circle())
 
             Text(text)
                 .font(AppFonts.badge)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
         }
         .frame(maxWidth: .infinity)
     }
