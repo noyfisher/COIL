@@ -117,7 +117,7 @@ struct SettingsView: View {
 
                         // Debug & Feedback
                         VStack(spacing: 0) {
-                            settingsRow(icon: "ladybug", color: .purple, title: "Export Debug Log") {
+                            settingsRow(icon: "ladybug", color: AppColors.accent, title: "Export Debug Log") {
                                 if let url = SessionLogger.shared.exportAsShareableFile() {
                                     shareURL = url
                                     showShareSheet = true

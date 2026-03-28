@@ -177,7 +177,7 @@ struct WellnessDetailView: View {
     // MARK: - Duration
 
     private var durationSection: some View {
-        CardSection(icon: "calendar", color: .blue, title: "How long has this been an issue?") {
+        CardSection(icon: "calendar", color: AppColors.accent, title: "How long has this been an issue?") {
             FlowLayout(spacing: AppSpacing.sm) {
                 ForEach(WellnessAssessment.Duration.allCases, id: \.self) { d in
                     ChipButton(
@@ -193,7 +193,7 @@ struct WellnessDetailView: View {
     // MARK: - Time of Day (Multi-select)
 
     private var timeOfDaySection: some View {
-        CardSection(icon: "clock.fill", color: .purple, title: "When does this bother you most?") {
+        CardSection(icon: "clock.fill", color: AppColors.accent, title: "When does this bother you most?") {
             FlowLayout(spacing: AppSpacing.sm) {
                 ForEach(WellnessAssessment.TimeOfDay.allCases, id: \.self) { time in
                     ChipButton(
@@ -215,7 +215,7 @@ struct WellnessDetailView: View {
     // MARK: - Commitment Level
 
     private var commitmentSection: some View {
-        CardSection(icon: "timer", color: .teal, title: "How much time can you dedicate daily?") {
+        CardSection(icon: "timer", color: AppColors.accent, title: "How much time can you dedicate daily?") {
             FlowLayout(spacing: AppSpacing.sm) {
                 ForEach(WellnessAssessment.CommitmentLevel.allCases, id: \.self) { level in
                     ChipButton(
@@ -322,7 +322,7 @@ struct WellnessDetailView: View {
     // MARK: - Prior Attempts
 
     private var priorAttemptsSection: some View {
-        CardSection(icon: "arrow.counterclockwise", color: .cyan, title: "What have you tried before?") {
+        CardSection(icon: "arrow.counterclockwise", color: AppColors.accent, title: "What have you tried before?") {
             FlowLayout(spacing: AppSpacing.sm) {
                 ForEach(WellnessAssessment.PriorAttempt.allCases, id: \.self) { attempt in
                     ChipButton(

@@ -30,9 +30,9 @@ struct RegionPainInputView: View {
             HStack {
                 Image(systemName: "figure.arms.open")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(.purple)
+                    .foregroundColor(AppColors.accent)
                     .frame(width: 28, height: 28)
-                    .background(Color.purple.opacity(0.12))
+                    .background(AppColors.accentTint)
                     .cornerRadius(AppCorners.small)
 
                 Text("Pain by Region")
@@ -46,7 +46,7 @@ struct RegionPainInputView: View {
                         Text("Add")
                     }
                     .font(.caption.weight(.medium))
-                    .foregroundColor(.blue)
+                    .foregroundColor(AppColors.accent)
                 }
             }
 
@@ -143,7 +143,7 @@ struct RegionPainInputView: View {
                     .foregroundColor(.primary)
                 Spacer()
                 Image(systemName: "plus.circle")
-                    .foregroundColor(.blue)
+                    .foregroundColor(AppColors.accent)
             }
         }
     }

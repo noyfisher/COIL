@@ -365,7 +365,7 @@ struct AnalysisResultView: View {
                     }
 
                     // Session length
-                    CardSection(icon: "clock.fill", color: .purple, title: "Session Length") {
+                    CardSection(icon: "clock.fill", color: AppColors.accent, title: "Session Length") {
                         FlowLayout(spacing: AppSpacing.sm) {
                             ForEach(RehabPlanPreferences.SessionLength.allCases, id: \.self) { option in
                                 ChipButton(

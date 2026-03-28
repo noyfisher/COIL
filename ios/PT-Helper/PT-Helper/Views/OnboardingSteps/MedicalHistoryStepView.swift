@@ -49,7 +49,7 @@ struct MedicalHistoryStepView: View {
                         Image(systemName: showMoreConditions ? "chevron.up" : "chevron.down")
                             .font(.caption)
                     }
-                    .foregroundColor(.blue)
+                    .foregroundColor(AppColors.accent)
                 }
 
                 if showMoreConditions {
@@ -62,7 +62,7 @@ struct MedicalHistoryStepView: View {
                 }
 
                 // Medications section
-                CardSection(icon: "pills.fill", color: .purple, title: "Current Medications") {
+                CardSection(icon: "pills.fill", color: AppColors.accent, title: "Current Medications") {
                     VStack(alignment: .leading, spacing: AppSpacing.sm) {
                         Text("Select any medications you take regularly")
                             .font(.caption)
@@ -76,7 +76,7 @@ struct MedicalHistoryStepView: View {
                                         .foregroundColor(isSelected ? .white : .primary)
                                         .padding(.horizontal, AppSpacing.md)
                                         .padding(.vertical, AppSpacing.sm)
-                                        .background(isSelected ? Color.purple : AppColors.inputBackground)
+                                        .background(isSelected ? AppColors.accent : AppColors.inputBackground)
                                         .cornerRadius(AppCorners.small)
                                         .overlay(
                                             RoundedRectangle(cornerRadius: AppCorners.small)
@@ -103,7 +103,7 @@ struct MedicalHistoryStepView: View {
                                 Button(action: { addCustomMedication() }) {
                                     Image(systemName: "plus.circle.fill")
                                         .font(.title2)
-                                        .foregroundColor(.purple)
+                                        .foregroundColor(AppColors.accent)
                                 }
                                 .disabled(customMedicationText.trimmingCharacters(in: .whitespaces).isEmpty)
                             }
@@ -126,7 +126,7 @@ struct MedicalHistoryStepView: View {
                                             .foregroundColor(.white)
                                             .padding(.horizontal, AppSpacing.md)
                                             .padding(.vertical, AppSpacing.sm)
-                                            .background(Color.purple)
+                                            .background(AppColors.accent)
                                             .cornerRadius(AppCorners.small)
                                         }
                                     }
@@ -168,12 +168,12 @@ struct MedicalHistoryStepView: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, AppSpacing.lg)
             .padding(.horizontal, AppSpacing.sm)
-            .background(isSelected ? Color.blue : AppColors.cardBackground)
+            .background(isSelected ? AppColors.accent : AppColors.cardBackground)
             .cornerRadius(AppCorners.medium)
             .shadow(color: .black.opacity(isSelected ? 0 : 0.04), radius: 6, y: 2)
             .overlay(
                 RoundedRectangle(cornerRadius: AppCorners.medium)
-                    .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2)
+                    .stroke(isSelected ? AppColors.accent : Color.clear, lineWidth: 2)
             )
         }
     }

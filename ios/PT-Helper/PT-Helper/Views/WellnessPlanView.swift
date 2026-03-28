@@ -36,7 +36,7 @@ struct WellnessPlanView: View {
             Image(systemName: "figure.flexibility")
                 .font(.system(size: 60))
                 .foregroundStyle(
-                    LinearGradient(colors: [.teal, .green], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    LinearGradient(colors: [AppColors.accent, AppColors.accentLight], startPoint: .topLeading, endPoint: .bottomTrailing)
                 )
                 .symbolEffect(.pulse.byLayer, options: .repeating)
 
@@ -154,7 +154,7 @@ struct WellnessPlanView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Tips")
                         .font(.caption.weight(.semibold))
-                        .foregroundColor(.teal)
+                        .foregroundColor(AppColors.accent)
                     ForEach(exercise.tips, id: \.self) { tip in
                         HStack(alignment: .top, spacing: 4) {
                             Text("•")

@@ -84,8 +84,8 @@ struct ExerciseImageView: View {
     private var difficultyColor: Color {
         switch exercise.difficulty {
         case .beginner: return .green
-        case .intermediate: return .blue
-        case .advanced: return .purple
+        case .intermediate: return AppColors.accent
+        case .advanced: return AppColors.accent
         }
     }
 }

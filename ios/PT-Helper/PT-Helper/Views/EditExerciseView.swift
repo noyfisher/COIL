@@ -73,7 +73,7 @@ struct EditExerciseView: View {
                         }
 
                         // Description
-                        CardSection(icon: "text.alignleft", color: .purple, title: "Description") {
+                        CardSection(icon: "text.alignleft", color: AppColors.accent, title: "Description") {
                             TextField("Exercise description", text: $description, axis: .vertical)
                                 .lineLimit(3...8)
                                 .padding(AppSpacing.md)

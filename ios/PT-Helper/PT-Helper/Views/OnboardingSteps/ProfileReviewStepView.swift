@@ -13,7 +13,7 @@ struct ProfileReviewStepView: View {
         ScrollView {
             VStack(spacing: AppSpacing.lg) {
                 // Basic info
-                ReviewCard(title: "Personal Info", icon: "person.fill", color: .blue) {
+                ReviewCard(title: "Personal Info", icon: "person.fill", color: AppColors.accent) {
                     ReviewRow(label: "Name", value: "\(viewModel.userProfile.firstName) \(viewModel.userProfile.lastName)")
                     ReviewRow(label: "Date of Birth", value: viewModel.userProfile.dateOfBirth.formatted(date: .abbreviated, time: .omitted))
                     ReviewRow(label: "Sex", value: viewModel.userProfile.sex)

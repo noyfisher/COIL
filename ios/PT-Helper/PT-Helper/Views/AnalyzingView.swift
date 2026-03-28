@@ -115,7 +115,7 @@ struct AnalyzingView: View {
                 .font(.system(size: 70))
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [AppColors.accent, .purple],
+                        colors: [AppColors.accent, AppColors.accentLight],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )

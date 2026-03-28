@@ -17,9 +17,9 @@ struct ExerciseIllustrationView: View {
         case .beginner:
             return [Color.green.opacity(0.7), Color.green]
         case .intermediate:
-            return [Color.blue.opacity(0.7), Color.blue]
+            return [AppColors.accent.opacity(0.7), AppColors.accent]
         case .advanced:
-            return [Color.purple.opacity(0.7), Color.purple]
+            return [AppColors.accent.opacity(0.7), AppColors.accent]
         }
     }
 
@@ -34,8 +34,8 @@ struct ExerciseIllustrationView: View {
     private var difficultyColor: Color {
         switch difficulty {
         case .beginner: return .green
-        case .intermediate: return .blue
-        case .advanced: return .purple
+        case .intermediate: return AppColors.accent
+        case .advanced: return AppColors.accent
         }
     }
 
@@ -175,10 +175,10 @@ struct ExercisePositionGuideView: View {
                     positionStep(number: 1, label: "Starting Position", text: start, color: .green)
                 }
                 if let move = movement {
-                    positionStep(number: 2, label: "Movement", text: move, color: .blue)
+                    positionStep(number: 2, label: "Movement", text: move, color: AppColors.accent)
                 }
                 if let end = endPosition {
-                    positionStep(number: 3, label: "Return", text: end, color: .purple)
+                    positionStep(number: 3, label: "Return", text: end, color: AppColors.accent)
                 }
             }
         }
@@ -227,8 +227,8 @@ struct DifficultyBadge: View {
     private var color: Color {
         switch difficulty {
         case .beginner: return .green
-        case .intermediate: return .blue
-        case .advanced: return .purple
+        case .intermediate: return AppColors.accent
+        case .advanced: return AppColors.accent
         }
     }
 

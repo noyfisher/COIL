@@ -63,7 +63,7 @@ struct WellnessResultView: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Label("Summary", systemImage: "text.alignleft")
                 .font(.subheadline.weight(.semibold))
-                .foregroundColor(.teal)
+                .foregroundColor(AppColors.accent)
             Text(viewModel.analysisResult?.overallSummary ?? "")
                 .font(.body)
                 .lineSpacing(3)
@@ -177,7 +177,7 @@ struct WellnessResultView: View {
                             // Timeline
                             HStack(spacing: AppSpacing.sm) {
                                 Image(systemName: "calendar.badge.clock")
-                                    .foregroundColor(.purple)
+                                    .foregroundColor(AppColors.accent)
                                 Text(rec.expectedTimeline)
                                     .font(.subheadline)
                                     .foregroundColor(AppColors.secondaryText)
@@ -195,7 +195,7 @@ struct WellnessResultView: View {
                                                 .font(.caption)
                                                 .padding(.horizontal, AppSpacing.sm)
                                                 .padding(.vertical, 4)
-                                                .background(Color.teal.opacity(0.1))
+                                                .background(AppColors.accentTint)
                                                 .cornerRadius(AppCorners.small)
                                         }
                                     }
@@ -243,7 +243,7 @@ struct WellnessResultView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: AppSpacing.xl) {
-                    CardSection(icon: "dumbbell.fill", color: .blue, title: "Available Equipment") {
+                    CardSection(icon: "dumbbell.fill", color: AppColors.accent, title: "Available Equipment") {
                         FlowLayout(spacing: AppSpacing.sm) {
                             ForEach(RehabPlanPreferences.Equipment.allCases, id: \.self) { option in
                                 ChipButton(
@@ -255,7 +255,7 @@ struct WellnessResultView: View {
                         }
                     }
 
-                    CardSection(icon: "clock.fill", color: .purple, title: "Session Length") {
+                    CardSection(icon: "clock.fill", color: AppColors.accent, title: "Session Length") {
                         FlowLayout(spacing: AppSpacing.sm) {
                             ForEach(RehabPlanPreferences.SessionLength.allCases, id: \.self) { option in
                                 ChipButton(

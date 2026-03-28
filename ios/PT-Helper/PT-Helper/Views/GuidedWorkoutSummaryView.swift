@@ -70,7 +70,7 @@ struct GuidedWorkoutSummaryView: View {
                 )
 
                 // Notes
-                CardSection(icon: "note.text", color: .purple, title: "Session Notes") {
+                CardSection(icon: "note.text", color: AppColors.accent, title: "Session Notes") {
                     TextField("How did the session go?", text: $notes, axis: .vertical)
                         .lineLimit(3...6)
                         .padding(AppSpacing.md)

@@ -20,9 +20,9 @@ struct ActivityLevelStepView: View {
                         HStack(spacing: AppSpacing.lg) {
                             Image(systemName: icon)
                                 .font(.title3)
-                                .foregroundColor(isSelected ? .white : .blue)
+                                .foregroundColor(isSelected ? .white : AppColors.accent)
                                 .frame(width: 44, height: 44)
-                                .background(isSelected ? Color.blue : Color.blue.opacity(0.1))
+                                .background(isSelected ? AppColors.accent : AppColors.accentTint)
                                 .cornerRadius(AppCorners.medium)
 
                             VStack(alignment: .leading, spacing: 2) {
@@ -43,12 +43,12 @@ struct ActivityLevelStepView: View {
                             }
                         }
                         .padding(AppSpacing.lg)
-                        .background(isSelected ? Color.blue : AppColors.cardBackground)
+                        .background(isSelected ? AppColors.accent : AppColors.cardBackground)
                         .cornerRadius(AppCorners.card)
                         .shadow(color: .black.opacity(isSelected ? 0 : 0.04), radius: 8, y: 2)
                         .overlay(
                             RoundedRectangle(cornerRadius: AppCorners.card)
-                                .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2)
+                                .stroke(isSelected ? AppColors.accent : Color.clear, lineWidth: 2)
                         )
                     }
                 }

@@ -7,7 +7,7 @@ struct BodyMapView: View {
 
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground)
+            AppColors.bgGradient
                 .ignoresSafeArea()
 
             VStack(spacing: 16) {
@@ -77,7 +77,7 @@ struct BodyMapView: View {
                                             // Pulse ring hint for unselected on first view
                                             if showPulseHint && !region.isSelected {
                                                 Circle()
-                                                    .stroke(Color.blue.opacity(0.3), lineWidth: 2)
+                                                    .stroke(AppColors.accent.opacity(0.3), lineWidth: 2)
                                                     .frame(width: 56, height: 56)
                                                     .scaleEffect(showPulseHint ? 1.15 : 1.0)
                                                     .opacity(showPulseHint ? 0.6 : 0)
@@ -88,23 +88,23 @@ struct BodyMapView: View {
                                             }
 
                                             Circle()
-                                                .fill(region.isSelected ? Color.blue : Color.blue.opacity(0.15))
+                                                .fill(region.isSelected ? AppColors.accent : AppColors.accentTint)
                                                 .frame(width: 48, height: 48)
                                                 .overlay(
                                                     Circle()
-                                                        .stroke(Color.blue, lineWidth: region.isSelected ? 0 : 1.5)
+                                                        .stroke(AppColors.accent, lineWidth: region.isSelected ? 0 : 1.5)
                                                 )
                                                 .overlay(
                                                     Image(systemName: region.isSelected ? "checkmark" : "plus")
                                                         .font(.system(size: 15, weight: .bold))
-                                                        .foregroundColor(region.isSelected ? .white : .blue)
+                                                        .foregroundColor(region.isSelected ? .white : AppColors.accent)
                                                 )
                                                 .scaleEffect(region.isSelected ? 1.1 : 1.0)
                                         }
 
                                         Text(region.name)
                                             .font(.system(size: 9, weight: .medium))
-                                            .foregroundColor(region.isSelected ? .blue : .secondary)
+                                            .foregroundColor(region.isSelected ? AppColors.accent : .secondary)
                                             .lineLimit(1)
                                     }
                                 }

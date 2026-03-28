@@ -40,7 +40,7 @@ struct ReAssessmentComparisonView: View {
 
                 // Per-region comparison
                 if !allRegions.isEmpty {
-                    CardSection(icon: "figure.arms.open", color: .purple, title: "Pain by Region") {
+                    CardSection(icon: "figure.arms.open", color: AppColors.accent, title: "Pain by Region") {
                         VStack(spacing: AppSpacing.md) {
                             ForEach(allRegions, id: \.self) { region in
                                 regionComparisonRow(region: region)

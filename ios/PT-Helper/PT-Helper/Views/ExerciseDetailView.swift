@@ -85,7 +85,7 @@ struct ExerciseDetailView: View {
     }
 
     private var timerView: some View {
-        CardSection(icon: "timer", color: .purple, title: "Timer") {
+        CardSection(icon: "timer", color: AppColors.accent, title: "Timer") {
             Text("\(exercise.reps) remaining")
                 .font(.system(.title2, design: .serif))
                 .foregroundColor(AppColors.primaryText)

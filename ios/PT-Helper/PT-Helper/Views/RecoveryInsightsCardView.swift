@@ -27,7 +27,7 @@ struct RecoveryInsightsCardView: View {
     // MARK: - Generate Card
 
     private var generateCard: some View {
-        CardSection(icon: "brain.head.profile", color: .purple, title: "Recovery Insights") {
+        CardSection(icon: "brain.head.profile", color: AppColors.accent, title: "Recovery Insights") {
             VStack(spacing: AppSpacing.md) {
                 Text("Your AI recovery coach can analyze your recent workouts and share personalized insights.")
                     .font(.subheadline)
@@ -58,7 +58,7 @@ struct RecoveryInsightsCardView: View {
     // MARK: - Loading Card
 
     private var loadingCard: some View {
-        CardSection(icon: "brain.head.profile", color: .purple, title: "Recovery Insights") {
+        CardSection(icon: "brain.head.profile", color: AppColors.accent, title: "Recovery Insights") {
             HStack(spacing: AppSpacing.md) {
                 ProgressView()
                     .scaleEffect(0.9)
@@ -74,7 +74,7 @@ struct RecoveryInsightsCardView: View {
     // MARK: - Insight Preview Card
 
     private func insightPreviewCard(_ insight: RecoveryInsight) -> some View {
-        let content = CardSection(icon: "brain.head.profile", color: .purple, title: "Recovery Insights") {
+        let content = CardSection(icon: "brain.head.profile", color: AppColors.accent, title: "Recovery Insights") {
             VStack(alignment: .leading, spacing: AppSpacing.md) {
                 // Headline
                 Text(insight.headline)

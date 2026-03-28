@@ -10,7 +10,7 @@ struct BasicInfoStepView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: AppSpacing.lg) {
-                CardSection(icon: "person.fill", color: .blue, title: "Full Name", required: true) {
+                CardSection(icon: "person.fill", color: AppColors.accent, title: "Full Name", required: true) {
                     VStack(alignment: .leading, spacing: AppSpacing.sm) {
                         StyledTextField(placeholder: "First Name", text: $viewModel.userProfile.firstName)
                         if showErrors && viewModel.userProfile.firstName.trimmingCharacters(in: .whitespaces).isEmpty {
@@ -32,7 +32,7 @@ struct BasicInfoStepView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
 
-                CardSection(icon: "figure.stand", color: .teal, title: "Sex", required: true) {
+                CardSection(icon: "figure.stand", color: AppColors.accent, title: "Sex", required: true) {
                     VStack(alignment: .leading, spacing: AppSpacing.sm) {
                         HStack(spacing: AppSpacing.sm) {
                             ForEach(["Male", "Female", "Other"], id: \.self) { option in
@@ -42,7 +42,7 @@ struct BasicInfoStepView: View {
                                         .foregroundColor(viewModel.userProfile.sex == option ? .white : .primary)
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, AppSpacing.md)
-                                        .background(viewModel.userProfile.sex == option ? Color.teal : AppColors.subtleBorder)
+                                        .background(viewModel.userProfile.sex == option ? AppColors.accent : AppColors.subtleBorder)
                                         .cornerRadius(AppCorners.medium)
                                 }
                             }
@@ -111,7 +111,7 @@ struct BasicInfoStepView: View {
                     }
                 }
 
-                CardSection(icon: "scalemass", color: .teal, title: "Weight (lbs)", required: true) {
+                CardSection(icon: "scalemass", color: AppColors.accent, title: "Weight (lbs)", required: true) {
                     VStack(alignment: .leading, spacing: AppSpacing.sm) {
                         HStack {
                             TextField("Enter weight", text: $weightText)

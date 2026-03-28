@@ -49,7 +49,7 @@ struct RecoveryInsightsDetailView: View {
                 .font(.system(size: 40))
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [.purple, .pink],
+                        colors: [AppColors.accent, AppColors.accentLight],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
