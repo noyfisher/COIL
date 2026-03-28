@@ -14,7 +14,7 @@ struct AnalysisResultView: View {
 
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground).ignoresSafeArea()
+            AppColors.bgGradient.ignoresSafeArea()
             ScrollView {
                 VStack(spacing: 16) {
                     // App-detected red flags (from validation pipeline)
@@ -70,13 +70,13 @@ struct AnalysisResultView: View {
     private var disclaimerBanner: some View {
         HStack(spacing: 10) {
             Image(systemName: "info.circle.fill")
-                .foregroundColor(.blue)
+                .foregroundColor(AppColors.accent)
             Text(analysisResult.disclaimerText)
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
         }
         .padding()
-        .background(Color.blue.opacity(0.08))
+        .background(AppColors.accentTint)
         .cornerRadius(AppCorners.card)
     }
 
@@ -86,29 +86,29 @@ struct AnalysisResultView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
                 Image(systemName: "exclamationmark.circle.fill")
-                    .foregroundColor(.orange)
+                    .foregroundColor(AppColors.warning)
                 Text("Things to Keep in Mind")
                     .font(.subheadline.weight(.semibold))
-                    .foregroundColor(.primary)
+                    .foregroundColor(AppColors.primaryText)
             }
             ForEach(Array(cautionWarnings.enumerated()), id: \.offset) { _, warning in
                 Text("• \(warning.message)")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
             }
         }
         .padding()
-        .background(Color.orange.opacity(0.08))
+        .background(AppColors.warning.opacity(0.08))
         .cornerRadius(AppCorners.card)
     }
 
     // MARK: - Summary
 
     private var overallSummaryCard: some View {
-        CardSection(icon: "heart.text.clipboard", color: .blue, title: "What We Found") {
+        CardSection(icon: "heart.text.clipboard", color: AppColors.accent, title: "What We Found") {
             Text(analysisResult.overallSummary)
                 .font(.body)
-                .foregroundColor(.primary)
+                .foregroundColor(AppColors.primaryText)
                 .lineSpacing(3)
         }
     }
@@ -142,15 +142,15 @@ struct AnalysisResultView: View {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(condition.commonName)
                                     .font(AppFonts.sectionTitle)
-                                    .foregroundColor(.primary)
+                                    .foregroundColor(AppColors.primaryText)
                                 Text(condition.conditionName)
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(AppColors.secondaryText)
                             }
                             Spacer()
                             Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                                 .font(.system(size: 12, weight: .semibold))
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.secondaryText)
                         }
 
                         // Match strength indicator
@@ -163,7 +163,7 @@ struct AnalysisResultView: View {
                             Button(action: { showConfidenceInfo = true }) {
                                 Image(systemName: "info.circle")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(AppColors.secondaryText)
                             }
                         }
                         .accessibilityElement(children: .combine)
@@ -180,7 +180,7 @@ struct AnalysisResultView: View {
                             .foregroundColor(.white)
                             .padding(AppSpacing.sm)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color.red)
+                            .background(AppColors.danger)
                             .cornerRadius(AppCorners.small)
                         }
                     }
@@ -200,7 +200,7 @@ struct AnalysisResultView: View {
                         // Explanation
                         Text(condition.explanation)
                             .font(.body)
-                            .foregroundColor(.primary)
+                            .foregroundColor(AppColors.primaryText)
                             .lineSpacing(3)
                             .padding(.horizontal, AppSpacing.lg)
 
@@ -208,10 +208,10 @@ struct AnalysisResultView: View {
                         VStack(alignment: .leading, spacing: AppSpacing.sm) {
                             Label("What's happening", systemImage: "figure.stand")
                                 .font(.subheadline.weight(.semibold))
-                                .foregroundColor(.blue)
+                                .foregroundColor(AppColors.accent)
                             Text(condition.whatItMeans)
                                 .font(.subheadline)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.secondaryText)
                                 .lineSpacing(3)
                         }
                         .padding(.horizontal, AppSpacing.lg)
@@ -220,16 +220,16 @@ struct AnalysisResultView: View {
                         VStack(alignment: .leading, spacing: AppSpacing.sm) {
                             Label("Suggested next steps", systemImage: "list.number")
                                 .font(.subheadline.weight(.semibold))
-                                .foregroundColor(.purple)
+                                .foregroundColor(AppColors.accent)
                             ForEach(Array(condition.nextSteps.enumerated()), id: \.offset) { index, step in
                                 HStack(alignment: .top, spacing: AppSpacing.sm) {
                                     Text("\(index + 1).")
                                         .font(.subheadline.weight(.semibold))
-                                        .foregroundColor(.purple)
+                                        .foregroundColor(AppColors.accent)
                                         .frame(width: 20, alignment: .leading)
                                     Text(step)
                                         .font(.subheadline)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(AppColors.secondaryText)
                                 }
                             }
                         }
@@ -242,7 +242,7 @@ struct AnalysisResultView: View {
         }
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.xl)
-        .shadow(color: .black.opacity(0.06), radius: 10, y: 3)
+        .shadow(color: AppColors.cardShadowColor, radius: 10, y: 3)
     }
 
     private func matchStrengthDots(_ strength: MatchStrength) -> some View {
@@ -267,9 +267,9 @@ struct AnalysisResultView: View {
 
     private func matchColor(_ strength: MatchStrength) -> Color {
         switch strength {
-        case .strong: return .green
-        case .moderate: return .orange
-        case .weak: return .gray
+        case .strong: return AppColors.success
+        case .moderate: return AppColors.warning
+        case .weak: return AppColors.mutedText
         }
     }
 
@@ -298,7 +298,7 @@ struct AnalysisResultView: View {
             }
         }
         .padding()
-        .background(Color.red)
+        .background(AppColors.danger)
         .cornerRadius(AppCorners.card)
     }
 
@@ -327,7 +327,7 @@ struct AnalysisResultView: View {
             }
         }
         .padding()
-        .background(Color.red.opacity(0.85))
+        .background(AppColors.danger.opacity(0.85))
         .cornerRadius(AppCorners.card)
     }
 
@@ -352,7 +352,7 @@ struct AnalysisResultView: View {
             ScrollView {
                 VStack(spacing: AppSpacing.xl) {
                     // Equipment
-                    CardSection(icon: "dumbbell.fill", color: .blue, title: "Available Equipment") {
+                    CardSection(icon: "dumbbell.fill", color: AppColors.accent, title: "Available Equipment") {
                         FlowLayout(spacing: AppSpacing.sm) {
                             ForEach(RehabPlanPreferences.Equipment.allCases, id: \.self) { option in
                                 ChipButton(

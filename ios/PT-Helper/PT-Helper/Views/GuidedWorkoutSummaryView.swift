@@ -29,7 +29,7 @@ struct GuidedWorkoutSummaryView: View {
                             .foregroundColor(.yellow)
                         Text(insight)
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppColors.secondaryText)
                     }
                     .padding(AppSpacing.md)
                     .background(Color.yellow.opacity(0.08))
@@ -46,7 +46,7 @@ struct GuidedWorkoutSummaryView: View {
                                 .foregroundColor(painColor)
                             Text("/ 10")
                                 .font(.title3)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.secondaryText)
                             Spacer()
                         }
                         Slider(value: $overallPain, in: 0...10, step: 1)
@@ -54,11 +54,11 @@ struct GuidedWorkoutSummaryView: View {
                         HStack {
                             Text("No pain")
                                 .font(.caption2)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.secondaryText)
                             Spacer()
                             Text("Severe")
                                 .font(.caption2)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.secondaryText)
                         }
                     }
                 }
@@ -151,11 +151,12 @@ struct GuidedWorkoutSummaryView: View {
                 .symbolEffect(.bounce, value: true)
 
             Text("Workout Complete!")
-                .font(.title2.weight(.bold))
+                .font(.system(.title2, design: .serif).weight(.bold))
+                .foregroundColor(AppColors.primaryText)
 
             Text(vm.plan.planName)
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, AppSpacing.xl)
@@ -167,19 +168,19 @@ struct GuidedWorkoutSummaryView: View {
         HStack(spacing: AppSpacing.md) {
             summaryStatCard(
                 icon: "clock",
-                color: .blue,
+                color: AppColors.accent,
                 value: formattedDuration,
                 label: "Duration"
             )
             summaryStatCard(
                 icon: "checkmark.circle",
-                color: .green,
+                color: AppColors.success,
                 value: "\(vm.completedExercises.count)",
                 label: "Completed"
             )
             summaryStatCard(
                 icon: "forward",
-                color: .orange,
+                color: AppColors.warning,
                 value: "\(vm.skippedExercises.count)",
                 label: "Skipped"
             )
@@ -197,16 +198,17 @@ struct GuidedWorkoutSummaryView: View {
 
             Text(value)
                 .font(.system(size: 22, weight: .bold, design: .rounded))
+                .foregroundColor(AppColors.primaryText)
 
             Text(label)
                 .font(.caption2)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, AppSpacing.lg)
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.card)
-        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 
     // MARK: - Helpers
@@ -242,9 +244,9 @@ struct GuidedWorkoutSummaryView: View {
 
     private var painColor: Color {
         switch Int(overallPain) {
-        case 0...3: return .green
-        case 4...6: return .orange
-        default: return .red
+        case 0...3: return AppColors.success
+        case 4...6: return AppColors.warning
+        default: return AppColors.danger
         }
     }
 

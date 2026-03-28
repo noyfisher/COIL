@@ -18,11 +18,12 @@ struct HealthCheckPromptView: View {
             // Heading
             VStack(spacing: AppSpacing.sm) {
                 Text("Welcome Back!")
-                    .font(.title.weight(.bold))
+                    .font(.system(.title, design: .serif).weight(.bold))
+                    .foregroundColor(AppColors.primaryText)
 
                 Text("It's been a while since your last visit. Have there been any changes to your health?")
                     .font(.body)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.xl)
             }
@@ -40,7 +41,7 @@ struct HealthCheckPromptView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, AppSpacing.lg)
-                    .background(Color.blue)
+                    .background(AppColors.ctaBackground)
                     .cornerRadius(AppCorners.card)
                 }
 
@@ -50,7 +51,7 @@ struct HealthCheckPromptView: View {
                         Text("No, Continue to Analysis")
                     }
                     .font(.body.weight(.medium))
-                    .foregroundColor(.primary)
+                    .foregroundColor(AppColors.primaryText)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, AppSpacing.lg)
                     .background(AppColors.cardBackground)
@@ -64,6 +65,6 @@ struct HealthCheckPromptView: View {
             .padding(.horizontal, AppSpacing.xl)
             .padding(.bottom, AppSpacing.xxl)
         }
-        .background(AppColors.pageBackground.ignoresSafeArea())
+        .background(AppColors.bgGradient.ignoresSafeArea())
     }
 }

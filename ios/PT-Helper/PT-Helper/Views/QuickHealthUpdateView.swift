@@ -40,10 +40,11 @@ struct QuickHealthUpdateView: View {
                             // Header
                             VStack(spacing: AppSpacing.xs) {
                                 Text("Quick Health Update")
-                                    .font(.title2.weight(.bold))
+                                    .font(.system(.title2, design: .serif).weight(.bold))
+                                    .foregroundColor(AppColors.primaryText)
                                 Text("Update any changes since your last visit")
                                     .font(.subheadline)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(AppColors.secondaryText)
                             }
                             .padding(.top, AppSpacing.md)
 
@@ -63,10 +64,10 @@ struct QuickHealthUpdateView: View {
                                         .foregroundColor(AppColors.warning)
                                     Text("Failed to save. Please try again.")
                                         .font(.caption)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(AppColors.secondaryText)
                                 }
                                 .padding(AppSpacing.md)
-                                .background(Color.orange.opacity(0.1))
+                                .background(AppColors.warning.opacity(0.1))
                                 .cornerRadius(AppCorners.small)
                             }
 
@@ -85,7 +86,7 @@ struct QuickHealthUpdateView: View {
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, AppSpacing.lg)
-                                .background(Color.green)
+                                .background(AppColors.ctaBackground)
                                 .cornerRadius(AppCorners.card)
                             }
                             .disabled(isSaving)
@@ -118,11 +119,11 @@ struct QuickHealthUpdateView: View {
     // MARK: - Sections
 
     private var medicationsSection: some View {
-        CardSection(icon: "pills.fill", color: .purple, title: "Current Medications") {
+        CardSection(icon: "pills.fill", color: AppColors.accent, title: "Current Medications") {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 Text("Update your current medications")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
 
                 FlowLayout(spacing: AppSpacing.sm) {
                     ForEach(predefinedMedications, id: \.self) { med in
@@ -130,10 +131,10 @@ struct QuickHealthUpdateView: View {
                         Button(action: { toggleMedication(med) }) {
                             Text(med)
                                 .font(.subheadline.weight(.medium))
-                                .foregroundColor(isSelected ? .white : .primary)
+                                .foregroundColor(isSelected ? .white : AppColors.primaryText)
                                 .padding(.horizontal, AppSpacing.md)
                                 .padding(.vertical, AppSpacing.sm)
-                                .background(isSelected ? Color.purple : AppColors.inputBackground)
+                                .background(isSelected ? AppColors.accent : AppColors.inputBackground)
                                 .cornerRadius(AppCorners.small)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: AppCorners.small)
@@ -147,7 +148,7 @@ struct QuickHealthUpdateView: View {
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text("Other Medications")
                         .font(.caption.weight(.semibold))
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                         .padding(.top, AppSpacing.sm)
 
                     HStack(spacing: AppSpacing.sm) {
@@ -160,7 +161,7 @@ struct QuickHealthUpdateView: View {
                         Button(action: { addCustomMedication() }) {
                             Image(systemName: "plus.circle.fill")
                                 .font(.title2)
-                                .foregroundColor(.purple)
+                                .foregroundColor(AppColors.accent)
                         }
                         .disabled(customMedicationText.trimmingCharacters(in: .whitespaces).isEmpty)
                     }
@@ -183,7 +184,7 @@ struct QuickHealthUpdateView: View {
                                     .foregroundColor(.white)
                                     .padding(.horizontal, AppSpacing.md)
                                     .padding(.vertical, AppSpacing.sm)
-                                    .background(Color.purple)
+                                    .background(AppColors.accent)
                                     .cornerRadius(AppCorners.small)
                                 }
                             }
@@ -195,11 +196,11 @@ struct QuickHealthUpdateView: View {
     }
 
     private var surgeriesSection: some View {
-        CardSection(icon: "bandage.fill", color: .orange, title: "New Surgeries") {
+        CardSection(icon: "bandage.fill", color: AppColors.warning, title: "New Surgeries") {
             VStack(spacing: AppSpacing.sm) {
                 Text("Add any surgeries since your last visit")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 ForEach(Array(viewModel.userProfile.surgeries.enumerated()), id: \.element.id) { index, surgery in
@@ -207,13 +208,13 @@ struct QuickHealthUpdateView: View {
                         HStack {
                             Text("Surgery \(index + 1)")
                                 .font(.caption.weight(.semibold))
-                                .foregroundColor(.orange)
+                                .foregroundColor(AppColors.warning)
                             Spacer()
                             Button(action: {
                                 viewModel.userProfile.surgeries.remove(at: index)
                             }) {
                                 Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(AppColors.mutedText)
                             }
                         }
 
@@ -231,7 +232,7 @@ struct QuickHealthUpdateView: View {
                         HStack {
                             Text("Year")
                                 .font(.subheadline)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.secondaryText)
                             Spacer()
                             Picker("Year", selection: Binding(
                                 get: { viewModel.userProfile.surgeries[safe: index]?.year ?? Calendar.current.component(.year, from: Date()) },
@@ -242,7 +243,7 @@ struct QuickHealthUpdateView: View {
                                 }
                             }
                             .pickerStyle(.menu)
-                            .tint(.orange)
+                            .tint(AppColors.warning)
                         }
                         .padding(AppSpacing.md)
                         .background(AppColors.inputBackground)
@@ -272,18 +273,18 @@ struct QuickHealthUpdateView: View {
                         Text("Add Surgery")
                     }
                     .font(.subheadline.weight(.medium))
-                    .foregroundColor(.orange)
+                    .foregroundColor(AppColors.warning)
                 }
             }
         }
     }
 
     private var injuriesSection: some View {
-        CardSection(icon: "cross.case.fill", color: .red, title: "New Injuries") {
+        CardSection(icon: "cross.case.fill", color: AppColors.danger, title: "New Injuries") {
             VStack(spacing: AppSpacing.sm) {
                 Text("Add any injuries since your last visit")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 ForEach(Array(viewModel.userProfile.injuries.enumerated()), id: \.element.id) { index, injury in
@@ -291,13 +292,13 @@ struct QuickHealthUpdateView: View {
                         HStack {
                             Text("Injury \(index + 1)")
                                 .font(.caption.weight(.semibold))
-                                .foregroundColor(.red)
+                                .foregroundColor(AppColors.danger)
                             Spacer()
                             Button(action: {
                                 viewModel.userProfile.injuries.remove(at: index)
                             }) {
                                 Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(AppColors.mutedText)
                             }
                         }
 
@@ -324,7 +325,7 @@ struct QuickHealthUpdateView: View {
                         Text("Add Injury")
                     }
                     .font(.subheadline.weight(.medium))
-                    .foregroundColor(.red)
+                    .foregroundColor(AppColors.danger)
                 }
             }
         }

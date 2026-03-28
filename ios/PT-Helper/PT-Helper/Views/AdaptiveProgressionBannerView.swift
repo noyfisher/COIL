@@ -23,7 +23,7 @@ struct AdaptiveProgressionBannerView: View {
                         .font(.subheadline.weight(.semibold))
                     Text(recommendation.reason)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                         .lineLimit(2)
                 }
 
@@ -48,7 +48,7 @@ struct AdaptiveProgressionBannerView: View {
                         .padding(.top, 5)
                     Text(point)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                 }
             }
 
@@ -73,7 +73,7 @@ struct AdaptiveProgressionBannerView: View {
                     Button(action: onDismiss) {
                         Text("Not Now")
                             .font(.subheadline.weight(.medium))
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppColors.secondaryText)
                     }
                 }
             }
@@ -81,7 +81,7 @@ struct AdaptiveProgressionBannerView: View {
         .padding(AppSpacing.lg)
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.card)
-        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
         .overlay(
             RoundedRectangle(cornerRadius: AppCorners.card)
                 .stroke(accentColor.opacity(0.2), lineWidth: 1)
@@ -113,7 +113,7 @@ struct AdaptiveProgressionBannerView: View {
         case .advance: return AppColors.success
         case .maintain: return AppColors.accent
         case .scaleBack: return AppColors.warning
-        case .insufficientData: return .gray
+        case .insufficientData: return AppColors.mutedText
         }
     }
 }

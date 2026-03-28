@@ -30,14 +30,14 @@ struct EditRehabPlanView: View {
                                         .font(.subheadline.weight(.medium))
                                     Text("\(exercise.sets) sets \u{00D7} \(exercise.reps) \u{2022} \(exercise.difficulty.rawValue.capitalized)")
                                         .font(.caption)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(AppColors.secondaryText)
                                 }
 
                                 Spacer()
 
                                 Button(action: { editingExerciseIndex = index }) {
                                     Image(systemName: "pencil.circle")
-                                        .foregroundColor(.blue)
+                                        .foregroundColor(AppColors.accent)
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -53,7 +53,7 @@ struct EditRehabPlanView: View {
                                 Image(systemName: "plus.circle.fill")
                                 Text("Add Custom Exercise")
                             }
-                            .foregroundColor(.blue)
+                            .foregroundColor(AppColors.accent)
                         }
                     }
                 }

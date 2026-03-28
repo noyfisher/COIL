@@ -20,7 +20,7 @@ struct EditExerciseView: View {
                 ScrollView {
                     VStack(spacing: AppSpacing.lg) {
                         // Name
-                        CardSection(icon: "textformat", color: .blue, title: "Exercise Name") {
+                        CardSection(icon: "textformat", color: AppColors.accent, title: "Exercise Name") {
                             TextField("Exercise name", text: $name)
                                 .font(.body)
                                 .padding(AppSpacing.md)
@@ -29,7 +29,7 @@ struct EditExerciseView: View {
                         }
 
                         // Sets & Reps
-                        CardSection(icon: "arrow.triangle.2.circlepath", color: .green, title: "Sets & Reps") {
+                        CardSection(icon: "arrow.triangle.2.circlepath", color: AppColors.success, title: "Sets & Reps") {
                             VStack(spacing: AppSpacing.md) {
                                 HStack {
                                     Text("Sets")
@@ -63,7 +63,7 @@ struct EditExerciseView: View {
                         }
 
                         // Difficulty
-                        CardSection(icon: "gauge.with.dots.needle.33percent", color: .orange, title: "Difficulty") {
+                        CardSection(icon: "gauge.with.dots.needle.33percent", color: AppColors.warning, title: "Difficulty") {
                             Picker("Difficulty", selection: $difficulty) {
                                 ForEach(RehabExercise.Difficulty.allCases, id: \.self) { level in
                                     Text(level.rawValue.capitalized).tag(level)

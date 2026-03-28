@@ -6,7 +6,7 @@ struct AchievementsView: View {
 
     var body: some View {
         ZStack {
-            AppColors.pageBackground.ignoresSafeArea()
+            AppColors.bgGradient.ignoresSafeArea()
 
             ScrollView {
                 VStack(spacing: AppSpacing.lg) {
@@ -16,25 +16,29 @@ struct AchievementsView: View {
                             value: "\(streakService.streakData.currentStreak)",
                             label: "Current",
                             icon: "flame.fill",
-                            color: .orange
+                            color: AppColors.warning
                         )
                         streakStat(
                             value: "\(streakService.streakData.longestStreak)",
                             label: "Longest",
                             icon: "trophy.fill",
-                            color: .yellow
+                            color: AppColors.warning
                         )
                         streakStat(
                             value: "\(earnedCount)",
                             label: "Earned",
                             icon: "star.fill",
-                            color: .purple
+                            color: AppColors.accent
                         )
                     }
                     .padding(AppSpacing.lg)
                     .background(AppColors.cardBackground)
                     .cornerRadius(AppCorners.card)
-                    .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: AppCorners.card)
+                            .stroke(AppColors.cardBorder, lineWidth: 1)
+                    )
+                    .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
 
                     // Achievement list
                     ForEach(streakService.achievements) { achievement in
@@ -61,7 +65,7 @@ struct AchievementsView: View {
                 .font(.system(size: 24, weight: .bold, design: .rounded))
             Text(label)
                 .font(.caption2)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
         }
         .frame(maxWidth: .infinity)
     }
@@ -71,27 +75,27 @@ struct AchievementsView: View {
             // Icon
             Image(systemName: achievement.iconName)
                 .font(.title3)
-                .foregroundColor(achievement.isEarned ? .yellow : .gray)
+                .foregroundColor(achievement.isEarned ? AppColors.warning : AppColors.mutedText)
                 .frame(width: 44, height: 44)
                 .background(
                     Circle()
-                        .fill(achievement.isEarned ? Color.yellow.opacity(0.15) : Color.gray.opacity(0.1))
+                        .fill(achievement.isEarned ? AppColors.warning.opacity(0.15) : AppColors.mutedText.opacity(0.1))
                 )
 
             // Info
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(achievement.title)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundColor(achievement.isEarned ? .primary : .secondary)
+                    .foregroundColor(achievement.isEarned ? AppColors.primaryText : AppColors.secondaryText)
 
                 Text(achievement.description)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
 
                 if let date = achievement.dateEarned {
                     Text("Earned \(date.formatted(date: .abbreviated, time: .omitted))")
                         .font(.caption2)
-                        .foregroundColor(.green)
+                        .foregroundColor(AppColors.success)
                 }
             }
 
@@ -99,16 +103,20 @@ struct AchievementsView: View {
 
             if achievement.isEarned {
                 Image(systemName: "checkmark.seal.fill")
-                    .foregroundColor(.green)
+                    .foregroundColor(AppColors.success)
             } else {
                 Image(systemName: "lock.fill")
-                    .foregroundColor(.gray.opacity(0.4))
+                    .foregroundColor(AppColors.mutedText.opacity(0.4))
             }
         }
         .padding(AppSpacing.lg)
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.card)
-        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+        .overlay(
+            RoundedRectangle(cornerRadius: AppCorners.card)
+                .stroke(AppColors.cardBorder, lineWidth: 1)
+        )
+        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
         .opacity(achievement.isEarned ? 1 : 0.7)
     }
 

@@ -21,34 +21,34 @@ struct DisclaimerView: View {
                             .padding(.top, AppSpacing.xxl)
 
                         Text("Before You Begin")
-                            .font(.title2.weight(.bold))
+                            .font(.system(.title2, design: .serif).weight(.bold))
 
                         // Disclaimer text
                         VStack(alignment: .leading, spacing: AppSpacing.lg) {
                             disclaimerSection(
                                 icon: "info.circle.fill",
-                                color: .blue,
+                                color: AppColors.accent,
                                 title: "Educational Tool Only",
                                 text: "PT Helper provides general health information for educational purposes. It is not a medical device and does not provide medical diagnoses."
                             )
 
                             disclaimerSection(
                                 icon: "person.fill",
-                                color: .green,
+                                color: AppColors.success,
                                 title: "Not a Substitute for Professional Care",
                                 text: "The information provided should not replace professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider for medical concerns."
                             )
 
                             disclaimerSection(
                                 icon: "exclamationmark.triangle.fill",
-                                color: .orange,
+                                color: AppColors.warning,
                                 title: "Seek Emergency Care When Needed",
                                 text: "If you experience severe pain, sudden weakness, difficulty breathing, or any symptoms you believe are a medical emergency, call 911 or go to your nearest emergency room immediately."
                             )
 
                             disclaimerSection(
                                 icon: "lock.shield.fill",
-                                color: .purple,
+                                color: AppColors.accent,
                                 title: "Your Data",
                                 text: "Your health information is stored securely and used only to provide personalized guidance. You can delete your account and all data at any time from Settings."
                             )
@@ -64,7 +64,7 @@ struct DisclaimerView: View {
                             Text("I Understand, Continue")
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 16)
-                                .background(Color.blue)
+                                .background(AppColors.accent)
                                 .foregroundColor(.white)
                                 .font(.headline)
                                 .cornerRadius(AppCorners.large)
@@ -95,7 +95,7 @@ struct DisclaimerView: View {
                     .font(.subheadline.weight(.semibold))
                 Text(text)
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }

@@ -28,7 +28,7 @@ struct PainDetailView: View {
 
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground).ignoresSafeArea()
+            AppColors.bgGradient.ignoresSafeArea()
 
             ScrollViewReader { proxy in
                 ScrollView {
@@ -42,13 +42,13 @@ struct PainDetailView: View {
                                         .foregroundColor(.white)
                                         .padding(.horizontal, AppSpacing.md)
                                         .padding(.vertical, AppSpacing.xs)
-                                        .background(Color.blue)
+                                        .background(AppColors.accent)
                                         .cornerRadius(AppCorners.medium)
                                     Spacer()
                                     // Encouraging micro-copy
                                     Text(encouragingText)
                                         .font(.caption)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(AppColors.secondaryText)
                                         .transition(.opacity)
                                         .animation(AppAnimations.smooth, value: formCompletionFields)
                                 }
@@ -60,7 +60,7 @@ struct PainDetailView: View {
                                             .fill(Color(.systemGray5))
                                             .frame(height: 3)
                                         Capsule()
-                                            .fill(Color.blue)
+                                            .fill(AppColors.accent)
                                             .frame(width: geo.size.width * formCompletionProgress, height: 3)
                                             .animation(AppAnimations.smooth, value: formCompletionProgress)
                                     }
@@ -71,7 +71,7 @@ struct PainDetailView: View {
                         }
 
                         if let currentRegion = viewModel.currentRegion {
-                            CardSection(icon: "figure.walk", color: .blue, title: "Assessing: \(currentRegion.name)") {
+                            CardSection(icon: "figure.walk", color: AppColors.accent, title: "Assessing: \(currentRegion.name)") {
                                 VStack(alignment: .leading, spacing: AppSpacing.xl) {
                                     // Essential fields — always visible
                                     painTypeSelection
@@ -90,19 +90,19 @@ struct PainDetailView: View {
                                     }) {
                                         HStack {
                                             Image(systemName: showMoreDetails ? "chevron.up.circle.fill" : "plus.circle.fill")
-                                                .foregroundColor(.blue)
+                                                .foregroundColor(AppColors.accent)
                                             Text(showMoreDetails ? "Hide Additional Details" : "Add More Details")
                                                 .font(.subheadline.weight(.medium))
-                                                .foregroundColor(.blue)
+                                                .foregroundColor(AppColors.accent)
                                             Spacer()
                                             if !showMoreDetails && hasOptionalContent {
                                                 Text("Has content")
                                                     .font(.caption2)
-                                                    .foregroundColor(.green)
+                                                    .foregroundColor(AppColors.success)
                                             }
                                         }
                                         .padding(AppSpacing.md)
-                                        .background(Color.blue.opacity(0.06))
+                                        .background(AppColors.accentTint)
                                         .cornerRadius(AppCorners.medium)
                                     }
                                     .buttonStyle(.plain)
@@ -117,7 +117,7 @@ struct PainDetailView: View {
                             navigationButtons
                         } else {
                             Text("No region selected")
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.secondaryText)
                         }
                     }
                     .padding(.horizontal, AppSpacing.xl)
@@ -345,7 +345,7 @@ struct PainDetailView: View {
                 Button(action: addCustomPainType) {
                     Image(systemName: "plus.circle.fill")
                         .font(.title3)
-                        .foregroundColor(customPainType.trimmingCharacters(in: .whitespaces).isEmpty ? .gray : .blue)
+                        .foregroundColor(customPainType.trimmingCharacters(in: .whitespaces).isEmpty ? AppColors.mutedText : AppColors.accent)
                 }
                 .disabled(customPainType.trimmingCharacters(in: .whitespaces).isEmpty)
             }
@@ -364,7 +364,7 @@ struct PainDetailView: View {
                     .foregroundColor(painColor)
                 Text("/ 10")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
                 Spacer()
                 Text(painDescription)
                     .font(.caption.weight(.medium))
@@ -379,11 +379,11 @@ struct PainDetailView: View {
             HStack {
                 Text("Mild")
                     .font(.caption2)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
                 Spacer()
                 Text("Severe")
                     .font(.caption2)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
             }
         }
     }
@@ -471,7 +471,7 @@ struct PainDetailView: View {
                 Button(action: addCustomFrequency) {
                     Image(systemName: "plus.circle.fill")
                         .font(.title3)
-                        .foregroundColor(customFrequency.trimmingCharacters(in: .whitespaces).isEmpty ? .gray : .blue)
+                        .foregroundColor(customFrequency.trimmingCharacters(in: .whitespaces).isEmpty ? AppColors.mutedText : AppColors.accent)
                 }
                 .disabled(customFrequency.trimmingCharacters(in: .whitespaces).isEmpty)
             }
@@ -533,7 +533,7 @@ struct PainDetailView: View {
                 Button(action: addCustomOnset) {
                     Image(systemName: "plus.circle.fill")
                         .font(.title3)
-                        .foregroundColor(customOnset.trimmingCharacters(in: .whitespaces).isEmpty ? .gray : .blue)
+                        .foregroundColor(customOnset.trimmingCharacters(in: .whitespaces).isEmpty ? AppColors.mutedText : AppColors.accent)
                 }
                 .disabled(customOnset.trimmingCharacters(in: .whitespaces).isEmpty)
             }
@@ -584,7 +584,7 @@ struct PainDetailView: View {
                 Button(action: addCustomAggravating) {
                     Image(systemName: "plus.circle.fill")
                         .font(.title3)
-                        .foregroundColor(customAggravating.trimmingCharacters(in: .whitespaces).isEmpty ? .gray : .blue)
+                        .foregroundColor(customAggravating.trimmingCharacters(in: .whitespaces).isEmpty ? AppColors.mutedText : AppColors.accent)
                 }
                 .disabled(customAggravating.trimmingCharacters(in: .whitespaces).isEmpty)
             }
@@ -635,7 +635,7 @@ struct PainDetailView: View {
                 Button(action: addCustomRelieving) {
                     Image(systemName: "plus.circle.fill")
                         .font(.title3)
-                        .foregroundColor(customRelieving.trimmingCharacters(in: .whitespaces).isEmpty ? .gray : .blue)
+                        .foregroundColor(customRelieving.trimmingCharacters(in: .whitespaces).isEmpty ? AppColors.mutedText : AppColors.accent)
                 }
                 .disabled(customRelieving.trimmingCharacters(in: .whitespaces).isEmpty)
             }
@@ -772,19 +772,19 @@ struct PainDetailView: View {
                 .font(.headline)
             Text("Optional — helps provide better recommendations")
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
 
             // Seen a doctor toggle
             Toggle("Have you seen a doctor for this pain?", isOn: $hasSeenDoctor)
                 .font(.subheadline)
-                .tint(.blue)
+                .tint(AppColors.accent)
 
             if hasSeenDoctor {
                 // Imaging
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text("Imaging done")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                     FlowLayout(spacing: AppSpacing.sm) {
                         ForEach(imagingOptions, id: \.self) { option in
                             ChipButton(
@@ -805,7 +805,7 @@ struct PainDetailView: View {
                 // Diagnosis
                 Toggle("Were you given a diagnosis?", isOn: $hasDiagnosis)
                     .font(.subheadline)
-                    .tint(.blue)
+                    .tint(AppColors.accent)
 
                 if hasDiagnosis {
                     TextField("What was the diagnosis?", text: $diagnosisText)
@@ -819,7 +819,7 @@ struct PainDetailView: View {
             // Currently receiving treatment
             Toggle("Currently receiving treatment?", isOn: $currentlyReceivingTreatment)
                 .font(.subheadline)
-                .tint(.blue)
+                .tint(AppColors.accent)
 
             if currentlyReceivingTreatment {
                 TextField("Describe your current treatment", text: $treatmentDetails, axis: .vertical)
@@ -920,7 +920,7 @@ struct PainDetailView: View {
                 .font(.headline)
             Text("Optional — describe what your pain feels like in your own words")
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
             TextField("e.g., feels like pressure, stiffness in the morning...", text: $customPainDescription, axis: .vertical)
                 .lineLimit(2...3)
                 .padding(AppSpacing.md)
@@ -944,9 +944,9 @@ struct PainDetailView: View {
 
     private var painColor: Color {
         switch Int(painIntensity) {
-        case 1...3: return .green
-        case 4...6: return .orange
-        default: return .red
+        case 1...3: return AppColors.success
+        case 4...6: return AppColors.warning
+        default: return AppColors.danger
         }
     }
 

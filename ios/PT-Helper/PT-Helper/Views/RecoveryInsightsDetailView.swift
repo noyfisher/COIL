@@ -56,12 +56,12 @@ struct RecoveryInsightsDetailView: View {
                 )
 
             Text(insight.headline)
-                .font(.title2.weight(.bold))
+                .font(.system(.title2, design: .serif).weight(.bold))
                 .multilineTextAlignment(.center)
 
             Text(insight.summary)
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
                 .multilineTextAlignment(.center)
 
             if let date = formattedDate(insight.generatedDate) {
@@ -96,12 +96,12 @@ struct RecoveryInsightsDetailView: View {
 
                     Text("Avg \(String(format: "%.1f", analysis.averagePain))/10")
                         .font(.subheadline.weight(.bold))
-                        .foregroundColor(.primary)
+                        .foregroundColor(AppColors.primaryText)
                 }
 
                 Text(analysis.trendDescription)
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
 
                 // Per-region breakdown
                 if let regions = analysis.regionBreakdown, !regions.isEmpty {
@@ -110,14 +110,14 @@ struct RecoveryInsightsDetailView: View {
                         HStack {
                             Text(RegionPainInputView.displayName(for: region.region))
                                 .font(.caption)
-                                .foregroundColor(.primary)
+                                .foregroundColor(AppColors.primaryText)
                             Spacer()
                             Image(systemName: trendIcon(region.trend))
                                 .font(.caption2.weight(.bold))
                                 .foregroundColor(trendColor(region.trend))
                             Text(String(format: "%.1f", region.averagePain))
                                 .font(.caption.weight(.semibold))
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.secondaryText)
                         }
                     }
                 }
@@ -136,14 +136,14 @@ struct RecoveryInsightsDetailView: View {
                         .foregroundColor(adherenceColor(adherence.score))
                     Text("/ 100")
                         .font(.title3)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                     Spacer()
                     VStack(alignment: .trailing, spacing: 2) {
                         Text("\(adherence.sessionsCompleted) of \(adherence.sessionsExpected)")
                             .font(.caption.weight(.semibold))
                         Text("sessions")
                             .font(.caption2)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppColors.secondaryText)
                     }
                 }
 
@@ -151,7 +151,7 @@ struct RecoveryInsightsDetailView: View {
                 GeometryReader { geometry in
                     ZStack(alignment: .leading) {
                         RoundedRectangle(cornerRadius: 4)
-                            .fill(Color.gray.opacity(0.15))
+                            .fill(AppColors.mutedText.opacity(0.15))
                             .frame(height: 8)
                         RoundedRectangle(cornerRadius: 4)
                             .fill(adherenceColor(adherence.score))
@@ -162,7 +162,7 @@ struct RecoveryInsightsDetailView: View {
 
                 Text(adherence.description)
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
             }
         }
     }
@@ -180,7 +180,7 @@ struct RecoveryInsightsDetailView: View {
                             .padding(.top, 2)
                         Text(win)
                             .font(.subheadline)
-                            .foregroundColor(.primary)
+                            .foregroundColor(AppColors.primaryText)
                     }
                 }
             }
@@ -200,7 +200,7 @@ struct RecoveryInsightsDetailView: View {
                             .padding(.top, 2)
                         Text(area)
                             .font(.subheadline)
-                            .foregroundColor(.primary)
+                            .foregroundColor(AppColors.primaryText)
                     }
                 }
             }
@@ -210,24 +210,24 @@ struct RecoveryInsightsDetailView: View {
     // MARK: - Recommendations
 
     private func recommendationsSection(_ recommendations: [RecoveryInsight.Recommendation]) -> some View {
-        CardSection(icon: "lightbulb.fill", color: .blue, title: "Recommendations") {
+        CardSection(icon: "lightbulb.fill", color: AppColors.accent, title: "Recommendations") {
             VStack(spacing: AppSpacing.md) {
                 ForEach(recommendations, id: \.title) { rec in
                     HStack(alignment: .top, spacing: AppSpacing.md) {
                         Image(systemName: rec.icon)
                             .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.blue)
+                            .foregroundColor(AppColors.accent)
                             .frame(width: 32, height: 32)
-                            .background(Color.blue.opacity(0.12))
+                            .background(AppColors.accentTint)
                             .clipShape(Circle())
 
                         VStack(alignment: .leading, spacing: AppSpacing.xs) {
                             Text(rec.title)
                                 .font(.subheadline.weight(.semibold))
-                                .foregroundColor(.primary)
+                                .foregroundColor(AppColors.primaryText)
                             Text(rec.description)
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.secondaryText)
                         }
                     }
                 }
@@ -253,7 +253,7 @@ struct RecoveryInsightsDetailView: View {
                 Text("Regenerate Insights")
             }
             .font(.subheadline.weight(.medium))
-            .foregroundColor(.blue)
+            .foregroundColor(AppColors.accent)
         }
         .disabled(vm.isLoading)
         .padding(.top, AppSpacing.sm)
@@ -288,17 +288,17 @@ struct RecoveryInsightsDetailView: View {
 
     private func trendColor(_ direction: String) -> Color {
         switch direction {
-        case "improving": return .green
-        case "worsening": return .red
-        default: return .orange
+        case "improving": return AppColors.success
+        case "worsening": return AppColors.danger
+        default: return AppColors.warning
         }
     }
 
     private func adherenceColor(_ score: Int) -> Color {
         switch score {
-        case 80...100: return .green
-        case 50...79: return .orange
-        default: return .red
+        case 80...100: return AppColors.success
+        case 50...79: return AppColors.warning
+        default: return AppColors.danger
         }
     }
 }

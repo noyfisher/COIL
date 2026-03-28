@@ -74,25 +74,25 @@ struct PlansTab: View {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 Text(plan.planName)
                     .font(AppFonts.cardTitle)
-                    .foregroundColor(.primary)
+                    .foregroundColor(AppColors.primaryText)
                 HStack(spacing: 6) {
                     ForEach(plan.conditions, id: \.self) { condition in
                         Text(condition)
                             .font(.caption2)
                             .padding(.horizontal, AppSpacing.sm)
                             .padding(.vertical, 3)
-                            .background(Color.blue.opacity(0.1))
-                            .foregroundColor(.blue)
+                            .background(AppColors.accentTint)
+                            .foregroundColor(AppColors.accent)
                             .cornerRadius(AppCorners.small)
                     }
                 }
                 HStack(spacing: AppSpacing.sm) {
                     Text(plan.createdDate.formatted(date: .abbreviated, time: .omitted))
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                     Text("\(plan.exercises.count) exercises")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                 }
             }
             Spacer()
@@ -101,7 +101,7 @@ struct PlansTab: View {
             NavigationLink(destination: GuidedWorkoutView(plan: plan)) {
                 Image(systemName: "play.circle.fill")
                     .font(.title2)
-                    .foregroundColor(.blue)
+                    .foregroundColor(AppColors.accent)
                     .padding(AppSpacing.xs)
             }
             .buttonStyle(.plain)
@@ -137,10 +137,10 @@ struct PlansTab: View {
             Spacer()
             Image(systemName: "wifi.exclamationmark")
                 .font(.system(size: 40))
-                .foregroundColor(.orange)
+                .foregroundColor(AppColors.warning)
             Text(error)
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, AppSpacing.xxl)
             Button("Retry") {

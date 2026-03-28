@@ -2,7 +2,7 @@ import SwiftUI
 
 struct TimerView: View {
     @ObservedObject var viewModel: TimerViewModel
-    var accentColor: Color = .blue
+    var accentColor: Color = AppColors.accent
 
     var body: some View {
         VStack(spacing: AppSpacing.xl) {
@@ -27,7 +27,7 @@ struct TimerView: View {
                     Text(viewModel.timeString)
                         .font(.system(size: 40, weight: .bold, design: .rounded))
                         .monospacedDigit()
-                        .foregroundColor(.primary)
+                        .foregroundColor(AppColors.primaryText)
 
                     Text(statusText)
                         .font(AppFonts.badge)
@@ -42,7 +42,7 @@ struct TimerView: View {
                 // Reset button
                 controlButton(
                     icon: "arrow.counterclockwise",
-                    color: .secondary,
+                    color: AppColors.secondaryText,
                     action: { viewModel.reset() },
                     disabled: !viewModel.timer.isRunning && viewModel.timer.timeRemaining == viewModel.timer.duration
                 )
@@ -73,7 +73,7 @@ struct TimerView: View {
                 // Stop button
                 controlButton(
                     icon: "stop.fill",
-                    color: .red,
+                    color: AppColors.danger,
                     action: {
                         viewModel.stop()
                         viewModel.reset()
@@ -102,14 +102,14 @@ struct TimerView: View {
         } else if viewModel.timer.timeRemaining < viewModel.timer.duration {
             // Paused
             return LinearGradient(
-                colors: [.green, .green.opacity(0.7)],
+                colors: [AppColors.success, AppColors.success.opacity(0.7)],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
         } else {
             // Reset/idle
             return LinearGradient(
-                colors: [.gray, .gray.opacity(0.5)],
+                colors: [AppColors.mutedText, AppColors.mutedText.opacity(0.5)],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -132,9 +132,9 @@ struct TimerView: View {
         if viewModel.timer.isRunning {
             return accentColor
         } else if viewModel.timer.timeRemaining < viewModel.timer.duration {
-            return .green
+            return AppColors.success
         } else {
-            return .secondary
+            return AppColors.secondaryText
         }
     }
 
@@ -142,11 +142,11 @@ struct TimerView: View {
         Button(action: action) {
             Image(systemName: icon)
                 .font(.system(size: 16, weight: .bold))
-                .foregroundColor(disabled ? .gray.opacity(0.4) : color)
+                .foregroundColor(disabled ? AppColors.mutedText.opacity(0.4) : color)
                 .frame(width: 44, height: 44)
                 .background(
                     Circle()
-                        .fill(disabled ? Color.gray.opacity(0.08) : color.opacity(0.12))
+                        .fill(disabled ? AppColors.mutedText.opacity(0.08) : color.opacity(0.12))
                 )
         }
         .disabled(disabled)

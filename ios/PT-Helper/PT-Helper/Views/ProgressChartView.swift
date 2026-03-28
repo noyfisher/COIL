@@ -71,8 +71,8 @@ struct ProgressChartView: View {
                 .font(.caption.weight(.medium))
                 .padding(.horizontal, AppSpacing.md)
                 .padding(.vertical, AppSpacing.sm)
-                .background(isSelected ? Color.blue : Color(.systemGray5))
-                .foregroundColor(isSelected ? .white : .primary)
+                .background(isSelected ? AppColors.accent : Color(.systemGray5))
+                .foregroundColor(isSelected ? .white : AppColors.primaryText)
                 .cornerRadius(AppCorners.medium)
         }
     }
@@ -95,7 +95,7 @@ struct ProgressChartView: View {
             ? "\(RegionPainInputView.displayName(for: selectedRegion!)) Pain"
             : "Pain Trend"
 
-        return CardSection(icon: "chart.line.uptrend.xyaxis", color: .blue, title: chartTitle) {
+        return CardSection(icon: "chart.line.uptrend.xyaxis", color: AppColors.accent, title: chartTitle) {
             Chart(filteredChartData, id: \.id) { session in
                 let painValue = painValueForChart(session)
                 LineMark(
@@ -104,7 +104,7 @@ struct ProgressChartView: View {
                 )
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [.blue, .purple],
+                        colors: [AppColors.accent, AppColors.accent.opacity(0.6)],
                         startPoint: .leading,
                         endPoint: .trailing
                     )
@@ -117,7 +117,7 @@ struct ProgressChartView: View {
                 )
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [.blue.opacity(0.2), .blue.opacity(0.02)],
+                        colors: [AppColors.accent.opacity(0.2), AppColors.accent.opacity(0.02)],
                         startPoint: .top,
                         endPoint: .bottom
                     )
@@ -127,14 +127,14 @@ struct ProgressChartView: View {
                     x: .value("Date", session.date),
                     y: .value("Pain", painValue)
                 )
-                .foregroundStyle(.blue)
+                .foregroundStyle(AppColors.accent)
                 .symbolSize(30)
             }
             .chartYScale(domain: 0...10)
             .chartYAxis {
                 AxisMarks(values: [0, 2, 4, 6, 8, 10]) { value in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [4]))
-                        .foregroundStyle(Color.gray.opacity(0.3))
+                        .foregroundStyle(AppColors.mutedText.opacity(0.3))
                     AxisValueLabel()
                         .foregroundStyle(.secondary)
                 }
@@ -171,7 +171,7 @@ struct ProgressChartView: View {
         HStack(spacing: AppSpacing.md) {
             statCard(
                 icon: "number",
-                color: .blue,
+                color: AppColors.accent,
                 value: "\(viewModel.sessions.count)",
                 label: "Sessions"
             )
@@ -185,7 +185,7 @@ struct ProgressChartView: View {
 
             statCard(
                 icon: "clock",
-                color: .orange,
+                color: AppColors.warning,
                 value: "\(totalMinutes)",
                 label: "Total Min"
             )
@@ -203,17 +203,17 @@ struct ProgressChartView: View {
 
             Text(value)
                 .font(.system(size: 22, weight: .bold, design: .rounded))
-                .foregroundColor(.primary)
+                .foregroundColor(AppColors.primaryText)
 
             Text(label)
                 .font(.caption2)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, AppSpacing.lg)
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.card)
-        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 
     // MARK: - Computed Properties
@@ -226,9 +226,9 @@ struct ProgressChartView: View {
 
     private var averagePainColor: Color {
         switch Int(averagePain) {
-        case 0...3: return .green
-        case 4...6: return .orange
-        default: return .red
+        case 0...3: return AppColors.success
+        case 4...6: return AppColors.warning
+        default: return AppColors.danger
         }
     }
 

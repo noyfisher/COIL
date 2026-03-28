@@ -8,7 +8,7 @@ struct DashProfileView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                AppColors.dashBackground.ignoresSafeArea()
+                AppColors.bgGradient.ignoresSafeArea()
 
                 ScrollView {
                     VStack(spacing: AppSpacing.lg) {
@@ -26,7 +26,7 @@ struct DashProfileView: View {
                         }
 
                         settingsGroup {
-                            settingsRow(icon: "ladybug", color: .purple, title: "Debug Log") {
+                            settingsRow(icon: "ladybug", color: AppColors.accentLight, title: "Debug Log") {
                                 showSettings = true
                             }
                         }
@@ -45,7 +45,7 @@ struct DashProfileView: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("Profile")
-                        .font(.headline)
+                        .font(.system(.headline, design: .serif))
                         .foregroundColor(AppColors.dashTextPrimary)
                 }
             }
@@ -79,7 +79,7 @@ struct DashProfileView: View {
 
             VStack(spacing: AppSpacing.xs) {
                 Text(profileService.firstName)
-                    .font(.title3.weight(.bold))
+                    .font(.system(.title3, design: .serif).weight(.bold))
                     .foregroundColor(AppColors.dashTextPrimary)
 
                 if profileService.profileCompleted {

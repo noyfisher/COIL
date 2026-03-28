@@ -49,11 +49,12 @@ struct ExerciseSwapSheet: View {
                         .foregroundStyle(AppColors.coolGradient)
 
                     Text("Why can't you do this exercise?")
-                        .font(.headline)
+                        .font(.system(.headline, design: .serif))
+                        .foregroundColor(AppColors.primaryText)
 
                     Text(vm.exercise.name)
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                 }
                 .padding(.top, AppSpacing.xl)
 
@@ -64,10 +65,10 @@ struct ExerciseSwapSheet: View {
                             .foregroundColor(AppColors.warning)
                         Text(error)
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppColors.secondaryText)
                     }
                     .padding(AppSpacing.md)
-                    .background(Color.orange.opacity(0.08))
+                    .background(AppColors.warning.opacity(0.08))
                     .cornerRadius(AppCorners.medium)
                 }
 
@@ -80,25 +81,25 @@ struct ExerciseSwapSheet: View {
                         HStack(spacing: AppSpacing.lg) {
                             Image(systemName: reason.icon)
                                 .font(.title3)
-                                .foregroundColor(.blue)
+                                .foregroundColor(AppColors.accent)
                                 .frame(width: 36, height: 36)
-                                .background(Color.blue.opacity(0.1))
+                                .background(AppColors.accentTint)
                                 .cornerRadius(AppCorners.small)
 
                             Text(reason.displayName)
                                 .font(.body.weight(.medium))
-                                .foregroundColor(.primary)
+                                .foregroundColor(AppColors.primaryText)
 
                             Spacer()
 
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 12, weight: .semibold))
-                                .foregroundColor(.gray.opacity(0.5))
+                                .foregroundColor(AppColors.mutedText.opacity(0.5))
                         }
                         .padding(AppSpacing.lg)
                         .background(AppColors.cardBackground)
                         .cornerRadius(AppCorners.card)
-                        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+                        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
                     }
                     .buttonStyle(.plain)
                 }
@@ -118,7 +119,7 @@ struct ExerciseSwapSheet: View {
                 .font(.system(size: 60))
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [.green, .blue],
+                        colors: [AppColors.success, AppColors.accent],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -127,18 +128,19 @@ struct ExerciseSwapSheet: View {
 
             VStack(spacing: AppSpacing.sm) {
                 Text("Finding Alternatives")
-                    .font(.title2.weight(.bold))
+                    .font(.system(.title2, design: .serif).weight(.bold))
+                    .foregroundColor(AppColors.primaryText)
 
                 Text("Looking for exercises that work for you...")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.xl)
             }
 
             ProgressView()
                 .scaleEffect(1.2)
-                .tint(.green)
+                .tint(AppColors.success)
 
             Spacer()
             Spacer()
@@ -154,11 +156,12 @@ struct ExerciseSwapSheet: View {
                 // Header
                 VStack(spacing: AppSpacing.sm) {
                     Text("Pick a Substitute")
-                        .font(.headline)
+                        .font(.system(.headline, design: .serif))
+                        .foregroundColor(AppColors.primaryText)
 
                     Text("Replacing: \(vm.exercise.name)")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                 }
                 .padding(.top, AppSpacing.md)
 
@@ -169,16 +172,16 @@ struct ExerciseSwapSheet: View {
                             .foregroundColor(AppColors.warning)
                         Text(error)
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppColors.secondaryText)
                         Spacer()
                         Button("Retry") {
                             Task { await vm.fetchSubstitutes() }
                         }
                         .font(.caption.weight(.semibold))
-                        .foregroundColor(.blue)
+                        .foregroundColor(AppColors.accent)
                     }
                     .padding(AppSpacing.md)
-                    .background(Color.orange.opacity(0.08))
+                    .background(AppColors.warning.opacity(0.08))
                     .cornerRadius(AppCorners.medium)
                 }
 
@@ -214,7 +217,7 @@ struct ExerciseSwapSheet: View {
                     HStack(spacing: AppSpacing.sm) {
                         Text("\(substitute.sets) sets \u{00D7} \(substitute.reps)")
                             .font(.caption.weight(.medium))
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppColors.secondaryText)
 
                         DifficultyBadge(difficulty: substitute.difficulty)
                     }
@@ -229,7 +232,7 @@ struct ExerciseSwapSheet: View {
                         .foregroundColor(.yellow)
                     Text(reason)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                 }
             }
 
@@ -239,13 +242,13 @@ struct ExerciseSwapSheet: View {
                 HStack(spacing: AppSpacing.sm) {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .font(.caption2)
-                        .foregroundColor(.red)
+                        .foregroundColor(AppColors.danger)
                     Text(reason)
                         .font(.caption2)
-                        .foregroundColor(.red)
+                        .foregroundColor(AppColors.danger)
                 }
                 .padding(AppSpacing.sm)
-                .background(Color.red.opacity(0.08))
+                .background(AppColors.danger.opacity(0.08))
                 .cornerRadius(AppCorners.small)
             }
 
@@ -269,7 +272,7 @@ struct ExerciseSwapSheet: View {
         .padding(AppSpacing.lg)
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.card)
-        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 
     // MARK: - Verification Badge
@@ -280,23 +283,23 @@ struct ExerciseSwapSheet: View {
         case .verified:
             Label("Verified", systemImage: "checkmark.seal.fill")
                 .font(.caption2.weight(.medium))
-                .foregroundColor(.green)
+                .foregroundColor(AppColors.success)
         case .contraindicated:
             Label("Warning", systemImage: "xmark.octagon.fill")
                 .font(.caption2.weight(.medium))
-                .foregroundColor(.red)
+                .foregroundColor(AppColors.danger)
         case .crossModelVerified:
             Label("Checked", systemImage: "checkmark.seal")
                 .font(.caption2.weight(.medium))
-                .foregroundColor(.blue)
+                .foregroundColor(AppColors.accent)
         case .crossModelFlagged:
             Label("Review", systemImage: "exclamationmark.triangle.fill")
                 .font(.caption2.weight(.medium))
-                .foregroundColor(.orange)
+                .foregroundColor(AppColors.warning)
         default:
             Label("Unreviewed", systemImage: "questionmark.circle")
                 .font(.caption2.weight(.medium))
-                .foregroundColor(.gray)
+                .foregroundColor(AppColors.mutedText)
         }
     }
 }

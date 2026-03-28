@@ -31,7 +31,7 @@ struct RecoveryInsightsCardView: View {
             VStack(spacing: AppSpacing.md) {
                 Text("Your AI recovery coach can analyze your recent workouts and share personalized insights.")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
 
                 if let error = vm.error {
                     HStack(spacing: AppSpacing.sm) {
@@ -40,7 +40,7 @@ struct RecoveryInsightsCardView: View {
                             .font(.caption)
                         Text(error)
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppColors.secondaryText)
                     }
                 }
 
@@ -64,7 +64,7 @@ struct RecoveryInsightsCardView: View {
                     .scaleEffect(0.9)
                 Text("Analyzing your recovery data…")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, AppSpacing.md)
@@ -79,12 +79,12 @@ struct RecoveryInsightsCardView: View {
                 // Headline
                 Text(insight.headline)
                     .font(AppFonts.cardTitle)
-                    .foregroundColor(.primary)
+                    .foregroundColor(AppColors.primaryText)
 
                 // Summary
                 Text(insight.summary)
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
                     .lineLimit(3)
 
                 // Quick stats row
@@ -114,10 +114,10 @@ struct RecoveryInsightsCardView: View {
                         Spacer()
                         Text("View Full Digest")
                             .font(.caption.weight(.medium))
-                            .foregroundColor(.blue)
+                            .foregroundColor(AppColors.accent)
                         Image(systemName: "chevron.right")
                             .font(.caption2.weight(.semibold))
-                            .foregroundColor(.blue)
+                            .foregroundColor(AppColors.accent)
                     }
                 }
             }
@@ -145,13 +145,13 @@ struct RecoveryInsightsCardView: View {
             VStack(spacing: AppSpacing.sm) {
                 Text("Complete \(remaining) more workout\(remaining == 1 ? "" : "s") in the next 2 weeks to unlock AI recovery insights.")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
 
                 // Progress dots
                 HStack(spacing: AppSpacing.xs) {
                     ForEach(0..<RecoveryInsightsViewModel.minimumSessionCount, id: \.self) { index in
                         Circle()
-                            .fill(index < recent.count ? Color.purple : Color.gray.opacity(0.3))
+                            .fill(index < recent.count ? AppColors.accent : AppColors.mutedText.opacity(0.3))
                             .frame(width: 8, height: 8)
                     }
                     Spacer()
@@ -179,10 +179,10 @@ struct RecoveryInsightsCardView: View {
                 .foregroundColor(color)
             Text(value)
                 .font(.caption.weight(.bold))
-                .foregroundColor(.primary)
+                .foregroundColor(AppColors.primaryText)
             Text(label)
                 .font(.caption2)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
         }
         .frame(maxWidth: .infinity)
     }
@@ -197,17 +197,17 @@ struct RecoveryInsightsCardView: View {
 
     private func trendColor(_ direction: String) -> Color {
         switch direction {
-        case "improving": return .green
-        case "worsening": return .red
-        default: return .orange
+        case "improving": return AppColors.success
+        case "worsening": return AppColors.danger
+        default: return AppColors.warning
         }
     }
 
     private func adherenceColor(_ score: Int) -> Color {
         switch score {
-        case 80...100: return .green
-        case 50...79: return .orange
-        default: return .red
+        case 80...100: return AppColors.success
+        case 50...79: return AppColors.warning
+        default: return AppColors.danger
         }
     }
 }

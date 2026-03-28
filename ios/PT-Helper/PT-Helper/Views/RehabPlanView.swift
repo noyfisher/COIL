@@ -39,7 +39,7 @@ struct RehabPlanView: View {
 
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground).ignoresSafeArea()
+            AppColors.bgGradient.ignoresSafeArea()
 
             if viewModel.isGenerating {
                 generatingView
@@ -99,10 +99,10 @@ struct RehabPlanView: View {
                                     Text("View Progress Comparison")
                                 }
                                 .font(.subheadline.weight(.medium))
-                                .foregroundColor(.blue)
+                                .foregroundColor(AppColors.accent)
                                 .padding(AppSpacing.md)
                                 .frame(maxWidth: .infinity)
-                                .background(Color.blue.opacity(0.08))
+                                .background(AppColors.accentTint)
                                 .cornerRadius(AppCorners.medium)
                             }
                         }
@@ -124,7 +124,7 @@ struct RehabPlanView: View {
                                 .padding(.vertical, 14)
                                 .background(AppColors.coolGradient)
                                 .cornerRadius(AppCorners.large)
-                                .shadow(color: .blue.opacity(0.2), radius: 8, y: 4)
+                                .shadow(color: AppColors.cardShadowColor, radius: 8, y: 4)
                             }
                         }
 
@@ -229,13 +229,13 @@ struct RehabPlanView: View {
                         .padding(.top, AppSpacing.lg)
 
                     // Overall pain
-                    CardSection(icon: "waveform.path.ecg", color: .blue, title: "Overall Pain") {
+                    CardSection(icon: "waveform.path.ecg", color: AppColors.accent, title: "Overall Pain") {
                         VStack(spacing: AppSpacing.md) {
                             HStack {
                                 Text("\(Int(reAssessmentPain))")
                                     .font(.system(size: 36, weight: .bold, design: .rounded))
                                     .foregroundColor(reAssessmentPainColor)
-                                Text("/ 10").font(.title3).foregroundColor(.secondary)
+                                Text("/ 10").font(.title3).foregroundColor(AppColors.secondaryText)
                                 Spacer()
                             }
                             Slider(value: $reAssessmentPain, in: 0...10, step: 1)
@@ -296,9 +296,9 @@ struct RehabPlanView: View {
 
     private var reAssessmentPainColor: Color {
         switch Int(reAssessmentPain) {
-        case 0...3: return .green
-        case 4...6: return .orange
-        default: return .red
+        case 0...3: return AppColors.success
+        case 4...6: return AppColors.warning
+        default: return AppColors.danger
         }
     }
 
@@ -312,7 +312,7 @@ struct RehabPlanView: View {
                 .font(.system(size: 60))
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [.green, .blue],
+                        colors: [AppColors.success, AppColors.accent],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -321,18 +321,18 @@ struct RehabPlanView: View {
 
             VStack(spacing: AppSpacing.sm) {
                 Text("Building Your Plan")
-                    .font(.title2.weight(.bold))
+                    .font(.system(.title2, design: .serif).weight(.bold))
 
                 Text("Creating a personalized exercise program based on your conditions and fitness level...")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.xl)
             }
 
             ProgressView()
                 .scaleEffect(1.2)
-                .tint(.green)
+                .tint(AppColors.success)
 
             Spacer()
             Spacer()
@@ -352,11 +352,11 @@ struct RehabPlanView: View {
 
             VStack(spacing: AppSpacing.sm) {
                 Text("Plan Generation Failed")
-                    .font(.title3.weight(.bold))
+                    .font(.system(.title3, design: .serif).weight(.bold))
 
                 Text(message)
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.lg)
             }
@@ -383,18 +383,18 @@ struct RehabPlanView: View {
     // MARK: - Plan Display
 
     private func planHeader(plan: RehabPlan) -> some View {
-        CardSection(icon: "calendar", color: .blue, title: plan.planName) {
+        CardSection(icon: "calendar", color: AppColors.accent, title: plan.planName) {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Conditions: \(plan.conditions.joined(separator: ", "))")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
                 Text("Duration: \(plan.totalWeeks) weeks")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
                 HStack {
                     Text("Start Date:")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                     DatePicker("", selection: Binding(
                         get: { viewModel.rehabPlan?.createdDate ?? Date() },
                         set: { viewModel.rehabPlan?.createdDate = $0 }
@@ -405,7 +405,7 @@ struct RehabPlanView: View {
                 if let notes = plan.notes, !notes.isEmpty {
                     Text(notes)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                         .padding(.top, AppSpacing.xs)
                 }
             }
@@ -424,17 +424,17 @@ struct RehabPlanView: View {
                     VStack(spacing: AppSpacing.sm) {
                         Text(dayNames[day])
                             .font(.caption2.weight(.medium))
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppColors.secondaryText)
 
                         ZStack {
                             Circle()
-                                .fill(hasExercises ? Color.blue.opacity(0.12) : Color.clear)
+                                .fill(hasExercises ? AppColors.accentTint : Color.clear)
                                 .frame(width: 36, height: 36)
 
                             if hasExercises {
                                 Text("\(exerciseCount)")
                                     .font(.caption.weight(.bold))
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(AppColors.accent)
                             } else {
                                 Text("-")
                                     .font(.caption)
@@ -450,11 +450,11 @@ struct RehabPlanView: View {
             HStack(spacing: AppSpacing.lg) {
                 HStack(spacing: AppSpacing.xs) {
                     Circle()
-                        .fill(Color.blue.opacity(0.12))
+                        .fill(AppColors.accentTint)
                         .frame(width: 8, height: 8)
                     Text("Exercise day")
                         .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                 }
                 HStack(spacing: AppSpacing.xs) {
                     Text("-")
@@ -462,14 +462,14 @@ struct RehabPlanView: View {
                         .foregroundColor(Color(.systemGray4))
                     Text("Rest day")
                         .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                 }
             }
         }
         .padding(AppSpacing.lg)
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.card)
-        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 
     private func exerciseList(for plan: RehabPlan) -> some View {
@@ -506,7 +506,7 @@ struct RehabPlanView: View {
                 HStack(spacing: AppSpacing.xs) {
                     Text(exercise.name)
                         .font(.body.weight(.semibold))
-                        .foregroundColor(.primary)
+                        .foregroundColor(AppColors.primaryText)
                         .lineLimit(2)
 
                     Spacer()
@@ -519,13 +519,13 @@ struct RehabPlanView: View {
 
                 Text("Target: \(exercise.targetArea)")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
 
                 // Position preview teaser
                 if let start = exercise.startPosition {
                     Text(start)
                         .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                         .lineLimit(1)
                         .italic()
                 }
@@ -533,7 +533,7 @@ struct RehabPlanView: View {
                 HStack(spacing: AppSpacing.sm) {
                     Text("\(exercise.sets) sets \u{00D7} \(exercise.reps)")
                         .font(.caption.weight(.medium))
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
 
                     Spacer()
 
@@ -546,7 +546,7 @@ struct RehabPlanView: View {
                    let firstConcern = concerns.first {
                     Text(firstConcern)
                         .font(.caption2)
-                        .foregroundColor(.orange)
+                        .foregroundColor(AppColors.warning)
                         .lineLimit(2)
                 }
             }
@@ -554,7 +554,7 @@ struct RehabPlanView: View {
             VStack(spacing: AppSpacing.sm) {
                 Image(systemName: "chevron.right")
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(.gray.opacity(0.5))
+                    .foregroundColor(AppColors.mutedText)
 
                 // Visible swap button (only for saved plans)
                 if analysisResult == nil {
@@ -564,9 +564,9 @@ struct RehabPlanView: View {
                     }) {
                         Image(systemName: "arrow.triangle.2.circlepath")
                             .font(.caption)
-                            .foregroundColor(.blue)
+                            .foregroundColor(AppColors.accent)
                             .frame(width: 28, height: 28)
-                            .background(Color.blue.opacity(0.1))
+                            .background(AppColors.accentTint)
                             .clipShape(Circle())
                     }
                     .buttonStyle(.plain)
@@ -576,7 +576,7 @@ struct RehabPlanView: View {
         .padding(AppSpacing.lg)
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.card)
-        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 
     // MARK: - Verification UI
@@ -587,30 +587,30 @@ struct RehabPlanView: View {
         case .verified:
             Label("Verified", systemImage: "checkmark.seal.fill")
                 .font(.caption2.weight(.medium))
-                .foregroundColor(.green)
+                .foregroundColor(AppColors.success)
         case .contraindicated:
             Label("Warning", systemImage: "xmark.octagon.fill")
                 .font(.caption2.weight(.medium))
-                .foregroundColor(.red)
+                .foregroundColor(AppColors.danger)
         case .crossModelVerified:
             Label("Checked", systemImage: "checkmark.seal")
                 .font(.caption2.weight(.medium))
-                .foregroundColor(.blue)
+                .foregroundColor(AppColors.accent)
         case .crossModelFlagged:
             Label("Review", systemImage: "exclamationmark.triangle.fill")
                 .font(.caption2.weight(.medium))
-                .foregroundColor(.orange)
+                .foregroundColor(AppColors.warning)
         case .crossModelFailed:
             Label("Unreviewed", systemImage: "questionmark.circle")
                 .font(.caption2.weight(.medium))
-                .foregroundColor(.gray)
+                .foregroundColor(AppColors.mutedText)
         case .checking:
             HStack(spacing: 4) {
                 ProgressView()
                     .scaleEffect(0.6)
                 Text("Checking...")
                     .font(.caption2)
-                    .foregroundColor(.gray)
+                    .foregroundColor(AppColors.mutedText)
             }
         }
     }
@@ -618,13 +618,13 @@ struct RehabPlanView: View {
     private var verificationSummaryBanner: some View {
         HStack(spacing: AppSpacing.sm) {
             Image(systemName: viewModel.isVerifyingUnknowns ? "arrow.triangle.2.circlepath" : "checkmark.shield")
-                .foregroundColor(viewModel.flaggedCount > 0 ? .orange : .green)
+                .foregroundColor(viewModel.flaggedCount > 0 ? AppColors.warning : AppColors.success)
                 .font(.subheadline)
 
             if viewModel.isVerifyingUnknowns {
                 Text("Verifying exercises...")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
                 ProgressView()
                     .scaleEffect(0.7)
             } else {
@@ -635,11 +635,11 @@ struct RehabPlanView: View {
                 if flagged > 0 {
                     Text("\(verified) of \(total) verified \u{2022} \(flagged) flagged for review")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                 } else {
                     Text("\(verified) of \(total) exercises verified")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                 }
             }
 
@@ -647,7 +647,7 @@ struct RehabPlanView: View {
         }
         .padding(AppSpacing.md)
         .background(
-            (viewModel.flaggedCount > 0 ? Color.orange : Color.green)
+            (viewModel.flaggedCount > 0 ? AppColors.warning : AppColors.success)
                 .opacity(0.08)
         )
         .cornerRadius(AppCorners.medium)
@@ -661,7 +661,7 @@ struct RehabPlanView: View {
                         .foregroundColor(AppColors.warning)
                     Text("Failed to save: \(error)")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                         .lineLimit(2)
                 }
 
@@ -726,7 +726,7 @@ struct RehabPlanView: View {
                 if urgentWarnings.isEmpty {
                     HStack(spacing: 8) {
                         Image(systemName: "exclamationmark.circle.fill")
-                            .foregroundColor(urgentWarnings.isEmpty ? .orange : .white)
+                            .foregroundColor(urgentWarnings.isEmpty ? AppColors.warning : .white)
                         Text("Things to Keep in Mind")
                             .font(.subheadline.weight(.semibold))
                             .foregroundColor(urgentWarnings.isEmpty ? .primary : .white)
@@ -740,7 +740,7 @@ struct RehabPlanView: View {
             }
         }
         .padding()
-        .background(viewModel.rehabPlanWarnings.contains(where: { $0.severity == .urgent }) ? Color.red : Color.orange.opacity(0.08))
+        .background(viewModel.rehabPlanWarnings.contains(where: { $0.severity == .urgent }) ? AppColors.danger : AppColors.warning.opacity(0.08))
         .cornerRadius(AppCorners.card)
     }
 
@@ -781,24 +781,24 @@ struct RehabPlanView: View {
         VStack(spacing: AppSpacing.sm) {
             HStack {
                 Image(systemName: "calendar.badge.clock")
-                    .foregroundColor(.blue)
+                    .foregroundColor(AppColors.accent)
                 Text("Week \(week) of \(totalWeeks)")
                     .font(.headline)
                 Spacer()
                 if let note = ProgressionRule.progressionNote(week: week, totalWeeks: totalWeeks) {
                     Text(note)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                 }
             }
 
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(Color.blue.opacity(0.15))
+                        .fill(AppColors.accent.opacity(0.15))
                         .frame(height: 6)
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(Color.blue)
+                        .fill(AppColors.accent)
                         .frame(width: geometry.size.width * CGFloat(week) / CGFloat(max(totalWeeks, 1)), height: 6)
                 }
             }
@@ -807,7 +807,7 @@ struct RehabPlanView: View {
         .padding(AppSpacing.lg)
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.card)
-        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 
     private var startPlanBanner: some View {

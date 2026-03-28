@@ -8,18 +8,18 @@ struct NotesView: View {
 
     var body: some View {
         ZStack {
-            AppColors.pageBackground
+            AppColors.bgGradient
                 .ignoresSafeArea()
 
             ScrollView {
                 VStack(spacing: AppSpacing.lg) {
                     // New note input
-                    CardSection(icon: "square.and.pencil", color: .blue, title: "New Note") {
+                    CardSection(icon: "square.and.pencil", color: AppColors.accent, title: "New Note") {
                         VStack(spacing: AppSpacing.md) {
                             ZStack(alignment: .topLeading) {
                                 if viewModel.newNoteContent.isEmpty {
                                     Text("How are you feeling today? Any progress or setbacks...")
-                                        .foregroundColor(.secondary.opacity(0.5))
+                                        .foregroundColor(AppColors.secondaryText.opacity(0.5))
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 12)
                                 }
@@ -61,7 +61,7 @@ struct NotesView: View {
                             subtitle: "Start tracking your recovery by adding your first note above"
                         )
                     } else {
-                        SectionHeader(icon: "clock.arrow.circlepath", color: .purple, title: "Previous Notes")
+                        SectionHeader(icon: "clock.arrow.circlepath", color: AppColors.accent, title: "Previous Notes")
 
                         ForEach(viewModel.notes) { note in
                             noteCard(for: note)
@@ -100,20 +100,20 @@ struct NotesView: View {
         HStack(alignment: .top, spacing: AppSpacing.md) {
             Image(systemName: "note.text")
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(.green)
+                .foregroundColor(AppColors.success)
                 .frame(width: 28, height: 28)
-                .background(Color.green.opacity(0.15))
+                .background(AppColors.success.opacity(0.15))
                 .cornerRadius(7)
 
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(note.content)
                     .font(.body)
-                    .foregroundColor(.primary)
+                    .foregroundColor(AppColors.primaryText)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Text(note.dateCreated, style: .date)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
             }
 
             Spacer()
@@ -124,7 +124,7 @@ struct NotesView: View {
             } label: {
                 Image(systemName: "trash")
                     .font(.caption)
-                    .foregroundColor(.red.opacity(0.7))
+                    .foregroundColor(AppColors.danger.opacity(0.7))
                     .padding(AppSpacing.sm)
             }
             .buttonStyle(.plain)

@@ -11,14 +11,14 @@ struct ReAssessmentPromptView: View {
             HStack(spacing: AppSpacing.sm) {
                 Image(systemName: "clipboard.fill")
                     .font(.title3)
-                    .foregroundColor(.blue)
+                    .foregroundColor(AppColors.accent)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(titleText)
                         .font(.subheadline.weight(.semibold))
                     Text(subtitleText)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                 }
 
                 Spacer()
@@ -33,12 +33,12 @@ struct ReAssessmentPromptView: View {
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
-                .background(Color.blue)
+                .background(AppColors.accent)
                 .cornerRadius(AppCorners.medium)
             }
         }
         .padding(AppSpacing.lg)
-        .background(Color.blue.opacity(0.08))
+        .background(AppColors.accentTint)
         .cornerRadius(AppCorners.card)
         .trackScreen("ReAssessmentPrompt")
     }

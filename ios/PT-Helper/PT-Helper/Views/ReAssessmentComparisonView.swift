@@ -14,24 +14,24 @@ struct ReAssessmentComparisonView: View {
                 VStack(spacing: AppSpacing.sm) {
                     Image(systemName: overallImproved ? "arrow.down.heart.fill" : "heart.fill")
                         .font(.system(size: 40))
-                        .foregroundColor(overallImproved ? .green : .orange)
+                        .foregroundColor(overallImproved ? AppColors.success : AppColors.warning)
 
                     Text(overallImproved ? "You're Improving!" : "Keep Going!")
-                        .font(.title2.weight(.bold))
+                        .font(.system(.title2, design: .serif).weight(.bold))
 
                     Text("Comparing \(initial.assessmentType.rawValue) to \(latest.assessmentType.rawValue)")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, AppSpacing.lg)
 
                 // Overall pain comparison
-                CardSection(icon: "waveform.path.ecg", color: .blue, title: "Overall Pain") {
+                CardSection(icon: "waveform.path.ecg", color: AppColors.accent, title: "Overall Pain") {
                     HStack(spacing: AppSpacing.xl) {
                         painComparisonColumn(label: "Before", value: initial.overallPain)
                         Image(systemName: "arrow.right")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppColors.secondaryText)
                         painComparisonColumn(label: "After", value: latest.overallPain)
                         Spacer()
                         changeIndicator(before: initial.overallPain, after: latest.overallPain)
@@ -73,7 +73,7 @@ struct ReAssessmentComparisonView: View {
                             }
                         }
                         .chartYScale(domain: 0...10)
-                        .chartForegroundStyleScale(["Before": Color.red.opacity(0.7), "After": Color.green.opacity(0.7)])
+                        .chartForegroundStyleScale(["Before": AppColors.danger.opacity(0.7), "After": AppColors.success.opacity(0.7)])
                         .frame(height: 220)
                     }
                 }
@@ -97,7 +97,7 @@ struct ReAssessmentComparisonView: View {
         VStack(spacing: 4) {
             Text(label)
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
             Text(String(format: "%.1f", value))
                 .font(.system(size: 28, weight: .bold, design: .rounded))
                 .foregroundColor(painColor(for: value))
@@ -113,10 +113,10 @@ struct ReAssessmentComparisonView: View {
             Text(String(format: "%+.1f", diff))
                 .font(.caption.weight(.bold))
         }
-        .foregroundColor(improved ? .green : (diff > 0 ? .red : .secondary))
+        .foregroundColor(improved ? AppColors.success : (diff > 0 ? AppColors.danger : AppColors.secondaryText))
         .padding(.horizontal, AppSpacing.sm)
         .padding(.vertical, AppSpacing.xs)
-        .background(improved ? Color.green.opacity(0.1) : (diff > 0 ? Color.red.opacity(0.1) : Color.gray.opacity(0.1)))
+        .background(improved ? AppColors.success.opacity(0.1) : (diff > 0 ? AppColors.danger.opacity(0.1) : AppColors.mutedText.opacity(0.1)))
         .cornerRadius(AppCorners.small)
     }
 
@@ -133,16 +133,16 @@ struct ReAssessmentComparisonView: View {
 
             Text(String(format: "%.0f", before))
                 .font(.caption.weight(.medium))
-                .foregroundColor(.red.opacity(0.8))
+                .foregroundColor(AppColors.danger.opacity(0.8))
                 .frame(width: 30)
 
             Image(systemName: "arrow.right")
                 .font(.caption2)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
 
             Text(String(format: "%.0f", after))
                 .font(.caption.weight(.medium))
-                .foregroundColor(.green)
+                .foregroundColor(AppColors.success)
                 .frame(width: 30)
 
             changeIndicator(before: before, after: after)
@@ -162,9 +162,9 @@ struct ReAssessmentComparisonView: View {
 
     private func painColor(for level: Double) -> Color {
         switch Int(level) {
-        case 0...3: return .green
-        case 4...6: return .orange
-        default: return .red
+        case 0...3: return AppColors.success
+        case 4...6: return AppColors.warning
+        default: return AppColors.danger
         }
     }
 }

@@ -21,7 +21,7 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                AppColors.pageBackground
+                AppColors.bgGradient
                     .ignoresSafeArea()
 
                 ScrollView {
@@ -35,27 +35,31 @@ struct SettingsView: View {
                                 .frame(width: 72, height: 72)
                                 .background(
                                     Circle()
-                                        .fill(AppColors.coolGradient)
+                                        .fill(AppColors.primaryGradient)
                                 )
 
                             Text(userName.isEmpty ? "User" : userName)
-                                .font(AppFonts.sectionTitle)
-                                .foregroundColor(.primary)
+                                .font(.system(.title3, design: .serif).weight(.bold))
+                                .foregroundColor(AppColors.primaryText)
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, AppSpacing.xl)
                         .background(AppColors.cardBackground)
                         .cornerRadius(AppCorners.xl)
-                        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: AppCorners.xl)
+                                .stroke(AppColors.cardBorder, lineWidth: 1)
+                        )
+                        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
 
                         // Notifications
                         VStack(spacing: 0) {
                             HStack(spacing: AppSpacing.md) {
                                 Image(systemName: "bell.badge")
                                     .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(.orange)
+                                    .foregroundColor(AppColors.warning)
                                     .frame(width: 32, height: 32)
-                                    .background(Color.orange.opacity(0.12))
+                                    .background(AppColors.warning.opacity(0.12))
                                     .cornerRadius(AppCorners.small)
 
                                 Text("Reminders")
@@ -81,9 +85,9 @@ struct SettingsView: View {
                                 HStack(spacing: AppSpacing.md) {
                                     Image(systemName: "clock")
                                         .font(.system(size: 14, weight: .semibold))
-                                        .foregroundColor(.blue)
+                                        .foregroundColor(AppColors.accent)
                                         .frame(width: 32, height: 32)
-                                        .background(Color.blue.opacity(0.12))
+                                        .background(AppColors.accentTint)
                                         .cornerRadius(AppCorners.small)
 
                                     Text("Reminder Time")
@@ -105,7 +109,11 @@ struct SettingsView: View {
                         }
                         .background(AppColors.cardBackground)
                         .cornerRadius(AppCorners.large)
-                        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: AppCorners.large)
+                                .stroke(AppColors.cardBorder, lineWidth: 1)
+                        )
+                        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
 
                         // Debug & Feedback
                         VStack(spacing: 0) {
@@ -121,9 +129,9 @@ struct SettingsView: View {
                             HStack(spacing: AppSpacing.md) {
                                 Image(systemName: "doc.text.magnifyingglass")
                                     .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(.teal)
+                                    .foregroundColor(AppColors.accentLight)
                                     .frame(width: 32, height: 32)
-                                    .background(Color.teal.opacity(0.12))
+                                    .background(AppColors.accentTint)
                                     .cornerRadius(AppCorners.small)
 
                                 VStack(alignment: .leading, spacing: 2) {
@@ -131,7 +139,7 @@ struct SettingsView: View {
                                         .font(.body)
                                     Text("\(SessionLogger.shared.eventCount) events this session")
                                         .font(.caption2)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(AppColors.secondaryText)
                                 }
 
                                 Spacer()
@@ -141,11 +149,15 @@ struct SettingsView: View {
                         }
                         .background(AppColors.cardBackground)
                         .cornerRadius(AppCorners.large)
-                        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: AppCorners.large)
+                                .stroke(AppColors.cardBorder, lineWidth: 1)
+                        )
+                        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
 
                         // Actions
                         VStack(spacing: 0) {
-                            settingsRow(icon: "heart.text.clipboard", color: .blue, title: "Update Health Info") {
+                            settingsRow(icon: "heart.text.clipboard", color: AppColors.accent, title: "Update Health Info") {
                                 dismiss()
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                                     onEditProfile()
@@ -155,30 +167,38 @@ struct SettingsView: View {
 
                             Divider().padding(.leading, 52)
 
-                            settingsRow(icon: "rectangle.portrait.and.arrow.right", color: .red, title: "Sign Out") {
+                            settingsRow(icon: "rectangle.portrait.and.arrow.right", color: AppColors.danger, title: "Sign Out") {
                                 showSignOutConfirmation = true
                             }
                             .accessibilityIdentifier("settings.signOutButton")
                         }
                         .background(AppColors.cardBackground)
                         .cornerRadius(AppCorners.large)
-                        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: AppCorners.large)
+                                .stroke(AppColors.cardBorder, lineWidth: 1)
+                        )
+                        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
 
                         // Danger zone
                         VStack(spacing: 0) {
-                            settingsRow(icon: "trash", color: .red, title: "Delete Account") {
+                            settingsRow(icon: "trash", color: AppColors.danger, title: "Delete Account") {
                                 showDeleteConfirmation = true
                             }
                             .accessibilityIdentifier("settings.deleteAccountButton")
                         }
                         .background(AppColors.cardBackground)
                         .cornerRadius(AppCorners.large)
-                        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: AppCorners.large)
+                                .stroke(AppColors.cardBorder, lineWidth: 1)
+                        )
+                        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
 
                         // App version
                         Text(appVersionText)
                             .font(.caption2)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppColors.mutedText)
                             .padding(.top, AppSpacing.lg)
                     }
                     .padding(.horizontal, AppSpacing.xl)
@@ -325,13 +345,13 @@ struct SettingsView: View {
 
                 Text(title)
                     .font(.body)
-                    .foregroundColor(title == "Sign Out" ? .red : .primary)
+                    .foregroundColor(title == "Sign Out" ? AppColors.danger : AppColors.primaryText)
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(.gray)
+                    .foregroundColor(AppColors.mutedText)
             }
             .padding(.horizontal, AppSpacing.lg)
             .padding(.vertical, AppSpacing.md)

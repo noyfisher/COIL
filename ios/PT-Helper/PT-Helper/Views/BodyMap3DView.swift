@@ -381,7 +381,7 @@ struct BodyMap3DView: View {
                 }) {
                     Text("Got it")
                         .font(.subheadline.weight(.semibold))
-                        .foregroundColor(.blue)
+                        .foregroundColor(AppColors.accent)
                         .padding(.horizontal, AppSpacing.xxl)
                         .padding(.vertical, AppSpacing.sm)
                         .background(.white)
