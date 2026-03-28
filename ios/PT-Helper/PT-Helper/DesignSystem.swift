@@ -9,58 +9,88 @@ extension Notification.Name {
 // MARK: - Design Tokens
 
 enum AppColors {
-    static let accent = Color.blue
-    static let success = Color.green
-    static let warning = Color.orange
-    static let danger = Color.red
-    static let info = Color.cyan
+    // MARK: Semantic Colors
+    static let accent = Color(red: 0.369, green: 0.549, blue: 0.353)               // #5E8C5A
+    static let success = Color(red: 0.369, green: 0.549, blue: 0.353)              // #5E8C5A
+    static let warning = Color(red: 0.722, green: 0.588, blue: 0.239)             // #B8963D
+    static let danger = Color(red: 0.722, green: 0.361, blue: 0.361)              // #B85C5C
+    static let info = Color(red: 0.369, green: 0.549, blue: 0.353)                // #5E8C5A
 
+    // MARK: Text Colors
+    static let primaryText = Color(red: 0.118, green: 0.169, blue: 0.102)         // #1E2B1A
+    static let secondaryText = Color(red: 0.333, green: 0.420, blue: 0.290)       // #556B4A
+    static let mutedText = Color(red: 0.541, green: 0.604, blue: 0.494)           // #8A9A7E
+
+    // MARK: Brand Gradients (Sage-toned)
     static let primaryGradient = LinearGradient(
-        colors: [.blue, .purple],
+        colors: [Color(red: 0.369, green: 0.549, blue: 0.353), Color(red: 0.227, green: 0.369, blue: 0.212)],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
-
-    // Brand gradients
     static let warmGradient = LinearGradient(
-        colors: [Color(red: 1.0, green: 0.42, blue: 0.42), Color(red: 0.93, green: 0.35, blue: 0.14)],
+        colors: [Color(red: 0.722, green: 0.588, blue: 0.239), Color(red: 0.612, green: 0.498, blue: 0.180)],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
     static let coolGradient = LinearGradient(
-        colors: [Color(red: 0.04, green: 0.74, blue: 0.89), Color(red: 0.12, green: 0.56, blue: 1.0)],
+        colors: [Color(red: 0.369, green: 0.549, blue: 0.353), Color(red: 0.659, green: 0.800, blue: 0.647)],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
     static let healingGradient = LinearGradient(
-        colors: [Color(red: 0.0, green: 0.72, blue: 0.58), Color(red: 0.0, green: 0.81, blue: 0.79)],
+        colors: [Color(red: 0.369, green: 0.549, blue: 0.353), Color(red: 0.459, green: 0.639, blue: 0.443)],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
 
-    // Surface colors
-    static let cardBackground = Color(.systemBackground)
-    static let pageBackground = Color(.systemGroupedBackground)
-    static let elevatedSurface = Color(.secondarySystemGroupedBackground)
-    static let inputBackground = Color(.systemGray6)
-    static let subtleBorder = Color(.systemGray5)
+    // MARK: Surface Colors
+    static let cardBackground = Color(red: 0.980, green: 0.988, blue: 0.973)      // #FAFCF8
+    static let pageBackground = Color(red: 0.937, green: 0.949, blue: 0.925)      // #EFF2EC
+    static let elevatedSurface = Color(red: 0.886, green: 0.910, blue: 0.855)     // #E2E8DA
+    static let inputBackground = Color(red: 0.980, green: 0.988, blue: 0.973)     // #FAFCF8
+    static let subtleBorder = Color(red: 0.294, green: 0.392, blue: 0.255).opacity(0.12)
 
-    // MARK: Dashboard Dark Theme
-    static let dashBackground = Color(red: 0.059, green: 0.078, blue: 0.098)       // #0F1419
-    static let dashSurface = Color(red: 0.102, green: 0.122, blue: 0.180)          // #1A1F2E
-    static let dashAccent = Color(red: 0.0, green: 0.831, blue: 1.0)               // #00D4FF
-    static let dashSecondaryAccent = Color(red: 0.0, green: 0.6, blue: 0.8)        // #0099CC
-    static let dashBorder = Color.white.opacity(0.08)
-    static let dashTextPrimary = Color.white
-    static let dashTextSecondary = Color.white.opacity(0.6)
-    static let dashSuccess = Color(red: 0.0, green: 0.88, blue: 0.46)              // #00E076
-    static let dashWarning = Color(red: 1.0, green: 0.76, blue: 0.0)               // #FFC200
-    static let dashDanger = Color(red: 1.0, green: 0.34, blue: 0.34)               // #FF5757
-    static let dashAccentGradient = LinearGradient(
-        colors: [Color(red: 0.0, green: 0.831, blue: 1.0), Color(red: 0.0, green: 0.6, blue: 0.8)],
-        startPoint: .leading,
-        endPoint: .trailing
+    // MARK: CTA Colors
+    static let ctaBackground = Color(red: 0.227, green: 0.369, blue: 0.212)       // #3A5E36
+    static let ctaText = Color(red: 0.949, green: 0.961, blue: 0.933)             // #F2F5EE
+
+    // MARK: Accent Variants
+    static let accentLight = Color(red: 0.659, green: 0.800, blue: 0.647)         // #A8CCA5
+    static let accentTint = Color(red: 0.369, green: 0.549, blue: 0.353).opacity(0.10)
+
+    // MARK: Chip Colors
+    static let chipSelectedBg = Color(red: 0.831, green: 0.898, blue: 0.824)      // #D4E5D2
+    static let chipSelectedBorder = Color(red: 0.545, green: 0.722, blue: 0.533)  // #8BB888
+    static let chipSelectedText = Color(red: 0.176, green: 0.290, blue: 0.165)    // #2D4A2A
+
+    // MARK: Card Styling
+    static let cardBorder = Color(red: 0.294, green: 0.392, blue: 0.255).opacity(0.10)
+    static let cardShadowColor = Color(red: 0.176, green: 0.235, blue: 0.137).opacity(0.05)
+    static let inputFocusBorder = Color(red: 0.369, green: 0.549, blue: 0.353)    // #5E8C5A
+
+    // MARK: Background Gradient
+    static let bgGradient = LinearGradient(
+        colors: [
+            Color(red: 0.949, green: 0.961, blue: 0.933),  // #F2F5EE
+            Color(red: 0.910, green: 0.929, blue: 0.878),  // #E8EDE0
+            Color(red: 0.867, green: 0.898, blue: 0.831)   // #DDE5D4
+        ],
+        startPoint: .top,
+        endPoint: .bottom
     )
+
+    // MARK: Dashboard Aliases (backward compat → Sage & Stone)
+    static let dashBackground = pageBackground
+    static let dashSurface = cardBackground
+    static let dashAccent = accent
+    static let dashSecondaryAccent = accentLight
+    static let dashBorder = cardBorder
+    static let dashTextPrimary = primaryText
+    static let dashTextSecondary = secondaryText
+    static let dashSuccess = success
+    static let dashWarning = warning
+    static let dashDanger = danger
+    static let dashAccentGradient = primaryGradient
 }
 
 enum AppSpacing {
@@ -74,21 +104,21 @@ enum AppSpacing {
 }
 
 enum AppCorners {
-    static let small: CGFloat = 8
-    static let medium: CGFloat = 10
-    static let card: CGFloat = 14
-    static let large: CGFloat = 16
-    static let xl: CGFloat = 20
-    static let xxl: CGFloat = 24
+    static let small: CGFloat = 14
+    static let medium: CGFloat = 16
+    static let card: CGFloat = 20
+    static let large: CGFloat = 20
+    static let xl: CGFloat = 24
+    static let xxl: CGFloat = 28
     static let pill: CGFloat = 100
 }
 
 // MARK: - Typography Presets
 
 enum AppFonts {
-    static let heroTitle = Font.system(size: 34, weight: .bold, design: .rounded)
-    static let sectionTitle = Font.title3.weight(.bold)
-    static let cardTitle = Font.body.weight(.semibold)
+    static let heroTitle = Font.system(size: 34, weight: .bold, design: .serif)
+    static let sectionTitle = Font.system(.title3, design: .serif).weight(.bold)
+    static let cardTitle = Font.system(.body, design: .serif).weight(.semibold)
     static let statNumber = Font.system(size: 28, weight: .bold, design: .rounded)
     static let badge = Font.caption2.weight(.semibold)
 
@@ -120,26 +150,13 @@ struct CardStyle: ViewModifier {
         content
             .padding(AppSpacing.lg)
             .background(AppColors.cardBackground)
-            .cornerRadius(cornerRadius)
-            .shadow(color: shadowColor, radius: shadowRadius, y: shadowY)
-    }
-
-    private var cornerRadius: CGFloat {
-        switch elevation {
-        case .flat: return AppCorners.card
-        case .subtle: return AppCorners.card
-        case .raised: return AppCorners.large
-        case .hero: return AppCorners.xl
-        }
-    }
-
-    private var shadowColor: Color {
-        switch elevation {
-        case .flat: return .clear
-        case .subtle: return .black.opacity(0.04)
-        case .raised: return .black.opacity(0.08)
-        case .hero: return .black.opacity(0.12)
-        }
+            .cornerRadius(AppCorners.card)
+            .overlay(
+                RoundedRectangle(cornerRadius: AppCorners.card)
+                    .stroke(AppColors.cardBorder, lineWidth: 1)
+            )
+            .shadow(color: AppColors.cardShadowColor, radius: shadowRadius, y: shadowY)
+            .shadow(color: AppColors.cardShadowColor.opacity(0.5), radius: secondShadowRadius, y: secondShadowY)
     }
 
     private var shadowRadius: CGFloat {
@@ -159,6 +176,24 @@ struct CardStyle: ViewModifier {
         case .hero: return 6
         }
     }
+
+    private var secondShadowRadius: CGFloat {
+        switch elevation {
+        case .flat: return 0
+        case .subtle: return 2
+        case .raised: return 4
+        case .hero: return 6
+        }
+    }
+
+    private var secondShadowY: CGFloat {
+        switch elevation {
+        case .flat: return 0
+        case .subtle: return 1
+        case .raised: return 2
+        case .hero: return 3
+        }
+    }
 }
 
 extension View {
@@ -175,21 +210,15 @@ struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.body.weight(.semibold))
-            .foregroundColor(.white)
+            .foregroundColor(AppColors.ctaText)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 14)
             .background(
                 isDisabled
-                    ? AnyShapeStyle(Color.gray)
-                    : AnyShapeStyle(
-                        LinearGradient(
-                            colors: [.blue, .blue.opacity(0.85)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    ? AnyShapeStyle(AppColors.mutedText)
+                    : AnyShapeStyle(AppColors.ctaBackground)
             )
-            .cornerRadius(AppCorners.card)
+            .clipShape(Capsule())
             .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
             .animation(.spring(response: 0.2), value: configuration.isPressed)
     }
@@ -199,11 +228,11 @@ struct SecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.body.weight(.medium))
-            .foregroundColor(.blue)
+            .foregroundColor(AppColors.accent)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 14)
-            .background(Color.blue.opacity(0.1))
-            .cornerRadius(AppCorners.card)
+            .background(AppColors.accentTint)
+            .clipShape(Capsule())
             .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
             .animation(.spring(response: 0.2), value: configuration.isPressed)
     }
@@ -213,11 +242,11 @@ struct DestructiveButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.subheadline.weight(.medium))
-            .foregroundColor(.red)
+            .foregroundColor(AppColors.danger)
             .padding(.vertical, AppSpacing.md)
             .padding(.horizontal, AppSpacing.xl)
-            .background(Color.red.opacity(0.1))
-            .cornerRadius(AppCorners.medium)
+            .background(AppColors.danger.opacity(0.1))
+            .clipShape(Capsule())
             .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
             .animation(.spring(response: 0.2), value: configuration.isPressed)
     }
@@ -239,15 +268,15 @@ struct CardSection<Content: View>: View {
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(color)
                     .frame(width: 28, height: 28)
-                    .background(color.opacity(0.15))
+                    .background(color.opacity(0.10))
                     .cornerRadius(7)
                 Text(title)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundColor(.secondary)
+                    .font(.system(.subheadline, design: .serif).weight(.semibold))
+                    .foregroundColor(AppColors.secondaryText)
                 if required {
                     Text("Required")
                         .font(.caption2.weight(.medium))
-                        .foregroundColor(.red.opacity(0.8))
+                        .foregroundColor(AppColors.danger.opacity(0.8))
                 }
             }
             content
@@ -279,21 +308,15 @@ struct EmptyStateView: View {
         VStack(spacing: AppSpacing.lg) {
             Image(systemName: icon)
                 .font(.system(size: 48))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [.blue.opacity(0.6), .purple.opacity(0.4)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .foregroundStyle(AppColors.primaryGradient)
 
             VStack(spacing: AppSpacing.sm) {
                 Text(title)
                     .font(AppFonts.cardTitle)
-                    .foregroundColor(.primary)
+                    .foregroundColor(AppColors.primaryText)
                 Text(subtitle)
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.lg)
             }
@@ -309,8 +332,12 @@ struct EmptyStateView: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, AppSpacing.xxl)
         .background(AppColors.cardBackground)
-        .cornerRadius(AppCorners.large)
-        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+        .cornerRadius(AppCorners.card)
+        .overlay(
+            RoundedRectangle(cornerRadius: AppCorners.card)
+                .stroke(AppColors.cardBorder, lineWidth: 1)
+        )
+        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 }
 
@@ -320,10 +347,11 @@ struct LoadingStateView: View {
     var body: some View {
         VStack(spacing: AppSpacing.md) {
             ProgressView()
+                .tint(AppColors.accent)
                 .scaleEffect(1.2)
             Text(message)
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -341,36 +369,34 @@ struct QuickActionCard<Destination: View>: View {
             HStack(spacing: 14) {
                 Image(systemName: icon)
                     .font(.title2)
-                    .foregroundColor(.white)
+                    .foregroundColor(gradientColors.first ?? AppColors.accent)
                     .frame(width: 50, height: 50)
-                    .background(
-                        LinearGradient(
-                            colors: gradientColors,
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .background((gradientColors.first ?? AppColors.accent).opacity(0.10))
                     .cornerRadius(AppCorners.card)
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(title)
-                        .font(.body.weight(.semibold))
-                        .foregroundColor(.primary)
+                        .font(AppFonts.cardTitle)
+                        .foregroundColor(AppColors.primaryText)
                     Text(subtitle)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(.gray)
+                    .foregroundColor(AppColors.mutedText)
             }
             .padding(AppSpacing.lg)
             .background(AppColors.cardBackground)
-            .cornerRadius(AppCorners.large)
-            .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+            .cornerRadius(AppCorners.card)
+            .overlay(
+                RoundedRectangle(cornerRadius: AppCorners.card)
+                    .stroke(AppColors.cardBorder, lineWidth: 1)
+            )
+            .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
         }
     }
 }
@@ -388,36 +414,34 @@ struct QuickActionButton: View {
             HStack(spacing: 14) {
                 Image(systemName: icon)
                     .font(.title2)
-                    .foregroundColor(.white)
+                    .foregroundColor(gradientColors.first ?? AppColors.accent)
                     .frame(width: 50, height: 50)
-                    .background(
-                        LinearGradient(
-                            colors: gradientColors,
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .background((gradientColors.first ?? AppColors.accent).opacity(0.10))
                     .cornerRadius(AppCorners.card)
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(title)
-                        .font(.body.weight(.semibold))
-                        .foregroundColor(.primary)
+                        .font(AppFonts.cardTitle)
+                        .foregroundColor(AppColors.primaryText)
                     Text(subtitle)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(.gray)
+                    .foregroundColor(AppColors.mutedText)
             }
             .padding(AppSpacing.lg)
             .background(AppColors.cardBackground)
-            .cornerRadius(AppCorners.large)
-            .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+            .cornerRadius(AppCorners.card)
+            .overlay(
+                RoundedRectangle(cornerRadius: AppCorners.card)
+                    .stroke(AppColors.cardBorder, lineWidth: 1)
+            )
+            .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
         }
     }
 }
@@ -433,8 +457,8 @@ struct SectionHeader: View {
             Image(systemName: icon)
                 .foregroundColor(color)
             Text(title)
-                .font(.subheadline.weight(.semibold))
-                .foregroundColor(.secondary)
+                .font(.system(.subheadline, design: .serif).weight(.semibold))
+                .foregroundColor(AppColors.secondaryText)
             Spacer()
         }
     }
@@ -535,14 +559,14 @@ struct ChipButton: View {
         Button(action: action) {
             Text(label)
                 .font(.subheadline.weight(.medium))
-                .foregroundColor(isSelected ? .white : .primary)
+                .foregroundColor(isSelected ? AppColors.chipSelectedText : AppColors.primaryText)
                 .padding(.horizontal, AppSpacing.md)
                 .padding(.vertical, AppSpacing.sm)
-                .background(isSelected ? Color.blue : AppColors.inputBackground)
-                .cornerRadius(AppCorners.small)
+                .background(isSelected ? AppColors.chipSelectedBg : AppColors.cardBackground)
+                .clipShape(Capsule())
                 .overlay(
-                    RoundedRectangle(cornerRadius: AppCorners.small)
-                        .stroke(isSelected ? Color.clear : AppColors.subtleBorder, lineWidth: 1)
+                    Capsule()
+                        .stroke(isSelected ? AppColors.chipSelectedBorder : AppColors.subtleBorder, lineWidth: 1)
                 )
         }
     }
