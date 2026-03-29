@@ -6,10 +6,11 @@ final class PlansTabUITests: UITestBase {
     func testPlansExist_ShowsCards() throws {
         tapTab("Rehab")
 
-        // With seeded mock data, plans should be visible
+        // Scroll to see plans list (section header is uppercased)
+        app.swipeUp()
         XCTAssertTrue(
             staticText("Knee Rehab Plan").waitForExistence(timeout: 5) ||
-            staticText("Active Plans").waitForExistence(timeout: 5),
+            staticText("ACTIVE PLANS").waitForExistence(timeout: 5),
             "Plans should be visible with seeded data"
         )
 
@@ -25,7 +26,13 @@ final class PlansTabUITests: UITestBase {
 
         tapTab("Rehab")
 
-        // Should show some content even without plans (empty state or metrics)
+        // Should show empty state message
+        XCTAssertTrue(
+            staticText("No Rehab Data").waitForExistence(timeout: 5) ||
+            app.navigationBars["Rehab"].waitForExistence(timeout: 5),
+            "Rehab tab should show content even without plans"
+        )
+
         captureScreenshot(name: "Plans-EmptyState")
     }
 }

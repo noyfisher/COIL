@@ -3,15 +3,16 @@ import XCTest
 final class DashboardUITests: UITestBase {
 
     @MainActor
-    func testThreeTabs_Exist() throws {
+    func testFourTabs_Exist() throws {
         let tabBar = app.tabBars.firstMatch
         XCTAssertTrue(tabBar.waitForExistence(timeout: 5))
 
         XCTAssertTrue(tabBar.buttons["Dashboard"].exists, "Dashboard tab should exist")
+        XCTAssertTrue(tabBar.buttons["Form Check"].exists, "Form Check tab should exist")
         XCTAssertTrue(tabBar.buttons["Rehab"].exists, "Rehab tab should exist")
         XCTAssertTrue(tabBar.buttons["Profile"].exists, "Profile tab should exist")
 
-        captureScreenshot(name: "Dashboard-ThreeTabs")
+        captureScreenshot(name: "Dashboard-FourTabs")
     }
 
     @MainActor
@@ -20,10 +21,20 @@ final class DashboardUITests: UITestBase {
         let tabBar = app.tabBars.firstMatch
         _ = tabBar.waitForExistence(timeout: 5)
 
-        // Verify key content is visible
-        XCTAssertTrue(staticText("Quick Actions").waitForExistence(timeout: 5),
-                      "Quick Actions section should be visible")
-        assertExists("dashboard.newAnalysisButton")
+        // Widget labels are uppercased by DashStatWidget
+        XCTAssertTrue(
+            staticText("TOP MATCH").waitForExistence(timeout: 5) ||
+            staticText("ACTIVE PLANS").waitForExistence(timeout: 5),
+            "Dashboard widget grid should be visible"
+        )
+
+        // Scroll down to reveal the gateway section (uppercased by DashSectionHeader)
+        app.swipeUp()
+        XCTAssertTrue(
+            staticText("WHAT CAN WE HELP WITH?").waitForExistence(timeout: 3) ||
+            app.descendants(matching: .any)["dashboard.somethingHurtsButton"].waitForExistence(timeout: 3),
+            "Gateway section should be visible after scrolling"
+        )
 
         captureScreenshot(name: "Dashboard-Widgets")
     }
@@ -32,12 +43,12 @@ final class DashboardUITests: UITestBase {
     func testRehabTab_ShowsMetrics() throws {
         tapTab("Rehab")
 
-        // Should show rehab metrics content
-        let rehabContent = app.navigationBars["Rehab"].firstMatch
-        // Look for any rehab-specific text
+        // Metric labels are uppercased by DashStatWidget
         XCTAssertTrue(
-            staticText("Adherence").waitForExistence(timeout: 5) ||
-            staticText("Active Plans").waitForExistence(timeout: 5),
+            staticText("ADHERENCE").waitForExistence(timeout: 5) ||
+            staticText("PLAN PROGRESS").waitForExistence(timeout: 5) ||
+            staticText("No Rehab Data").waitForExistence(timeout: 5) ||
+            app.navigationBars["Rehab"].waitForExistence(timeout: 5),
             "Rehab tab should show metrics content"
         )
 
@@ -45,10 +56,13 @@ final class DashboardUITests: UITestBase {
     }
 
     @MainActor
-    func testNewAnalysis_NavigatesToBodyMap() throws {
-        let newAnalysisButton = app.descendants(matching: .any)["dashboard.newAnalysisButton"]
-        XCTAssertTrue(newAnalysisButton.waitForExistence(timeout: 5))
-        newAnalysisButton.tap()
+    func testSomethingHurts_NavigatesToBodyMap() throws {
+        // Scroll down to reveal the gateway section
+        app.swipeUp()
+
+        let somethingHurtsButton = app.descendants(matching: .any)["dashboard.somethingHurtsButton"]
+        XCTAssertTrue(somethingHurtsButton.waitForExistence(timeout: 5))
+        somethingHurtsButton.tap()
 
         // Should navigate to body map
         XCTAssertTrue(

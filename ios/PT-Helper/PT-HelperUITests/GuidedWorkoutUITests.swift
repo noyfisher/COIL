@@ -7,6 +7,10 @@ final class GuidedWorkoutUITests: UITestBase {
     private func navigateToWorkout() {
         tapTab("Rehab")
 
+        // Scroll down to reveal plans list (below metrics grid and pain chart)
+        app.swipeUp()
+        app.swipeUp()
+
         // Tap on the first plan in active plans list
         let planLink = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Knee Rehab Plan'")).firstMatch
         if planLink.waitForExistence(timeout: 5) {

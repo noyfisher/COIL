@@ -65,10 +65,12 @@ final class SettingsUITests: UITestBase {
     func testSettings_DeleteAccount_ShowsConfirmation() throws {
         navigateToSettings()
 
+        // Scroll down to reveal the delete account button
+        app.swipeUp()
+        app.swipeUp()
+
         let deleteAccount = app.descendants(matching: .any)["settings.deleteAccountButton"]
         if deleteAccount.waitForExistence(timeout: 5) {
-            // Scroll down if needed
-            app.swipeUp()
             deleteAccount.tap()
         } else {
             let deleteText = staticText("Delete Account")

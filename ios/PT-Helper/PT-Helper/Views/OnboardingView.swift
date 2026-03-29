@@ -101,6 +101,7 @@ struct OnboardingView: View {
                             }
                         }
                         .buttonStyle(PrimaryButtonStyle(isDisabled: !viewModel.canProceedFromCurrentStep))
+                        .disabled(!viewModel.canProceedFromCurrentStep)
                         .accessibilityIdentifier("onboarding.continueButton")
                     }
                 }
