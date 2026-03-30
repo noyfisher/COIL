@@ -7,6 +7,7 @@ struct RootView: View {
     @State private var isCheckingProfile = true
     @State private var showError = false
     @State private var errorMessage = ""
+    @State private var hasLoggedSignIn = false
     @StateObject private var profileService = UserProfileService.shared
 
     /// UI testing mode: bypass Firebase Auth and route based on launch arguments.
@@ -38,7 +39,10 @@ struct RootView: View {
                 if let user = user {
                     SessionLogger.shared.startSession(userId: user.uid)
                     AnalyticsService.shared.setUserId(user.uid)
-                    AnalyticsService.shared.log(.signInCompleted)
+                    if !hasLoggedSignIn {
+                        hasLoggedSignIn = true
+                        AnalyticsService.shared.log(.signInCompleted)
+                    }
                     checkProfileCompletion()
                 } else {
                     SessionLogger.shared.log(.signedOut, category: .auth, message: "User signed out")
@@ -55,7 +59,7 @@ struct RootView: View {
 
     @ViewBuilder
     private var uiTestingContent: some View {
-        if TestDataSeeder.shouldSkipOnboarding {
+        if TestDataSeeder.shouldSkipOnboarding || profileCompleted {
             MainTabView()
         } else {
             OnboardingView(onComplete: {
