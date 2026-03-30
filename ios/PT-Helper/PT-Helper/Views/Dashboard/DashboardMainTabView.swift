@@ -71,6 +71,7 @@ struct DashboardMainTabView: View {
             let tabNames = ["Dashboard", "Form Check", "Rehab", "Profile"]
             let name = newTab < tabNames.count ? tabNames[newTab] : "Unknown"
             SessionLogger.shared.logNavigation(.tabSwitched, screen: name, metadata: ["tab": "\(newTab)"])
+            AnalyticsService.shared.log(.tabSwitched, parameters: ["tab_index": newTab])
         }
         .onReceive(NotificationCenter.default.publisher(for: .popToRoot)) { _ in
             tabSelection.popToRootAndGoHome()
