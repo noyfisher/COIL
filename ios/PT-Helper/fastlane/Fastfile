@@ -9,7 +9,7 @@ platform :ios do
     scan(
       project: "PT-Helper.xcodeproj",
       scheme: "PT-Helper",
-      device: "iPhone 16",
+      device: ENV["TEST_DEVICE"] || "iPhone 16",
       testplan: "SmokePlan",
       output_types: "junit",
       result_bundle: true,
