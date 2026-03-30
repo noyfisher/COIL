@@ -1,6 +1,7 @@
 import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
 import { onSchedule } from "firebase-functions/v2/scheduler";
+import sgMail from "@sendgrid/mail";
 
 admin.initializeApp();
 
@@ -357,6 +358,37 @@ RULES:
 
 RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure:
 {"planName":"...","exercises":[{"name":"...","targetArea":"...","description":"...","sets":3,"reps":"10","restSeconds":30,"difficulty":"beginner","demonstrationIcon":"figure.flexibility","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"stretch","imageFileName":"exercise-name"}],"totalWeeks":4,"notes":"..."}`,
+
+  nightly_report: `You are a product analytics assistant for PT Helper, a physical therapy iOS app.
+Given the following metrics from the past 24 hours, write a brief, scannable email report that a solo developer can read in 2 minutes over morning coffee.
+
+Structure your response EXACTLY like this (use markdown headers):
+
+## TL;DR
+1 sentence: is the app healthy? Sum it up.
+
+## Users
+DAU, new signups, total users, trend vs yesterday.
+
+## Engagement
+Sessions, workout completions, plans generated, avg activity.
+
+## Funnel
+Conversion rates at each step, any notable drops.
+
+## Stability
+API success rate, error count, crash logs.
+
+## Action Items
+0-3 bullet points of things that need attention. If everything looks good, say so.
+
+RULES:
+- Keep it conversational, use plain numbers (not jargon)
+- Flag anything unusual with a warning emoji
+- If a metric is missing or zero (pre-launch or no data), say so briefly and move on
+- Compare today vs yesterday when both are available
+- Be honest — if there are problems, call them out clearly
+- End with an encouraging note if things are going well`,
 };
 
 // Server-side model configuration (NOT client-controlled)
@@ -370,6 +402,7 @@ const MODEL_CONFIG: Record<string, { model: string; max_tokens: number; temperat
   wellness_analysis: { model: "claude-haiku-4-5-20251001", max_tokens: 4096, temperature: 0.2 },
   wellness_verify: { model: "claude-haiku-4-5-20251001", max_tokens: 4096, temperature: 0.2 },
   wellness_plan: { model: "claude-haiku-4-5-20251001", max_tokens: 4096 },
+  nightly_report: { model: "claude-haiku-4-5-20251001", max_tokens: 2048, temperature: 0.3 },
 };
 
 // ---------------------------------------------------------------------------
@@ -848,3 +881,184 @@ export const aggregateDailyMetrics = onSchedule("every day 01:00", async () => {
     console.error("Error aggregating daily metrics:", error);
   }
 });
+
+// ---------------------------------------------------------------------------
+// Nightly Email Report — AI-written summary of app health
+// Runs at 07:00 local time, collects metrics, calls Claude for summary,
+// sends via SendGrid.
+// ---------------------------------------------------------------------------
+async function collectMetrics(): Promise<string> {
+  const db = admin.firestore();
+  const today = new Date().toISOString().split("T")[0];
+  const yesterday = new Date(Date.now() - 86_400_000).toISOString().split("T")[0];
+
+  const lines: string[] = [`Report date: ${today}`, ""];
+
+  // --- Firestore daily aggregates (from aggregateDailyMetrics) ---
+  try {
+    const todayDoc = await db
+      .collection("analytics").doc("dailyAggregates").collection("days").doc(today)
+      .get();
+    const yesterdayDoc = await db
+      .collection("analytics").doc("dailyAggregates").collection("days").doc(yesterday)
+      .get();
+
+    if (todayDoc.exists) {
+      const d = todayDoc.data()!;
+      lines.push("## Firestore Aggregates (today)");
+      lines.push(`- Total users: ${d.totalUsers}`);
+      lines.push(`- Total rehab plans: ${d.totalPlans}`);
+      lines.push(`- Total workout sessions: ${d.totalWorkoutSessions}`);
+      lines.push(`- Active plans (last 14d): ${d.activePlansCount}`);
+    } else {
+      lines.push("## Firestore Aggregates (today): no data yet");
+    }
+
+    if (yesterdayDoc.exists) {
+      const d = yesterdayDoc.data()!;
+      lines.push("\n## Firestore Aggregates (yesterday)");
+      lines.push(`- Total users: ${d.totalUsers}`);
+      lines.push(`- Total rehab plans: ${d.totalPlans}`);
+      lines.push(`- Total workout sessions: ${d.totalWorkoutSessions}`);
+      lines.push(`- Active plans (last 14d): ${d.activePlansCount}`);
+    }
+  } catch (err) {
+    lines.push(`Firestore aggregate error: ${err}`);
+  }
+
+  // --- Crash / session logs (last 24h) ---
+  try {
+    const oneDayAgo = admin.firestore.Timestamp.fromDate(new Date(Date.now() - 86_400_000));
+
+    const crashSnap = await db
+      .collectionGroup("crashLogs")
+      .where("timestamp", ">=", oneDayAgo)
+      .count()
+      .get();
+    lines.push(`\n## Crash Logs (last 24h): ${crashSnap.data().count}`);
+
+    const sessionLogSnap = await db
+      .collectionGroup("sessionLogs")
+      .where("uploadedAt", ">=", oneDayAgo)
+      .count()
+      .get();
+    lines.push(`## Session Logs uploaded (last 24h): ${sessionLogSnap.data().count}`);
+  } catch (err) {
+    lines.push(`Crash/session log query error: ${err}`);
+  }
+
+  // --- Missing exercise images reported ---
+  try {
+    const missingSnap = await db.collection("missingExerciseImages").count().get();
+    lines.push(`\n## Missing Exercise Images reported: ${missingSnap.data().count}`);
+  } catch (err) {
+    lines.push(`Missing images query error: ${err}`);
+  }
+
+  return lines.join("\n");
+}
+
+function markdownToHtml(md: string): string {
+  // Simple markdown → HTML for email
+  return md
+    .replace(/^## (.+)$/gm, "<h2 style=\"color:#6B7F6B;margin:16px 0 8px;font-size:18px;\">$1</h2>")
+    .replace(/^- (.+)$/gm, "<li style=\"margin:4px 0;\">$1</li>")
+    .replace(/(<li[^>]*>.*<\/li>\n?)+/g, (match) => `<ul style="padding-left:20px;">${match}</ul>`)
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\n\n/g, "<br><br>")
+    .replace(/\n/g, "<br>");
+}
+
+export const sendNightlyReport = onSchedule(
+  {
+    schedule: "every day 07:00",
+    timeZone: "Asia/Jerusalem",
+    secrets: ["ANTHROPIC_API_KEY", "SENDGRID_API_KEY"],
+  },
+  async () => {
+    // --- 1. Collect metrics ---
+    const metricsText = await collectMetrics();
+    console.log("Collected metrics:\n", metricsText);
+
+    // --- 2. Call Claude for human-readable summary ---
+    const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
+    if (!anthropicApiKey) {
+      console.error("ANTHROPIC_API_KEY not configured");
+      return;
+    }
+
+    const systemPrompt = SYSTEM_PROMPTS.nightly_report;
+    const config = MODEL_CONFIG.nightly_report;
+
+    let summary: string;
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "x-api-key": anthropicApiKey,
+          "anthropic-version": "2023-06-01",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          model: config.model,
+          max_tokens: config.max_tokens,
+          temperature: config.temperature,
+          system: systemPrompt,
+          messages: [{ role: "user", content: metricsText }],
+        }),
+      });
+
+      const data = await response.json() as {
+        content?: { type: string; text: string }[];
+      };
+      summary = data.content?.[0]?.text || "Failed to generate summary";
+    } catch (err) {
+      console.error("Claude API error:", err);
+      summary = `Error generating AI summary. Raw metrics:\n\n${metricsText}`;
+    }
+
+    // --- 3. Send email via SendGrid ---
+    const sendgridKey = process.env.SENDGRID_API_KEY;
+    const recipientEmail = process.env.REPORT_RECIPIENT_EMAIL || "noyfisher@gmail.com";
+
+    if (!sendgridKey) {
+      console.error("SENDGRID_API_KEY not configured — logging report to console instead");
+      console.log("=== NIGHTLY REPORT ===\n", summary);
+      return;
+    }
+
+    sgMail.setApiKey(sendgridKey);
+
+    const htmlBody = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#3D3D3D;background:#F5F2EC;">
+  <div style="background:#FFFFFF;border-radius:12px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+    <h1 style="color:#6B7F6B;font-size:22px;margin:0 0 4px;">PT Helper Daily Report</h1>
+    <p style="color:#9B8F80;font-size:14px;margin:0 0 20px;">${new Date().toISOString().split("T")[0]}</p>
+    <hr style="border:none;border-top:1px solid #E8E3DA;margin:16px 0;">
+    ${markdownToHtml(summary)}
+    <hr style="border:none;border-top:1px solid #E8E3DA;margin:16px 0;">
+    <p style="color:#9B8F80;font-size:12px;text-align:center;margin:0;">
+      Generated by PT Helper Nightly Report &bull; Powered by Claude AI
+    </p>
+  </div>
+</body>
+</html>`;
+
+    const reportDate = new Date().toISOString().split("T")[0];
+
+    try {
+      await sgMail.send({
+        to: recipientEmail,
+        from: { email: "reports@pthelper.app", name: "PT Helper Reports" },
+        subject: `PT Helper Daily Report — ${reportDate}`,
+        html: htmlBody,
+      });
+      console.log(`Nightly report sent to ${recipientEmail}`);
+    } catch (err) {
+      console.error("SendGrid error:", err);
+    }
+  }
+);

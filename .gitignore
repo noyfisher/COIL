@@ -11,3 +11,12 @@ __pycache__/
 # Xcode user data
 xcuserdata/
 *.xcuserstate
+
+# Fastlane
+ios/PT-Helper/vendor/
+ios/PT-Helper/fastlane/report.xml
+ios/PT-Helper/fastlane/Preview.html
+ios/PT-Helper/fastlane/screenshots
+ios/PT-Helper/fastlane/test_output
+ios/PT-Helper/fastlane/AuthKey*.p8
+ios/PT-Helper/build/

@@ -1,0 +1,79 @@
+default_platform(:ios)
+
+ASC_KEY_ID_DEFAULT = "HX3TT4DFZY"
+ASC_ISSUER_ID_DEFAULT = "7ac7871f-f081-4467-9ea3-ff2609a89f40"
+
+platform :ios do
+  desc "Run smoke tests"
+  lane :test do
+    scan(
+      project: "PT-Helper.xcodeproj",
+      scheme: "PT-Helper",
+      device: "iPhone 16",
+      testplan: "SmokePlan",
+      output_types: "junit",
+      result_bundle: true,
+      clean: true
+    )
+  end
+
+  desc "Build IPA for App Store / TestFlight"
+  lane :build do
+    key_id = ENV["ASC_KEY_ID"] || ASC_KEY_ID_DEFAULT
+    issuer_id = ENV["ASC_ISSUER_ID"] || ASC_ISSUER_ID_DEFAULT
+    key_path = File.expand_path("../fastlane/AuthKey.p8", __dir__)
+
+    increment_build_number(
+      xcodeproj: "PT-Helper.xcodeproj"
+    )
+
+    build_app(
+      project: "PT-Helper.xcodeproj",
+      scheme: "PT-Helper",
+      output_directory: "./build",
+      clean: true,
+      export_options: "./fastlane/ExportOptions.plist",
+      xcargs: "-allowProvisioningUpdates -authenticationKeyPath '#{key_path}' -authenticationKeyID #{key_id} -authenticationKeyIssuerID #{issuer_id}"
+    )
+  end
+
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    key_id = ENV["ASC_KEY_ID"] || ASC_KEY_ID_DEFAULT
+    issuer_id = ENV["ASC_ISSUER_ID"] || ASC_ISSUER_ID_DEFAULT
+
+    build
+
+    if ENV["ASC_KEY_CONTENT"]
+      api_key = app_store_connect_api_key(
+        key_id: key_id,
+        issuer_id: issuer_id,
+        key_content: ENV["ASC_KEY_CONTENT"],
+        is_key_content_base64: true
+      )
+    else
+      api_key = app_store_connect_api_key(
+        key_id: key_id,
+        issuer_id: issuer_id,
+        key_filepath: "./fastlane/AuthKey.p8"
+      )
+    end
+
+    changelog = changelog_from_git_commits(
+      commits_count: 10,
+      pretty: "- %s",
+      merge_commit_filtering: "exclude_merges"
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      changelog: changelog,
+      skip_waiting_for_build_processing: true
+    )
+  end
+
+  desc "Submit to App Store (placeholder)"
+  lane :release do
+    UI.message("App Store release lane — not yet configured")
+  end
+end
