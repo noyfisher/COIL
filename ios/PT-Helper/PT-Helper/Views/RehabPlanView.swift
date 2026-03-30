@@ -119,7 +119,7 @@ struct RehabPlanView: View {
                                     Text("Start Guided Workout")
                                 }
                                 .font(.headline)
-                                .foregroundColor(.white)
+                                .foregroundColor(AppColors.primaryText)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 14)
                                 .background(AppColors.coolGradient)
@@ -689,7 +689,7 @@ struct RehabPlanView: View {
                     HStack(spacing: AppSpacing.sm) {
                         if viewModel.isSaving {
                             ProgressView()
-                                .tint(.white)
+                                .tint(AppColors.ctaText)
                         } else {
                             Image(systemName: "square.and.arrow.down")
                         }
@@ -825,9 +825,9 @@ struct RehabPlanView: View {
                 Spacer()
                 Text("Track your weekly progress")
                     .font(.caption)
-                    .foregroundColor(.white.opacity(0.8))
+                    .foregroundColor(AppColors.primaryText.opacity(0.7))
             }
-            .foregroundColor(.white)
+            .foregroundColor(AppColors.primaryText)
             .padding(AppSpacing.lg)
             .background(AppColors.healingGradient)
             .cornerRadius(AppCorners.card)

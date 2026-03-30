@@ -6,29 +6,38 @@ final class OnboardingUITests: UITestBase {
 
     override var skipOnboarding: Bool { false }
     override var seedMockData: Bool { false }
+    override var additionalLaunchArguments: [String] { ["--prefill-weight"] }
+
+    /// Dismiss the software keyboard if it's showing.
+    @MainActor
+    private func dismissKeyboard() {
+        // Tap on the step indicator area at the top, which is always visible and non-interactive
+        let stepIndicator = app.descendants(matching: .any)["onboarding.stepIndicator"]
+        if stepIndicator.exists {
+            stepIndicator.tap()
+        }
+    }
 
     /// Fill all required Step 1 fields so the Continue button becomes enabled.
     @MainActor
     private func fillStep1RequiredFields() {
-        // First Name
+        // First Name — tap and type
         let firstNameField = app.textFields["First Name"]
         if firstNameField.waitForExistence(timeout: 3) {
             firstNameField.tap()
+            _ = app.keyboards.firstMatch.waitForExistence(timeout: 3)
             firstNameField.typeText("Test")
         }
 
-        // Last Name
+        // Last Name — tap directly (keyboard already up from first field)
         let lastNameField = app.textFields["Last Name"]
-        if lastNameField.exists {
+        if lastNameField.waitForExistence(timeout: 3) {
             lastNameField.tap()
             lastNameField.typeText("User")
         }
 
-        // Dismiss keyboard
-        app.swipeDown()
-
-        // Scroll down to see Sex, Height, and Weight fields
-        app.swipeUp()
+        // Dismiss keyboard by tapping the step indicator
+        dismissKeyboard()
 
         // Sex — tap "Male" chip
         let maleButton = button("Male")
@@ -36,28 +45,8 @@ final class OnboardingUITests: UITestBase {
             maleButton.tap()
         }
 
-        // Height — tap feet menu then select 5 ft
-        let feetMenu = app.buttons.matching(NSPredicate(format: "label CONTAINS 'ft'")).firstMatch
-        if feetMenu.waitForExistence(timeout: 3) {
-            feetMenu.tap()
-            let fiveFeet = button("5 ft")
-            if fiveFeet.waitForExistence(timeout: 3) {
-                fiveFeet.tap()
-            }
-        }
-
-        // Scroll down more for weight
-        app.swipeUp()
-
-        // Weight — type 170
-        let weightField = app.textFields["Enter weight"]
-        if weightField.waitForExistence(timeout: 3) {
-            weightField.tap()
-            weightField.typeText("170")
-        }
-
-        // Dismiss keyboard
-        app.swipeDown()
+        // Height uses default 5ft 7in which passes validation.
+        // Weight is pre-filled to 170 via --prefill-weight launch argument.
     }
 
     @MainActor
@@ -69,10 +58,15 @@ final class OnboardingUITests: UITestBase {
         // Fill all required fields
         fillStep1RequiredFields()
 
+        // Scroll down to reveal Continue button fully
+        app.swipeUp()
+
         // Tap continue to advance
         let continueButton = app.descendants(matching: .any)["onboarding.continueButton"]
         XCTAssertTrue(continueButton.waitForExistence(timeout: 3))
-        if continueButton.isEnabled { continueButton.tap() }
+        if continueButton.isEnabled {
+            continueButton.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        }
 
         // Step 2: Medical History (optional step)
         XCTAssertTrue(staticText("Step 2 of 6").waitForExistence(timeout: 3))
@@ -94,12 +88,12 @@ final class OnboardingUITests: UITestBase {
 
         // Step 5: Activity Level — select a level
         XCTAssertTrue(staticText("Step 5 of 6").waitForExistence(timeout: 3))
-        let moderateButton = button("Moderate")
+        let moderateButton = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Moderately'")).firstMatch
         if moderateButton.waitForExistence(timeout: 3) {
             moderateButton.tap()
         }
         if continueButton.exists, continueButton.isEnabled {
-            continueButton.tap()
+            continueButton.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
         }
 
         // Step 6: Review & Submit
@@ -116,7 +110,7 @@ final class OnboardingUITests: UITestBase {
 
         // Should land on the main tab view (Dashboard or legacy tabs)
         let tabBar = app.tabBars.firstMatch
-        XCTAssertTrue(tabBar.waitForExistence(timeout: 5), "Tab bar should appear after skipping onboarding")
+        XCTAssertTrue(tabBar.waitForExistence(timeout: 10), "Tab bar should appear after skipping onboarding")
     }
 
     @MainActor

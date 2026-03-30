@@ -97,6 +97,7 @@ struct BodyMap3DView: View {
             }
         }
         .onAppear {
+            AnalyticsService.shared.log(.bodyMapOpened)
             if !hasSeenCoach && !isLoading {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                     withAnimation { showCoachMark = true }

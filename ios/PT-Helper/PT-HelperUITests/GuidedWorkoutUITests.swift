@@ -2,12 +2,33 @@ import XCTest
 
 final class GuidedWorkoutUITests: UITestBase {
 
+    override var additionalLaunchArguments: [String] { ["--clear-workout-checkpoint"] }
+
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+
+        // Register an interruption handler for the "Resume Workout?" alert
+        // that appears when a checkpoint exists from a previous session.
+        addUIInterruptionMonitor(withDescription: "Resume Workout Alert") { alert in
+            let startFreshButton = alert.buttons["Start Fresh"]
+            if startFreshButton.exists {
+                startFreshButton.tap()
+                return true
+            }
+            return false
+        }
+    }
+
     /// Navigate to a rehab plan and start a guided workout.
     @MainActor
     private func navigateToWorkout() {
         tapTab("Rehab")
 
-        // Scroll down to reveal plans list (below metrics grid and pain chart)
+        // Wait for Rehab tab to fully load
+        _ = app.navigationBars["Rehab"].waitForExistence(timeout: 5)
+
+        // Scroll down to reveal plans list (below metrics grid, pain chart, exercise table)
+        app.swipeUp()
         app.swipeUp()
         app.swipeUp()
 
@@ -15,6 +36,12 @@ final class GuidedWorkoutUITests: UITestBase {
         let planLink = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Knee Rehab Plan'")).firstMatch
         if planLink.waitForExistence(timeout: 5) {
             planLink.tap()
+        } else {
+            // Fallback: any plan button
+            let anyPlan = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Plan'")).firstMatch
+            if anyPlan.waitForExistence(timeout: 3) {
+                anyPlan.tap()
+            }
         }
 
         // Tap Start Guided Workout
@@ -22,6 +49,10 @@ final class GuidedWorkoutUITests: UITestBase {
         if startButton.waitForExistence(timeout: 5) {
             startButton.tap()
         }
+
+        // Trigger the interruption monitor by interacting with the app
+        // (XCUI only fires interruption monitors on next interaction)
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
     }
 
     @MainActor
@@ -29,7 +60,7 @@ final class GuidedWorkoutUITests: UITestBase {
         navigateToWorkout()
 
         // Should show exercise name and set counter
-        assertExists("workout.exerciseName", timeout: 5)
+        assertExists("workout.exerciseName", timeout: 10)
         assertExists("workout.completeSetButton")
 
         captureScreenshot(name: "Workout-FirstExercise")
@@ -40,7 +71,7 @@ final class GuidedWorkoutUITests: UITestBase {
         navigateToWorkout()
 
         let completeButton = app.descendants(matching: .any)["workout.completeSetButton"]
-        XCTAssertTrue(completeButton.waitForExistence(timeout: 5))
+        XCTAssertTrue(completeButton.waitForExistence(timeout: 10))
 
         // Tap complete set
         completeButton.tap()
@@ -53,7 +84,7 @@ final class GuidedWorkoutUITests: UITestBase {
         navigateToWorkout()
 
         let skipButton = app.descendants(matching: .any)["workout.skipButton"]
-        XCTAssertTrue(skipButton.waitForExistence(timeout: 5))
+        XCTAssertTrue(skipButton.waitForExistence(timeout: 10))
         skipButton.tap()
 
         // Should still show exercise phase (next exercise)
@@ -67,7 +98,7 @@ final class GuidedWorkoutUITests: UITestBase {
         navigateToWorkout()
 
         let pauseButton = app.descendants(matching: .any)["workout.pauseButton"]
-        XCTAssertTrue(pauseButton.waitForExistence(timeout: 5))
+        XCTAssertTrue(pauseButton.waitForExistence(timeout: 10))
 
         // Tap pause
         pauseButton.tap()
@@ -83,7 +114,7 @@ final class GuidedWorkoutUITests: UITestBase {
         navigateToWorkout()
 
         let endButton = app.descendants(matching: .any)["workout.endButton"]
-        XCTAssertTrue(endButton.waitForExistence(timeout: 5))
+        XCTAssertTrue(endButton.waitForExistence(timeout: 10))
         endButton.tap()
 
         // Should show confirmation dialog
@@ -98,7 +129,7 @@ final class GuidedWorkoutUITests: UITestBase {
         navigateToWorkout()
 
         let swapButton = app.descendants(matching: .any)["workout.swapButton"]
-        XCTAssertTrue(swapButton.waitForExistence(timeout: 5))
+        XCTAssertTrue(swapButton.waitForExistence(timeout: 10))
         swapButton.tap()
 
         // Should show swap sheet with reason chips

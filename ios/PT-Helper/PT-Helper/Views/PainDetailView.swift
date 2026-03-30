@@ -135,6 +135,9 @@ struct PainDetailView: View {
         .navigationTitle("Pain Assessment")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
+            if viewModel.currentRegionIndex == 0 {
+                AnalyticsService.shared.log(.assessmentStarted)
+            }
             restoreFormState()
         }
         .onDisappear {

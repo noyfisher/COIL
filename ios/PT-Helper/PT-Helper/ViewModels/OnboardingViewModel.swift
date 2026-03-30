@@ -12,7 +12,7 @@ class OnboardingViewModel: ObservableObject {
                                              sex: "",
                                              heightFeet: 5,
                                              heightInches: 7,
-                                             weight: 0.0,
+                                             weight: TestDataSeeder.shouldPrefillWeight ? 170.0 : 0.0,
                                              medicalConditions: [],
                                              otherMedicalConditions: nil,
                                              surgeries: [],

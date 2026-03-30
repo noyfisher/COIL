@@ -233,7 +233,7 @@ struct WellnessPlanView: View {
             HStack(spacing: AppSpacing.sm) {
                 if viewModel.isSaving {
                     ProgressView()
-                        .tint(.white)
+                        .tint(AppColors.ctaText)
                 } else {
                     Image(systemName: "square.and.arrow.down")
                 }

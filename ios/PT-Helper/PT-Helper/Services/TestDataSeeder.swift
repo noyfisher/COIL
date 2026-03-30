@@ -29,6 +29,14 @@ enum TestDataSeeder {
         ProcessInfo.processInfo.arguments.contains("--use-legacy-ui")
     }
 
+    static var shouldClearWorkoutCheckpoint: Bool {
+        ProcessInfo.processInfo.arguments.contains("--clear-workout-checkpoint")
+    }
+
+    static var shouldPrefillWeight: Bool {
+        ProcessInfo.processInfo.arguments.contains("--prefill-weight")
+    }
+
     // MARK: - Seed All Data
 
     @MainActor
@@ -37,6 +45,10 @@ enum TestDataSeeder {
 
         if shouldClearCoachMark {
             UserDefaults.standard.set(false, forKey: "hasSeenBodyMapCoach")
+        }
+
+        if shouldClearWorkoutCheckpoint {
+            UserDefaults.standard.removeObject(forKey: "GuidedWorkoutCheckpoint")
         }
 
         if shouldSimulateOffline {

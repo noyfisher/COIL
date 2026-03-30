@@ -109,6 +109,9 @@ struct OnboardingView: View {
                 .padding(.bottom, AppSpacing.xxl)
             }
         }
+        .onAppear {
+            AnalyticsService.shared.log(.onboardingStarted)
+        }
     }
 
     private var stepTitle: String {

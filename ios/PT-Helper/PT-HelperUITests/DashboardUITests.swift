@@ -66,9 +66,9 @@ final class DashboardUITests: UITestBase {
 
         // Should navigate to body map
         XCTAssertTrue(
-            staticText("Select Pain Areas").waitForExistence(timeout: 5) ||
-            app.navigationBars["Analyze"].waitForExistence(timeout: 5) ||
-            staticText("Tap to select").waitForExistence(timeout: 5),
+            staticText("Where does it hurt?").waitForExistence(timeout: 5) ||
+            app.navigationBars["Body Map"].waitForExistence(timeout: 5) ||
+            staticText("Tap a body zone to zoom in").waitForExistence(timeout: 5),
             "Should navigate to body map view"
         )
 

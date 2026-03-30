@@ -3,6 +3,7 @@ import SwiftUI
 struct BasicInfoStepView: View {
     @ObservedObject var viewModel: OnboardingViewModel
     @State private var weightText: String = ""
+    @FocusState private var isWeightFieldFocused: Bool
 
     /// Whether to show validation errors — driven by ViewModel
     private var showErrors: Bool { viewModel.showValidationErrors }
@@ -116,6 +117,7 @@ struct BasicInfoStepView: View {
                         HStack {
                             TextField("Enter weight", text: $weightText)
                                 .keyboardType(.decimalPad)
+                                .focused($isWeightFieldFocused)
                                 .font(.title3.weight(.medium))
                                 .padding(AppSpacing.md)
                                 .background(AppColors.inputBackground)
