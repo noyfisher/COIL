@@ -1019,7 +1019,7 @@ export const sendNightlyReport = onSchedule(
 
     // --- 3. Send email via SendGrid ---
     const sendgridKey = process.env.SENDGRID_API_KEY;
-    const recipientEmail = process.env.REPORT_RECIPIENT_EMAIL || "noyfisher@gmail.com";
+    const recipientEmail = process.env.REPORT_RECIPIENT_EMAIL || "noyfisher2003@gmail.com";
 
     if (!sendgridKey) {
       console.error("SENDGRID_API_KEY not configured — logging report to console instead");
@@ -1052,7 +1052,7 @@ export const sendNightlyReport = onSchedule(
     try {
       await sgMail.send({
         to: recipientEmail,
-        from: { email: "reports@pthelper.app", name: "PT Helper Reports" },
+        from: { email: "noyfisher2003@gmail.com", name: "PT Helper Reports" },
         subject: `PT Helper Daily Report — ${reportDate}`,
         html: htmlBody,
       });
