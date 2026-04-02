@@ -233,7 +233,6 @@ struct HomeTab: View {
                 .font(AppFonts.statNumber)
                 .foregroundColor(AppColors.primaryText)
                 .lineLimit(1)
-                .minimumScaleFactor(0.7)
 
             Text(label)
                 .font(.caption2)

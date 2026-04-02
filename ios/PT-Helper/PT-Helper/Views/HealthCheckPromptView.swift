@@ -66,5 +66,6 @@ struct HealthCheckPromptView: View {
             .padding(.bottom, AppSpacing.xxl)
         }
         .background(AppColors.bgGradient.ignoresSafeArea())
+        .trackScreen("HealthCheckPrompt")
     }
 }

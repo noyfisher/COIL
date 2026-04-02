@@ -4,6 +4,7 @@ struct OnboardingView: View {
     var onComplete: (() -> Void)? = nil
     var onSkip: (() -> Void)? = nil
     @StateObject private var viewModel = OnboardingViewModel()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         ZStack {
@@ -17,6 +18,7 @@ struct OnboardingView: View {
                     if let onSkip = onSkip {
                         Button(action: {
                             AnalyticsService.shared.log(.onboardingSkipped, parameters: ["skipped_at_step": viewModel.currentStep])
+                            OnboardingViewModel.clearDraft()
                             onSkip()
                         }) {
                             Text("Skip")
@@ -111,7 +113,16 @@ struct OnboardingView: View {
         }
         .onAppear {
             AnalyticsService.shared.log(.onboardingStarted)
+            if viewModel.loadDraft() {
+                AppLogger.data.info("Resumed onboarding draft at step \(viewModel.currentStep)")
+            }
         }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .background {
+                viewModel.saveDraft()
+            }
+        }
+        .trackScreen("Onboarding")
     }
 
     private var stepTitle: String {

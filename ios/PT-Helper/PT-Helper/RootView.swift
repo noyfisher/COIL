@@ -1,5 +1,6 @@
 import SwiftUI
 import FirebaseAuth
+import FirebaseCrashlytics
 
 struct RootView: View {
     @State private var signedIn = (Auth.auth().currentUser != nil)
@@ -38,6 +39,7 @@ struct RootView: View {
                 signedIn = (user != nil)
                 if let user = user {
                     SessionLogger.shared.startSession(userId: user.uid)
+                    Crashlytics.crashlytics().setUserID(user.uid)
                     AnalyticsService.shared.setUserId(user.uid)
                     if !hasLoggedSignIn {
                         hasLoggedSignIn = true
@@ -46,7 +48,10 @@ struct RootView: View {
                     checkProfileCompletion()
                 } else {
                     SessionLogger.shared.log(.signedOut, category: .auth, message: "User signed out")
+                    Crashlytics.crashlytics().setUserID("")
                     AnalyticsService.shared.setUserId(nil)
+                    NotificationService.shared.clearFCMToken()
+                    OnboardingViewModel.clearDraft()
                     profileCompleted = false
                     isCheckingProfile = true
                     profileService.clear()

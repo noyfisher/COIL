@@ -76,5 +76,27 @@ struct DashboardMainTabView: View {
         .onReceive(NotificationCenter.default.publisher(for: .popToRoot)) { _ in
             tabSelection.popToRootAndGoHome()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .deepLink)) { _ in
+            if let tab = NotificationService.shared.pendingDeepLink {
+                switch tab {
+                case "home": tabSelection.selectedTab = 0
+                case "plans", "rehab": tabSelection.selectedTab = 2
+                case "progress", "profile": tabSelection.selectedTab = 3
+                default: break
+                }
+                NotificationService.shared.pendingDeepLink = nil
+            }
+        }
+        .onAppear {
+            if let tab = NotificationService.shared.pendingDeepLink {
+                switch tab {
+                case "home": tabSelection.selectedTab = 0
+                case "plans", "rehab": tabSelection.selectedTab = 2
+                case "progress", "profile": tabSelection.selectedTab = 3
+                default: break
+                }
+                NotificationService.shared.pendingDeepLink = nil
+            }
+        }
     }
 }

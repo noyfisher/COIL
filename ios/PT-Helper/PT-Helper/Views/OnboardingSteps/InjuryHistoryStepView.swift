@@ -19,17 +19,17 @@ struct InjuryHistoryStepView: View {
                             .foregroundColor(AppColors.primaryText)
                         Text(viewModel.userProfile.injuries.isEmpty ? "Tap to add" : "\(viewModel.userProfile.injuries.count) recorded")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppColors.secondaryText)
                     }
                     Spacer()
                     Image(systemName: viewModel.userProfile.injuries.isEmpty ? "cross.case" : "cross.case.fill")
                         .font(.title2)
-                        .foregroundColor(.red)
+                        .foregroundColor(AppColors.danger)
                 }
                 .padding(AppSpacing.lg)
                 .background(AppColors.cardBackground)
                 .cornerRadius(AppCorners.card)
-                .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+                .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
 
                 // Injury entries
                 ForEach(Array(viewModel.userProfile.injuries.enumerated()), id: \.element.id) { index, injury in
@@ -37,13 +37,13 @@ struct InjuryHistoryStepView: View {
                         HStack {
                             Text("Injury \(index + 1)")
                                 .font(.caption.weight(.semibold))
-                                .foregroundColor(.red)
+                                .foregroundColor(AppColors.danger)
                             Spacer()
                             Button(action: {
                                 viewModel.userProfile.injuries.remove(at: index)
                             }) {
                                 Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(AppColors.mutedText)
                             }
                         }
 
@@ -69,10 +69,10 @@ struct InjuryHistoryStepView: View {
                                 }) {
                                     Text(label)
                                         .font(.subheadline.weight(.medium))
-                                        .foregroundColor(selected ? .white : .primary)
+                                        .foregroundColor(selected ? AppColors.ctaText : AppColors.primaryText)
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, AppSpacing.sm)
-                                        .background(selected ? Color.red.opacity(0.8) : AppColors.subtleBorder)
+                                        .background(selected ? AppColors.danger.opacity(0.8) : AppColors.subtleBorder)
                                         .cornerRadius(AppCorners.small)
                                 }
                             }
@@ -82,7 +82,7 @@ struct InjuryHistoryStepView: View {
                         HStack {
                             Text("Year")
                                 .font(.subheadline)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.secondaryText)
                             Spacer()
                             Picker("Year", selection: Binding(
                                 get: { viewModel.userProfile.injuries[safe: index]?.year ?? Calendar.current.component(.year, from: Date()) },
@@ -93,7 +93,7 @@ struct InjuryHistoryStepView: View {
                                 }
                             }
                             .pickerStyle(.menu)
-                            .tint(.red)
+                            .tint(AppColors.danger)
                         }
                         .padding(AppSpacing.md)
                         .background(AppColors.inputBackground)
@@ -122,7 +122,7 @@ struct InjuryHistoryStepView: View {
                             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                                 Text("Recovery")
                                     .font(.subheadline)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(AppColors.secondaryText)
                                 HStack(spacing: AppSpacing.sm) {
                                     ForEach(["Fully recovered", "Mostly recovered", "Still dealing with it"], id: \.self) { status in
                                         let isSelected = viewModel.userProfile.injuries[safe: index]?.recoveryStatus == status
@@ -133,11 +133,11 @@ struct InjuryHistoryStepView: View {
                                         }) {
                                             Text(status)
                                                 .font(.caption.weight(.medium))
-                                                .foregroundColor(isSelected ? .white : .primary)
+                                                .foregroundColor(isSelected ? AppColors.ctaText : AppColors.primaryText)
                                                 .padding(.horizontal, AppSpacing.sm)
                                                 .padding(.vertical, AppSpacing.xs)
                                                 .frame(maxWidth: .infinity)
-                                                .background(isSelected ? Color.red.opacity(0.7) : AppColors.inputBackground)
+                                                .background(isSelected ? AppColors.danger.opacity(0.7) : AppColors.inputBackground)
                                                 .cornerRadius(AppCorners.small)
                                         }
                                     }
@@ -148,7 +148,7 @@ struct InjuryHistoryStepView: View {
                     .padding(AppSpacing.lg)
                     .background(AppColors.cardBackground)
                     .cornerRadius(AppCorners.card)
-                    .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+                    .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
                 }
 
                 // Add button
@@ -160,12 +160,13 @@ struct InjuryHistoryStepView: View {
                         Text("Add Injury")
                     }
                     .font(.body.weight(.medium))
-                    .foregroundColor(.red)
+                    .foregroundColor(AppColors.danger)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, AppSpacing.lg)
-                    .background(Color.red.opacity(0.1))
+                    .background(AppColors.danger.opacity(0.1))
                     .cornerRadius(AppCorners.medium)
                 }
+                .accessibilityIdentifier("onboarding.addInjuryButton")
             }
             .padding(.horizontal, AppSpacing.xl)
             .padding(.vertical, AppSpacing.md)
@@ -174,13 +175,14 @@ struct InjuryHistoryStepView: View {
         .onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
+        .trackScreen("OnboardingInjuryHistory")
     }
 
     private func yesNoToggle(label: String, value: Binding<Bool?>) -> some View {
         VStack(alignment: .leading, spacing: AppSpacing.xs) {
             Text(label)
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
             HStack(spacing: AppSpacing.sm) {
                 ForEach(["Yes", "No"], id: \.self) { option in
                     let isYes = option == "Yes"
@@ -190,10 +192,10 @@ struct InjuryHistoryStepView: View {
                     }) {
                         Text(option)
                             .font(.caption.weight(.medium))
-                            .foregroundColor(isSelected ? .white : .primary)
+                            .foregroundColor(isSelected ? AppColors.ctaText : AppColors.primaryText)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, AppSpacing.xs)
-                            .background(isSelected ? Color.red.opacity(0.7) : AppColors.inputBackground)
+                            .background(isSelected ? AppColors.danger.opacity(0.7) : AppColors.inputBackground)
                             .cornerRadius(AppCorners.small)
                     }
                 }

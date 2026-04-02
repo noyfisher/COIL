@@ -19,7 +19,7 @@ struct ZoneSelectionPanel: View {
                         Text("Back")
                             .font(.caption.weight(.semibold))
                     }
-                    .foregroundColor(.white.opacity(0.8))
+                    .foregroundColor(AppColors.primaryText.opacity(0.8))
                 }
 
                 Spacer()
@@ -30,12 +30,12 @@ struct ZoneSelectionPanel: View {
                     Text(zone.displayName)
                         .font(.subheadline.weight(.bold))
                 }
-                .foregroundColor(.white)
+                .foregroundColor(AppColors.primaryText)
             }
             .padding(.bottom, AppSpacing.xs)
 
             Divider()
-                .background(Color.white.opacity(0.2))
+                .background(AppColors.elevatedSurface.opacity(0.5))
 
             // Sub-region list
             ScrollView(.vertical, showsIndicators: false) {
@@ -49,7 +49,7 @@ struct ZoneSelectionPanel: View {
 
                                 Text(region.name)
                                     .font(.caption.weight(.medium))
-                                    .foregroundColor(.white)
+                                    .foregroundColor(AppColors.primaryText)
                                     .lineLimit(1)
 
                                 Spacer()
@@ -61,7 +61,7 @@ struct ZoneSelectionPanel: View {
                                 } else {
                                     Image(systemName: "circle")
                                         .font(.system(size: 16))
-                                        .foregroundColor(.white.opacity(0.3))
+                                        .foregroundColor(AppColors.primaryText.opacity(0.3))
                                 }
                             }
                             .padding(.horizontal, AppSpacing.sm)
@@ -69,7 +69,7 @@ struct ZoneSelectionPanel: View {
                             .background(
                                 region.isSelected
                                     ? Color(uiColor: BodyMapConstants.highlightColor).opacity(0.15)
-                                    : Color.white.opacity(0.05)
+                                    : AppColors.elevatedSurface.opacity(0.15)
                             )
                             .cornerRadius(AppCorners.small)
                         }
@@ -79,9 +79,9 @@ struct ZoneSelectionPanel: View {
             }
         }
         .padding(AppSpacing.md)
-        .background(.ultraThinMaterial)
-        .environment(\.colorScheme, .dark)
+        .background(AppColors.elevatedSurface)
         .cornerRadius(AppCorners.card)
+        .trackScreen("ZoneSelection")
     }
 
     private func regionColor(for region: BodyRegion) -> Color {

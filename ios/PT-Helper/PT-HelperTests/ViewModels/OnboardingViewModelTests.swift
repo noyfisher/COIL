@@ -13,6 +13,7 @@ final class OnboardingViewModelTests: XCTestCase {
         vm.userProfile.heightFeet = 5
         vm.userProfile.heightInches = 10
         vm.userProfile.weight = 175
+        vm.hasAcceptedTerms = true
     }
 
     /// Helper to fill valid step 5 data

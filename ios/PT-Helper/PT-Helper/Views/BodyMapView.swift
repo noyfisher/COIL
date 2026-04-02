@@ -30,6 +30,7 @@ struct BodyMapView: View {
                 }
                 .pickerStyle(.segmented)
                 .padding(.horizontal, 20)
+                .accessibilityIdentifier("bodyMap.frontBackToggle")
 
                 // Body map
                 GeometryReader { geometry in
@@ -46,10 +47,10 @@ struct BodyMapView: View {
                             VStack {
                                 Text("BACK VIEW")
                                     .font(.caption2.weight(.bold))
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(AppColors.secondaryText)
                                     .padding(.horizontal, 8)
                                     .padding(.vertical, 4)
-                                    .background(Color(.systemGray5))
+                                    .background(AppColors.elevatedSurface)
                                     .cornerRadius(AppCorners.small)
                                 Spacer()
                             }
@@ -97,14 +98,14 @@ struct BodyMapView: View {
                                                 .overlay(
                                                     Image(systemName: region.isSelected ? "checkmark" : "plus")
                                                         .font(.system(size: 15, weight: .bold))
-                                                        .foregroundColor(region.isSelected ? .white : AppColors.accent)
+                                                        .foregroundColor(region.isSelected ? AppColors.ctaText : AppColors.accent)
                                                 )
                                                 .scaleEffect(region.isSelected ? 1.1 : 1.0)
                                         }
 
                                         Text(region.name)
                                             .font(.system(size: 9, weight: .medium))
-                                            .foregroundColor(region.isSelected ? AppColors.accent : .secondary)
+                                            .foregroundColor(region.isSelected ? AppColors.accent : AppColors.secondaryText)
                                             .lineLimit(1)
                                     }
                                 }
@@ -120,7 +121,7 @@ struct BodyMapView: View {
                 .padding(AppSpacing.lg)
                 .background(AppColors.cardBackground)
                 .cornerRadius(AppCorners.large)
-                .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+                .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
                 .padding(.horizontal, 20)
 
                 // Summary bar and actions
@@ -135,6 +136,7 @@ struct BodyMapView: View {
                                 Text("Clear All")
                             }
                             .buttonStyle(DestructiveButtonStyle())
+                            .accessibilityIdentifier("bodyMap.clearAllButton")
                         }
                     }
 
@@ -147,6 +149,7 @@ struct BodyMapView: View {
                     }
                     .buttonStyle(PrimaryButtonStyle(isDisabled: viewModel.selectedRegions.isEmpty))
                     .disabled(viewModel.selectedRegions.isEmpty)
+                    .accessibilityIdentifier("bodyMap.continueButton")
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 30)
@@ -162,5 +165,6 @@ struct BodyMapView: View {
                 )
             )
         }
+        .trackScreen("BodyMap")
     }
 }

@@ -82,6 +82,7 @@ struct NotesView: View {
         .refreshable {
             viewModel.fetchNotes()
         }
+        .trackScreen("Notes")
         .alert("Delete Note", isPresented: $showDeleteConfirmation) {
             Button("Cancel", role: .cancel) {
                 noteToDelete = nil

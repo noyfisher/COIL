@@ -5,6 +5,7 @@ import FirebaseAuth
 
 class OnboardingViewModel: ObservableObject {
     @Published var currentStep: Int = 1
+    @Published var hasAcceptedTerms: Bool = false
     @Published var userProfile = UserProfile(userId: Auth.auth().currentUser?.uid ?? "",
                                              firstName: "",
                                              lastName: "",
@@ -104,6 +105,9 @@ class OnboardingViewModel: ObservableObject {
                         completion(false)
                     } else {
                         AnalyticsService.shared.log(.onboardingCompleted)
+                        UserDefaults.standard.set(true, forKey: "hasAcceptedTermsOfService")
+                        UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: "tosAcceptedDate")
+                        OnboardingViewModel.clearDraft()
                         completion(true)
                     }
                 }
@@ -214,7 +218,7 @@ class OnboardingViewModel: ObservableObject {
             let hasSex = !userProfile.sex.isEmpty
             let hasHeight = userProfile.heightFeet >= 3 && userProfile.heightFeet <= 7
             let hasWeight = userProfile.weight >= 50 && userProfile.weight <= 500
-            return hasName && hasSex && hasHeight && hasWeight
+            return hasName && hasSex && hasHeight && hasWeight && hasAcceptedTerms
         case 5:
             // Activity level must be selected
             return !userProfile.activityLevel.isEmpty
@@ -233,6 +237,7 @@ class OnboardingViewModel: ObservableObject {
         if currentStep < 6 && canProceedFromCurrentStep {
             showValidationErrors = false
             currentStep += 1
+            saveDraft()
             AnalyticsService.shared.log(.onboardingStepCompleted, parameters: ["step_number": currentStep - 1])
         } else {
             showValidationErrors = true
@@ -242,7 +247,70 @@ class OnboardingViewModel: ObservableObject {
     func previousStep() {
         if currentStep > 1 {
             currentStep -= 1
+            saveDraft()
         }
+    }
+
+    // MARK: - Draft Persistence
+
+    private enum DraftKeys {
+        static let profile = "onboarding_draft_profile"
+        static let step = "onboarding_draft_step"
+        static let acceptedTerms = "onboarding_draft_accepted_terms"
+        static let savedAt = "onboarding_draft_saved_at"
+    }
+
+    /// Maximum draft age before it's considered stale and discarded (7 days).
+    private static let maxDraftAgeSeconds: TimeInterval = 7 * 24 * 60 * 60
+
+    /// Saves the current onboarding state to UserDefaults for crash/interruption recovery.
+    func saveDraft() {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        if let data = try? encoder.encode(userProfile) {
+            UserDefaults.standard.set(data, forKey: DraftKeys.profile)
+        }
+        UserDefaults.standard.set(currentStep, forKey: DraftKeys.step)
+        UserDefaults.standard.set(hasAcceptedTerms, forKey: DraftKeys.acceptedTerms)
+        UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: DraftKeys.savedAt)
+    }
+
+    /// Loads a previously saved draft. Returns true if a valid draft was restored.
+    func loadDraft() -> Bool {
+        // Don't load drafts during UI testing
+        guard !ProcessInfo.processInfo.arguments.contains("--uitesting") else { return false }
+
+        // Check draft age — discard if stale
+        let savedAt = UserDefaults.standard.double(forKey: DraftKeys.savedAt)
+        if savedAt > 0 {
+            let age = Date().timeIntervalSince1970 - savedAt
+            if age > Self.maxDraftAgeSeconds {
+                Self.clearDraft()
+                return false
+            }
+        }
+
+        guard let data = UserDefaults.standard.data(forKey: DraftKeys.profile) else {
+            return false
+        }
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        guard let draft = try? decoder.decode(UserProfile.self, from: data) else {
+            Self.clearDraft()
+            return false
+        }
+        userProfile = draft
+        currentStep = max(1, min(6, UserDefaults.standard.integer(forKey: DraftKeys.step)))
+        hasAcceptedTerms = UserDefaults.standard.bool(forKey: DraftKeys.acceptedTerms)
+        return true
+    }
+
+    /// Removes any saved draft from UserDefaults.
+    static func clearDraft() {
+        UserDefaults.standard.removeObject(forKey: DraftKeys.profile)
+        UserDefaults.standard.removeObject(forKey: DraftKeys.step)
+        UserDefaults.standard.removeObject(forKey: DraftKeys.acceptedTerms)
+        UserDefaults.standard.removeObject(forKey: DraftKeys.savedAt)
     }
 
     // MARK: - Medication Diff Tracking

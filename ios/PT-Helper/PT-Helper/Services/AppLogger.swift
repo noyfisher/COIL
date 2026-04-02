@@ -1,4 +1,5 @@
 import Foundation
+import FirebaseCrashlytics
 import os
 
 /// Centralized logging using Apple's unified logging system (os.Logger).
@@ -11,4 +12,10 @@ enum AppLogger {
     static let auth = Logger(subsystem: Bundle.main.bundleIdentifier ?? "PTHelper", category: "Auth")
     static let rehab = Logger(subsystem: Bundle.main.bundleIdentifier ?? "PTHelper", category: "Rehab")
     static let ui = Logger(subsystem: Bundle.main.bundleIdentifier ?? "PTHelper", category: "UI")
+
+    /// Set a custom key-value pair on Crashlytics for crash context.
+    /// Use this to annotate the current screen, active plan ID, etc.
+    static func setCrashlyticsKey(_ key: String, value: String) {
+        Crashlytics.crashlytics().setCustomValue(value, forKey: key)
+    }
 }

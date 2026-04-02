@@ -1,4 +1,5 @@
 import Foundation
+import FirebaseCrashlytics
 import FirebaseFirestore
 import FirebaseAuth
 import FirebaseStorage
@@ -135,6 +136,9 @@ class SessionLogger: ObservableObject {
         meta["errorDomain"] = String(describing: Swift.type(of: error))
         meta["errorDescription"] = error.localizedDescription
         log(.errorOccurred, category: .error, message: "\(context): \(error.localizedDescription)", metadata: meta)
+
+        // Record non-fatal in Crashlytics for crash-free metrics
+        Crashlytics.crashlytics().record(error: error, userInfo: ["context": context])
 
         // Auto-upload on critical errors
         Task { await uploadToFirestore() }

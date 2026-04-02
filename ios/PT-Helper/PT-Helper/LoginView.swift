@@ -2,7 +2,9 @@ import SwiftUI
 import AuthenticationServices
 import CryptoKit
 import FirebaseAuth
+import FirebaseCore
 import FirebaseFirestore
+import GoogleSignIn
 
 struct LoginView: View {
     var onSignedIn: () -> Void
@@ -70,6 +72,29 @@ struct LoginView: View {
                     .signInWithAppleButtonStyle(.black)
                     .frame(height: 52)
                     .clipShape(Capsule())
+                    .accessibilityIdentifier("login.appleSignInButton")
+
+                    // Google Sign-In
+                    Button {
+                        vm.signInWithGoogle { onSignedIn() }
+                    } label: {
+                        HStack(spacing: AppSpacing.md) {
+                            Image(systemName: "g.circle.fill")
+                                .font(.title2)
+                            Text("Sign in with Google")
+                                .font(.body.weight(.medium))
+                        }
+                        .foregroundColor(AppColors.primaryText)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 52)
+                        .background(AppColors.cardBackground)
+                        .clipShape(Capsule())
+                        .overlay(
+                            Capsule()
+                                .stroke(AppColors.cardBorder, lineWidth: 1)
+                        )
+                    }
+                    .accessibilityIdentifier("login.googleSignInButton")
 
                     if let msg = vm.msg {
                         Text(msg)
@@ -90,6 +115,7 @@ struct LoginView: View {
                 appeared = true
             }
         }
+        .trackScreen("Login")
     }
 
     private func featurePill(icon: String, text: String) -> some View {
@@ -177,6 +203,75 @@ final class LoginVM: NSObject, ObservableObject {
                 "role": "athlete",                 // you can add a role picker later
                 "created_at": FieldValue.serverTimestamp()
             ])
+        }
+    }
+
+    // MARK: - Google Sign-In
+
+    func signInWithGoogle(onSuccess: @escaping () -> Void) {
+        guard let clientID = FirebaseApp.app()?.options.clientID else {
+            msg = "Missing Firebase client ID"
+            return
+        }
+
+        msg = "Preparing Google sign in…"
+        Task { @MainActor in
+            SessionLogger.shared.log(.signInStarted, category: .auth, message: "Google sign-in started")
+        }
+
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootVC = windowScene.windows.first?.rootViewController else {
+            msg = "Cannot find root view controller"
+            return
+        }
+
+        let config = GIDConfiguration(clientID: clientID)
+        GIDSignIn.sharedInstance.configuration = config
+
+        GIDSignIn.sharedInstance.signIn(withPresenting: rootVC) { [weak self] result, error in
+            guard let self else { return }
+
+            if let error {
+                self.msg = "Google error: \(error.localizedDescription)"
+                Task { @MainActor in
+                    SessionLogger.shared.log(.signInFailed, category: .auth, message: "Google sign-in failed",
+                                              metadata: ["error": error.localizedDescription])
+                }
+                return
+            }
+
+            guard let user = result?.user,
+                  let idToken = user.idToken?.tokenString else {
+                self.msg = "Missing Google token"
+                return
+            }
+
+            let credential = GoogleAuthProvider.credential(
+                withIDToken: idToken,
+                accessToken: user.accessToken.tokenString
+            )
+
+            Auth.auth().signIn(with: credential) { res, err in
+                if let err {
+                    self.msg = "Firebase error: \(err.localizedDescription)"
+                    Task { @MainActor in
+                        SessionLogger.shared.log(.signInFailed, category: .auth, message: "Firebase sign-in failed (Google)",
+                                                  metadata: ["error": err.localizedDescription])
+                    }
+                    return
+                }
+
+                self.msg = "Signed in ✅"
+                Task { @MainActor in
+                    SessionLogger.shared.log(.signInSucceeded, category: .auth, message: "Google sign-in succeeded")
+                }
+
+                if let uid = res?.user.uid {
+                    let displayName = user.profile?.givenName ?? user.profile?.name ?? "User"
+                    self.ensureUser(uid: uid, name: displayName)
+                }
+                onSuccess()
+            }
         }
     }
 

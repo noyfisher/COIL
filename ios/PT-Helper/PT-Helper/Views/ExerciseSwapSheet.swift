@@ -229,7 +229,7 @@ struct ExerciseSwapSheet: View {
                 HStack(alignment: .top, spacing: AppSpacing.sm) {
                     Image(systemName: "lightbulb.fill")
                         .font(.caption)
-                        .foregroundColor(.yellow)
+                        .foregroundColor(AppColors.warning)
                     Text(reason)
                         .font(.caption)
                         .foregroundColor(AppColors.secondaryText)
@@ -268,6 +268,7 @@ struct ExerciseSwapSheet: View {
                 .frame(maxWidth: .infinity)
             }
             .buttonStyle(SecondaryButtonStyle())
+            .accessibilityIdentifier("exerciseSwap.confirmButton")
         }
         .padding(AppSpacing.lg)
         .background(AppColors.cardBackground)

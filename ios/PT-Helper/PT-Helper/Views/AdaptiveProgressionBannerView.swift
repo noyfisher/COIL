@@ -86,6 +86,7 @@ struct AdaptiveProgressionBannerView: View {
             RoundedRectangle(cornerRadius: AppCorners.card)
                 .stroke(accentColor.opacity(0.2), lineWidth: 1)
         )
+        .trackScreen("AdaptiveProgressionBanner")
     }
 
     // MARK: - Computed
