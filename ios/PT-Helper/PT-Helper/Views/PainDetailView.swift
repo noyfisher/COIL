@@ -39,7 +39,7 @@ struct PainDetailView: View {
                                 HStack {
                                     Text("Region \(viewModel.currentRegionIndex + 1) of \(viewModel.totalRegions)")
                                         .font(.caption.weight(.semibold))
-                                        .foregroundColor(.white)
+                                        .foregroundColor(AppColors.ctaText)
                                         .padding(.horizontal, AppSpacing.md)
                                         .padding(.vertical, AppSpacing.xs)
                                         .background(AppColors.accent)
@@ -57,7 +57,7 @@ struct PainDetailView: View {
                                 GeometryReader { geo in
                                     ZStack(alignment: .leading) {
                                         Capsule()
-                                            .fill(Color(.systemGray5))
+                                            .fill(AppColors.elevatedSurface)
                                             .frame(height: 3)
                                         Capsule()
                                             .fill(AppColors.accent)
@@ -314,6 +314,7 @@ struct PainDetailView: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text("Pain Type")
                 .font(.headline)
+                .foregroundColor(AppColors.primaryText)
             FlowLayout(spacing: AppSpacing.sm) {
                 ForEach(painTypeOptions, id: \.self) { type in
                     ChipButton(
@@ -337,8 +338,9 @@ struct PainDetailView: View {
                 }
             }
             HStack(spacing: AppSpacing.sm) {
-                TextField("Add your own...", text: $customPainType)
+                TextField("", text: $customPainType, prompt: Text("Add your own...").foregroundColor(AppColors.mutedText))
                     .font(.subheadline)
+                    .foregroundColor(AppColors.primaryText)
                     .padding(.horizontal, AppSpacing.md)
                     .padding(.vertical, AppSpacing.sm)
                     .background(AppColors.inputBackground)
@@ -361,6 +363,7 @@ struct PainDetailView: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text("Pain Intensity")
                 .font(.headline)
+                .foregroundColor(AppColors.primaryText)
             HStack {
                 Text("\(Int(painIntensity))")
                     .font(.system(size: 28, weight: .bold, design: .rounded))
@@ -401,6 +404,7 @@ struct PainDetailView: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text("Pain Duration")
                 .font(.headline)
+                .foregroundColor(AppColors.primaryText)
             FlowLayout(spacing: AppSpacing.sm) {
                 ForEach(painDurationOptions, id: \.self) { duration in
                     ChipButton(
@@ -440,6 +444,7 @@ struct PainDetailView: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text("Pain Frequency")
                 .font(.headline)
+                .foregroundColor(AppColors.primaryText)
             FlowLayout(spacing: AppSpacing.sm) {
                 ForEach(painFrequencyOptions, id: \.self) { frequency in
                     ChipButton(
@@ -463,8 +468,9 @@ struct PainDetailView: View {
                 }
             }
             HStack(spacing: AppSpacing.sm) {
-                TextField("Add your own...", text: $customFrequency)
+                TextField("", text: $customFrequency, prompt: Text("Add your own...").foregroundColor(AppColors.mutedText))
                     .font(.subheadline)
+                    .foregroundColor(AppColors.primaryText)
                     .padding(.horizontal, AppSpacing.md)
                     .padding(.vertical, AppSpacing.sm)
                     .background(AppColors.inputBackground)
@@ -502,6 +508,7 @@ struct PainDetailView: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text("Pain Onset")
                 .font(.headline)
+                .foregroundColor(AppColors.primaryText)
             FlowLayout(spacing: AppSpacing.sm) {
                 ForEach(painOnsetOptions, id: \.self) { onset in
                     ChipButton(
@@ -525,8 +532,9 @@ struct PainDetailView: View {
                 }
             }
             HStack(spacing: AppSpacing.sm) {
-                TextField("Add your own...", text: $customOnset)
+                TextField("", text: $customOnset, prompt: Text("Add your own...").foregroundColor(AppColors.mutedText))
                     .font(.subheadline)
+                    .foregroundColor(AppColors.primaryText)
                     .padding(.horizontal, AppSpacing.md)
                     .padding(.vertical, AppSpacing.sm)
                     .background(AppColors.inputBackground)
@@ -549,6 +557,7 @@ struct PainDetailView: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text("What Makes It Worse?")
                 .font(.headline)
+                .foregroundColor(AppColors.primaryText)
             FlowLayout(spacing: AppSpacing.sm) {
                 ForEach(aggravatingOptions, id: \.self) { factor in
                     ChipButton(
@@ -576,8 +585,9 @@ struct PainDetailView: View {
             }
             // Custom input
             HStack(spacing: AppSpacing.sm) {
-                TextField("Add your own...", text: $customAggravating)
+                TextField("", text: $customAggravating, prompt: Text("Add your own...").foregroundColor(AppColors.mutedText))
                     .font(.subheadline)
+                    .foregroundColor(AppColors.primaryText)
                     .padding(.horizontal, AppSpacing.md)
                     .padding(.vertical, AppSpacing.sm)
                     .background(AppColors.inputBackground)
@@ -600,6 +610,7 @@ struct PainDetailView: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text("What Helps?")
                 .font(.headline)
+                .foregroundColor(AppColors.primaryText)
             FlowLayout(spacing: AppSpacing.sm) {
                 ForEach(relievingOptions, id: \.self) { factor in
                     ChipButton(
@@ -627,8 +638,9 @@ struct PainDetailView: View {
             }
             // Custom input
             HStack(spacing: AppSpacing.sm) {
-                TextField("Add your own...", text: $customRelieving)
+                TextField("", text: $customRelieving, prompt: Text("Add your own...").foregroundColor(AppColors.mutedText))
                     .font(.subheadline)
+                    .foregroundColor(AppColors.primaryText)
                     .padding(.horizontal, AppSpacing.md)
                     .padding(.vertical, AppSpacing.sm)
                     .background(AppColors.inputBackground)
@@ -773,6 +785,7 @@ struct PainDetailView: View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
             Text("Treatment History")
                 .font(.headline)
+                .foregroundColor(AppColors.primaryText)
             Text("Optional — helps provide better recommendations")
                 .font(.caption)
                 .foregroundColor(AppColors.secondaryText)
@@ -780,6 +793,7 @@ struct PainDetailView: View {
             // Seen a doctor toggle
             Toggle("Have you seen a doctor for this pain?", isOn: $hasSeenDoctor)
                 .font(.subheadline)
+                .foregroundColor(AppColors.primaryText)
                 .tint(AppColors.accent)
 
             if hasSeenDoctor {
@@ -808,11 +822,13 @@ struct PainDetailView: View {
                 // Diagnosis
                 Toggle("Were you given a diagnosis?", isOn: $hasDiagnosis)
                     .font(.subheadline)
+                    .foregroundColor(AppColors.primaryText)
                     .tint(AppColors.accent)
 
                 if hasDiagnosis {
-                    TextField("What was the diagnosis?", text: $diagnosisText)
+                    TextField("", text: $diagnosisText, prompt: Text("What was the diagnosis?").foregroundColor(AppColors.mutedText))
                         .font(.subheadline)
+                        .foregroundColor(AppColors.primaryText)
                         .padding(AppSpacing.md)
                         .background(AppColors.inputBackground)
                         .cornerRadius(AppCorners.medium)
@@ -822,12 +838,14 @@ struct PainDetailView: View {
             // Currently receiving treatment
             Toggle("Currently receiving treatment?", isOn: $currentlyReceivingTreatment)
                 .font(.subheadline)
+                .foregroundColor(AppColors.primaryText)
                 .tint(AppColors.accent)
 
             if currentlyReceivingTreatment {
-                TextField("Describe your current treatment", text: $treatmentDetails, axis: .vertical)
+                TextField("", text: $treatmentDetails, prompt: Text("Describe your current treatment").foregroundColor(AppColors.mutedText), axis: .vertical)
                     .lineLimit(2...3)
                     .font(.subheadline)
+                    .foregroundColor(AppColors.primaryText)
                     .padding(AppSpacing.md)
                     .background(AppColors.inputBackground)
                     .cornerRadius(AppCorners.medium)
@@ -841,8 +859,10 @@ struct PainDetailView: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text("Additional Notes")
                 .font(.headline)
-            TextField("Enter any additional notes", text: $additionalNotes, axis: .vertical)
+                .foregroundColor(AppColors.primaryText)
+            TextField("", text: $additionalNotes, prompt: Text("Enter any additional notes").foregroundColor(AppColors.mutedText), axis: .vertical)
                 .lineLimit(2...4)
+                .foregroundColor(AppColors.primaryText)
                 .padding(AppSpacing.md)
                 .background(AppColors.inputBackground)
                 .cornerRadius(AppCorners.medium)
@@ -863,12 +883,13 @@ struct PainDetailView: View {
                         Text("Apply to All \(viewModel.totalRegions) Regions & Analyze")
                     }
                     .font(.subheadline.weight(.semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(AppColors.ctaText)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, AppSpacing.md)
                     .background(AppColors.healingGradient)
                     .cornerRadius(AppCorners.large)
                 }
+                .accessibilityIdentifier("painDetail.applyToAllButton")
             }
 
             // Existing navigation row
@@ -898,6 +919,7 @@ struct PainDetailView: View {
                         }
                     }
                     .buttonStyle(PrimaryButtonStyle())
+                    .accessibilityIdentifier("painDetail.analyzeButton")
                 } else {
                     Button(action: {
                         guard let assessment = buildAssessment() else { return }
@@ -921,11 +943,13 @@ struct PainDetailView: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text("Describe Your Pain")
                 .font(.headline)
+                .foregroundColor(AppColors.primaryText)
             Text("Optional — describe what your pain feels like in your own words")
                 .font(.caption)
                 .foregroundColor(AppColors.secondaryText)
-            TextField("e.g., feels like pressure, stiffness in the morning...", text: $customPainDescription, axis: .vertical)
+            TextField("", text: $customPainDescription, prompt: Text("e.g., feels like pressure, stiffness in the morning...").foregroundColor(AppColors.mutedText), axis: .vertical)
                 .lineLimit(2...3)
+                .foregroundColor(AppColors.primaryText)
                 .padding(AppSpacing.md)
                 .background(AppColors.inputBackground)
                 .cornerRadius(AppCorners.medium)

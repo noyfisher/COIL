@@ -22,6 +22,7 @@ struct RecoveryInsightsCardView: View {
                 insufficientDataCard
             }
         }
+        .trackScreen("RecoveryInsightsCard")
     }
 
     // MARK: - Generate Card
@@ -103,7 +104,7 @@ struct RecoveryInsightsCardView: View {
                     )
                     miniStat(
                         icon: "star.fill",
-                        color: .yellow,
+                        color: AppColors.warning,
                         label: "Wins",
                         value: "\(insight.keyWins.count)"
                     )
@@ -141,7 +142,7 @@ struct RecoveryInsightsCardView: View {
         let recent = vm.recentSessions(from: workoutViewModel.sessions)
         let remaining = RecoveryInsightsViewModel.minimumSessionCount - recent.count
 
-        return CardSection(icon: "brain.head.profile", color: .gray, title: "Recovery Insights") {
+        return CardSection(icon: "brain.head.profile", color: AppColors.mutedText, title: "Recovery Insights") {
             VStack(spacing: AppSpacing.sm) {
                 Text("Complete \(remaining) more workout\(remaining == 1 ? "" : "s") in the next 2 weeks to unlock AI recovery insights.")
                     .font(.subheadline)

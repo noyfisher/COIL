@@ -18,17 +18,17 @@ struct SurgicalHistoryStepView: View {
                             .font(.body.weight(.medium))
                         Text(viewModel.userProfile.surgeries.isEmpty ? "Tap to add" : "\(viewModel.userProfile.surgeries.count) recorded")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppColors.secondaryText)
                     }
                     Spacer()
                     Image(systemName: viewModel.userProfile.surgeries.isEmpty ? "bandage" : "bandage.fill")
                         .font(.title2)
-                        .foregroundColor(.orange)
+                        .foregroundColor(AppColors.warning)
                 }
                 .padding(AppSpacing.lg)
                 .background(AppColors.cardBackground)
                 .cornerRadius(AppCorners.card)
-                .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+                .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
 
                 // Surgery entries
                 ForEach(Array(viewModel.userProfile.surgeries.enumerated()), id: \.element.id) { index, surgery in
@@ -36,13 +36,13 @@ struct SurgicalHistoryStepView: View {
                         HStack {
                             Text("Surgery \(index + 1)")
                                 .font(.caption.weight(.semibold))
-                                .foregroundColor(.orange)
+                                .foregroundColor(AppColors.warning)
                             Spacer()
                             Button(action: {
                                 viewModel.userProfile.surgeries.remove(at: index)
                             }) {
                                 Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(AppColors.mutedText)
                             }
                         }
 
@@ -60,7 +60,7 @@ struct SurgicalHistoryStepView: View {
                         HStack {
                             Text("Year")
                                 .font(.subheadline)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.secondaryText)
                             Spacer()
                             Picker("Year", selection: Binding(
                                 get: { viewModel.userProfile.surgeries[safe: index]?.year ?? Calendar.current.component(.year, from: Date()) },
@@ -71,7 +71,7 @@ struct SurgicalHistoryStepView: View {
                                 }
                             }
                             .pickerStyle(.menu)
-                            .tint(.orange)
+                            .tint(AppColors.warning)
                         }
                         .padding(AppSpacing.md)
                         .background(AppColors.inputBackground)
@@ -81,7 +81,7 @@ struct SurgicalHistoryStepView: View {
                         VStack(alignment: .leading, spacing: AppSpacing.xs) {
                             Text("Recovery Status")
                                 .font(.subheadline)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.secondaryText)
                             HStack(spacing: AppSpacing.sm) {
                                 ForEach(["Fully recovered", "Still recovering", "Have restrictions"], id: \.self) { status in
                                     let isSelected = viewModel.userProfile.surgeries[safe: index]?.recoveryStatus == status
@@ -95,11 +95,11 @@ struct SurgicalHistoryStepView: View {
                                     }) {
                                         Text(status)
                                             .font(.caption.weight(.medium))
-                                            .foregroundColor(isSelected ? .white : .primary)
+                                            .foregroundColor(isSelected ? AppColors.ctaText : AppColors.primaryText)
                                             .padding(.horizontal, AppSpacing.sm)
                                             .padding(.vertical, AppSpacing.xs)
                                             .frame(maxWidth: .infinity)
-                                            .background(isSelected ? Color.orange.opacity(0.8) : AppColors.inputBackground)
+                                            .background(isSelected ? AppColors.warning.opacity(0.8) : AppColors.inputBackground)
                                             .cornerRadius(AppCorners.small)
                                     }
                                 }
@@ -133,7 +133,7 @@ struct SurgicalHistoryStepView: View {
                         VStack(alignment: .leading, spacing: AppSpacing.xs) {
                             Text("Did surgery leave pins, screws, or plates?")
                                 .font(.subheadline)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.secondaryText)
                             HStack(spacing: AppSpacing.sm) {
                                 ForEach(["Yes", "No", "Not Sure"], id: \.self) { option in
                                     let currentValue: String? = {
@@ -168,11 +168,11 @@ struct SurgicalHistoryStepView: View {
                                     }) {
                                         Text(option)
                                             .font(.caption.weight(.medium))
-                                            .foregroundColor(isSelected ? .white : .primary)
+                                            .foregroundColor(isSelected ? AppColors.ctaText : AppColors.primaryText)
                                             .padding(.horizontal, AppSpacing.sm)
                                             .padding(.vertical, AppSpacing.xs)
                                             .frame(maxWidth: .infinity)
-                                            .background(isSelected ? Color.orange.opacity(0.8) : AppColors.inputBackground)
+                                            .background(isSelected ? AppColors.warning.opacity(0.8) : AppColors.inputBackground)
                                             .cornerRadius(AppCorners.small)
                                     }
                                 }
@@ -190,7 +190,7 @@ struct SurgicalHistoryStepView: View {
                     .padding(AppSpacing.lg)
                     .background(AppColors.cardBackground)
                     .cornerRadius(AppCorners.card)
-                    .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+                    .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
                 }
 
                 // Add button
@@ -203,12 +203,13 @@ struct SurgicalHistoryStepView: View {
                         Text("Add Surgery")
                     }
                     .font(.body.weight(.medium))
-                    .foregroundColor(.orange)
+                    .foregroundColor(AppColors.warning)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, AppSpacing.lg)
-                    .background(Color.orange.opacity(0.1))
+                    .background(AppColors.warning.opacity(0.1))
                     .cornerRadius(AppCorners.medium)
                 }
+                .accessibilityIdentifier("onboarding.addSurgeryButton")
             }
             .padding(.horizontal, AppSpacing.xl)
             .padding(.vertical, AppSpacing.md)
@@ -217,6 +218,7 @@ struct SurgicalHistoryStepView: View {
         .onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
+        .trackScreen("OnboardingSurgicalHistory")
     }
 }
 

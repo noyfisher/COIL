@@ -66,7 +66,7 @@ struct MedicalHistoryStepView: View {
                     VStack(alignment: .leading, spacing: AppSpacing.sm) {
                         Text("Select any medications you take regularly")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppColors.secondaryText)
                         FlowLayout(spacing: AppSpacing.sm) {
                             ForEach(medications, id: \.self) { med in
                                 let isSelected = viewModel.userProfile.medications?.contains(med) ?? false
@@ -90,7 +90,7 @@ struct MedicalHistoryStepView: View {
                         VStack(alignment: .leading, spacing: AppSpacing.xs) {
                             Text("Other Medications")
                                 .font(.caption.weight(.semibold))
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.secondaryText)
                                 .padding(.top, AppSpacing.sm)
 
                             HStack(spacing: AppSpacing.sm) {
@@ -123,7 +123,7 @@ struct MedicalHistoryStepView: View {
                                                         .foregroundColor(.white.opacity(0.8))
                                                 }
                                             }
-                                            .foregroundColor(.white)
+                                            .foregroundColor(AppColors.ctaText)
                                             .padding(.horizontal, AppSpacing.md)
                                             .padding(.vertical, AppSpacing.sm)
                                             .background(AppColors.accent)
@@ -136,7 +136,7 @@ struct MedicalHistoryStepView: View {
                     }
                 }
 
-                CardSection(icon: "plus.circle.fill", color: .orange, title: "Other Conditions") {
+                CardSection(icon: "plus.circle.fill", color: AppColors.warning, title: "Other Conditions") {
                     TextField("e.g. Epilepsy, Thyroid issues...", text: $viewModel.userProfile.otherMedicalConditions.bound)
                         .padding(AppSpacing.md)
                         .background(AppColors.inputBackground)
@@ -151,6 +151,7 @@ struct MedicalHistoryStepView: View {
         .onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
+        .trackScreen("OnboardingMedicalHistory")
     }
 
     private func conditionButton(condition: String, icon: String) -> some View {
@@ -161,8 +162,7 @@ struct MedicalHistoryStepView: View {
                     .font(.system(size: 14))
                 Text(condition)
                     .font(.subheadline.weight(.medium))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .lineLimit(2)
             }
             .foregroundColor(isSelected ? .white : .primary)
             .frame(maxWidth: .infinity)
@@ -170,7 +170,7 @@ struct MedicalHistoryStepView: View {
             .padding(.horizontal, AppSpacing.sm)
             .background(isSelected ? AppColors.accent : AppColors.cardBackground)
             .cornerRadius(AppCorners.medium)
-            .shadow(color: .black.opacity(isSelected ? 0 : 0.04), radius: 6, y: 2)
+            .shadow(color: AppColors.cardShadowColor.opacity(isSelected ? 0 : 1), radius: 6, y: 2)
             .overlay(
                 RoundedRectangle(cornerRadius: AppCorners.medium)
                     .stroke(isSelected ? AppColors.accent : Color.clear, lineWidth: 2)

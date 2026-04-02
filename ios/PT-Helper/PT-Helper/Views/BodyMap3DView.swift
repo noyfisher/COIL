@@ -113,7 +113,7 @@ struct BodyMap3DView: View {
         }
         .navigationTitle("Body Map")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbarColorScheme(.light, for: .navigationBar)
         .sheet(isPresented: $showDisclaimer) {
             DisclaimerView(onAccept: {
                 injuryAnalysisVM = InjuryAnalysisViewModel(
@@ -150,7 +150,7 @@ struct BodyMap3DView: View {
                             Text("Back")
                                 .font(.subheadline.weight(.medium))
                         }
-                        .foregroundColor(.white.opacity(0.8))
+                        .foregroundColor(AppColors.primaryText.opacity(0.8))
                     }
 
                     Spacer()
@@ -161,7 +161,7 @@ struct BodyMap3DView: View {
                         Text(zone.displayName)
                             .font(AppFonts.sectionTitle)
                     }
-                    .foregroundColor(.white)
+                    .foregroundColor(AppColors.primaryText)
 
                     Spacer()
 
@@ -170,15 +170,15 @@ struct BodyMap3DView: View {
                 }
                 Text("Tap regions to select specific areas")
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(AppColors.mutedText)
             } else {
                 // Overview header
                 Text("Where does it hurt?")
                     .font(AppFonts.sectionTitle)
-                    .foregroundColor(.white)
+                    .foregroundColor(AppColors.primaryText)
                 Text("Tap a body zone to zoom in")
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(AppColors.mutedText)
                     .multilineTextAlignment(.center)
             }
         }
@@ -195,10 +195,10 @@ struct BodyMap3DView: View {
                 if viewModel.selectedRegions.isEmpty {
                     Text("No areas selected")
                         .font(.caption)
-                        .foregroundColor(.gray)
+                        .foregroundColor(AppColors.mutedText)
                         .padding(.horizontal, AppSpacing.md)
                         .padding(.vertical, AppSpacing.sm)
-                        .background(Color.white.opacity(0.1))
+                        .background(AppColors.elevatedSurface.opacity(0.3))
                         .clipShape(Capsule())
                 } else {
                     ForEach(viewModel.selectedRegions, id: \.id) { region in
@@ -208,7 +208,7 @@ struct BodyMap3DView: View {
                                 .frame(width: 8, height: 8)
                             Text(region.name)
                                 .font(.caption.weight(.medium))
-                                .foregroundColor(.white)
+                                .foregroundColor(AppColors.primaryText)
                             Button(action: {
                                 withAnimation(AppAnimations.springy) {
                                     viewModel.toggleSelection(for: region)
@@ -217,7 +217,7 @@ struct BodyMap3DView: View {
                             }) {
                                 Image(systemName: "xmark.circle.fill")
                                     .font(.system(size: 12))
-                                    .foregroundColor(.white.opacity(0.7))
+                                    .foregroundColor(AppColors.primaryText.opacity(0.7))
                             }
                         }
                         .padding(.horizontal, AppSpacing.md)
@@ -291,10 +291,10 @@ struct BodyMap3DView: View {
         VStack(spacing: AppSpacing.lg) {
             ProgressView()
                 .scaleEffect(1.5)
-                .tint(.white)
+                .tint(AppColors.mutedText)
             Text("Loading 3D Model...")
                 .font(.subheadline)
-                .foregroundColor(.gray)
+                .foregroundColor(AppColors.mutedText)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(uiColor: BodyMapConstants.loadingOverlayBackground))
@@ -309,10 +309,10 @@ struct BodyMap3DView: View {
             VStack(spacing: AppSpacing.sm) {
                 Text("Unable to Load 3D Model")
                     .font(AppFonts.cardTitle)
-                    .foregroundColor(.white)
+                    .foregroundColor(AppColors.primaryText)
                 Text("Please try again or restart the app.")
                     .font(.subheadline)
-                    .foregroundColor(.gray)
+                    .foregroundColor(AppColors.mutedText)
                     .multilineTextAlignment(.center)
             }
 
@@ -322,7 +322,7 @@ struct BodyMap3DView: View {
                     Text("Retry")
                 }
                 .font(.body.weight(.semibold))
-                .foregroundColor(.white)
+                .foregroundColor(AppColors.ctaText)
                 .padding(.horizontal, AppSpacing.xxl)
                 .padding(.vertical, AppSpacing.md)
                 .background(AppColors.accent)
@@ -344,37 +344,37 @@ struct BodyMap3DView: View {
                     VStack(spacing: AppSpacing.sm) {
                         Image(systemName: "hand.tap.fill")
                             .font(.system(size: 28))
-                            .foregroundColor(.white)
+                            .foregroundColor(AppColors.primaryText)
                             .symbolEffect(.pulse, options: .repeating)
                         Text("Tap to zoom in")
                             .font(.caption.weight(.semibold))
-                            .foregroundColor(.white)
+                            .foregroundColor(AppColors.primaryText)
                     }
 
                     VStack(spacing: AppSpacing.sm) {
                         Image(systemName: "hand.draw.fill")
                             .font(.system(size: 28))
-                            .foregroundColor(.white)
+                            .foregroundColor(AppColors.primaryText)
                             .symbolEffect(.pulse, options: .repeating)
                         Text("Drag to rotate")
                             .font(.caption.weight(.semibold))
-                            .foregroundColor(.white)
+                            .foregroundColor(AppColors.primaryText)
                     }
 
                     VStack(spacing: AppSpacing.sm) {
                         Image(systemName: "arrow.up.left.and.arrow.down.right")
                             .font(.system(size: 28))
-                            .foregroundColor(.white)
+                            .foregroundColor(AppColors.primaryText)
                             .symbolEffect(.pulse, options: .repeating)
                         Text("Pinch to zoom")
                             .font(.caption.weight(.semibold))
-                            .foregroundColor(.white)
+                            .foregroundColor(AppColors.primaryText)
                     }
                 }
 
                 Text("Tap a body zone, then select specific areas")
                     .font(.caption)
-                    .foregroundColor(.white.opacity(0.8))
+                    .foregroundColor(AppColors.primaryText.opacity(0.8))
 
                 Button(action: {
                     withAnimation { showCoachMark = false }
@@ -385,18 +385,18 @@ struct BodyMap3DView: View {
                         .foregroundColor(AppColors.accent)
                         .padding(.horizontal, AppSpacing.xxl)
                         .padding(.vertical, AppSpacing.sm)
-                        .background(.white)
+                        .background(AppColors.cardBackground)
                         .cornerRadius(AppCorners.pill)
                 }
             }
             .padding(AppSpacing.xl)
-            .background(.ultraThinMaterial)
+            .background(AppColors.elevatedSurface)
             .cornerRadius(AppCorners.xl)
             .padding(.horizontal, AppSpacing.xl)
             .padding(.bottom, AppSpacing.xxl)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.black.opacity(0.3))
+        .background(AppColors.primaryText.opacity(0.3))
         .transition(.opacity)
         .onTapGesture {
             withAnimation { showCoachMark = false }
@@ -408,10 +408,10 @@ struct BodyMap3DView: View {
         VStack {
             Text(name)
                 .font(.caption.weight(.semibold))
-                .foregroundColor(.white)
+                .foregroundColor(AppColors.ctaText)
                 .padding(.horizontal, AppSpacing.lg)
                 .padding(.vertical, AppSpacing.sm)
-                .background(Color.black.opacity(0.75))
+                .background(AppColors.primaryText.opacity(0.75))
                 .clipShape(Capsule())
                 .transition(.opacity.combined(with: .scale))
             Spacer()
@@ -652,12 +652,13 @@ struct BodyMap3DView: View {
                 Text("Reset")
                     .font(.caption.weight(.semibold))
             }
-            .foregroundColor(.white)
+            .foregroundColor(AppColors.primaryText)
             .padding(.horizontal, AppSpacing.lg)
             .padding(.vertical, AppSpacing.md)
-            .background(.ultraThinMaterial)
+            .background(AppColors.elevatedSurface)
             .clipShape(Capsule())
         }
+        .accessibilityIdentifier("bodyMap3D.resetButton")
     }
 
     // MARK: - Bottom Actions
@@ -667,7 +668,7 @@ struct BodyMap3DView: View {
             HStack {
                 Text("\(viewModel.selectedRegions.count) area(s) selected")
                     .font(.subheadline.weight(.medium))
-                    .foregroundColor(.white)
+                    .foregroundColor(AppColors.primaryText)
                 Spacer()
                 if !viewModel.selectedRegions.isEmpty {
                     Button(action: { clearAllSelections() }) {
@@ -675,6 +676,7 @@ struct BodyMap3DView: View {
                             .font(.subheadline.weight(.medium))
                             .foregroundColor(AppColors.danger)
                     }
+                    .accessibilityIdentifier("bodyMap3D.clearAllButton")
                 }
             }
 
@@ -698,14 +700,15 @@ struct BodyMap3DView: View {
                 .padding(.vertical, AppSpacing.lg)
                 .background(
                     viewModel.selectedRegions.isEmpty
-                        ? Color.gray.opacity(0.3)
+                        ? AppColors.mutedText.opacity(0.3)
                         : AppColors.accent
                 )
-                .foregroundColor(.white)
+                .foregroundColor(viewModel.selectedRegions.isEmpty ? AppColors.mutedText : AppColors.ctaText)
                 .font(.headline)
                 .cornerRadius(AppCorners.large)
             }
             .disabled(viewModel.selectedRegions.isEmpty)
+            .accessibilityIdentifier("bodyMap3D.continueButton")
         }
         .padding(.horizontal, AppSpacing.xl)
         .padding(.bottom, AppSpacing.xxl)
@@ -1077,7 +1080,7 @@ struct BodyMap3DView: View {
                                 .frame(width: 8, height: 8)
                             Text(region.name)
                                 .font(.caption.weight(.medium))
-                                .foregroundColor(.white)
+                                .foregroundColor(AppColors.primaryText)
                             if region.isSelected {
                                 Image(systemName: "checkmark")
                                     .font(.system(size: 10, weight: .bold))
@@ -1089,7 +1092,7 @@ struct BodyMap3DView: View {
                         .background(
                             region.isSelected
                                 ? Color(uiColor: BodyMapConstants.highlightColor).opacity(0.25)
-                                : Color.white.opacity(0.1)
+                                : AppColors.elevatedSurface.opacity(0.3)
                         )
                         .clipShape(Capsule())
                     }

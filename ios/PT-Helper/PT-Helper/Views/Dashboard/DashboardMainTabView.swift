@@ -20,7 +20,7 @@ struct DashboardMainTabView: View {
                     Text("You're offline. Changes will sync when reconnected.")
                         .font(.caption)
                 }
-                .foregroundColor(.white)
+                .foregroundColor(AppColors.ctaText)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, AppSpacing.sm)
                 .background(AppColors.danger.opacity(0.8))
@@ -75,6 +75,28 @@ struct DashboardMainTabView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .popToRoot)) { _ in
             tabSelection.popToRootAndGoHome()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .deepLink)) { _ in
+            if let tab = NotificationService.shared.pendingDeepLink {
+                switch tab {
+                case "home": tabSelection.selectedTab = 0
+                case "plans", "rehab": tabSelection.selectedTab = 2
+                case "progress", "profile": tabSelection.selectedTab = 3
+                default: break
+                }
+                NotificationService.shared.pendingDeepLink = nil
+            }
+        }
+        .onAppear {
+            if let tab = NotificationService.shared.pendingDeepLink {
+                switch tab {
+                case "home": tabSelection.selectedTab = 0
+                case "plans", "rehab": tabSelection.selectedTab = 2
+                case "progress", "profile": tabSelection.selectedTab = 3
+                default: break
+                }
+                NotificationService.shared.pendingDeepLink = nil
+            }
         }
     }
 }

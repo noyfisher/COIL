@@ -1,7 +1,10 @@
 import Foundation
+import FirebaseAuth
+import FirebaseFirestore
+import FirebaseMessaging
 import UserNotifications
 
-/// Manages local push notification reminders for rehab plan schedules.
+/// Manages local + remote push notification reminders for rehab plan schedules.
 @MainActor
 class NotificationService: ObservableObject {
     static let shared = NotificationService()
@@ -17,10 +20,34 @@ class NotificationService: ObservableObject {
         didSet { UserDefaults.standard.set(isEnabled, forKey: "notif_enabled") }
     }
 
+    // MARK: - FCM Token
+
+    @Published var fcmToken: String?
+
+    // MARK: - Notification Type Preferences
+
+    @Published var workoutRemindersEnabled: Bool {
+        didSet { UserDefaults.standard.set(workoutRemindersEnabled, forKey: "notif_workout_reminders") }
+    }
+    @Published var reassessmentRemindersEnabled: Bool {
+        didSet { UserDefaults.standard.set(reassessmentRemindersEnabled, forKey: "notif_reassessment_reminders") }
+    }
+    @Published var inactivityNudgesEnabled: Bool {
+        didSet { UserDefaults.standard.set(inactivityNudgesEnabled, forKey: "notif_inactivity_nudges") }
+    }
+
+    // MARK: - Deep Link Queue (for cold-launch)
+
+    /// Stores the target tab from a notification tap, consumed by MainTabView/DashboardMainTabView on appear.
+    @Published var pendingDeepLink: String?
+
     private init() {
         self.reminderHour = UserDefaults.standard.object(forKey: "notif_reminder_hour") as? Int ?? 9
         self.reminderMinute = UserDefaults.standard.object(forKey: "notif_reminder_minute") as? Int ?? 0
         self.isEnabled = UserDefaults.standard.object(forKey: "notif_enabled") as? Bool ?? false
+        self.workoutRemindersEnabled = UserDefaults.standard.object(forKey: "notif_workout_reminders") as? Bool ?? true
+        self.reassessmentRemindersEnabled = UserDefaults.standard.object(forKey: "notif_reassessment_reminders") as? Bool ?? true
+        self.inactivityNudgesEnabled = UserDefaults.standard.object(forKey: "notif_inactivity_nudges") as? Bool ?? true
         checkAuthorizationStatus()
     }
 
@@ -108,6 +135,47 @@ class NotificationService: ObservableObject {
         // Reschedule all plans with new time
         for plan in plans {
             scheduleReminders(for: plan)
+        }
+    }
+
+    // MARK: - FCM Token Management
+
+    /// Called by AppDelegate when FCM registration token is received or refreshed.
+    func updateFCMToken(_ token: String) {
+        fcmToken = token
+        AppLogger.data.info("FCM token updated: \(token.prefix(20))...")
+        uploadTokenToFirestore()
+    }
+
+    /// Uploads the current FCM token to the user's Firestore document.
+    private func uploadTokenToFirestore() {
+        guard let token = fcmToken,
+              let uid = Auth.auth().currentUser?.uid else { return }
+
+        let db = Firestore.firestore()
+        db.collection("users").document(uid).setData([
+            "fcmToken": token,
+            "fcmTokenUpdatedAt": FieldValue.serverTimestamp()
+        ], merge: true) { error in
+            if let error {
+                AppLogger.data.error("Failed to upload FCM token: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    /// Clears the FCM token from Firestore (called on sign-out).
+    func clearFCMToken() {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        fcmToken = nil
+
+        let db = Firestore.firestore()
+        db.collection("users").document(uid).updateData([
+            "fcmToken": FieldValue.delete(),
+            "fcmTokenUpdatedAt": FieldValue.delete()
+        ]) { error in
+            if let error {
+                AppLogger.data.error("Failed to clear FCM token: \(error.localizedDescription)")
+            }
         }
     }
 

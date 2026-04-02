@@ -38,22 +38,23 @@ struct ActivityLevelStepView: View {
 
                             if isSelected {
                                 Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(.white)
+                                    .foregroundColor(AppColors.ctaText)
                                     .font(.title3)
                             }
                         }
                         .padding(AppSpacing.lg)
                         .background(isSelected ? AppColors.accent : AppColors.cardBackground)
                         .cornerRadius(AppCorners.card)
-                        .shadow(color: .black.opacity(isSelected ? 0 : 0.04), radius: 8, y: 2)
+                        .shadow(color: AppColors.cardShadowColor.opacity(isSelected ? 0 : 1), radius: 8, y: 2)
                         .overlay(
                             RoundedRectangle(cornerRadius: AppCorners.card)
                                 .stroke(isSelected ? AppColors.accent : Color.clear, lineWidth: 2)
                         )
                     }
+                    .accessibilityIdentifier("onboarding.activityLevelOption")
                 }
 
-                CardSection(icon: "sportscourt", color: .green, title: "Primary Sport or Activity") {
+                CardSection(icon: "sportscourt", color: AppColors.success, title: "Primary Sport or Activity") {
                     TextField("e.g. Basketball, Running, Yoga...", text: $viewModel.userProfile.primarySport.bound)
                         .padding(AppSpacing.md)
                         .background(AppColors.inputBackground)
@@ -68,5 +69,6 @@ struct ActivityLevelStepView: View {
         .onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
+        .trackScreen("OnboardingActivityLevel")
     }
 }

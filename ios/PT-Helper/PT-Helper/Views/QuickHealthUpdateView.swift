@@ -76,14 +76,14 @@ struct QuickHealthUpdateView: View {
                                 HStack {
                                     if isSaving {
                                         ProgressView()
-                                            .tint(.white)
+                                            .tint(AppColors.ctaText)
                                     } else {
                                         Image(systemName: "checkmark.circle.fill")
                                         Text("Save & Continue")
                                     }
                                 }
                                 .font(.body.weight(.semibold))
-                                .foregroundColor(.white)
+                                .foregroundColor(AppColors.ctaText)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, AppSpacing.lg)
                                 .background(AppColors.ctaBackground)
@@ -114,6 +114,7 @@ struct QuickHealthUpdateView: View {
         .onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
+        .trackScreen("QuickHealthUpdate")
     }
 
     // MARK: - Sections
@@ -181,7 +182,7 @@ struct QuickHealthUpdateView: View {
                                                 .foregroundColor(.white.opacity(0.8))
                                         }
                                     }
-                                    .foregroundColor(.white)
+                                    .foregroundColor(AppColors.ctaText)
                                     .padding(.horizontal, AppSpacing.md)
                                     .padding(.vertical, AppSpacing.sm)
                                     .background(AppColors.accent)

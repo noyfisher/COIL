@@ -20,6 +20,7 @@ struct ExerciseDetailView: View {
                 .padding(20)
             }
         }
+        .trackScreen("ExerciseDetail")
     }
 
     private var demonstrationIcon: some View {
@@ -61,7 +62,7 @@ struct ExerciseDetailView: View {
     }
 
     private var formTips: some View {
-        CardSection(icon: "lightbulb", color: .yellow, title: "Form Tips") {
+        CardSection(icon: "lightbulb", color: AppColors.warning, title: "Form Tips") {
             VStack(alignment: .leading, spacing: 8) {
                 ForEach(exercise.tips, id: \.self) { tip in
                     Text("- \(tip)")

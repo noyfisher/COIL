@@ -17,6 +17,8 @@ struct SettingsView: View {
     @State private var reminderDate = Date()
     @State private var shareURL: URL?
     @State private var showShareSheet = false
+    @State private var showPrivacyPolicy = false
+    @State private var showTermsOfService = false
 
     var body: some View {
         NavigationStack {
@@ -31,7 +33,7 @@ struct SettingsView: View {
                             // Avatar
                             Text(initials)
                                 .font(.system(size: 28, weight: .bold, design: .rounded))
-                                .foregroundColor(.white)
+                                .foregroundColor(AppColors.ctaText)
                                 .frame(width: 72, height: 72)
                                 .background(
                                     Circle()
@@ -105,6 +107,60 @@ struct SettingsView: View {
                                 }
                                 .padding(.horizontal, AppSpacing.lg)
                                 .padding(.vertical, AppSpacing.md)
+
+                                Divider().padding(.leading, 52)
+
+                                HStack(spacing: AppSpacing.md) {
+                                    Image(systemName: "dumbbell")
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(AppColors.success)
+                                        .frame(width: 32, height: 32)
+                                        .background(AppColors.success.opacity(0.12))
+                                        .cornerRadius(AppCorners.small)
+                                    Text("Workout Reminders")
+                                        .font(.body)
+                                    Spacer()
+                                    Toggle("", isOn: $notificationService.workoutRemindersEnabled)
+                                        .labelsHidden()
+                                }
+                                .padding(.horizontal, AppSpacing.lg)
+                                .padding(.vertical, AppSpacing.md)
+
+                                Divider().padding(.leading, 52)
+
+                                HStack(spacing: AppSpacing.md) {
+                                    Image(systemName: "arrow.triangle.2.circlepath")
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(AppColors.accent)
+                                        .frame(width: 32, height: 32)
+                                        .background(AppColors.accentTint)
+                                        .cornerRadius(AppCorners.small)
+                                    Text("Re-Assessment Prompts")
+                                        .font(.body)
+                                    Spacer()
+                                    Toggle("", isOn: $notificationService.reassessmentRemindersEnabled)
+                                        .labelsHidden()
+                                }
+                                .padding(.horizontal, AppSpacing.lg)
+                                .padding(.vertical, AppSpacing.md)
+
+                                Divider().padding(.leading, 52)
+
+                                HStack(spacing: AppSpacing.md) {
+                                    Image(systemName: "bell.badge.waveform")
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(AppColors.warning)
+                                        .frame(width: 32, height: 32)
+                                        .background(AppColors.warning.opacity(0.12))
+                                        .cornerRadius(AppCorners.small)
+                                    Text("Inactivity Nudges")
+                                        .font(.body)
+                                    Spacer()
+                                    Toggle("", isOn: $notificationService.inactivityNudgesEnabled)
+                                        .labelsHidden()
+                                }
+                                .padding(.horizontal, AppSpacing.lg)
+                                .padding(.vertical, AppSpacing.md)
                             }
                         }
                         .background(AppColors.cardBackground)
@@ -146,6 +202,28 @@ struct SettingsView: View {
                             }
                             .padding(.horizontal, AppSpacing.lg)
                             .padding(.vertical, AppSpacing.md)
+                        }
+                        .background(AppColors.cardBackground)
+                        .cornerRadius(AppCorners.large)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: AppCorners.large)
+                                .stroke(AppColors.cardBorder, lineWidth: 1)
+                        )
+                        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+
+                        // Legal
+                        VStack(spacing: 0) {
+                            settingsRow(icon: "hand.raised", color: AppColors.accent, title: "Privacy Policy") {
+                                showPrivacyPolicy = true
+                            }
+                            .accessibilityIdentifier("settings.privacyPolicyButton")
+
+                            Divider().padding(.leading, 52)
+
+                            settingsRow(icon: "doc.text", color: AppColors.accent, title: "Terms of Service") {
+                                showTermsOfService = true
+                            }
+                            .accessibilityIdentifier("settings.termsOfServiceButton")
                         }
                         .background(AppColors.cardBackground)
                         .cornerRadius(AppCorners.large)
@@ -246,14 +324,14 @@ struct SettingsView: View {
             .overlay {
                 if isDeletingAccount {
                     ZStack {
-                        Color.black.opacity(0.4).ignoresSafeArea()
+                        AppColors.primaryText.opacity(0.4).ignoresSafeArea()
                         VStack(spacing: AppSpacing.md) {
                             ProgressView()
                                 .scaleEffect(1.3)
-                                .tint(.white)
+                                .tint(AppColors.ctaText)
                             Text("Deleting account...")
                                 .font(.subheadline)
-                                .foregroundColor(.white)
+                                .foregroundColor(AppColors.ctaText)
                         }
                         .padding(AppSpacing.xxl)
                         .background(.ultraThinMaterial)
@@ -267,6 +345,12 @@ struct SettingsView: View {
             if let url = shareURL {
                 ShareSheet(activityItems: [url])
             }
+        }
+        .sheet(isPresented: $showPrivacyPolicy) {
+            LegalDocumentView(title: "Privacy Policy", markdownContent: LegalContent.privacyPolicy)
+        }
+        .sheet(isPresented: $showTermsOfService) {
+            LegalDocumentView(title: "Terms of Service", markdownContent: LegalContent.termsOfService)
         }
     }
 
@@ -298,6 +382,7 @@ struct SettingsView: View {
                 await MainActor.run {
                     UserProfileService.shared.clear()
                     DisclaimerManager.reset()
+                    OnboardingViewModel.clearDraft()
                 }
 
                 // 4. Delete the Firebase Auth account

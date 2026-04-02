@@ -5,6 +5,7 @@ import SwiftUI
 struct DashWidgetContainer: ViewModifier {
     func body(content: Content) -> some View {
         content
+            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
             .padding(AppSpacing.lg)
             .background(AppColors.dashSurface)
             .cornerRadius(AppCorners.large)
@@ -48,7 +49,6 @@ struct DashStatWidget: View {
                 .font(AppFonts.dataMedium)
                 .foregroundColor(AppColors.dashTextPrimary)
                 .lineLimit(1)
-                .minimumScaleFactor(0.6)
 
             Text(label.uppercased())
                 .font(AppFonts.dashLabel)
@@ -125,7 +125,7 @@ struct DashEmptyStateView: View {
                 Button(action: action) {
                     Text(actionTitle)
                         .font(.subheadline.weight(.semibold))
-                        .foregroundColor(.white)
+                        .foregroundColor(AppColors.ctaText)
                         .padding(.horizontal, AppSpacing.xl)
                         .padding(.vertical, AppSpacing.md)
                         .background(AppColors.dashAccentGradient)

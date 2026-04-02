@@ -25,7 +25,7 @@ struct ProfileReviewStepView: View {
                 }
 
                 // Medical
-                ReviewCard(title: "Medical History", icon: "heart.fill", color: .red) {
+                ReviewCard(title: "Medical History", icon: "heart.fill", color: AppColors.danger) {
                     if viewModel.userProfile.medicalConditions.isEmpty {
                         ReviewRow(label: "Conditions", value: "None reported")
                     } else {
@@ -40,7 +40,7 @@ struct ProfileReviewStepView: View {
                 }
 
                 // Surgeries
-                ReviewCard(title: "Surgical History", icon: "bandage.fill", color: .orange) {
+                ReviewCard(title: "Surgical History", icon: "bandage.fill", color: AppColors.warning) {
                     if viewModel.userProfile.surgeries.isEmpty {
                         ReviewRow(label: "", value: "No surgeries reported")
                     } else {
@@ -74,7 +74,7 @@ struct ProfileReviewStepView: View {
                 }
 
                 // Injuries
-                ReviewCard(title: "Injuries", icon: "cross.case.fill", color: .red) {
+                ReviewCard(title: "Injuries", icon: "cross.case.fill", color: AppColors.danger) {
                     if viewModel.userProfile.injuries.isEmpty {
                         ReviewRow(label: "", value: "No injuries reported")
                     } else {
@@ -93,7 +93,7 @@ struct ProfileReviewStepView: View {
                 }
 
                 // Activity
-                ReviewCard(title: "Activity Level", icon: "figure.run", color: .green) {
+                ReviewCard(title: "Activity Level", icon: "figure.run", color: AppColors.success) {
                     ReviewRow(label: "Level", value: viewModel.userProfile.activityLevel.isEmpty ? "Not set" : viewModel.userProfile.activityLevel)
                     if let sport = viewModel.userProfile.primarySport, !sport.isEmpty {
                         ReviewRow(label: "Sport", value: sport)
@@ -107,10 +107,10 @@ struct ProfileReviewStepView: View {
                             .foregroundColor(AppColors.warning)
                         Text("Failed to save profile. Please try again.")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppColors.secondaryText)
                     }
                     .padding(AppSpacing.md)
-                    .background(Color.orange.opacity(0.1))
+                    .background(AppColors.warning.opacity(0.1))
                     .cornerRadius(AppCorners.small)
                 }
 
@@ -138,7 +138,7 @@ struct ProfileReviewStepView: View {
                     HStack {
                         if isSaving {
                             ProgressView()
-                                .tint(.white)
+                                .tint(AppColors.ctaText)
                         } else if showSuccess {
                             Image(systemName: "checkmark")
                                 .font(.body.weight(.bold))
@@ -149,13 +149,14 @@ struct ProfileReviewStepView: View {
                         }
                     }
                     .font(.body.weight(.semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(AppColors.ctaText)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, AppSpacing.lg)
-                    .background(showSuccess ? Color.green.opacity(0.8) : Color.green)
+                    .background(showSuccess ? AppColors.success.opacity(0.8) : AppColors.success)
                     .cornerRadius(AppCorners.card)
                 }
                 .disabled(isSaving || showSuccess)
+                .accessibilityIdentifier("onboarding.submitButton")
                 .padding(.top, AppSpacing.sm)
             }
             .padding(.horizontal, AppSpacing.xl)
@@ -164,7 +165,7 @@ struct ProfileReviewStepView: View {
 
         // Celebration overlay
         if showCelebration {
-            Color.black.opacity(0.2)
+            AppColors.primaryText.opacity(0.2)
                 .ignoresSafeArea()
                 .transition(.opacity)
 
@@ -175,6 +176,7 @@ struct ProfileReviewStepView: View {
             )
         }
         } // ZStack
+        .trackScreen("OnboardingProfileReview")
     }
 }
 
@@ -195,7 +197,7 @@ struct ReviewCard<Content: View>: View {
                     .cornerRadius(7)
                 Text(title)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
             }
             Divider()
             content
@@ -213,12 +215,12 @@ struct ReviewRow: View {
             if !label.isEmpty {
                 Text(label)
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
             }
             Spacer()
             Text(value)
                 .font(.subheadline.weight(.medium))
-                .foregroundColor(.primary)
+                .foregroundColor(AppColors.primaryText)
                 .multilineTextAlignment(.trailing)
         }
     }

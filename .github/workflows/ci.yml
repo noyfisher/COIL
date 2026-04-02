@@ -128,6 +128,26 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: bundle exec fastlane beta
 
+      - name: Upload dSYMs to Crashlytics
+        env:
+          GOOGLE_APP_ID: ${{ secrets.GOOGLE_APP_ID }}
+        run: |
+          # Find the Crashlytics upload-symbols script from SPM checkout
+          UPLOAD_SCRIPT=$(find "${HOME}/Library/Developer/Xcode/DerivedData" \
+            -name "upload-symbols" -path "*/FirebaseCrashlytics/*" 2>/dev/null | head -1)
+          if [ -z "$UPLOAD_SCRIPT" ]; then
+            echo "⚠️ upload-symbols not found in DerivedData, skipping dSYM upload"
+            exit 0
+          fi
+          # Find dSYM files from the archive
+          DSYM_DIR=$(find build -name "*.dSYM" -type d 2>/dev/null | head -1)
+          if [ -z "$DSYM_DIR" ]; then
+            echo "⚠️ No dSYM files found, skipping upload"
+            exit 0
+          fi
+          echo "Uploading dSYMs from: $DSYM_DIR"
+          "$UPLOAD_SCRIPT" -gsp PT-Helper/GoogleService-Info.plist -p ios "$DSYM_DIR"
+
       - name: Upload IPA artifact
         if: always()
         uses: actions/upload-artifact@v4

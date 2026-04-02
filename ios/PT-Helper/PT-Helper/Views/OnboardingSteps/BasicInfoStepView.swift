@@ -3,6 +3,8 @@ import SwiftUI
 struct BasicInfoStepView: View {
     @ObservedObject var viewModel: OnboardingViewModel
     @State private var weightText: String = ""
+    @State private var showTermsSheet = false
+    @State private var showPrivacySheet = false
     @FocusState private var isWeightFieldFocused: Bool
 
     /// Whether to show validation errors — driven by ViewModel
@@ -24,7 +26,7 @@ struct BasicInfoStepView: View {
                     }
                 }
 
-                CardSection(icon: "calendar", color: .orange, title: "Date of Birth") {
+                CardSection(icon: "calendar", color: AppColors.warning, title: "Date of Birth") {
                     DatePicker("", selection: $viewModel.userProfile.dateOfBirth,
                                in: ...Date(),
                                displayedComponents: .date)
@@ -40,7 +42,7 @@ struct BasicInfoStepView: View {
                                 Button(action: { viewModel.userProfile.sex = option }) {
                                     Text(option)
                                         .font(.subheadline.weight(.medium))
-                                        .foregroundColor(viewModel.userProfile.sex == option ? .white : .primary)
+                                        .foregroundColor(viewModel.userProfile.sex == option ? AppColors.ctaText : AppColors.primaryText)
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, AppSpacing.md)
                                         .background(viewModel.userProfile.sex == option ? AppColors.accent : AppColors.subtleBorder)
@@ -54,23 +56,23 @@ struct BasicInfoStepView: View {
                     }
                 }
 
-                CardSection(icon: "hand.raised.fill", color: .indigo, title: "Dominant Side") {
+                CardSection(icon: "hand.raised.fill", color: AppColors.accent, title: "Dominant Side") {
                     HStack(spacing: AppSpacing.sm) {
                         ForEach(["Left", "Right", "Ambidextrous"], id: \.self) { option in
                             Button(action: { viewModel.userProfile.dominantSide = option }) {
                                 Text(option)
                                     .font(.subheadline.weight(.medium))
-                                    .foregroundColor(viewModel.userProfile.dominantSide == option ? .white : .primary)
+                                    .foregroundColor(viewModel.userProfile.dominantSide == option ? AppColors.ctaText : AppColors.primaryText)
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, AppSpacing.md)
-                                    .background(viewModel.userProfile.dominantSide == option ? Color.indigo : AppColors.subtleBorder)
+                                    .background(viewModel.userProfile.dominantSide == option ? AppColors.accent : AppColors.subtleBorder)
                                     .cornerRadius(AppCorners.medium)
                             }
                         }
                     }
                 }
 
-                CardSection(icon: "ruler", color: .green, title: "Height") {
+                CardSection(icon: "ruler", color: AppColors.success, title: "Height") {
                     HStack(spacing: AppSpacing.md) {
                         Menu {
                             ForEach(3..<8, id: \.self) { feet in
@@ -82,9 +84,9 @@ struct BasicInfoStepView: View {
                                     .font(.title3.weight(.medium))
                                 Image(systemName: "chevron.up.chevron.down")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(AppColors.secondaryText)
                             }
-                            .foregroundColor(.primary)
+                            .foregroundColor(AppColors.primaryText)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, AppSpacing.md)
                             .background(AppColors.inputBackground)
@@ -101,9 +103,9 @@ struct BasicInfoStepView: View {
                                     .font(.title3.weight(.medium))
                                 Image(systemName: "chevron.up.chevron.down")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(AppColors.secondaryText)
                             }
-                            .foregroundColor(.primary)
+                            .foregroundColor(AppColors.primaryText)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, AppSpacing.md)
                             .background(AppColors.inputBackground)
@@ -130,7 +132,7 @@ struct BasicInfoStepView: View {
                                     }
                                 }
                             Text("lbs")
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.secondaryText)
                                 .font(.body.weight(.medium))
                         }
                         if showErrors && (viewModel.userProfile.weight < 50 || viewModel.userProfile.weight > 500) {
@@ -138,6 +140,49 @@ struct BasicInfoStepView: View {
                         }
                     }
                 }
+                // Terms of Service acceptance
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    HStack(alignment: .top, spacing: AppSpacing.md) {
+                        Button {
+                            viewModel.hasAcceptedTerms.toggle()
+                        } label: {
+                            Image(systemName: viewModel.hasAcceptedTerms ? "checkmark.square.fill" : "square")
+                                .font(.title3)
+                                .foregroundColor(viewModel.hasAcceptedTerms ? AppColors.accent : AppColors.mutedText)
+                        }
+                        .accessibilityIdentifier("onboarding.termsCheckbox")
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack(spacing: 0) {
+                                Text("I agree to the ")
+                                    .font(.subheadline)
+                                    .foregroundColor(AppColors.primaryText)
+                                Button("Terms of Service") { showTermsSheet = true }
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundColor(AppColors.accent)
+                            }
+                            HStack(spacing: 0) {
+                                Text("and ")
+                                    .font(.subheadline)
+                                    .foregroundColor(AppColors.primaryText)
+                                Button("Privacy Policy") { showPrivacySheet = true }
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundColor(AppColors.accent)
+                            }
+                        }
+                    }
+                    if showErrors && !viewModel.hasAcceptedTerms {
+                        validationMessage("You must accept the Terms of Service to continue")
+                    }
+                }
+                .padding(AppSpacing.lg)
+                .background(AppColors.cardBackground)
+                .cornerRadius(AppCorners.large)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppCorners.large)
+                        .stroke(AppColors.cardBorder, lineWidth: 1)
+                )
+                .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
             }
             .padding(.horizontal, AppSpacing.xl)
             .padding(.vertical, AppSpacing.md)
@@ -151,6 +196,13 @@ struct BasicInfoStepView: View {
                 weightText = String(Int(viewModel.userProfile.weight))
             }
         }
+        .sheet(isPresented: $showTermsSheet) {
+            LegalDocumentView(title: "Terms of Service", markdownContent: LegalContent.termsOfService)
+        }
+        .sheet(isPresented: $showPrivacySheet) {
+            LegalDocumentView(title: "Privacy Policy", markdownContent: LegalContent.privacyPolicy)
+        }
+        .trackScreen("OnboardingBasicInfo")
     }
 
     private func validationMessage(_ text: String) -> some View {
@@ -160,7 +212,7 @@ struct BasicInfoStepView: View {
             Text(text)
                 .font(.caption)
         }
-        .foregroundColor(.red)
+        .foregroundColor(AppColors.danger)
         .transition(.opacity.combined(with: .move(edge: .top)))
     }
 }

@@ -13,7 +13,7 @@ struct AdaptiveProgressionBannerView: View {
             HStack(spacing: AppSpacing.sm) {
                 Image(systemName: iconName)
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(AppColors.ctaText)
                     .frame(width: 28, height: 28)
                     .background(accentColor.opacity(0.9))
                     .cornerRadius(7)
@@ -63,7 +63,7 @@ struct AdaptiveProgressionBannerView: View {
                                  ? "Advance Plan" : "Scale Back")
                         }
                         .font(.subheadline.weight(.medium))
-                        .foregroundColor(.white)
+                        .foregroundColor(AppColors.ctaText)
                         .padding(.horizontal, AppSpacing.lg)
                         .padding(.vertical, AppSpacing.sm)
                         .background(accentColor)
@@ -86,6 +86,7 @@ struct AdaptiveProgressionBannerView: View {
             RoundedRectangle(cornerRadius: AppCorners.card)
                 .stroke(accentColor.opacity(0.2), lineWidth: 1)
         )
+        .trackScreen("AdaptiveProgressionBanner")
     }
 
     // MARK: - Computed

@@ -4,6 +4,7 @@ import SwiftUI
 
 extension Notification.Name {
     static let popToRoot = Notification.Name("popToRoot")
+    static let deepLink = Notification.Name("deepLink")
 }
 
 // MARK: - Design Tokens
@@ -116,17 +117,18 @@ enum AppCorners {
 // MARK: - Typography Presets
 
 enum AppFonts {
-    static let heroTitle = Font.system(size: 34, weight: .bold, design: .serif)
+    // Semantic text styles — scale with Dynamic Type
+    static let heroTitle = Font.system(.largeTitle, design: .serif).weight(.bold)
     static let sectionTitle = Font.system(.title3, design: .serif).weight(.bold)
     static let cardTitle = Font.system(.body, design: .serif).weight(.semibold)
-    static let statNumber = Font.system(size: 28, weight: .bold, design: .rounded)
+    static let statNumber = Font.system(.title, design: .rounded).weight(.bold)
     static let badge = Font.caption2.weight(.semibold)
 
-    // MARK: Dashboard Data Typography (SF Mono)
-    static let dataLarge = Font.system(size: 28, weight: .bold, design: .monospaced)
-    static let dataMedium = Font.system(size: 18, weight: .semibold, design: .monospaced)
-    static let dataSmall = Font.system(size: 13, weight: .medium, design: .monospaced)
-    static let dashLabel = Font.system(size: 11, weight: .semibold)
+    // MARK: Dashboard Data Typography (SF Mono) — scale with Dynamic Type
+    static let dataLarge = Font.system(.title, design: .monospaced).weight(.bold)
+    static let dataMedium = Font.system(.body, design: .monospaced).weight(.semibold)
+    static let dataSmall = Font.system(.footnote, design: .monospaced).weight(.medium)
+    static let dashLabel = Font.system(.caption2).weight(.semibold)
 }
 
 // MARK: - Animation Presets
