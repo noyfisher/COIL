@@ -13,7 +13,10 @@ struct GuidedWorkoutView: View {
     @State private var showResumePrompt = false
     @State private var savedCheckpoint: GuidedWorkoutViewModel.WorkoutCheckpoint?
 
-    init(plan: RehabPlan) {
+    let snackMode: Bool
+
+    init(plan: RehabPlan, snackMode: Bool = false) {
+        self.snackMode = snackMode
         _vm = StateObject(wrappedValue: GuidedWorkoutViewModel(plan: plan))
     }
 
@@ -30,7 +33,7 @@ struct GuidedWorkoutView: View {
                 case .rest:
                     restPhaseView
                 case .complete:
-                    GuidedWorkoutSummaryView(vm: vm)
+                    GuidedWorkoutSummaryView(vm: vm, isSnackMode: snackMode)
                 }
             }
         }

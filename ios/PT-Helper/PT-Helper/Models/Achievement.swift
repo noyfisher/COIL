@@ -20,6 +20,13 @@ struct Achievement: Identifiable, Codable {
         Achievement(id: "sessions_10", title: "Dedicated", description: "Complete 10 workout sessions", iconName: "star", requirement: 10),
         Achievement(id: "sessions_50", title: "Committed", description: "Complete 50 workout sessions", iconName: "star.fill", requirement: 50),
         Achievement(id: "pain_improved", title: "Progress!", description: "Average pain decreased over 2 weeks", iconName: "arrow.down.heart", requirement: 1),
+
+        // MARK: Preventative Streak Milestones
+        Achievement(id: "prevent_streak_7",  title: "Seven Days Strong",   description: "Complete 7 days of preventative movement", iconName: "flame",        requirement: 7),
+        Achievement(id: "prevent_streak_14", title: "Two-Week Habit",       description: "Complete 14 days of preventative movement", iconName: "flame.fill",   requirement: 14),
+        Achievement(id: "prevent_streak_30", title: "Monthly Mover",        description: "Complete 30 days of preventative movement", iconName: "star.fill",    requirement: 30),
+        Achievement(id: "prevent_streak_60", title: "Consistency Champion", description: "Complete 60 days of preventative movement", iconName: "trophy",       requirement: 60),
+        Achievement(id: "prevent_streak_90", title: "Prevention Pro",       description: "Complete 90 days of preventative movement", iconName: "trophy.fill",  requirement: 90),
     ]
 }
 

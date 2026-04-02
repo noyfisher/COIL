@@ -8,6 +8,8 @@ struct AnalysisDashboardView: View {
 
     @ObservedObject private var streakService = StreakService.shared
     @ObservedObject private var profileService = UserProfileService.shared
+    @ObservedObject private var preventativeStreakVM = PreventativeStreakViewModel.shared
+    @ObservedObject private var weaknessAnalyzer = WeaknessPatternAnalyzer.shared
 
     @State private var animateEntrance = false
     @State private var navigateToBodyMap = false
@@ -49,6 +51,8 @@ struct AnalysisDashboardView: View {
             withAnimation(AppAnimations.smooth.delay(0.1)) {
                 animateEntrance = true
             }
+            // Run weakness analysis against current sessions
+            weaknessAnalyzer.analyze(sessions: workoutVM.sessions)
         }
         .trackScreen("DashboardTab")
     }
@@ -65,6 +69,30 @@ struct AnalysisDashboardView: View {
                 // Widget Grid
                 widgetGrid(result: result)
                     .entranceAnimation(animateEntrance, delay: 0.1)
+
+                // Daily Movement Snack (when wellness plans exist)
+                if !wellnessGoals.isEmpty {
+                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                        dashSectionLabel("Today's Movement")
+                        DailyMovementSnackCard(wellnessGoals: wellnessGoals)
+                    }
+                    .entranceAnimation(animateEntrance, delay: 0.15)
+                }
+
+                // Preventative streak nudge (compact)
+                if preventativeStreakVM.streak.currentStreak > 0 {
+                    preventativeStreakNudge
+                        .entranceAnimation(animateEntrance, delay: 0.18)
+                }
+
+                // Weakness insight card (when a blind spot is detected)
+                if weaknessAnalyzer.topInsight != nil {
+                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                        dashSectionLabel("Movement Insights")
+                        WeaknessInsightCard()
+                    }
+                    .entranceAnimation(animateEntrance, delay: 0.22)
+                }
 
                 // Confidence Chart
                 DashConfidenceChart(conditions: result.conditions)
@@ -200,6 +228,57 @@ struct AnalysisDashboardView: View {
             }
             .buttonStyle(.plain)
         }
+    }
+
+    // MARK: - Wellness Goals (for snack card)
+
+    private var wellnessGoals: [String] {
+        savedPlansVM.rehabPlans
+            .filter { $0.planType == .wellness }
+            .map(\.planName)
+    }
+
+    // MARK: - Preventative Streak Nudge
+
+    private var preventativeStreakNudge: some View {
+        HStack(spacing: AppSpacing.md) {
+            Image(systemName: preventativeStreakVM.streak.isActive ? "flame.fill" : "flame")
+                .font(.system(size: 18))
+                .foregroundColor(preventativeStreakVM.streak.isActive ? AppColors.warning : AppColors.mutedText)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(preventativeStreakVM.streak.currentStreak)-Day Prevention Streak")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundColor(AppColors.primaryText)
+                Text(preventativeStreakVM.streak.goalLabel)
+                    .font(.caption)
+                    .foregroundColor(AppColors.secondaryText)
+            }
+
+            Spacer()
+
+            Button {
+                tabSelection.selectedTab = 3 // Prevent tab
+            } label: {
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundColor(AppColors.secondaryText)
+            }
+        }
+        .padding(AppSpacing.md)
+        .background(AppColors.cardBackground)
+        .cornerRadius(AppCorners.card)
+        .overlay(RoundedRectangle(cornerRadius: AppCorners.card)
+            .stroke(AppColors.subtleBorder, lineWidth: 1))
+        .shadow(color: AppColors.cardShadowColor, radius: 4, x: 0, y: 1)
+    }
+
+    private func dashSectionLabel(_ text: String) -> some View {
+        Text(text)
+            .font(.caption.weight(.semibold))
+            .foregroundColor(AppColors.mutedText)
+            .textCase(.uppercase)
+            .tracking(0.5)
     }
 
     private func gatewayCard(icon: String, title: String, subtitle: String, accentColor: Color) -> some View {

@@ -58,6 +58,10 @@ enum AIRequestType: String, Encodable {
     case wellness_analysis
     case wellness_verify
     case wellness_plan
+    case body_risk_assessment
+    case body_risk_assessment_verify
+    case generate_movement_snack
+    case posture_check
 }
 
 struct ClaudeProxyRequest: Encodable {

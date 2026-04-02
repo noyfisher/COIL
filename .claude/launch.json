@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Firebase Emulator (Functions)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "serve"],
+      "cwd": "functions",
+      "port": 5001
+    },
+    {
+      "name": "TypeScript Watch (Functions)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "build", "--", "--watch"],
+      "cwd": "functions",
+      "port": null
+    }
+  ]
+}

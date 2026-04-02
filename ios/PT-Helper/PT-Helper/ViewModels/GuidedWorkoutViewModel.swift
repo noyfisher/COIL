@@ -166,6 +166,7 @@ class GuidedWorkoutViewModel: ObservableObject {
             painLevel: painLevel,
             isCompleted: true,
             exercisesPerformed: completedExercises,
+            skippedExercises: skippedExercises.isEmpty ? nil : skippedExercises,
             notes: notes?.trimmingCharacters(in: .whitespaces).isEmpty == true ? nil : notes,
             regionPainLevels: regionPainLevels?.isEmpty == true ? nil : regionPainLevels,
             planId: plan.id

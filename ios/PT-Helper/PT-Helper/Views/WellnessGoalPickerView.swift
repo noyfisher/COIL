@@ -2,17 +2,21 @@ import SwiftUI
 
 struct WellnessGoalPickerView: View {
     let userProfile: UserProfile
-    @State private var selectedCategories: Set<GoalCategory> = []
+    @State private var selectedCategories: Set<GoalCategory>
     @State private var customGoalText: String = ""
     @State private var showDetailView = false
-    @StateObject private var viewModel: WellnessAnalysisViewModel = {
-        // Placeholder — will be replaced when navigating
-        WellnessAnalysisViewModel(userProfile: UserProfile(
+    @StateObject private var viewModel: WellnessAnalysisViewModel
+
+    init(userProfile: UserProfile, preselectedCategories: Set<GoalCategory> = []) {
+        self.userProfile = userProfile
+        self._selectedCategories = State(initialValue: preselectedCategories)
+        let placeholder = UserProfile(
             userId: "", firstName: "", lastName: "", dateOfBirth: Date(), sex: "",
             heightFeet: 0, heightInches: 0, weight: 0, medicalConditions: [],
             surgeries: [], injuries: [], activityLevel: ""
-        ), selectedGoals: [])
-    }()
+        )
+        self._viewModel = StateObject(wrappedValue: WellnessAnalysisViewModel(userProfile: placeholder, selectedGoals: []))
+    }
 
     private let columns = [
         GridItem(.flexible(), spacing: AppSpacing.md),

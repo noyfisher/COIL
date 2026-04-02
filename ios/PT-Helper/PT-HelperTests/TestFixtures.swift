@@ -463,4 +463,106 @@ enum TestFixtures {
         }
         """
     }
+
+    // MARK: - Body Risk Assessment
+
+    static func makeBodyRiskAssessment(
+        primaryActivity: PrimaryActivity = .deskWork,
+        hoursSeatedPerDay: Double = 8.0,
+        dominantSportOrHobby: String? = "Running"
+    ) -> BodyRiskAssessment {
+        BodyRiskAssessment(
+            primaryActivity: primaryActivity,
+            hoursSeatedPerDay: hoursSeatedPerDay,
+            dominantSportOrHobby: dominantSportOrHobby
+        )
+    }
+
+    // MARK: - Preventative Streak
+
+    // MARK: - Weakness Insight
+
+    static func makeWeaknessInsight(
+        muscleGroup: String = "Hip Flexors",
+        targetAreaKey: String = "Hip Flexors",
+        skipRate: Double = 0.6,
+        sessionsAnalyzed: Int = 8,
+        linkedRisk: String = "Lower back strain and anterior hip pain",
+        recommendation: String = "Add a daily hip flexor stretch to your routine."
+    ) -> WeaknessInsight {
+        WeaknessInsight(
+            muscleGroup: muscleGroup,
+            targetAreaKey: targetAreaKey,
+            skipRate: skipRate,
+            sessionsAnalyzed: sessionsAnalyzed,
+            linkedRisk: linkedRisk,
+            recommendation: recommendation
+        )
+    }
+
+    // MARK: - Posture Check Result
+
+    static func makePostureCheckResult(
+        context: PostureContext = .atDesk,
+        score: Int = 72,
+        observations: [String] = [
+            "Right shoulder appears slightly elevated compared to the left.",
+            "Head position is forward of the shoulder midline."
+        ],
+        correctiveCues: [String] = [
+            "Slide shoulder blades down and back.",
+            "Tuck chin gently and lift the crown of your head."
+        ]
+    ) -> PostureCheckResult {
+        PostureCheckResult(
+            context: context,
+            score: score,
+            observations: observations,
+            correctiveCues: correctiveCues
+        )
+    }
+
+    static func makePreventativeStreak(
+        currentStreak: Int = 5,
+        longestStreak: Int = 14,
+        goalLabel: String = "Posture Maintenance",
+        daysActiveThisWeek: Int = 3
+    ) -> PreventativeStreak {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let today = Date()
+        var activityDays: [String] = []
+        for offset in 0..<min(daysActiveThisWeek, 7) {
+            if let day = Calendar.current.date(byAdding: .day, value: -offset, to: today) {
+                activityDays.append(formatter.string(from: day))
+            }
+        }
+        var streak = PreventativeStreak()
+        streak.currentStreak = currentStreak
+        streak.longestStreak = longestStreak
+        streak.lastActivityDate = today
+        streak.activityDays = activityDays
+        streak.goalLabel = goalLabel
+        streak.restDaysUsedThisWeek = 0
+        return streak
+    }
+
+    static func makeBodyRiskResult(
+        regions: [(name: String, level: RiskLevel, rationale: String)]? = nil
+    ) -> BodyRiskResult {
+        let defaultRegions: [(name: String, level: RiskLevel, rationale: String)] = [
+            ("Lower Back", .elevated, "Prolonged sitting compresses lumbar discs and weakens the posterior chain."),
+            ("Neck/Cervical", .moderate, "Forward head posture from desk work places extra load on cervical vertebrae.")
+        ]
+        let regionData = regions ?? defaultRegions
+        let riskRegions = regionData.map {
+            RiskRegion(id: UUID(), regionName: $0.name, riskLevel: $0.level, rationale: $0.rationale)
+        }
+        return BodyRiskResult(
+            id: UUID(),
+            riskRegions: riskRegions,
+            generatedDate: Date(),
+            assessmentSnapshot: makeBodyRiskAssessment()
+        )
+    }
 }

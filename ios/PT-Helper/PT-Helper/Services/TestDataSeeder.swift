@@ -37,6 +37,10 @@ enum TestDataSeeder {
         ProcessInfo.processInfo.arguments.contains("--prefill-weight")
     }
 
+    static var shouldSeedPreventativeData: Bool {
+        ProcessInfo.processInfo.arguments.contains("--seed-preventative-data")
+    }
+
     // MARK: - Seed All Data
 
     @MainActor
@@ -60,6 +64,10 @@ enum TestDataSeeder {
         seedProfile()
         seedAnalysisResult()
         seedStreakData()
+
+        if shouldSeedPreventativeData {
+            seedBodyRiskResult()
+        }
     }
 
     // MARK: - Profile
@@ -173,6 +181,31 @@ enum TestDataSeeder {
             longestStreak: 7,
             lastWorkoutDate: Calendar.current.date(byAdding: .day, value: -1, to: Date())
         )
+    }
+
+    // MARK: - Body Risk Result
+
+    @MainActor
+    private static func seedBodyRiskResult() {
+        let assessment = BodyRiskAssessment(
+            primaryActivity: .deskWork,
+            hoursSeatedPerDay: 9.0,
+            dominantSportOrHobby: "Running"
+        )
+        let result = BodyRiskResult(
+            id: UUID(),
+            riskRegions: [
+                RiskRegion(id: UUID(), regionName: "Lower Back", riskLevel: .elevated,
+                           rationale: "Prolonged sitting compresses lumbar discs and weakens the posterior chain."),
+                RiskRegion(id: UUID(), regionName: "Neck/Cervical", riskLevel: .moderate,
+                           rationale: "Forward head posture from desk work places extra load on cervical vertebrae.")
+            ],
+            generatedDate: Calendar.current.date(byAdding: .day, value: -2, to: Date())!,
+            assessmentSnapshot: assessment
+        )
+        if let data = try? JSONEncoder().encode(result) {
+            UserDefaults.standard.set(data, forKey: "SavedBodyRiskResult")
+        }
     }
 
     // MARK: - Mock Plans

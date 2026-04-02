@@ -5,6 +5,7 @@ struct RehabPlan: Codable, Identifiable {
     enum PlanType: String, Codable {
         case rehab
         case wellness
+        case movementSnack
     }
 
     let id: UUID

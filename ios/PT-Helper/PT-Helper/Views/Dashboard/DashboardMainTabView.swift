@@ -48,11 +48,17 @@ struct DashboardMainTabView: View {
                     .tag(2)
                     .id(tabSelection.rehabNavigationId)
 
+                PreventativeHomeView()
+                    .tabItem {
+                        Label("Prevent", systemImage: "leaf.fill")
+                    }
+                    .tag(3)
+
                 DashProfileView()
                     .tabItem {
                         Label("Profile", systemImage: "person.fill")
                     }
-                    .tag(3)
+                    .tag(4)
                     .id(tabSelection.profileNavigationId)
             }
             .tint(AppColors.accent)
@@ -68,7 +74,7 @@ struct DashboardMainTabView: View {
             if oldTab == newTab {
                 tabSelection.popToRootCurrentTab()
             }
-            let tabNames = ["Dashboard", "Form Check", "Rehab", "Profile"]
+            let tabNames = ["Dashboard", "Form Check", "Rehab", "Prevent", "Profile"]
             let name = newTab < tabNames.count ? tabNames[newTab] : "Unknown"
             SessionLogger.shared.logNavigation(.tabSwitched, screen: name, metadata: ["tab": "\(newTab)"])
             AnalyticsService.shared.log(.tabSwitched, parameters: ["tab_index": newTab])

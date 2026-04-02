@@ -1,0 +1,78 @@
+[debug] [2026-04-01T18:22:11.400Z] ----------------------------------------------------------------------
+[debug] [2026-04-01T18:22:11.402Z] Command:       /opt/homebrew/Cellar/node/25.6.1/bin/node /opt/homebrew/bin/firebase deploy --only functions --debug
+[debug] [2026-04-01T18:22:11.402Z] CLI Version:   15.12.0
+[debug] [2026-04-01T18:22:11.402Z] Platform:      darwin
+[debug] [2026-04-01T18:22:11.403Z] Node Version:  v25.6.1
+[debug] [2026-04-01T18:22:11.403Z] Time:          Wed Apr 01 2026 11:22:11 GMT-0700 (Pacific Daylight Time)
+[debug] [2026-04-01T18:22:11.403Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-04-01T18:22:11.983Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-04-01T18:22:11.983Z] > authorizing via signed-in user (suwajalen@gmail.com)
+[debug] [2026-04-01T18:22:11.984Z] [iam] checking project pt-helper-dev for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2026-04-01T18:22:11.984Z] Checked if tokens are valid: true, expires at: 1775071222442
+[debug] [2026-04-01T18:22:11.984Z] Checked if tokens are valid: true, expires at: 1775071222442
+[debug] [2026-04-01T18:22:11.984Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/pt-helper-dev:testIamPermissions [none]
+[debug] [2026-04-01T18:22:11.984Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/pt-helper-dev:testIamPermissions  x-goog-user-project=pt-helper-dev
+[debug] [2026-04-01T18:22:11.984Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/pt-helper-dev:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2026-04-01T18:22:12.098Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/pt-helper-dev:testIamPermissions 200
+[debug] [2026-04-01T18:22:12.098Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/pt-helper-dev:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2026-04-01T18:22:12.098Z] Checked if tokens are valid: true, expires at: 1775071222442
+[debug] [2026-04-01T18:22:12.098Z] Checked if tokens are valid: true, expires at: 1775071222442
+[debug] [2026-04-01T18:22:12.098Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/pt-helper-dev/serviceAccounts/pt-helper-dev@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2026-04-01T18:22:12.098Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/pt-helper-dev/serviceAccounts/pt-helper-dev@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2026-04-01T18:22:12.422Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/pt-helper-dev/serviceAccounts/pt-helper-dev@appspot.gserviceaccount.com:testIamPermissions 200
+[debug] [2026-04-01T18:22:12.423Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/pt-helper-dev/serviceAccounts/pt-helper-dev@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[info] 
+[info] === Deploying to 'pt-helper-dev'...
+[info] 
+[info] i  deploying functions 
+[debug] [2026-04-01T18:22:12.425Z] Checked if tokens are valid: true, expires at: 1775071222442
+[debug] [2026-04-01T18:22:12.425Z] Checked if tokens are valid: true, expires at: 1775071222442
+[debug] [2026-04-01T18:22:12.425Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/pt-helper-dev [none]
+[debug] [2026-04-01T18:22:12.539Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/pt-helper-dev 200
+[debug] [2026-04-01T18:22:12.539Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/pt-helper-dev {"projectNumber":"892493410961","projectId":"pt-helper-dev","lifecycleState":"ACTIVE","name":"PT-Helper-dev","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2025-09-23T01:45:55.457300Z"}
+[info] i  functions: preparing codebase default for deployment 
+[info] i  functions: ensuring required API cloudfunctions.googleapis.com is enabled... 
+[info] i  functions: ensuring required API cloudbuild.googleapis.com is enabled... 
+[info] i  artifactregistry: ensuring required API artifactregistry.googleapis.com is enabled... 
+[debug] [2026-04-01T18:22:12.540Z] Checked if tokens are valid: true, expires at: 1775071222442
+[debug] [2026-04-01T18:22:12.540Z] Checked if tokens are valid: true, expires at: 1775071222442
+[debug] [2026-04-01T18:22:12.541Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/pt-helper-dev/adminSdkConfig [none]
+[debug] [2026-04-01T18:22:12.829Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/pt-helper-dev/adminSdkConfig 200
+[debug] [2026-04-01T18:22:12.830Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/pt-helper-dev/adminSdkConfig {"projectId":"pt-helper-dev","storageBucket":"pt-helper-dev.firebasestorage.app"}
+[debug] [2026-04-01T18:22:12.830Z] Checked if tokens are valid: true, expires at: 1775071222442
+[debug] [2026-04-01T18:22:12.830Z] Checked if tokens are valid: true, expires at: 1775071222442
+[debug] [2026-04-01T18:22:12.830Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/pt-helper-dev/configs [none]
+[debug] [2026-04-01T18:22:13.131Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/pt-helper-dev/configs 200
+[debug] [2026-04-01T18:22:13.132Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/pt-helper-dev/configs {}
+[debug] [2026-04-01T18:22:13.133Z] Validating nodejs source
+[debug] [2026-04-01T18:22:13.520Z] > [functions] package.json contents: {
+  "name": "pt-helper-functions",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "deploy": "npm run build && firebase deploy --only functions",
+    "lint": "eslint src/**/*.ts"
+  },
+  "engines": {
+    "node": "22"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.0",
+    "firebase-admin": "^12.0.0",
+    "firebase-functions": "^7.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0"
+  }
+}
+[debug] [2026-04-01T18:22:13.520Z] Building nodejs source
+[info] i  functions: Loading and analyzing source code for codebase default to determine what to deploy 
+[debug] [2026-04-01T18:22:13.521Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-04-01T18:22:13.524Z] Found firebase-functions binary at '/Users/sushisuwa/Documents/GitHub/PT-Helper-Agent-v1/functions/node_modules/.bin/firebase-functions'
+[debug] [2026-04-01T18:22:23.567Z] Failed to call quitquitquit. This often means the server failed to start request to http://localhost:8074/__/quitquitquit failed, reason:  {"message":"request to http://localhost:8074/__/quitquitquit failed, reason: ","type":"system","errno":"ECONNREFUSED","code":"ECONNREFUSED"}
+[error] 
+[error] Error: User code failed to load. Cannot determine backend specification. Timeout after 10000. See https://firebase.google.com/docs/functions/tips#avoid_deployment_timeouts_during_initialization'

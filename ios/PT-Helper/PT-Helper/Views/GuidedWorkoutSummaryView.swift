@@ -6,6 +6,8 @@ struct GuidedWorkoutSummaryView: View {
     @EnvironmentObject private var workoutViewModel: WorkoutViewModel
     @Environment(\.dismiss) private var dismiss
 
+    var isSnackMode: Bool = false
+
     @State private var overallPain: Double = 3
     @State private var regionPainLevels: [String: Double] = [:]
     @State private var notes: String = ""
@@ -14,6 +16,112 @@ struct GuidedWorkoutSummaryView: View {
     @State private var insightText: String?
 
     var body: some View {
+        if isSnackMode {
+            snackCompletionView
+        } else {
+            standardWorkoutView
+        }
+    }
+
+    // MARK: - Snack Completion View
+
+    private var snackCompletionView: some View {
+        ScrollView {
+            VStack(spacing: AppSpacing.xl) {
+                // Snack-specific celebration header
+                VStack(spacing: AppSpacing.md) {
+                    ZStack {
+                        Circle()
+                            .fill(AppColors.accentTint)
+                            .frame(width: 90, height: 90)
+                        Image(systemName: "leaf.fill")
+                            .font(.system(size: 42))
+                            .foregroundColor(AppColors.accent)
+                            .symbolEffect(.bounce, value: isSaved)
+                    }
+                    Text("Movement Complete!")
+                        .font(.system(.title2, design: .serif).weight(.bold))
+                        .foregroundColor(AppColors.primaryText)
+                    Text(vm.plan.planName)
+                        .font(.subheadline)
+                        .foregroundColor(AppColors.secondaryText)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, AppSpacing.xl)
+
+                // Stats
+                statsGrid
+
+                // Streak bump indicator
+                if isSaved {
+                    HStack(spacing: AppSpacing.sm) {
+                        Image(systemName: "flame.fill")
+                            .foregroundColor(AppColors.warning)
+                        Text("Streak updated! Keep it up 🌿")
+                            .font(.subheadline.weight(.medium))
+                            .foregroundColor(AppColors.primaryText)
+                    }
+                    .padding(AppSpacing.md)
+                    .frame(maxWidth: .infinity)
+                    .background(AppColors.warning.opacity(0.10))
+                    .cornerRadius(AppCorners.card)
+                    .transition(.scale.combined(with: .opacity))
+                }
+
+                Button(action: { dismiss() }) {
+                    HStack(spacing: AppSpacing.sm) {
+                        Image(systemName: "checkmark.circle.fill")
+                        Text("Done")
+                    }
+                }
+                .buttonStyle(PrimaryButtonStyle())
+
+                Spacer(minLength: 40)
+            }
+            .padding(.horizontal, AppSpacing.xl)
+            .padding(.vertical, AppSpacing.md)
+        }
+        .onAppear {
+            guard !isSaved else { return }
+            autoSaveSnackSession()
+        }
+        .overlay {
+            if showSavedConfirmation {
+                CelebrationOverlay(
+                    icon: "leaf.fill",
+                    message: "Snack Complete!",
+                    iconColor: AppColors.accent
+                )
+            }
+        }
+        .trackScreen("SnackWorkoutSummary")
+    }
+
+    private func autoSaveSnackSession() {
+        let session = vm.buildSession(painLevel: 0, regionPainLevels: nil, notes: nil)
+        workoutViewModel.addSession(session: session)
+        isSaved = true
+
+        // Increment preventative streak
+        Task {
+            await PreventativeStreakViewModel.shared.incrementStreak()
+        }
+
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+
+        withAnimation(AppAnimations.bouncy) {
+            showSavedConfirmation = true
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            withAnimation { showSavedConfirmation = false }
+            // Invalidate today's snack so a new one is generated next time
+            DailySnackScheduler.shared.invalidateCache()
+        }
+    }
+
+    // MARK: - Standard Workout View (non-snack)
+
+    private var standardWorkoutView: some View {
         ScrollView {
             VStack(spacing: AppSpacing.lg) {
                 // Celebration header
@@ -221,6 +329,11 @@ struct GuidedWorkoutSummaryView: View {
         )
         workoutViewModel.addSession(session: session)
         isSaved = true
+
+        // Also increment preventative streak for wellness sessions
+        if vm.plan.planType == .wellness {
+            Task { await PreventativeStreakViewModel.shared.incrementStreak() }
+        }
 
         let notification = UINotificationFeedbackGenerator()
         notification.notificationOccurred(.success)
