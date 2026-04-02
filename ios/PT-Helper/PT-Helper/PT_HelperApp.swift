@@ -22,6 +22,7 @@ struct PainPointApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                .preferredColorScheme(.light)
                 .onChange(of: scenePhase) { _, newPhase in
                     switch newPhase {
                     case .active:

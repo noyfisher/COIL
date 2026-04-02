@@ -177,7 +177,7 @@ struct AnalysisResultView: View {
                                 Text(condition.redFlagMessage ?? "Seek immediate medical attention")
                                     .font(.caption.weight(.medium))
                             }
-                            .foregroundColor(.white)
+                            .foregroundColor(AppColors.ctaText)
                             .padding(AppSpacing.sm)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .background(AppColors.danger)
@@ -280,21 +280,21 @@ struct AnalysisResultView: View {
             HStack(spacing: 10) {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.title2)
-                    .foregroundColor(.white)
+                    .foregroundColor(AppColors.ctaText)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Important Safety Notice")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(AppColors.ctaText)
                     Text("Based on what you reported, please read this carefully")
                         .font(.caption)
-                        .foregroundColor(.white.opacity(0.9))
+                        .foregroundColor(AppColors.ctaText.opacity(0.9))
                 }
                 Spacer()
             }
             ForEach(Array(redFlagAlerts.enumerated()), id: \.offset) { _, alert in
                 Text(alert.message)
                     .font(.subheadline)
-                    .foregroundColor(.white.opacity(0.95))
+                    .foregroundColor(AppColors.ctaText.opacity(0.95))
             }
         }
         .padding()
@@ -309,21 +309,21 @@ struct AnalysisResultView: View {
             HStack(spacing: 10) {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.title2)
-                    .foregroundColor(.white)
+                    .foregroundColor(AppColors.ctaText)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Please Read This Carefully")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(AppColors.ctaText)
                     Text("Some of your symptoms may need urgent attention")
                         .font(.caption)
-                        .foregroundColor(.white.opacity(0.9))
+                        .foregroundColor(AppColors.ctaText.opacity(0.9))
                 }
                 Spacer()
             }
             ForEach(analysisResult.conditions.filter({ $0.isRedFlag })) { condition in
                 Text(condition.redFlagMessage ?? "")
                     .font(.subheadline)
-                    .foregroundColor(.white.opacity(0.95))
+                    .foregroundColor(AppColors.ctaText.opacity(0.95))
             }
         }
         .padding()

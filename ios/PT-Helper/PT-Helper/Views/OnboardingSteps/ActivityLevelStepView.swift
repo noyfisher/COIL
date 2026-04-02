@@ -20,7 +20,7 @@ struct ActivityLevelStepView: View {
                         HStack(spacing: AppSpacing.lg) {
                             Image(systemName: icon)
                                 .font(.title3)
-                                .foregroundColor(isSelected ? .white : AppColors.accent)
+                                .foregroundColor(isSelected ? AppColors.ctaText : AppColors.accent)
                                 .frame(width: 44, height: 44)
                                 .background(isSelected ? AppColors.accent : AppColors.accentTint)
                                 .cornerRadius(AppCorners.medium)
@@ -28,17 +28,17 @@ struct ActivityLevelStepView: View {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(level)
                                     .font(.body.weight(.semibold))
-                                    .foregroundColor(isSelected ? .white : .primary)
+                                    .foregroundColor(isSelected ? AppColors.ctaText : AppColors.primaryText)
                                 Text(subtitle)
                                     .font(.caption)
-                                    .foregroundColor(isSelected ? .white.opacity(0.8) : .secondary)
+                                    .foregroundColor(isSelected ? AppColors.ctaText.opacity(0.8) : AppColors.secondaryText)
                             }
 
                             Spacer()
 
                             if isSelected {
                                 Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(.white)
+                                    .foregroundColor(AppColors.ctaText)
                                     .font(.title3)
                             }
                         }
@@ -55,6 +55,7 @@ struct ActivityLevelStepView: View {
 
                 CardSection(icon: "sportscourt", color: .green, title: "Primary Sport or Activity") {
                     TextField("e.g. Basketball, Running, Yoga...", text: $viewModel.userProfile.primarySport.bound)
+                        .foregroundColor(AppColors.primaryText)
                         .padding(AppSpacing.md)
                         .background(AppColors.inputBackground)
                         .cornerRadius(AppCorners.medium)

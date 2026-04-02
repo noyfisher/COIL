@@ -115,7 +115,7 @@ struct MainTabView: View {
                     Text("You're offline. Changes will sync when reconnected.")
                         .font(.caption)
                 }
-                .foregroundColor(.white)
+                .foregroundColor(AppColors.ctaText)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, AppSpacing.sm)
                 .background(AppColors.danger)

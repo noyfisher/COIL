@@ -84,7 +84,7 @@ struct HomeTab: View {
                                             .foregroundColor(.purple)
                                         Text("Complete \(3 - recentCount) more workout\(3 - recentCount == 1 ? "" : "s") to unlock AI Recovery Insights")
                                             .font(.caption)
-                                            .foregroundColor(.secondary)
+                                            .foregroundColor(AppColors.secondaryText)
                                         Spacer()
                                         HStack(spacing: 4) {
                                             ForEach(0..<3, id: \.self) { i in
@@ -146,11 +146,11 @@ struct HomeTab: View {
                         // Profile avatar
                         Text(avatarInitials)
                             .font(.system(size: 12, weight: .bold, design: .rounded))
-                            .foregroundColor(.white)
+                            .foregroundColor(AppColors.ctaText)
                             .frame(width: 32, height: 32)
                             .background(
                                 Circle()
-                                    .fill(AppColors.coolGradient)
+                                    .fill(AppColors.primaryGradient)
                             )
                     }
                 }
@@ -180,17 +180,17 @@ struct HomeTab: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text(greetingText)
                 .font(.subheadline)
-                .foregroundColor(.white.opacity(0.8))
+                .foregroundColor(AppColors.ctaText.opacity(0.8))
             Text(profileName.isEmpty ? "Welcome!" : "Hi, \(profileName)!")
                 .font(AppFonts.heroTitle)
-                .foregroundColor(.white)
+                .foregroundColor(AppColors.ctaText)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(AppSpacing.xl)
         .padding(.vertical, AppSpacing.sm)
         .background(
             RoundedRectangle(cornerRadius: AppCorners.xl)
-                .fill(AppColors.coolGradient)
+                .fill(AppColors.primaryGradient)
         )
         .shadow(color: .blue.opacity(0.15), radius: 12, y: 6)
     }
@@ -231,13 +231,13 @@ struct HomeTab: View {
 
             Text(value)
                 .font(AppFonts.statNumber)
-                .foregroundColor(.primary)
+                .foregroundColor(AppColors.primaryText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
 
             Text(label)
                 .font(.caption2)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, AppSpacing.lg)
@@ -285,10 +285,10 @@ struct HomeTab: View {
                         VStack(alignment: .leading, spacing: AppSpacing.xs) {
                             Text(plan.planName)
                                 .font(AppFonts.cardTitle)
-                                .foregroundColor(.primary)
+                                .foregroundColor(AppColors.primaryText)
                             Text("\(plan.exercises.count) exercises")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.secondaryText)
                         }
                         Spacer()
                         Image(systemName: "chevron.right")
@@ -369,16 +369,16 @@ struct OnboardingEditView: View {
                         Text("Step \(viewModel.currentStep) of 6")
                             .font(.caption)
                             .fontWeight(.semibold)
-                            .foregroundColor(.white)
+                            .foregroundColor(AppColors.ctaText)
                             .padding(.horizontal, AppSpacing.md)
                             .padding(.vertical, AppSpacing.xs)
-                            .background(Color.blue)
-                            .cornerRadius(AppCorners.medium)
+                            .background(AppColors.accent)
+                            .clipShape(Capsule())
 
                         HStack(spacing: 6) {
                             ForEach(1...6, id: \.self) { step in
                                 Capsule()
-                                    .fill(step <= viewModel.currentStep ? Color.blue : Color.gray.opacity(0.25))
+                                    .fill(step <= viewModel.currentStep ? AppColors.accent : AppColors.elevatedSurface)
                                     .frame(height: 5)
                                     .animation(.spring(response: 0.35), value: viewModel.currentStep)
                             }
@@ -391,7 +391,7 @@ struct OnboardingEditView: View {
 
                         Text(stepSubtitle)
                             .font(.subheadline)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppColors.secondaryText)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 32)
                     }

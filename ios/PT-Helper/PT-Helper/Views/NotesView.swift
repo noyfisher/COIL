@@ -25,6 +25,7 @@ struct NotesView: View {
                                 }
                                 TextEditor(text: $viewModel.newNoteContent)
                                     .focused($isEditorFocused)
+                                    .foregroundColor(AppColors.primaryText)
                                     .frame(minHeight: 100)
                                     .scrollContentBackground(.hidden)
                                     .padding(AppSpacing.xs)

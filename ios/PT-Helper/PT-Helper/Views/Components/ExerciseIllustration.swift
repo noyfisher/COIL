@@ -201,7 +201,7 @@ struct ExercisePositionGuideView: View {
                     .foregroundColor(color)
                 Text(text)
                     .font(.subheadline)
-                    .foregroundColor(.primary)
+                    .foregroundColor(AppColors.primaryText)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }

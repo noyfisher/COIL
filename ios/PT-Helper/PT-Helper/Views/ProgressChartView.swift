@@ -72,7 +72,7 @@ struct ProgressChartView: View {
                 .padding(.horizontal, AppSpacing.md)
                 .padding(.vertical, AppSpacing.sm)
                 .background(isSelected ? AppColors.accent : Color(.systemGray5))
-                .foregroundColor(isSelected ? .white : AppColors.primaryText)
+                .foregroundColor(isSelected ? AppColors.ctaText : AppColors.primaryText)
                 .cornerRadius(AppCorners.medium)
         }
     }

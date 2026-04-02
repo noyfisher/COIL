@@ -65,7 +65,7 @@ struct DisclaimerView: View {
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 16)
                                 .background(AppColors.accent)
-                                .foregroundColor(.white)
+                                .foregroundColor(AppColors.ctaText)
                                 .font(.headline)
                                 .cornerRadius(AppCorners.large)
                         }

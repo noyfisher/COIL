@@ -710,15 +710,15 @@ struct RehabPlanView: View {
             if !urgentWarnings.isEmpty {
                 HStack(spacing: 8) {
                     Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundColor(.white)
+                        .foregroundColor(AppColors.ctaText)
                     Text("Safety Notice")
                         .font(.subheadline.weight(.semibold))
-                        .foregroundColor(.white)
+                        .foregroundColor(AppColors.ctaText)
                 }
                 ForEach(Array(urgentWarnings.enumerated()), id: \.offset) { _, warning in
                     Text("• \(warning.message)")
                         .font(.caption)
-                        .foregroundColor(.white.opacity(0.95))
+                        .foregroundColor(AppColors.ctaText.opacity(0.95))
                 }
             }
 

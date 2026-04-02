@@ -30,7 +30,7 @@ struct ReAssessmentPromptView: View {
                     Text("Start Re-Assessment")
                 }
                 .font(.subheadline.weight(.medium))
-                .foregroundColor(.white)
+                .foregroundColor(AppColors.ctaText)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
                 .background(AppColors.accent)

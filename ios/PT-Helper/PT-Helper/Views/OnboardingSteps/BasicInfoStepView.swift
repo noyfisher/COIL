@@ -30,6 +30,7 @@ struct BasicInfoStepView: View {
                                displayedComponents: .date)
                         .datePickerStyle(.compact)
                         .labelsHidden()
+                        .tint(AppColors.accent)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
 
@@ -82,9 +83,9 @@ struct BasicInfoStepView: View {
                                     .font(.title3.weight(.medium))
                                 Image(systemName: "chevron.up.chevron.down")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(AppColors.secondaryText)
                             }
-                            .foregroundColor(.primary)
+                            .foregroundColor(AppColors.primaryText)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, AppSpacing.md)
                             .background(AppColors.inputBackground)
@@ -101,9 +102,9 @@ struct BasicInfoStepView: View {
                                     .font(.title3.weight(.medium))
                                 Image(systemName: "chevron.up.chevron.down")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(AppColors.secondaryText)
                             }
-                            .foregroundColor(.primary)
+                            .foregroundColor(AppColors.primaryText)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, AppSpacing.md)
                             .background(AppColors.inputBackground)
@@ -119,6 +120,7 @@ struct BasicInfoStepView: View {
                                 .keyboardType(.decimalPad)
                                 .focused($isWeightFieldFocused)
                                 .font(.title3.weight(.medium))
+                                .foregroundColor(AppColors.primaryText)
                                 .padding(AppSpacing.md)
                                 .background(AppColors.inputBackground)
                                 .cornerRadius(AppCorners.medium)

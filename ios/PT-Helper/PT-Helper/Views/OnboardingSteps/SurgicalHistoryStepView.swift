@@ -16,6 +16,7 @@ struct SurgicalHistoryStepView: View {
                     VStack(alignment: .leading, spacing: AppSpacing.xs) {
                         Text("Have you had any surgeries?")
                             .font(.body.weight(.medium))
+                            .foregroundColor(AppColors.primaryText)
                         Text(viewModel.userProfile.surgeries.isEmpty ? "Tap to add" : "\(viewModel.userProfile.surgeries.count) recorded")
                             .font(.caption)
                             .foregroundColor(.secondary)

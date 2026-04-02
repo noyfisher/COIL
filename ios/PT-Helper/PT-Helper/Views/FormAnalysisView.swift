@@ -203,11 +203,11 @@ struct FormAnalysisView: View {
                     VStack(alignment: .leading, spacing: AppSpacing.sm) {
                         Label("Important", systemImage: "exclamationmark.triangle.fill")
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(AppColors.ctaText)
                         ForEach(urgentWarnings.map { $0.message }, id: \.self) { msg in
                             Text(msg)
                                 .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.9))
+                                .foregroundColor(AppColors.ctaText.opacity(0.9))
                         }
                     }
                     .padding(AppSpacing.lg)

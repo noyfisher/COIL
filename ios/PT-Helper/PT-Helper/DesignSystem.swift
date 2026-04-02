@@ -291,6 +291,7 @@ struct StyledTextField: View {
 
     var body: some View {
         TextField(placeholder, text: $text)
+            .foregroundColor(AppColors.primaryText)
             .padding(AppSpacing.md)
             .background(AppColors.inputBackground)
             .cornerRadius(AppCorners.medium)
@@ -539,7 +540,7 @@ struct CelebrationOverlay: View {
                 .foregroundColor(iconColor)
             Text(message)
                 .font(.headline)
-                .foregroundColor(.primary)
+                .foregroundColor(AppColors.primaryText)
         }
         .padding(AppSpacing.xxl)
         .background(.ultraThinMaterial)

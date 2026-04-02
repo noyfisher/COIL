@@ -83,7 +83,7 @@ struct QuickHealthUpdateView: View {
                                     }
                                 }
                                 .font(.body.weight(.semibold))
-                                .foregroundColor(.white)
+                                .foregroundColor(AppColors.ctaText)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, AppSpacing.lg)
                                 .background(AppColors.ctaBackground)
@@ -131,7 +131,7 @@ struct QuickHealthUpdateView: View {
                         Button(action: { toggleMedication(med) }) {
                             Text(med)
                                 .font(.subheadline.weight(.medium))
-                                .foregroundColor(isSelected ? .white : AppColors.primaryText)
+                                .foregroundColor(isSelected ? AppColors.ctaText : AppColors.primaryText)
                                 .padding(.horizontal, AppSpacing.md)
                                 .padding(.vertical, AppSpacing.sm)
                                 .background(isSelected ? AppColors.accent : AppColors.inputBackground)
@@ -154,6 +154,7 @@ struct QuickHealthUpdateView: View {
                     HStack(spacing: AppSpacing.sm) {
                         TextField("Type medication name", text: $customMedicationText)
                             .font(.subheadline)
+                            .foregroundColor(AppColors.primaryText)
                             .padding(AppSpacing.md)
                             .background(AppColors.inputBackground)
                             .cornerRadius(AppCorners.medium)
@@ -178,10 +179,10 @@ struct QuickHealthUpdateView: View {
                                         Button(action: { toggleMedication(med) }) {
                                             Image(systemName: "xmark.circle.fill")
                                                 .font(.caption)
-                                                .foregroundColor(.white.opacity(0.8))
+                                                .foregroundColor(AppColors.ctaText.opacity(0.8))
                                         }
                                     }
-                                    .foregroundColor(.white)
+                                    .foregroundColor(AppColors.ctaText)
                                     .padding(.horizontal, AppSpacing.md)
                                     .padding(.vertical, AppSpacing.sm)
                                     .background(AppColors.accent)

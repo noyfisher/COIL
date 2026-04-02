@@ -15,10 +15,10 @@ struct BodyMapView: View {
                 VStack(spacing: 6) {
                     Text("Where does it hurt?")
                         .font(.title2.weight(.bold))
-                        .foregroundColor(.primary)
+                        .foregroundColor(AppColors.primaryText)
                     Text("Tap all areas where you feel pain or discomfort")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                         .multilineTextAlignment(.center)
                 }
                 .padding(.top, 20)
@@ -128,7 +128,7 @@ struct BodyMapView: View {
                     HStack {
                         Text("\(viewModel.selectedRegions.count) area(s) selected")
                             .font(.subheadline.weight(.medium))
-                            .foregroundColor(.primary)
+                            .foregroundColor(AppColors.primaryText)
                         Spacer()
                         if !viewModel.selectedRegions.isEmpty {
                             Button(action: { viewModel.clearAll() }) {

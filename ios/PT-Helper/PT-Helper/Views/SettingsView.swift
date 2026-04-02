@@ -31,7 +31,7 @@ struct SettingsView: View {
                             // Avatar
                             Text(initials)
                                 .font(.system(size: 28, weight: .bold, design: .rounded))
-                                .foregroundColor(.white)
+                                .foregroundColor(AppColors.ctaText)
                                 .frame(width: 72, height: 72)
                                 .background(
                                     Circle()
@@ -250,10 +250,10 @@ struct SettingsView: View {
                         VStack(spacing: AppSpacing.md) {
                             ProgressView()
                                 .scaleEffect(1.3)
-                                .tint(.white)
+                                .tint(AppColors.ctaText)
                             Text("Deleting account...")
                                 .font(.subheadline)
-                                .foregroundColor(.white)
+                                .foregroundColor(AppColors.primaryText)
                         }
                         .padding(AppSpacing.xxl)
                         .background(.ultraThinMaterial)

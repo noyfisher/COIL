@@ -38,7 +38,7 @@ struct HealthCheckPromptView: View {
                         Text("Yes, Update My Profile")
                     }
                     .font(.body.weight(.semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(AppColors.ctaText)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, AppSpacing.lg)
                     .background(AppColors.ctaBackground)

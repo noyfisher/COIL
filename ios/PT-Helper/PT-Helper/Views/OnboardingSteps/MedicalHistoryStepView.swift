@@ -73,7 +73,7 @@ struct MedicalHistoryStepView: View {
                                 Button(action: { toggleMedication(med) }) {
                                     Text(med)
                                         .font(.subheadline.weight(.medium))
-                                        .foregroundColor(isSelected ? .white : .primary)
+                                        .foregroundColor(isSelected ? AppColors.ctaText : AppColors.primaryText)
                                         .padding(.horizontal, AppSpacing.md)
                                         .padding(.vertical, AppSpacing.sm)
                                         .background(isSelected ? AppColors.accent : AppColors.inputBackground)
@@ -96,6 +96,7 @@ struct MedicalHistoryStepView: View {
                             HStack(spacing: AppSpacing.sm) {
                                 TextField("Type medication name", text: $customMedicationText)
                                     .font(.subheadline)
+                                    .foregroundColor(AppColors.primaryText)
                                     .padding(AppSpacing.md)
                                     .background(AppColors.inputBackground)
                                     .cornerRadius(AppCorners.medium)
@@ -120,10 +121,10 @@ struct MedicalHistoryStepView: View {
                                                 Button(action: { toggleMedication(med) }) {
                                                     Image(systemName: "xmark.circle.fill")
                                                         .font(.caption)
-                                                        .foregroundColor(.white.opacity(0.8))
+                                                        .foregroundColor(AppColors.ctaText.opacity(0.8))
                                                 }
                                             }
-                                            .foregroundColor(.white)
+                                            .foregroundColor(AppColors.ctaText)
                                             .padding(.horizontal, AppSpacing.md)
                                             .padding(.vertical, AppSpacing.sm)
                                             .background(AppColors.accent)
@@ -138,6 +139,7 @@ struct MedicalHistoryStepView: View {
 
                 CardSection(icon: "plus.circle.fill", color: .orange, title: "Other Conditions") {
                     TextField("e.g. Epilepsy, Thyroid issues...", text: $viewModel.userProfile.otherMedicalConditions.bound)
+                        .foregroundColor(AppColors.primaryText)
                         .padding(AppSpacing.md)
                         .background(AppColors.inputBackground)
                         .cornerRadius(AppCorners.medium)
@@ -164,7 +166,7 @@ struct MedicalHistoryStepView: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
             }
-            .foregroundColor(isSelected ? .white : .primary)
+            .foregroundColor(isSelected ? AppColors.ctaText : AppColors.primaryText)
             .frame(maxWidth: .infinity)
             .padding(.vertical, AppSpacing.lg)
             .padding(.horizontal, AppSpacing.sm)

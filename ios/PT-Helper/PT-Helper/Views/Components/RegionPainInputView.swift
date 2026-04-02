@@ -140,7 +140,7 @@ struct RegionPainInputView: View {
         }) {
             HStack {
                 Text(Self.displayName(for: region))
-                    .foregroundColor(.primary)
+                    .foregroundColor(AppColors.primaryText)
                 Spacer()
                 Image(systemName: "plus.circle")
                     .foregroundColor(AppColors.accent)

@@ -16,6 +16,7 @@ struct InjuryHistoryStepView: View {
                     VStack(alignment: .leading, spacing: AppSpacing.xs) {
                         Text("Any current or past injuries?")
                             .font(.body.weight(.medium))
+                            .foregroundColor(AppColors.primaryText)
                         Text(viewModel.userProfile.injuries.isEmpty ? "Tap to add" : "\(viewModel.userProfile.injuries.count) recorded")
                             .font(.caption)
                             .foregroundColor(.secondary)

@@ -39,7 +39,7 @@ struct PainDetailView: View {
                                 HStack {
                                     Text("Region \(viewModel.currentRegionIndex + 1) of \(viewModel.totalRegions)")
                                         .font(.caption.weight(.semibold))
-                                        .foregroundColor(.white)
+                                        .foregroundColor(AppColors.ctaText)
                                         .padding(.horizontal, AppSpacing.md)
                                         .padding(.vertical, AppSpacing.xs)
                                         .background(AppColors.accent)
@@ -863,7 +863,7 @@ struct PainDetailView: View {
                         Text("Apply to All \(viewModel.totalRegions) Regions & Analyze")
                     }
                     .font(.subheadline.weight(.semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(AppColors.ctaText)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, AppSpacing.md)
                     .background(AppColors.healingGradient)

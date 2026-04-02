@@ -59,7 +59,7 @@ struct TimerView: View {
                 }) {
                     Image(systemName: viewModel.timer.isRunning ? "pause.fill" : "play.fill")
                         .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(AppColors.ctaText)
                         .frame(width: 64, height: 64)
                         .background(
                             Circle()

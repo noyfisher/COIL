@@ -20,10 +20,10 @@ struct DashboardMainTabView: View {
                     Text("You're offline. Changes will sync when reconnected.")
                         .font(.caption)
                 }
-                .foregroundColor(.white)
+                .foregroundColor(AppColors.ctaText)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, AppSpacing.sm)
-                .background(AppColors.danger.opacity(0.8))
+                .background(AppColors.danger)
                 .accessibilityIdentifier("offlineBanner")
             }
 

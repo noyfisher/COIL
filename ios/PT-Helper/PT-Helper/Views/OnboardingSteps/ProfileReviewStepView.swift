@@ -138,7 +138,7 @@ struct ProfileReviewStepView: View {
                     HStack {
                         if isSaving {
                             ProgressView()
-                                .tint(.white)
+                                .tint(AppColors.ctaText)
                         } else if showSuccess {
                             Image(systemName: "checkmark")
                                 .font(.body.weight(.bold))
@@ -149,10 +149,10 @@ struct ProfileReviewStepView: View {
                         }
                     }
                     .font(.body.weight(.semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(AppColors.ctaText)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, AppSpacing.lg)
-                    .background(showSuccess ? Color.green.opacity(0.8) : Color.green)
+                    .background(showSuccess ? AppColors.success.opacity(0.8) : AppColors.success)
                     .cornerRadius(AppCorners.card)
                 }
                 .disabled(isSaving || showSuccess)
@@ -213,12 +213,12 @@ struct ReviewRow: View {
             if !label.isEmpty {
                 Text(label)
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AppColors.secondaryText)
             }
             Spacer()
             Text(value)
                 .font(.subheadline.weight(.medium))
-                .foregroundColor(.primary)
+                .foregroundColor(AppColors.primaryText)
                 .multilineTextAlignment(.trailing)
         }
     }

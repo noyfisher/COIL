@@ -125,7 +125,7 @@ struct DashEmptyStateView: View {
                 Button(action: action) {
                     Text(actionTitle)
                         .font(.subheadline.weight(.semibold))
-                        .foregroundColor(.white)
+                        .foregroundColor(AppColors.ctaText)
                         .padding(.horizontal, AppSpacing.xl)
                         .padding(.vertical, AppSpacing.md)
                         .background(AppColors.dashAccentGradient)
@@ -150,7 +150,7 @@ struct DashChipButton: View {
         Button(action: action) {
             Text(label)
                 .font(.subheadline.weight(.medium))
-                .foregroundColor(isSelected ? .white : AppColors.dashTextSecondary)
+                .foregroundColor(isSelected ? AppColors.ctaText : AppColors.dashTextSecondary)
                 .padding(.horizontal, AppSpacing.md)
                 .padding(.vertical, AppSpacing.sm)
                 .background(isSelected ? AppColors.dashAccent : AppColors.dashSurface)

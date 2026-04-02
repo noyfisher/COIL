@@ -83,7 +83,7 @@ struct RecoveryInsightsDetailView: View {
                 HStack(spacing: AppSpacing.sm) {
                     Image(systemName: trendIcon(analysis.trendDirection))
                         .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(AppColors.ctaText)
                         .frame(width: 28, height: 28)
                         .background(trendColor(analysis.trendDirection))
                         .clipShape(Circle())

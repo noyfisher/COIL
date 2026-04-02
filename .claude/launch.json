@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "firebase-emulator",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "serve"],
+      "cwd": "functions",
+      "port": 5001
+    },
+    {
+      "name": "virtual-user-portal",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "virtual-users/portal",
+      "port": 3100
+    }
+  ]
+}
