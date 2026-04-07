@@ -289,6 +289,78 @@ enum TestFixtures {
         """
     }
 
+    // MARK: - Wellness Goal Selection
+
+    static func makeGoalSelection(
+        category: GoalCategory = .improvePosture,
+        customDescription: String? = nil
+    ) -> GoalSelection {
+        GoalSelection(category: category, customDescription: customDescription)
+    }
+
+    // MARK: - Wellness Assessment
+
+    static func makeWellnessAssessment(
+        goalCategory: GoalCategory = .improvePosture,
+        impactLevel: WellnessAssessment.ImpactLevel = .moderate,
+        motivationLevel: Int = 7,
+        duration: WellnessAssessment.Duration = .fewMonths,
+        commitmentLevel: WellnessAssessment.CommitmentLevel = .fifteenMin
+    ) -> WellnessAssessment {
+        WellnessAssessment(
+            id: UUID(),
+            goalCategory: goalCategory,
+            customGoalText: nil,
+            impactLevel: impactLevel,
+            motivationLevel: motivationLevel,
+            duration: duration,
+            timeOfDay: [.morning],
+            dailyActivitiesAffected: ["Sitting at desk"],
+            currentHabits: ["Walking"],
+            priorAttempts: [.stretching],
+            commitmentLevel: commitmentLevel,
+            specificContext: nil,
+            additionalNotes: nil
+        )
+    }
+
+    // MARK: - Wellness Recommendation
+
+    static func makeWellnessRecommendation(
+        goalCategory: String = "improve_posture",
+        title: String = "Posture Improvement"
+    ) -> WellnessRecommendation {
+        WellnessRecommendation(
+            id: UUID(),
+            goalCategory: goalCategory,
+            title: title,
+            currentStateAssessment: "Test assessment",
+            rootCauses: ["Prolonged sitting"],
+            expectedTimeline: "4-6 weeks",
+            keyInsight: "Focus on core strengthening",
+            priorityLevel: "high",
+            relatedGoals: []
+        )
+    }
+
+    // MARK: - Wellness Analysis Result
+
+    static func makeWellnessAnalysisResult(
+        assessments: [WellnessAssessment]? = nil,
+        recommendations: [WellnessRecommendation]? = nil,
+        profile: UserProfile? = nil
+    ) -> WellnessAnalysisResult {
+        WellnessAnalysisResult(
+            id: UUID(),
+            assessments: assessments ?? [makeWellnessAssessment()],
+            recommendations: recommendations ?? [makeWellnessRecommendation()],
+            overallSummary: "Test wellness summary",
+            disclaimerText: "This is not medical advice.",
+            generatedDate: Date(),
+            userProfileSnapshot: profile ?? makeProfile()
+        )
+    }
+
     // MARK: - Exercise Substitute Response
 
     /// Returns a valid JSON string matching the expected AI exercise substitute response format.
@@ -399,6 +471,131 @@ enum TestFixtures {
             isCompleted: isCompleted,
             exercisesPerformed: exercisesPerformed,
             planId: planId
+        )
+    }
+
+    // MARK: - Pose Frame
+
+    /// Creates a PoseFrame with all 17 joints at uniform positions and confidence.
+    static func makePoseFrame(
+        timestamp: Double = 0,
+        jointCount: Int = 17,
+        confidence: Double = 0.9,
+        bodyHeight: Double? = 1.75
+    ) -> PoseFrame {
+        var joints: [String: JointPoint3D] = [:]
+        let allJoints = BodyJoint3D.allCases
+        for i in 0..<min(jointCount, allJoints.count) {
+            let joint = allJoints[i]
+            // Place joints at distinct positions so bone lengths are realistic
+            let y = Double(i) * 0.1
+            joints[joint.rawValue] = JointPoint3D(x: 0, y: y, z: 0, confidence: confidence)
+        }
+        return PoseFrame(timestamp: timestamp, joints: joints, bodyHeight: bodyHeight)
+    }
+
+    /// Creates a PoseFrame with explicit joints dictionary.
+    static func makePoseFrame(
+        timestamp: Double = 0,
+        joints: [String: JointPoint3D],
+        bodyHeight: Double? = nil
+    ) -> PoseFrame {
+        PoseFrame(timestamp: timestamp, joints: joints, bodyHeight: bodyHeight)
+    }
+
+    // MARK: - Rep Metrics
+
+    static func makeRepMetrics(
+        repNumber: Int = 1,
+        kneeAngle: RepMetrics.AngleRange? = nil,
+        durationSeconds: Double = 2.5
+    ) -> RepMetrics {
+        let angle = kneeAngle ?? RepMetrics.AngleRange(
+            minDegrees: 85, maxDegrees: 170, rangeOfMotion: 85,
+            atStart: 170, atMid: 85, atEnd: 170
+        )
+        return RepMetrics(
+            repNumber: repNumber,
+            keyAngles: ["left_knee": angle],
+            durationSeconds: durationSeconds,
+            startTimestamp: Double(repNumber - 1) * durationSeconds,
+            endTimestamp: Double(repNumber) * durationSeconds
+        )
+    }
+
+    // MARK: - Form Analysis Data
+
+    static func makeFormAnalysisData(
+        exerciseName: String = "Squat",
+        repCount: Int = 3,
+        repMetrics: [RepMetrics]? = nil,
+        symmetry: FormAnalysisData.SymmetryData? = nil,
+        alignment: [FormAnalysisData.AlignmentIssue] = [],
+        averageTempo: Double? = 2.5,
+        tempoVariability: Double? = 0.3
+    ) -> FormAnalysisData {
+        let reps = repMetrics ?? (1...repCount).map { makeRepMetrics(repNumber: $0) }
+        return FormAnalysisData(
+            exerciseName: exerciseName,
+            exerciseCategory: "strength",
+            targetArea: "Quadriceps",
+            totalFramesProcessed: 100,
+            videoFPS: 30.0,
+            videoDurationSeconds: 10.0,
+            detectedRepCount: reps.count,
+            repMetrics: reps,
+            symmetry: symmetry,
+            alignment: alignment,
+            averageTempo: averageTempo,
+            tempoVariability: tempoVariability,
+            bodyHeight: 1.75
+        )
+    }
+
+    // MARK: - Data Quality Report
+
+    static func makeDataQualityReport(
+        overallScore: Double = 0.8,
+        frameCoverage: Double = 0.9,
+        averageJointCount: Double = 16.0,
+        linkLengthConsistency: Double = 0.9,
+        temporalOutlierCount: Int = 0,
+        totalVideoFrames: Int = 300,
+        framesWithPose: Int = 270,
+        minimumDataThresholdMet: Bool = true,
+        warnings: [String] = []
+    ) -> DataQualityReport {
+        DataQualityReport(
+            overallScore: overallScore,
+            frameCoverage: frameCoverage,
+            averageJointCount: averageJointCount,
+            linkLengthConsistency: linkLengthConsistency,
+            temporalOutlierCount: temporalOutlierCount,
+            totalVideoFrames: totalVideoFrames,
+            framesWithPose: framesWithPose,
+            minimumDataThresholdMet: minimumDataThresholdMet,
+            warnings: warnings
+        )
+    }
+
+    // MARK: - Form Feedback
+
+    static func makeFormFeedback(
+        score: Int = 75,
+        verdict: FormFeedback.Verdict = .good,
+        corrections: [FormFeedback.Correction] = [],
+        positivePoints: [String] = ["Good depth"],
+        safetyNotes: [String] = [],
+        dataLimitations: [String] = []
+    ) -> FormFeedback {
+        FormFeedback(
+            exerciseName: "Squat",
+            overallScore: score,
+            verdict: verdict,
+            corrections: corrections,
+            positivePoints: positivePoints,
+            safetyNotes: safetyNotes,
+            dataLimitations: dataLimitations
         )
     }
 

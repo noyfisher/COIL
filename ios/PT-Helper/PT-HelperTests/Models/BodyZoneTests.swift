@@ -60,6 +60,20 @@ final class BodyZoneTests: XCTestCase {
         XCTAssertNil(BodyZone.zone(for: ""))
     }
 
+    /// Every zone has a non-empty display name.
+    func testDisplayName_allZones_nonEmpty() {
+        for zone in BodyZone.allCases {
+            XCTAssertFalse(zone.displayName.isEmpty, "\(zone.rawValue) should have a non-empty displayName")
+        }
+    }
+
+    /// Every zone has a non-empty icon name.
+    func testIconName_allZones_nonEmpty() {
+        for zone in BodyZone.allCases {
+            XCTAssertFalse(zone.iconName.isEmpty, "\(zone.rawValue) should have a non-empty iconName")
+        }
+    }
+
     /// Camera targets exist for every zone.
     func testCameraTargetExistsForEveryZone() {
         for zone in BodyZone.allCases {

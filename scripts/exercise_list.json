@@ -1447,6 +1447,30 @@
       "target_area": "Hips, Inner Thigh, Core",
       "body_position": "standing",
       "pose_description": "The figure takes a wide step to one side, bending that knee while keeping the other leg straight. The torso leans slightly forward and the opposite arm reaches toward the bent knee foot. The straight leg inner thigh is stretched. Weight is on the bent leg with the foot flat on the ground."
+    },
+    {
+      "name": "Exercise 1",
+      "normalized_filename": "exercise-1",
+      "category": "strength",
+      "target_area": "Knee"
+    },
+    {
+      "name": "Exercise 2",
+      "normalized_filename": "exercise-2",
+      "category": "strength",
+      "target_area": "Knee"
+    },
+    {
+      "name": "Exercise 3",
+      "normalized_filename": "exercise-3",
+      "category": "strength",
+      "target_area": "Knee"
+    },
+    {
+      "name": "Quadriceps Sets (Isometric)",
+      "normalized_filename": "quadriceps-sets-isometric",
+      "category": "strength",
+      "target_area": "Left Knee, Quadriceps"
     }
   ]
 }

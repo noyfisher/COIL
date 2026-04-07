@@ -1,13 +1,23 @@
 import SwiftUI
 
-/// Feature flag for the experimental data-driven dashboard UI (Manus Concept 2).
-/// Set to `true` to enable the dark 3-tab dashboard, `false` for original 4-tab UI.
-/// In UI testing mode, `--use-legacy-ui` launch argument forces the legacy layout.
-var useDashboardUI: Bool {
+/// Feature flag for the new 3-tab navigation (Assess / My Plan / Progress).
+/// Set to `true` to enable the simplified 3-tab layout.
+/// In UI testing mode, `--use-legacy-ui` launch argument forces the legacy 4-tab layout.
+var useThreeTabUI: Bool {
     if TestDataSeeder.isUITesting && TestDataSeeder.shouldUseLegacyUI {
         return false
     }
     return true
+}
+
+/// Feature flag for the experimental data-driven dashboard UI (Manus Concept 2).
+/// Superseded by `useThreeTabUI` when that is enabled.
+var useDashboardUI: Bool {
+    if useThreeTabUI { return false }
+    if TestDataSeeder.isUITesting && TestDataSeeder.shouldUseLegacyUI {
+        return false
+    }
+    return false // Dashboard UI disabled in favor of 3-tab layout
 }
 
 /// Observable class to allow any child view to switch tabs or pop to root
@@ -23,16 +33,27 @@ class TabSelection: ObservableObject {
     @Published var rehabNavigationId = UUID()
     @Published var profileNavigationId = UUID()
 
+    /// Navigation IDs for the new 3-tab layout (Assess / My Plan / Progress).
+    @Published var assessNavigationId = UUID()
+    @Published var myPlanNavigationId = UUID()
+
     func popToRootAndGoHome() {
         if selectedTab == 0 {
-            // Already on Home/Dashboard — just reset navigation to pop to root
+            // Already on Home/Dashboard/Assess — just reset navigation to pop to root
             homeNavigationId = UUID()
             dashboardNavigationId = UUID()
+            assessNavigationId = UUID()
             return
         }
 
         // Clean up the deep navigation state on the tab we're leaving
-        if useDashboardUI {
+        if useThreeTabUI {
+            switch selectedTab {
+            case 1: myPlanNavigationId = UUID()
+            case 2: progressNavigationId = UUID()
+            default: break
+            }
+        } else if useDashboardUI {
             switch selectedTab {
             case 1: rehabNavigationId = UUID()
             case 2: profileNavigationId = UUID()
@@ -55,7 +76,14 @@ class TabSelection: ObservableObject {
 
     /// Pop to root on the current tab (used when re-tapping the active tab).
     func popToRootCurrentTab() {
-        if useDashboardUI {
+        if useThreeTabUI {
+            switch selectedTab {
+            case 0: assessNavigationId = UUID()
+            case 1: myPlanNavigationId = UUID()
+            case 2: progressNavigationId = UUID()
+            default: break
+            }
+        } else if useDashboardUI {
             switch selectedTab {
             case 0: dashboardNavigationId = UUID()
             case 1: rehabNavigationId = UUID()
@@ -98,7 +126,9 @@ struct MainTabView: View {
     }
 
     var body: some View {
-        if useDashboardUI {
+        if useThreeTabUI {
+            ThreeTabView()
+        } else if useDashboardUI {
             DashboardMainTabView()
         } else {
             existingTabView

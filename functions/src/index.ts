@@ -846,8 +846,9 @@ export const aggregateDailyMetrics = onSchedule("every day 01:00", async () => {
   const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
 
   try {
-    // Count users with profiles
-    const usersSnap = await db.collectionGroup("health").count().get();
+    // Count users with profiles (path: users/{uid}/profile/health)
+    // "profile" is the subcollection, "health" is the document ID
+    const usersSnap = await db.collectionGroup("profile").count().get();
     const totalUsers = usersSnap.data().count;
 
     // Count total rehab plans
@@ -926,17 +927,22 @@ async function collectMetrics(): Promise<string> {
     lines.push(`Firestore aggregate error: ${err}`);
   }
 
-  // --- Crash / session logs (last 24h) ---
-  try {
-    const oneDayAgo = admin.firestore.Timestamp.fromDate(new Date(Date.now() - 86_400_000));
+  // --- Crash logs (last 24h) ---
+  const oneDayAgo = admin.firestore.Timestamp.fromDate(new Date(Date.now() - 86_400_000));
 
+  try {
     const crashSnap = await db
       .collectionGroup("crashLogs")
       .where("timestamp", ">=", oneDayAgo)
       .count()
       .get();
     lines.push(`\n## Crash Logs (last 24h): ${crashSnap.data().count}`);
+  } catch (err) {
+    lines.push(`\nCrash log query error: ${err}`);
+  }
 
+  // --- Session logs (last 24h) ---
+  try {
     const sessionLogSnap = await db
       .collectionGroup("sessionLogs")
       .where("uploadedAt", ">=", oneDayAgo)
@@ -944,7 +950,7 @@ async function collectMetrics(): Promise<string> {
       .get();
     lines.push(`## Session Logs uploaded (last 24h): ${sessionLogSnap.data().count}`);
   } catch (err) {
-    lines.push(`Crash/session log query error: ${err}`);
+    lines.push(`Session log query error: ${err}`);
   }
 
   // --- Missing exercise images reported ---

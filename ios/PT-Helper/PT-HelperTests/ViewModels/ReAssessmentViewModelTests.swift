@@ -144,4 +144,40 @@ final class ReAssessmentViewModelTests: XCTestCase {
         vm.assessments = []
         XCTAssertNil(vm.initialAssessment(for: planId))
     }
+
+    // MARK: - Comparison with 3 assessments
+
+    func testComparison_threeAssessments_returnsInitialAndMostRecent() {
+        let planId = UUID()
+        let initial = AssessmentSnapshot(
+            id: UUID(), planId: planId, assessmentType: .initial,
+            date: Calendar.current.date(byAdding: .day, value: -28, to: Date())!,
+            regionPainLevels: ["right_knee": 8.0], overallPain: 8.0
+        )
+        let midpoint = AssessmentSnapshot(
+            id: UUID(), planId: planId, assessmentType: .midpoint,
+            date: Calendar.current.date(byAdding: .day, value: -14, to: Date())!,
+            regionPainLevels: ["right_knee": 5.0], overallPain: 5.0
+        )
+        let completion = AssessmentSnapshot(
+            id: UUID(), planId: planId, assessmentType: .completion,
+            date: Date(),
+            regionPainLevels: ["right_knee": 2.0], overallPain: 2.0
+        )
+        vm.assessments = [initial, midpoint, completion]
+
+        let result = vm.comparison(for: planId)
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?.initial.assessmentType, .initial)
+        XCTAssertEqual(result?.latest.assessmentType, .completion, "Should return the most recent as latest")
+    }
+
+    // MARK: - Early week assessment type
+
+    func testAssessmentType_earlyWeek_returnsNil() {
+        // Week 1 of 6-week plan — not at midpoint or completion
+        var plan = TestFixtures.makePlan(totalWeeks: 6)
+        plan.startDate = Calendar.current.date(byAdding: .day, value: -3, to: Date()) // ~week 1
+        XCTAssertNil(vm.assessmentType(for: plan), "Early week should not trigger assessment")
+    }
 }

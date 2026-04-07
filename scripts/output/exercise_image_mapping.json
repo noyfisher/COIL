@@ -1078,5 +1078,29 @@
     "filename": "lateral-lunge-with-reach.png",
     "category": "mobility",
     "target_area": "Hips, Inner Thigh, Core"
+  },
+  "exercise-1": {
+    "name": "Exercise 1",
+    "filename": "exercise-1.png",
+    "category": "strength",
+    "target_area": "Knee"
+  },
+  "exercise-2": {
+    "name": "Exercise 2",
+    "filename": "exercise-2.png",
+    "category": "strength",
+    "target_area": "Knee"
+  },
+  "exercise-3": {
+    "name": "Exercise 3",
+    "filename": "exercise-3.png",
+    "category": "strength",
+    "target_area": "Knee"
+  },
+  "quadriceps-sets-isometric": {
+    "name": "Quadriceps Sets (Isometric)",
+    "filename": "quadriceps-sets-isometric.png",
+    "category": "strength",
+    "target_area": "Left Knee, Quadriceps"
   }
 }

@@ -5,13 +5,17 @@ generate them via FLUX Kontext Pro, upload to Firebase Storage,
 and update mappings.
 
 Usage:
+    python scripts/process_missing_images.py --keychain --dry-run
+    python scripts/process_missing_images.py --keychain --limit 5 --min-count 2
+    python scripts/process_missing_images.py --keychain --cleanup-resolved
     python scripts/process_missing_images.py --api-key YOUR_BFL_KEY --dry-run
-    python scripts/process_missing_images.py --api-key YOUR_BFL_KEY --limit 5
-    python scripts/process_missing_images.py --api-key YOUR_BFL_KEY --min-count 2
 
 Prerequisites:
     pip install -r scripts/requirements.txt
     gcloud auth application-default login   (for Firestore + Storage access)
+
+Keychain setup (one-time):
+    security add-generic-password -s "BFL_API_KEY" -a "bfl" -w "YOUR_KEY"
 """
 
 import argparse
@@ -392,14 +396,79 @@ def mark_as_generated(db, succeeded: list[dict]):
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+def read_api_key_from_keychain() -> str:
+    """Read BFL API key from macOS Keychain."""
+    result = subprocess.run(
+        ["security", "find-generic-password", "-s", "BFL_API_KEY", "-w"],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        print("ERROR: Could not read BFL_API_KEY from keychain.")
+        print("Store it with:")
+        print('  security add-generic-password -s "BFL_API_KEY" -a "bfl" -w "YOUR_KEY"')
+        sys.exit(1)
+    return result.stdout.strip()
+
+
+def cleanup_resolved_exercises(db, mapping: dict, dry_run: bool = False) -> int:
+    """
+    Find Firestore docs in missingExerciseImages where the exercise is already
+    in the mapping but status != 'generated', and mark them as generated.
+
+    Returns the number of documents updated.
+    """
+    from google.cloud.firestore import SERVER_TIMESTAMP
+
+    collection = db.collection("missingExerciseImages")
+    docs = list(collection.stream())
+
+    to_resolve = []
+    for doc in docs:
+        data = doc.to_dict()
+        if data.get("status") == "generated":
+            continue
+        normalized_key = data.get("normalizedKey", doc.id)
+        if normalized_key in mapping:
+            to_resolve.append((doc.id, normalized_key))
+
+    if not to_resolve:
+        print("  No resolved exercises to clean up.")
+        return 0
+
+    print(f"  Found {len(to_resolve)} already-resolved exercises in Firestore:")
+    for doc_id, key in to_resolve:
+        print(f"    - {key} (doc: {doc_id})")
+
+    if dry_run:
+        print(f"  [DRY RUN] Would mark {len(to_resolve)} documents as generated.")
+        return len(to_resolve)
+
+    for doc_id, key in to_resolve:
+        db.collection("missingExerciseImages").document(doc_id).update(
+            {
+                "status": "generated",
+                "generatedAt": SERVER_TIMESTAMP,
+                "imageFileName": key,
+            }
+        )
+    print(f"  Marked {len(to_resolve)} documents as generated.")
+    return len(to_resolve)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Fetch missing exercise images from Firestore, generate via FLUX Kontext Pro, and upload to Firebase Storage"
     )
-    parser.add_argument(
+    key_group = parser.add_mutually_exclusive_group(required=True)
+    key_group.add_argument(
         "--api-key",
-        required=True,
         help="BFL (Black Forest Labs) API key for FLUX Kontext Pro image generation",
+    )
+    key_group.add_argument(
+        "--keychain",
+        action="store_true",
+        help="Read BFL API key from macOS Keychain (service: BFL_API_KEY)",
     )
     parser.add_argument(
         "--service-account",
@@ -410,6 +479,11 @@ def main():
         "--dry-run",
         action="store_true",
         help="Preview what would happen without making API calls",
+    )
+    parser.add_argument(
+        "--cleanup-resolved",
+        action="store_true",
+        help="Mark Firestore docs as generated for exercises already in the mapping, then exit",
     )
     parser.add_argument(
         "--limit",
@@ -435,6 +509,9 @@ def main():
     )
     args = parser.parse_args()
 
+    if args.keychain:
+        args.api_key = read_api_key_from_keychain()
+
     print("=" * 60)
     print("  Missing Exercise Image Pipeline (FLUX Kontext Pro)")
     print("=" * 60)
@@ -446,11 +523,19 @@ def main():
 
     # Step 2: Load existing mapping
     print("\n[2/6] Loading existing image mapping...")
+
     mapping = {}
     if MAPPING_FILE.exists():
         with open(MAPPING_FILE, "r") as f:
             mapping = json.load(f)
     print(f"  {len(mapping)} exercises currently in mapping.")
+
+    # Optional early-exit: cleanup already-resolved Firestore docs
+    if args.cleanup_resolved:
+        print("\n[CLEANUP] Marking already-resolved exercises in Firestore...")
+        resolved = cleanup_resolved_exercises(db, mapping, dry_run=args.dry_run)
+        print(f"\nCleanup complete. {resolved} documents {'would be ' if args.dry_run else ''}updated.")
+        return
 
     # Step 3: Fetch missing exercises
     print("\n[3/6] Fetching missing exercises from Firestore...")

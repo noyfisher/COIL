@@ -2,10 +2,15 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "pitch-preview",
+      "runtimeExecutable": "/usr/bin/python3",
+      "runtimeArgs": ["-m", "http.server", "8090", "--directory", ".claude/plans"],
+      "port": 8090
+    },
+    {
       "name": "firebase-emulator",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "serve"],
-      "cwd": "functions",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "export PATH=/usr/local/bin:$PATH && cd functions && npm run serve"],
       "port": 5001
     },
     {

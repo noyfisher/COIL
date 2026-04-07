@@ -172,6 +172,73 @@ final class FormAnalysisViewModelTests: XCTestCase {
         XCTAssertEqual(feedback.positivePoints, ["Good depth"])
     }
 
+    // MARK: - buildUserMessage with Data Quality
+
+    func testBuildUserMessage_withDataQuality_includesSection() {
+        let vm = FormAnalysisViewModel(apiService: mockAPI)
+        let exercise = TestFixtures.makeExercise(name: "Squat", targetArea: "Quadriceps")
+        let metrics = TestFixtures.makeFormAnalysisData()
+        let quality = TestFixtures.makeDataQualityReport(overallScore: 0.85)
+
+        let message = vm.buildUserMessage(metrics: metrics, exercise: exercise, dataQuality: quality)
+
+        XCTAssertTrue(message.contains("DATA QUALITY"), "Message should include data quality section")
+        XCTAssertTrue(message.contains("0.85"), "Should include overall quality score")
+        XCTAssertTrue(message.contains("Frame coverage"), "Should include frame coverage")
+    }
+
+    func testBuildUserMessage_withSymmetry_includesSection() {
+        let vm = FormAnalysisViewModel(apiService: mockAPI)
+        let exercise = TestFixtures.makeExercise(name: "Squat", targetArea: "Quadriceps")
+        let symmetry = FormAnalysisData.SymmetryData(
+            leftAvgAngles: ["left_knee": 90], rightAvgAngles: ["right_knee": 100],
+            differencesDegrees: ["knee": 10]
+        )
+        let metrics = TestFixtures.makeFormAnalysisData(symmetry: symmetry)
+
+        let message = vm.buildUserMessage(metrics: metrics, exercise: exercise)
+
+        XCTAssertTrue(message.contains("SYMMETRY"), "Message should include symmetry section")
+        XCTAssertTrue(message.contains("knee"), "Should include joint name")
+    }
+
+    func testBuildUserMessage_withAlignmentIssues_includesSection() {
+        let vm = FormAnalysisViewModel(apiService: mockAPI)
+        let exercise = TestFixtures.makeExercise(name: "Squat", targetArea: "Quadriceps")
+        let alignment = [FormAnalysisData.AlignmentIssue(description: "Trunk lean detected", affectedReps: 2, totalReps: 3)]
+        let metrics = TestFixtures.makeFormAnalysisData(alignment: alignment)
+
+        let message = vm.buildUserMessage(metrics: metrics, exercise: exercise)
+
+        XCTAssertTrue(message.contains("ALIGNMENT ISSUES"), "Message should include alignment section")
+        XCTAssertTrue(message.contains("Trunk lean detected"))
+    }
+
+    func testBuildUserMessage_withTempo_includesSection() {
+        let vm = FormAnalysisViewModel(apiService: mockAPI)
+        let exercise = TestFixtures.makeExercise(name: "Squat", targetArea: "Quadriceps")
+        let metrics = TestFixtures.makeFormAnalysisData(averageTempo: 2.5, tempoVariability: 0.4)
+
+        let message = vm.buildUserMessage(metrics: metrics, exercise: exercise)
+
+        XCTAssertTrue(message.contains("TEMPO"), "Message should include tempo section")
+        XCTAssertTrue(message.contains("2.5"), "Should include average tempo")
+        XCTAssertTrue(message.contains("0.4"), "Should include tempo variability")
+    }
+
+    func testBuildUserMessage_noTempo_omitsSection() {
+        let vm = FormAnalysisViewModel(apiService: mockAPI)
+        let exercise = TestFixtures.makeExercise(name: "Plank", targetArea: "Core")
+        let metrics = TestFixtures.makeFormAnalysisData(repCount: 0, repMetrics: [], averageTempo: nil, tempoVariability: nil)
+
+        let message = vm.buildUserMessage(metrics: metrics, exercise: exercise)
+
+        XCTAssertFalse(message.contains("TEMPO"), "No tempo data should omit tempo section")
+        XCTAssertTrue(message.contains("No repetitions were detected"))
+    }
+
+    // MARK: - State
+
     func testFormAnalysisState_equality() {
         XCTAssertEqual(FormAnalysisState.idle, FormAnalysisState.idle)
         XCTAssertEqual(FormAnalysisState.analyzing, FormAnalysisState.analyzing)

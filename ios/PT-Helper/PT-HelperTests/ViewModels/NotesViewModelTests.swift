@@ -63,4 +63,25 @@ final class NotesViewModelTests: XCTestCase {
 
         XCTAssertNotEqual(vm.notes[0].id, vm.notes[1].id)
     }
+
+    func testDeleteNote_removesFromLocalArray() {
+        let vm = NotesViewModel()
+        vm.newNoteContent = "To delete"
+        vm.addNote()
+        XCTAssertEqual(vm.notes.count, 1)
+
+        let note = vm.notes[0]
+        vm.deleteNote(note)
+        XCTAssertTrue(vm.notes.isEmpty, "Note should be removed locally")
+    }
+
+    func testDeleteNote_nonexistentNote_noChange() {
+        let vm = NotesViewModel()
+        vm.newNoteContent = "Keep me"
+        vm.addNote()
+
+        let fake = Note(content: "Not in list")
+        vm.deleteNote(fake)
+        XCTAssertEqual(vm.notes.count, 1, "Deleting a non-existent note should not affect the list")
+    }
 }

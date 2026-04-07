@@ -110,6 +110,7 @@ final class OnboardingViewModelTests: XCTestCase {
         vm.userProfile.sex = "Male"
         vm.userProfile.heightFeet = 5
         vm.userProfile.weight = 175
+        vm.hasAcceptedTerms = true
         XCTAssertTrue(vm.canProceedFromCurrentStep, "All required fields filled")
     }
 
@@ -155,5 +156,133 @@ final class OnboardingViewModelTests: XCTestCase {
         let currentInjuries = vm.userProfile.injuries.filter { $0.isCurrent }
         XCTAssertEqual(currentInjuries.count, 1)
         XCTAssertEqual(currentInjuries.first?.bodyArea, "Lower Back")
+    }
+
+    // MARK: - Validation Edge Cases
+
+    func testCanProceed_step1_weightBelowMinimum_returnsFalse() {
+        let vm = OnboardingViewModel()
+        fillValidBasicInfo(vm)
+        vm.userProfile.weight = 40 // below 50 minimum
+        XCTAssertFalse(vm.canProceedFromCurrentStep)
+    }
+
+    func testCanProceed_step1_weightAboveMaximum_returnsFalse() {
+        let vm = OnboardingViewModel()
+        fillValidBasicInfo(vm)
+        vm.userProfile.weight = 600 // above 500 maximum
+        XCTAssertFalse(vm.canProceedFromCurrentStep)
+    }
+
+    func testCanProceed_step1_heightTooShort_returnsFalse() {
+        let vm = OnboardingViewModel()
+        fillValidBasicInfo(vm)
+        vm.userProfile.heightFeet = 2 // below 3 minimum
+        XCTAssertFalse(vm.canProceedFromCurrentStep)
+    }
+
+    func testCanProceed_step1_missingTermsAcceptance_returnsFalse() {
+        let vm = OnboardingViewModel()
+        fillValidBasicInfo(vm)
+        vm.hasAcceptedTerms = false
+        XCTAssertFalse(vm.canProceedFromCurrentStep)
+    }
+
+    func testCanProceed_step5_emptyActivityLevel_returnsFalse() {
+        let vm = OnboardingViewModel()
+        fillValidBasicInfo(vm)
+        // Advance to step 5
+        for _ in 1..<5 { vm.nextStep() }
+        XCTAssertEqual(vm.currentStep, 5)
+
+        vm.userProfile.activityLevel = ""
+        XCTAssertFalse(vm.canProceedFromCurrentStep)
+    }
+
+    func testCanProceed_steps2Through4_alwaysTrue() {
+        let vm = OnboardingViewModel()
+        fillValidBasicInfo(vm)
+        vm.nextStep() // → step 2
+        XCTAssertTrue(vm.canProceedFromCurrentStep, "Step 2 should always allow proceed")
+        vm.nextStep() // → step 3
+        XCTAssertTrue(vm.canProceedFromCurrentStep, "Step 3 should always allow proceed")
+        vm.nextStep() // → step 4
+        XCTAssertTrue(vm.canProceedFromCurrentStep, "Step 4 should always allow proceed")
+    }
+
+    func testNextStep_failedValidation_showsValidationErrors() {
+        let vm = OnboardingViewModel()
+        // Don't fill required fields
+        vm.nextStep()
+        XCTAssertTrue(vm.showValidationErrors, "Failed validation should set showValidationErrors")
+        XCTAssertEqual(vm.currentStep, 1, "Should remain on step 1")
+    }
+
+    // MARK: - Draft Persistence
+
+    override func tearDown() {
+        OnboardingViewModel.clearDraft()
+        super.tearDown()
+    }
+
+    func testSaveDraft_thenLoadDraft_restoresProfile() {
+        let vm = OnboardingViewModel()
+        fillValidBasicInfo(vm)
+        vm.hasAcceptedTerms = true
+        vm.nextStep() // advances to step 2, which calls saveDraft()
+
+        let vm2 = OnboardingViewModel()
+        let loaded = vm2.loadDraft()
+        XCTAssertTrue(loaded, "Should successfully load draft")
+        XCTAssertEqual(vm2.userProfile.firstName, "Test")
+        XCTAssertEqual(vm2.currentStep, 2)
+    }
+
+    func testLoadDraft_staleDraft_discarded() {
+        let vm = OnboardingViewModel()
+        fillValidBasicInfo(vm)
+        vm.saveDraft()
+
+        // Set savedAt to 8 days ago (stale)
+        let staleSavedAt = Date().timeIntervalSince1970 - (8 * 24 * 60 * 60)
+        UserDefaults.standard.set(staleSavedAt, forKey: "onboarding_draft_saved_at")
+
+        let vm2 = OnboardingViewModel()
+        let loaded = vm2.loadDraft()
+        XCTAssertFalse(loaded, "Stale draft should be discarded")
+    }
+
+    func testLoadDraft_corruptData_returnsFalse() {
+        UserDefaults.standard.set(Data([0xFF, 0xFE]), forKey: "onboarding_draft_profile")
+        UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: "onboarding_draft_saved_at")
+
+        let vm = OnboardingViewModel()
+        let loaded = vm.loadDraft()
+        XCTAssertFalse(loaded, "Corrupt data should return false")
+    }
+
+    func testClearDraft_removesAllKeys() {
+        let vm = OnboardingViewModel()
+        fillValidBasicInfo(vm)
+        vm.saveDraft()
+
+        OnboardingViewModel.clearDraft()
+
+        XCTAssertNil(UserDefaults.standard.data(forKey: "onboarding_draft_profile"))
+        XCTAssertNil(UserDefaults.standard.object(forKey: "onboarding_draft_saved_at"))
+    }
+
+    // MARK: - Medication History
+
+    func testUpdateMedicationHistory_newMedAdded_recordsStartedAction() {
+        let vm = OnboardingViewModel()
+        vm.userProfile.medications = ["Ibuprofen", "Aspirin"]
+
+        vm.updateMedicationHistory(previousMedications: ["Ibuprofen"])
+
+        let history = vm.userProfile.medicationHistory ?? []
+        let started = history.filter { $0.action == "started" }
+        XCTAssertEqual(started.count, 1)
+        XCTAssertEqual(started.first?.medication, "Aspirin")
     }
 }
