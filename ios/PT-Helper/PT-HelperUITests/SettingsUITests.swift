@@ -4,19 +4,26 @@ final class SettingsUITests: UITestBase {
 
     @MainActor
     private func navigateToSettings() {
-        tapTab("Profile")
+        tapTab("Progress")
 
-        // Wait for Profile tab to load
-        _ = app.navigationBars.firstMatch.waitForExistence(timeout: 5)
+        // Wait for Progress tab to load
+        _ = app.navigationBars["Progress"].waitForExistence(timeout: 5)
 
-        // In dashboard UI, "Debug Log" row opens the Settings sheet
-        let debugButton = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Debug'")).firstMatch
-        let settingsButton = button("Settings")
+        // In the 3-tab UI, Settings is accessed via the gear icon in the Progress toolbar
+        let gearButton = app.buttons.matching(NSPredicate(format: "label CONTAINS[cd] 'gear' OR label CONTAINS[cd] 'settings'")).firstMatch
+        let gearImage = app.images.matching(NSPredicate(format: "label CONTAINS[cd] 'gearshape'")).firstMatch
 
-        if debugButton.waitForExistence(timeout: 5) {
-            debugButton.tap()
-        } else if settingsButton.waitForExistence(timeout: 3) {
-            settingsButton.tap()
+        if gearButton.waitForExistence(timeout: 5) {
+            gearButton.tap()
+        } else if gearImage.waitForExistence(timeout: 3) {
+            gearImage.tap()
+        } else {
+            // Fallback: tap the rightmost toolbar button area
+            let navBar = app.navigationBars["Progress"]
+            let buttons = navBar.buttons
+            if buttons.count > 0 {
+                buttons.element(boundBy: buttons.count - 1).tap()
+            }
         }
 
         // Wait for the settings sheet to appear

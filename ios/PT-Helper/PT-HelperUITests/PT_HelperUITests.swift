@@ -47,6 +47,13 @@ final class OnboardingUITests: UITestBase {
 
         // Height uses default 5ft 7in which passes validation.
         // Weight is pre-filled to 170 via --prefill-weight launch argument.
+
+        // Accept Terms of Service checkbox (required for Continue)
+        app.swipeUp()
+        let termsCheckbox = app.descendants(matching: .any)["onboarding.termsCheckbox"]
+        if termsCheckbox.waitForExistence(timeout: 3) {
+            termsCheckbox.tap()
+        }
     }
 
     @MainActor
@@ -58,36 +65,42 @@ final class OnboardingUITests: UITestBase {
         // Fill all required fields
         fillStep1RequiredFields()
 
-        // Scroll down to reveal Continue button fully
+        // Dismiss keyboard and scroll to reveal Continue button
+        dismissKeyboard()
         app.swipeUp()
 
-        // Tap continue to advance
+        // Wait for validation to enable Continue, then tap
         let continueButton = app.descendants(matching: .any)["onboarding.continueButton"]
-        XCTAssertTrue(continueButton.waitForExistence(timeout: 3))
-        if continueButton.isEnabled {
-            continueButton.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
-        }
+        XCTAssertTrue(continueButton.waitForExistence(timeout: 5))
+
+        // Wait for button to become enabled after field validation
+        let enabledPredicate = NSPredicate(format: "isEnabled == true")
+        let expectation = XCTNSPredicateExpectation(predicate: enabledPredicate, object: continueButton)
+        let result = XCTWaiter.wait(for: [expectation], timeout: 5)
+        XCTAssertTrue(result == .completed, "Continue button should become enabled after filling required fields")
+
+        continueButton.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
 
         // Step 2: Medical History (optional step)
-        XCTAssertTrue(staticText("Step 2 of 6").waitForExistence(timeout: 3))
+        XCTAssertTrue(staticText("Step 2 of 6").waitForExistence(timeout: 5))
         if continueButton.exists, continueButton.isEnabled {
             continueButton.tap()
         }
 
         // Step 3: Surgical History (optional step)
-        XCTAssertTrue(staticText("Step 3 of 6").waitForExistence(timeout: 3))
+        XCTAssertTrue(staticText("Step 3 of 6").waitForExistence(timeout: 5))
         if continueButton.exists, continueButton.isEnabled {
             continueButton.tap()
         }
 
         // Step 4: Injuries (optional step)
-        XCTAssertTrue(staticText("Step 4 of 6").waitForExistence(timeout: 3))
+        XCTAssertTrue(staticText("Step 4 of 6").waitForExistence(timeout: 5))
         if continueButton.exists, continueButton.isEnabled {
             continueButton.tap()
         }
 
         // Step 5: Activity Level — select a level
-        XCTAssertTrue(staticText("Step 5 of 6").waitForExistence(timeout: 3))
+        XCTAssertTrue(staticText("Step 5 of 6").waitForExistence(timeout: 5))
         let moderateButton = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Moderately'")).firstMatch
         if moderateButton.waitForExistence(timeout: 3) {
             moderateButton.tap()
@@ -97,7 +110,7 @@ final class OnboardingUITests: UITestBase {
         }
 
         // Step 6: Review & Submit
-        XCTAssertTrue(staticText("Step 6 of 6").waitForExistence(timeout: 3))
+        XCTAssertTrue(staticText("Step 6 of 6").waitForExistence(timeout: 5))
 
         captureScreenshot(name: "Onboarding-Step6-Review")
     }
@@ -117,15 +130,24 @@ final class OnboardingUITests: UITestBase {
     func testBackButton_NavigatesToPreviousStep() throws {
         // Fill step 1 required fields and advance
         fillStep1RequiredFields()
+        dismissKeyboard()
+        app.swipeUp()
 
         let continueButton = app.descendants(matching: .any)["onboarding.continueButton"]
-        if continueButton.waitForExistence(timeout: 3), continueButton.isEnabled {
+        XCTAssertTrue(continueButton.waitForExistence(timeout: 5))
+
+        // Wait for button to become enabled after field validation
+        let enabledPredicate = NSPredicate(format: "isEnabled == true")
+        let expectation = XCTNSPredicateExpectation(predicate: enabledPredicate, object: continueButton)
+        _ = XCTWaiter.wait(for: [expectation], timeout: 5)
+
+        if continueButton.isEnabled {
             // Step 1 → 2
-            continueButton.tap()
-            _ = staticText("Step 2 of 6").waitForExistence(timeout: 3)
+            continueButton.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+            _ = staticText("Step 2 of 6").waitForExistence(timeout: 5)
             // Step 2 → 3
             if continueButton.isEnabled { continueButton.tap() }
-            _ = staticText("Step 3 of 6").waitForExistence(timeout: 3)
+            _ = staticText("Step 3 of 6").waitForExistence(timeout: 5)
         }
 
         // Go back twice

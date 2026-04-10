@@ -172,6 +172,21 @@ class GuidedWorkoutViewModel: ObservableObject {
         )
     }
 
+    /// Discard the workout entirely without saving any session data.
+    /// Used when a user accidentally starts a workout.
+    func discardWorkout() {
+        stopTimer()
+        elapsedSubscription?.cancel()
+        elapsedSubscription = nil
+        clearCheckpoint()
+        AnalyticsService.shared.log(.workoutDiscarded, parameters: [
+            "completed_count": completedExercises.count,
+            "duration_seconds": Int(totalElapsedTime)
+        ])
+        SessionLogger.shared.logUserAction(.buttonTapped, action: "discardWorkout",
+                                            metadata: ["completed": "\(completedExercises.count)"])
+    }
+
     /// End the workout early, marking remaining exercises as skipped.
     func endWorkoutEarly() {
         // Mark all remaining exercises (including current) as skipped

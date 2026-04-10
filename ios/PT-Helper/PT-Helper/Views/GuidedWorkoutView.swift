@@ -82,9 +82,13 @@ struct GuidedWorkoutView: View {
             Button("End & Save", role: .destructive) {
                 vm.endWorkoutEarly()
             }
+            Button("Discard Workout") {
+                vm.discardWorkout()
+                dismiss()
+            }
             Button("Cancel", role: .cancel) { }
         } message: {
-            Text("Your completed exercises will be saved. This cannot be undone.")
+            Text("Save your progress, or discard if you started by mistake.")
         }
         .sheet(isPresented: $showSwapSheet) {
             if let exercise = vm.currentExercise {

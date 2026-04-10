@@ -27,6 +27,7 @@ final class AnalyticsService {
         case workoutStarted = "workout_started"
         case workoutCompleted = "workout_completed"
         case workoutEndedEarly = "workout_ended_early"
+        case workoutDiscarded = "workout_discarded"
     }
 
     // MARK: - Engagement Events (feature adoption & depth)

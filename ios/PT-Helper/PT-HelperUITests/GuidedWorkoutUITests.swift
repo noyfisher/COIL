@@ -22,32 +22,22 @@ final class GuidedWorkoutUITests: UITestBase {
     /// Navigate to a rehab plan and start a guided workout.
     @MainActor
     private func navigateToWorkout() {
-        tapTab("Rehab")
+        tapTab("My Plan")
 
-        // Wait for Rehab tab to fully load
-        _ = app.navigationBars["Rehab"].waitForExistence(timeout: 5)
+        // Wait for My Plan tab to fully load
+        _ = app.navigationBars["My Plan"].waitForExistence(timeout: 5)
 
-        // Scroll down to reveal plans list (below metrics grid, pain chart, exercise table)
-        app.swipeUp()
-        app.swipeUp()
-        app.swipeUp()
-
-        // Tap on the first plan in active plans list
-        let planLink = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Knee Rehab Plan'")).firstMatch
-        if planLink.waitForExistence(timeout: 5) {
-            planLink.tap()
-        } else {
-            // Fallback: any plan button
-            let anyPlan = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Plan'")).firstMatch
-            if anyPlan.waitForExistence(timeout: 3) {
-                anyPlan.tap()
-            }
-        }
-
-        // Tap Start Guided Workout
-        let startButton = button("Start Guided Workout")
+        // In the 3-tab layout, the "Start Guided Workout" CTA is directly visible
+        // on the hero card — no need to scroll through metrics
+        let startButton = app.descendants(matching: .any)["myPlan.startWorkoutButton"]
         if startButton.waitForExistence(timeout: 5) {
             startButton.tap()
+        } else {
+            // Fallback: find by label text
+            let startByLabel = button("Start Guided Workout")
+            if startByLabel.waitForExistence(timeout: 3) {
+                startByLabel.tap()
+            }
         }
 
         // Trigger the interruption monitor by interacting with the app
@@ -97,7 +87,7 @@ final class GuidedWorkoutUITests: UITestBase {
     func testPauseResume_TogglesState() throws {
         navigateToWorkout()
 
-        let pauseButton = app.descendants(matching: .any)["workout.pauseButton"]
+        let pauseButton = app.buttons["workout.pauseButton"]
         XCTAssertTrue(pauseButton.waitForExistence(timeout: 10))
 
         // Tap pause
@@ -105,7 +95,9 @@ final class GuidedWorkoutUITests: UITestBase {
         captureScreenshot(name: "Workout-Paused")
 
         // Tap play (same button, toggled)
-        pauseButton.tap()
+        let resumeButton = app.buttons["workout.pauseButton"]
+        _ = resumeButton.waitForExistence(timeout: 3)
+        resumeButton.tap()
         captureScreenshot(name: "Workout-Resumed")
     }
 
@@ -113,7 +105,7 @@ final class GuidedWorkoutUITests: UITestBase {
     func testEndEarly_ShowsConfirmation() throws {
         navigateToWorkout()
 
-        let endButton = app.descendants(matching: .any)["workout.endButton"]
+        let endButton = app.buttons["workout.endButton"]
         XCTAssertTrue(endButton.waitForExistence(timeout: 10))
         endButton.tap()
 
@@ -121,7 +113,34 @@ final class GuidedWorkoutUITests: UITestBase {
         XCTAssertTrue(staticText("End Workout?").waitForExistence(timeout: 3),
                       "End workout confirmation should appear")
 
+        // Verify both save and discard options exist
+        XCTAssertTrue(button("End & Save").exists, "End & Save button should exist")
+        XCTAssertTrue(button("Discard Workout").exists, "Discard Workout button should exist")
+
         captureScreenshot(name: "Workout-EndConfirmation")
+    }
+
+    @MainActor
+    func testDiscardWorkout_DismissesWithoutSaving() throws {
+        navigateToWorkout()
+
+        let endButton = app.buttons["workout.endButton"]
+        XCTAssertTrue(endButton.waitForExistence(timeout: 10))
+        endButton.tap()
+
+        // Tap Discard
+        let discardButton = button("Discard Workout")
+        XCTAssertTrue(discardButton.waitForExistence(timeout: 3))
+        discardButton.tap()
+
+        // Should dismiss back to My Plan tab
+        XCTAssertTrue(
+            app.navigationBars["My Plan"].waitForExistence(timeout: 5) ||
+            staticText("Knee Rehab Plan").waitForExistence(timeout: 5),
+            "Should return to My Plan after discarding"
+        )
+
+        captureScreenshot(name: "Workout-DiscardedBackToPlan")
     }
 
     @MainActor

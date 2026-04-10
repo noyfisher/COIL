@@ -56,49 +56,56 @@ struct MyPlanTab: View {
     // MARK: - Plan Content
 
     private var planContent: some View {
-        ScrollView {
-            VStack(spacing: AppSpacing.lg) {
-                // Active plan hero
-                if let plan = activePlan {
+        List {
+            // Active plan hero
+            if let plan = activePlan {
+                Section {
                     activePlanHero(plan)
                 }
+                .listRowInsets(EdgeInsets(top: AppSpacing.md, leading: AppSpacing.xl, bottom: 0, trailing: AppSpacing.xl))
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+            }
 
-                // Saved plans list
-                if !savedPlans.isEmpty {
-                    VStack(alignment: .leading, spacing: AppSpacing.md) {
-                        Text("SAVED PLANS")
-                            .font(.caption.weight(.semibold))
-                            .foregroundColor(AppColors.mutedText)
-                            .tracking(1.5)
-
-                        ForEach(savedPlans) { plan in
-                            NavigationLink(destination: RehabPlanView(existingPlan: plan)) {
-                                savedPlanCard(plan)
-                            }
-                            .buttonStyle(.plain)
-                            .contextMenu {
-                                Button(role: .destructive) {
-                                    planToDelete = plan
-                                    showDeleteConfirmation = true
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
-                            }
-                            .swipeActions(edge: .trailing) {
-                                Button(role: .destructive) {
-                                    planToDelete = plan
-                                    showDeleteConfirmation = true
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
+            // Saved plans list
+            if !savedPlans.isEmpty {
+                Section {
+                    ForEach(savedPlans) { plan in
+                        NavigationLink(destination: RehabPlanView(existingPlan: plan)) {
+                            savedPlanCard(plan)
+                        }
+                        .buttonStyle(.plain)
+                        .contextMenu {
+                            Button(role: .destructive) {
+                                planToDelete = plan
+                                showDeleteConfirmation = true
+                            } label: {
+                                Label("Delete", systemImage: "trash")
                             }
                         }
+                        .swipeActions(edge: .trailing) {
+                            Button(role: .destructive) {
+                                planToDelete = plan
+                                showDeleteConfirmation = true
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
+                        .listRowInsets(EdgeInsets(top: AppSpacing.sm, leading: AppSpacing.xl, bottom: AppSpacing.sm, trailing: AppSpacing.xl))
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
                     }
+                } header: {
+                    Text("SAVED PLANS")
+                        .font(.caption.weight(.semibold))
+                        .foregroundColor(AppColors.mutedText)
+                        .tracking(1.5)
                 }
             }
-            .padding(.horizontal, AppSpacing.xl)
-            .padding(.vertical, AppSpacing.md)
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(AppColors.pageBackground)
     }
 
     // MARK: - Active Plan Hero
