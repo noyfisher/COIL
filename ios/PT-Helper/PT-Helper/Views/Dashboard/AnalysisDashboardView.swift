@@ -199,6 +199,7 @@ struct AnalysisDashboardView: View {
                 )
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("dashboard.viewRehabPlansButton")
         }
     }
 

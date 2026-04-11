@@ -287,6 +287,7 @@ struct GuidedWorkoutView: View {
                 }
             }
             .buttonStyle(SecondaryButtonStyle())
+            .accessibilityIdentifier("workout.skipRestButton")
             .padding(.horizontal, AppSpacing.xl)
             .padding(.bottom, AppSpacing.xxl)
         }

@@ -154,11 +154,13 @@ struct RehabPlanView: View {
                             ) {
                                 Image(systemName: "square.and.arrow.up")
                             }
+                            .accessibilityIdentifier("rehabPlan.shareButton")
                         }
 
                         Button(action: { showEditSheet = true }) {
                             Image(systemName: "pencil.circle")
                         }
+                        .accessibilityIdentifier("rehabPlan.editButton")
                     }
                 }
             }
@@ -569,7 +571,10 @@ struct RehabPlanView: View {
                             .background(AppColors.accentTint)
                             .clipShape(Circle())
                     }
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(Circle())
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier("rehabPlan.swapExerciseButton")
                 }
             }
         }

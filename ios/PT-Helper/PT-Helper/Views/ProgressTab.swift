@@ -105,11 +105,13 @@ struct ProgressTabContent: View {
                         StreakToolbarBadge(streakService: streakService)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier("progress.streakBadge")
 
                     Button(action: onSettingsTapped) {
                         Image(systemName: "gearshape.fill")
                             .foregroundColor(AppColors.accent)
                     }
+                    .accessibilityIdentifier("progress.settingsButton")
                 }
             }
         }
