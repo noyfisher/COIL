@@ -63,9 +63,10 @@ struct RecoveryInsightsCardView: View {
             HStack(spacing: AppSpacing.md) {
                 ProgressView()
                     .scaleEffect(0.9)
-                Text("Analyzing your recovery data…")
+                Text(vm.loadingMessage)
                     .font(.subheadline)
                     .foregroundColor(AppColors.secondaryText)
+                    .animation(.easeInOut(duration: 0.3), value: vm.loadingMessage)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, AppSpacing.md)

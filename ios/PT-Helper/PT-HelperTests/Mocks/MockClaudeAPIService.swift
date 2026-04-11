@@ -42,6 +42,33 @@ final class MockClaudeAPIService: ClaudeAPIServiceProtocol {
     /// Ordered list of all user messages across calls (for verifying message content).
     private(set) var allUserMessages: [String] = []
 
+    // MARK: - Agent Insights Support
+
+    /// The response to return from `requestAgentInsights()`.
+    var agentInsightsResponseToReturn: String?
+
+    /// If set, `requestAgentInsights()` throws this error.
+    var agentInsightsErrorToThrow: Error?
+
+    /// Number of times `requestAgentInsights` was called.
+    private(set) var requestAgentInsightsCallCount = 0
+
+    func requestAgentInsights() async throws -> String {
+        requestAgentInsightsCallCount += 1
+
+        if simulatedDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(simulatedDelay * 1_000_000_000))
+        }
+
+        if let error = agentInsightsErrorToThrow {
+            throw error
+        }
+
+        return agentInsightsResponseToReturn ?? responseToReturn
+    }
+
+    // MARK: - Send Message
+
     func sendMessage(requestType: AIRequestType, userMessage: String) async throws -> String {
         sendMessageCallCount += 1
         lastRequestType = requestType

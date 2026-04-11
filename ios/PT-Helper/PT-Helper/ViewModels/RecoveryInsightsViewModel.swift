@@ -29,9 +29,21 @@ class RecoveryInsightsViewModel: ObservableObject {
 
     @Published var insight: RecoveryInsight?
     @Published var isLoading: Bool = false
+    @Published var loadingMessage: String = "Analyzing your recovery data…"
     @Published var error: String?
     /// In-memory only — resets on app restart. Prevents repeated API calls within a session.
     @Published var lastGeneratedDate: Date?
+
+    /// Rotating loading messages for the agent's multi-step analysis.
+    private static let loadingMessages = [
+        "Analyzing your recovery data…",
+        "Detecting pain trends across sessions…",
+        "Evaluating your adherence patterns…",
+        "Cross-referencing with your rehab plan…",
+        "Personalizing recommendations…",
+        "Preparing your recovery digest…",
+    ]
+    private var loadingMessageTask: Task<Void, Never>?
 
     // MARK: - Configuration
 
@@ -92,12 +104,41 @@ class RecoveryInsightsViewModel: ObservableObject {
         }
 
         isLoading = true
+        loadingMessage = Self.loadingMessages[0]
         error = nil
+        startLoadingMessages()
 
         SessionLogger.shared.log(.buttonTapped, category: .userAction,
                                   message: "Requested recovery insights",
                                   metadata: ["sessionCount": "\(recent.count)"])
 
+        // Try agent-powered insights first (server fetches data, multi-step analysis)
+        // Fall back to single-call path on any error
+        do {
+            let response = try await apiService.requestAgentInsights()
+            let parsed = try parseInsight(from: response)
+            self.insight = parsed
+            self.lastGeneratedDate = Date()
+            self.isLoading = false
+            self.stopLoadingMessages()
+
+            AnalyticsService.shared.log(.recoveryInsightsViewed)
+            SessionLogger.shared.log(.loadingFinished, category: .stateChange,
+                                      message: "Recovery insights generated (agent)",
+                                      metadata: [
+                                          "headline": parsed.headline,
+                                          "painTrend": parsed.painAnalysis.trendDirection,
+                                          "adherenceScore": "\(parsed.adherenceAnalysis.score)",
+                                          "source": "agent"
+                                      ])
+            return
+        } catch {
+            SessionLogger.shared.log(.errorOccurred, category: .error,
+                                      message: "Agent insights failed, falling back",
+                                      metadata: ["error": error.localizedDescription])
+        }
+
+        // Fallback: single-call recovery insights via claudeProxy
         do {
             let message = buildUserMessage(sessions: recent, plans: plans, profile: profile)
             let response = try await apiService.sendMessage(
@@ -108,18 +149,21 @@ class RecoveryInsightsViewModel: ObservableObject {
             self.insight = parsed
             self.lastGeneratedDate = Date()
             self.isLoading = false
+            self.stopLoadingMessages()
 
             AnalyticsService.shared.log(.recoveryInsightsViewed)
             SessionLogger.shared.log(.loadingFinished, category: .stateChange,
-                                      message: "Recovery insights generated",
+                                      message: "Recovery insights generated (fallback)",
                                       metadata: [
                                           "headline": parsed.headline,
                                           "painTrend": parsed.painAnalysis.trendDirection,
-                                          "adherenceScore": "\(parsed.adherenceAnalysis.score)"
+                                          "adherenceScore": "\(parsed.adherenceAnalysis.score)",
+                                          "source": "fallback"
                                       ])
         } catch {
             self.error = error.localizedDescription
             self.isLoading = false
+            self.stopLoadingMessages()
 
             SessionLogger.shared.log(.errorOccurred, category: .error,
                                       message: "Recovery insights generation failed",
@@ -234,6 +278,24 @@ class RecoveryInsightsViewModel: ObservableObject {
             },
             generatedDate: Date()
         )
+    }
+
+    // MARK: - Loading Messages
+
+    private func startLoadingMessages() {
+        loadingMessageTask?.cancel()
+        loadingMessageTask = Task {
+            for index in 1..<Self.loadingMessages.count {
+                try? await Task.sleep(nanoseconds: 8_000_000_000) // 8 seconds per message
+                guard !Task.isCancelled else { return }
+                self.loadingMessage = Self.loadingMessages[index]
+            }
+        }
+    }
+
+    private func stopLoadingMessages() {
+        loadingMessageTask?.cancel()
+        loadingMessageTask = nil
     }
 
     // MARK: - Helpers

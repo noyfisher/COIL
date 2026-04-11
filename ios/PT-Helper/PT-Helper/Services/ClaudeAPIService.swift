@@ -84,6 +84,7 @@ struct ClaudeResponse: Decodable {
 
 protocol ClaudeAPIServiceProtocol {
     func sendMessage(requestType: AIRequestType, userMessage: String) async throws -> String
+    func requestAgentInsights() async throws -> String
 }
 
 // MARK: - Claude API Service
@@ -208,6 +209,87 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
         }
 
         // Clean up the response — strip markdown code fences if present
+        return ClaudeAPIService.cleanJSONResponse(text)
+    }
+
+    /// Request recovery insights from the managed agent endpoint.
+    /// The server fetches user data from Firestore and runs a multi-step agent analysis.
+    /// No request body needed — the server identifies the user via the auth token.
+    func requestAgentInsights() async throws -> String {
+        guard let url = URL(string: APIConfig.agentInsightsURL) else {
+            throw ClaudeAPIError.invalidURL
+        }
+
+        guard let currentUser = Auth.auth().currentUser else {
+            throw ClaudeAPIError.authenticationRequired
+        }
+
+        let idToken: String
+        do {
+            idToken = try await currentUser.getIDToken()
+        } catch {
+            throw ClaudeAPIError.authenticationRequired
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.timeoutInterval = 180 // Agent may take longer than regular calls
+        request.setValue("Bearer \(idToken)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = "{}".data(using: .utf8)
+
+        await MainActor.run {
+            SessionLogger.shared.logAPI(.apiCallStarted, endpoint: "agentInsights",
+                                         metadata: ["requestType": "recovery_insights_agent"])
+        }
+
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await URLSession.shared.data(for: request)
+        } catch {
+            await MainActor.run {
+                SessionLogger.shared.logAPI(.apiCallFailed, endpoint: "agentInsights",
+                                             metadata: ["error": error.localizedDescription])
+            }
+            throw ClaudeAPIError.networkError(error)
+        }
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw ClaudeAPIError.invalidResponse(0, "Invalid HTTP response")
+        }
+
+        switch httpResponse.statusCode {
+        case 200:
+            break
+        case 401:
+            throw ClaudeAPIError.authenticationRequired
+        case 429:
+            throw ClaudeAPIError.rateLimited
+        default:
+            let errorBody = String(data: data, encoding: .utf8) ?? "No error details"
+            throw ClaudeAPIError.invalidResponse(httpResponse.statusCode, errorBody)
+        }
+
+        let claudeResponse: ClaudeResponse
+        do {
+            claudeResponse = try JSONDecoder().decode(ClaudeResponse.self, from: data)
+        } catch {
+            let rawBody = String(data: data, encoding: .utf8) ?? "<non-UTF8>"
+            AppLogger.api.error("AgentInsights decode failed. Raw body (\(data.count) bytes): \(rawBody.prefix(500))")
+            throw ClaudeAPIError.decodingError(error)
+        }
+
+        guard let textBlock = claudeResponse.content.first(where: { $0.type == "text" }),
+              let text = textBlock.text, !text.isEmpty else {
+            throw ClaudeAPIError.noContent
+        }
+
+        await MainActor.run {
+            SessionLogger.shared.logAPI(.apiCallSucceeded, endpoint: "agentInsights",
+                                         metadata: ["responseLength": "\(text.count)"])
+        }
+
         return ClaudeAPIService.cleanJSONResponse(text)
     }
 

@@ -2,6 +2,8 @@ import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import sgMail from "@sendgrid/mail";
+import { fetchRecoveryInsightsData, MINIMUM_SESSION_COUNT } from "./firestore-queries";
+import { runRecoveryInsightsAgent, validateInsightResult } from "./managed-agent";
 
 admin.initializeApp();
 
@@ -1068,3 +1070,126 @@ export const sendNightlyReport = onSchedule(
     }
   }
 );
+
+// ---------------------------------------------------------------------------
+// Agent-Powered Recovery Insights
+// Uses Claude Managed Agents for multi-step analysis.
+// Falls back to single-call claudeProxy path on failure.
+// ---------------------------------------------------------------------------
+export const agentInsights = functions
+  .runWith({
+    timeoutSeconds: 300,
+    memory: "512MB",
+    secrets: ["ANTHROPIC_API_KEY", "MANAGED_AGENT_ID", "MANAGED_ENVIRONMENT_ID"],
+  })
+  .https.onRequest(async (req, res) => {
+    if (req.method !== "POST") {
+      res.status(405).json({ error: "Method not allowed" });
+      return;
+    }
+
+    // 1. Authenticate
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      res.status(401).json({ error: "Missing or invalid Authorization header" });
+      return;
+    }
+
+    const idToken = authHeader.split("Bearer ")[1];
+    let uid: string;
+    try {
+      const decoded = await admin.auth().verifyIdToken(idToken);
+      uid = decoded.uid;
+    } catch {
+      res.status(401).json({ error: "Invalid Firebase ID token" });
+      return;
+    }
+
+    // 2. Rate limit
+    if (isRateLimited(uid)) {
+      res.status(429).json({ error: "Rate limit exceeded. Please wait and try again." });
+      return;
+    }
+
+    // 3. Fetch user data from Firestore
+    let data;
+    try {
+      data = await fetchRecoveryInsightsData(uid);
+    } catch (err) {
+      console.error("Error fetching recovery data:", err);
+      res.status(500).json({ error: "Failed to fetch recovery data" });
+      return;
+    }
+
+    if (data.sessionCount < MINIMUM_SESSION_COUNT) {
+      res.status(400).json({
+        error: `Need at least ${MINIMUM_SESSION_COUNT} sessions in the past 14 days`,
+      });
+      return;
+    }
+
+    // 4. Try managed agent
+    let resultJson: string;
+    try {
+      const result = await runRecoveryInsightsAgent(data.userMessage);
+
+      // Server-side validation before returning
+      if (!validateInsightResult(result)) {
+        throw new Error("Agent returned invalid insight structure");
+      }
+
+      resultJson = JSON.stringify(result);
+      console.log("Agent insights generated successfully");
+    } catch (agentErr) {
+      // 5. Fallback to single-call Messages API with Haiku
+      console.warn("Agent failed, falling back to Messages API:", agentErr);
+
+      const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
+      if (!anthropicApiKey) {
+        res.status(500).json({ error: "Server configuration error" });
+        return;
+      }
+
+      try {
+        const systemPrompt = SYSTEM_PROMPTS.recovery_insights;
+        const config = MODEL_CONFIG.recovery_insights;
+
+        const fallbackResponse = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "x-api-key": anthropicApiKey,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            model: config.model,
+            max_tokens: config.max_tokens,
+            temperature: config.temperature,
+            system: systemPrompt,
+            messages: [{ role: "user", content: data.userMessage }],
+          }),
+        });
+
+        const fallbackData = await fallbackResponse.json();
+
+        if (!fallbackResponse.ok) {
+          res.status(fallbackResponse.status).json(fallbackData);
+          return;
+        }
+
+        // Return fallback response directly (already in Anthropic format)
+        res.status(200).json(fallbackData);
+        return;
+      } catch (fallbackErr) {
+        console.error("Fallback also failed:", fallbackErr);
+        res.status(502).json({ error: "Failed to generate recovery insights" });
+        return;
+      }
+    }
+
+    // 6. Wrap agent result in Anthropic response format for iOS compatibility
+    res.status(200).json({
+      content: [{ type: "text", text: resultJson }],
+      stop_reason: "end_turn",
+    });
+  });
