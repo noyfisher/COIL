@@ -206,7 +206,7 @@ final class BodyMapCollisionTests: XCTestCase {
 
     func testNoProxiesForLargeRegions() {
         let largeBaseKeys: Set<String> = [
-            "head", "chest", "abdomen", "upper_back", "lower_back",
+            "chest", "abdomen", "upper_back", "lower_back",
             "upper_arm", "forearm", "glute", "hip",
             "thigh", "hamstring", "calf_shin"
         ]

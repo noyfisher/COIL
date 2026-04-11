@@ -90,17 +90,17 @@ final class TimerViewModelTests: XCTestCase {
         vm.timer.timeRemaining = 1
         vm.start()
 
-        // Simulate the internal updateTimer call sequence
-        // After timeRemaining becomes 0, the timer should stop
-        // We can't easily call updateTimer (it's private), but we can test via the
-        // actual timer mechanism with a short wait
+        // Timer fires every 1s on .main run loop. With 1s remaining:
+        //   ~1s: decrements to 0
+        //   ~2s: detects 0, calls stop()
+        // Allow 3s to account for CI/simulator scheduling jitter.
         let expectation = XCTestExpectation(description: "Timer reaches zero")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             XCTAssertEqual(vm.timer.timeRemaining, 0)
             XCTAssertFalse(vm.timer.isRunning, "Timer should auto-stop at zero")
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 3)
+        wait(for: [expectation], timeout: 5)
     }
 
     // MARK: - Time String Formatting

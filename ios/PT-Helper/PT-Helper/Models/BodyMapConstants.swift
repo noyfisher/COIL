@@ -48,11 +48,6 @@ enum BodyMapConstants {
         "wrist_hand": 0.03,
         "neck": 0.020,
         "shoulder": 0.022,
-        "hip": 0.04,
-        "glute": 0.022,
-        "hamstring": 0.022,
-        "forearm": 0.025,
-        "upper_arm": 0.020,
     ]
 
     /// How far anterior (toward camera) proxy entities protrude past the mesh

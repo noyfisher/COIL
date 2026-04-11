@@ -777,7 +777,6 @@ struct BodyMap3DView: View {
             // Regions that need extra forward bias to sit in front of adjacent regions
             let forwardBias: Float
             switch baseKey {
-            case "hip": forwardBias = 0.05
             case "head": forwardBias = 0.04
             default: forwardBias = BodyMapConstants.proxyForwardBias
             }

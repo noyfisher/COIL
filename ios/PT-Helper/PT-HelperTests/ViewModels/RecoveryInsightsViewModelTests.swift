@@ -116,6 +116,9 @@ final class RecoveryInsightsViewModelTests: XCTestCase {
     }
 
     func testGenerateInsights_correctRequestType() async {
+        // Force agent path to fail so we hit the sendMessage fallback
+        mockAPI.agentInsightsErrorToThrow = ClaudeAPIError.networkError(
+            NSError(domain: "test", code: -1))
         mockAPI.responseToReturn = TestFixtures.makeRecoveryInsightsResponseJSON()
         let sessions = makeSessions(count: 4)
 
@@ -124,9 +127,23 @@ final class RecoveryInsightsViewModelTests: XCTestCase {
         XCTAssertEqual(mockAPI.lastRequestType, .recovery_insights)
     }
 
+    func testGenerateInsights_agentSuccess_doesNotCallSendMessage() async {
+        mockAPI.agentInsightsResponseToReturn = TestFixtures.makeRecoveryInsightsResponseJSON()
+        let sessions = makeSessions(count: 4)
+
+        await vm.generateInsights(sessions: sessions, plans: makePlans(), profile: nil)
+
+        XCTAssertEqual(mockAPI.requestAgentInsightsCallCount, 1)
+        XCTAssertEqual(mockAPI.sendMessageCallCount, 0, "Should not fall back when agent succeeds")
+        XCTAssertNotNil(vm.insight)
+    }
+
     // MARK: - Caching
 
     func testGenerateInsights_cached_doesNotCallAPI() async {
+        // Force agent path to fail so we hit the sendMessage fallback
+        mockAPI.agentInsightsErrorToThrow = ClaudeAPIError.networkError(
+            NSError(domain: "test", code: -1))
         mockAPI.responseToReturn = TestFixtures.makeRecoveryInsightsResponseJSON()
         let sessions = makeSessions(count: 4)
         let plans = makePlans()
@@ -141,6 +158,9 @@ final class RecoveryInsightsViewModelTests: XCTestCase {
     }
 
     func testGenerateInsights_forceRegenerate_bypassesCache() async {
+        // Force agent path to fail so we hit the sendMessage fallback
+        mockAPI.agentInsightsErrorToThrow = ClaudeAPIError.networkError(
+            NSError(domain: "test", code: -1))
         mockAPI.responseToReturn = TestFixtures.makeRecoveryInsightsResponseJSON()
         let sessions = makeSessions(count: 4)
         let plans = makePlans()
