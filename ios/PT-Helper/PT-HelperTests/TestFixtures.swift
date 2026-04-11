@@ -156,7 +156,8 @@ enum TestFixtures {
     static func makeExercise(
         name: String = "Wall Sits",
         targetArea: String = "Knee",
-        difficulty: RehabExercise.Difficulty = .beginner
+        difficulty: RehabExercise.Difficulty = .beginner,
+        exerciseCategory: String? = nil
     ) -> RehabExercise {
         RehabExercise(
             id: UUID(),
@@ -169,7 +170,8 @@ enum TestFixtures {
             difficulty: difficulty,
             demonstrationIcon: "figure.cooldown",
             tips: ["Tip 1"],
-            contraindications: ["Stop if pain."]
+            contraindications: ["Stop if pain."],
+            exerciseCategory: exerciseCategory
         )
     }
 

@@ -28,12 +28,50 @@ class SavedPlansViewModel: ObservableObject {
         listenerRegistration = nil
     }
 
+    /// One-time migration: move any docs from the legacy `wellnessPlans` collection
+    /// into `rehabPlans` so they appear in the My Plan tab.
+    private func migrateWellnessPlansIfNeeded(uid: String) {
+        let key = "wellnessPlansMigrated_\(uid)"
+        guard !UserDefaults.standard.bool(forKey: key) else { return }
+
+        Task {
+            do {
+                let snapshot = try await db.collection("users").document(uid)
+                    .collection("wellnessPlans").getDocuments()
+
+                guard !snapshot.documents.isEmpty else {
+                    UserDefaults.standard.set(true, forKey: key)
+                    return
+                }
+
+                AppLogger.data.info("Migrating \(snapshot.documents.count) wellness plan(s) to rehabPlans")
+
+                for doc in snapshot.documents {
+                    let data = doc.data()
+                    try await db.collection("users").document(uid)
+                        .collection("rehabPlans").document(doc.documentID)
+                        .setData(data)
+                    try await doc.reference.delete()
+                }
+
+                UserDefaults.standard.set(true, forKey: key)
+                SessionLogger.shared.log(.firestoreWrite, category: .data,
+                                          message: "Migrated \(snapshot.documents.count) wellness plan(s) to rehabPlans")
+            } catch {
+                AppLogger.data.error("Wellness plan migration failed: \(error.localizedDescription)")
+                SessionLogger.shared.logError(error, context: "WellnessPlanMigration")
+            }
+        }
+    }
+
     /// Start real-time Firestore listener for rehab plans.
     /// Idempotent — if a listener is already active, this is a no-op.
     func startListening() {
         guard listenerRegistration == nil else { return }
         guard let uid = Auth.auth().currentUser?.uid else { return }
         isLoading = true
+
+        migrateWellnessPlansIfNeeded(uid: uid)
 
         listenerRegistration = db.collection("users").document(uid).collection("rehabPlans")
             .order(by: "createdDate", descending: true)

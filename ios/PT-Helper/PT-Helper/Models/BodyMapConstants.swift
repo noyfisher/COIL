@@ -83,31 +83,31 @@ enum BodyMapConstants {
     /// Color coding for each region group. Bilateral pairs share a color.
     /// Key = base region key (no left_/right_ prefix).
     static let regionColors: [String: UIColor] = [
-        "head":       UIColor(red: 0.45, green: 0.72, blue: 1.00, alpha: 1),  // light blue
-        "neck":       UIColor(red: 0.00, green: 0.75, blue: 0.70, alpha: 1),  // teal
-        "chest":      UIColor(red: 1.00, green: 0.60, blue: 0.22, alpha: 1),  // orange
-        "abdomen":    UIColor(red: 0.65, green: 0.85, blue: 0.25, alpha: 1),  // yellow-green
-        "upper_back": UIColor(red: 0.62, green: 0.35, blue: 0.82, alpha: 1),  // purple
-        "lower_back": UIColor(red: 0.35, green: 0.35, blue: 0.80, alpha: 1),  // indigo
-        "shoulder":   UIColor(red: 1.00, green: 0.50, blue: 0.50, alpha: 1),  // coral
-        "upper_arm":  UIColor(red: 0.30, green: 0.60, blue: 0.90, alpha: 1),  // sky blue
-        "elbow":      UIColor(red: 0.50, green: 0.88, blue: 0.35, alpha: 1),  // lime
-        "forearm":    UIColor(red: 0.92, green: 0.78, blue: 0.20, alpha: 1),  // gold
-        "wrist_hand": UIColor(red: 1.00, green: 0.42, blue: 0.70, alpha: 1),  // pink
-        "glute":      UIColor(red: 0.62, green: 0.42, blue: 0.24, alpha: 1),  // brown
-        "hip":        UIColor(red: 0.82, green: 0.32, blue: 0.72, alpha: 1),  // magenta
-        "thigh":      UIColor(red: 0.22, green: 0.65, blue: 0.35, alpha: 1),  // forest green
-        "hamstring":  UIColor(red: 0.55, green: 0.62, blue: 0.22, alpha: 1),  // olive
-        "knee":       UIColor(red: 0.00, green: 0.82, blue: 0.82, alpha: 1),  // cyan
-        "calf_shin":  UIColor(red: 0.70, green: 0.52, blue: 0.90, alpha: 1),  // lavender
-        "ankle_foot": UIColor(red: 1.00, green: 0.72, blue: 0.48, alpha: 1),  // peach
+        "head":       UIColor(red: 0.318, green: 0.749, blue: 0.427, alpha: 1),  // #51BF6D — spring green
+        "neck":       UIColor(red: 0.624, green: 0.812, blue: 0.784, alpha: 1),  // #9FCFC8 — pale aqua
+        "chest":      UIColor(red: 0.333, green: 0.769, blue: 0.710, alpha: 1),  // #55C4B5 — teal mint
+        "abdomen":    UIColor(red: 0.549, green: 0.824, blue: 0.529, alpha: 1),  // #8CD287 — soft lime
+        "upper_back": UIColor(red: 0.231, green: 0.675, blue: 0.224, alpha: 1),  // #3BAC39 — kelly green
+        "lower_back": UIColor(red: 0.314, green: 0.588, blue: 0.545, alpha: 1),  // #50968B — deep sage teal
+        "shoulder":   UIColor(red: 0.310, green: 0.588, blue: 0.349, alpha: 1),  // #4F9659 — forest sage
+        "upper_arm":  UIColor(red: 0.435, green: 0.698, blue: 0.584, alpha: 1),  // #6FB295 — seafoam
+        "elbow":      UIColor(red: 0.490, green: 0.816, blue: 0.682, alpha: 1),  // #7DD0AE — mint cream
+        "forearm":    UIColor(red: 0.286, green: 0.733, blue: 0.569, alpha: 1),  // #49BB91 — jade
+        "wrist_hand": UIColor(red: 0.451, green: 0.710, blue: 0.443, alpha: 1),  // #73B571 — sage green
+        "glute":      UIColor(red: 0.624, green: 0.812, blue: 0.635, alpha: 1),  // #9FCFA2 — pale sage
+        "hip":        UIColor(red: 0.310, green: 0.761, blue: 0.286, alpha: 1),  // #4FC249 — vivid green
+        "thigh":      UIColor(red: 0.412, green: 0.804, blue: 0.514, alpha: 1),  // #69CD83 — emerald mint
+        "hamstring":  UIColor(red: 0.231, green: 0.671, blue: 0.427, alpha: 1),  // #3BAB6D — clover
+        "knee":       UIColor(red: 0.514, green: 0.831, blue: 0.788, alpha: 1),  // #83D4C9 — aqua mist
+        "calf_shin":  UIColor(red: 0.353, green: 0.655, blue: 0.467, alpha: 1),  // #5AA777 — eucalyptus
+        "ankle_foot": UIColor(red: 0.380, green: 0.706, blue: 0.353, alpha: 1),  // #61B45A — leaf green
     ]
 
     // MARK: - Zone Drill-Down
 
     /// Alpha tint for dimmed (non-zone) region materials during drill-down.
     /// 0.02 makes them nearly invisible — a faint ghost outline only.
-    static let zoneDimAlpha: CGFloat = 0.02
+    static let zoneDimAlpha: CGFloat = 0.06
     static let zoneDimRoughness: Float = 0.8
     static let zoneDimMetallic: Float = 0.0
 
@@ -131,8 +131,8 @@ enum BodyMapConstants {
 
     // MARK: - Background
 
-    static let sceneBackground = UIColor(red: 0.08, green: 0.08, blue: 0.10, alpha: 1.0)
-    static let loadingOverlayBackground = UIColor(red: 0.08, green: 0.08, blue: 0.10, alpha: 0.95)
+    static let sceneBackground = UIColor(red: 0.91, green: 0.94, blue: 0.91, alpha: 1.0)           // #E8F0E9
+    static let loadingOverlayBackground = UIColor(red: 0.91, green: 0.94, blue: 0.91, alpha: 0.95)  // #E8F0E9
 
     // MARK: - Helpers
 

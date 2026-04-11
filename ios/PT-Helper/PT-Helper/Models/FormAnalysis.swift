@@ -65,6 +65,17 @@ struct DataQualityReport: Codable {
 
 // MARK: - Form Analysis Data
 
+/// Per-rep symmetry data: left/right differences at key phases within a rep.
+struct RepSymmetryData: Codable {
+    let repNumber: Int
+    /// Joint name → left-right difference at the minimum angle phase
+    let atMinAngle: [String: Double]
+    /// Joint name → left-right difference at the midpoint phase
+    let atMidAngle: [String: Double]
+    /// Joint name → left-right difference at the maximum angle phase
+    let atMaxAngle: [String: Double]
+}
+
 /// Aggregated metrics from pose analysis of a recorded exercise.
 struct FormAnalysisData: Codable {
     let exerciseName: String
@@ -76,6 +87,7 @@ struct FormAnalysisData: Codable {
     let detectedRepCount: Int
     let repMetrics: [RepMetrics]
     let symmetry: SymmetryData?
+    let perRepSymmetry: [RepSymmetryData]?
     let alignment: [AlignmentIssue]
     let averageTempo: Double?  // seconds per rep
     let tempoVariability: Double?  // standard deviation
@@ -91,6 +103,51 @@ struct FormAnalysisData: Codable {
         let description: String
         let affectedReps: Int
         let totalReps: Int
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case exerciseName, exerciseCategory, targetArea, totalFramesProcessed
+        case videoFPS, videoDurationSeconds, detectedRepCount, repMetrics
+        case symmetry, perRepSymmetry, alignment, averageTempo, tempoVariability, bodyHeight
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        exerciseName = try container.decode(String.self, forKey: .exerciseName)
+        exerciseCategory = try container.decodeIfPresent(String.self, forKey: .exerciseCategory)
+        targetArea = try container.decode(String.self, forKey: .targetArea)
+        totalFramesProcessed = try container.decode(Int.self, forKey: .totalFramesProcessed)
+        videoFPS = try container.decode(Double.self, forKey: .videoFPS)
+        videoDurationSeconds = try container.decode(Double.self, forKey: .videoDurationSeconds)
+        detectedRepCount = try container.decode(Int.self, forKey: .detectedRepCount)
+        repMetrics = try container.decode([RepMetrics].self, forKey: .repMetrics)
+        symmetry = try container.decodeIfPresent(SymmetryData.self, forKey: .symmetry)
+        perRepSymmetry = try container.decodeIfPresent([RepSymmetryData].self, forKey: .perRepSymmetry)
+        alignment = try container.decode([AlignmentIssue].self, forKey: .alignment)
+        averageTempo = try container.decodeIfPresent(Double.self, forKey: .averageTempo)
+        tempoVariability = try container.decodeIfPresent(Double.self, forKey: .tempoVariability)
+        bodyHeight = try container.decodeIfPresent(Double.self, forKey: .bodyHeight)
+    }
+
+    init(exerciseName: String, exerciseCategory: String?, targetArea: String,
+         totalFramesProcessed: Int, videoFPS: Double, videoDurationSeconds: Double,
+         detectedRepCount: Int, repMetrics: [RepMetrics], symmetry: SymmetryData?,
+         perRepSymmetry: [RepSymmetryData]? = nil, alignment: [AlignmentIssue],
+         averageTempo: Double?, tempoVariability: Double?, bodyHeight: Double?) {
+        self.exerciseName = exerciseName
+        self.exerciseCategory = exerciseCategory
+        self.targetArea = targetArea
+        self.totalFramesProcessed = totalFramesProcessed
+        self.videoFPS = videoFPS
+        self.videoDurationSeconds = videoDurationSeconds
+        self.detectedRepCount = detectedRepCount
+        self.repMetrics = repMetrics
+        self.symmetry = symmetry
+        self.perRepSymmetry = perRepSymmetry
+        self.alignment = alignment
+        self.averageTempo = averageTempo
+        self.tempoVariability = tempoVariability
+        self.bodyHeight = bodyHeight
     }
 }
 

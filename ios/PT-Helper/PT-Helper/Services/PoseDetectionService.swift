@@ -12,8 +12,10 @@ class PoseDetectionService {
     /// Minimum confidence threshold for a joint to be considered valid
     private let minimumConfidence: Float = 0.1
 
-    /// Process every Nth frame (2 = every other frame for 30fps → 15 frames/sec)
-    private let frameSubsampleRate: Int = 2
+    /// Process every Nth frame. Adaptive: 1 for short videos (≤15s), 2 for longer.
+    private let defaultSubsampleRate: Int = 2
+    private let shortVideoSubsampleRate: Int = 1
+    private let shortVideoThresholdSeconds: Double = 15.0
 
     private init() {}
 
@@ -36,11 +38,17 @@ class PoseDetectionService {
 
         let duration = try await asset.load(.duration)
         let nominalFrameRate = try await videoTrack.load(.nominalFrameRate)
-        let totalFrames = Int(CMTimeGetSeconds(duration) * Double(nominalFrameRate))
+        let durationSeconds = CMTimeGetSeconds(duration)
+        let totalFrames = Int(durationSeconds * Double(nominalFrameRate))
 
         guard totalFrames > 0 else {
             throw PoseDetectionError.emptyVideo
         }
+
+        // Adaptive subsampling: process every frame for short videos, subsample longer ones
+        let subsampleRate = durationSeconds <= shortVideoThresholdSeconds
+            ? shortVideoSubsampleRate
+            : defaultSubsampleRate
 
         // Configure asset reader
         let reader = try AVAssetReader(asset: asset)
@@ -68,7 +76,7 @@ class PoseDetectionService {
 
         while let sampleBuffer = trackOutput.copyNextSampleBuffer() {
             // Subsample: skip frames for efficiency
-            if frameIndex % frameSubsampleRate != 0 {
+            if frameIndex % subsampleRate != 0 {
                 frameIndex += 1
                 continue
             }
@@ -99,9 +107,12 @@ class PoseDetectionService {
             throw PoseDetectionError.noPoseDetected
         }
 
-        AppLogger.api.info("PoseDetection: Processed \(poseFrames.count) frames from \(totalFrames) total (subsample: \(self.frameSubsampleRate)x)")
+        // Post-process: compute proxy confidence for each joint
+        let refinedFrames = computeProxyConfidence(for: poseFrames, fps: fps)
 
-        return poseFrames
+        AppLogger.api.info("PoseDetection: Processed \(refinedFrames.count) frames from \(totalFrames) total (subsample: \(subsampleRate)x)")
+
+        return refinedFrames
     }
 
     /// Get the video's frame rate.
@@ -119,6 +130,104 @@ class PoseDetectionService {
         let asset = AVURLAsset(url: videoURL)
         let duration = try await asset.load(.duration)
         return CMTimeGetSeconds(duration)
+    }
+
+    // MARK: - Proxy Confidence
+
+    /// Bone segments used for link-length stability checks.
+    private static let boneSegments: [(from: BodyJoint3D, to: BodyJoint3D)] = [
+        (.leftShoulder, .leftElbow),
+        (.rightShoulder, .rightElbow),
+        (.leftElbow, .leftWrist),
+        (.rightElbow, .rightWrist),
+        (.leftHip, .leftKnee),
+        (.rightHip, .rightKnee),
+        (.leftKnee, .leftAnkle),
+        (.rightKnee, .rightAnkle),
+        (.neck, .root),
+    ]
+
+    /// Compute proxy confidence for each joint based on link-length stability and velocity.
+    /// Replaces the hardcoded 1.0 values with meaningful per-joint confidence scores.
+    private func computeProxyConfidence(for poses: [PoseFrame], fps: Double) -> [PoseFrame] {
+        guard poses.count >= 3 else { return poses }
+
+        // Step 1: Compute per-joint link-length coefficient of variation.
+        // For each joint, average the CV of all bone segments it participates in.
+        var jointBoneCVs: [String: [Double]] = [:]
+
+        for segment in Self.boneSegments {
+            let fromKey = segment.from.rawValue
+            let toKey = segment.to.rawValue
+
+            let lengths: [Double] = poses.compactMap { frame in
+                guard let from = frame.joints[fromKey],
+                      let to = frame.joints[toKey] else { return nil }
+                let dx = from.x - to.x, dy = from.y - to.y, dz = from.z - to.z
+                return sqrt(dx * dx + dy * dy + dz * dz)
+            }
+            guard lengths.count >= 3 else { continue }
+
+            let mean = lengths.reduce(0, +) / Double(lengths.count)
+            guard mean > 0.01 else { continue }
+            let variance = lengths.map { ($0 - mean) * ($0 - mean) }.reduce(0, +) / Double(lengths.count)
+            let cv = sqrt(variance) / mean
+
+            jointBoneCVs[fromKey, default: []].append(cv)
+            jointBoneCVs[toKey, default: []].append(cv)
+        }
+
+        // Step 2: Build updated frames with proxy confidence from link stability + velocity.
+        var updatedPoses: [PoseFrame] = []
+
+        for i in 0..<poses.count {
+            var newJoints: [String: JointPoint3D] = [:]
+
+            for (jointName, joint) in poses[i].joints {
+                var confidence = 1.0
+
+                // Link-length stability factor (0.1–1.0).
+                // CV < 0.05 → full confidence; CV > 0.25 → minimum.
+                if let cvs = jointBoneCVs[jointName], !cvs.isEmpty {
+                    let avgCV = cvs.reduce(0, +) / Double(cvs.count)
+                    let linkFactor = max(0.1, min(1.0, 1.0 - (avgCV - 0.05) / 0.20))
+                    confidence *= linkFactor
+                }
+
+                // Velocity factor (0.1–1.0): penalize sudden jumps.
+                if i > 0 && i < poses.count - 1 {
+                    if let prev = poses[i - 1].joints[jointName],
+                       let next = poses[i + 1].joints[jointName] {
+                        let dt = max(poses[i].timestamp - poses[i - 1].timestamp, 1.0 / fps)
+                        let dx = joint.x - prev.x, dy = joint.y - prev.y, dz = joint.z - prev.z
+                        let velocity = sqrt(dx * dx + dy * dy + dz * dz) / dt
+
+                        let dt2 = max(poses[i + 1].timestamp - poses[i].timestamp, 1.0 / fps)
+                        let dx2 = next.x - joint.x, dy2 = next.y - joint.y, dz2 = next.z - joint.z
+                        let velocity2 = sqrt(dx2 * dx2 + dy2 * dy2 + dz2 * dz2) / dt2
+                        let accel = abs(velocity2 - velocity) / ((dt + dt2) / 2)
+
+                        // > 3 m/s is suspicious for rehab exercises; > 10 m/s² accel is likely a glitch
+                        let velocityFactor = max(0.1, min(1.0, 1.0 - (velocity - 3.0) / 5.0))
+                        let accelFactor = max(0.1, min(1.0, 1.0 - (accel - 10.0) / 20.0))
+                        confidence *= min(velocityFactor, accelFactor)
+                    }
+                }
+
+                newJoints[jointName] = JointPoint3D(
+                    x: joint.x, y: joint.y, z: joint.z,
+                    confidence: confidence
+                )
+            }
+
+            updatedPoses.append(PoseFrame(
+                timestamp: poses[i].timestamp,
+                joints: newJoints,
+                bodyHeight: poses[i].bodyHeight
+            ))
+        }
+
+        return updatedPoses
     }
 
     // MARK: - Private

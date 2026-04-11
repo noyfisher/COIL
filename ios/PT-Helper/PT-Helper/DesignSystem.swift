@@ -46,7 +46,7 @@ enum AppColors {
 
     // MARK: Surface Colors
     static let cardBackground = Color(red: 0.980, green: 0.988, blue: 0.973)      // #FAFCF8
-    static let pageBackground = Color(red: 0.937, green: 0.949, blue: 0.925)      // #EFF2EC
+    static let pageBackground = Color(red: 0.91, green: 0.94, blue: 0.91)         // #E8F0E9
     static let elevatedSurface = Color(red: 0.886, green: 0.910, blue: 0.855)     // #E2E8DA
     static let inputBackground = Color(red: 0.980, green: 0.988, blue: 0.973)     // #FAFCF8
     static let subtleBorder = Color(red: 0.294, green: 0.392, blue: 0.255).opacity(0.12)

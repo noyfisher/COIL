@@ -85,7 +85,8 @@ class FormAnalysisViewModel: ObservableObject {
             let dataQuality = qualityScorer.score(
                 poses: poses,
                 totalVideoFrames: totalFrames,
-                exercise: exercise
+                exercise: exercise,
+                fps: fps
             )
 
             state = .processing(progress: 0.75)
@@ -224,11 +225,24 @@ class FormAnalysisViewModel: ObservableObject {
         }
 
         if let symmetry = metrics.symmetry, !symmetry.differencesDegrees.isEmpty {
-            message += "\n\nSYMMETRY:"
+            message += "\n\nSYMMETRY (global averages):"
             for (joint, diff) in symmetry.differencesDegrees.sorted(by: { $0.key < $1.key }) {
                 let leftVal = symmetry.leftAvgAngles["left_\(joint)"] ?? 0
                 let rightVal = symmetry.rightAvgAngles["right_\(joint)"] ?? 0
                 message += "\n  \(joint): left_avg=\(leftVal)° right_avg=\(rightVal)° diff=\(diff)°"
+            }
+        }
+
+        if let perRepSym = metrics.perRepSymmetry, !perRepSym.isEmpty {
+            message += "\n\nSYMMETRY (per-rep phases):"
+            for repSym in perRepSym {
+                let allJoints = Set(Array(repSym.atMinAngle.keys) + Array(repSym.atMidAngle.keys) + Array(repSym.atMaxAngle.keys))
+                for joint in allJoints.sorted() {
+                    let atMin = repSym.atMinAngle[joint].map { "\($0)°" } ?? "n/a"
+                    let atMid = repSym.atMidAngle[joint].map { "\($0)°" } ?? "n/a"
+                    let atMax = repSym.atMaxAngle[joint].map { "\($0)°" } ?? "n/a"
+                    message += "\n  Rep \(repSym.repNumber) \(joint): bottom=\(atMin) mid=\(atMid) top=\(atMax)"
+                }
             }
         }
 

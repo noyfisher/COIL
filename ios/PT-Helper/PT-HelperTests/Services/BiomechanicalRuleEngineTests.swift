@@ -297,4 +297,57 @@ final class BiomechanicalRuleEngineTests: XCTestCase {
         XCTAssertEqual(thresholds.trunkLeanMeters, 0.10, "Plank should have tighter trunk lean threshold")
         XCTAssertLessThan(thresholds.trunkLeanMeters, AlignmentThresholds.default.trunkLeanMeters)
     }
+
+    // MARK: - New Exercise Rules
+
+    func testRules_pushUp_matchesByName() {
+        let exercise = TestFixtures.makeExercise(name: "Push Up", targetArea: "Chest")
+        let rules = engine.rules(for: exercise)
+        XCTAssertTrue(rules.expectedAngleRanges.keys.contains("left_elbow"))
+        XCTAssertTrue(rules.safetyConstraints.contains { $0.name == "pushup_trunk_straightness" })
+    }
+
+    func testRules_row_matchesByName() {
+        let exercise = TestFixtures.makeExercise(name: "Bent Over Row", targetArea: "Back")
+        let rules = engine.rules(for: exercise)
+        XCTAssertTrue(rules.expectedAngleRanges.keys.contains("left_elbow"))
+        XCTAssertTrue(rules.safetyConstraints.contains { $0.name == "row_shoulder_compensation" })
+    }
+
+    func testRules_calfRaise_matchesByName() {
+        let exercise = TestFixtures.makeExercise(name: "Standing Calf Raise", targetArea: "Calves")
+        let rules = engine.rules(for: exercise)
+        XCTAssertTrue(rules.expectedAngleRanges.keys.contains("left_knee"))
+        XCTAssertEqual(rules.minimumRepROM, 8)
+    }
+
+    func testRules_birdDog_matchesByName() {
+        let exercise = TestFixtures.makeExercise(name: "Bird Dog", targetArea: "Core")
+        let rules = engine.rules(for: exercise)
+        XCTAssertTrue(rules.expectedAngleRanges.keys.contains("left_hip"))
+        XCTAssertTrue(rules.safetyConstraints.contains { $0.name == "birddog_trunk_stability" })
+    }
+
+    func testRules_clamshell_matchesByName() {
+        let exercise = TestFixtures.makeExercise(name: "Clamshell", targetArea: "Glutes")
+        let rules = engine.rules(for: exercise)
+        XCTAssertTrue(rules.expectedAngleRanges.keys.contains("left_hip"))
+        XCTAssertTrue(rules.safetyConstraints.contains { $0.name == "clamshell_trunk_rotation" })
+    }
+
+    // MARK: - Category-Level Rules
+
+    func testRules_stretchCategory_usesStretchRules() {
+        let exercise = TestFixtures.makeExercise(name: "Custom Stretch", targetArea: "Full Body", exerciseCategory: "stretch")
+        let rules = engine.rules(for: exercise)
+        XCTAssertTrue(rules.safetyConstraints.contains { $0.name == "stretch_bouncing" })
+        XCTAssertEqual(rules.minimumRepROM, 5)
+    }
+
+    func testRules_balanceCategory_usesBalanceRules() {
+        let exercise = TestFixtures.makeExercise(name: "Single Leg Stand", targetArea: "Full Body", exerciseCategory: "balance")
+        let rules = engine.rules(for: exercise)
+        XCTAssertTrue(rules.safetyConstraints.contains { $0.name == "balance_sway" })
+        XCTAssertEqual(rules.alignmentThresholds.trunkLeanMeters, 0.08)
+    }
 }

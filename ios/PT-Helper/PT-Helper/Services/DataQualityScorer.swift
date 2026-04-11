@@ -36,6 +36,7 @@ class DataQualityScorer {
         poses: [PoseFrame],
         totalVideoFrames: Int,
         exercise: RehabExercise,
+        fps: Double = 30.0,
         analysisEngine: PoseAnalysisEngine = .shared
     ) -> DataQualityReport {
         var warnings: [String] = []
@@ -75,7 +76,7 @@ class DataQualityScorer {
         }
 
         // 4. Temporal outlier detection
-        let outlierCount = detectTemporalOutliers(poses: poses)
+        let outlierCount = detectTemporalOutliers(poses: poses, fps: fps)
         if outlierCount > poses.count / 5 {
             warnings.append("\(outlierCount) frames had sudden joint position jumps (possible detection noise).")
         }
@@ -155,44 +156,59 @@ class DataQualityScorer {
     // MARK: - Temporal Outlier Detection
 
     /// Count frames where any joint position jumps more than 3 SD from the rolling mean.
-    func detectTemporalOutliers(poses: [PoseFrame], windowSize: Int = 5) -> Int {
+    /// Iterates frames first (outer), joints second (inner) to avoid double-counting.
+    func detectTemporalOutliers(poses: [PoseFrame], fps: Double = 30.0) -> Int {
+        let windowSize = max(3, Int(fps * 0.15))
         guard poses.count > windowSize * 2 else { return 0 }
 
-        var outlierCount = 0
-        let allJointNames = Set(poses.flatMap { $0.joints.keys })
+        let allJointNames = Array(Set(poses.flatMap { $0.joints.keys }))
+        var outlierFrames: Set<Int> = []
 
+        // Pre-extract joint positions indexed by frame for efficient lookup
+        var jointPositions: [String: [(frame: Int, x: Double, y: Double, z: Double)]] = [:]
         for jointName in allJointNames {
-            // Extract positions for this joint
-            let positions: [(index: Int, x: Double, y: Double, z: Double)] = poses.enumerated().compactMap { (i, frame) in
+            jointPositions[jointName] = poses.enumerated().compactMap { (i, frame) in
                 guard let joint = frame.joints[jointName] else { return nil }
                 return (i, joint.x, joint.y, joint.z)
             }
+        }
 
-            guard positions.count > windowSize * 2 else { continue }
+        // Check each frame: is it an outlier for ANY joint?
+        for frameIdx in windowSize..<(poses.count - windowSize) {
+            if outlierFrames.contains(frameIdx) { continue }
 
-            // Compute rolling mean and detect jumps
-            for i in windowSize..<(positions.count - windowSize) {
-                let window = positions[(i - windowSize)..<i]
-                let meanX = window.map { $0.x }.reduce(0, +) / Double(windowSize)
-                let meanY = window.map { $0.y }.reduce(0, +) / Double(windowSize)
-                let meanZ = window.map { $0.z }.reduce(0, +) / Double(windowSize)
+            for jointName in allJointNames {
+                guard let positions = jointPositions[jointName] else { continue }
 
-                let sdX = sqrt(window.map { ($0.x - meanX) * ($0.x - meanX) }.reduce(0, +) / Double(windowSize))
-                let sdY = sqrt(window.map { ($0.y - meanY) * ($0.y - meanY) }.reduce(0, +) / Double(windowSize))
-                let sdZ = sqrt(window.map { ($0.z - meanZ) * ($0.z - meanZ) }.reduce(0, +) / Double(windowSize))
+                // Find this frame and its window in the joint's position array
+                guard let posIdx = positions.firstIndex(where: { $0.frame == frameIdx }) else { continue }
+                let windowStart = max(0, posIdx - windowSize)
+                guard windowStart < posIdx else { continue }
 
-                let current = positions[i]
+                let window = positions[windowStart..<posIdx]
+                guard window.count >= 2 else { continue }
+                let wCount = Double(window.count)
+
+                let meanX = window.map { $0.x }.reduce(0, +) / wCount
+                let meanY = window.map { $0.y }.reduce(0, +) / wCount
+                let meanZ = window.map { $0.z }.reduce(0, +) / wCount
+
+                let sdX = sqrt(window.map { ($0.x - meanX) * ($0.x - meanX) }.reduce(0, +) / wCount)
+                let sdY = sqrt(window.map { ($0.y - meanY) * ($0.y - meanY) }.reduce(0, +) / wCount)
+                let sdZ = sqrt(window.map { ($0.z - meanZ) * ($0.z - meanZ) }.reduce(0, +) / wCount)
+
+                let current = positions[posIdx]
                 let threshold = 3.0
                 if abs(current.x - meanX) > threshold * max(sdX, 0.01) ||
-                   abs(current.y - meanY) > threshold * max(sdY, 0.01) ||
-                   abs(current.z - meanZ) > threshold * max(sdZ, 0.01) {
-                    outlierCount += 1
-                    break  // Count each frame at most once across joints
+                    abs(current.y - meanY) > threshold * max(sdY, 0.01) ||
+                    abs(current.z - meanZ) > threshold * max(sdZ, 0.01) {
+                    outlierFrames.insert(frameIdx)
+                    break  // This frame is an outlier — no need to check more joints
                 }
             }
         }
 
-        return outlierCount
+        return outlierFrames.count
     }
 
     // MARK: - Helpers

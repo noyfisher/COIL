@@ -417,7 +417,7 @@ class WellnessPlanViewModel: ObservableObject {
 
         Task {
             do {
-                try await db.collection("users").document(userId).collection("wellnessPlans")
+                try await db.collection("users").document(userId).collection("rehabPlans")
                     .document(plan.id.uuidString)
                     .setData(planData)
                 self.isSaving = false

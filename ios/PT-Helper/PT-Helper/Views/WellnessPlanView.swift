@@ -22,7 +22,7 @@ struct WellnessPlanView: View {
         .alert("Plan Saved!", isPresented: $viewModel.showSaveSuccess) {
             Button("OK", role: .cancel) { }
         } message: {
-            Text("Your wellness plan has been saved. You can find it in your Rehab tab.")
+            Text("Your wellness plan has been saved. You can find it in the My Plan tab.")
         }
         .trackScreen("WellnessPlan")
     }

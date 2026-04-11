@@ -366,7 +366,7 @@ struct SettingsView: View {
         Task {
             do {
                 // 1. Delete Firestore user data (subcollections)
-                let subcollections = ["profile", "rehabPlans", "workoutSessions", "notes"]
+                let subcollections = ["profile", "rehabPlans", "workoutSessions", "notes", "wellnessPlans"]
                 for subcollection in subcollections {
                     let snapshot = try await db.collection("users").document(uid)
                         .collection(subcollection).getDocuments()

@@ -84,7 +84,33 @@ final class PoseAnalysisEngineTests: XCTestCase {
         XCTAssertNotNil(angles["right_knee"], "Should compute right knee even if left has low confidence")
     }
 
-    // MARK: - Primary Angle Determination
+    // MARK: - Primary Joint Determination
+
+    func testDeterminePrimaryJoint_squat_returnsKnee() {
+        let exercise = TestFixtures.makeExercise(name: "Bodyweight Squat", targetArea: "Quadriceps")
+        let joint = engine.determinePrimaryJoint(for: exercise)
+        XCTAssertEqual(joint, "knee")
+    }
+
+    func testDeterminePrimaryJoint_curl_returnsElbow() {
+        let exercise = TestFixtures.makeExercise(name: "Bicep Curl", targetArea: "Biceps")
+        let joint = engine.determinePrimaryJoint(for: exercise)
+        XCTAssertEqual(joint, "elbow")
+    }
+
+    func testDeterminePrimaryJoint_bridge_returnsHip() {
+        let exercise = TestFixtures.makeExercise(name: "Glute Bridge", targetArea: "Glutes")
+        let joint = engine.determinePrimaryJoint(for: exercise)
+        XCTAssertEqual(joint, "hip")
+    }
+
+    func testDeterminePrimaryJoint_shoulderPress_returnsShoulder() {
+        let exercise = TestFixtures.makeExercise(name: "Overhead Press", targetArea: "Shoulders")
+        let joint = engine.determinePrimaryJoint(for: exercise)
+        XCTAssertEqual(joint, "shoulder")
+    }
+
+    // MARK: - Primary Angle Determination (legacy — no poses)
 
     func testDeterminePrimaryAngle_squat_returnsKnee() {
         let exercise = TestFixtures.makeExercise(name: "Bodyweight Squat", targetArea: "Quadriceps")
@@ -108,6 +134,32 @@ final class PoseAnalysisEngineTests: XCTestCase {
         let exercise = TestFixtures.makeExercise(name: "Overhead Press", targetArea: "Shoulders")
         let angle = engine.determinePrimaryAngle(for: exercise)
         XCTAssertEqual(angle, "left_shoulder")
+    }
+
+    // MARK: - Both-Sides Selection
+
+    func testDeterminePrimaryAngle_withPoses_selectsBetterSide() {
+        let exercise = TestFixtures.makeExercise(name: "Bodyweight Squat", targetArea: "Quadriceps")
+
+        // Create poses where right side has higher confidence than left
+        var frames: [PoseFrame] = []
+        for i in 0..<20 {
+            var joints = makeSquatJoints(kneeAngle: 120)
+            // Degrade left side confidence
+            if let lKnee = joints[BodyJoint3D.leftKnee.rawValue] {
+                joints[BodyJoint3D.leftKnee.rawValue] = JointPoint3D(x: lKnee.x, y: lKnee.y, z: lKnee.z, confidence: 0.2)
+            }
+            if let lHip = joints[BodyJoint3D.leftHip.rawValue] {
+                joints[BodyJoint3D.leftHip.rawValue] = JointPoint3D(x: lHip.x, y: lHip.y, z: lHip.z, confidence: 0.2)
+            }
+            if let lAnkle = joints[BodyJoint3D.leftAnkle.rawValue] {
+                joints[BodyJoint3D.leftAnkle.rawValue] = JointPoint3D(x: lAnkle.x, y: lAnkle.y, z: lAnkle.z, confidence: 0.2)
+            }
+            frames.append(PoseFrame(timestamp: Double(i) / 30.0, joints: joints, bodyHeight: 1.75))
+        }
+
+        let angle = engine.determinePrimaryAngle(for: exercise, poses: frames)
+        XCTAssertEqual(angle, "right_knee", "Should select right side when left has lower confidence")
     }
 
     // MARK: - Smoothing (One-Euro Filter)
@@ -169,6 +221,44 @@ final class PoseAnalysisEngineTests: XCTestCase {
         XCTAssertLessThanOrEqual(result.detectedRepCount, 4, "Should not over-detect reps")
         XCTAssertEqual(result.exerciseName, "Bodyweight Squat")
         XCTAssertEqual(result.targetArea, "Quadriceps")
+    }
+
+    // MARK: - Rep Detection Improvements
+
+    func testAnalyze_veryShortReps_filteredOut() {
+        let exercise = TestFixtures.makeExercise(name: "Bodyweight Squat", targetArea: "Quadriceps")
+        // Create a sequence with very fast "reps" (~0.2s each) — should be filtered out
+        let frames = makeSquatRepSequence(repCount: 5, framesPerRep: 6, fps: 30.0)  // 0.2s per rep
+
+        let result = engine.analyze(poses: frames, exercise: exercise, videoFPS: 30, videoDuration: 1.0)
+
+        // Very short reps (<0.5s) should be filtered out
+        XCTAssertEqual(result.detectedRepCount, 0, "Reps shorter than 0.5s should be filtered out")
+    }
+
+    func testAnalyze_normalReps_detected() {
+        let exercise = TestFixtures.makeExercise(name: "Bodyweight Squat", targetArea: "Quadriceps")
+        // 3 reps at 60 frames each (2 seconds per rep at 30fps)
+        let frames = makeSquatRepSequence(repCount: 3, framesPerRep: 60, fps: 30.0)
+
+        let result = engine.analyze(poses: frames, exercise: exercise, videoFPS: 30, videoDuration: 6.0)
+
+        XCTAssertGreaterThanOrEqual(result.detectedRepCount, 2, "Should detect at least 2 reps")
+    }
+
+    // MARK: - Per-Rep Symmetry
+
+    func testAnalyze_producesPerRepSymmetry() {
+        let exercise = TestFixtures.makeExercise(name: "Bodyweight Squat", targetArea: "Quadriceps")
+        let frames = makeSquatRepSequence(repCount: 3, framesPerRep: 60, fps: 30.0)
+
+        let result = engine.analyze(poses: frames, exercise: exercise, videoFPS: 30, videoDuration: 6.0)
+
+        if result.detectedRepCount > 0 {
+            XCTAssertNotNil(result.perRepSymmetry, "Should produce per-rep symmetry data when reps are detected")
+            XCTAssertEqual(result.perRepSymmetry?.count, result.detectedRepCount,
+                          "Should have one symmetry entry per detected rep")
+        }
     }
 
     // MARK: - Helpers
