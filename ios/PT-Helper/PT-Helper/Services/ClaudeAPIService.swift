@@ -1,5 +1,6 @@
 import Foundation
 import FirebaseAuth
+import UIKit
 
 // MARK: - Error Types
 
@@ -94,9 +95,34 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
 
     private init() {}
 
+    // MARK: - Background Task Support
+
+    /// Request background execution time so API calls survive app backgrounding.
+    /// Returns the task ID to end when the call completes.
+    private func beginBackgroundTask(named name: String) async -> UIBackgroundTaskIdentifier {
+        await MainActor.run {
+            var taskID: UIBackgroundTaskIdentifier = .invalid
+            taskID = UIApplication.shared.beginBackgroundTask(withName: name) {
+                UIApplication.shared.endBackgroundTask(taskID)
+                taskID = .invalid
+            }
+            return taskID
+        }
+    }
+
+    private func endBackgroundTask(_ taskID: UIBackgroundTaskIdentifier) {
+        guard taskID != .invalid else { return }
+        Task { @MainActor in
+            UIApplication.shared.endBackgroundTask(taskID)
+        }
+    }
+
     /// Send a message to the Claude API via the Firebase proxy and return the text response.
     /// The system prompt, model, and max_tokens are controlled server-side for security.
     func sendMessage(requestType: AIRequestType, userMessage: String) async throws -> String {
+        let bgTaskID = await beginBackgroundTask(named: "claudeProxy-\(requestType.rawValue)")
+        defer { endBackgroundTask(bgTaskID) }
+
         guard let url = URL(string: APIConfig.claudeProxyURL) else {
             throw ClaudeAPIError.invalidURL
         }
@@ -216,6 +242,9 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
     /// The server fetches user data from Firestore and runs a multi-step agent analysis.
     /// No request body needed — the server identifies the user via the auth token.
     func requestAgentInsights() async throws -> String {
+        let bgTaskID = await beginBackgroundTask(named: "agentInsights")
+        defer { endBackgroundTask(bgTaskID) }
+
         guard let url = URL(string: APIConfig.agentInsightsURL) else {
             throw ClaudeAPIError.invalidURL
         }

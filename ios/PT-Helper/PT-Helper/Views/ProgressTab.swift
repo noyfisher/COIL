@@ -47,6 +47,8 @@ struct ProgressTabContent: View {
     var onSettingsTapped: () -> Void
 
     @State private var selectedRegion: String? = nil
+    @State private var sessionToDelete: WorkoutSession?
+    @State private var showDeleteConfirmation = false
 
     var body: some View {
         ScrollView {
@@ -71,6 +73,9 @@ struct ProgressTabContent: View {
 
                     // AI Recovery Insights
                     RecoveryInsightsCardView(vm: insightsVM)
+
+                    // Recent Workouts
+                    recentWorkoutsSection
                 }
 
                 // Log Workout card
@@ -96,6 +101,21 @@ struct ProgressTabContent: View {
             .padding(.vertical, AppSpacing.md)
         }
         .background(AppColors.pageBackground)
+        .alert("Delete Session", isPresented: $showDeleteConfirmation) {
+            Button("Cancel", role: .cancel) {
+                sessionToDelete = nil
+            }
+            Button("Delete", role: .destructive) {
+                if let session = sessionToDelete {
+                    withAnimation {
+                        workoutViewModel.deleteSession(session)
+                    }
+                    sessionToDelete = nil
+                }
+            }
+        } message: {
+            Text("Are you sure you want to delete this workout session? This cannot be undone.")
+        }
         .navigationTitle("Progress")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
@@ -134,6 +154,100 @@ struct ProgressTabContent: View {
         .padding(AppSpacing.md)
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.card)
+    }
+
+    // MARK: - Recent Workouts
+
+    private var recentWorkouts: [WorkoutSession] {
+        Array(workoutViewModel.sessions.prefix(10))
+    }
+
+    private var recentWorkoutsSection: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
+            HStack {
+                Image(systemName: "clock.arrow.circlepath")
+                    .foregroundColor(AppColors.accent)
+                    .font(.system(size: 16, weight: .semibold))
+                Text("Recent Workouts")
+                    .font(AppFonts.cardTitle)
+                    .foregroundColor(AppColors.primaryText)
+                Spacer()
+                if workoutViewModel.sessions.count > 10 {
+                    NavigationLink(destination: WorkoutSessionView()) {
+                        Text("See All")
+                            .font(.caption.weight(.medium))
+                            .foregroundColor(AppColors.accent)
+                    }
+                }
+            }
+
+            ForEach(recentWorkouts, id: \.id) { session in
+                workoutSessionRow(session)
+                    .contentShape(Rectangle())
+                    .contextMenu {
+                        Button(role: .destructive) {
+                            sessionToDelete = session
+                            showDeleteConfirmation = true
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
+            }
+        }
+        .padding(AppSpacing.lg)
+        .background(AppColors.cardBackground)
+        .cornerRadius(AppCorners.card)
+    }
+
+    private func workoutSessionRow(_ session: WorkoutSession) -> some View {
+        HStack(spacing: AppSpacing.md) {
+            Circle()
+                .fill(painColor(for: session.painLevel).opacity(0.15))
+                .frame(width: 40, height: 40)
+                .overlay(
+                    Text("\(Int(session.painLevel))")
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .foregroundColor(painColor(for: session.painLevel))
+                )
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(session.date, style: .date)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundColor(AppColors.primaryText)
+                Text("\(Int(session.duration / 60)) min")
+                    .font(.caption)
+                    .foregroundColor(AppColors.secondaryText)
+            }
+
+            Spacer()
+
+            if !session.exercisesPerformed.isEmpty {
+                Text("\(session.exercisesPerformed.count) exercises")
+                    .font(.caption)
+                    .foregroundColor(AppColors.secondaryText)
+            }
+
+            Button {
+                sessionToDelete = session
+                showDeleteConfirmation = true
+            } label: {
+                Image(systemName: "trash")
+                    .font(.system(size: 12))
+                    .foregroundColor(AppColors.danger.opacity(0.6))
+                    .frame(width: 32, height: 32)
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("progress.deleteSession")
+        }
+        .padding(.vertical, AppSpacing.xs)
+    }
+
+    private func painColor(for level: Double) -> Color {
+        switch Int(level) {
+        case 0...3: return AppColors.success
+        case 4...6: return AppColors.warning
+        default: return AppColors.danger
+        }
     }
 
     // MARK: - Region Filter

@@ -36,7 +36,7 @@ struct PainPointApp: App {
                         SessionLogger.shared.log(.appForegrounded, category: .lifecycle, message: "App foregrounded")
                         AnalyticsService.shared.log(.appOpened)
                     case .background:
-                        SessionLogger.shared.endSession()
+                        SessionLogger.shared.log(.appBackgrounded, category: .lifecycle, message: "App backgrounded")
                     default:
                         break
                     }
