@@ -6,4 +6,7 @@ enum APIConfig {
 
     // Managed Agent endpoint for recovery insights (server fetches data, multi-step analysis)
     static let agentInsightsURL = "https://us-central1-pt-helper-dev.cloudfunctions.net/agentInsights"
+
+    // On-demand exercise image generation (FLUX 2 Pro + Gemini QA)
+    static let generateImageURL = "https://us-central1-pt-helper-dev.cloudfunctions.net/generateExerciseImage"
 }

@@ -762,6 +762,14 @@ def main():
             "'flux2-pro' uses FLUX 2 Pro with structured JSON prompts (better for prone)."
         ),
     )
+    parser.add_argument(
+        "--generate-end-frames", action="store_true",
+        help=(
+            "Generate end-position images for exercises that have an "
+            "'end_pose_description' field. Saves as {name}_end.png and "
+            "adds end_filename to the mapping."
+        ),
+    )
     # Legacy flag kept for backward compat with process_missing_images.py
     parser.add_argument(
         "--step", default="generate",
@@ -845,12 +853,38 @@ def main():
         if image_data and save_image(image_data, filepath):
             kb = filepath.stat().st_size / 1024
             print(f" -- OK ({kb:.0f} KB)")
-            mapping[filename] = {
+            mapping_entry = {
                 "name": name,
                 "filename": f"{filename}.png",
                 "category": exercise.get("category", "general"),
                 "target_area": exercise.get("target_area", "General"),
             }
+
+            # Generate end-position frame if requested and description available
+            if args.generate_end_frames and exercise.get("end_pose_description"):
+                end_filepath = OUTPUT_DIR / f"{filename}_end.png"
+                if not (args.skip_existing and end_filepath.exists()):
+                    time.sleep(RATE_LIMIT_DELAY)
+                    end_exercise = exercise.copy()
+                    end_exercise["pose_description"] = exercise["end_pose_description"]
+                    end_exercise["normalized_filename"] = f"{filename}_end"
+                    print(f"      end frame...", end="", flush=True)
+                    end_data = generate_image(
+                        None, end_exercise, dry_run=False,
+                        api_key=args.api_key,
+                        seed_offset=args.seed_offset + 500,
+                        model=args.model,
+                    )
+                    if end_data and save_image(end_data, end_filepath):
+                        end_kb = end_filepath.stat().st_size / 1024
+                        print(f" -- OK ({end_kb:.0f} KB)")
+                        mapping_entry["end_filename"] = f"{filename}_end.png"
+                    else:
+                        print(" -- END FRAME ERROR")
+                elif end_filepath.exists():
+                    mapping_entry["end_filename"] = f"{filename}_end.png"
+
+            mapping[filename] = mapping_entry
             generated += 1
         else:
             print(" -- GENERATION ERROR")

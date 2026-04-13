@@ -4,6 +4,7 @@ import { onSchedule } from "firebase-functions/v2/scheduler";
 import sgMail from "@sendgrid/mail";
 import { fetchRecoveryInsightsData, MINIMUM_SESSION_COUNT } from "./firestore-queries";
 import { runRecoveryInsightsAgent, validateInsightResult } from "./managed-agent";
+import { handleGenerateExerciseImage } from "./image-generation";
 
 admin.initializeApp();
 
@@ -1192,4 +1193,54 @@ export const agentInsights = functions
       content: [{ type: "text", text: resultJson }],
       stop_reason: "end_turn",
     });
+  });
+
+// ---------------------------------------------------------------------------
+// On-demand exercise image generation
+// ---------------------------------------------------------------------------
+export const generateExerciseImage = functions
+  .runWith({
+    timeoutSeconds: 540,
+    memory: "512MB",
+    secrets: ["BFL_API_KEY", "GEMINI_API_KEY"],
+  })
+  .https.onRequest(async (req, res) => {
+    if (req.method !== "POST") {
+      res.status(405).json({ error: "Method not allowed" });
+      return;
+    }
+
+    // 1. Authenticate
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      res.status(401).json({ error: "Missing or invalid Authorization header" });
+      return;
+    }
+
+    const idToken = authHeader.split("Bearer ")[1];
+    let uid: string;
+    try {
+      const decoded = await admin.auth().verifyIdToken(idToken);
+      uid = decoded.uid;
+    } catch {
+      res.status(401).json({ error: "Invalid Firebase ID token" });
+      return;
+    }
+
+    // 2. Handle request
+    try {
+      const result = await handleGenerateExerciseImage({
+        body: req.body,
+        uid,
+      });
+
+      const statusCode = result.status === "rate_limited" ? 429
+        : result.status === "generation_failed" || result.status === "qa_failed" ? 502
+        : 200;
+
+      res.status(statusCode).json(result);
+    } catch (err) {
+      console.error("generateExerciseImage error:", err);
+      res.status(500).json({ status: "generation_failed", message: "Internal error", retryable: true });
+    }
   });

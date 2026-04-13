@@ -1,6 +1,8 @@
 import Foundation
 import os
 import UIKit
+import FirebaseAuth
+import FirebaseFirestore
 import FirebaseStorage
 
 /// Loads, caches, and serves AI-generated exercise illustration images.
@@ -20,6 +22,24 @@ final class ExerciseImageService: @unchecked Sendable {
         let filename: String
         let category: String
         let target_area: String
+        let end_filename: String?
+    }
+
+    // MARK: - Image Match Metadata
+
+    /// Describes how an exercise name was resolved to an image key.
+    enum MatchType: String {
+        case exact              // Layers 1-3: imageFileName, normalized name, or alias
+        case prefixFuzzy        // Layer 4: longestPrefixMatch
+        case suffixFuzzy        // Layer 5: suffixMatch
+        case pluralToggle       // Layer 6: plural/singular toggle
+        case synonymExpansion   // Layer 7: body-part synonym expansion
+    }
+
+    /// Result of resolving an exercise to an image key, including how it was matched.
+    struct ImageMatch {
+        let key: String
+        let matchType: MatchType
     }
 
     // MARK: - Caches
@@ -39,6 +59,16 @@ final class ExerciseImageService: @unchecked Sendable {
 
     /// Track in-flight downloads to avoid duplicate network requests.
     private var activeDownloads: [String: Task<UIImage?, Never>] = [:]
+
+    /// Track in-flight on-demand generation requests (dedup).
+    private var activeGenerations: [String: Task<UIImage?, Never>] = [:]
+
+    /// Normalized keys already logged to Firestore this session (dedup).
+    private var loggedThisSession: Set<String> = []
+
+    /// Firestore aliases merged with hardcoded aliasMap (fetched once per session).
+    private var firestoreAliases: [String: String]?
+    private var firestoreAliasesLastFetch: Date?
 
     /// Lock protecting mutable dictionaries from concurrent access.
     private let lock = NSLock()
@@ -117,6 +147,121 @@ final class ExerciseImageService: @unchecked Sendable {
         } catch {
             // No animated version available — that's fine
             return nil
+        }
+    }
+
+    // MARK: - End Image Support
+
+    /// Whether a start+end image pair is available for this exercise.
+    func hasImagePair(for exercise: RehabExercise) -> Bool {
+        guard let key = imageKey(for: exercise),
+              let entry = mapping[key] else { return false }
+        return entry.end_filename != nil
+    }
+
+    /// Load the end-position image for an exercise.
+    /// Returns nil if no end image exists.
+    func loadEndImage(for exercise: RehabExercise) async -> UIImage? {
+        guard let key = imageKey(for: exercise),
+              let entry = mapping[key],
+              let endFilename = entry.end_filename else { return nil }
+
+        let endKey = endFilename.replacingOccurrences(of: ".png", with: "")
+        return await loadImage(forKey: endKey)
+    }
+
+    // MARK: - On-Demand Image Generation
+
+    /// Request on-demand image generation via Cloud Function.
+    /// Returns the generated image, or nil if generation failed.
+    /// Deduplicates concurrent requests for the same exercise.
+    func requestImageGeneration(for exercise: RehabExercise) async -> UIImage? {
+        guard let user = Auth.auth().currentUser else { return nil }
+        let normalized = normalizeName(exercise.name)
+
+        // Dedup: reuse in-flight generation task
+        let task: Task<UIImage?, Never> = lock.withLock {
+            if let existing = activeGenerations[normalized] {
+                return existing
+            }
+
+            let newTask = Task<UIImage?, Never> {
+                defer {
+                    self.lock.withLock { self.activeGenerations.removeValue(forKey: normalized) }
+                }
+                return await self.performImageGeneration(for: exercise, user: user, normalized: normalized)
+            }
+
+            activeGenerations[normalized] = newTask
+            return newTask
+        }
+
+        return await task.value
+    }
+
+    private func performImageGeneration(for exercise: RehabExercise, user: User, normalized: String) async -> UIImage? {
+        guard let idToken = try? await user.getIDToken() else { return nil }
+        guard let url = URL(string: APIConfig.generateImageURL) else { return nil }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(idToken)", forHTTPHeaderField: "Authorization")
+        request.timeoutInterval = 300 // 5 min for generation + QA
+
+        let body: [String: Any] = [
+            "exerciseName": exercise.name,
+            "exerciseCategory": exercise.exerciseCategory ?? "general",
+            "targetArea": exercise.targetArea,
+        ]
+
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body)
+            let (data, response) = try await URLSession.shared.data(for: request)
+
+            guard let httpResponse = response as? HTTPURLResponse else { return nil }
+
+            let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+            let status = json?["status"] as? String
+
+            if httpResponse.statusCode == 200 {
+                if let key = json?["key"] as? String {
+                    // Image was found or generated — reload from Firebase Storage
+                    // Update in-memory mapping if it's a new image
+                    if status == "success", let imageUrl = json?["imageUrl"] as? String {
+                        AppLogger.images.info("On-demand image generated for \(exercise.name)")
+                    }
+                    return await loadImage(forKey: key)
+                }
+            }
+
+            AppLogger.images.warning("Image generation returned status=\(status ?? "unknown") for \(exercise.name)")
+            return nil
+        } catch {
+            AppLogger.images.error("Image generation request failed for \(exercise.name): \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+    // MARK: - Firestore Aliases
+
+    /// Fetch remote aliases from Firestore and merge with hardcoded aliasMap.
+    func fetchRemoteAliases() async {
+        // Only fetch once per hour
+        if let lastFetch = firestoreAliasesLastFetch,
+           Date().timeIntervalSince(lastFetch) < 3600 { return }
+
+        do {
+            let doc = try await Firestore.firestore().collection("config").document("exerciseImageAliases").getDocument()
+            if let aliases = doc.data()?["aliases"] as? [String: String] {
+                lock.withLock {
+                    firestoreAliases = aliases
+                    firestoreAliasesLastFetch = Date()
+                }
+                AppLogger.images.info("Fetched \(aliases.count) remote aliases from Firestore")
+            }
+        } catch {
+            AppLogger.images.warning("Failed to fetch remote aliases: \(error.localizedDescription)")
         }
     }
 
@@ -269,10 +414,57 @@ final class ExerciseImageService: @unchecked Sendable {
         "sural-nerve-glide-neural-mobility-for-sural-nerve-irritation": "sciatic-nerve-glide",
         // Terminal knee extension variants
         "terminal-knee-extensions-tke": "terminal-knee-extension",
+        // Calf raise variants (additional)
+        "calf-raises": "double-leg-calf-raise",
+        // Cervical / chin tuck variants
+        "cervical-gentle-rom-neck-mobility-check": "chin-tucks",
+        "prone-chin-tucks-cervical-posture-support": "chin-tucks",
+        // Cross-body stretch variants
+        "cross-body-shoulder-stretch": "cross-body-stretch",
+        // Deep hip flexor variants
+        "deep-hip-flexor-quad-stretch-90-90": "hip-flexor-stretch",
+        "tall-kneeling-hip-flexor-stretch": "hip-flexor-stretch",
+        // Hamstring variants (additional)
+        "hamstring-calf-stretch-standing": "supine-hamstring-stretch",
+        "hamstring-sets-isometric": "prone-hamstring-curl",
+        "lying-hamstring-stretch-90-90-position": "supine-hamstring-stretch",
+        // Lateral band walk variants (additional)
+        "lateral-band-walk-hip-abductor-activation": "lateral-band-walks",
+        // Prone cobra variants (additional)
+        "prone-cobra-posterior-chain-extension-low-back-mobility": "prone-press-up",
+        // Prone shoulder variants (additional)
+        "prone-shoulder-blade-squeeze-isometric": "prone-scapular-retraction",
+        "prone-shoulder-i-y-t-raises-isometric-hold": "prone-i-y-t-raises",
+        "prone-shoulder-retraction-y-raises-prone": "prone-i-y-t-raises",
+        // Superman variants
+        "prone-superman-hold": "superman-exercise",
+        // Foam roller variants
+        "quadriceps-foam-roll": "foam-roller-quad",
+        // Quad stretch variants (additional)
+        "quadriceps-stretch-left-leg-kneeling": "standing-quad-stretch",
+        // Quadruped shoulder variants
+        "quadruped-shoulder-blade-squeezes-scapular-stabilization": "quadruped-shoulder-taps",
+        "quadruped-shoulder-stability-taps": "quadruped-shoulder-taps",
+        // Scapular wall slides variants
+        "scapular-wall-slides-slow-controlled": "wall-slides",
+        // Seated knee extension variants (additional)
+        "seated-knee-extensions-right-leg-focus": "seated-knee-extension",
+        // Side-lying external rotation variants
+        "sidelying-external-rotation-90-90-position": "side-lying-external-rotation",
+        // Single-leg variants (additional)
+        "single-leg-deadlifts-bodyweight": "single-leg-deadlift",
+        "single-leg-glute-bridge": "glute-bridge",
+        // Standing shoulder variants
+        "standing-shoulder-external-rotation-band-free-isometric": "external-rotation",
+        // Straight leg raise variants (additional)
+        "straight-leg-raise-quad-dominant": "straight-leg-raises",
+        // Upper back / wall variants
+        "upper-back-postural-correction-standing-wall-hold": "wall-slides",
+        // Wrist variants (additional)
+        "wrist-flexion-extension": "wrist-curls",
+        // Copenhagen adduction variants
+        "copenhagen-adduction-side-lying-hip-adductor-squeeze": "copenhagen-adduction",
     ]
-
-    /// Cache for fuzzy-matched keys to avoid redundant computation.
-    private var fuzzyMatchCache: [String: String?] = [:]
 
     /// Body-part synonyms for token-level replacement.
     private static let synonyms: [String: String] = [
@@ -286,20 +478,29 @@ final class ExerciseImageService: @unchecked Sendable {
     /// Resolve the mapping key for an exercise.
     /// Priority: imageFileName → normalized name → alias → fuzzy match → nil.
     func imageKey(for exercise: RehabExercise) -> String? {
+        resolveImageMatch(for: exercise)?.key
+    }
+
+    /// Resolve the mapping key for an exercise, including how it was matched.
+    /// Returns nil when no match is found at any layer.
+    func resolveImageMatch(for exercise: RehabExercise) -> ImageMatch? {
         // 1. Explicit imageFileName from AI / Firestore
         if let fileName = exercise.imageFileName, mapping[fileName] != nil {
-            return fileName
+            return ImageMatch(key: fileName, matchType: .exact)
         }
 
         // 2. Normalize the exercise name and look up
         let normalized = normalizeName(exercise.name)
         if mapping[normalized] != nil {
-            return normalized
+            return ImageMatch(key: normalized, matchType: .exact)
         }
 
-        // 3. Check alias map for AI-generated name variants
+        // 3. Check alias map for AI-generated name variants (hardcoded + Firestore)
         if let alias = Self.aliasMap[normalized], mapping[alias] != nil {
-            return alias
+            return ImageMatch(key: alias, matchType: .exact)
+        }
+        if let remoteAlias = lock.withLock({ firestoreAliases?[normalized] }), mapping[remoteAlias] != nil {
+            return ImageMatch(key: remoteAlias, matchType: .exact)
         }
 
         // 4-7. Fuzzy matching (cached)
@@ -315,33 +516,37 @@ final class ExerciseImageService: @unchecked Sendable {
 
     // MARK: - Fuzzy Matching
 
+    /// Cache for fuzzy-matched results to avoid redundant computation.
+    /// Stores full ImageMatch (key + matchType) so callers know how the match was found.
+    private var fuzzyMatchCache: [String: ImageMatch?] = [:]
+
     /// Layers 4-7: progressively looser matching strategies.
-    private func fuzzyMatch(_ normalized: String) -> String? {
+    private func fuzzyMatch(_ normalized: String) -> ImageMatch? {
         // Layer 4: Longest prefix match
         // e.g. "cat-cow-stretch-modified-for-lower-back-relief" starts with "cat-cow-stretch-"
-        if let match = longestPrefixMatch(normalized) { return match }
+        if let match = longestPrefixMatch(normalized) { return ImageMatch(key: match, matchType: .prefixFuzzy) }
 
         // Layer 5: Suffix match — AI omits position prefix
         // e.g. "calf-raises" is a suffix of "standing-calf-raises"
-        if let match = suffixMatch(normalized) { return match }
+        if let match = suffixMatch(normalized) { return ImageMatch(key: match, matchType: .suffixFuzzy) }
 
         // Layer 6: Plural/singular toggle, then retry layers 4-5
         let toggled = normalized.hasSuffix("s") ? String(normalized.dropLast()) : normalized + "s"
-        if mapping[toggled] != nil { return toggled }
-        if let match = longestPrefixMatch(toggled) { return match }
-        if let match = suffixMatch(toggled) { return match }
+        if mapping[toggled] != nil { return ImageMatch(key: toggled, matchType: .pluralToggle) }
+        if let match = longestPrefixMatch(toggled) { return ImageMatch(key: match, matchType: .pluralToggle) }
+        if let match = suffixMatch(toggled) { return ImageMatch(key: match, matchType: .pluralToggle) }
 
         // Layer 7: Synonym expansion, then retry layers 2+4+5
         let expanded = applySynonyms(normalized)
         if expanded != normalized {
-            if mapping[expanded] != nil { return expanded }
-            if let match = longestPrefixMatch(expanded) { return match }
-            if let match = suffixMatch(expanded) { return match }
+            if mapping[expanded] != nil { return ImageMatch(key: expanded, matchType: .synonymExpansion) }
+            if let match = longestPrefixMatch(expanded) { return ImageMatch(key: match, matchType: .synonymExpansion) }
+            if let match = suffixMatch(expanded) { return ImageMatch(key: match, matchType: .synonymExpansion) }
             // Also try plural toggle on expanded form
             let expandedToggled = expanded.hasSuffix("s") ? String(expanded.dropLast()) : expanded + "s"
-            if mapping[expandedToggled] != nil { return expandedToggled }
-            if let match = longestPrefixMatch(expandedToggled) { return match }
-            if let match = suffixMatch(expandedToggled) { return match }
+            if mapping[expandedToggled] != nil { return ImageMatch(key: expandedToggled, matchType: .synonymExpansion) }
+            if let match = longestPrefixMatch(expandedToggled) { return ImageMatch(key: match, matchType: .synonymExpansion) }
+            if let match = suffixMatch(expandedToggled) { return ImageMatch(key: match, matchType: .synonymExpansion) }
         }
 
         return nil
@@ -464,6 +669,63 @@ final class ExerciseImageService: @unchecked Sendable {
             AppLogger.images.info("Loaded mapping with \(self.mapping.count) exercises")
         } catch {
             AppLogger.images.error("Failed to decode mapping: \(error.localizedDescription)")
+        }
+    }
+
+    // MARK: - Missing Image Logging
+
+    /// Log exercise to Firestore `missingExerciseImages` if it doesn't have an exact image match.
+    /// Deduplicates within the session — safe to call on every exercise display.
+    func logMissingImageIfNeeded(for exercise: RehabExercise) {
+        let match = resolveImageMatch(for: exercise)
+
+        // Exact matches have a proper image — nothing to log
+        if match?.matchType == .exact { return }
+
+        let normalized = normalizeName(exercise.name)
+
+        // Deduplicate within this session
+        let alreadyLogged = lock.withLock {
+            if loggedThisSession.contains(normalized) { return true }
+            loggedThisSession.insert(normalized)
+            return false
+        }
+        guard !alreadyLogged else { return }
+
+        // Must be authenticated to write to Firestore
+        guard Auth.auth().currentUser != nil else { return }
+
+        let matchTypeValue = match?.matchType.rawValue ?? "none"
+        let matchedTo = match?.key
+
+        Task {
+            let db = Firestore.firestore()
+            let docRef = db.collection("missingExerciseImages").document(normalized)
+
+            var data: [String: Any] = [
+                "exerciseName": exercise.name,
+                "normalizedKey": normalized,
+                "matchType": matchTypeValue,
+                "exerciseCategory": exercise.exerciseCategory ?? "unknown",
+                "targetArea": exercise.targetArea,
+                "source": "display",
+                "count": FieldValue.increment(Int64(1)),
+                "lastSeen": FieldValue.serverTimestamp(),
+            ]
+
+            if let matchedTo {
+                data["matchedTo"] = matchedTo
+            }
+
+            do {
+                let snapshot = try? await docRef.getDocument()
+                if snapshot?.exists != true {
+                    data["firstSeen"] = FieldValue.serverTimestamp()
+                }
+                try await docRef.setData(data, merge: true)
+            } catch {
+                AppLogger.images.error("Failed to log missing image for \(exercise.name): \(error.localizedDescription)")
+            }
         }
     }
 
