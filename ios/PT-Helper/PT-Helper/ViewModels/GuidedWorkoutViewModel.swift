@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import UIKit
 
 /// Manages the state for a guided workout flow: exercise-by-exercise
 /// with set tracking, rest timers, and completion summary.
@@ -39,6 +40,35 @@ class GuidedWorkoutViewModel: ObservableObject {
         case exercise
         case rest
         case complete
+    }
+
+    // MARK: - Exercise Familiarity
+
+    enum ExerciseFamiliarity: Int, Comparable {
+        case new = 0, learning = 1, familiar = 2, mastered = 3
+
+        init(completions: Int) {
+            switch completions {
+            case 0: self = .new
+            case 1...3: self = .learning
+            case 4...9: self = .familiar
+            default: self = .mastered
+            }
+        }
+
+        static func < (lhs: Self, rhs: Self) -> Bool {
+            lhs.rawValue < rhs.rawValue
+        }
+    }
+
+    static func completionCount(for exerciseName: String) -> Int {
+        UserDefaults.standard.integer(forKey: "exerciseCompletions_\(exerciseName)")
+    }
+
+    static func incrementCompletionCount(for exerciseName: String) {
+        let key = "exerciseCompletions_\(exerciseName)"
+        let current = UserDefaults.standard.integer(forKey: key)
+        UserDefaults.standard.set(current + 1, forKey: key)
     }
 
     // MARK: - Timer
@@ -100,6 +130,7 @@ class GuidedWorkoutViewModel: ObservableObject {
         if currentSet >= exercise.sets {
             // All sets done for this exercise
             completedExercises.append(exercise.name)
+            Self.incrementCompletionCount(for: exercise.name)
             saveCheckpoint()
 
             if currentExerciseIndex < totalExercises - 1 {
@@ -135,6 +166,11 @@ class GuidedWorkoutViewModel: ObservableObject {
         if phase == .rest {
             moveToNextExercise()
         }
+    }
+
+    /// Adjust rest timer by a number of seconds (positive or negative)
+    func adjustRestTime(by seconds: Int) {
+        timeRemaining = max(5, timeRemaining + seconds)
     }
 
     /// Toggle pause state
@@ -311,6 +347,11 @@ class GuidedWorkoutViewModel: ObservableObject {
                 guard let self = self, !self.isPaused else { return }
                 if self.timeRemaining > 0 {
                     self.timeRemaining -= 1
+                    if self.timeRemaining == 5 {
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    } else if self.timeRemaining == 0 {
+                        UINotificationFeedbackGenerator().notificationOccurred(.success)
+                    }
                 } else {
                     self.stopTimer()
                     self.moveToNextExercise()
