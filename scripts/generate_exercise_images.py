@@ -231,10 +231,14 @@ _CUSTOM_VISUAL_PROMPTS = {
     },
     "standing-hip-adduction": {
         "description": (
-            "Standing upright on his left leg. His left hand touches a wall for "
-            "balance. His right leg is straight and swinging across the front of "
-            "his body, crossing past his left standing leg toward the left side. "
-            "His torso is upright and vertical. He is standing, NOT sitting."
+            "Standing upright on his left leg with his left hand touching a wall "
+            "or post for balance. His right leg is completely straight with the "
+            "knee locked, and it is crossing ACROSS the front of his left standing "
+            "leg toward the left side of his body. His right foot is off the ground, "
+            "hovering about 6 inches in the air. His torso is completely vertical "
+            "and upright. He is STANDING on one leg, NOT sitting on a chair. "
+            "NO chair, NO stool. Just a man standing on one leg with the other "
+            "leg crossing in front."
         ),
         "angle": "front-facing",
     },
@@ -277,11 +281,13 @@ _CUSTOM_VISUAL_PROMPTS = {
     },
     "toe-raises": {
         "description": (
-            "Standing upright with feet hip-width apart, lightly touching a wall "
-            "with one hand for balance. The front half of both feet — his toes "
-            "and forefoot — are lifted UP off the ground, pointing upward. ONLY "
-            "his heels remain on the floor. This is the OPPOSITE of a calf raise. "
-            "His toes point toward the ceiling, heels stay down."
+            "Standing upright with feet hip-width apart, one hand lightly touching "
+            "a wall for balance. His HEELS are flat on the ground. The FRONT of "
+            "both feet — all ten toes and the balls of his feet — are lifted UP "
+            "off the ground, curling upward toward the ceiling. There is a visible "
+            "gap between the front of his feet and the floor. His weight is entirely "
+            "on his heels. This is the OPPOSITE of a calf raise — heels DOWN, "
+            "toes UP. Think of pulling your toes toward your shins."
         ),
         "angle": "side profile",
     },
@@ -297,12 +303,14 @@ _CUSTOM_VISUAL_PROMPTS = {
     },
     "reverse-wrist-curls": {
         "description": (
-            "Seated on a chair with his right forearm resting flat on his right "
-            "thigh. His palm faces DOWN toward the floor, gripping a small light "
-            "dumbbell. His wrist bends upward, lifting the BACK of his hand "
-            "toward the ceiling. His forearm does NOT move — it stays flat on "
-            "his thigh. This is NOT a bicep curl. The arm does not bend at the "
-            "elbow. Only the wrist moves."
+            "Seated on a bench or chair. His right forearm rests flat along the "
+            "top of his right thigh with the wrist hanging just past the kneecap. "
+            "He grips a small light dumbbell with his palm facing DOWN (overhand "
+            "grip, knuckles on top). His wrist bends upward, raising the back of "
+            "his hand toward the ceiling while the forearm stays pinned to the "
+            "thigh. His left hand rests on his left knee. This is a WRIST exercise "
+            "— the elbow does NOT bend, the arm does NOT lift. Only the wrist "
+            "hinges up and down. He is a real human, not a cartoon."
         ),
         "angle": "three-quarter (45-degree)",
     },
@@ -358,6 +366,67 @@ _CUSTOM_VISUAL_PROMPTS = {
             "touch the ground."
         ),
         "angle": "side profile",
+    },
+    "glute-bridges": {
+        "description": (
+            "Lying flat on his back on the floor, face up. His knees are bent "
+            "and his feet are flat on the floor, hip-width apart, about 12 inches "
+            "from his buttocks. His arms rest at his sides with palms flat on the "
+            "floor. His hips are pushed UP toward the ceiling, lifting his pelvis "
+            "off the ground so his body forms a straight line from his shoulders "
+            "to his knees. His shoulders and upper back remain on the floor. "
+            "His core is tight. This is a glute bridge — a simple floor exercise."
+        ),
+        "angle": "side profile",
+    },
+    "childs-pose": {
+        "description": (
+            "Kneeling on the floor with his knees spread apart and his big toes "
+            "touching behind him. He is sitting his hips BACK onto his heels. "
+            "His torso folds forward and down, draping over his thighs. His "
+            "forehead rests on the floor. Both arms are extended straight forward "
+            "on the floor in front of him, palms down, reaching as far ahead as "
+            "possible. His back is gently rounded. This is a resting yoga pose, "
+            "NOT a quadruped or all-fours position — his hips are back on his heels."
+        ),
+        "angle": "side profile",
+    },
+    "standing-quad-stretch": {
+        "description": (
+            "Standing upright on his left leg. His left hand touches a wall for "
+            "balance. His right knee is bent behind him, bringing his right foot "
+            "up toward his buttock. He reaches back with his right hand and grabs "
+            "his right ankle or foot, pulling it closer to his glute. His right "
+            "knee points straight down toward the floor, parallel to his left leg. "
+            "His torso is upright and vertical. This is a classic standing "
+            "quadricep stretch."
+        ),
+        "angle": "side profile",
+    },
+    "childs-pose-with-side-reach": {
+        "description": (
+            "Kneeling on the floor with his hips sitting BACK on his heels. His "
+            "torso folds forward and down over his thighs with his forehead near "
+            "the floor. Both arms are extended forward on the floor, but both "
+            "hands walk over to the RIGHT side, creating a lateral stretch along "
+            "the left side of his torso. His body curves in a gentle C-shape to "
+            "the right. His hips stay back on his heels — this is a child's pose "
+            "variation, NOT an all-fours position."
+        ),
+        "angle": "three-quarter (45-degree)",
+    },
+    "wrist-curls": {
+        "description": (
+            "Seated on a bench or chair. His right forearm rests flat along the "
+            "top of his right thigh with the wrist hanging just past the kneecap. "
+            "He grips a small light dumbbell with his palm facing UP (underhand "
+            "grip, palm toward the ceiling). His wrist curls upward, bringing "
+            "the dumbbell toward his forearm. His left hand rests on his left "
+            "knee. This is a WRIST exercise — the elbow does NOT bend, the arm "
+            "does NOT lift. Only the wrist hinges up and down. Photo-realistic "
+            "style, NOT a cartoon."
+        ),
+        "angle": "three-quarter (45-degree)",
     },
     "lateral-lunge-with-reach": {
         "description": (
