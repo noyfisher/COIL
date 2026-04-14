@@ -251,6 +251,22 @@ def analyze_consistency(
         return _make_error_result(exercise, f"API error: {e}", "API_ERROR")
 
 
+def analyze_consistency_quick(
+    api_key: str,
+    start_path: Path,
+    end_path: Path,
+    exercise: dict,
+) -> ConsistencyResult:
+    """
+    Quick single-pair consistency check for inline use during generation.
+    Creates a fresh client each call — use the batch version for bulk QA.
+
+    Returns the result with failed_checks populated for Tier 2 prompt selection.
+    """
+    client = genai.Client(api_key=api_key)
+    return analyze_consistency(client, start_path, end_path, exercise)
+
+
 async def analyze_consistency_async(
     client: genai.Client,
     start_path: Path,

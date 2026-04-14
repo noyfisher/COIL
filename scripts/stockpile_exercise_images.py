@@ -423,7 +423,7 @@ def phase3_generate_images(
     limit: int | None = None,
 ):
     """Phase 3: Generate images for exercises that need them."""
-    from generate_exercise_images import generate_image, generate_end_frame, save_image, RATE_LIMIT_DELAY
+    from generate_exercise_images import generate_image, generate_end_frame, generate_end_frame_kontext, save_image, RATE_LIMIT_DELAY
 
     # Set up Gemini QA if key available
     qa_client = None
@@ -509,24 +509,60 @@ def phase3_generate_images(
                     "target_area": ex_data.get("targetArea", "General"),
                 }
 
-                # Generate end image using Kontext Pro image-to-image
-                # (uses start image as reference for visual consistency)
+                # Generate end image using tiered approach:
+                # Tier 1: Matched-template FLUX 2 Pro
+                # Tier 2: Kontext Pro with failure-specific prompts (if Tier 1 fails QA)
                 end_desc = ex_data.get("endPoseDescription")
                 if end_desc and output_path.exists():
                     time.sleep(RATE_LIMIT_DELAY)
+                    end_path = OUTPUT_DIR / f"{normalized}_end.png"
+
+                    # Tier 1: Matched-template
                     end_bytes = generate_end_frame(
-                        exercise,
-                        output_path,
+                        exercise, output_path,
                         api_key=bfl_key,
                         end_pose_description=end_desc,
                     )
+                    end_ok = False
                     if end_bytes:
-                        end_path = OUTPUT_DIR / f"{normalized}_end.png"
                         save_image(end_bytes, end_path)
+
+                        # Inline consistency QA if Gemini key available
+                        if gemini_key and end_path.exists():
+                            from qa_consistency import analyze_consistency_quick
+                            cqa = analyze_consistency_quick(gemini_key, output_path, end_path, exercise)
+                            if cqa.overall_pass:
+                                end_ok = True
+                                print(f"✓ QA pass (avg={cqa.overall_consistency_score})", end=" ", flush=True)
+                            else:
+                                # Tier 2: Kontext Pro with failure context
+                                print(f"QA fail ({', '.join(cqa.critical_failures)}), tier2...", end=" ", flush=True)
+                                time.sleep(RATE_LIMIT_DELAY)
+                                t2_bytes = generate_end_frame_kontext(
+                                    exercise, output_path,
+                                    api_key=bfl_key,
+                                    end_pose_description=end_desc,
+                                    failed_checks=cqa.critical_failures,
+                                    moving_part=ex_data.get("movingPart", ""),
+                                    anchored_parts=ex_data.get("anchoredParts", ""),
+                                    equipment=ex_data.get("equipment", ""),
+                                )
+                                if t2_bytes:
+                                    save_image(t2_bytes, end_path)
+                                    cqa2 = analyze_consistency_quick(gemini_key, output_path, end_path, exercise)
+                                    if cqa2.overall_pass:
+                                        end_ok = True
+                                        print(f"✓ tier2 pass (avg={cqa2.overall_consistency_score})", end=" ", flush=True)
+                                    else:
+                                        print(f"tier2 fail too", end=" ", flush=True)
+                        else:
+                            end_ok = True  # No QA available, assume OK
+
+                    if end_ok:
                         mapping[normalized]["end_filename"] = f"{normalized}_end.png"
                         print(f"✓ (start + end)", flush=True)
                     else:
-                        print(f"✓ (start only, end failed)", flush=True)
+                        print(f"✓ (start only, end needs review)", flush=True)
                 else:
                     print(f"✓ (start only)", flush=True)
 

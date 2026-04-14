@@ -701,16 +701,20 @@ def generate_end_frame(
     seed_offset: int = 0,
 ) -> bytes | None:
     """
-    Generate an end-position image using Kontext Pro image-to-image.
+    Generate an end-position image using matched-template FLUX 2 Pro.
 
-    Uses the start image as reference so the end frame maintains visual
-    consistency (same camera angle, character, clothing, scene setup).
-    Only the pose changes according to the end_pose_description.
+    Uses the SAME structured JSON prompt template as the start frame,
+    only changing the pose_description. This guarantees visual consistency
+    (same character, camera angle, style, scene) because both frames are
+    generated from identical templates.
+
+    This is Tier 1 of the generation strategy.
 
     Parameters
     ----------
     exercise : dict with name, normalized_filename, etc.
-    start_image_path : Path to the start-position PNG image
+    start_image_path : Path to the start-position PNG (unused in Tier 1,
+                       kept for API compat with Tier 2 fallback)
     api_key : BFL API key
     end_pose_description : Text describing the end/peak position
     dry_run : if True, skip the API call
@@ -722,32 +726,105 @@ def generate_end_frame(
         print(f"  [DRY RUN] Would generate end frame for: {name}")
         return None
 
-    if not start_image_path.exists():
-        print(f"  ERROR: Start image not found: {start_image_path}")
-        return None
+    # Build the SAME structured prompt as the start frame,
+    # but swap pose_description → end_pose_description
+    end_exercise = {**exercise, "pose_description": end_pose_description}
+    prompt = _build_flux2_prompt(end_exercise)
 
-    # Read start image and encode as base64
-    import base64
-    with open(start_image_path, "rb") as f:
-        start_base64 = base64.b64encode(f.read()).decode("utf-8")
-
-    # Build a prompt that describes ONLY the pose change
-    # Kontext Pro will preserve everything else from the reference image
-    prompt = (
-        f"Change the pose of the person in this image. "
-        f"Keep the exact same person, clothing, camera angle, background, and scene. "
-        f"Only change the body position to: {end_pose_description} "
-        f"This is the end position of the exercise: {name}."
-    )
-
+    # Use a related but different seed so the character looks similar
+    # but the pose actually changes
     seed = (hash(name) + 500 + seed_offset) % (2**32)
 
-    print(f" end-frame (kontext-pro i2i)...", end="", flush=True)
+    print(f" end-frame (matched-template)...", end="", flush=True)
     return _call_bfl_api(
         prompt, api_key,
         seed=seed,
         prompt_upsampling=False,
         label=f"{name} (end)",
+        model="flux2-pro",
+    )
+
+
+def generate_end_frame_kontext(
+    exercise: dict,
+    start_image_path: Path,
+    *,
+    api_key: str,
+    end_pose_description: str,
+    failed_checks: list[str] | None = None,
+    moving_part: str = "",
+    anchored_parts: str = "",
+    equipment: str = "",
+    seed_offset: int = 0,
+) -> bytes | None:
+    """
+    Tier 2 fallback: Generate end frame using Kontext Pro image-to-image
+    with failure-specific prompts based on which consistency checks failed.
+
+    Only called when Tier 1 (matched-template FLUX 2 Pro) fails QA.
+
+    Parameters
+    ----------
+    exercise : dict with name, normalized_filename, etc.
+    start_image_path : Path to the start-position PNG (used as reference)
+    api_key : BFL API key
+    end_pose_description : Text describing the end/peak position
+    failed_checks : list of consistency check names that failed (e.g., ["BODY_ANCHORING", "MOVEMENT_LOGIC"])
+    moving_part : what body part moves (e.g., "right leg")
+    anchored_parts : what must NOT move (e.g., "left leg, torso, head")
+    equipment : props that must persist (e.g., "resistance band")
+    seed_offset : added to the deterministic seed
+    """
+    import base64
+
+    name = exercise["name"]
+
+    if not start_image_path.exists():
+        print(f"  ERROR: Start image not found: {start_image_path}")
+        return None
+
+    with open(start_image_path, "rb") as f:
+        start_base64 = base64.b64encode(f.read()).decode("utf-8")
+
+    # Build failure-specific prompt
+    failed = set(failed_checks or [])
+
+    if "BODY_ANCHORING" in failed and moving_part:
+        prompt = (
+            f"In this image, ONLY move the {moving_part}. "
+            f"The {anchored_parts or 'rest of the body'} must remain in EXACTLY the same position. "
+            f"Target pose for {moving_part}: {end_pose_description}"
+        )
+    elif "SCENE_SETUP" in failed and equipment:
+        prompt = (
+            f"Keep the exact same scene, background, and equipment. "
+            f"The {equipment} must remain visible in the same position. "
+            f"Only change the person's pose to: {end_pose_description}"
+        )
+    elif "MOVEMENT_LOGIC" in failed and moving_part:
+        prompt = (
+            f"Change ONLY the {moving_part} in this image. "
+            f"Move it to: {end_pose_description}. "
+            f"Everything else must stay EXACTLY the same — "
+            f"same camera angle, same background, same clothing."
+        )
+    else:
+        # Generic fallback
+        prompt = (
+            f"Change the pose of the person in this image. "
+            f"Keep the exact same person, clothing, camera angle, background, and scene. "
+            f"Only change the body position to: {end_pose_description} "
+            f"This is the end position of the exercise: {name}."
+        )
+
+    seed = (hash(name) + 500 + seed_offset) % (2**32)
+
+    print(f" end-frame (kontext-pro tier2)...", end="", flush=True)
+    return _call_bfl_api(
+        prompt, api_key,
+        seed=seed,
+        prompt_upsampling=False,
+        label=f"{name} (end-t2)",
         model="kontext-pro",
         input_image_base64=start_base64,
     )
