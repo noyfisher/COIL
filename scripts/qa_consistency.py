@@ -189,7 +189,10 @@ def _recompute_consistency(result: ConsistencyResult, exercise: dict) -> Consist
 
     result.overall_consistency_score = round(avg_score, 2)
     result.critical_failures = failures
-    result.overall_pass = len(failures) == 0 and avg_score >= 3.5
+    # High quality bar: avg >= 4.5 and no individual check below 4
+    low_scores = [name for name, check in checks.items() if check.score < 4]
+    result.critical_failures = low_scores
+    result.overall_pass = len(low_scores) == 0 and avg_score >= 4.5
     result.exercise_name = exercise["name"]
     result.filename = exercise.get("normalized_filename", "")
 
