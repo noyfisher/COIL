@@ -518,9 +518,10 @@ def _call_bfl_api(
     prompt_upsampling: bool = False,
     label: str = "",
     model: str = "kontext-pro",
+    input_image_base64: str | None = None,
 ) -> bytes | None:
     """
-    Submit a text-to-image generation request to BFL and poll for the result.
+    Submit a generation request to BFL and poll for the result.
 
     Parameters
     ----------
@@ -530,6 +531,9 @@ def _call_bfl_api(
     prompt_upsampling : If False, prevent BFL from auto-expanding the prompt.
     label : Human-readable label for log messages.
     model : "kontext-pro" or "flux2-pro".
+    input_image_base64 : Base64-encoded reference image for image-to-image editing
+                         (Kontext Pro only). When provided, the prompt describes
+                         edits to apply to this image.
 
     Returns
     -------
@@ -555,6 +559,9 @@ def _call_bfl_api(
             "safety_tolerance": 6,
             "prompt_upsampling": prompt_upsampling,
         }
+        # Image-to-image: pass start frame as reference for Kontext Pro
+        if input_image_base64:
+            payload["input_image"] = input_image_base64
     if seed is not None:
         payload["seed"] = seed
 
@@ -681,6 +688,68 @@ def generate_image(
         prompt_upsampling=False,
         label=name,
         model=model,
+    )
+
+
+def generate_end_frame(
+    exercise: dict,
+    start_image_path: Path,
+    *,
+    api_key: str,
+    end_pose_description: str,
+    dry_run: bool = False,
+    seed_offset: int = 0,
+) -> bytes | None:
+    """
+    Generate an end-position image using Kontext Pro image-to-image.
+
+    Uses the start image as reference so the end frame maintains visual
+    consistency (same camera angle, character, clothing, scene setup).
+    Only the pose changes according to the end_pose_description.
+
+    Parameters
+    ----------
+    exercise : dict with name, normalized_filename, etc.
+    start_image_path : Path to the start-position PNG image
+    api_key : BFL API key
+    end_pose_description : Text describing the end/peak position
+    dry_run : if True, skip the API call
+    seed_offset : added to the deterministic seed
+    """
+    name = exercise["name"]
+
+    if dry_run:
+        print(f"  [DRY RUN] Would generate end frame for: {name}")
+        return None
+
+    if not start_image_path.exists():
+        print(f"  ERROR: Start image not found: {start_image_path}")
+        return None
+
+    # Read start image and encode as base64
+    import base64
+    with open(start_image_path, "rb") as f:
+        start_base64 = base64.b64encode(f.read()).decode("utf-8")
+
+    # Build a prompt that describes ONLY the pose change
+    # Kontext Pro will preserve everything else from the reference image
+    prompt = (
+        f"Change the pose of the person in this image. "
+        f"Keep the exact same person, clothing, camera angle, background, and scene. "
+        f"Only change the body position to: {end_pose_description} "
+        f"This is the end position of the exercise: {name}."
+    )
+
+    seed = (hash(name) + 500 + seed_offset) % (2**32)
+
+    print(f" end-frame (kontext-pro i2i)...", end="", flush=True)
+    return _call_bfl_api(
+        prompt, api_key,
+        seed=seed,
+        prompt_upsampling=False,
+        label=f"{name} (end)",
+        model="kontext-pro",
+        input_image_base64=start_base64,
     )
 
 
@@ -861,19 +930,18 @@ def main():
             }
 
             # Generate end-position frame if requested and description available
+            # Uses Kontext Pro image-to-image for visual consistency with start frame
             if args.generate_end_frames and exercise.get("end_pose_description"):
                 end_filepath = OUTPUT_DIR / f"{filename}_end.png"
                 if not (args.skip_existing and end_filepath.exists()):
                     time.sleep(RATE_LIMIT_DELAY)
-                    end_exercise = exercise.copy()
-                    end_exercise["pose_description"] = exercise["end_pose_description"]
-                    end_exercise["normalized_filename"] = f"{filename}_end"
-                    print(f"      end frame...", end="", flush=True)
-                    end_data = generate_image(
-                        None, end_exercise, dry_run=False,
+                    print(f"     ", end="", flush=True)
+                    end_data = generate_end_frame(
+                        exercise,
+                        filepath,
                         api_key=args.api_key,
-                        seed_offset=args.seed_offset + 500,
-                        model=args.model,
+                        end_pose_description=exercise["end_pose_description"],
+                        seed_offset=args.seed_offset,
                     )
                     if end_data and save_image(end_data, end_filepath):
                         end_kb = end_filepath.stat().st_size / 1024

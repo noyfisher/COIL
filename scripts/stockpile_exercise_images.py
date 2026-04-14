@@ -423,7 +423,7 @@ def phase3_generate_images(
     limit: int | None = None,
 ):
     """Phase 3: Generate images for exercises that need them."""
-    from generate_exercise_images import generate_image, save_image
+    from generate_exercise_images import generate_image, generate_end_frame, save_image, RATE_LIMIT_DELAY
 
     # Set up Gemini QA if key available
     qa_client = None
@@ -509,14 +509,17 @@ def phase3_generate_images(
                     "target_area": ex_data.get("targetArea", "General"),
                 }
 
-                # Generate end image if description available
+                # Generate end image using Kontext Pro image-to-image
+                # (uses start image as reference for visual consistency)
                 end_desc = ex_data.get("endPoseDescription")
-                if end_desc:
-                    end_exercise = exercise.copy()
-                    end_exercise["pose_description"] = end_desc
-                    end_exercise["normalized_filename"] = f"{normalized}_end"
-
-                    end_bytes = generate_image(None, end_exercise, api_key=bfl_key, model="flux2-pro")
+                if end_desc and output_path.exists():
+                    time.sleep(RATE_LIMIT_DELAY)
+                    end_bytes = generate_end_frame(
+                        exercise,
+                        output_path,
+                        api_key=bfl_key,
+                        end_pose_description=end_desc,
+                    )
                     if end_bytes:
                         end_path = OUTPUT_DIR / f"{normalized}_end.png"
                         save_image(end_bytes, end_path)
