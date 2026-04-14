@@ -424,7 +424,19 @@ def phase3_generate_images(
 ):
     """Phase 3: Generate images for exercises that need them."""
     from generate_exercise_images import generate_image, save_image
-    from qa_exercise_images import analyze_image
+
+    # Set up Gemini QA if key available
+    qa_client = None
+    if gemini_key:
+        try:
+            from google import genai
+            from qa_exercise_images import analyze_image
+            qa_client = genai.Client(api_key=gemini_key)
+            print("  Gemini QA enabled")
+        except ImportError:
+            print("  Warning: google-genai not installed, skipping QA")
+    else:
+        print("  Gemini QA disabled (no --gemini-key)")
 
     needs_image = [
         (k, v) for k, v in progress["all_exercises"].items()
@@ -471,10 +483,23 @@ def phase3_generate_images(
 
         # Generate start image
         try:
-            image_bytes = generate_image(exercise, bfl_key, model="flux2-pro")
+            image_bytes = generate_image(None, exercise, api_key=bfl_key, model="flux2-pro")
             if image_bytes:
                 output_path = OUTPUT_DIR / f"{normalized}.png"
-                save_image(image_bytes, str(output_path))
+                save_image(image_bytes, output_path)
+
+                # QA check on start image
+                if qa_client and output_path.exists():
+                    qa_result = analyze_image(qa_client, output_path, exercise)
+                    if not qa_result.overall_pass:
+                        print(f"QA failed ({', '.join(qa_result.critical_failures)}), retrying...", end=" ", flush=True)
+                        time.sleep(8)
+                        retry_bytes = generate_image(None, exercise, api_key=bfl_key, model="flux2-pro", seed_offset=1000)
+                        if retry_bytes:
+                            save_image(retry_bytes, output_path)
+                            qa_retry = analyze_image(qa_client, output_path, exercise)
+                            if not qa_retry.overall_pass:
+                                print(f"QA retry failed, keeping anyway.", end=" ", flush=True)
 
                 # Update mapping
                 mapping[normalized] = {
@@ -491,10 +516,10 @@ def phase3_generate_images(
                     end_exercise["pose_description"] = end_desc
                     end_exercise["normalized_filename"] = f"{normalized}_end"
 
-                    end_bytes = generate_image(end_exercise, bfl_key, model="flux2-pro")
+                    end_bytes = generate_image(None, end_exercise, api_key=bfl_key, model="flux2-pro")
                     if end_bytes:
                         end_path = OUTPUT_DIR / f"{normalized}_end.png"
-                        save_image(end_bytes, str(end_path))
+                        save_image(end_bytes, end_path)
                         mapping[normalized]["end_filename"] = f"{normalized}_end.png"
                         print(f"✓ (start + end)", flush=True)
                     else:
