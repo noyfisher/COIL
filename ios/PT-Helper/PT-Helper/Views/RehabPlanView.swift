@@ -133,7 +133,7 @@ struct RehabPlanView: View {
                             homeButton
                         }
                     }
-                    .padding(20)
+                    .padding(AppSpacing.xl)
                 }
             } else {
                 emptyState

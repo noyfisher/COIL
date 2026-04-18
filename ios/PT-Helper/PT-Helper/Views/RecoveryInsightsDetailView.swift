@@ -67,7 +67,7 @@ struct RecoveryInsightsDetailView: View {
             if let date = formattedDate(insight.generatedDate) {
                 Text("Generated \(date)")
                     .font(.caption2)
-                    .foregroundColor(.secondary.opacity(0.7))
+                    .foregroundColor(AppColors.mutedText)
             }
         }
         .frame(maxWidth: .infinity)
@@ -264,7 +264,7 @@ struct RecoveryInsightsDetailView: View {
     private var disclaimerText: some View {
         Text("These insights are educational only and not a substitute for professional medical advice. Always consult your healthcare provider about your recovery.")
             .font(.caption2)
-            .foregroundColor(.secondary.opacity(0.7))
+            .foregroundColor(AppColors.mutedText)
             .multilineTextAlignment(.center)
             .padding(.horizontal, AppSpacing.lg)
     }

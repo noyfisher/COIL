@@ -1166,7 +1166,7 @@ struct BodyMap3DView: View {
         if let color = BodyMapConstants.regionColors[baseKey] {
             return Color(uiColor: color)
         }
-        return .gray
+        return AppColors.mutedText
     }
 
     // MARK: - Region Color Coding

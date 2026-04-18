@@ -51,7 +51,7 @@ struct OnboardingView: View {
                                 .animation(.spring(response: 0.35), value: viewModel.currentStep)
                         }
                     }
-                    .padding(.horizontal, 32)
+                    .padding(.horizontal, AppSpacing.xxl)
 
                     Text(stepTitle)
                         .font(AppFonts.sectionTitle)
@@ -61,7 +61,7 @@ struct OnboardingView: View {
                         .font(.subheadline)
                         .foregroundColor(AppColors.secondaryText)
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal, 32)
+                        .padding(.horizontal, AppSpacing.xxl)
                 }
                 .padding(.bottom, AppSpacing.sm)
 

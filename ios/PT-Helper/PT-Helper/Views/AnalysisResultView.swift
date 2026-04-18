@@ -37,7 +37,7 @@ struct AnalysisResultView: View {
                     buildRehabPlanButton
                     navigationButtons
                 }
-                .padding(20)
+                .padding(AppSpacing.xl)
             }
         }
         .navigationTitle("Analysis Results")
@@ -198,7 +198,7 @@ struct AnalysisResultView: View {
                     VStack(alignment: .leading, spacing: AppSpacing.lg) {
                         // Thin separator
                         Rectangle()
-                            .fill(Color(.systemGray5))
+                            .fill(AppColors.elevatedSurface)
                             .frame(height: 1)
                             .padding(.horizontal, AppSpacing.lg)
 
@@ -267,7 +267,7 @@ struct AnalysisResultView: View {
         case .moderate: filledCount = 2
         case .weak: filledCount = 1
         }
-        return index < filledCount ? matchColor(strength) : Color(.systemGray5)
+        return index < filledCount ? matchColor(strength) : AppColors.elevatedSurface
     }
 
     private func matchColor(_ strength: MatchStrength) -> Color {

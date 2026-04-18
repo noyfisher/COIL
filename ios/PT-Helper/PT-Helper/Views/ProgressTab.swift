@@ -285,7 +285,7 @@ struct ProgressTabContent: View {
                 .font(.caption.weight(.medium))
                 .padding(.horizontal, AppSpacing.md)
                 .padding(.vertical, AppSpacing.sm)
-                .background(isSelected ? AppColors.accent : Color(.systemGray5))
+                .background(isSelected ? AppColors.accent : AppColors.elevatedSurface)
                 .foregroundColor(isSelected ? AppColors.ctaText : AppColors.primaryText)
                 .cornerRadius(AppCorners.medium)
         }
