@@ -125,8 +125,10 @@ struct WellnessGoalPickerView: View {
                         .transition(.scale.combined(with: .opacity))
                 }
             }
+            .contentShape(RoundedRectangle(cornerRadius: AppCorners.card))
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("\(category.displayName), \(selectedCategories.contains(category) ? "selected" : "not selected")")
     }
 
     // MARK: - Custom Goal

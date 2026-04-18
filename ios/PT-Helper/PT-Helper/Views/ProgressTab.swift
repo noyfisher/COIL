@@ -234,9 +234,11 @@ struct ProgressTabContent: View {
                 Image(systemName: "trash")
                     .font(.system(size: 12))
                     .foregroundColor(AppColors.danger.opacity(0.6))
-                    .frame(width: 32, height: 32)
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Delete session")
             .accessibilityIdentifier("progress.deleteSession")
         }
         .padding(.vertical, AppSpacing.xs)

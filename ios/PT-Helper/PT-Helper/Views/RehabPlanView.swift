@@ -574,6 +574,7 @@ struct RehabPlanView: View {
                     .frame(minWidth: 44, minHeight: 44)
                     .contentShape(Circle())
                     .buttonStyle(.plain)
+                    .accessibilityLabel("Swap exercise")
                     .accessibilityIdentifier("rehabPlan.swapExerciseButton")
                 }
             }

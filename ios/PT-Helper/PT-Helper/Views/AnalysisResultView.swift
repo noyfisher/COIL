@@ -164,10 +164,15 @@ struct AnalysisResultView: View {
                                 Image(systemName: "info.circle")
                                     .font(.caption)
                                     .foregroundColor(AppColors.secondaryText)
+                                    .frame(width: 44, height: 44)
+                                    .contentShape(Rectangle())
                             }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Match strength information")
                         }
                         .accessibilityElement(children: .combine)
                         .accessibilityLabel("\(condition.commonName), \(strength.rawValue)")
+                        .accessibilityAction(named: "Match strength information") { showConfidenceInfo = true }
 
                         // Red flag inline warning
                         if condition.isRedFlag {
