@@ -79,6 +79,12 @@ struct DisclaimerView: View {
             .navigationTitle("Important Information")
             .navigationBarTitleDisplayMode(.inline)
             .interactiveDismissDisabled()
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                        .accessibilityLabel("Cancel and close disclaimer")
+                }
+            }
         }
         .trackScreen("Disclaimer")
     }
