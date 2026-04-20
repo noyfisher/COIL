@@ -20,3 +20,19 @@ ios/PT-Helper/fastlane/screenshots
 ios/PT-Helper/fastlane/test_output
 ios/PT-Helper/fastlane/AuthKey*.p8
 ios/PT-Helper/build/
+.env
+
+# Office temp/lock files
+~$*
+
+# Claude scratch
+.claude/worktrees/
+.claude/scheduled_tasks.lock
+
+# Exercise image pipeline — local iteration artifacts (not shipped)
+scripts/output/_auto_prompt_backup/
+scripts/output/_flux_backup/
+scripts/output/_best_of_three/
+scripts/output/_nb_round1_backup/
+scripts/output/_sample_pass_fail/
+scripts/output/_nb_score5_contact_sheet.png
