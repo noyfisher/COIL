@@ -40,14 +40,14 @@ enum BodyMapConstants {
 
     /// Small regions that get forward-protruding invisible proxy spheres.
     /// Key = base region key (no left_/right_ prefix), Value = sphere radius in model space.
+    /// Arm regions (shoulder, upper_arm, elbow, forearm, wrist_hand) are handled
+    /// by `createArmZoneProxies` instead — each gets a Y-band box proxy so arm
+    /// taps resolve to the correct region with clean vertical boundaries.
     static let proxyRadii: [String: Float] = [
         "head": 0.04,
         "knee": 0.025,
-        "elbow": 0.018,
         "ankle_foot": 0.035,
-        "wrist_hand": 0.03,
         "neck": 0.020,
-        "shoulder": 0.022,
     ]
 
     /// How far anterior (toward camera) proxy entities protrude past the mesh
@@ -61,6 +61,19 @@ enum BodyMapConstants {
 
     /// Fraction of ankle zone height used for capsule height
     static let ankleCapsuleHeightFraction: Float = 0.5
+
+    /// How far anterior each arm zone box protrudes past its region's mesh
+    /// front. Ensures the zoned box is hit before any adjacent region's
+    /// convex hull at the same (X, Y) position. Mirrors `proxyForwardBias`.
+    static let armZoneForwardBias: Float = 0.03
+
+    /// Ordered arm region keys from top (shoulder) to bottom (wrist_hand).
+    /// Used by `createArmZoneProxies` to build adjacent, non-overlapping
+    /// Y-banded collisions so every tap inside a region's band resolves to
+    /// that region — no convex hull bloat, no neighbor interception.
+    static let armRegionOrder: [String] = [
+        "shoulder", "upper_arm", "elbow", "forearm", "wrist_hand"
+    ]
 
     // MARK: - Highlight Material
 

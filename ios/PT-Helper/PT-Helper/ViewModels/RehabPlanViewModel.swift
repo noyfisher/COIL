@@ -659,27 +659,41 @@ class RehabPlanViewModel: ObservableObject {
 
     // MARK: - Missing Image Logging
 
-    /// Logs exercises that don't have images to Firestore so we know which to generate next.
+    /// Logs exercises without exact image matches to Firestore so we know which to generate next.
+    /// Includes match metadata (matchType, matchedTo) for fuzzy-matched exercises.
     /// Fire-and-forget — non-blocking, errors are printed to console.
     private func logMissingImages(exercises: [RehabExercise], source: String) {
-        let missing = ExerciseImageService.shared.exercisesWithoutImages(in: exercises)
-        guard !missing.isEmpty else { return }
+        let imageService = ExerciseImageService.shared
+        let needsLogging = exercises.filter { exercise in
+            let match = imageService.resolveImageMatch(for: exercise)
+            return match == nil || match?.matchType != .exact
+        }
+        guard !needsLogging.isEmpty else { return }
 
-        AppLogger.images.info("\(missing.count) exercise(s) missing images: \(missing.map { $0.name }.joined(separator: ", "))")
+        let trulyMissing = needsLogging.filter { imageService.resolveImageMatch(for: $0) == nil }
+        let fuzzyMatched = needsLogging.count - trulyMissing.count
+
+        AppLogger.images.info("\(trulyMissing.count) exercise(s) missing images, \(fuzzyMatched) fuzzy-matched: \(needsLogging.map { $0.name }.joined(separator: ", "))")
 
         Task {
-            for exercise in missing {
-                let normalizedKey = ExerciseImageService.shared.normalizeName(exercise.name)
+            for exercise in needsLogging {
+                let normalizedKey = imageService.normalizeName(exercise.name)
+                let match = imageService.resolveImageMatch(for: exercise)
 
                 var data: [String: Any] = [
                     "exerciseName": exercise.name,
                     "normalizedKey": normalizedKey,
+                    "matchType": match?.matchType.rawValue ?? "none",
                     "exerciseCategory": exercise.exerciseCategory ?? "unknown",
                     "targetArea": exercise.targetArea,
                     "source": source,
                     "count": FieldValue.increment(Int64(1)),
                     "lastSeen": FieldValue.serverTimestamp()
                 ]
+
+                if let matchedTo = match?.key {
+                    data["matchedTo"] = matchedTo
+                }
 
                 if let imageFile = exercise.imageFileName {
                     data["imageFileName"] = imageFile

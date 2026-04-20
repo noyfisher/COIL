@@ -252,6 +252,7 @@ struct BodyMap3DView: View {
 
                     configureCollisionShapes(for: entity, regionKeys: regionKeys)
                     createProxyEntities(for: entity, regionKeys: regionKeys)
+                    createArmZoneProxies(for: entity, regionKeys: regionKeys)
 
 
                     content.add(pivot)
@@ -720,16 +721,17 @@ struct BodyMap3DView: View {
     /// Configure each body-region child for tap interaction and apply region colors.
     @MainActor
     private func configureCollisionShapes(for parent: Entity, regionKeys: Set<String>) {
+        let armRegions = Set(BodyMapConstants.armRegionOrder)
         for child in parent.children {
             if regionKeys.contains(child.name),
                child.components[ModelComponent.self] != nil {
                 child.components.set(InputTargetComponent(allowedInputTypes: .indirect))
 
                 let baseKey = BodyMapConstants.regionBaseKey(child.name)
-                if baseKey == "forearm" {
-                    // Don't generate mesh collision for forearm — its convex hull overlaps
-                    // the wrist_hand entity and intercepts taps meant for the hand.
-                    // Forearm uses only its proxy sphere (defined in proxyRadii) for tap detection.
+                if armRegions.contains(baseKey) {
+                    // Arm regions use Y-banded zone box proxies (see
+                    // createArmZoneProxies). Their auto-generated convex hulls
+                    // overlap each other and the shoulder, so we skip them here.
                 } else {
                     child.generateCollisionShapes(recursive: true)
                 }
@@ -741,6 +743,62 @@ struct BodyMap3DView: View {
                 }
             }
             configureCollisionShapes(for: child, regionKeys: regionKeys)
+        }
+    }
+
+    /// Build box proxies for arm regions with clean vertical boundaries. Each
+    /// region (shoulder → wrist_hand) gets its own Y-band box; the boundary
+    /// between two adjacent regions is the midpoint of their mesh bounds so
+    /// there is no overlap or gap. This is what makes "tap in the visible
+    /// shoulder area" reliably resolve to shoulder — no convex-hull bloat.
+    @MainActor
+    private func createArmZoneProxies(for entity: Entity, regionKeys: Set<String>) {
+        for side in ["left", "right"] {
+            createArmZoneProxies(for: entity, side: side, regionKeys: regionKeys)
+        }
+    }
+
+    @MainActor
+    private func createArmZoneProxies(for entity: Entity, side: String, regionKeys: Set<String>) {
+        let order = BodyMapConstants.armRegionOrder
+        let zoneKeys = order.map { "\(side)_\($0)" }
+        guard zoneKeys.allSatisfy(regionKeys.contains) else { return }
+        let ents = zoneKeys.compactMap { entity.findEntity(named: $0) }
+        guard ents.count == order.count else { return }
+        let bounds = ents.map { $0.visualBounds(relativeTo: entity) }
+
+        // Z = height in the model's root frame; bounds[0] (shoulder) is highest.
+        // Arm region meshes OVERLAP each other significantly (elbow sits
+        // entirely inside upper_arm's bounds; forearm's mesh extends upward
+        // past elbow). Using min.z/max.z midpoints would produce inverted
+        // zones. Use CENTER midpoints instead — always well-ordered.
+        var transitions: [Float] = []
+        for i in 0..<(order.count - 1) {
+            transitions.append((bounds[i].center.z + bounds[i + 1].center.z) / 2)
+        }
+
+        for (i, zoneKey) in zoneKeys.enumerated() {
+            let topZ = (i == 0) ? bounds[i].max.z : transitions[i - 1]
+            let botZ = (i == order.count - 1) ? bounds[i].min.z : transitions[i]
+            let zoneExtentZ = max(0.005, topZ - botZ)
+            let zoneCenterZ = (topZ + botZ) / 2
+
+            // Front-protrude so the box sits ahead of any torso/chest convex hull.
+            let yFront = bounds[i].min.y - BodyMapConstants.armZoneForwardBias
+            let yBack = bounds[i].max.y
+            let zoneCenterY = (yFront + yBack) / 2
+            let zoneExtentY = max(0.005, yBack - yFront)
+
+            let zoneCenterX = bounds[i].center.x
+            let zoneExtentX = max(0.005, bounds[i].extents.x)
+
+            let proxy = Entity()
+            proxy.name = BodyMapConstants.proxyPrefix + zoneKey
+            proxy.position = SIMD3<Float>(zoneCenterX, zoneCenterY, zoneCenterZ)
+            let shape = ShapeResource.generateBox(size: SIMD3<Float>(zoneExtentX, zoneExtentY, zoneExtentZ))
+            proxy.components.set(CollisionComponent(shapes: [shape]))
+            proxy.components.set(InputTargetComponent(allowedInputTypes: .indirect))
+            entity.addChild(proxy)
         }
     }
 

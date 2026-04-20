@@ -37,6 +37,7 @@ final class BodyMapCollisionTests: XCTestCase {
 
         configureCollision(for: entity)
         createProxies(for: entity)
+        createArmZoneProxies(for: entity)
 
         bodyEntity = entity
 
@@ -59,13 +60,60 @@ final class BodyMapCollisionTests: XCTestCase {
     // MARK: - Setup Helpers (replicate BodyMap3DView logic exactly)
 
     private func configureCollision(for parent: Entity) {
+        let armRegions = Set(BodyMapConstants.armRegionOrder)
         for child in parent.children {
             if regionKeys.contains(child.name),
                child.components[ModelComponent.self] != nil {
                 child.components.set(InputTargetComponent(allowedInputTypes: .indirect))
-                child.generateCollisionShapes(recursive: true)
+                let baseKey = BodyMapConstants.regionBaseKey(child.name)
+                if !armRegions.contains(baseKey) {
+                    child.generateCollisionShapes(recursive: true)
+                }
             }
             configureCollision(for: child)
+        }
+    }
+
+    private func createArmZoneProxies(for entity: Entity) {
+        for side in ["left", "right"] {
+            createArmZoneProxies(for: entity, side: side)
+        }
+    }
+
+    private func createArmZoneProxies(for entity: Entity, side: String) {
+        let order = BodyMapConstants.armRegionOrder
+        let zoneKeys = order.map { "\(side)_\($0)" }
+        guard zoneKeys.allSatisfy({ regionKeys.contains($0) }) else { return }
+        let ents = zoneKeys.compactMap { entity.findEntity(named: $0) }
+        guard ents.count == order.count else { return }
+        let bounds = ents.map { $0.visualBounds(relativeTo: entity) }
+
+        var transitions: [Float] = []
+        for i in 0..<(order.count - 1) {
+            transitions.append((bounds[i].center.z + bounds[i + 1].center.z) / 2)
+        }
+
+        for (i, zoneKey) in zoneKeys.enumerated() {
+            let topZ = (i == 0) ? bounds[i].max.z : transitions[i - 1]
+            let botZ = (i == order.count - 1) ? bounds[i].min.z : transitions[i]
+            let zoneExtentZ = max(0.005, topZ - botZ)
+            let zoneCenterZ = (topZ + botZ) / 2
+
+            let yFront = bounds[i].min.y - BodyMapConstants.armZoneForwardBias
+            let yBack = bounds[i].max.y
+            let zoneCenterY = (yFront + yBack) / 2
+            let zoneExtentY = max(0.005, yBack - yFront)
+
+            let zoneCenterX = bounds[i].center.x
+            let zoneExtentX = max(0.005, bounds[i].extents.x)
+
+            let proxy = Entity()
+            proxy.name = proxyPrefix + zoneKey
+            proxy.position = SIMD3<Float>(zoneCenterX, zoneCenterY, zoneCenterZ)
+            let shape = ShapeResource.generateBox(size: SIMD3<Float>(zoneExtentX, zoneExtentY, zoneExtentZ))
+            proxy.components.set(CollisionComponent(shapes: [shape]))
+            proxy.components.set(InputTargetComponent(allowedInputTypes: .indirect))
+            entity.addChild(proxy)
         }
     }
 
@@ -83,6 +131,8 @@ final class BodyMapCollisionTests: XCTestCase {
                 proxyZ = bounds.min.z + bounds.extents.z * BodyMapConstants.kneeCapHeightFraction
             } else if baseKey == "ankle_foot" {
                 proxyZ = center.z
+            } else if baseKey == "head" {
+                proxyZ = bounds.max.z - bounds.extents.z * 0.2
             }
 
             // Push ankle proxy laterally outward so it protrudes past
@@ -96,11 +146,17 @@ final class BodyMapCollisionTests: XCTestCase {
                 }
             }
 
+            let forwardBias: Float
+            switch baseKey {
+            case "head": forwardBias = 0.04
+            default: forwardBias = proxyForwardBias
+            }
+
             let proxy = Entity()
             proxy.name = proxyPrefix + zoneKey
             proxy.position = SIMD3<Float>(
                 proxyX,
-                bounds.min.y - proxyForwardBias,
+                bounds.min.y - forwardBias,
                 proxyZ
             )
 
@@ -128,14 +184,43 @@ final class BodyMapCollisionTests: XCTestCase {
     // MARK: - Raycast Helpers (world space: X=left/right, Y=height, Z=depth)
 
     /// Cast a ray from the front (positive Z) through (worldX, worldY).
+    /// Returns the NEAREST hit so overlapping collisions resolve deterministically.
     private func frontRaycast(x: Float, y: Float) -> String? {
+        let origin = SIMD3<Float>(x, y, 1.0)
+        let direction = SIMD3<Float>(0, 0, -1)
+        let results = arView.scene.raycast(
+            origin: origin, direction: direction,
+            length: 3.0, query: .nearest, mask: .all, relativeTo: nil
+        )
+        return results.first?.entity.name
+    }
+
+    /// Cast a ray from the front and return all hit entity names, sorted
+    /// nearest-to-farthest by distance. Used to simulate the app's
+    /// drill-down mode, which ignores hits outside the active zone.
+    private func frontRaycastAll(x: Float, y: Float) -> [String] {
         let origin = SIMD3<Float>(x, y, 1.0)
         let direction = SIMD3<Float>(0, 0, -1)
         let results = arView.scene.raycast(
             origin: origin, direction: direction,
             length: 3.0, query: .all, mask: .all, relativeTo: nil
         )
-        return results.first?.entity.name
+        return results.sorted(by: { $0.distance < $1.distance }).map { $0.entity.name }
+    }
+
+    /// Simulates the app's arm-zone drill-down: pick the closest raycast hit
+    /// that belongs to the given arm side. Off-zone hits (chest, torso) get
+    /// filtered out just like `handleEntityTap` does in production.
+    private func firstArmZoneHit(x: Float, y: Float, isLeft: Bool) -> String? {
+        let armKeys: Set<String> = isLeft
+            ? ["left_shoulder", "left_upper_arm", "left_elbow", "left_forearm", "left_wrist_hand"]
+            : ["right_shoulder", "right_upper_arm", "right_elbow", "right_forearm", "right_wrist_hand"]
+        for rawName in frontRaycastAll(x: x, y: y) {
+            if let resolved = resolveHit(rawName), armKeys.contains(resolved) {
+                return resolved
+            }
+        }
+        return nil
     }
 
     /// Cast a ray from the back (negative Z) through (worldX, worldY).
@@ -204,11 +289,12 @@ final class BodyMapCollisionTests: XCTestCase {
         }
     }
 
-    func testNoProxiesForLargeRegions() {
+    func testNoProxiesForTorsoAndLegRegions() {
+        // Torso and leg large regions rely on mesh collision — no proxies.
+        // (Arm regions DO have proxies now: Y-band boxes from createArmZoneProxies.)
         let largeBaseKeys: Set<String> = [
             "chest", "abdomen", "upper_back", "lower_back",
-            "upper_arm", "forearm", "glute", "hip",
-            "thigh", "hamstring", "calf_shin"
+            "glute", "hip", "thigh", "hamstring", "calf_shin"
         ]
         for key in regionKeys {
             let baseKey = regionBaseKey(key)
@@ -216,6 +302,52 @@ final class BodyMapCollisionTests: XCTestCase {
                 XCTAssertNil(
                     bodyEntity.findEntity(named: proxyPrefix + key),
                     "Large region '\(key)' should NOT have a proxy"
+                )
+            }
+        }
+    }
+
+    func testArmRegionsHaveZoneProxies() {
+        for side in ["left", "right"] {
+            for baseKey in BodyMapConstants.armRegionOrder {
+                let key = "\(side)_\(baseKey)"
+                XCTAssertNotNil(
+                    bodyEntity.findEntity(named: proxyPrefix + key),
+                    "Arm region '\(key)' should have a Y-band zone proxy"
+                )
+            }
+        }
+    }
+
+    /// End-to-end boundary check: for each pair of adjacent arm regions,
+    /// cast a ray just above and just below their *center* midpoint and
+    /// confirm the two rays resolve to the upper region and lower region
+    /// respectively. Uses center midpoints (not min/max) because the arm
+    /// meshes overlap each other significantly along Z.
+    func testAdjacentArmZonesMeetAtSingleBoundary() {
+        for side in ["left", "right"] {
+            let order = BodyMapConstants.armRegionOrder
+            let zoneKeys = order.map { "\(side)_\($0)" }
+            let ents = zoneKeys.compactMap { bodyEntity.findEntity(named: $0) }
+            guard ents.count == order.count else {
+                XCTFail("Missing arm entities for side=\(side)"); return
+            }
+            let worldBounds = ents.map { $0.visualBounds(relativeTo: nil) }
+            let isLeft = (side == "left")
+            for i in 0..<(order.count - 1) {
+                let upperBounds = worldBounds[i]
+                let lowerBounds = worldBounds[i + 1]
+                // World Y = height; use center midpoint, not min/max.
+                let midY = (upperBounds.center.y + lowerBounds.center.y) / 2
+                // Tap at each region's own X center so the ray is squarely inside
+                // that region's zone box laterally.
+                let hitAbove = firstArmZoneHit(x: upperBounds.center.x, y: midY + 0.003, isLeft: isLeft)
+                let hitBelow = firstArmZoneHit(x: lowerBounds.center.x, y: midY - 0.003, isLeft: isLeft)
+                XCTAssertEqual(hitAbove, zoneKeys[i],
+                    "Tap just above \(order[i])/\(order[i+1]) midpoint should select \(zoneKeys[i]), got: \(hitAbove ?? "nil")"
+                )
+                XCTAssertEqual(hitBelow, zoneKeys[i + 1],
+                    "Tap just below \(order[i])/\(order[i+1]) midpoint should select \(zoneKeys[i+1]), got: \(hitBelow ?? "nil")"
                 )
             }
         }
@@ -337,7 +469,50 @@ final class BodyMapCollisionTests: XCTestCase {
         XCTAssertEqual(hit, "left_calf_shin", "Tapping calf center should select left_calf_shin, got: \(hit ?? "nil")")
     }
 
-    // MARK: - 4b. Ankle/Foot Capsule Geometric Tests (local space, Z=height)
+    // MARK: - 4a. Arm Zone Boundary Tests (world space)
+
+    /// Regression test for the reported bug. A tap anywhere inside the
+    /// shoulder's Y band — including the lower portion abutting upper_arm —
+    /// must resolve to shoulder, never upper_arm.
+    func testTapJustAboveShoulderUpperArmBoundarySelectsShoulder() {
+        guard let shoulder = bodyEntity.findEntity(named: "left_shoulder"),
+              let upperArm = bodyEntity.findEntity(named: "left_upper_arm") else {
+            XCTFail("Arm entities not found"); return
+        }
+        let sBounds = shoulder.visualBounds(relativeTo: nil)
+        let uBounds = upperArm.visualBounds(relativeTo: nil)
+        let boundaryY = (sBounds.center.y + uBounds.center.y) / 2
+        let tapY = boundaryY + 0.002
+        let hit = firstArmZoneHit(x: sBounds.center.x, y: tapY, isLeft: true)
+        XCTAssertEqual(hit, "left_shoulder", "Tap just above shoulder/upper_arm boundary should select left_shoulder, got: \(hit ?? "nil")")
+    }
+
+    /// A tap just below the same boundary must resolve to upper_arm, never
+    /// shoulder. Together with the previous test this confirms the line where
+    /// shoulder and upper_arm meet.
+    func testTapJustBelowShoulderUpperArmBoundarySelectsUpperArm() {
+        guard let shoulder = bodyEntity.findEntity(named: "left_shoulder"),
+              let upperArm = bodyEntity.findEntity(named: "left_upper_arm") else {
+            XCTFail("Arm entities not found"); return
+        }
+        let sBounds = shoulder.visualBounds(relativeTo: nil)
+        let uBounds = upperArm.visualBounds(relativeTo: nil)
+        let boundaryY = (sBounds.center.y + uBounds.center.y) / 2
+        let tapY = boundaryY - 0.002
+        let hit = firstArmZoneHit(x: uBounds.center.x, y: tapY, isLeft: true)
+        XCTAssertEqual(hit, "left_upper_arm", "Tap just below shoulder/upper_arm boundary should select left_upper_arm, got: \(hit ?? "nil")")
+    }
+
+    func testTapMidUpperArmSelectsUpperArm() {
+        guard let upperArm = bodyEntity.findEntity(named: "left_upper_arm") else {
+            XCTFail("Upper arm not found"); return
+        }
+        let bounds = upperArm.visualBounds(relativeTo: nil)
+        let hit = firstArmZoneHit(x: bounds.center.x, y: bounds.center.y, isLeft: true)
+        XCTAssertEqual(hit, "left_upper_arm", "Arm-zone tap at upper_arm center should select left_upper_arm, got: \(hit ?? "nil")")
+    }
+
+    // MARK: - 4c. Ankle/Foot Capsule Geometric Tests (local space, Z=height)
 
     func testAnkleFootProxyCenteredOnZone() {
         guard let ankleEntity = bodyEntity.findEntity(named: "left_ankle_foot"),
@@ -418,7 +593,7 @@ final class BodyMapCollisionTests: XCTestCase {
         )
     }
 
-    // MARK: - 4c. Raycast: Side-View Ankle/Foot Full Zone Tests (world space)
+    // MARK: - 4d. Raycast: Side-View Ankle/Foot Full Zone Tests (world space)
 
     /// Helper: side raycast at a given fraction of the ankle/foot zone height.
     /// 0.0 = bottom of foot, 1.0 = top of ankle mesh.
@@ -488,9 +663,9 @@ final class BodyMapCollisionTests: XCTestCase {
     func testTapChestSelectsChest() { assertFrontTapHits("chest", yFraction: 0.15) }
     func testTapAbdomenSelectsAbdomen() { assertFrontTapHits("abdomen") }
     func testTapLeftShoulderSelectsShoulder() { assertProxyFrontTapHits("left_shoulder") }
-    func testTapLeftUpperArmSelectsUpperArm() { assertFrontTapHits("left_upper_arm") }
+    func testTapLeftUpperArmSelectsUpperArm() { assertProxyFrontTapHits("left_upper_arm") }
     func testTapLeftElbowSelectsElbow() { assertProxyFrontTapHits("left_elbow") }
-    func testTapLeftForearmSelectsForearm() { assertFrontTapHits("left_forearm") }
+    func testTapLeftForearmSelectsForearm() { assertProxyFrontTapHits("left_forearm") }
     func testTapLeftWristHandSelectsWristHand() { assertProxyFrontTapHits("left_wrist_hand") }
     func testTapLeftHipSelectsHip() { assertFrontTapHits("left_hip", yFraction: -0.3) }
     func testTapLeftThighSelectsThigh() { assertFrontTapHits("left_thigh") }
@@ -501,9 +676,9 @@ final class BodyMapCollisionTests: XCTestCase {
     // MARK: - 6. Raycast: Front-Visible Regions (Right Side)
 
     func testTapRightShoulderSelectsShoulder() { assertProxyFrontTapHits("right_shoulder") }
-    func testTapRightUpperArmSelectsUpperArm() { assertFrontTapHits("right_upper_arm") }
+    func testTapRightUpperArmSelectsUpperArm() { assertProxyFrontTapHits("right_upper_arm") }
     func testTapRightElbowSelectsElbow() { assertProxyFrontTapHits("right_elbow") }
-    func testTapRightForearmSelectsForearm() { assertFrontTapHits("right_forearm") }
+    func testTapRightForearmSelectsForearm() { assertProxyFrontTapHits("right_forearm") }
     func testTapRightWristHandSelectsWristHand() { assertProxyFrontTapHits("right_wrist_hand") }
     func testTapRightHipSelectsHip() { assertFrontTapHits("right_hip", yFraction: -0.3) }
     func testTapRightThighSelectsThigh() { assertFrontTapHits("right_thigh") }

@@ -1,14 +1,12 @@
 import SwiftUI
 
 /// Displays AI-generated exercise images when available.
-/// Supports: single image, start+end pair (side-by-side), on-demand generation with loading state,
-/// and SF Symbol fallback.
+/// Supports: single image, on-demand generation with loading state, and SF Symbol fallback.
 struct ExerciseImageView: View {
     let exercise: RehabExercise
     var isCompact: Bool = false
 
     @State private var startImage: UIImage?
-    @State private var endImage: UIImage?
     @State private var isGenerating = false
     @State private var generationFailed = false
     @State private var hasCheckedImage = false
@@ -19,11 +17,7 @@ struct ExerciseImageView: View {
     var body: some View {
         Group {
             if let start = startImage {
-                if let end = endImage, !isCompact {
-                    imagePairContent(start: start, end: end)
-                } else {
-                    imageContent(start)
-                }
+                imageContent(start)
             } else if isGenerating {
                 generatingContent
             } else {
@@ -40,10 +34,7 @@ struct ExerciseImageView: View {
             // Try normal load
             startImage = await ExerciseImageService.shared.loadImage(for: exercise)
 
-            if startImage != nil {
-                // Also try loading end image for side-by-side
-                endImage = await ExerciseImageService.shared.loadEndImage(for: exercise)
-            } else if !isCompact {
+            if startImage == nil, !isCompact {
                 // No image found — trigger on-demand generation (full mode only)
                 isGenerating = true
                 let generated = await ExerciseImageService.shared.requestImageGeneration(for: exercise)
@@ -100,39 +91,6 @@ struct ExerciseImageView: View {
             DifficultyBadge(difficulty: exercise.difficulty)
         }
         .padding(.vertical, AppSpacing.lg)
-    }
-
-    // MARK: - Side-by-Side Pair Content
-
-    private func imagePairContent(start: UIImage, end: UIImage) -> some View {
-        VStack(spacing: AppSpacing.md) {
-            HStack(spacing: AppSpacing.md) {
-                labeledImage(start, label: "Start")
-                labeledImage(end, label: "End")
-            }
-
-            DifficultyBadge(difficulty: exercise.difficulty)
-        }
-        .padding(.vertical, AppSpacing.lg)
-    }
-
-    private func labeledImage(_ image: UIImage, label: String) -> some View {
-        VStack(spacing: AppSpacing.xs) {
-            Image(uiImage: image)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(maxWidth: 130, maxHeight: 130)
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(difficultyColor.opacity(0.15), lineWidth: 1.5)
-                )
-                .shadow(color: .black.opacity(0.06), radius: 8, y: 3)
-
-            Text(label)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-        }
     }
 
     // MARK: - Generating State
