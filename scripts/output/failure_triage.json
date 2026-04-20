@@ -1,0 +1,26 @@
+{
+  "forearm-rotation-pronation-supination": {
+    "classification": "image_wrong",
+    "reasoning": "The image shows the palm facing up, which contradicts the description's instruction to 'Start with your palm facing down'.",
+    "new_description": "",
+    "old_description": "Sit with your elbow bent at 90 degrees, tucked against your side, holding a light weight or object in your hand. Start with your palm facing down."
+  },
+  "neck-rotations": {
+    "classification": "both_wrong",
+    "reasoning": "The current description details the movement of the exercise rather than just the static start position, and the image depicts a mid-movement or end-range pose, not a neutral start.",
+    "new_description": "Stand tall with the feet hip-width apart and arms relaxed at the sides. Keep the shoulders level and relaxed, with the head held in a neutral position, gazing straight forward.",
+    "old_description": null
+  },
+  "prone-shoulder-horizontal-abduction": {
+    "classification": "image_wrong",
+    "reasoning": "The description states the arm should be at 'about 90 degrees of abduction' while hanging, but the image shows the arms fully adducted, hanging straight down.",
+    "new_description": "",
+    "old_description": "Lie face down on a bed with your arm hanging off the edge at about 90 degrees of abduction. Your head rests on the surface with neck in neutral."
+  },
+  "standing-row-with-band": {
+    "classification": "both_wrong",
+    "reasoning": "The description incorrectly includes movement as part of the 'start position' and misidentifies the band's anchor height and foot position shown in the image.",
+    "new_description": "Stand facing a resistance band anchored directly in front of you at chest height. Grip the band handles with both hands, arms fully extended forward at shoulder height, feeling tension in the band. Maintain a tall, upright posture with feet parallel or staggered for stability.",
+    "old_description": null
+  }
+}

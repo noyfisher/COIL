@@ -1,12 +1,12 @@
 # Exercise Image Pipeline
 
-This directory contains the tools for generating, validating, and managing the 178 AI-generated exercise illustrations used in PT Helper.
+This directory contains the tools for generating, validating, and managing the ~190 AI-generated exercise illustrations used in PT Helper.
 
 ## Overview
 
 ```
 exercise_list.json          →  generate_exercise_images.py  →  output/*.png
-(178 exercises + metadata)     (FLUX 2 Pro via BFL API)        (512x512 images)
+(exercises + metadata)        (FLUX 2 Pro via BFL API)        (512x512 images)
                                                                     │
                                                                     ▼
                                                             qa_exercise_images.py
@@ -21,7 +21,7 @@ exercise_list.json          →  generate_exercise_images.py  →  output/*.png
 
 | File | Purpose |
 |------|---------|
-| `exercise_list.json` | Master list of 178 exercises with metadata (name, body_position, pose_description, equipment, etc.) |
+| `exercise_list.json` | Master list of exercises with metadata (name, body_position, pose_description, equipment, etc.) |
 | `generate_exercise_images.py` | Generates exercise images using FLUX 2 Pro (BFL API) |
 | `qa_exercise_images.py` | Automated QA using Gemini 2.5 Flash vision model |
 | `process_missing_images.py` | Re-processes failed or missing images |
@@ -72,7 +72,7 @@ The QA script:
 4. Outputs `output/qa_report.json` with pass/fail per exercise
 
 ### Current Results
-- **Pass rate**: 92% (163/178)
+- **Pass rate**: ~92%
 - **4 Gemini safety blocks**: False positives on fitness poses (glute-bridges, childs-pose, standing-quad-stretch, childs-pose-with-side-reach) — images are fine
 - **11 pose accuracy failures**: Exercises too subtle for AI vision QA (wrist curls, chin tucks, etc.)
 

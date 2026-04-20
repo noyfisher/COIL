@@ -107,7 +107,7 @@ def init_firebase(service_account_path: str | None = None):
 # Fetch missing exercises from Firestore
 # ---------------------------------------------------------------------------
 def fetch_missing_exercises(
-    db, min_count: int = 1, existing_mapping: dict = None
+    db, min_count: int = 1, existing_mapping: dict = None, match_type_filter: str = None
 ) -> list[dict]:
     """
     Query Firestore 'missingExerciseImages' collection.
@@ -116,6 +116,13 @@ def fetch_missing_exercises(
     - Documents where status == "generated"
     - Documents whose normalizedKey already exists in the mapping
     - Documents with count < min_count
+    - Documents not matching match_type_filter (if specified)
+
+    Parameters
+    ----------
+    match_type_filter : str, optional
+        Filter by matchType field. Values: "none" (truly missing), "prefix",
+        "suffix", "pluralToggle", "synonymExpansion". If None, includes all.
 
     Returns list of exercise dicts compatible with generate_exercise_images.py.
     """
@@ -129,6 +136,7 @@ def fetch_missing_exercises(
     skipped_generated = 0
     skipped_in_mapping = 0
     skipped_low_count = 0
+    skipped_match_type = 0
 
     for doc in docs:
         data = doc.to_dict()
@@ -151,6 +159,12 @@ def fetch_missing_exercises(
             skipped_low_count += 1
             continue
 
+        # Skip if match type doesn't match filter
+        doc_match_type = data.get("matchType", "none")
+        if match_type_filter and doc_match_type != match_type_filter:
+            skipped_match_type += 1
+            continue
+
         exercises.append(
             {
                 "name": data.get("exerciseName", doc.id),
@@ -160,6 +174,8 @@ def fetch_missing_exercises(
                 "pose_description": data.get("poseDescription", ""),
                 "body_position": data.get("bodyPosition", ""),
                 "count": count,
+                "match_type": doc_match_type,
+                "matched_to": data.get("matchedTo"),
                 "firestore_doc_id": doc.id,
             }
         )
@@ -172,6 +188,8 @@ def fetch_missing_exercises(
     print(f"  Skipped (generated): {skipped_generated}")
     print(f"  Skipped (in mapping): {skipped_in_mapping}")
     print(f"  Skipped (count < {min_count}): {skipped_low_count}")
+    if match_type_filter:
+        print(f"  Skipped (matchType != {match_type_filter}): {skipped_match_type}")
 
     return exercises
 
@@ -498,6 +516,12 @@ def main():
         help="Only generate for exercises requested at least N times (default: 1)",
     )
     parser.add_argument(
+        "--match-type",
+        choices=["none", "prefix", "suffix", "pluralToggle", "synonymExpansion"],
+        default=None,
+        help="Only process exercises with this matchType (e.g., 'none' for truly missing, 'prefix' for fuzzy prefix matches)",
+    )
+    parser.add_argument(
         "--skip-upload",
         action="store_true",
         help="Skip uploading to Firebase Storage",
@@ -540,7 +564,8 @@ def main():
     # Step 3: Fetch missing exercises
     print("\n[3/6] Fetching missing exercises from Firestore...")
     missing = fetch_missing_exercises(
-        db, min_count=args.min_count, existing_mapping=mapping
+        db, min_count=args.min_count, existing_mapping=mapping,
+        match_type_filter=args.match_type,
     )
 
     if not missing:
@@ -549,7 +574,11 @@ def main():
 
     print(f"\nExercises to generate:")
     for ex in missing:
-        print(f"  - {ex['name']} ({ex['normalized_filename']}) -- {ex.get('count', 'N/A')}x requests")
+        match_info = f" [matchType={ex.get('match_type', 'none')}"
+        if ex.get("matched_to"):
+            match_info += f", matchedTo={ex['matched_to']}"
+        match_info += "]"
+        print(f"  - {ex['name']} ({ex['normalized_filename']}) -- {ex.get('count', 'N/A')}x requests{match_info}")
 
     # Step 4: Generate images
     print(f"\n[4/6] Generating images via FLUX Kontext Pro...")

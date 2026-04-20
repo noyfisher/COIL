@@ -1,0 +1,3305 @@
+{
+  "total_pairs": 74,
+  "passed": 25,
+  "failed": 49,
+  "average_consistency_score": 4.04,
+  "check_averages": {
+    "camera_angle": 4.3,
+    "character_identity": 4.73,
+    "clothing": 4.76,
+    "art_style": 4.68,
+    "scene_setup": 3.72,
+    "body_anchoring": 3.35,
+    "movement_logic": 2.74
+  },
+  "check_failures": {
+    "movement_logic": 40,
+    "body_anchoring": 31,
+    "scene_setup": 23,
+    "camera_angle": 14,
+    "art_style": 6,
+    "character_identity": 4,
+    "clothing": 4
+  },
+  "results": {
+    "band-external-rotation": {
+      "exercise_name": "Band External Rotation",
+      "filename": "band-external-rotation",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are identical between the two images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including facial features, hair, and body proportions, is consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing, including shirt, shorts, socks, and shoes, is identical.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, line work, shading, and color palette are perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The resistance band, a critical prop for the exercise name, is present in the start image but completely missing in the end image.",
+        "score": 1,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "The lower body and torso remain anchored. However, the left arm, which should be a non-moving part, changes its position from resting on the thigh to being held in front of the body.",
+        "score": 2,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The end position shows the right arm in an internally rotated position, potentially an internal rotation stretch, and the band is missing. This does not represent a natural continuation of 'Band External Rotation' where the band provides resistance for external rotation.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 3.43,
+      "overall_pass": false,
+      "critical_failures": [
+        "SCENE_SETUP",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "band-internal-rotation": {
+      "exercise_name": "Band Internal Rotation",
+      "filename": "band-internal-rotation",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the two images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including facial features, hair, skin tone, and body proportions, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The clothing (shirt, shorts, shoes, socks) is perfectly consistent in style and color.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, line work, shading, and color palette are perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The resistance band's attachment point and direction of pull are completely different between the start (held by hand, pulling down) and end (attached to upper arm, pulling horizontally). This makes the scene setup inconsistent for the depicted exercise.",
+        "score": 1,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "Non-moving body parts (torso, head, left arm, legs) are largely consistent, though there's a slight shift in the right hand's position relative to the knee.",
+        "score": 4,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The transition is confusing because the resistance band's attachment and direction of pull change completely, making the start position illogical for performing the internal rotation shown in the end position.",
+        "score": 2,
+        "passed": false
+      },
+      "overall_consistency_score": 3.86,
+      "overall_pass": false,
+      "critical_failures": [
+        "SCENE_SETUP",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "band-lat-pulldown": {
+      "exercise_name": "Band Lat Pulldown",
+      "filename": "band-lat-pulldown",
+      "camera_angle": {
+        "observation": "The camera angle is significantly different; the start image is more frontal and slightly higher, while the end image is more from the side and lower. The framing is also inconsistent.",
+        "score": 2,
+        "passed": false
+      },
+      "character_identity": {
+        "observation": "The character's face, hair, and overall body build appear different between the two images. They do not look like the same person.",
+        "score": 2,
+        "passed": false
+      },
+      "clothing": {
+        "observation": "The clothing (t-shirt, shorts, shoes, socks) is identical in style and color in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line work, shading, and color palette, is consistent between the two images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The resistance band setup is completely different; in the start image, it's looped over a bar attached to the bench, while in the end image, it's anchored under the feet. A shadow is also present in the end image but not the start.",
+        "score": 1,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "The body's position relative to the bench and the band's anchor point changes significantly. The torso angle and the way the band interacts with the feet are different.",
+        "score": 2,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The start and end positions represent two different setups and potentially different exercises. The initial band setup over a bar is inconsistent with the end position where the band is under the feet, making the movement illogical.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 2.57,
+      "overall_pass": false,
+      "critical_failures": [
+        "CAMERA_ANGLE",
+        "CHARACTER_IDENTITY",
+        "SCENE_SETUP",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "band-resisted-shoulder-abduction": {
+      "exercise_name": "Band Resisted Shoulder Abduction",
+      "filename": "band-resisted-shoulder-abduction",
+      "camera_angle": {
+        "observation": "Camera angle, distance, and framing are perfectly consistent between the two images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, and body proportions, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "Clothing, including color and style, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, rendering, and color palette are perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The scene setup, including the white background and the resistance band, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The unmoving parts of the body (torso, head, lower body) are perfectly anchored, with only the arms performing the intended movement.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The movement from start to end clearly and logically depicts a band resisted shoulder abduction.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "band-reverse-fly": {
+      "exercise_name": "Band Reverse Fly",
+      "filename": "band-reverse-fly",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's physical appearance, including face, hair, and body proportions, is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's outfit, including the grey t-shirt, dark shorts, and shoes, is perfectly consistent in color and style across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, line weight, shading, and color palette are consistent, maintaining the same art style for both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The background is plain white in both images. The resistance band is present and correctly positioned under the feet for both the start and end positions.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The lower body, including the feet and legs, remains anchored in place. The head position is also consistent. Only the arms and shoulders move as intended for the exercise.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The transition from holding the band by the sides to extending the arms outwards, stretching the band, accurately depicts the 'Band Reverse Fly' movement.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "banded-external-rotation-90-90": {
+      "exercise_name": "Banded External Rotation 90 90",
+      "filename": "banded-external-rotation-90-90",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, and body proportions, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's outfit, including shirt, shorts, shoes, and socks, is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, encompassing line work, shading, detail level, and color palette, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background and the resistance band are consistently depicted in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The character's head, torso, hips, legs, and the supporting left arm remain perfectly anchored. Only the right forearm rotates as intended.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The transition from the start (forearm pointing forward) to the end (forearm rotated upwards) clearly and logically demonstrates the external rotation of the arm, consistent with the exercise.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "calf-stretch": {
+      "exercise_name": "Calf Stretch",
+      "filename": "calf-stretch",
+      "camera_angle": {
+        "observation": "The camera angle completely changed from a rear view in the start image to a front view in the end image.",
+        "score": 1,
+        "passed": false
+      },
+      "character_identity": {
+        "observation": "The character appears to be the same person with consistent hair, skin tone, and general build, despite the change in camera angle.",
+        "score": 4,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing (light gray t-shirt, dark shorts, white socks, gray sneakers) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, line weight, shading, and color palette are perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The background featuring a white wall with subtle texture and a clear floor line is consistent in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The body anchoring is completely different. The character's orientation, interaction with the wall, and overall posture have changed significantly. The entire body position is different, not just the moving parts for the exercise.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The transition from the start (rear-facing, leaning against wall, crossed legs) to the end (front-facing, standing upright, one leg slightly lifted) does not logically represent a calf stretch. It's unclear what movement is intended or how the end position is achieved from the start for this exercise.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 3.14,
+      "overall_pass": false,
+      "critical_failures": [
+        "CAMERA_ANGLE",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "calf-stretches": {
+      "exercise_name": "Calf Stretches",
+      "filename": "calf-stretches",
+      "camera_angle": {
+        "observation": "The camera angle is completely different. The start image is a rear view, while the end image is a front view.",
+        "score": 1,
+        "passed": false
+      },
+      "character_identity": {
+        "observation": "The character's identity, including body proportions, hair, and skin tone, is consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The clothing (gray t-shirt, dark shorts, gray/white shoes, white socks) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line weight, shading, and color palette, is perfectly consistent between the two images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The background wall and floor line are consistent, but the character's orientation to the wall changes significantly between frames.",
+        "score": 3,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The entire body's anchoring and orientation are completely different. The start image shows the character facing a wall with hands on it, while the end image shows the character facing the camera, not actively leaning on the wall.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The movement logic is unclear. The transition from a rear-facing wall stretch to a front-facing standing stretch does not represent a single, coherent exercise movement between start and end positions.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 3.0,
+      "overall_pass": false,
+      "critical_failures": [
+        "CAMERA_ANGLE",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "chest-doorway-stretch": {
+      "exercise_name": "Chest Doorway Stretch",
+      "filename": "chest-doorway-stretch",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing (shirt, shorts, shoes, socks) is identical in color and style in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line weight, shading, level of detail, and color palette, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The background scene setup, specifically the doorway frame, is identical and consistently positioned in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The character's feet and lower body maintain the exact same anchored position relative to the doorway. Only the arms and upper torso adjust for the movement.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The end position (arms crossed over chest) does not clearly illustrate the end or peak of a 'Chest Doorway Stretch' when compared to the start position (one arm pressing against the frame). It appears to be a relaxed or released position rather than the actual stretch, which can be confusing for understanding the exercise's movement.",
+        "score": 2,
+        "passed": false
+      },
+      "overall_consistency_score": 4.57,
+      "overall_pass": false,
+      "critical_failures": [
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "doorway-chest-stretch": {
+      "exercise_name": "Doorway Chest Stretch",
+      "filename": "doorway-chest-stretch",
+      "camera_angle": {
+        "observation": "The camera angle and distance are different. The start image is angled and closer, while the end image is head-on and zoomed out, showing more of the environment.",
+        "score": 2,
+        "passed": false
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, and build, is consistent between the two images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing (grey t-shirt, dark shorts, grey/white shoes, white socks) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, line work, shading, and color palette are consistent across both illustrations.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The doorway background elements are consistent, though their perceived position shifts due to the change in camera angle.",
+        "score": 4,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The character's overall body position, including foot placement and torso orientation relative to the doorway and ground, is significantly different between the start (lunge stance) and end (upright stance) images.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The transition from the start (lunging, hands forward) to the end (upright, hands higher) does not logically represent a continuous or typical 'Doorway Chest Stretch' movement. The poses appear to be for different phases or variations of a stretch, rather than a clear progression for the same exercise.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 3.29,
+      "overall_pass": false,
+      "critical_failures": [
+        "CAMERA_ANGLE",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "dumbbell-external-rotation-90-90": {
+      "exercise_name": "Dumbbell External Rotation 90 90",
+      "filename": "dumbbell-external-rotation-90-90",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are identical between the two images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing (t-shirt, shorts, socks, shoes) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, line work, shading, and color palette are perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background and the dumbbell are consistent in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "All non-moving body parts (torso, head, left arm, legs) and the right upper arm are anchored in the same position.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The 'start' and 'end' images are identical, showing no movement. For a dumbbell external rotation, the forearm should rotate externally (backwards) to a different position, but both images show the forearm in the same vertical position. This fails to illustrate the exercise movement.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 4.43,
+      "overall_pass": false,
+      "critical_failures": [
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "dumbbell-farmer-carry": {
+      "exercise_name": "Dumbbell Farmer Carry",
+      "filename": "dumbbell-farmer-carry",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's outfit (gray t-shirt, dark shorts, gray/white sneakers, white socks) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line work, shading, and color palette, is perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background and the presence of dumbbells are consistent, indicating an identical scene setup.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The upper body and arms are anchored consistently, with only the legs showing the intended movement of taking a step.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The transition from standing to taking a step forward clearly illustrates the 'carry' motion of the Dumbbell Farmer Carry.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "dumbbell-step-ups": {
+      "exercise_name": "Dumbbell Step Ups",
+      "filename": "dumbbell-step-ups",
+      "camera_angle": {
+        "observation": "The camera angle and distance are significantly different. The start image has the character further away with more space around them, while the end image is more zoomed in and closer to the character.",
+        "score": 2,
+        "passed": false
+      },
+      "character_identity": {
+        "observation": "The start image features an illustrated character, while the end image features a real person. They are completely different individuals with different physical attributes.",
+        "score": 1,
+        "passed": false
+      },
+      "clothing": {
+        "observation": "The type and color of clothing (light grey t-shirt, dark shorts, grey/white sneakers) are generally consistent, though the specific styles and brands differ due to the change in character and art style.",
+        "score": 4,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The start image is an illustration, while the end image is a photograph. This represents a complete inconsistency in art style.",
+        "score": 1,
+        "passed": false
+      },
+      "scene_setup": {
+        "observation": "Both images have a white background and a black exercise bench. However, the bench's position relative to the character and the camera is different. In the start image, the bench is to the side, while in the end image, it's directly under the character's stepping leg.",
+        "score": 2,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "Due to the fundamental difference in character identity and art style, the body anchoring cannot be consistently maintained. The proportions and exact posture of the non-moving parts differ significantly.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The movement from standing next to the bench to having one foot on the bench with the knee raised clearly and logically depicts the action of a dumbbell step-up.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 2.29,
+      "overall_pass": false,
+      "critical_failures": [
+        "CAMERA_ANGLE",
+        "CHARACTER_IDENTITY",
+        "ART_STYLE",
+        "SCENE_SETUP",
+        "BODY_ANCHORING"
+      ]
+    },
+    "eccentric-biceps-curl-band": {
+      "exercise_name": "Eccentric Biceps Curl Band",
+      "filename": "eccentric-biceps-curl-band",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between both images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's facial features, hair style, skin tone, and body proportions are identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's outfit, including the t-shirt, shorts, socks, and shoes, is identical in color and style in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, line weight, shading, and color palette are consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background and the resistance band's setup under the character's feet are consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The character's lower body (legs, feet, and stance) and torso remain in the same anchored position. Only the arms and the resistance band's extension have changed, which is consistent with the exercise.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The transition from the start position (arms bent, band extended) to the end position (arms lowered, band contracted) clearly demonstrates the eccentric phase of a biceps curl, making the movement logical and easy to understand.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "eccentric-hamstring-curls": {
+      "exercise_name": "Eccentric Hamstring Curls",
+      "filename": "eccentric-hamstring-curls",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are identical between both images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's face, hair, and overall body proportions are consistent, with minor variations in shading.",
+        "score": 4,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's outfit, including shirt, shorts, and shoes, is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line work, shading, and detail level, is consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background is consistent, and no props are present or change.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The torso, head, and arms, which should remain anchored, are in consistent positions in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "Both images show the character in an identical static position with legs extended, indicating no movement has occurred. This does not effectively illustrate the dynamic nature of 'Eccentric Hamstring Curls'.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 4.29,
+      "overall_pass": false,
+      "critical_failures": [
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "glute-kickbacks-dumbbell": {
+      "exercise_name": "Glute Kickbacks Dumbbell",
+      "filename": "glute-kickbacks-dumbbell",
+      "camera_angle": {
+        "observation": "Camera angle, distance, and framing are consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, and body proportions, is consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing (t-shirt, shorts, shoes, socks) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, line work, shading, and color palette are perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background and the dumbbell are consistent in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The hand position and which hand holds the dumbbell are inconsistent. In the start, the left hand holds the dumbbell and the right hand is on the ground. In the end, the right hand holds the dumbbell and both hands are on the ground. This is a major inconsistency.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The change in which hand holds the dumbbell and the position of the hands on the ground makes the exercise movement illogical. The dumbbell is meant to be held by the working leg, or an assisting hand, not swapped and anchored as shown.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 3.86,
+      "overall_pass": false,
+      "critical_failures": [
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "glute-squeezes": {
+      "exercise_name": "Glute Squeezes",
+      "filename": "glute-squeezes",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing (shirt, shorts, shoes, socks) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, line work, shading, and color palette are perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The scene setup, including the plain white background and shadows, is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "All body parts that should remain static (torso, head, arms, legs, and feet placement) are in the exact same position in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "Both the start and end images are identical, showing no discernible visual change. This makes it impossible to understand the 'squeeze' or the intended movement for the exercise from the visual pair alone.",
+        "score": 2,
+        "passed": false
+      },
+      "overall_consistency_score": 4.57,
+      "overall_pass": false,
+      "critical_failures": [
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "half-kneeling-single-arm-dumbbell-press": {
+      "exercise_name": "Half Kneeling Single Arm Dumbbell Press",
+      "filename": "half-kneeling-single-arm-dumbbell-press",
+      "camera_angle": {
+        "observation": "Camera angle, distance, and framing are identical between the start and end positions.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, and body proportions, is perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The clothing (shirt, shorts, socks, and shoes) is identical in color and style in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line work, shading, and color palette, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background and the appearance of the dumbbell are consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "All non-moving body parts, including the left knee on the ground, the right foot placement, the left arm, torso, and head position, remain perfectly anchored.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The movement from the dumbbell at shoulder height to a fully extended overhead press logically and clearly depicts the exercise.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "hamstring-sets": {
+      "exercise_name": "Hamstring Sets",
+      "filename": "hamstring-sets",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's outfit (shirt, shorts, shoes, socks) is identical in both images, with consistent colors and style.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line work, shading, and color palette, is completely consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The scene setup is consistent, with a plain white background and no props in either image.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The character's head, torso, and arms remain anchored in the same position, while only the legs move as intended for the exercise.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The transition from extended legs to bent knees is logical and clearly demonstrates the intended movement for 'Hamstring Sets'.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "hamstring-stretch-with-band": {
+      "exercise_name": "Hamstring Stretch With Band",
+      "filename": "hamstring-stretch-with-band",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing, including the gray t-shirt, dark blue shorts, white socks, and gray sneakers, is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, line weight, shading, and color palette are perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The scene setup, with a plain white background and the resistance band, is consistent, with the band's position changing only due to the exercise movement.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The non-moving parts of the body, specifically the torso and the left leg, remain in a consistent anchored position. The right leg and arms move as part of the exercise.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The transition from the bent right knee with the band to the straightened and lifted right leg demonstrates a clear and logical hamstring stretch movement.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "hamstring-stretches": {
+      "exercise_name": "Hamstring Stretches",
+      "filename": "hamstring-stretches",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The same individual is clearly depicted in both images, with no changes in appearance or identity.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The clothing (grey t-shirt, navy shorts, grey shoes, white socks) is identical in both the start and end positions.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, rendering quality, lighting, and level of detail are consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background is identical in both images. No props are present or change.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The torso, head, and the non-moving right leg remain perfectly anchored. Only the left leg and arms move to perform the stretch.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The movement from an extended leg to a bent leg pulled towards the chest clearly illustrates the hamstring stretch, making logical sense.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "hip-abduction-with-band": {
+      "exercise_name": "Hip Abduction With Band",
+      "filename": "hip-abduction-with-band",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, remains consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing (shirt, shorts, shoes) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line work, shading, and color palette, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The resistance band used is completely different in the end image compared to the start image. The start image shows a loop band around the thighs, while the end image shows a long resistance band with handles, held by hand and hooked to the foot.",
+        "score": 1,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "The non-moving parts of the body, such as the torso, head, and supporting leg, are correctly anchored and remain in the same position.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The movement logic is severely flawed because the resistance band changes completely between the start and end positions. If starting with a thigh loop band, the end position with a hand-held foot band does not make logical sense for a single continuous exercise.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 3.86,
+      "overall_pass": false,
+      "critical_failures": [
+        "SCENE_SETUP",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "isometric-shoulder-activation": {
+      "exercise_name": "Isometric Shoulder Activation",
+      "filename": "isometric-shoulder-activation",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The clothing (gray t-shirt, dark shorts, white socks, gray shoes) is identical in color and style in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, including line weight, shading, detail, and color palette, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The background is plain white in both images, indicating a consistent scene setup.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The character's head, torso, legs, and non-moving arm are anchored in the exact same position. Only the right arm is moving.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The movement from the arm bent at the elbow to extending straight forward clearly depicts an isometric shoulder activation. The transition is logical.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "it-band-foam-roll-stretch": {
+      "exercise_name": "It Band Foam Roll Stretch",
+      "filename": "it-band-foam-roll-stretch",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are identical between the start and end positions.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including facial features, hair, and body build, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The clothing, including color and style, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line weight, shading, and color palette, is consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The foam roller changes color from dark grey to purple. Otherwise, the scene setup is consistent.",
+        "score": 3,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The body anchoring is completely different; the character shifts from a seated upright position rolling the right leg to a side-lying position rolling the left side, changing all support points.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The start image shows rolling the right IT band, while the end image shows rolling the left IT band/hip. This is not a continuous movement or progression of the same side of the body.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 3.57,
+      "overall_pass": false,
+      "critical_failures": [
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "lateral-lunge-dumbbell": {
+      "exercise_name": "Lateral Lunge Dumbbell",
+      "filename": "lateral-lunge-dumbbell",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "While the intended character is consistent, the first image is an illustration and the second is a photograph, leading to inherent differences in realistic detail vs. stylized rendering.",
+        "score": 3,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The general style and color of the clothing are similar, but the start image shows Adidas shoes and a plain t-shirt, while the end image shows New Balance shoes and a Nike-branded t-shirt. This is a significant inconsistency.",
+        "score": 2,
+        "passed": false
+      },
+      "art_style": {
+        "observation": "The start image is a stylized illustration, and the end image is a photorealistic depiction. This is a complete mismatch in art style.",
+        "score": 1,
+        "passed": false
+      },
+      "scene_setup": {
+        "observation": "Both images feature a consistent plain white background, and the dumbbell is present in both frames.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The exercise is named 'Lateral Lunge Dumbbell', implying movement of the legs for the lunge. However, the legs are anchored in an almost identical, static forward lunge position in both images. Only the arm holding the dumbbell moves. This incorrectly anchors the primary moving parts of the stated exercise.",
+        "score": 2,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The images depict a static forward lunge stance with a dumbbell curl/extension movement, not a 'Lateral Lunge Dumbbell' as indicated by the exercise name. This is completely illogical and confusing for the specified exercise.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 2.71,
+      "overall_pass": false,
+      "critical_failures": [
+        "CLOTHING",
+        "ART_STYLE",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "patellar-tendon-stretches": {
+      "exercise_name": "Patellar Tendon Stretches",
+      "filename": "patellar-tendon-stretches",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are nearly identical, maintaining a consistent perspective.",
+        "score": 4,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's physical attributes, including face, hair, skin tone, and body proportions, are perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's attire (grey t-shirt, dark shorts, white socks, grey sneakers) is consistent in style and color, though the 'Adidas' logo appears on the t-shirt in the end image but not in the start.",
+        "score": 3,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, line work, shading, and color palette are perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The white background and the dark grey exercise mat remain consistent in appearance and placement.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The anchoring of the lower body (kneeling right knee, left foot flat) and the upright torso posture are consistently maintained. The primary change is the positioning of the hands.",
+        "score": 4,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The transition shows the character bringing hands from hovering to resting on the front knee. While this is a plausible part of preparing for or performing a stretch, the core 'stretching' movement for patellar tendons (e.g., leaning forward) is not explicitly conveyed as the primary difference between the two frames, making the full movement logic slightly less obvious.",
+        "score": 3,
+        "passed": true
+      },
+      "overall_consistency_score": 4.14,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "pendulum-circles": {
+      "exercise_name": "Pendulum Circles",
+      "filename": "pendulum-circles",
+      "camera_angle": {
+        "observation": "The camera angle is inconsistent; the start image is captured from a slightly higher, more angled perspective, while the end image is more directly from the side and at eye-level.",
+        "score": 2,
+        "passed": false
+      },
+      "character_identity": {
+        "observation": "The character's identity, including facial features, hair, and body proportions, is consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The clothing is mostly consistent, but the grey t-shirt in the end image has a different texture and a visible logo that is absent in the start image.",
+        "score": 3,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line weight, shading, and overall rendering, is consistent between the two illustrations.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The scene setup is consistent, with both images featuring a plain white background.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The body anchoring is critically inconsistent. The torso and head significantly change position from a bent-over stance in the start image to an upright stance in the end image. This is a fundamental change in the non-moving parts of the body.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The movement logic is severely flawed. The dramatic change in body posture from bent-over to upright makes it difficult to understand this as a single 'Pendulum Circles' exercise. It appears to depict two entirely different exercises or stages, rather than a continuous movement.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 3.14,
+      "overall_pass": false,
+      "critical_failures": [
+        "CAMERA_ANGLE",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "pigeon-pose-stretch": {
+      "exercise_name": "Pigeon Pose Stretch",
+      "filename": "pigeon-pose-stretch",
+      "camera_angle": {
+        "observation": "The camera angle is noticeably different. The start image is from a slightly higher, more direct frontal shot, while the end image is from a lower angle looking down at the character who is also leaning forward.",
+        "score": 2,
+        "passed": false
+      },
+      "character_identity": {
+        "observation": "The start image features an illustrated character, while the end image features a photograph of a real person. They are completely different individuals.",
+        "score": 1,
+        "passed": false
+      },
+      "clothing": {
+        "observation": "While similar in color palette (grey shirt, dark shorts), the specific clothing items (different shirt texture/fit, different shoe brand/style) are inconsistent, reflecting the different characters and rendering styles.",
+        "score": 2,
+        "passed": false
+      },
+      "art_style": {
+        "observation": "The start image is a vector illustration with clean lines and flat shading, whereas the end image is a photorealistic capture. The art styles are completely disparate.",
+        "score": 1,
+        "passed": false
+      },
+      "scene_setup": {
+        "observation": "Both images feature a plain white background, but the end image has subtle studio lighting and floor reflections/shadows indicative of a photograph, unlike the clean, flat white of the illustration.",
+        "score": 3,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The body anchoring is inconsistent due to the different camera angles and the entirely different characters. The relative positions and proportions of the 'anchored' body parts (e.g., the forward knee and hip placement) appear different between the two images.",
+        "score": 2,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The movement from an upright pigeon pose to leaning forward into the stretch is a logical progression for the exercise, clearly demonstrating the intended range of motion.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 2.29,
+      "overall_pass": false,
+      "critical_failures": [
+        "CAMERA_ANGLE",
+        "CHARACTER_IDENTITY",
+        "CLOTHING",
+        "ART_STYLE",
+        "BODY_ANCHORING"
+      ]
+    },
+    "posterior-shoulder-stretch-band": {
+      "exercise_name": "Posterior Shoulder Stretch Band",
+      "filename": "posterior-shoulder-stretch-band",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The clothing is almost identical, but a 'Nike' logo appeared on the character's shorts in the end image which was not present in the start image. This is a subtle difference.",
+        "score": 4,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line work, shading, detail, and color palette, is perfectly consistent between both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The background and the resistance band prop are consistent and unchanged between the two images.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "All body parts, including those that would typically remain static during an exercise, are in precisely the same position in both images. There is no depicted movement.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The start and end images are identical, depicting no movement whatsoever. It is impossible to understand the exercise or the movement to be performed from this pair of images.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 4.29,
+      "overall_pass": false,
+      "critical_failures": [
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "posterior-shoulder-stretch": {
+      "exercise_name": "Posterior Shoulder Stretch",
+      "filename": "posterior-shoulder-stretch",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are identical between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including facial features, hair, skin tone, and body proportions, is perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing, including the grey t-shirt, dark shorts, socks, and shoes, is identical in color and style in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, line work, shading, and overall rendering are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background remains unchanged, and no props appear or disappear between the images.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The character's lower body, torso, and head remain anchored in the same position; only the arms move to perform the stretch.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The transition from the start to the end position clearly and logically demonstrates the posterior shoulder stretch, with the hand gripping the shoulder to deepen the stretch.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "prone-horizontal-abduction": {
+      "exercise_name": "Prone Horizontal Abduction",
+      "filename": "prone-horizontal-abduction",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are significantly different. The start image shows an elevated view focusing on the character on a bench, while the end image is a ground-level view of the character lying on the floor, which looks like different setups.",
+        "score": 1,
+        "passed": false
+      },
+      "character_identity": {
+        "observation": "The character is consistently depicted as the same person in terms of face, hair, and body build.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing, including shirt, shorts, socks, and shoes, is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic style, line work, shading, and overall rendering are consistent between the two images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The scene setup is completely different. The start image features a weight bench and dumbbells, while the end image shows the character on the floor with a medicine ball. This is a major inconsistency.",
+        "score": 1,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "The body anchoring is inconsistent. In the start, the character's torso is supported by a bench. In the end, the entire body is supported by the floor. This represents a fundamental change in the exercise setup and base position.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The transition does not make logical sense as a single exercise movement. It appears to be two different exercises or setups (prone on a bench with dumbbells vs. prone on the floor with a medicine ball) rather than a continuous movement from start to end for 'Prone Horizontal Abduction'.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 2.71,
+      "overall_pass": false,
+      "critical_failures": [
+        "CAMERA_ANGLE",
+        "SCENE_SETUP",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "prone-shoulder-abduction-dumbbell": {
+      "exercise_name": "Prone Shoulder Abduction Dumbbell",
+      "filename": "prone-shoulder-abduction-dumbbell",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character is consistently the same person with identical physical features, hair, and skin tone.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing, including shirt, shorts, socks, and shoes, is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line work, shading, and overall rendering, is perfectly consistent across both illustrations.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background is consistent, and the dumbbell is the only prop, moving appropriately with the exercise.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The body anchoring is inconsistent. The start image shows the character supported on forearms and knees, with the body off the ground. The end image shows the character lying flat on the ground with their chest and left forearm resting. This fundamental change in body support between frames indicates a significant break in continuity.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The movement logic is confusing because the entire body's relationship to the ground changes drastically. Transitioning from an elbow plank-like position to lying completely flat on the ground while abducting the shoulder does not represent a single, continuous exercise movement for 'Prone Shoulder Abduction'.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 3.86,
+      "overall_pass": false,
+      "critical_failures": [
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "prone-shoulder-extension-band": {
+      "exercise_name": "Prone Shoulder Extension Band",
+      "filename": "prone-shoulder-extension-band",
+      "camera_angle": {
+        "observation": "The general side view is maintained, but the character is on a bench in the start image and on the floor in the end image, leading to a different relative camera height and framing.",
+        "score": 2,
+        "passed": false
+      },
+      "character_identity": {
+        "observation": "The character appears to be the same person in both images, with consistent facial features, hair, and body proportions.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's outfit (grey t-shirt, dark shorts, grey and white athletic shoes, white socks) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, including line work, shading, and color palette, is consistent between the two illustrations.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The start image features the character on a wooden bench with a resistance band, both of which are completely absent in the end image where the character is on the floor.",
+        "score": 1,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "The body's anchoring is entirely different due to the change from a bench to the floor. The legs and torso position relative to the ground/support are not consistent.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The start position shows an exercise involving a resistance band on a bench. The end position shows a different exercise performed on the floor without a band. The transition does not logically follow for the same exercise.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 2.86,
+      "overall_pass": false,
+      "critical_failures": [
+        "CAMERA_ANGLE",
+        "SCENE_SETUP",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "prone-shoulder-external-rotation": {
+      "exercise_name": "Prone Shoulder External Rotation",
+      "filename": "prone-shoulder-external-rotation",
+      "camera_angle": {
+        "observation": "The camera angle and distance are completely different. The start image is a closer view of the subject on a bench, while the end image is a wider shot of the subject on the floor, from a slightly different perspective.",
+        "score": 1,
+        "passed": false
+      },
+      "character_identity": {
+        "observation": "The character appears to be a different person. Facial features, build, and muscle definition are inconsistent between the two images.",
+        "score": 1,
+        "passed": false
+      },
+      "clothing": {
+        "observation": "The clothing, while similar in color (grey shirt, dark blue shorts), has different designs, fit, and material texture. The shoes are also different in design.",
+        "score": 2,
+        "passed": false
+      },
+      "art_style": {
+        "observation": "The art styles are distinct. The start image uses a more illustrative, stylized approach with clearer line art, while the end image is more realistically rendered, almost photographic, with smoother shading and less defined lines.",
+        "score": 1,
+        "passed": false
+      },
+      "scene_setup": {
+        "observation": "The scene setup is entirely different. The start image shows the character on a weight bench, which is completely absent in the end image where the character is on the floor.",
+        "score": 1,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "The entire body anchoring position is different. In the start image, the character is lying prone on a bench. In the end image, the character is lying prone on the floor. This is a fundamental change to the base position.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "While both images show a prone position with a dumbbell for shoulder external rotation, the drastic change in scene setup (bench vs. floor) and body anchoring breaks the logical continuity of the movement for a single exercise. It's not a direct, smooth transition.",
+        "score": 2,
+        "passed": false
+      },
+      "overall_consistency_score": 1.29,
+      "overall_pass": false,
+      "critical_failures": [
+        "CAMERA_ANGLE",
+        "CHARACTER_IDENTITY",
+        "CLOTHING",
+        "ART_STYLE",
+        "SCENE_SETUP",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "prone-shoulder-iyt": {
+      "exercise_name": "Prone Shoulder Iyt",
+      "filename": "prone-shoulder-iyt",
+      "camera_angle": {
+        "observation": "Perfect match in camera angle, distance, and framing.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The clothing is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "Art style, rendering, and level of detail are perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background is consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The torso, hips, and legs are perfectly anchored; only the arms move as intended for the exercise.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The transition clearly demonstrates the movement from forearms on the ground to arms extended overhead in a 'Y' shape, which is logical for the Prone Shoulder Iyt.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "prone-shoulder-squeeze-on-pillow": {
+      "exercise_name": "Prone Shoulder Squeeze On Pillow",
+      "filename": "prone-shoulder-squeeze-on-pillow",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The clothing (t-shirt, shorts, socks, and shoes) is identical in style and color in both the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line work, shading, and color palette, is perfectly consistent between both illustrations.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The background is consistently a plain white. The pillow used as a prop is identical in both images and positioned correctly.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The parts of the body not involved in the movement, such as the legs, lower torso, and head on the pillow, remain consistently anchored. The change in the upper back and arms reflects the intended exercise.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The movement from the start (arms resting on the floor) to the end (forearms lifted, hands closer, indicating a shoulder squeeze) is logical and clearly demonstrates the exercise progression.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "prone-shoulder-stability-ball-y-raises": {
+      "exercise_name": "Prone Shoulder Stability Ball Y Raises",
+      "filename": "prone-shoulder-stability-ball-y-raises",
+      "camera_angle": {
+        "observation": "The camera angle is similar in terms of side view, but the perspective and framing are significantly different due to the character being on a stability ball in the start image and lying on the floor in the end image.",
+        "score": 2,
+        "passed": false
+      },
+      "character_identity": {
+        "observation": "The character's identity (face, hair, body proportions) remains consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The outfit (shirt, shorts, shoes) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line work, shading, and color palette, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The stability ball, which is central to the exercise name and setup, is present in the start position but completely absent in the end position. The character is on the floor in the end position.",
+        "score": 1,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "The body's anchoring is completely different; the character is supported by a stability ball in the start image and lying flat on the floor in the end image.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The movement logic is severely flawed because the character transitions from being on a stability ball to lying on the floor. The exercise name implies the ball should be used throughout. Additionally, the dumbbell in the left hand (from the viewer's perspective) is obscured/missing in the end image, and the head position changes.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 2.86,
+      "overall_pass": false,
+      "critical_failures": [
+        "CAMERA_ANGLE",
+        "SCENE_SETUP",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "quad-stretches": {
+      "exercise_name": "Quad Stretches",
+      "filename": "quad-stretches",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are identical between the two images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's face, hair, skin tone, and body proportions are perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's t-shirt, shorts, socks, and shoes are identical in style and color in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, line weight, shading, and level of detail are perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background is consistent across both images, with no additional props or scene elements.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "All parts of the body not involved in the stretch (torso, head, left arm, left leg) remain in the same position relative to the camera. Only the right arm and leg show movement for the stretch.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The end position clearly demonstrates the completion of a quad stretch, which is a logical progression from the start position. The movement is easily understood.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "quadriceps-stretch-with-band": {
+      "exercise_name": "Quadriceps Stretch With Band",
+      "filename": "quadriceps-stretch-with-band",
+      "camera_angle": {
+        "observation": "Camera angle, distance, and framing are perfectly consistent between the two images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including facial features, hair, and body proportions, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing is perfectly consistent in style and color.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, rendering, and color palette are perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background and the resistance bands are consistent in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The upper body and head remain anchored consistently. The legs widen and arm position changes, which represents the movement.",
+        "score": 4,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The depicted movement (widening stance and lowering hands) is entirely inconsistent with a \"Quadriceps Stretch With Band\". This is a different exercise setup.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 4.29,
+      "overall_pass": false,
+      "critical_failures": [
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "quadruped-shoulder-stability-hold": {
+      "exercise_name": "Quadruped Shoulder Stability Hold",
+      "filename": "quadruped-shoulder-stability-hold",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The same character is depicted in both images, with consistent features, hair, and physique.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's outfit (grey t-shirt, navy shorts, grey shoes, white socks) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, lighting, and level of detail are perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white studio background is consistent, with no changes or additional props.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The anchoring points have changed significantly. In the start, the character is on all fours. In the end, the right arm is extended and the left knee is lifted, changing the base of support from four points to two (left hand, right knee). This violates the principle that non-moving body parts should remain identical, as the core quadruped stance is not maintained.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The movement from a quadruped position to an opposite arm and leg extension (like a Bird Dog) is a clear and logical exercise progression. However, given the exercise name 'Quadruped Shoulder Stability Hold', the movement involves more than just shoulder stability in a strict quadruped position.",
+        "score": 4,
+        "passed": true
+      },
+      "overall_consistency_score": 4.29,
+      "overall_pass": false,
+      "critical_failures": [
+        "BODY_ANCHORING"
+      ]
+    },
+    "quadruped-shoulder-stability": {
+      "exercise_name": "Quadruped Shoulder Stability",
+      "filename": "quadruped-shoulder-stability",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character appears to be the same individual in both images. Minor differences in rendering are present due to the distinct art styles.",
+        "score": 4,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing, including the grey t-shirt, dark blue shorts, white socks, and grey/white sneakers, is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The start image is a photograph, while the end image is an illustration. This is a complete divergence in art style.",
+        "score": 1,
+        "passed": false
+      },
+      "scene_setup": {
+        "observation": "The background remains a consistent plain white studio in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The parts of the body that should remain anchored, such as the hands relative to the ground and the general torso position (aside from the intended backward shift), are consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The movement from the all-fours starting position to the end position (shifting hips back towards the heels) logically represents a step in a quadruped shoulder stability exercise.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 4.29,
+      "overall_pass": false,
+      "critical_failures": [
+        "ART_STYLE"
+      ]
+    },
+    "resistance-band-external-rotation": {
+      "exercise_name": "Resistance Band External Rotation",
+      "filename": "resistance-band-external-rotation",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are identical between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's face, hair, skin tone, and body proportions are consistent, indicating the same person in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's shirt, shorts, socks, and shoes are identical in style and color in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, including line weight, shading technique, level of detail, and color palette, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "While the background is consistent, the setup of the resistance band on the character's left arm changes significantly. In the start image, the band is anchored around the upper arm/bicep, while in the end image, it's around the forearm/wrist. This alters the exercise setup.",
+        "score": 2,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "The character's left arm, which is the anchoring point for the resistance band, changes position drastically from bent with the band on the bicep to extended with the band on the forearm/wrist. This is a major inconsistency as the anchoring part of the body should remain stable.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The movement of the right arm for external rotation is clear, but the significant change in the left arm's position and the resistance band's anchoring point between frames makes the overall transition illogical for a single, consistent exercise execution. It appears as if the character adjusted their entire left side and band setup, not just performed the rotation.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 3.43,
+      "overall_pass": false,
+      "critical_failures": [
+        "SCENE_SETUP",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "resistance-band-hip-abduction": {
+      "exercise_name": "Resistance Band Hip Abduction",
+      "filename": "resistance-band-hip-abduction",
+      "camera_angle": {
+        "observation": "Camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing (t-shirt, shorts, socks, shoes) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, line weight, shading technique, and color palette are perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The type of resistance band used in the start and end images is completely different. The start image shows a loop band around the thighs, while the end image shows a tube band with handles.",
+        "score": 1,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "The way the character interacts with the resistance band is entirely different due to the change in equipment. In the start, the band is around the thighs with arms relaxed. In the end, the arms are holding a different type of band, implying a different exercise or body interaction.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The end position does not logically follow the start position for a 'Resistance Band Hip Abduction' exercise. The equipment is different, and the implied movement is not a continuation of the initial setup.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 3.29,
+      "overall_pass": false,
+      "critical_failures": [
+        "SCENE_SETUP",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "resistance-band-knee-extensions": {
+      "exercise_name": "Resistance Band Knee Extensions",
+      "filename": "resistance-band-knee-extensions",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing (t-shirt, shorts, shoes, and socks) is identical in style and color in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, line work, shading, and color palette are perfectly consistent, maintaining the same art style in both illustrations.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The chair present in the start image is completely missing in the end image, making the character appear to be floating. The floor/background support is also gone. This is a critical inconsistency.",
+        "score": 1,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "The parts of the body that should remain anchored (torso, non-moving leg) are not consistently supported. The character is sitting on a chair in the start position but is floating in the end position, indicating a complete lack of consistent anchoring.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "While the knee extension movement itself is clear, the complete disappearance of the supporting chair in the end image breaks the exercise context and makes the overall movement illogical, as the character is no longer seated but floating.",
+        "score": 2,
+        "passed": false
+      },
+      "overall_consistency_score": 3.43,
+      "overall_pass": false,
+      "critical_failures": [
+        "SCENE_SETUP",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "resistance-band-lateral-walks": {
+      "exercise_name": "Resistance Band Lateral Walks",
+      "filename": "resistance-band-lateral-walks",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's face, hair, skin tone, and body proportions are identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character is wearing the exact same outfit, including the gray t-shirt, dark shorts, gray shoes, and white socks.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, including line work, shading, detail level, and color palette, is completely consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The start image shows only a loop resistance band around the thighs. The end image introduces an additional piece of equipment: a tube resistance band with handles, which the character is actively holding. This is a major inconsistency in the props and scene setup.",
+        "score": 1,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "The character's upper body and arms are not anchored. In the start image, the arms are relaxed at the sides. In the end image, the arms are bent and holding resistance band handles that were not present in the start image, indicating a significant change in upper body posture and interaction with equipment.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "While the leg movement aligns with a lateral walk, the sudden appearance and active use of a hand-held resistance band in the end image, which was absent in the start, introduces confusion. The exercise depicted in the end image fundamentally differs from the implicit 'Resistance Band Lateral Walks' suggested by the start image and its equipment.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 3.29,
+      "overall_pass": false,
+      "critical_failures": [
+        "SCENE_SETUP",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "scapular-retraction-band": {
+      "exercise_name": "Scapular Retraction Band",
+      "filename": "scapular-retraction-band",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are identical between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The clothing (shirt, shorts, socks, shoes) is identical in both images, maintaining perfect consistency.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, line weight, shading, and level of detail are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The resistance band changes color from black in the start image to blue in the end image. This is a significant inconsistency for the prop.",
+        "score": 2,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "The non-exercised body parts (legs, torso, head) maintain consistent positions. The arms are also anchored in the same position.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "There is no discernible movement or change in the character's body position, particularly the shoulders and arms, between the start and end images. The poses are virtually identical, failing to illustrate the scapular retraction movement.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 4.0,
+      "overall_pass": false,
+      "critical_failures": [
+        "SCENE_SETUP",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "seated-doorway-chest-stretch": {
+      "exercise_name": "Seated Doorway Chest Stretch",
+      "filename": "seated-doorway-chest-stretch",
+      "camera_angle": {
+        "observation": "The camera angle changes significantly from a slight side-angle in the start image to a direct front-facing view in the end image.",
+        "score": 1,
+        "passed": false
+      },
+      "character_identity": {
+        "observation": "The character's identity is consistent across both images, showing the same person.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing (t-shirt, shorts, socks, shoes) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line work, shading, and color palette, is consistent between the two images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "A critical prop, the door frame, is present in the start image but completely missing in the end image.",
+        "score": 1,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "The character's torso and head orientation changes significantly from a side turn in the start image to a direct forward-facing pose in the end image. These parts should ideally remain anchored for consistent movement illustration.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The end position with arms crossed and no door does not logically represent the end of a 'Seated Doorway Chest Stretch' from the given start position. The exercise intent is lost due to the missing prop and changed body position.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 2.71,
+      "overall_pass": false,
+      "critical_failures": [
+        "CAMERA_ANGLE",
+        "SCENE_SETUP",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "seated-marching": {
+      "exercise_name": "Seated Marching",
+      "filename": "seated-marching",
+      "camera_angle": {
+        "observation": "The camera angle and perspective have significantly changed. The start image shows the character sitting on a chair from a higher perspective, while the end image shows the character kneeling on the floor from a much lower perspective.",
+        "score": 1,
+        "passed": false
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, remains consistent between both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing (t-shirt, shorts, socks, and shoes) is identical in style and color across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, including line work, shading, detail level, and color palette, is consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The scene setup is inconsistent; a chair is present in the start image but is completely absent in the end image. The character's position relative to the ground also changes from sitting to kneeling.",
+        "score": 1,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "The entire body anchoring has changed drastically. The character moves from sitting on a chair to kneeling on the floor, indicating a complete shift in body base and posture rather than just an isolated limb movement.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The movement logic is completely flawed. The exercise is 'Seated Marching', but the end position shows the character kneeling on the floor and holding a leg, which is not a natural progression or end state of seated marching. It appears to be a different exercise altogether.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 2.71,
+      "overall_pass": false,
+      "critical_failures": [
+        "CAMERA_ANGLE",
+        "SCENE_SETUP",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "seated-shoulder-abduction": {
+      "exercise_name": "Seated Shoulder Abduction",
+      "filename": "seated-shoulder-abduction",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing (t-shirt, shorts, shoes) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line work, shading, and color palette, is consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The type of bench changes from a gym bench in the start image to a regular chair in the end image. Additionally, dumbbells are present in the start but absent in the end.",
+        "score": 1,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "While the character's core body position on the seat is similar, the significant change in equipment (dumbbells disappearing) and the different type of chair represent a major inconsistency in anchoring and the overall setup.",
+        "score": 2,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The arm movement for shoulder abduction is clear, but the inconsistency of dumbbells present in the start and absent in the end, combined with the change of seating, makes the exercise transition illogical and confusing.",
+        "score": 2,
+        "passed": false
+      },
+      "overall_consistency_score": 3.57,
+      "overall_pass": false,
+      "critical_failures": [
+        "SCENE_SETUP",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "seated-shoulder-shrugs-dumbbell": {
+      "exercise_name": "Seated Shoulder Shrugs Dumbbell",
+      "filename": "seated-shoulder-shrugs-dumbbell",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are consistent between both images, maintaining a clear view of the exercise.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's outfit (shirt, shorts, shoes, socks) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, line work, shading, and color palette are perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The seating prop has changed significantly; the start image shows a chair with legs and a backrest, while the end image shows a solid bench.",
+        "score": 1,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "Due to the change in the seating prop, the character's lower body anchoring (legs and feet placement relative to the torso) is inconsistent.",
+        "score": 2,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The movement from a relaxed shoulder position to an elevated (shrugged) shoulder position logically depicts the 'Seated Shoulder Shrugs Dumbbell' exercise, despite the scene setup issue.",
+        "score": 4,
+        "passed": true
+      },
+      "overall_consistency_score": 3.86,
+      "overall_pass": false,
+      "critical_failures": [
+        "SCENE_SETUP",
+        "BODY_ANCHORING"
+      ]
+    },
+    "seated-shoulder-shrugs": {
+      "exercise_name": "Seated Shoulder Shrugs",
+      "filename": "seated-shoulder-shrugs",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing (t-shirt, shorts, socks, shoes) is identical in color, style, and appearance in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line work, shading, detail level, and color palette, is perfectly consistent between both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The background and the chair prop are identical and in the same position in both the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The non-moving parts of the body (torso, hips, legs, feet) are well-anchored and remain in the same position relative to the chair and scene. Only the shoulders and arms demonstrate movement.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The transition from a relaxed seated posture to a seated position with shoulders shrugged upwards is clear and accurately depicts the intended movement for seated shoulder shrugs.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "seated-upper-back-posture-reset": {
+      "exercise_name": "Seated Upper Back Posture Reset",
+      "filename": "seated-upper-back-posture-reset",
+      "camera_angle": {
+        "observation": "The camera angle is mostly consistent for the character's upper body. However, the chair is either cropped or missing in the end image, which affects the perception of the overall scene's camera angle.",
+        "score": 3,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's face, hair, skin tone, and body proportions are identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character is wearing the same grey t-shirt, dark blue shorts, white socks, and grey sneakers in both images. Logos are also consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, line work, shading, and color palette are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The most significant inconsistency is the chair. In the start image, the character is clearly sitting on a grey chair. In the end image, the chair is almost entirely missing or severely cropped, making it appear as if the character is sitting on a small, ambiguous surface or floating.",
+        "score": 1,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "Due to the chair disappearing, the 'seated' anchor point for the character is inconsistent. The lower body's contact with a surface drastically changes, leading to poor body anchoring.",
+        "score": 2,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The intended movement of transitioning from hands behind the head to hands behind the lower back for a posture reset is logical. However, the vanishing chair in the end image makes the 'seated' aspect of the exercise confusing.",
+        "score": 3,
+        "passed": true
+      },
+      "overall_consistency_score": 3.43,
+      "overall_pass": false,
+      "critical_failures": [
+        "SCENE_SETUP",
+        "BODY_ANCHORING"
+      ]
+    },
+    "side-lying-shoulder-abduction": {
+      "exercise_name": "Side Lying Shoulder Abduction",
+      "filename": "side-lying-shoulder-abduction",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are identical between the two images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's face, hair, skin tone, and body proportions are perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's t-shirt, shorts, and shoes are identical in color and style.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, line work, shading, and detail level are perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "There is no background or props in either image, maintaining perfect consistency.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The supporting left arm, torso, and legs remain consistently anchored. Only the right arm moves as intended.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The movement from the right hand on the thigh to the right arm extended upwards clearly depicts the side lying shoulder abduction, making the transition logical and easy to understand.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "side-lying-shoulder-internal-rotation": {
+      "exercise_name": "Side Lying Shoulder Internal Rotation",
+      "filename": "side-lying-shoulder-internal-rotation",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end positions.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing (shirt, shorts, shoes, socks) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, line work, shading, and color palette are perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The dumbbell present in the start position is missing in the end position. Equipment disappearing between frames is a critical inconsistency.",
+        "score": 1,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "The non-moving parts of the body, such as the supporting arm, torso, and legs, maintain consistent positioning.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The body movement clearly depicts the internal rotation of the shoulder from an elevated position to a lower, internally rotated position. The absence of the dumbbell is a minor detractor for full understanding of the exercise with equipment, but the physical movement is logical.",
+        "score": 4,
+        "passed": true
+      },
+      "overall_consistency_score": 4.29,
+      "overall_pass": false,
+      "critical_failures": [
+        "SCENE_SETUP"
+      ]
+    },
+    "standing-balance": {
+      "exercise_name": "Standing Balance",
+      "filename": "standing-balance",
+      "camera_angle": {
+        "observation": "Camera angle, distance, and framing are identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's outfit, including shirt, shorts, shoes, and socks, is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, line work, shading, and color palette are consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background is identical in both images, with no changes in scene elements.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "All body parts remain in the exact same position; no movement is depicted in any limb or torso.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The images are identical, showing no movement. This fails to convey any transition or specific movement for a 'Standing Balance' exercise, making it impossible to understand what action to perform.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 4.43,
+      "overall_pass": false,
+      "critical_failures": [
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "standing-band-row": {
+      "exercise_name": "Standing Band Row",
+      "filename": "standing-band-row",
+      "camera_angle": {
+        "observation": "Camera angle, distance, and framing are identical between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The clothing (t-shirt, shorts, shoes, socks) is identical in style and color in both the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, line weight, shading, and color palette are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background and the resistance band are consistent. The band's position correctly reflects the movement.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The legs, torso, and head remain in the same position relative to the camera, with only the arms and shoulders moving as part of the exercise.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The transition from arms extended forward to arms pulled back towards the chest clearly and logically depicts a standing band row.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "standing-dumbbell-reverse-fly": {
+      "exercise_name": "Standing Dumbbell Reverse Fly",
+      "filename": "standing-dumbbell-reverse-fly",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are identical between both images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character is the same person with consistent facial features, hair, and body proportions.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The clothing (gray t-shirt, dark shorts, gray and white shoes, white socks) is identical in style and color.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, line work, shading, and color palette are perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "Both images have a plain white background with no additional props or elements, which is consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The torso, head, and legs remain in the same anchored position. Only the arms move from a downward position to an outward horizontal position.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The movement from holding dumbbells down to lifting them outwards horizontally clearly depicts the Standing Dumbbell Reverse Fly exercise. The transition is natural and logical.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "standing-figure-four-stretch": {
+      "exercise_name": "Standing Figure Four Stretch",
+      "filename": "standing-figure-four-stretch",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are completely different. The start image is a side-view with the character leaning against a wall, while the end image is a front-facing view with the character standing in the middle of a blank space.",
+        "score": 1,
+        "passed": false
+      },
+      "character_identity": {
+        "observation": "The character's face, hair, body proportions, and skin tone are consistent between the two images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The t-shirt in the end image has a different logo (Joma) and pattern on the chest compared to the start image. The shorts also appear to be a different style; the end image shows tighter, slightly longer shorts, while the start image shows looser running shorts.",
+        "score": 2,
+        "passed": false
+      },
+      "art_style": {
+        "observation": "The art style, line weight, shading, and color palette are consistent between the two images, both maintaining a clean, cartoonish vector style.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The start image features a wall that the character is leaning on, which is completely absent in the end image where the character stands in an open white space.",
+        "score": 1,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "The character's entire body position and orientation are completely different. The start image shows a single-leg stance against a wall, while the end image shows a two-leg standing pose in open space. Nothing from the torso down is consistently anchored.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The end position of the character standing upright and looking down bears no logical continuation or endpoint relation to the 'Standing Figure Four Stretch' shown in the start image. It appears to be two unrelated poses.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 2.29,
+      "overall_pass": false,
+      "critical_failures": [
+        "CAMERA_ANGLE",
+        "CLOTHING",
+        "SCENE_SETUP",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "standing-posterior-shoulder-stretch": {
+      "exercise_name": "Standing Posterior Shoulder Stretch",
+      "filename": "standing-posterior-shoulder-stretch",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are identical between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's face, hair style, skin tone, and body proportions are perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's grey t-shirt, dark shorts, grey shoes, and white socks are identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line weight, shading technique, level of detail, and color palette, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "Both images feature a plain white background with no props, maintaining perfect consistency.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The legs, torso, and the character's right arm (left side of image) remain anchored in the same position. Only the left arm (right side of image) moves for the stretch.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The transition from the start position (arm bent across chest) to the end position (arm extended across chest) clearly illustrates the standing posterior shoulder stretch, making the movement logical and easy to understand.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "standing-wall-push-off": {
+      "exercise_name": "Standing Wall Push Off",
+      "filename": "standing-wall-push-off",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's physical appearance, including face, hair, skin tone, and body proportions, is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's outfit (t-shirt, shorts, socks, shoes) is consistent in style and color across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, including line weight, shading, and color palette, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The background (plain white wall and grey floor line) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The non-moving parts of the body (legs, torso) maintain their position relative to the background and each other. Only the arms have changed, as expected for movement.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The movement shown, transitioning from hands raised to hands behind the back, does not logically represent a 'Standing Wall Push Off'. The starting position is not against a wall, and the end position does not reflect any pushing motion. A user would not understand how to perform the described exercise from these images.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 4.43,
+      "overall_pass": false,
+      "critical_failures": [
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "supine-cross-body-shoulder-stretch": {
+      "exercise_name": "Supine Cross Body Shoulder Stretch",
+      "filename": "supine-cross-body-shoulder-stretch",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The same character is depicted in both images, with consistent facial features, hair, skin tone, and body proportions.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's outfit, including the grey t-shirt, dark blue shorts, white socks, and grey/white sneakers, is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, lighting, shading, and level of detail are consistent, maintaining the same art style across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background is consistent, and no props are present or change between the images.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "Parts of the body not involved in the primary movement, such as the head, torso, and the right arm (resting abducted from the body), remain consistently anchored. Only the right leg and left arm change position.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The movement from the start (right leg bent, left hand on right thigh) to the end (right leg extended, left arm reaching across the body towards the right foot) is a logical and clear progression, easily understood for performing the exercise.",
+        "score": 4,
+        "passed": true
+      },
+      "overall_consistency_score": 4.86,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "supine-external-rotation-bent-elbow": {
+      "exercise_name": "Supine External Rotation Bent Elbow",
+      "filename": "supine-external-rotation-bent-elbow",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are identical between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including facial features, hair, and body proportions, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The clothing (shirt, shorts, shoes, socks) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line weight, shading, and color palette, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background is consistent across both images. No props are present.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The character's legs are fully extended in the start image but are bent with feet on the floor in the end image. This is a significant change in body anchoring for an exercise that typically focuses on arm movement.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The images depict a change in leg position from extended to bent, not the \"Supine External Rotation Bent Elbow\" movement described by the exercise name. The actual exercise movement is entirely missing.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 3.86,
+      "overall_pass": false,
+      "critical_failures": [
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "supine-external-rotation-dumbbell": {
+      "exercise_name": "Supine External Rotation Dumbbell",
+      "filename": "supine-external-rotation-dumbbell",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing (shirt, shorts, shoes, socks) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, line work, shading, and color palette are perfectly consistent between both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The background is consistent (plain white). The character's overall setup on the ground is also consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "All body parts that should remain stationary (head, torso, legs, right arm) are perfectly anchored in the same position. Only the left arm is meant to move, but it is shown in the same position.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The two images do not show a movement. The start and end positions of the character are identical, with the left arm holding the dumbbell in the exact same pose. Only the color/style of the dumbbell has changed. This fails to depict the external rotation movement.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 4.43,
+      "overall_pass": false,
+      "critical_failures": [
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "supine-figure-4-stretch": {
+      "exercise_name": "Supine Figure 4 Stretch",
+      "filename": "supine-figure-4-stretch",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are identical between both images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's face, hair style, skin tone, and body proportions are perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's outfit, including shirt, shorts, socks, and shoes, is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, line weight, shading technique, and color palette are perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The background and lack of props are consistent in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The torso, head, and the right leg (crossed over) are well-anchored and consistent. The left knee and hands show the intended movement.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The end position logically follows the start position, clearly illustrating the stretching movement for the Supine Figure 4 Stretch.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "supine-hamstring-curls": {
+      "exercise_name": "Supine Hamstring Curls",
+      "filename": "supine-hamstring-curls",
+      "camera_angle": {
+        "observation": "Identical camera angle, distance, and framing are maintained between the start and end positions.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's outfit (grey t-shirt, dark blue shorts, white socks, grey/black sneakers) is identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line weight, shading technique, level of detail, and color palette, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background and subtle shadow under the character are consistent, with no changes in scene elements or props.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The head, torso, and arms remain consistently anchored to the ground. The non-moving left leg also maintains a consistent bent position relative to the body, with its foot now on the ground.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The exercise is named 'Supine Hamstring Curls'. The start position shows both legs bent with feet off the ground. The end position shows one leg extended while the other remains bent with the foot on the ground. The movement depicted for the right leg is an extension, not a 'curl' (which involves knee flexion by the hamstrings). This contradicts the exercise name and would confuse users about the intended movement.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 4.43,
+      "overall_pass": false,
+      "critical_failures": [
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "supine-hip-bridges": {
+      "exercise_name": "Supine Hip Bridges",
+      "filename": "supine-hip-bridges",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are identical in both images, providing a consistent side profile view.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent between the start and end positions.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's outfit (t-shirt, shorts, socks, and shoes) is exactly the same in both images with no changes in color or style.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line work, shading, and color palette, is completely consistent across both illustrations.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background and the minimal shadow beneath the character are consistent, with no changes in the scene setup.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The head, upper back, arms, and feet remain consistently anchored to the ground. Only the hips and legs move as intended for the exercise.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The end position shows the hips fully raised, forming a straight line from shoulders to knees, which is a logical and correct progression from the starting position for a hip bridge.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "supine-passive-rom": {
+      "exercise_name": "Supine Passive Rom",
+      "filename": "supine-passive-rom",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the two images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, remains consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing (t-shirt, shorts, socks, shoes) is identical in both style and color.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line work, shading, and color palette, is consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background is consistent, with no changes in scene setup or props.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "While the head and torso are anchored, the arms change position from by the sides in the start image to crossed over the chest in the end image. This is a significant change in a non-exercised body part.",
+        "score": 2,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The movement from bent knees to extended legs is logical for the exercise. However, the change in arm position is distracting and deviates from the expectation that only the exercised body part should move.",
+        "score": 3,
+        "passed": true
+      },
+      "overall_consistency_score": 4.29,
+      "overall_pass": false,
+      "critical_failures": [
+        "BODY_ANCHORING"
+      ]
+    },
+    "supine-quad-sets": {
+      "exercise_name": "Supine Quad Sets",
+      "filename": "supine-quad-sets",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's facial features, hair, skin tone, and body proportions are identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's outfit, including the gray t-shirt, dark shorts, and sneakers, is identical in color and style.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, line work, shading, and color palette are consistent across both illustrations.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background and the rolled towel under the character's neck remain consistent in position and appearance.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The torso, arms, and overall leg position are anchored well. However, the character's head position changes noticeably; it appears to rest deeper into the towel in the end image compared to the start.",
+        "score": 3,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The exercise is 'Supine Quad Sets', which involves contracting the quadriceps. The visual cues for this subtle muscle contraction in the legs are not clearly depicted, and the most noticeable change is the unintended movement of the head.",
+        "score": 3,
+        "passed": true
+      },
+      "overall_consistency_score": 4.43,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "supine-shoulder-blade-squeezes": {
+      "exercise_name": "Supine Shoulder Blade Squeezes",
+      "filename": "supine-shoulder-blade-squeezes",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character is the same person in both images, with identical facial features, hair, and body proportions.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The clothing (t-shirt, shorts, shoes, socks) is identical in color and style.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, line weight, shading, and color palette are consistent between both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "Both images have a plain white background with no props; the scene setup is identical.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "All parts of the body that would typically be anchored during this exercise (head, arms, legs, lower torso) are perfectly identical in position.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "There is no discernible difference between the start and end images, meaning no movement is depicted. The user cannot understand what movement to perform from these identical images.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 4.43,
+      "overall_pass": false,
+      "critical_failures": [
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "supine-shoulder-flexion-band": {
+      "exercise_name": "Supine Shoulder Flexion Band",
+      "filename": "supine-shoulder-flexion-band",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end positions.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's physical appearance, including face, hair, skin tone, and body proportions, remains identical.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's t-shirt, shorts, socks, and shoes are identical in color and style in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, line weight, shading, and color palette are consistent across both illustrations.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The plain white background is consistent. The resistance band is present in both images, though its specific interaction with the body changes due to the movement.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The torso remains anchored. There is a very slight change in the head's angle/position. The legs and arms move significantly as part of the exercise.",
+        "score": 4,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The movement from bent knees and arms at chest to extended legs and arms overhead is logical for a full-body extension with shoulder flexion. However, the resistance band's interaction changes significantly: from being looped under the knees to going behind the head. This change in the band's path and resistance point is not a simple stretch and makes the progression of the band's role in the exercise unclear and potentially confusing for the user.",
+        "score": 2,
+        "passed": false
+      },
+      "overall_consistency_score": 4.43,
+      "overall_pass": false,
+      "critical_failures": [
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "supine-shoulder-flexion-dumbbell": {
+      "exercise_name": "Supine Shoulder Flexion Dumbbell",
+      "filename": "supine-shoulder-flexion-dumbbell",
+      "camera_angle": {
+        "observation": "Camera angle, distance, and framing are perfectly consistent between the two images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including facial features, hair, and body proportions, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "Clothing (t-shirt, shorts, socks, shoes) is identical in color and style.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line work, shading, and color palette, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "A dumbbell present next to the character's left side in the start image is missing in the end image.",
+        "score": 2,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "The left arm's posture and the presence of a dumbbell next to the left shoulder differ significantly between the start and end images, despite the left side not being involved in the primary movement.",
+        "score": 2,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The right arm's movement from resting to overhead flexion is logically depicted for the exercise. However, the change in the left arm's state and the disappearance of the left dumbbell create minor confusion in the overall transition.",
+        "score": 3,
+        "passed": true
+      },
+      "overall_consistency_score": 3.86,
+      "overall_pass": false,
+      "critical_failures": [
+        "SCENE_SETUP",
+        "BODY_ANCHORING"
+      ]
+    },
+    "supine-shoulder-flexion-pulley": {
+      "exercise_name": "Supine Shoulder Flexion Pulley",
+      "filename": "supine-shoulder-flexion-pulley",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are consistent between the two images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The same character is depicted in both images with consistent facial features, hair, and body proportions.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing and accessories (t-shirt, shorts, shoes, socks, smartwatch) are identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The artistic rendering, including line work, shading, and color palette, is consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The start image shows the character holding a dumbbell, while the end image features a pulley system. This represents a complete change in exercise equipment, making the scene setup inconsistent.",
+        "score": 1,
+        "passed": false
+      },
+      "body_anchoring": {
+        "observation": "The lower body position changes significantly from bent knees in the start image to straight legs in the end. Additionally, the non-exercising arm's position changes, indicating poor body anchoring.",
+        "score": 1,
+        "passed": false
+      },
+      "movement_logic": {
+        "observation": "The start and end images do not depict a logical progression of a single exercise. The change from a dumbbell to a pulley, one-arm to two-arm movement, and altered leg position makes the sequence confusing and illogical.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 3.29,
+      "overall_pass": false,
+      "critical_failures": [
+        "SCENE_SETUP",
+        "BODY_ANCHORING",
+        "MOVEMENT_LOGIC"
+      ]
+    },
+    "supine-shoulder-flexion": {
+      "exercise_name": "Supine Shoulder Flexion",
+      "filename": "supine-shoulder-flexion",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are identical between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing, including shirt, shorts, shoes, and socks, is identical in color and style in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, including line work, shading, detail level, and color palette, is perfectly consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The background is plain white in both images, with no other elements or props, maintaining perfect consistency.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The lower body and torso remain well-anchored. There is a very slight adjustment in the head/neck position in the end frame, looking slightly more upwards, which is a minor, natural adjustment due to the arm movement.",
+        "score": 4,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The movement from arms by the side to arms extended overhead is a clear and logical representation of supine shoulder flexion, making the exercise easy to understand.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 4.86,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "towel-stretch": {
+      "exercise_name": "Towel Stretch",
+      "filename": "towel-stretch",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are consistent between the start and end images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity is maintained; the illustration accurately depicts the person from the photo.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The outfit, including the gray t-shirt, dark shorts, white socks, gray shoes, and the light-colored towel, remains consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The start image is a photograph and the end image is an illustration, representing entirely different art styles.",
+        "score": 1,
+        "passed": false
+      },
+      "scene_setup": {
+        "observation": "The plain white background is consistent in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The non-moving parts of the body, such as the legs and torso, are anchored consistently. Only the arms and towel position change.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The transition from holding the towel overhead with both hands to holding it in one hand extended to the side does not represent a clear or logical single 'towel stretch' movement. It appears to be two distinct static poses that don't flow naturally as part of the same exercise instruction.",
+        "score": 1,
+        "passed": false
+      },
+      "overall_consistency_score": 3.86,
+      "overall_pass": false,
+      "critical_failures": [
+        "ART_STYLE",
+        "MOVEMENT_LOGIC"
+      ]
+    }
+  }
+}

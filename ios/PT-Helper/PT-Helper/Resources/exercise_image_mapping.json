@@ -1102,5 +1102,70 @@
     "filename": "quadriceps-sets-isometric.png",
     "category": "strength",
     "target_area": "Left Knee, Quadriceps"
+  },
+  "copenhagen-adduction": {
+    "name": "Copenhagen Adduction",
+    "filename": "copenhagen-adduction.png",
+    "category": "strength",
+    "target_area": "Hip"
+  },
+  "90-90-hip-stretch": {
+    "name": "90/90 Hip Stretch",
+    "filename": "90-90-hip-stretch.png",
+    "category": "stretch",
+    "target_area": "Hip"
+  },
+  "couch-stretch-hip-flexor-lengthening": {
+    "name": "Couch Stretch",
+    "filename": "couch-stretch-hip-flexor-lengthening.png",
+    "category": "stretch",
+    "target_area": "Hip"
+  },
+  "seated-posture-micro-practice-throughout-day-habit": {
+    "name": "Seated Posture Micro-Practice",
+    "filename": "seated-posture-micro-practice-throughout-day-habit.png",
+    "category": "seated",
+    "target_area": "Core"
+  },
+  "standing-hip-flexor-and-quad-stretch-evening-wind-down": {
+    "name": "Standing Hip Flexor and Quad Stretch",
+    "filename": "standing-hip-flexor-and-quad-stretch-evening-wind-down.png",
+    "category": "stretch",
+    "target_area": "Hip"
+  },
+  "knee-extension-resistance-band": {
+    "name": "Knee Extension with Resistance Band",
+    "filename": "knee-extension-resistance-band.png",
+    "category": "strength",
+    "target_area": "Knee",
+    "end_filename": "knee-extension-resistance-band_end.png"
+  },
+  "knee-flexion-stretch": {
+    "name": "Knee Flexion Stretch",
+    "filename": "knee-flexion-stretch.png",
+    "category": "stretch",
+    "target_area": "Knee",
+    "end_filename": "knee-flexion-stretch_end.png"
+  },
+  "stationary-bike": {
+    "name": "Stationary Bike",
+    "filename": "stationary-bike.png",
+    "category": "cardio",
+    "target_area": "Knee",
+    "end_filename": "stationary-bike_end.png"
+  },
+  "hip-abduction-band": {
+    "name": "Hip Abduction with Resistance Band",
+    "filename": "hip-abduction-band.png",
+    "category": "strength",
+    "target_area": "Hip",
+    "end_filename": "hip-abduction-band_end.png"
+  },
+  "single-leg-glute-bridge-dumbbell": {
+    "name": "Single-Leg Glute Bridges with Dumbbell",
+    "filename": "single-leg-glute-bridge-dumbbell.png",
+    "category": "strength",
+    "target_area": "Hip",
+    "end_filename": "single-leg-glute-bridge-dumbbell_end.png"
   }
 }

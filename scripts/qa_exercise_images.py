@@ -252,6 +252,56 @@ def _make_error_result(exercise: dict, error_msg: str, error_type: str) -> QARes
     )
 
 
+_KEY_MAP = {
+    # top-level
+    "exercise": "exercise_name",
+    "exerciseName": "exercise_name",
+    "file": "filename",
+    "fileName": "filename",
+    "overallPass": "overall_pass",
+    "pass": "overall_pass",
+    "score": "pose_score",
+    "poseScore": "pose_score",
+    "failures": "critical_failures",
+    "criticalFailures": "critical_failures",
+    # checks: lower-snake matches pydantic; uppercase/camelcase coerced below
+    "fullBody": "full_body",
+    "noText": "no_text",
+    "artStyle": "art_style",
+    "bodyOrientation": "body_orientation",
+    "poseAccuracy": "pose_accuracy",
+    # nested check field names
+    "observe": "observation",
+    "obs": "observation",
+    "description": "observation",
+    "passFail": "passed",
+    "result": "passed",
+}
+
+
+def _normalize_qa_keys(obj):
+    """Recursively normalize LLM-returned QA dict keys into Pydantic shape."""
+    if isinstance(obj, list):
+        return [_normalize_qa_keys(x) for x in obj]
+    if not isinstance(obj, dict):
+        return obj
+    out = {}
+    for k, v in obj.items():
+        # Strip "1_ANATOMY" / "9_POSE_ACCURACY" prefixes
+        nk = k
+        import re as _re
+        nk = _re.sub(r"^\d+_", "", nk)
+        # Lowercase + remove spaces
+        lower = nk.lower().replace(" ", "_")
+        # Map via dict or lower form
+        nk = _KEY_MAP.get(k, _KEY_MAP.get(nk, lower))
+        # Coerce booleans spelled "PASS"/"FAIL"
+        if isinstance(v, str) and v.strip().upper() in {"PASS", "FAIL"}:
+            v = (v.strip().upper() == "PASS")
+        out[nk] = _normalize_qa_keys(v)
+    return out
+
+
 def analyze_image(
     client: genai.Client,
     image_path: Path,
@@ -279,7 +329,44 @@ def analyze_image(
             },
         )
 
-        result = QAResult.model_validate_json(response.text)
+        # Gemini sometimes returns None text with response_schema set (no
+        # finish_reason, no safety_ratings, no content — a silent drop).
+        # Fall back to an unconstrained JSON call with explicit field names.
+        if response.text is None:
+            fallback_instructions = (
+                "\n\nRespond with ONLY a single JSON object (no markdown fences). "
+                "Use EXACTLY these lowercase keys — do not renumber, prefix, or rename:\n"
+                "  exercise_name, filename, anatomy, subject, full_body, clothing, "
+                "background, no_text, art_style, body_orientation, pose_accuracy, "
+                "pose_score, overall_pass, critical_failures.\n"
+                'Each check field (anatomy..pose_accuracy) must be: '
+                '{"observation": "...", "passed": true|false}. '
+                "pose_score is an integer 1-5. critical_failures is a list of "
+                "UPPERCASE check names that failed."
+            )
+            response = client.models.generate_content(
+                model=GEMINI_MODEL,
+                contents=[img, prompt + fallback_instructions],
+            )
+            if response.text is None:
+                raise ValueError("Gemini returned None for both schema and no-schema calls")
+            import re as _re
+            text = response.text
+            m = _re.search(r"```(?:json)?\s*(\{.*\})\s*```", text, _re.DOTALL)
+            if m:
+                text = m.group(1)
+            else:
+                m = _re.search(r"\{.*\}", text, _re.DOTALL)
+                if m:
+                    text = m.group(0)
+            # Defensive normalization: strip numeric prefixes like "1_ANATOMY" and
+            # map common alt key names back to the expected Pydantic fields.
+            data = json.loads(text)
+            data = _normalize_qa_keys(data)
+            result = QAResult.model_validate(data)
+        else:
+            result = QAResult.model_validate_json(response.text)
+
         return _recompute_result(result, exercise)
 
     except Exception as e:
@@ -499,10 +586,19 @@ def main():
         "--max-concurrent", type=int, default=MAX_CONCURRENT,
         help=f"Max concurrent API requests (default: {MAX_CONCURRENT})",
     )
+    parser.add_argument(
+        "--metadata-file", type=str, default="",
+        help="Path to alternative metadata JSON with {'exercises': [...]} schema. "
+             "Defaults to scripts/exercise_list.json via load_exercise_list().",
+    )
     args = parser.parse_args()
 
     # Load exercises
-    exercises = load_exercise_list()
+    if args.metadata_file:
+        with open(args.metadata_file) as f:
+            exercises = json.load(f)["exercises"]
+    else:
+        exercises = load_exercise_list()
     print(f"Loaded {len(exercises)} exercises")
 
     # Apply filters
@@ -543,15 +639,18 @@ def main():
     )
     elapsed = time.time() - start_time
 
-    # If rechecking, merge with previous results
-    if args.recheck and report_path.exists():
+    # Merge with previous report whenever we QA'd a subset (--recheck,
+    # --filter-name, or --filter-position). Without this, the report would
+    # be overwritten with only the filtered rows, silently discarding the rest.
+    is_subset = bool(args.recheck or args.filter_name or args.filter_position)
+    if is_subset and report_path.exists():
         with open(report_path) as f:
             prev_data = json.load(f)
         prev_results = prev_data.get("results", {})
-        # Overwrite failed entries with new results
+        # Overwrite re-tested entries with the fresh results
         for k, v in results.items():
             prev_results[k] = v.model_dump()
-        # Rebuild results for report
+        # Rebuild results for report, dropping any corrupt prior entries
         merged_results = {}
         for k, v in prev_results.items():
             if isinstance(v, dict):
