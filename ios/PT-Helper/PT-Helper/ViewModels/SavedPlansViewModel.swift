@@ -6,6 +6,12 @@ import FirebaseAuth
 
 @MainActor
 class SavedPlansViewModel: ObservableObject {
+    /// Cap on plans fetched by the real-time listener. Prevents unbounded reads
+    /// (and unbounded snapshot payloads on every write) if a user accumulates
+    /// many plans. Newest-first ordering means older plans fall off the window
+    /// once the cap is hit; add pagination here if users ever actually hit it.
+    private static let rehabPlansFetchLimit = 50
+
     @Published var rehabPlans: [RehabPlan] = []
     @Published var isLoading: Bool = false
     @Published var loadError: String?
@@ -75,6 +81,7 @@ class SavedPlansViewModel: ObservableObject {
 
         listenerRegistration = db.collection("users").document(uid).collection("rehabPlans")
             .order(by: "createdDate", descending: true)
+            .limit(to: Self.rehabPlansFetchLimit)
             .addSnapshotListener { [weak self] snapshot, error in
                 guard let self = self else { return }
                 Task { @MainActor [weak self] in
