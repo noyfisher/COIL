@@ -8,13 +8,18 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
 
 - **3D Body Map** — Interactive RealityKit body model with tap-to-select pain regions and invisible proxy entities for occluded areas
 - **AI Injury Analysis** — Claude-powered assessment that considers pain characteristics, medical history, and kinetic chain relationships
+- **Wellness Goals** — Proactive wellness pathway for posture, sleep, mobility, strength, and pain management with AI-generated exercise + habit plans
 - **Smart Health History** — Relevance-filtered surgical/injury/medication history using anatomical proximity and temporal rules
 - **Rehab Plans** — Structured exercise programs with phases, progressions, and weekly schedules
-- **Guided Workouts** — Step-by-step exercise sessions with timers, rep counters, and AI-generated exercise illustrations
-- **Exercise Images** — 178 AI-generated exercise illustrations (FLUX 2 Pro) with automated Gemini QA
+- **Guided Workouts** — Step-by-step exercise sessions with sticky action bar, 3-phase instruction stepper, progressive learning, timers, and rep counters
+- **Exercise Form Analysis** — Video-based form feedback using MLKit pose detection, biomechanical rules, and AI analysis
+- **Exercise Substitution** — AI-powered exercise swap from plan view or mid-workout
+- **Recovery Insights** — Weekly AI-generated recovery digest via Claude Managed Agents with pain trends, adherence scoring, and recommendations
+- **Adaptive Progressions** — Rules-based difficulty scaling based on workout performance
+- **Exercise Images** — ~190 AI-generated exercise illustrations (FLUX 2 Pro) with automated Gemini QA
 - **Progress Tracking** — Workout streaks, achievements, re-assessment comparisons, and progress charts
 - **Session Logging** — Detailed logging of analysis and workout sessions for debugging and analytics
-- **Safety Pipeline** — 8-layer response validation including medication-aware checks and red-flag detection
+- **Safety Pipeline** — Analysis validation (6 steps) and rehab plan validation (9 steps) including medication-aware checks and red-flag detection
 - **PDF Export** — Export rehab plans as formatted PDFs
 
 ## Architecture
@@ -33,14 +38,16 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
 │  • Rate limiting      │
 │  • System prompts     │
 │  • Prompt assembly    │
+│  • Managed Agents     │
 └──────────┬───────────┘
            │
 ┌──────────▼───────────┐     ┌──────────────────┐
 │   Claude API          │     │  Firestore        │
 │   (Anthropic)         │     │  • User profiles  │
-│   • Analysis          │     │  • Assessments    │
-│   • Rehab plans       │     │  • Rehab plans    │
-└───────────────────────┘     │  • Sessions/Notes │
+│   • Analysis (9 types)│     │  • Assessments    │
+│   • Managed Agents    │     │  • Rehab plans    │
+└───────────────────────┘     │  • Workouts       │
+                              │  • Wellness plans  │
                               └──────────────────┘
 ```
 
@@ -49,23 +56,25 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
 ```
 ├── ios/PT-Helper/
 │   └── PT-Helper/
-│       ├── Models/            # Data models (12 files)
-│       ├── Services/          # API, validation, logging (14 files)
-│       ├── ViewModels/        # Business logic (10 files)
-│       ├── Views/             # SwiftUI views (37 files)
+│       ├── Models/            # Data models (21 files)
+│       ├── Services/          # API, validation, logging (24 files)
+│       ├── ViewModels/        # Business logic (15 files)
+│       ├── Views/             # SwiftUI views (69 files)
 │       │   ├── Components/    # Reusable UI components
+│       │   ├── Dashboard/     # Dashboard widgets and charts
 │       │   └── OnboardingSteps/  # Onboarding flow steps
 │       ├── Resources/         # Exercise images, mappings
 │       └── DesignSystem.swift # Colors, spacing, typography
-│   └── PT-HelperTests/        # 23 test files, 148+ tests
+│   └── PT-HelperTests/        # Unit + UI tests
 ├── functions/src/             # Firebase Cloud Functions
-│   └── index.ts               # Rate limiting + system prompts
+│   ├── index.ts               # Rate limiting, system prompts, endpoints
+│   └── managed-agent.ts       # Managed Agents API client
 ├── scripts/                   # Exercise image pipeline
 │   ├── generate_exercise_images.py
 │   ├── qa_exercise_images.py
-│   ├── exercise_list.json     # 178 exercise metadata
-│   └── output/                # Generated images
-├── docs/                      # Product brief, UX flows, safety
+│   ├── exercise_list.json     # Exercise metadata
+│   └── output/                # ~190 generated images
+├── docs/                      # Product brief, UX flows, safety, API, data models
 ├── firebase.json              # Firebase deployment config
 └── firestore.rules            # Security rules
 ```
@@ -102,7 +111,6 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
 
 4. **Configure API endpoint**
    - Update `ios/PT-Helper/PT-Helper/Services/APIConfig.swift` with your Cloud Functions URL
-   - The app calls the `callClaude` function which handles rate limiting and prompt assembly
 
 5. **Deploy Firestore rules**
    ```bash
@@ -117,8 +125,14 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
 2. `PainDetailView` collects: pain level, type, duration, triggers, treatment history
 3. `InjuryAnalysisViewModel` builds the assessment with `HistoryRelevanceFilter` sorting medical history by anatomical proximity
 4. Request goes to Cloud Function → Claude API with structured system prompt
-5. `ResponseValidationPipeline` validates the response (8 checks including medication safety)
+5. `ResponseValidationPipeline` validates the response (6-step analysis validation)
 6. Results displayed in `AnalysisResultView`
+
+### Wellness Flow
+
+1. User selects wellness goals (posture, sleep, mobility, strength, pain management)
+2. Two-call analysis pipeline (`wellness_analysis` + `wellness_verify`)
+3. Wellness plan generated with exercises + daily habits/micro-practices
 
 ### Health History Relevance
 
@@ -137,10 +151,7 @@ xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
   -scheme PT-Helper -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
-**23 test files** organized by layer:
-- **Models** (9) — Data model encoding, enums, validation
-- **Services** (8) — API config, prompt construction, relevance filtering, image service
-- **ViewModels** (6) — Business logic, state management, navigation
+Test plans: SmokePlan (11 key tests), UnitPlan (all unit), FullPlan (all + collision + UI), PreReleasePlan (all + UI + coverage).
 
 ## Safety
 
@@ -148,22 +159,16 @@ The app includes multiple safety layers:
 
 1. **Red-flag detection** — Flags symptoms requiring emergency care (numbness, bowel/bladder changes, etc.)
 2. **Input sanitization** — Strips prompt injection attempts from user text
-3. **Response validation pipeline** — 8-step validation:
-   - JSON structure verification
-   - Required field checks
-   - Medical safety phrase detection
-   - Exercise count and format validation
-   - Severity range validation
-   - Content coherence checks
-   - Medication-aware safety (blood thinners, beta blockers, corticosteroids)
-   - Post-surgical restriction warnings
-4. **Rate limiting** — 20 requests/minute per user (server-side)
-5. **Firestore rules** — Users can only read/write their own data
-6. **Disclaimer** — App presents wellness guidance disclaimer, not medical diagnosis
+3. **Analysis validation** — 6-step pipeline: content validation, symptom/condition red flags, anatomical relevance, confidence calibration (85% cap), deduplication
+4. **Rehab plan validation** — 9-step pipeline: contraindications, knowledge graph verification, parameter ranges, exercise count, duration, age safety, medical conditions, medication-aware checks, post-surgical restrictions
+5. **Form feedback validation** — `FormFeedbackValidationPipeline` + `BiomechanicalRuleEngine` for exercise form analysis safety
+6. **Rate limiting** — 20 requests/minute per user (server-side)
+7. **Firestore rules** — Users can only read/write their own data
+8. **Disclaimer** — App presents wellness guidance disclaimer, not medical diagnosis
 
 ## Exercise Image Pipeline
 
-178 exercise illustrations generated with AI:
+~190 exercise illustrations generated with AI:
 
 ```bash
 # Generate images (requires BFL API key)
@@ -176,20 +181,25 @@ python qa_exercise_images.py --api-key YOUR_GEMINI_KEY
 
 - **Generator**: FLUX 2 Pro via BFL API with structured pose descriptions
 - **QA**: Gemini 2.5 Flash vision model checking pose accuracy
-- **Pass rate**: 92% (163/178) — remaining are subtle poses or false safety blocks
 - **Style**: Clean white background, anatomical mannequin figure
+- **Image resolution**: 7-layer fuzzy matching in `ExerciseImageService`
 
 ## Key Files
 
 | File | Purpose |
 |------|---------|
 | `Models/InjuryAnalyzer.swift` | Builds AI prompts with relevance-sorted history |
-| `Services/ResponseValidationPipeline.swift` | 8-layer response safety validation |
+| `Models/WellnessAnalyzer.swift` | Builds wellness analysis prompts |
+| `Services/ResponseValidationPipeline.swift` | Analysis (6-step) and rehab plan (9-step) validation |
+| `Services/BiomechanicalRuleEngine.swift` | Exercise-specific form validation rules |
 | `Services/HistoryRelevanceFilter.swift` | Kinetic chain health history classification |
+| `Services/ExerciseImageService.swift` | 7-layer fuzzy image matching and caching |
 | `ViewModels/InjuryAnalysisViewModel.swift` | Analysis flow orchestration |
-| `ViewModels/RehabPlanViewModel.swift` | Rehab plan generation and management |
-| `ViewModels/GuidedWorkoutViewModel.swift` | Workout session state machine |
+| `ViewModels/RecoveryInsightsViewModel.swift` | Managed Agent recovery insights |
+| `ViewModels/GuidedWorkoutViewModel.swift` | Workout state machine with checkpointing |
+| `Views/ThreeTabView.swift` | 3-tab navigation container |
 | `Views/BodyMap3DView.swift` | RealityKit 3D body model |
-| `Services/ClaudeAPIService.swift` | Claude API client |
+| `Services/ClaudeAPIService.swift` | Claude API client (9 request types) |
 | `functions/src/index.ts` | Cloud Functions with system prompts |
+| `functions/src/managed-agent.ts` | Managed Agents API client |
 | `DesignSystem.swift` | App-wide colors, spacing, typography |

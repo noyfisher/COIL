@@ -135,6 +135,8 @@ Completed workout session records.
   planId: string                    // reference to rehabPlan
   completedDate: Timestamp
   duration: number                  // seconds
+  painLevel: number                 // 0-10 overall pain rating
+  exercisesPerformed: string[]      // exercise names completed
   exercisesCompleted: [{
     exerciseId: string
     setsCompleted: number
@@ -155,6 +157,39 @@ User notes attached to plans or exercises.
   exerciseId: string?
   content: string
   createdDate: Timestamp
+}
+```
+
+### `users/{userId}/wellnessPlans/{planId}`
+Wellness exercise + habit plans generated from wellness goals.
+
+```
+{
+  id: string
+  planName: string
+  goals: string[]                   // wellness goals selected by user
+  createdDate: Timestamp
+  exercises: [...]                  // same structure as rehab plan exercises
+  habits: [{                        // daily micro-practices
+    name: string
+    description: string
+    frequency: string               // "daily", "3x/week", etc.
+    category: string                // "stretch", "breathing", "positioning", etc.
+  }]
+  totalWeeks: number
+  notes: string?
+}
+```
+
+### `users/{userId}/streakData/current`
+Single document tracking workout streak.
+
+```
+{
+  currentStreak: number             // consecutive days
+  longestStreak: number
+  lastWorkoutDate: Timestamp
+  totalWorkouts: number
 }
 ```
 
@@ -192,6 +227,18 @@ All user data is scoped to the authenticated user. No cross-user access is possi
 | `RehabExercise` | `Models/RehabPlan.swift` | Embedded in rehabPlans |
 | `WorkoutSession` | `Models/WorkoutSession.swift` | `users/{uid}/workoutSessions/{id}` |
 | `Note` | `Models/Note.swift` | `users/{uid}/notes/{id}` |
+| `WellnessAssessment` | `Models/WellnessAssessment.swift` | In-memory (wellness flow input) |
+| `WellnessAnalysisResult` | `Models/WellnessAnalysisResult.swift` | In-memory (wellness flow output) |
+| `RecoveryInsight` | `Models/RecoveryInsight.swift` | In-memory (cached in ViewModel) |
+| `FormAnalysis` | `Models/FormAnalysis.swift` | In-memory (form feedback output) |
+| `Achievement` | `Models/Achievement.swift` | In-memory (streak-derived) |
+| `AssessmentSnapshot` | `Models/AssessmentSnapshot.swift` | Embedded in assessments |
+| `BodyRegion` | `Models/BodyRegion.swift` | In-memory (body map selection) |
+| `BodyZone` | `Models/BodyZone.swift` | In-memory (zone mapping) |
+| `SessionEvent` | `Models/SessionEvent.swift` | Uploaded via SessionLogger |
+| `AdaptiveProgressionAnalyzer` | `Models/AdaptiveProgressionAnalyzer.swift` | In-memory (progression logic) |
+| `ProgressionRule` | `Models/ProgressionRule.swift` | In-memory (progression rules) |
+| `Timer` | `Models/Timer.swift` | In-memory (rest timer state) |
 
 ## Backward Compatibility
 

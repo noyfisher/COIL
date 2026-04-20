@@ -12,7 +12,7 @@ Users must acknowledge a disclaimer during onboarding before using the app.
 
 ## Safety Pipeline Overview
 
-The app validates AI responses through an 8-step pipeline before displaying results.
+The app validates AI responses through multi-step pipelines before displaying results.
 
 ### Analysis Validation (6 steps)
 
@@ -54,7 +54,7 @@ The app validates AI responses through an 8-step pipeline before displaying resu
 **Step 6: Deduplication**
 - Removes duplicate conditions by name
 
-### Rehab Plan Validation (8 steps)
+### Rehab Plan Validation (9 steps)
 
 **Step 1: Exercise Contraindication Check** (`ExerciseContraindicationChecker`)
 - Cross-references exercises against diagnosed conditions:
@@ -68,6 +68,11 @@ The app validates AI responses through an 8-step pipeline before displaying resu
   - Sciatica: no sit-ups, crunches, toe touches
   - Plantar fasciitis: no jumping, running
   - Carpal tunnel / tennis elbow / golfer's elbow: specific restrictions
+
+**Step 1.5: Knowledge Graph Validation** (`KnowledgeGraphValidator` via `KnowledgeGraphService`)
+- Deterministic exercise-condition verification
+- Classifies exercises as: verified, unverified, or contraindicated
+- Adds warnings for contraindicated exercises
 
 **Step 2: Parameter Range Validation**
 - Sets: must be 1-10
@@ -95,6 +100,21 @@ The app validates AI responses through an 8-step pipeline before displaying resu
 - Flags active surgical recovery (status = "Still recovering" or "Have restrictions")
 - Names the specific surgeries for user awareness
 
+### Form Feedback Validation
+
+**`FormFeedbackValidationPipeline`**
+- Validates AI-generated exercise form feedback for safety
+- Ensures form corrections don't introduce injury risk
+
+**`BiomechanicalRuleEngine`**
+- Exercise-specific form rules (knee valgus detection, spinal alignment, etc.)
+- Per-rep symmetry analysis via `PoseAnalysisEngine`
+- Validates joint angles are within safe ranges
+
+### Wellness Analysis Validation
+- Same two-call pipeline as injury analysis (`wellness_analysis` + `wellness_verify`)
+- Validation follows analysis pipeline steps adapted for wellness context
+
 ## Input Sanitization
 
 User text is sanitized before being sent to the AI (`InputSanitizer`):
@@ -112,7 +132,7 @@ The Firebase Cloud Function adds additional security:
 
 - **Authentication required**: Valid Firebase ID token mandatory
 - **Rate limiting**: 20 requests/minute per user (in-memory sliding window)
-- **Request type whitelist**: Only `analysis` and `rehab_plan` are accepted
+- **Request type whitelist**: Only configured request types in `SYSTEM_PROMPTS` are accepted (currently 10: `analysis`, `analysis_verify`, `rehab_plan`, `exercise_substitute`, `recovery_insights`, `form_analysis`, `wellness_analysis`, `wellness_verify`, `wellness_plan`, `nightly_report`)
 - **Message length cap**: 10,000 characters total across all messages
 - **Server-side prompts**: System prompts are NOT client-controlled — they live in the Cloud Function
 - **Server-side model config**: Model selection and token limits are server-controlled
@@ -136,6 +156,6 @@ When red flags are detected, the session log is automatically uploaded to Firest
 - It does not replace medical diagnosis
 - It does not guarantee the AI will always produce safe output
 - It does not prevent all possible harmful recommendations
-- It does not verify exercise form or technique
+- It validates exercise form feedback but does not replace professional form coaching
 
 Users should always consult healthcare providers for serious or worsening conditions.

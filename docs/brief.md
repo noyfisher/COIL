@@ -22,4 +22,4 @@ Users: Athletes and fitness enthusiasts (self-directed rehabilitation).
 ## Technical Stack
 - iOS: SwiftUI + RealityKit + Firebase (Auth, Firestore, Crashlytics)
 - Backend: Firebase Cloud Functions (TypeScript) → Claude API proxy
-- Images: 178 AI-generated exercise illustrations (FLUX 2 Pro)
+- Images: ~190 AI-generated exercise illustrations (FLUX 2 Pro)

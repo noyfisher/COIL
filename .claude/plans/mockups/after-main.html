@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0">
+<title>Redesigned Workout View</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+  :root {
+    --accent: #5E8C5A;
+    --accent-tint: rgba(94,140,90,0.10);
+    --accent-light: #A8CCA5;
+    --cta-bg: #3A5E36;
+    --cta-text: #F2F5EE;
+    --primary-text: #1E2B1A;
+    --secondary-text: #556B4A;
+    --muted-text: #8A9A7E;
+    --card-bg: #FAFCF8;
+    --page-bg: #E8F0E9;
+    --elevated: #E2E8DA;
+    --card-border: rgba(75,100,65,0.10);
+    --card-shadow: rgba(45,60,35,0.05);
+    --warning: #B8963D;
+    --danger: #B85C5C;
+    --corner-card: 20px;
+    --corner-small: 14px;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--page-bg);
+    width: 375px;
+    height: 812px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    height: 54px;
+    background: var(--page-bg);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--primary-text);
+    flex-shrink: 0;
+  }
+
+  .nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 20px 12px;
+    background: var(--page-bg);
+    flex-shrink: 0;
+  }
+  .nav-bar .end-btn { color: var(--danger); font-size: 17px; font-weight: 500; }
+  .nav-bar .title { font-family: 'Inter'; font-size: 17px; font-weight: 600; color: var(--primary-text); }
+  .nav-bar .pause-btn { color: var(--accent); font-size: 20px; }
+
+  .scrollable {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 20px;
+  }
+
+  /* Progress header - segmented */
+  .progress-header { margin-bottom: 16px; }
+  .progress-labels { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .progress-labels span { font-size: 12px; font-weight: 600; }
+  .progress-labels .exercise-label { color: var(--accent); }
+  .progress-labels .time-label { color: var(--secondary-text); }
+  .progress-segments {
+    display: flex;
+    gap: 4px;
+    height: 6px;
+  }
+  .progress-segment {
+    flex: 1;
+    background: var(--accent-tint);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-segment.completed { background: var(--accent); }
+  .progress-segment.current {
+    background: linear-gradient(90deg, var(--accent) 50%, var(--accent-tint) 50%);
+  }
+
+  /* Exercise image with annotation overlay */
+  .exercise-image-wrapper {
+    width: 100%;
+    height: 220px;
+    border-radius: var(--corner-card);
+    overflow: hidden;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .exercise-image-wrapper img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  /* Annotation overlays */
+  .annotation {
+    position: absolute;
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
+    background: rgba(94,140,90,0.85);
+    padding: 3px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+    backdrop-filter: blur(4px);
+    border: 1.5px solid rgba(255,255,255,0.4);
+  }
+  .annotation.warning {
+    background: rgba(184,92,92,0.85);
+  }
+  .annotation-line {
+    position: absolute;
+    border-left: 2px dashed rgba(255,255,255,0.6);
+  }
+  .angle-indicator {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border: 2.5px solid rgba(94,140,90,0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 800;
+    color: white;
+    background: rgba(94,140,90,0.3);
+    backdrop-filter: blur(2px);
+  }
+  .arrow-overlay {
+    position: absolute;
+    color: rgba(255,255,255,0.9);
+    font-size: 24px;
+    font-weight: 300;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  /* Exercise name row */
+  .exercise-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .exercise-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--primary-text);
+  }
+  .how-to-btn {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-tint);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 100px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Info badges */
+  .info-badges { display: flex; gap: 10px; margin-bottom: 16px; }
+  .badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    background: var(--accent-tint);
+    padding: 5px 10px;
+    border-radius: var(--corner-small);
+  }
+
+  /* Phase-based instruction stepper */
+  .phase-stepper {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .phase-step {
+    flex: 1;
+    text-align: center;
+    padding: 10px 6px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .phase-step.active {
+    background: var(--accent);
+    color: white;
+  }
+  .phase-step.inactive {
+    background: var(--accent-tint);
+    color: var(--accent);
+  }
+  .phase-step .step-num {
+    font-size: 11px;
+    font-weight: 700;
+    opacity: 0.7;
+  }
+  .phase-step .step-label {
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  /* Phase content */
+  .phase-content {
+    background: var(--card-bg);
+    border-radius: var(--corner-card);
+    padding: 14px 16px;
+    border: 1px solid var(--card-border);
+    box-shadow: 0 2px 8px var(--card-shadow);
+    margin-bottom: 16px;
+  }
+  .phase-cue {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--primary-text);
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+  .phase-key-point {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .phase-key-point .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* Compact secondary actions */
+  .secondary-actions {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 12px;
+    padding: 8px 0;
+  }
+  .action-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--secondary-text);
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .action-icon .icon-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 1px 4px var(--card-shadow);
+  }
+  .action-icon .icon-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--muted-text);
+  }
+
+  /* Bottom action bar */
+  .bottom-bar {
+    flex-shrink: 0;
+    background: var(--card-bg);
+    border-top: 1px solid var(--card-border);
+    padding: 12px 20px 34px;
+    box-shadow: 0 -4px 16px var(--card-shadow);
+  }
+
+  /* Set dots */
+  .set-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .set-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    transition: all 0.3s;
+  }
+  .set-dot.filled {
+    background: var(--accent);
+    transform: scale(1.1);
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 16px;
+    background: var(--cta-bg);
+    color: var(--cta-text);
+    border: none;
+    border-radius: 100px;
+    font-size: 17px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  .screen-label {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--accent);
+    color: white;
+    text-align: center;
+    padding: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+<div class="screen-label">✦ REDESIGNED — Phase-Based + Annotations + Sticky Action</div>
+
+<div class="status-bar">9:41</div>
+
+<div class="nav-bar">
+  <span class="end-btn">End</span>
+  <span class="title">Guided Workout</span>
+  <span class="pause-btn">⏸</span>
+</div>
+
+<div class="scrollable">
+  <!-- Segmented progress -->
+  <div class="progress-header">
+    <div class="progress-labels">
+      <span class="exercise-label">Exercise 2 of 6</span>
+      <span class="time-label">3:42</span>
+    </div>
+    <div class="progress-segments">
+      <div class="progress-segment completed"></div>
+      <div class="progress-segment current"></div>
+      <div class="progress-segment"></div>
+      <div class="progress-segment"></div>
+      <div class="progress-segment"></div>
+      <div class="progress-segment"></div>
+    </div>
+  </div>
+
+  <!-- Annotated exercise image -->
+  <div class="exercise-image-wrapper">
+    <img src="img/wall-sits.png" alt="Wall Sits">
+    <!-- Annotations -->
+    <div class="annotation" style="top: 18%; left: 12%;">Flat back</div>
+    <div class="angle-indicator" style="top: 55%; left: 58%;">90°</div>
+    <div class="annotation warning" style="bottom: 18%; right: 10%;">Knees behind toes</div>
+    <div class="arrow-overlay" style="top: 40%; left: 30%; transform: rotate(180deg);">↓</div>
+  </div>
+
+  <!-- Exercise name + How To toggle -->
+  <div class="exercise-header">
+    <div class="exercise-name">Wall Sits</div>
+    <button class="how-to-btn">📖 How to</button>
+  </div>
+
+  <!-- Info badges -->
+  <div class="info-badges">
+    <div class="badge">🔄 Set 1/3</div>
+    <div class="badge">⏱ 30 sec hold</div>
+    <div class="badge">💤 60s rest</div>
+  </div>
+
+  <!-- Phase-based instruction stepper -->
+  <div class="phase-stepper">
+    <div class="phase-step active">
+      <div class="step-num">STEP 1</div>
+      <div class="step-label">Setup</div>
+    </div>
+    <div class="phase-step inactive">
+      <div class="step-num">STEP 2</div>
+      <div class="step-label">Move</div>
+    </div>
+    <div class="phase-step inactive">
+      <div class="step-num">STEP 3</div>
+      <div class="step-label">Return</div>
+    </div>
+  </div>
+
+  <!-- Phase content (one at a time) -->
+  <div class="phase-content">
+    <div class="phase-cue">Stand with back flat against wall, feet shoulder-width apart</div>
+    <div class="phase-key-point">
+      <span class="dot"></span>
+      Feet 2 feet from wall
+    </div>
+  </div>
+
+  <!-- Compact secondary actions -->
+  <div class="secondary-actions">
+    <div class="action-icon">
+      <div class="icon-circle">📹</div>
+      <span class="icon-label">Form</span>
+    </div>
+    <div class="action-icon">
+      <div class="icon-circle">🔄</div>
+      <span class="icon-label">Swap</span>
+    </div>
+    <div class="action-icon">
+      <div class="icon-circle">⏭</div>
+      <span class="icon-label">Skip</span>
+    </div>
+  </div>
+</div>
+
+<!-- Fixed bottom bar -->
+<div class="bottom-bar">
+  <div class="set-dots">
+    <div class="set-dot"></div>
+    <div class="set-dot"></div>
+    <div class="set-dot"></div>
+  </div>
+  <button class="btn-primary">✓ Complete Set 1</button>
+</div>
+
+</body>
+</html>

@@ -1,11 +1,12 @@
 # UX Flows
 
 ## Navigation Structure
-4-tab layout via `MainTabView`:
-- **Home** (Tab 0) — Dashboard, quick actions, recent plans
-- **Analyze** (Tab 1) — 3D body map → pain assessment → AI analysis
-- **Plans** (Tab 2) — Saved rehab plans list
-- **Progress** (Tab 3) — Pain trend charts, recovery insights
+3-tab layout via `ThreeTabView`:
+- **Assess** (Tab 0) — Dual gateway: pain analysis or wellness goals
+- **My Plan** (Tab 1) — Active plan hero card + saved plans list
+- **Progress** (Tab 2) — Charts, recovery insights, settings, session history
+
+Note: Legacy 4-tab layout (`MainTabView`) accessible via `--use-legacy-ui` launch argument.
 
 ## Core Flow: Analysis → Plan → Workout
 
@@ -49,8 +50,10 @@
 - Adaptive progression banner when performance data warrants changes
 
 ### 6. Guided Workout (`GuidedWorkoutView`)
-- Exercise phase: image, 3-step instructions, tips, "Complete Set" button
-- Rest phase: circular countdown timer, next exercise preview
+- **Sticky bottom action bar** with primary action ("Complete Set" / "Skip Rest" / "Next Exercise")
+- **Exercise phase**: image, 3-phase instruction stepper (Start Position → Movement → Return Position), tips
+- **Progressive learning**: exercise familiarity tracking (new/learning/familiar/mastered); new exercises auto-expand instructions, familiar exercises collapse them
+- **Rest phase**: circular countdown timer, next exercise preview, skip rest button
 - Pause/resume, skip exercise, swap exercise mid-workout
 - "End" button shows confirmation dialog ("End & Save" / "Cancel")
 - **Checkpointing**: state saved to UserDefaults on every set completion/skip
@@ -65,14 +68,78 @@
 - "Save & Done" saves session; button changes to "Done" for explicit dismiss
 - No auto-dismiss — user controls when to leave
 
+## Wellness Flow
+
+### 1. Wellness Goal Picker (`WellnessGoalPickerView`)
+- Accessed from Assess tab dual gateway ("I want to improve my wellness")
+- User selects wellness goals: posture, sleep, mobility, strength, pain management
+- Additional context/questionnaire fields
+
+### 2. Wellness Analysis (`WellnessAnalyzingView` → `WellnessResultView`)
+- Two-call pipeline: `wellness_analysis` → `wellness_verify`
+- Loading screen similar to injury analysis
+- Results: personalized wellness assessment with recommendations
+
+### 3. Wellness Plan (`WellnessPlanView`)
+- AI-generated plan combining exercises and daily habits/micro-practices
+- Exercises structured same as rehab plans (sets, reps, phases)
+- Habits include: stretches, breathing exercises, positioning cues
+- Can start guided workout from plan
+
+## Form Analysis Flow
+
+### 1. Video Capture (`VideoRecorderView`)
+- Record exercise form during workout
+- Minimum 720p video quality required for pose detection
+
+### 2. Analysis (`FormAnalysisView`)
+- MLKit pose detection extracts joint positions on-device
+- `PoseAnalysisEngine` computes joint angles, per-rep symmetry
+- `BiomechanicalRuleEngine` applies exercise-specific form rules
+- AI-generated form feedback with safety validation
+- Results: form score, specific corrections, what you're doing well
+
+## Exercise Swap Flow
+
+### From Plan View
+- Swap button visible on each exercise card (saved plans only)
+- Opens `ExerciseSwapSheet` with AI-suggested alternatives
+- Alternatives match same difficulty and rehab purpose
+
+### Mid-Workout
+- Swap option available during guided workout
+- Uses `exercise_substitute` request type
+- Seamlessly continues workout with new exercise
+
+## Recovery Insights Flow
+
+### Recovery Digest (`RecoveryInsightsCardView` → `RecoveryInsightsDetailView`)
+- Available on Progress tab and Home/Assess tab as quick action
+- Requires 3+ workout sessions in past 14 days
+- Multi-step AI analysis via Managed Agent:
+  - Pain trend detection (improving/stable/worsening) per region
+  - Adherence scoring (sessions completed vs. expected)
+  - Key wins and focus areas
+  - Personalized recommendations with SF Symbol icons
+- Teaser with progress dots shown when < 3 sessions
+
+## Re-Assessment Flow
+
+### Re-Assessment Prompt (`ReAssessmentPromptView`)
+- Prompted periodically to re-assess pain levels
+- Comparison view (`ReAssessmentComparisonView`) shows current vs. previous
+- Tracks progress over time
+
 ## Secondary Flows
 
-### Home Tab
-- Personalized greeting, stats (active plans, last pain, streak)
-- Quick actions: Update Health Info, Recovery Notes, Log Workout
-- Recovery Insights teaser with progress dots (shown when < 3 sessions)
-- Recovery Digest quick action (shown when insights available)
-- Recent plans preview (first 2)
+### Assess Tab
+- Dual gateway: "I'm in pain" (→ body map) or "I want to improve" (→ wellness goals)
+- Health check prompt when returning after 3+ months of inactivity
+
+### My Plan Tab
+- Active plan hero card (most recent plan)
+- Saved plans list with tap to open
+- Recent workout sessions (last 10) with swipe-to-delete
 
 ### Onboarding (6-step wizard)
 1. Basic info (name, DOB, sex, height/weight) — required
@@ -94,4 +161,5 @@
 ### Progress Tab
 - Pain trend line chart filtered by region
 - Summary stats: total sessions, avg pain, total minutes
-- Recovery insights (AI-generated weekly digest, requires 3+ sessions in 14 days)
+- Recovery insights card (AI-generated weekly digest, requires 3+ sessions in 14 days)
+- Session history list

@@ -120,7 +120,7 @@ After completion, read `scripts/output/qa_report.json` and report:
 Read these files and summarize the current state:
 
 1. `scripts/output/exercise_image_mapping.json` — count of mapped exercises
-2. `scripts/exercise_list.json` — total exercise count (should be 178)
+2. `scripts/exercise_list.json` — total exercise count
 3. `scripts/output/qa_report.json` — QA pass rate and failure breakdown
 4. List any PNGs in `scripts/output/` that are NOT in the mapping (orphaned images)
 5. If Firestore is accessible, count pending entries in `missingExerciseImages`
@@ -128,11 +128,11 @@ Read these files and summarize the current state:
 Present as a dashboard:
 ```
 Exercise Images Status:
-  Total exercises:    178
-  Mapped:             178 (100%)
-  QA passed:          163 (92%)
-  QA failures:        15 (11 pose accuracy, 4 safety blocks)
-  Orphaned PNGs:      0
+  Total exercises:    <count from exercise_list.json>
+  Mapped:             <count from mapping JSON>
+  QA passed:          <from qa_report.json>
+  QA failures:        <from qa_report.json>
+  Orphaned PNGs:      <PNGs not in mapping>
   Firestore missing:  N/A (not connected)
 ```
 
@@ -159,4 +159,4 @@ Copy generated and approved images to the iOS app resources:
 | `scripts/qa_exercise_images.py` | Gemini 2.5 Flash vision QA |
 | `scripts/output/exercise_image_mapping.json` | Source of truth mapping |
 | `ios/PT-Helper/PT-Helper/Resources/exercise_image_mapping.json` | Bundled app copy |
-| `scripts/exercise_list.json` | Master exercise metadata (178 exercises) |
+| `scripts/exercise_list.json` | Master exercise metadata |

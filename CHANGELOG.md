@@ -5,19 +5,59 @@ All notable changes to PT Helper are documented here.
 ## [Unreleased]
 
 ### Added
-- **Smart Health History** — Enriched data model for surgeries (body area, recovery status, restrictions), injuries (year, doctor visits, PT history, recovery status), and medications
-- **Health History Relevance Filter** — Kinetic chain-based classification of health history as directly relevant, possibly relevant, or background-only for AI prompts
-- **Medication-Aware Safety** — Validation pipeline checks for blood thinners (fall risk), corticosteroids (tendon weakness), beta blockers (RPE guidance)
-- **Post-Surgical Restriction Warnings** — Active surgical recovery flagged in rehab plan validation
-- **Treatment History Per Assessment** — Track doctor visits, imaging, diagnosis, and active treatment per pain region
-- **Expanded Medical Conditions** — Osteoporosis, Blood Clotting Disorder, Fibromyalgia, Previous Cancer, Hypermobility, Neuropathy
-- **Medications Tracking** — Blood Thinners, Beta Blockers, Corticosteroids, Insulin/Diabetes Meds, Pain Medication, Muscle Relaxants
-- **Relevance-Sorted AI Prompts** — Surgical and injury history now organized by relevance to assessed pain region
-- **Production Documentation** — README, API docs, safety docs, data model, contributing guide, changelog, privacy policy
+- **Documentation Overhaul** — Updated all documentation to reflect current app state
+
+## [1.3.0] — 2025-04-12
+
+### Added
+- **Workout UX Overhaul** — Sticky bottom action bar, 3-phase exercise stepper (Start Position → Movement → Return Position), progressive learning with exercise familiarity tracking (new/learning/familiar/mastered)
+- **Exercise Image QA Fix Agent** — Claude-powered agent that analyzes QA failures, regenerates images via FLUX 2 Pro, and re-runs Gemini QA automatically
+- **Recent Workouts Section** — Last 10 workout sessions on dashboard with swipe-to-delete
+- **Background Task Support** — API calls continue when app is backgrounded
+
+### Fixed
+- Pre-beta UX — Touch targets, accessibility IDs, build number bump
+- Pre-beta test failures — Proxy collisions, agent mock setup, timer flake
+- Swipe-to-delete, discard workout confirmation, UI test updates
+
+## [1.2.0] — 2025-03-28
+
+### Added
+- **Pose Analysis Enhancement** — Per-rep symmetry analysis, expanded biomechanical rules for exercise form validation
+- **Claude Managed Agents** — Multi-step recovery insights via ephemeral Managed Agent sessions with `submit_recovery_insights` tool
+- **3-Tab Navigation Redesign** — New Assess / My Plan / Progress tabs replacing the old 4-tab layout
+- **Nightly Email Report** — SendGrid-powered daily product analytics digest
 
 ### Changed
-- System prompts updated with patient history usage instructions (kinetic chain, medication context, doctor recommendations)
-- Profile review step now displays all enriched health history fields
+- Wellness plan migration to new data model
+
+## [1.1.0] — 2025-03-15
+
+### Added
+- **Sage & Stone Restyle** — Complete visual overhaul of all screens with new design tokens
+- **Form Check Tab** — Exercise form analysis via video capture + MLKit pose detection
+- **Wellness Pathway** — Dual-gateway in Assess tab: pain analysis or wellness goals with goal picker, questionnaire, AI analysis (two-call pipeline), and habit-based plans
+- **Exercise Form Analysis** — 3D pose detection with 7-layer form feedback validation pipeline (`BiomechanicalRuleEngine`, `PoseAnalysisEngine`, `FormFeedbackValidationPipeline`)
+- **Dashboard Redesign** — Pain trend charts, confidence charts, differentials table, exercise performance table, session history list, profile widget
+- **Exercise Substitution** — AI-powered swap from plan view or mid-workout
+- **Recovery Insights** — AI-generated weekly recovery digest with pain trends, adherence scoring, recommendations
+- **Adaptive Progressions** — Rules-based difficulty scaling with progression banner
+- **Body Map Zones** — Extended zone system with `BodyZone` model
+- **Exercise Image Coverage** — Expanded to ~190 illustrations
+
+### Changed
+- Removed legacy OpenAI agent infrastructure
+- DesignSystem.swift overhauled with Sage & Stone tokens
+
+## [1.0.0] — 2025-03-08
+
+### Added
+- **Pre-Release Beta Sprint** — Firebase Crashlytics, legal docs (privacy policy, terms of service), Google Sign-In, FCM push notifications, accessibility improvements
+- **Release Automation Pipeline** — GitHub Actions for CI/CD
+- **Medical Knowledge Graph** — `KnowledgeGraphService` for deterministic exercise-condition verification
+- **Cross-Model Verification** — `CrossModelVerificationService` for rehab plan validation
+- **Enhanced Health Profile** — Expanded medical conditions and medications tracking
+- **Two-Call Verify Pipeline** — Secondary AI review for analysis results
 
 ## [0.9.0] — 2025-03-08
 
@@ -40,7 +80,7 @@ All notable changes to PT Helper are documented here.
 ## [0.7.0] — 2025-02-20
 
 ### Added
-- **AI Response Validation Pipeline** — 8-layer safety validation for analysis and rehab plan responses
+- **AI Response Validation Pipeline** — Multi-step safety validation for analysis and rehab plan responses
 - **Exercise Contraindication Checker** — Cross-references exercises against diagnosed conditions
 - **Medical Red Flag Detector** — Symptom pattern matching for emergency conditions
 - **Anatomical Relevance Checker** — Validates AI conditions match assessed body regions

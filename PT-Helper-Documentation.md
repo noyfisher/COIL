@@ -1,5 +1,5 @@
 # PT Helper — Complete Documentation
-**Generated: March 17, 2026**
+**Generated: March 17, 2026** *(Stale — refer to individual docs for current information: README.md, CLAUDE.md, docs/\*.md)*
 
 ---
 

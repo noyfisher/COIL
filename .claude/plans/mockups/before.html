@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0">
+<title>Current Workout View</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+  :root {
+    --accent: #5E8C5A;
+    --accent-tint: rgba(94,140,90,0.10);
+    --cta-bg: #3A5E36;
+    --cta-text: #F2F5EE;
+    --primary-text: #1E2B1A;
+    --secondary-text: #556B4A;
+    --muted-text: #8A9A7E;
+    --card-bg: #FAFCF8;
+    --page-bg: #E8F0E9;
+    --elevated: #E2E8DA;
+    --card-border: rgba(75,100,65,0.10);
+    --card-shadow: rgba(45,60,35,0.05);
+    --warning: #B8963D;
+    --danger: #B85C5C;
+    --corner-card: 20px;
+    --corner-small: 14px;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--page-bg);
+    width: 375px;
+    min-height: 812px;
+    overflow-x: hidden;
+  }
+
+  .status-bar {
+    height: 54px;
+    background: var(--page-bg);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--primary-text);
+  }
+
+  .nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 20px 12px;
+    background: var(--page-bg);
+  }
+  .nav-bar .end-btn { color: var(--danger); font-size: 17px; font-weight: 500; }
+  .nav-bar .title { font-family: 'Inter'; font-size: 17px; font-weight: 600; color: var(--primary-text); }
+  .nav-bar .pause-btn { color: var(--accent); font-size: 20px; }
+
+  .content { padding: 0 20px 40px; }
+
+  /* Progress header */
+  .progress-header { margin-bottom: 16px; }
+  .progress-labels { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .progress-labels span { font-size: 12px; font-weight: 600; }
+  .progress-labels .exercise-label { color: var(--accent); }
+  .progress-labels .time-label { color: var(--secondary-text); }
+  .progress-bar { height: 6px; background: var(--accent-tint); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; width: 33%; background: var(--accent); border-radius: 3px; }
+
+  /* Exercise image */
+  .exercise-image-container {
+    width: 100%;
+    height: 180px;
+    background: var(--elevated);
+    border-radius: var(--corner-card);
+    overflow: hidden;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .exercise-image-container img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  /* Exercise card */
+  .exercise-card {
+    background: var(--card-bg);
+    border-radius: var(--corner-card);
+    padding: 16px;
+    border: 1px solid var(--card-border);
+    box-shadow: 0 2px 8px var(--card-shadow);
+    margin-bottom: 16px;
+  }
+
+  .exercise-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-text);
+    margin-bottom: 12px;
+  }
+
+  /* Info badges */
+  .info-badges { display: flex; gap: 12px; margin-bottom: 16px; }
+  .badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    background: var(--accent-tint);
+    padding: 4px 8px;
+    border-radius: var(--corner-small);
+  }
+  .badge svg { width: 12px; height: 12px; fill: var(--accent); }
+
+  /* Instructions */
+  .instruction-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    align-items: flex-start;
+  }
+  .instruction-num {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .instruction-text {
+    font-size: 14px;
+    color: var(--secondary-text);
+    line-height: 1.4;
+  }
+
+  /* Tips */
+  .tips-section { margin-top: 12px; }
+  .tips-label { font-size: 12px; font-weight: 600; color: var(--secondary-text); margin-bottom: 6px; }
+  .tip-row { display: flex; gap: 4px; align-items: flex-start; margin-bottom: 4px; }
+  .tip-icon { font-size: 10px; margin-top: 2px; }
+  .tip-text { font-size: 12px; color: var(--secondary-text); line-height: 1.3; }
+
+  /* Buttons */
+  .btn-stack { display: flex; flex-direction: column; gap: 12px; }
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: var(--cta-bg);
+    color: var(--cta-text);
+    border: none;
+    border-radius: 100px;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+  .btn-secondary {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent-tint);
+    color: var(--accent);
+    border: none;
+    border-radius: 100px;
+    font-size: 16px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  /* Elapsed time */
+  .elapsed {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--secondary-text);
+  }
+
+  /* Label */
+  .screen-label {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--primary-text);
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+<div class="screen-label">CURRENT DESIGN</div>
+
+<div class="status-bar">9:41</div>
+
+<div class="nav-bar">
+  <span class="end-btn">End</span>
+  <span class="title">Guided Workout</span>
+  <span class="pause-btn">⏸</span>
+</div>
+
+<div class="content">
+  <!-- Progress -->
+  <div class="progress-header">
+    <div class="progress-labels">
+      <span class="exercise-label">Exercise 2 of 6</span>
+      <span class="time-label">3:42</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill"></div></div>
+  </div>
+
+  <!-- Exercise Image -->
+  <div class="exercise-image-container">
+    <img src="img/wall-sits.png" alt="Wall Sits">
+  </div>
+
+  <!-- Exercise Card -->
+  <div class="exercise-card">
+    <div class="exercise-name">Wall Sits</div>
+
+    <div class="info-badges">
+      <div class="badge">
+        <svg viewBox="0 0 20 20"><path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/></svg>
+        Set 1/3
+      </div>
+      <div class="badge">
+        <svg viewBox="0 0 20 20"><path d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1z"/></svg>
+        30 sec hold
+      </div>
+      <div class="badge">
+        <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="none" stroke="#5E8C5A" stroke-width="2"/><path d="M10 6v4l3 2" fill="none" stroke="#5E8C5A" stroke-width="2" stroke-linecap="round"/></svg>
+        60s rest
+      </div>
+    </div>
+
+    <!-- All instructions shown at once -->
+    <div class="instruction-row">
+      <div class="instruction-num">1</div>
+      <div class="instruction-text">Stand with your back flat against a wall, feet shoulder-width apart and about 2 feet from the wall</div>
+    </div>
+    <div class="instruction-row">
+      <div class="instruction-num">2</div>
+      <div class="instruction-text">Slowly slide your back down the wall until your thighs are parallel to the ground, keeping knees at 90 degrees</div>
+    </div>
+    <div class="instruction-row">
+      <div class="instruction-num">3</div>
+      <div class="instruction-text">Hold the position, pressing your back firmly against the wall, then slowly slide back up to standing</div>
+    </div>
+
+    <!-- Tips always visible -->
+    <div class="tips-section">
+      <div class="tips-label">Tips</div>
+      <div class="tip-row">
+        <span class="tip-icon">💡</span>
+        <span class="tip-text">Keep your back flat against the wall throughout the movement</span>
+      </div>
+      <div class="tip-row">
+        <span class="tip-icon">💡</span>
+        <span class="tip-text">Don't let your knees extend past your toes</span>
+      </div>
+      <div class="tip-row">
+        <span class="tip-icon">💡</span>
+        <span class="tip-text">Engage your core and breathe steadily</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 stacked buttons -->
+  <div class="btn-stack">
+    <button class="btn-primary">✓ Complete Set 1</button>
+    <button class="btn-secondary">📹 Check My Form</button>
+    <button class="btn-secondary">🔄 Swap Exercise</button>
+    <button class="btn-secondary">⏭ Skip Exercise</button>
+  </div>
+
+  <div class="elapsed">🕐 3:42</div>
+</div>
+
+</body>
+</html>
