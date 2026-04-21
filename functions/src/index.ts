@@ -5,6 +5,7 @@ import sgMail from "@sendgrid/mail";
 import { fetchRecoveryInsightsData, MINIMUM_SESSION_COUNT } from "./firestore-queries";
 import { runRecoveryInsightsAgent, validateInsightResult } from "./managed-agent";
 import { handleGenerateExerciseImage } from "./image-generation";
+import { newRequestContext, logCompleted, logError, logWarn } from "./logger";
 
 admin.initializeApp();
 
@@ -529,6 +530,9 @@ interface ProxyRequestBody {
 export const claudeProxy = functions
   .runWith({ timeoutSeconds: 120, memory: "256MB", secrets: ["ANTHROPIC_API_KEY"] })
   .https.onRequest(async (req, res) => {
+    const ctx = newRequestContext("claudeProxy");
+    res.on("finish", () => logCompleted(ctx, res.statusCode));
+
     if (req.method !== "POST") {
       res.status(405).json({ error: "Method not allowed" });
       return;
@@ -548,6 +552,7 @@ export const claudeProxy = functions
     try {
       const decoded = await admin.auth().verifyIdToken(idToken);
       uid = decoded.uid;
+      ctx.uid = uid;
     } catch {
       res.status(401).json({ error: "Invalid Firebase ID token" });
       return;
@@ -572,6 +577,8 @@ export const claudeProxy = functions
       });
       return;
     }
+
+    ctx.metadata.requestType = body.requestType;
 
     // Validate requestType is allowed (prevents misuse of API key)
     if (!ALLOWED_REQUEST_TYPES.has(body.requestType)) {
@@ -602,7 +609,7 @@ export const claudeProxy = functions
     // -----------------------------------------------------------------------
     const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
     if (!anthropicApiKey) {
-      console.error("ANTHROPIC_API_KEY not configured in environment");
+      logError(ctx, new Error("ANTHROPIC_API_KEY not configured in environment"));
       res.status(500).json({ error: "Server configuration error" });
       return;
     }
@@ -630,16 +637,31 @@ export const claudeProxy = functions
         }),
       });
 
-      const responseData = await anthropicResponse.json();
+      const responseData = await anthropicResponse.json() as {
+        usage?: {
+          input_tokens?: number;
+          output_tokens?: number;
+          cache_creation_input_tokens?: number;
+          cache_read_input_tokens?: number;
+        };
+      };
 
       if (!anthropicResponse.ok) {
         res.status(anthropicResponse.status).json(responseData);
         return;
       }
 
+      // Record token usage on the context so the completion log captures it.
+      if (responseData.usage) {
+        ctx.metadata.tokensIn = responseData.usage.input_tokens;
+        ctx.metadata.tokensOut = responseData.usage.output_tokens;
+        ctx.metadata.cacheCreateTokens = responseData.usage.cache_creation_input_tokens;
+        ctx.metadata.cacheReadTokens = responseData.usage.cache_read_input_tokens;
+      }
+
       res.status(200).json(responseData);
     } catch (error) {
-      console.error("Error calling Anthropic API:", error);
+      logError(ctx, error, { stage: "anthropic_call" });
       res.status(502).json({ error: "Failed to reach AI service" });
     }
   });
@@ -655,6 +677,9 @@ interface CrossVerifyRequestBody {
 export const crossVerify = functions
   .runWith({ timeoutSeconds: 30, memory: "256MB", secrets: ["ANTHROPIC_API_KEY", "OPENAI_API_KEY"] })
   .https.onRequest(async (req, res) => {
+    const ctx = newRequestContext("crossVerify");
+    res.on("finish", () => logCompleted(ctx, res.statusCode));
+
     if (req.method !== "POST") {
       res.status(405).json({ error: "Method not allowed" });
       return;
@@ -674,6 +699,7 @@ export const crossVerify = functions
     try {
       const decoded = await admin.auth().verifyIdToken(idToken);
       uid = decoded.uid;
+      ctx.uid = uid;
     } catch {
       res.status(401).json({ error: "Invalid Firebase ID token" });
       return;
@@ -707,10 +733,12 @@ export const crossVerify = functions
     // -----------------------------------------------------------------------
     const openaiApiKey = process.env.OPENAI_API_KEY;
     if (!openaiApiKey) {
-      console.error("OPENAI_API_KEY not configured in environment");
+      logError(ctx, new Error("OPENAI_API_KEY not configured in environment"));
       res.status(500).json({ error: "Server configuration error" });
       return;
     }
+
+    ctx.metadata.exerciseCount = body.exercises.length;
 
     // -----------------------------------------------------------------------
     // 5. Call GPT-4o-mini for each exercise (batched in one prompt)
@@ -766,7 +794,7 @@ Return results in the same order as the exercises listed above.`;
 
       if (!openaiResponse.ok) {
         const errorData = await openaiResponse.text();
-        console.error(`OpenAI API error (${openaiResponse.status}):`, errorData);
+        logError(ctx, new Error(`OpenAI API returned ${openaiResponse.status}: ${errorData}`), { stage: "openai_call" });
         res.status(502).json({ error: "Failed to reach verification service" });
         return;
       }
@@ -785,7 +813,7 @@ Return results in the same order as the exercises listed above.`;
       const parsed = JSON.parse(content);
       res.status(200).json(parsed);
     } catch (error) {
-      console.error("Error calling OpenAI API:", error);
+      logError(ctx, error, { stage: "openai_call" });
       res.status(502).json({ error: "Failed to reach verification service" });
     }
   });
@@ -1084,6 +1112,9 @@ export const agentInsights = functions
     secrets: ["ANTHROPIC_API_KEY", "MANAGED_AGENT_ID", "MANAGED_ENVIRONMENT_ID"],
   })
   .https.onRequest(async (req, res) => {
+    const ctx = newRequestContext("agentInsights");
+    res.on("finish", () => logCompleted(ctx, res.statusCode));
+
     if (req.method !== "POST") {
       res.status(405).json({ error: "Method not allowed" });
       return;
@@ -1101,6 +1132,7 @@ export const agentInsights = functions
     try {
       const decoded = await admin.auth().verifyIdToken(idToken);
       uid = decoded.uid;
+      ctx.uid = uid;
     } catch {
       res.status(401).json({ error: "Invalid Firebase ID token" });
       return;
@@ -1117,10 +1149,12 @@ export const agentInsights = functions
     try {
       data = await fetchRecoveryInsightsData(uid);
     } catch (err) {
-      console.error("Error fetching recovery data:", err);
+      logError(ctx, err, { stage: "fetch_recovery_data" });
       res.status(500).json({ error: "Failed to fetch recovery data" });
       return;
     }
+
+    ctx.metadata.sessionCount = data.sessionCount;
 
     if (data.sessionCount < MINIMUM_SESSION_COUNT) {
       res.status(400).json({
@@ -1140,10 +1174,11 @@ export const agentInsights = functions
       }
 
       resultJson = JSON.stringify(result);
-      console.log("Agent insights generated successfully");
+      ctx.metadata.path = "agent";
     } catch (agentErr) {
       // 5. Fallback to single-call Messages API with Haiku
-      console.warn("Agent failed, falling back to Messages API:", agentErr);
+      logWarn(ctx, "agent_fallback", { stage: "managed_agent", fallbackReason: agentErr instanceof Error ? agentErr.message : String(agentErr) });
+      ctx.metadata.path = "fallback";
 
       const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
       if (!anthropicApiKey) {
@@ -1182,7 +1217,7 @@ export const agentInsights = functions
         res.status(200).json(fallbackData);
         return;
       } catch (fallbackErr) {
-        console.error("Fallback also failed:", fallbackErr);
+        logError(ctx, fallbackErr, { stage: "fallback_call" });
         res.status(502).json({ error: "Failed to generate recovery insights" });
         return;
       }
@@ -1205,6 +1240,9 @@ export const generateExerciseImage = functions
     secrets: ["BFL_API_KEY", "GEMINI_API_KEY"],
   })
   .https.onRequest(async (req, res) => {
+    const ctx = newRequestContext("generateExerciseImage");
+    res.on("finish", () => logCompleted(ctx, res.statusCode));
+
     if (req.method !== "POST") {
       res.status(405).json({ error: "Method not allowed" });
       return;
@@ -1222,6 +1260,7 @@ export const generateExerciseImage = functions
     try {
       const decoded = await admin.auth().verifyIdToken(idToken);
       uid = decoded.uid;
+      ctx.uid = uid;
     } catch {
       res.status(401).json({ error: "Invalid Firebase ID token" });
       return;
@@ -1234,13 +1273,16 @@ export const generateExerciseImage = functions
         uid,
       });
 
+      ctx.metadata.resultStatus = result.status;
+      ctx.metadata.matchType = result.matchType;
+
       const statusCode = result.status === "rate_limited" ? 429
         : result.status === "generation_failed" || result.status === "qa_failed" ? 502
         : 200;
 
       res.status(statusCode).json(result);
     } catch (err) {
-      console.error("generateExerciseImage error:", err);
+      logError(ctx, err, { stage: "image_generation" });
       res.status(500).json({ status: "generation_failed", message: "Internal error", retryable: true });
     }
   });
