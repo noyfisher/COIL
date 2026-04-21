@@ -87,6 +87,42 @@ async function checkAndIncrementQuota(uid: string): Promise<QuotaResult> {
   });
 }
 
+/**
+ * Refunds one unit each from dayCount and monthCount if the recorded keys
+ * still match (otherwise day/month already rolled — silently skip).
+ *
+ * Fail-safe: errors are logged but not propagated; a stuck decrement is
+ * only an accounting drift, not a user-visible error. Called on upstream
+ * failure paths so users aren't charged for requests that never returned
+ * a useful response.
+ */
+async function decrementQuota(uid: string): Promise<void> {
+  const ref = admin.firestore().doc(`users/${uid}/quotas/current`);
+  const { dayKey, monthKey } = quotaKeys();
+  try {
+    await admin.firestore().runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      if (!snap.exists) return;
+      const data = snap.data() || {};
+
+      const patch: Record<string, number> = {};
+      if (data.dayKey === dayKey && typeof data.dayCount === "number" && data.dayCount > 0) {
+        patch.dayCount = data.dayCount - 1;
+      }
+      if (data.monthKey === monthKey && typeof data.monthCount === "number" && data.monthCount > 0) {
+        patch.monthCount = data.monthCount - 1;
+      }
+      // Single update with both field deltas — avoids any ambiguity around
+      // multiple writes to the same doc in one transaction.
+      if (Object.keys(patch).length > 0) {
+        tx.update(ref, patch);
+      }
+    });
+  } catch (err) {
+    console.error("decrementQuota failed:", err);
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Clinical knowledge base (compiled RAG — cached via prompt caching)
 // ---------------------------------------------------------------------------
@@ -623,25 +659,6 @@ export const claudeProxy = functions
     }
 
     // -----------------------------------------------------------------------
-    // 2b. Per-user daily/monthly quota (cost cap, survives scale-out)
-    // -----------------------------------------------------------------------
-    let quota: QuotaResult;
-    try {
-      quota = await checkAndIncrementQuota(uid);
-    } catch (err) {
-      console.error("Quota check failed:", err);
-      res.status(500).json({ error: "Quota check failed" });
-      return;
-    }
-    if (!quota.ok) {
-      res.status(429).json({
-        error: `${quota.reason === "daily" ? "Daily" : "Monthly"} usage limit reached (${quota.limit}). Please try again ${quota.reason === "daily" ? "tomorrow" : "next month"}.`,
-        quotaReason: quota.reason,
-      });
-      return;
-    }
-
-    // -----------------------------------------------------------------------
     // 3. Validate request body
     // -----------------------------------------------------------------------
     const body = req.body as ProxyRequestBody;
@@ -690,6 +707,28 @@ export const claudeProxy = functions
     }
 
     // -----------------------------------------------------------------------
+    // 4b. Per-user daily/monthly quota (cost cap, survives scale-out).
+    // Placed AFTER validation + API key check so malformed / mis-configured
+    // requests don't burn quota. Block is OUTSIDE the fetch try/catch so the
+    // decrement paths on failure are reachable (see below).
+    // -----------------------------------------------------------------------
+    let quota: QuotaResult;
+    try {
+      quota = await checkAndIncrementQuota(uid);
+    } catch (err) {
+      console.error("Quota check failed:", err);
+      res.status(500).json({ error: "Quota check failed" });
+      return;
+    }
+    if (!quota.ok) {
+      res.status(429).json({
+        error: `${quota.reason === "daily" ? "Daily" : "Monthly"} usage limit reached (${quota.limit}). Please try again ${quota.reason === "daily" ? "tomorrow" : "next month"}.`,
+        quotaReason: quota.reason,
+      });
+      return;
+    }
+
+    // -----------------------------------------------------------------------
     // 5. Build request with SERVER-SIDE prompt and model config
     // -----------------------------------------------------------------------
     const systemPrompt = SYSTEM_PROMPTS[body.requestType];
@@ -724,6 +763,8 @@ export const claudeProxy = functions
       };
 
       if (!anthropicResponse.ok) {
+        // Refund quota — user didn't get a usable response.
+        await decrementQuota(uid);
         res.status(anthropicResponse.status).json(responseData);
         return;
       }
@@ -738,6 +779,8 @@ export const claudeProxy = functions
 
       res.status(200).json(responseData);
     } catch (error) {
+      // Fetch threw (network error, timeout, etc.) — refund quota.
+      await decrementQuota(uid);
       logError(ctx, error, { stage: "anthropic_call" });
       res.status(502).json({ error: "Failed to reach AI service" });
     }
@@ -791,25 +834,6 @@ export const crossVerify = functions
     }
 
     // -----------------------------------------------------------------------
-    // 2b. Per-user daily/monthly quota (shared cost cap across AI endpoints)
-    // -----------------------------------------------------------------------
-    let quota: QuotaResult;
-    try {
-      quota = await checkAndIncrementQuota(uid);
-    } catch (err) {
-      console.error("Quota check failed:", err);
-      res.status(500).json({ error: "Quota check failed" });
-      return;
-    }
-    if (!quota.ok) {
-      res.status(429).json({
-        error: `${quota.reason === "daily" ? "Daily" : "Monthly"} usage limit reached (${quota.limit}).`,
-        quotaReason: quota.reason,
-      });
-      return;
-    }
-
-    // -----------------------------------------------------------------------
     // 3. Validate request
     // -----------------------------------------------------------------------
     const body = req.body as CrossVerifyRequestBody;
@@ -835,6 +859,28 @@ export const crossVerify = functions
     }
 
     ctx.metadata.exerciseCount = body.exercises.length;
+
+    // -----------------------------------------------------------------------
+    // 4b. Per-user daily/monthly quota (shared cost cap across AI endpoints).
+    // Placed AFTER validation + API key check so malformed / mis-configured
+    // requests don't burn quota. Block is OUTSIDE the fetch try/catch so the
+    // decrement paths on failure are reachable.
+    // -----------------------------------------------------------------------
+    let quota: QuotaResult;
+    try {
+      quota = await checkAndIncrementQuota(uid);
+    } catch (err) {
+      console.error("Quota check failed:", err);
+      res.status(500).json({ error: "Quota check failed" });
+      return;
+    }
+    if (!quota.ok) {
+      res.status(429).json({
+        error: `${quota.reason === "daily" ? "Daily" : "Monthly"} usage limit reached (${quota.limit}).`,
+        quotaReason: quota.reason,
+      });
+      return;
+    }
 
     // -----------------------------------------------------------------------
     // 5. Call GPT-4o-mini for each exercise (batched in one prompt)
@@ -890,6 +936,7 @@ Return results in the same order as the exercises listed above.`;
 
       if (!openaiResponse.ok) {
         const errorData = await openaiResponse.text();
+        await decrementQuota(uid);
         logError(ctx, new Error(`OpenAI API returned ${openaiResponse.status}: ${errorData}`), { stage: "openai_call" });
         res.status(502).json({ error: "Failed to reach verification service" });
         return;
@@ -901,6 +948,8 @@ Return results in the same order as the exercises listed above.`;
       const content = openaiData.choices?.[0]?.message?.content;
 
       if (!content) {
+        // Upstream delivered nothing useful — refund quota.
+        await decrementQuota(uid);
         res.status(502).json({ error: "Empty response from verification service" });
         return;
       }
@@ -909,6 +958,8 @@ Return results in the same order as the exercises listed above.`;
       const parsed = JSON.parse(content);
       res.status(200).json(parsed);
     } catch (error) {
+      // Fetch threw or JSON.parse of response threw — refund quota.
+      await decrementQuota(uid);
       logError(ctx, error, { stage: "openai_call" });
       res.status(502).json({ error: "Failed to reach verification service" });
     }

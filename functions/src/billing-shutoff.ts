@@ -13,6 +13,15 @@
  *    you've verified the wiring works and you're ready to arm the trigger.
  *  - Idempotent: if billing is already disabled, it no-ops.
  *
+ * PREREQUISITE — budget threshold configuration:
+ *   The linked budget MUST include a threshold rule at or above
+ *   SHUTOFF_THRESHOLD (currently 1.2 = 120%). GCP only publishes to the
+ *   Pub/Sub topic when a configured threshold is crossed; if the highest
+ *   rule is 1.0, `alertThresholdExceeded` never reaches 1.2 and this
+ *   function silently no-ops. Our `pt-helper-dev` budget has
+ *   [0.5, 0.8, 1.0, 1.2] — replicate the ≥1.2 rule on any mirror
+ *   (e.g., pt-helper-prod).
+ *
  * SETUP:
  *  1. `gcloud pubsub topics create budget-alerts --project=pt-helper-dev`
  *  2. Link the existing budget to publish to that topic (see PR description).
