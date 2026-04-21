@@ -18,6 +18,14 @@ class SessionLogger: ObservableObject {
     private let persistBatchSize = 10
     private var eventsSinceLastPersist = 0
 
+    /// Upload throttling — prevents a burst of errors from each triggering a
+    /// full Storage + Firestore write of the session log. Every upload writes
+    /// the *entire* log (not a delta), so 10 errors in 30s would otherwise
+    /// produce 10 increasingly-redundant uploads.
+    private static let minUploadInterval: TimeInterval = 60
+    private var lastUploadAt: Date?
+    private var lastUploadedEventCount: Int = 0
+
     private let fileManager = FileManager.default
     private let encoder: JSONEncoder = {
         let enc = JSONEncoder()
@@ -80,6 +88,8 @@ class SessionLogger: ObservableObject {
         )
         eventCount = 0
         eventsSinceLastPersist = 0
+        lastUploadAt = nil
+        lastUploadedEventCount = 0
 
         log(.appLaunched, category: .lifecycle, message: "Session started",
             metadata: crashDetected ? ["crashRecovery": "true"] : nil)
@@ -180,6 +190,22 @@ class SessionLogger: ObservableObject {
 
     func uploadToFirestore() async {
         guard let userId = Auth.auth().currentUser?.uid else { return }
+
+        // Dedup: skip if no new events since the last upload.
+        if currentLog.events.count == lastUploadedEventCount { return }
+
+        // Throttle: skip if we uploaded within the last minUploadInterval.
+        // Next caller after the window will carry the accumulated events.
+        if let last = lastUploadAt,
+           Date().timeIntervalSince(last) < Self.minUploadInterval {
+            return
+        }
+
+        // Reserve the upload slot *before* doing the IO so concurrent callers
+        // don't all race past the guard.
+        lastUploadAt = Date()
+        lastUploadedEventCount = currentLog.events.count
+
         guard let jsonData = try? encoder.encode(currentLog) else { return }
 
         let db = Firestore.firestore()
