@@ -7,6 +7,10 @@ import { runRecoveryInsightsAgent, validateInsightResult } from "./managed-agent
 import { handleGenerateExerciseImage } from "./image-generation";
 import { newRequestContext, logCompleted, logError, logWarn } from "./logger";
 
+// Hard billing shutoff (Pub/Sub triggered). Exported so firebase-tools
+// picks it up on deploy. See billing-shutoff.ts for arming instructions.
+export { onBudgetAlert } from "./billing-shutoff";
+
 admin.initializeApp();
 
 // ---------------------------------------------------------------------------
