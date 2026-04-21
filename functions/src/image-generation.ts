@@ -503,14 +503,16 @@ async function uploadAndUpdateMapping(
   const filename = `${normalizedKey}.png`;
   const filePath = `exercise-images/${filename}`;
 
-  // Upload image
+  // Upload image. Do NOT call makePublic() — clients authenticate via the
+  // Firebase Storage SDK and the storage.rules gate (`allow read: if
+  // request.auth != null`). Making the object public would bypass the rule
+  // and allow unauthenticated DoS against the GCS bucket.
   const file = bucket.file(filePath);
   await file.save(imageBuffer, {
     metadata: { contentType: "image/png" },
   });
-  await file.makePublic();
 
-  const imageUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+  const imageUrl = `gs://${bucket.name}/${filePath}`;
 
   // Update mapping in Storage
   const mapping = await loadMapping();
