@@ -62,8 +62,16 @@ export const onBudgetAlert = functions
       dryRun,
     });
 
-    if (!payload.costAmount || !payload.budgetAmount) {
+    // Use explicit type checks — costAmount can legitimately be 0 at the
+    // start of a billing period, and `!0 === true` would wrongly trip the
+    // missing-fields guard.
+    if (typeof payload.costAmount !== "number" || typeof payload.budgetAmount !== "number") {
       functions.logger.warn("budget_alert_missing_fields", { payload });
+      return;
+    }
+
+    if (payload.budgetAmount <= 0) {
+      functions.logger.warn("budget_alert_invalid_budget", { payload });
       return;
     }
 
