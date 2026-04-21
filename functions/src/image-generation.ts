@@ -555,6 +555,40 @@ function isImageGenRateLimited(uid: string): boolean {
   return false;
 }
 
+// ---------------------------------------------------------------------------
+// Per-user daily quota (separate from the global DAILY_BUDGET below).
+// Prevents one user from draining the global 50/day pool; Firestore-backed
+// so it survives Cloud Function scale-out.
+// ---------------------------------------------------------------------------
+const DAILY_USER_IMAGE_QUOTA = 5;
+
+type UserImageQuotaResult =
+  | { ok: true; remaining: number }
+  | { ok: false; limit: number };
+
+async function checkAndIncrementUserImageQuota(uid: string): Promise<UserImageQuotaResult> {
+  const ref = getDb().doc(`users/${uid}/quotas/images`);
+  const dayKey = new Date().toISOString().slice(0, 10);
+
+  return getDb().runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const data = snap.exists ? snap.data() || {} : {};
+    const count = data.dayKey === dayKey ? (data.dayCount || 0) : 0;
+
+    if (count >= DAILY_USER_IMAGE_QUOTA) {
+      return { ok: false, limit: DAILY_USER_IMAGE_QUOTA } as UserImageQuotaResult;
+    }
+
+    tx.set(ref, {
+      dayKey,
+      dayCount: count + 1,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+
+    return { ok: true, remaining: DAILY_USER_IMAGE_QUOTA - count - 1 } as UserImageQuotaResult;
+  });
+}
+
 // Daily global budget
 const DAILY_BUDGET = 50;
 
@@ -631,6 +665,7 @@ export async function handleGenerateExerciseImage(
   }
 
   // Step 1: Mapping intelligence — check if image already exists
+  // (No quota cost: cache hits don't trigger generation.)
   const resolution = await resolveOrAlias(exerciseName);
   if (resolution.found) {
     return {
@@ -640,7 +675,18 @@ export async function handleGenerateExerciseImage(
     };
   }
 
-  // Step 2: Check daily budget
+  // Step 2a: Per-user daily quota (caps cost per user; prevents a single
+  // user from draining the global DAILY_BUDGET pool).
+  const userQuota = await checkAndIncrementUserImageQuota(req.uid);
+  if (!userQuota.ok) {
+    return {
+      status: "rate_limited",
+      message: `Daily image generation limit reached (${userQuota.limit} per user). Please try again tomorrow.`,
+      retryable: false,
+    };
+  }
+
+  // Step 2b: Check global daily budget
   const budgetOk = await checkDailyBudget();
   if (!budgetOk) {
     return { status: "generation_failed", message: "Daily generation budget exhausted", retryable: false };
