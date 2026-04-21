@@ -31,6 +31,58 @@ function isRateLimited(uid: string): boolean {
 }
 
 // ---------------------------------------------------------------------------
+// Per-user quota (Firestore-backed, survives scale-out)
+// Doc path: users/{uid}/quotas/current
+// Fields: dayKey, dayCount, monthKey, monthCount
+// ---------------------------------------------------------------------------
+const DAILY_QUOTA = 100;
+const MONTHLY_QUOTA = 1000;
+
+type QuotaResult =
+  | { ok: true; dayCount: number; monthCount: number }
+  | { ok: false; reason: "daily" | "monthly"; limit: number };
+
+function quotaKeys(now: Date = new Date()): { dayKey: string; monthKey: string } {
+  const iso = now.toISOString();
+  return {
+    dayKey: iso.slice(0, 10),      // YYYY-MM-DD
+    monthKey: iso.slice(0, 7),     // YYYY-MM
+  };
+}
+
+async function checkAndIncrementQuota(uid: string): Promise<QuotaResult> {
+  const ref = admin.firestore().doc(`users/${uid}/quotas/current`);
+  const { dayKey, monthKey } = quotaKeys();
+
+  return admin.firestore().runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const data = snap.exists ? snap.data() || {} : {};
+
+    const dayCount = data.dayKey === dayKey ? (data.dayCount || 0) : 0;
+    const monthCount = data.monthKey === monthKey ? (data.monthCount || 0) : 0;
+
+    if (dayCount >= DAILY_QUOTA) {
+      return { ok: false, reason: "daily", limit: DAILY_QUOTA } as QuotaResult;
+    }
+    if (monthCount >= MONTHLY_QUOTA) {
+      return { ok: false, reason: "monthly", limit: MONTHLY_QUOTA } as QuotaResult;
+    }
+
+    const nextDay = dayCount + 1;
+    const nextMonth = monthCount + 1;
+    tx.set(ref, {
+      dayKey,
+      dayCount: nextDay,
+      monthKey,
+      monthCount: nextMonth,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+
+    return { ok: true, dayCount: nextDay, monthCount: nextMonth } as QuotaResult;
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Clinical knowledge base (compiled RAG — cached via prompt caching)
 // ---------------------------------------------------------------------------
 const CLINICAL_KNOWLEDGE_BASE = `
@@ -562,6 +614,25 @@ export const claudeProxy = functions
     }
 
     // -----------------------------------------------------------------------
+    // 2b. Per-user daily/monthly quota (cost cap, survives scale-out)
+    // -----------------------------------------------------------------------
+    let quota: QuotaResult;
+    try {
+      quota = await checkAndIncrementQuota(uid);
+    } catch (err) {
+      console.error("Quota check failed:", err);
+      res.status(500).json({ error: "Quota check failed" });
+      return;
+    }
+    if (!quota.ok) {
+      res.status(429).json({
+        error: `${quota.reason === "daily" ? "Daily" : "Monthly"} usage limit reached (${quota.limit}). Please try again ${quota.reason === "daily" ? "tomorrow" : "next month"}.`,
+        quotaReason: quota.reason,
+      });
+      return;
+    }
+
+    // -----------------------------------------------------------------------
     // 3. Validate request body
     // -----------------------------------------------------------------------
     const body = req.body as ProxyRequestBody;
@@ -625,7 +696,9 @@ export const claudeProxy = functions
           model: config.model,
           max_tokens: config.max_tokens,
           ...(config.temperature !== undefined && { temperature: config.temperature }),
-          system: systemPrompt,
+          system: [
+            { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } },
+          ],
           messages: body.messages,
         }),
       });
@@ -684,6 +757,25 @@ export const crossVerify = functions
     // -----------------------------------------------------------------------
     if (isRateLimited(uid)) {
       res.status(429).json({ error: "Rate limit exceeded. Please wait and try again." });
+      return;
+    }
+
+    // -----------------------------------------------------------------------
+    // 2b. Per-user daily/monthly quota (shared cost cap across AI endpoints)
+    // -----------------------------------------------------------------------
+    let quota: QuotaResult;
+    try {
+      quota = await checkAndIncrementQuota(uid);
+    } catch (err) {
+      console.error("Quota check failed:", err);
+      res.status(500).json({ error: "Quota check failed" });
+      return;
+    }
+    if (!quota.ok) {
+      res.status(429).json({
+        error: `${quota.reason === "daily" ? "Daily" : "Monthly"} usage limit reached (${quota.limit}).`,
+        quotaReason: quota.reason,
+      });
       return;
     }
 
@@ -1166,7 +1258,9 @@ export const agentInsights = functions
             model: config.model,
             max_tokens: config.max_tokens,
             temperature: config.temperature,
-            system: systemPrompt,
+            system: [
+              { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } },
+            ],
             messages: [{ role: "user", content: data.userMessage }],
           }),
         });
