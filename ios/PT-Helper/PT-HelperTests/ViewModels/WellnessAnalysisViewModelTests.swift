@@ -152,4 +152,38 @@ final class WellnessAnalysisViewModelTests: XCTestCase {
         )
         XCTAssertEqual(vm.selectedGoalNames, ["Improve Posture", "Manage Stress"])
     }
+
+    // MARK: - currentAssessment
+
+    func testCurrentAssessment_returnsNilBeforeSave() {
+        let vm = makeVM()
+        XCTAssertNil(vm.currentAssessment)
+    }
+
+    func testCurrentAssessment_returnsSavedAssessment() {
+        let vm = makeVM()
+        let assessment = TestFixtures.makeWellnessAssessment(motivationLevel: 9)
+        vm.saveCurrentAssessment(assessment)
+        XCTAssertEqual(vm.currentAssessment?.motivationLevel, 9)
+    }
+
+    // MARK: - Out-of-Bounds Guards
+
+    func testSaveCurrentAssessment_indexOutOfBounds_isNoOp() {
+        let vm = makeVM(goalCount: 2)
+        vm.currentGoalIndex = 5 // exceeds bounds
+        vm.saveCurrentAssessment(TestFixtures.makeWellnessAssessment())
+        XCTAssertTrue(vm.assessments.allSatisfy { $0 == nil },
+                      "Out-of-bounds save must not mutate assessments")
+    }
+
+    // MARK: - saveAndAnalyze
+
+    func testSaveAndAnalyze_savesAndTriggersAnalyzingScreen() {
+        let vm = makeVM(goalCount: 1)
+        let assessment = TestFixtures.makeWellnessAssessment()
+        vm.saveAndAnalyze(assessment)
+        XCTAssertNotNil(vm.assessments[0])
+        XCTAssertTrue(vm.showAnalyzingScreen)
+    }
 }
