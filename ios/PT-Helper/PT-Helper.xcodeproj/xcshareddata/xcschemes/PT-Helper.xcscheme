@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scheme
+   LastUpgradeVersion = "1600"
+   version = "1.7">
+   <BuildAction
+      parallelizeBuildables = "YES"
+      buildImplicitDependencies = "YES"
+      buildArchitectures = "Automatic">
+      <BuildActionEntries>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "7A071AF32E8236EC00497F94"
+               BuildableName = "PT-Helper.app"
+               BlueprintName = "PT-Helper"
+               ReferencedContainer = "container:PT-Helper.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+      </BuildActionEntries>
+   </BuildAction>
+   <TestAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      shouldUseLaunchSchemeArgsEnv = "YES">
+      <TestPlans>
+         <TestPlanReference
+            reference = "container:SmokePlan.xctestplan">
+         </TestPlanReference>
+         <TestPlanReference
+            reference = "container:UnitPlan.xctestplan"
+            default = "YES">
+         </TestPlanReference>
+         <TestPlanReference
+            reference = "container:FullPlan.xctestplan">
+         </TestPlanReference>
+         <TestPlanReference
+            reference = "container:PreReleasePlan.xctestplan">
+         </TestPlanReference>
+      </TestPlans>
+   </TestAction>
+   <LaunchAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      launchStyle = "0"
+      useCustomWorkingDirectory = "NO"
+      ignoresPersistentStateOnLaunch = "NO"
+      debugDocumentVersioning = "YES"
+      debugServiceExtension = "internal"
+      allowLocationSimulation = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "7A071AF32E8236EC00497F94"
+            BuildableName = "PT-Helper.app"
+            BlueprintName = "PT-Helper"
+            ReferencedContainer = "container:PT-Helper.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "GRPC_VERBOSITY"
+            value = "ERROR"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
+   </LaunchAction>
+   <ProfileAction
+      buildConfiguration = "Release"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      savedToolIdentifier = ""
+      useCustomWorkingDirectory = "NO"
+      debugDocumentVersioning = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "7A071AF32E8236EC00497F94"
+            BuildableName = "PT-Helper.app"
+            BlueprintName = "PT-Helper"
+            ReferencedContainer = "container:PT-Helper.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+   </ProfileAction>
+   <AnalyzeAction
+      buildConfiguration = "Debug">
+   </AnalyzeAction>
+   <ArchiveAction
+      buildConfiguration = "Release"
+      revealArchiveInOrganizer = "YES">
+      <PostActions>
+         <ExecutionAction
+            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
+            <ActionContent
+               title = "Generate missing dSYMs for Firebase xcframeworks"
+               scriptText = "#!/bin/bash&#10;# Generate dSYM bundles for Firebase/Google xcframeworks that ship&#10;# without dSYMs via SPM, suppressing App Store Connect warnings.&#10;# Runs as a post-archive action where $ARCHIVE_PATH is available.&#10;&#10;set -euo pipefail&#10;&#10;LOG=&quot;/tmp/pt-helper-dsym-gen.log&quot;&#10;exec &gt; &quot;$LOG&quot; 2&gt;&amp;1&#10;echo &quot;=== dSYM generation started $(date) ===&quot;&#10;&#10;if [ -z &quot;${ARCHIVE_PATH:-}&quot; ]; then&#10;  echo &quot;ERROR: ARCHIVE_PATH not set &#x2014; not running in post-archive context&quot;&#10;  exit 0&#10;fi&#10;&#10;DSYMS_DIR=&quot;$ARCHIVE_PATH/dSYMs&quot;&#10;FRAMEWORKS_DIR=&quot;$ARCHIVE_PATH/Products/Applications/PT-Helper.app/Frameworks&quot;&#10;&#10;echo &quot;ARCHIVE_PATH: $ARCHIVE_PATH&quot;&#10;echo &quot;DSYMS_DIR:    $DSYMS_DIR&quot;&#10;echo &quot;FRAMEWORKS:   $FRAMEWORKS_DIR&quot;&#10;&#10;if [ ! -d &quot;$FRAMEWORKS_DIR&quot; ]; then&#10;  echo &quot;No Frameworks directory in archive, skipping&quot;&#10;  exit 0&#10;fi&#10;&#10;mkdir -p &quot;$DSYMS_DIR&quot;&#10;&#10;GENERATED=0&#10;for fw in &quot;$FRAMEWORKS_DIR&quot;/*.framework; do&#10;  [ -d &quot;$fw&quot; ] || continue&#10;  FW_NAME=$(basename &quot;$fw&quot; .framework)&#10;  FW_BINARY=&quot;$fw/$FW_NAME&quot;&#10;  [ -f &quot;$FW_BINARY&quot; ] || continue&#10;&#10;  DSYM_BUNDLE=&quot;$DSYMS_DIR/$FW_NAME.framework.dSYM&quot;&#10;&#10;  # Skip if dSYM bundle already exists&#10;  if [ -d &quot;$DSYM_BUNDLE&quot; ]; then&#10;    echo &quot;SKIP $FW_NAME (dSYM exists)&quot;&#10;    continue&#10;  fi&#10;&#10;  # Try dsymutil to generate a proper dSYM bundle&#10;  echo &quot;Generating dSYM for $FW_NAME...&quot;&#10;  if dsymutil &quot;$FW_BINARY&quot; -o &quot;$DSYM_BUNDLE&quot; 2&gt;&amp;1; then&#10;    # Verify the dSYM has the DWARF directory&#10;    if [ -d &quot;$DSYM_BUNDLE/Contents/Resources/DWARF&quot; ]; then&#10;      echo &quot;  OK: $FW_NAME dSYM generated&quot;&#10;      GENERATED=$((GENERATED + 1))&#10;    else&#10;      echo &quot;  WARN: dsymutil produced empty dSYM for $FW_NAME, removing&quot;&#10;      rm -rf &quot;$DSYM_BUNDLE&quot;&#10;    fi&#10;  else&#10;    echo &quot;  WARN: dsymutil failed for $FW_NAME&quot;&#10;    rm -rf &quot;$DSYM_BUNDLE&quot;&#10;  fi&#10;done&#10;&#10;echo &quot;=== Done: generated $GENERATED dSYMs ===&quot;&#10;">
+               <EnvironmentBuildable>
+                  <BuildableReference
+                     BuildableIdentifier = "primary"
+                     BlueprintIdentifier = "7A071AF32E8236EC00497F94"
+                     BuildableName = "PT-Helper.app"
+                     BlueprintName = "PT-Helper"
+                     ReferencedContainer = "container:PT-Helper.xcodeproj">
+                  </BuildableReference>
+               </EnvironmentBuildable>
+            </ActionContent>
+         </ExecutionAction>
+      </PostActions>
+   </ArchiveAction>
+</Scheme>

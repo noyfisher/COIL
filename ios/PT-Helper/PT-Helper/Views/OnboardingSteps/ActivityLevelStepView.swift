@@ -20,41 +20,43 @@ struct ActivityLevelStepView: View {
                         HStack(spacing: AppSpacing.lg) {
                             Image(systemName: icon)
                                 .font(.title3)
-                                .foregroundColor(isSelected ? .white : .blue)
+                                .foregroundColor(isSelected ? AppColors.ctaText : AppColors.accent)
                                 .frame(width: 44, height: 44)
-                                .background(isSelected ? Color.blue : Color.blue.opacity(0.1))
+                                .background(isSelected ? AppColors.accent : AppColors.accentTint)
                                 .cornerRadius(AppCorners.medium)
 
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(level)
                                     .font(.body.weight(.semibold))
-                                    .foregroundColor(isSelected ? .white : .primary)
+                                    .foregroundColor(isSelected ? AppColors.ctaText : AppColors.primaryText)
                                 Text(subtitle)
                                     .font(.caption)
-                                    .foregroundColor(isSelected ? .white.opacity(0.8) : .secondary)
+                                    .foregroundColor(isSelected ? AppColors.ctaText.opacity(0.8) : AppColors.secondaryText)
                             }
 
                             Spacer()
 
                             if isSelected {
                                 Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(.white)
+                                    .foregroundColor(AppColors.ctaText)
                                     .font(.title3)
                             }
                         }
                         .padding(AppSpacing.lg)
-                        .background(isSelected ? Color.blue : AppColors.cardBackground)
+                        .background(isSelected ? AppColors.accent : AppColors.cardBackground)
                         .cornerRadius(AppCorners.card)
-                        .shadow(color: .black.opacity(isSelected ? 0 : 0.04), radius: 8, y: 2)
+                        .shadow(color: AppColors.cardShadowColor.opacity(isSelected ? 0 : 1), radius: 8, y: 2)
                         .overlay(
                             RoundedRectangle(cornerRadius: AppCorners.card)
-                                .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2)
+                                .stroke(isSelected ? AppColors.accent : Color.clear, lineWidth: 2)
                         )
                     }
+                    .accessibilityIdentifier("onboarding.activityLevelOption")
                 }
 
-                CardSection(icon: "sportscourt", color: .green, title: "Primary Sport or Activity") {
+                CardSection(icon: "sportscourt", color: AppColors.success, title: "Primary Sport or Activity") {
                     TextField("e.g. Basketball, Running, Yoga...", text: $viewModel.userProfile.primarySport.bound)
+                        .foregroundColor(AppColors.primaryText)
                         .padding(AppSpacing.md)
                         .background(AppColors.inputBackground)
                         .cornerRadius(AppCorners.medium)
@@ -68,5 +70,6 @@ struct ActivityLevelStepView: View {
         .onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
+        .trackScreen("OnboardingActivityLevel")
     }
 }

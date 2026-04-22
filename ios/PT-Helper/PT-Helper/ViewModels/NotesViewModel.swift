@@ -27,7 +27,7 @@ class NotesViewModel: ObservableObject {
                     guard let self = self else { return }
                     self.isLoading = false
                     if let error = error {
-                        print("Error fetching notes: \(error.localizedDescription)")
+                        AppLogger.data.error("Error fetching notes: \(error.localizedDescription)")
                         self.loadError = "Unable to load your notes. Pull down to retry."
                         return
                     }
@@ -63,7 +63,7 @@ class NotesViewModel: ObservableObject {
             .document(newNote.id.uuidString)
             .setData(noteData) { error in
                 if let error = error {
-                    print("Error saving note: \(error.localizedDescription)")
+                    AppLogger.data.error("Error saving note: \(error.localizedDescription)")
                 }
             }
     }
@@ -78,7 +78,7 @@ class NotesViewModel: ObservableObject {
             .document(note.id.uuidString)
             .delete { [weak self] error in
                 if let error = error {
-                    print("Error deleting note: \(error.localizedDescription)")
+                    AppLogger.data.error("Error deleting note: \(error.localizedDescription)")
                     // Re-fetch to restore consistent state
                     DispatchQueue.main.async {
                         self?.fetchNotes()

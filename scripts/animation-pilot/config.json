@@ -1,0 +1,22 @@
+{
+  "pilot_exercises": [
+    "wall-slides",
+    "standing-hip-abduction",
+    "pendulum-swings",
+    "bird-dog",
+    "clamshells",
+    "straight-leg-raises",
+    "seated-knee-extension",
+    "seated-calf-raises",
+    "chin-tucks",
+    "scapular-squeezes"
+  ],
+  "flux_model": "flux2-pro",
+  "pikaframes_model": "fal-ai/pika/v2.2/pikaframes",
+  "pikaframes_resolution": "720p",
+  "gif_fps": 10,
+  "gif_max_width": 512,
+  "bfl_rate_limit_seconds": 8,
+  "fal_poll_interval_seconds": 2,
+  "output_size": 1024
+}

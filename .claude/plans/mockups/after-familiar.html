@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0">
+<title>Familiar Exercise View</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+  :root {
+    --accent: #5E8C5A;
+    --accent-tint: rgba(94,140,90,0.10);
+    --accent-light: #A8CCA5;
+    --cta-bg: #3A5E36;
+    --cta-text: #F2F5EE;
+    --primary-text: #1E2B1A;
+    --secondary-text: #556B4A;
+    --muted-text: #8A9A7E;
+    --card-bg: #FAFCF8;
+    --page-bg: #E8F0E9;
+    --elevated: #E2E8DA;
+    --card-border: rgba(75,100,65,0.10);
+    --card-shadow: rgba(45,60,35,0.05);
+    --corner-card: 20px;
+    --corner-small: 14px;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--page-bg);
+    width: 375px;
+    height: 812px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    height: 54px; background: var(--page-bg);
+    display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 8px; font-size: 15px; font-weight: 600; color: var(--primary-text);
+    flex-shrink: 0;
+  }
+
+  .nav-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 20px 12px; background: var(--page-bg); flex-shrink: 0;
+  }
+  .nav-bar .end-btn { color: #B85C5C; font-size: 17px; font-weight: 500; }
+  .nav-bar .title { font-size: 17px; font-weight: 600; color: var(--primary-text); }
+  .nav-bar .pause-btn { color: var(--accent); font-size: 20px; }
+
+  .scrollable { flex: 1; overflow-y: auto; padding: 0 20px; display: flex; flex-direction: column; }
+
+  /* Progress segments */
+  .progress-header { margin-bottom: 16px; }
+  .progress-labels { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .progress-labels span { font-size: 12px; font-weight: 600; }
+  .progress-labels .el { color: var(--accent); }
+  .progress-labels .tl { color: var(--secondary-text); }
+  .progress-segments { display: flex; gap: 4px; height: 6px; }
+  .seg { flex: 1; border-radius: 3px; }
+  .seg.done { background: var(--accent); }
+  .seg.now { background: linear-gradient(90deg, var(--accent) 50%, var(--accent-tint) 50%); }
+  .seg.todo { background: var(--accent-tint); }
+
+  /* Hero image - larger for familiar view */
+  .hero-image {
+    width: 100%;
+    height: 280px;
+    border-radius: var(--corner-card);
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .hero-image img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* Mastery badge */
+  .mastery-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(94,140,90,0.9);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 100px;
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Minimal info row */
+  .minimal-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .exercise-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-text);
+  }
+
+  .info-chips {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .chip {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-tint);
+    padding: 6px 12px;
+    border-radius: 100px;
+  }
+
+  /* Last session context */
+  .last-session {
+    background: var(--card-bg);
+    border-radius: var(--corner-card);
+    padding: 12px 16px;
+    border: 1px solid var(--card-border);
+    box-shadow: 0 1px 4px var(--card-shadow);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .ls-icon {
+    width: 32px; height: 32px; min-width: 32px;
+    border-radius: 8px;
+    background: rgba(94,140,90,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .ls-text {
+    font-size: 13px;
+    color: var(--secondary-text);
+  }
+  .ls-text strong { color: var(--primary-text); }
+
+  /* Audio tempo toggle */
+  .tempo-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--card-bg);
+    border-radius: var(--corner-card);
+    padding: 12px 16px;
+    border: 1px solid var(--card-border);
+    margin-bottom: 16px;
+  }
+  .tempo-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tempo-icon {
+    font-size: 20px;
+  }
+  .tempo-info {}
+  .tempo-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary-text);
+  }
+  .tempo-sub {
+    font-size: 11px;
+    color: var(--muted-text);
+  }
+  .toggle-track {
+    width: 48px; height: 28px;
+    border-radius: 14px;
+    background: var(--accent);
+    position: relative;
+  }
+  .toggle-thumb {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: white;
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+
+  /* Review form link */
+  .review-link {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .review-link a {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .spacer { flex: 1; }
+
+  /* Compact secondary actions */
+  .secondary-row {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 8px;
+  }
+  .sec-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .sec-icon {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .sec-label { font-size: 10px; color: var(--muted-text); font-weight: 500; }
+
+  /* Bottom bar */
+  .bottom-bar {
+    flex-shrink: 0;
+    background: var(--card-bg);
+    border-top: 1px solid var(--card-border);
+    padding: 12px 20px 34px;
+    box-shadow: 0 -4px 16px var(--card-shadow);
+  }
+  .set-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+  }
+  .dot.filled { background: var(--accent); }
+
+  .btn-primary {
+    width: 100%;
+    padding: 16px;
+    background: var(--cta-bg);
+    color: var(--cta-text);
+    border: none;
+    border-radius: 100px;
+    font-size: 17px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .screen-label {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: #2D4A2A;
+    color: white; text-align: center; padding: 4px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+<div class="screen-label">✦ FAMILIAR EXERCISE — Progressive Learning (10+ completions)</div>
+
+<div class="status-bar">9:41</div>
+
+<div class="nav-bar">
+  <span class="end-btn">End</span>
+  <span class="title">Guided Workout</span>
+  <span class="pause-btn">⏸</span>
+</div>
+
+<div class="scrollable">
+  <!-- Progress -->
+  <div class="progress-header">
+    <div class="progress-labels">
+      <span class="el">Exercise 4 of 6</span>
+      <span class="tl">12:18</span>
+    </div>
+    <div class="progress-segments">
+      <div class="seg done"></div>
+      <div class="seg done"></div>
+      <div class="seg done"></div>
+      <div class="seg now"></div>
+      <div class="seg todo"></div>
+      <div class="seg todo"></div>
+    </div>
+  </div>
+
+  <!-- Hero image with mastery badge -->
+  <div class="hero-image">
+    <img src="img/wall-sits.png" alt="Wall Sits">
+    <div class="mastery-badge">⭐ Mastered · 12 sessions</div>
+  </div>
+
+  <!-- Minimal info -->
+  <div class="minimal-row">
+    <div class="exercise-name">Wall Sits</div>
+  </div>
+
+  <div class="info-chips">
+    <div class="chip">Set 2/3</div>
+    <div class="chip">30 sec hold</div>
+    <div class="chip">60s rest</div>
+  </div>
+
+  <!-- Last session context -->
+  <div class="last-session">
+    <div class="ls-icon">📊</div>
+    <div class="ls-text"><strong>Last time:</strong> Completed 3/3 sets · Pain 2/10</div>
+  </div>
+
+  <!-- Audio tempo toggle -->
+  <div class="tempo-toggle">
+    <div class="tempo-left">
+      <div class="tempo-icon">🔊</div>
+      <div class="tempo-info">
+        <div class="tempo-title">Audio Tempo</div>
+        <div class="tempo-sub">Voice counts through each hold</div>
+      </div>
+    </div>
+    <div class="toggle-track">
+      <div class="toggle-thumb"></div>
+    </div>
+  </div>
+
+  <!-- Review form link -->
+  <div class="review-link">
+    <a href="#">📖 Review form instructions →</a>
+  </div>
+
+  <div class="spacer"></div>
+
+  <!-- Compact secondary -->
+  <div class="secondary-row">
+    <div class="sec-action"><div class="sec-icon">📹</div><span class="sec-label">Form</span></div>
+    <div class="sec-action"><div class="sec-icon">🔄</div><span class="sec-label">Swap</span></div>
+    <div class="sec-action"><div class="sec-icon">⏭</div><span class="sec-label">Skip</span></div>
+  </div>
+</div>
+
+<!-- Fixed bottom bar -->
+<div class="bottom-bar">
+  <div class="set-dots">
+    <div class="dot filled"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+  <button class="btn-primary">✓ Complete Set 2</button>
+</div>
+
+</body>
+</html>

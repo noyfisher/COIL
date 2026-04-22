@@ -1,0 +1,105 @@
+{
+  "endTime" : "2026-03-25T04:56:10Z",
+  "events" : [
+    {
+      "action" : "funnel_event",
+      "expectedAnalyticsEvent" : "sign_in_completed",
+      "metadata" : {
+
+      },
+      "timestamp" : "2026-03-25T04:53:52Z",
+      "virtualUserId" : "vuser-dropoff-bodymap-006"
+    },
+    {
+      "action" : "funnel_event",
+      "expectedAnalyticsEvent" : "onboarding_started",
+      "metadata" : {
+
+      },
+      "timestamp" : "2026-03-25T04:53:56Z",
+      "virtualUserId" : "vuser-dropoff-bodymap-006"
+    },
+    {
+      "action" : "screen_view",
+      "expectedAnalyticsEvent" : "screen_view",
+      "metadata" : {
+
+      },
+      "screenName" : "Onboarding",
+      "timestamp" : "2026-03-25T04:53:56Z",
+      "virtualUserId" : "vuser-dropoff-bodymap-006"
+    },
+    {
+      "action" : "funnel_event",
+      "expectedAnalyticsEvent" : "onboarding_completed",
+      "metadata" : {
+
+      },
+      "timestamp" : "2026-03-25T04:55:27Z",
+      "virtualUserId" : "vuser-dropoff-bodymap-006"
+    },
+    {
+      "action" : "screen_view",
+      "expectedAnalyticsEvent" : "screen_view",
+      "metadata" : {
+
+      },
+      "screenName" : "BodyMap3D",
+      "timestamp" : "2026-03-25T04:55:28Z",
+      "virtualUserId" : "vuser-dropoff-bodymap-006"
+    },
+    {
+      "action" : "funnel_event",
+      "expectedAnalyticsEvent" : "body_map_opened",
+      "metadata" : {
+
+      },
+      "timestamp" : "2026-03-25T04:55:28Z",
+      "virtualUserId" : "vuser-dropoff-bodymap-006"
+    },
+    {
+      "action" : "screen_view",
+      "expectedAnalyticsEvent" : "screen_view",
+      "metadata" : {
+
+      },
+      "screenName" : "DashboardTab",
+      "timestamp" : "2026-03-25T04:55:41Z",
+      "virtualUserId" : "vuser-dropoff-bodymap-006"
+    },
+    {
+      "action" : "engagement_event",
+      "expectedAnalyticsEvent" : "tab_switched",
+      "metadata" : {
+        "tab" : "Profile"
+      },
+      "timestamp" : "2026-03-25T04:55:51Z",
+      "virtualUserId" : "vuser-dropoff-bodymap-006"
+    },
+    {
+      "action" : "screen_view",
+      "expectedAnalyticsEvent" : "screen_view",
+      "metadata" : {
+
+      },
+      "screenName" : "DashProfile",
+      "timestamp" : "2026-03-25T04:55:51Z",
+      "virtualUserId" : "vuser-dropoff-bodymap-006"
+    }
+  ],
+  "funnelEvents" : [
+    "sign_in_completed",
+    "onboarding_started",
+    "onboarding_completed",
+    "body_map_opened"
+  ],
+  "screenViews" : [
+    "Onboarding",
+    "BodyMap3D",
+    "DashboardTab",
+    "DashProfile"
+  ],
+  "startTime" : "2026-03-25T04:53:49Z",
+  "totalEvents" : 9,
+  "virtualUserId" : "vuser-dropoff-bodymap-006"
+}

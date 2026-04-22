@@ -6,32 +6,36 @@ struct AnalyzingView: View {
     @State private var navigateToResults = false
     @State private var elapsedSeconds: Int = 0
     @State private var timer: Timer?
+    @State private var showCompletionFlash = false
 
     var body: some View {
         ZStack {
             AppColors.pageBackground.ignoresSafeArea()
-
-            // Navigate to results — only when user-driven flag is set
-            NavigationLink(
-                destination: AnalysisResultView(analysisResult: viewModel.analysisResult ?? AnalysisResult(
-                    id: UUID(), assessments: [], conditions: [],
-                    overallSummary: "", disclaimerText: "",
-                    generatedDate: Date(), userProfileSnapshot: viewModel.userProfile
-                )),
-                isActive: $navigateToResults
-            ) {
-                EmptyView()
-            }
 
             if let error = viewModel.analysisError {
                 errorView(error)
             } else {
                 loadingView
             }
+
+            // Completion flash overlay
+            if showCompletionFlash {
+                Color.black.opacity(0.15)
+                    .ignoresSafeArea()
+                    .transition(.opacity)
+
+                CelebrationOverlay(
+                    icon: "checkmark.circle.fill",
+                    message: "Analysis Complete!",
+                    iconColor: AppColors.success
+                )
+            }
         }
         .navigationTitle("Analyzing")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        .interactiveDismissDisabled(viewModel.isAnalyzing)
+        .gesture(viewModel.isAnalyzing ? DragGesture() : nil)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 if viewModel.isAnalyzing {
@@ -56,18 +60,48 @@ struct AnalyzingView: View {
             timer?.invalidate()
             timer = nil
         }
-        .onChange(of: viewModel.isAnalyzing) { isAnalyzing in
-            // When analysis finishes and we have a result, navigate forward
+        .onChange(of: viewModel.isAnalyzing) { _, isAnalyzing in
+            // When analysis finishes and we have a result, show flash then navigate
             if !isAnalyzing && viewModel.analysisResult != nil {
-                navigateToResults = true
+                let notification = UINotificationFeedbackGenerator()
+                notification.notificationOccurred(.success)
+                withAnimation(AppAnimations.bouncy) {
+                    showCompletionFlash = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                    showCompletionFlash = false
+                    navigateToResults = true
+                }
             }
         }
-        .onChange(of: navigateToResults) { newValue in
-            // When user navigates back from results, clean up so they can re-analyze
+        .onChange(of: navigateToResults) { _, newValue in
+            // When user navigates back from results, also pop back to PainDetailView.
+            // Use Task + yield to let NavigationStack complete its transition before
+            // mutating the second navigation binding. This avoids the simultaneous
+            // navigation state mutation crash that a fixed-delay asyncAfter can cause.
             if !newValue {
                 viewModel.analysisResult = nil
+                Task { @MainActor in
+                    // Yield twice to let the NavigationStack pop animation settle
+                    await Task.yield()
+                    await Task.yield()
+                    try? await Task.sleep(for: .milliseconds(50))
+                    viewModel.showAnalyzingScreen = false
+                }
             }
         }
+        .navigationDestination(isPresented: $navigateToResults) {
+            AnalysisResultView(
+                analysisResult: viewModel.analysisResult ?? AnalysisResult(
+                    id: UUID(), assessments: [], conditions: [],
+                    overallSummary: "", disclaimerText: "",
+                    generatedDate: Date(), userProfileSnapshot: viewModel.userProfile
+                ),
+                validationWarnings: viewModel.validationWarnings,
+                redFlagAlerts: viewModel.redFlagAlerts
+            )
+        }
+        .trackScreen("Analyzing")
     }
 
     // MARK: - Loading View
@@ -81,7 +115,7 @@ struct AnalyzingView: View {
                 .font(.system(size: 70))
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [AppColors.accent, .purple],
+                        colors: [AppColors.accent, AppColors.accentLight],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -125,6 +159,12 @@ struct AnalyzingView: View {
                     isActive: animateSteps
                 )
                 AnalysisStepRow(
+                    icon: "checkmark.shield.fill",
+                    text: "Verifying results...",
+                    isCompleted: false,
+                    isActive: false
+                )
+                AnalysisStepRow(
                     icon: "list.bullet.clipboard.fill",
                     text: "Generating recommendations",
                     isCompleted: false,
@@ -146,8 +186,8 @@ struct AnalyzingView: View {
     private var elapsedTimeText: String {
         if elapsedSeconds < 5 {
             return ""
-        } else if elapsedSeconds < 15 {
-            return "\(elapsedSeconds)s — this usually takes 5–15 seconds"
+        } else if elapsedSeconds < 20 {
+            return "\(elapsedSeconds)s — this usually takes 10–20 seconds"
         } else {
             return "\(elapsedSeconds)s — almost there..."
         }

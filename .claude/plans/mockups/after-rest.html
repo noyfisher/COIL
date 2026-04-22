@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0">
+<title>Enhanced Rest Timer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+  :root {
+    --accent: #5E8C5A;
+    --accent-tint: rgba(94,140,90,0.10);
+    --cta-bg: #3A5E36;
+    --cta-text: #F2F5EE;
+    --primary-text: #1E2B1A;
+    --secondary-text: #556B4A;
+    --muted-text: #8A9A7E;
+    --card-bg: #FAFCF8;
+    --page-bg: #E8F0E9;
+    --elevated: #E2E8DA;
+    --card-border: rgba(75,100,65,0.10);
+    --card-shadow: rgba(45,60,35,0.05);
+    --warning: #B8963D;
+    --danger: #B85C5C;
+    --corner-card: 20px;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--page-bg);
+    width: 375px;
+    height: 812px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .timer-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+  }
+
+  /* Timer ring */
+  .timer-ring {
+    position: relative;
+    width: 220px;
+    height: 220px;
+  }
+  .timer-ring svg {
+    width: 220px;
+    height: 220px;
+    transform: rotate(-90deg);
+  }
+  .ring-bg {
+    fill: none;
+    stroke: var(--accent-tint);
+    stroke-width: 10;
+  }
+  .ring-fill {
+    fill: none;
+    stroke: var(--warning);
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke-dasharray: 628;
+    stroke-dashoffset: 314; /* 50% through */
+    transition: stroke 0.5s;
+  }
+  .timer-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .timer-number {
+    font-size: 56px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--warning);
+    line-height: 1;
+  }
+  .timer-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--secondary-text);
+    margin-top: 4px;
+  }
+
+  /* Adjustment buttons */
+  .timer-adjust {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .adjust-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid var(--card-border);
+    background: var(--card-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--secondary-text);
+    cursor: pointer;
+    box-shadow: 0 2px 6px var(--card-shadow);
+  }
+  .adjust-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted-text);
+    text-align: center;
+  }
+  .adjust-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Color phases legend */
+  .color-legend {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: -10px;
+  }
+  .color-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--secondary-text);
+    font-weight: 500;
+  }
+  .color-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  /* Up next card */
+  .up-next-card {
+    background: var(--card-bg);
+    border-radius: var(--corner-card);
+    padding: 14px 20px;
+    border: 1px solid var(--card-border);
+    box-shadow: 0 2px 8px var(--card-shadow);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 300px;
+  }
+  .up-next-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--elevated);
+  }
+  .up-next-img img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .up-next-info {
+    flex: 1;
+  }
+  .up-next-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted-text);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+  .up-next-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--primary-text);
+  }
+  .up-next-detail {
+    font-size: 12px;
+    color: var(--secondary-text);
+    margin-top: 1px;
+  }
+
+  /* Skip rest */
+  .skip-rest {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--accent);
+    background: var(--accent-tint);
+    border: none;
+    border-radius: 100px;
+    padding: 12px 28px;
+    cursor: pointer;
+  }
+
+  .screen-label {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: var(--warning);
+    color: white; text-align: center; padding: 4px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+<div class="screen-label">✦ ENHANCED REST TIMER — Color Phases + Adjustable</div>
+
+<div class="timer-section">
+  <!-- Timer ring -->
+  <div class="timer-ring">
+    <svg viewBox="0 0 220 220">
+      <circle class="ring-bg" cx="110" cy="110" r="100" />
+      <circle class="ring-fill" cx="110" cy="110" r="100" />
+    </svg>
+    <div class="timer-center">
+      <div class="timer-number">0:32</div>
+      <div class="timer-label">Rest</div>
+    </div>
+  </div>
+
+  <!-- Color phases legend -->
+  <div class="color-legend">
+    <div class="color-item"><div class="color-dot" style="background:#5E8C5A"></div> Plenty of time</div>
+    <div class="color-item"><div class="color-dot" style="background:#B8963D"></div> Halfway</div>
+    <div class="color-item"><div class="color-dot" style="background:#B85C5C"></div> Almost up</div>
+  </div>
+
+  <!-- Timer adjustment -->
+  <div class="timer-adjust">
+    <div class="adjust-group">
+      <div class="adjust-btn">−15</div>
+      <div class="adjust-label">seconds</div>
+    </div>
+    <div class="adjust-group">
+      <div class="adjust-btn">+15</div>
+      <div class="adjust-label">seconds</div>
+    </div>
+  </div>
+
+  <!-- Up next with image -->
+  <div class="up-next-card">
+    <div class="up-next-img">
+      <img src="img/clamshells.png" alt="Clamshells">
+    </div>
+    <div class="up-next-info">
+      <div class="up-next-label">Up Next</div>
+      <div class="up-next-name">Clamshells</div>
+      <div class="up-next-detail">3 sets × 12 reps</div>
+    </div>
+  </div>
+
+  <!-- Skip rest -->
+  <button class="skip-rest">⏭ Skip Rest</button>
+</div>
+
+</body>
+</html>

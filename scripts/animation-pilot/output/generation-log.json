@@ -1,0 +1,11 @@
+[
+  {
+    "name": "Bird Dog",
+    "filename": "bird-dog",
+    "start_frame": "/Users/noyfisher/IOS-Projects/PT-Helper-Agent-v1/scripts/animation-pilot/output/start-frames/bird-dog.png",
+    "end_frame": "/Users/noyfisher/IOS-Projects/PT-Helper-Agent-v1/scripts/animation-pilot/output/end-frames/bird-dog_end.png",
+    "video": "/Users/noyfisher/IOS-Projects/PT-Helper-Agent-v1/scripts/animation-pilot/output/videos/bird-dog.mp4",
+    "gif": "/Users/noyfisher/IOS-Projects/PT-Helper-Agent-v1/scripts/animation-pilot/output/gifs/bird-dog_anim.gif",
+    "error": null
+  }
+]

@@ -2,7 +2,9 @@ import SwiftUI
 import Charts
 
 struct ProgressChartView: View {
-    @StateObject private var viewModel = WorkoutViewModel()
+    @EnvironmentObject private var viewModel: WorkoutViewModel
+    @EnvironmentObject private var insightsVM: RecoveryInsightsViewModel
+    @State private var selectedRegion: String? = nil
 
     var body: some View {
         ZStack {
@@ -19,8 +21,12 @@ struct ProgressChartView: View {
             } else {
                 ScrollView {
                     VStack(spacing: AppSpacing.lg) {
+                        regionFilterPicker
                         painTrendChart
                         summaryStats
+
+                        // AI Recovery Insights
+                        RecoveryInsightsCardView(vm: insightsVM)
                     }
                     .padding(.horizontal, AppSpacing.xl)
                     .padding(.vertical, AppSpacing.md)
@@ -29,20 +35,76 @@ struct ProgressChartView: View {
         }
         .navigationTitle("Progress")
         .navigationBarTitleDisplayMode(.inline)
+        .trackScreen("ProgressChart")
+    }
+
+    // MARK: - Region Filter
+
+    private var regionFilterPicker: some View {
+        let regions = availableRegions
+        if regions.isEmpty {
+            return AnyView(EmptyView())
+        }
+        return AnyView(
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: AppSpacing.sm) {
+                    filterChip(label: "Overall", isSelected: selectedRegion == nil) {
+                        selectedRegion = nil
+                    }
+                    ForEach(regions, id: \.self) { region in
+                        filterChip(
+                            label: RegionPainInputView.displayName(for: region),
+                            isSelected: selectedRegion == region
+                        ) {
+                            selectedRegion = region
+                        }
+                    }
+                }
+                .padding(.horizontal, AppSpacing.xs)
+            }
+        )
+    }
+
+    private func filterChip(label: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(label)
+                .font(.caption.weight(.medium))
+                .padding(.horizontal, AppSpacing.md)
+                .padding(.vertical, AppSpacing.sm)
+                .background(isSelected ? AppColors.accent : Color(.systemGray5))
+                .foregroundColor(isSelected ? AppColors.ctaText : AppColors.primaryText)
+                .cornerRadius(AppCorners.medium)
+        }
+    }
+
+    /// All unique region keys across sessions that have per-region data
+    private var availableRegions: [String] {
+        var regions = Set<String>()
+        for session in viewModel.sessions {
+            if let regionPain = session.regionPainLevels {
+                regions.formUnion(regionPain.keys)
+            }
+        }
+        return regions.sorted()
     }
 
     // MARK: - Pain Trend Chart
 
     private var painTrendChart: some View {
-        CardSection(icon: "chart.line.uptrend.xyaxis", color: .blue, title: "Pain Trend") {
-            Chart(viewModel.sessions, id: \.id) { session in
+        let chartTitle = selectedRegion != nil
+            ? "\(RegionPainInputView.displayName(for: selectedRegion!)) Pain"
+            : "Pain Trend"
+
+        return CardSection(icon: "chart.line.uptrend.xyaxis", color: AppColors.accent, title: chartTitle) {
+            Chart(filteredChartData, id: \.id) { session in
+                let painValue = painValueForChart(session)
                 LineMark(
                     x: .value("Date", session.date),
-                    y: .value("Pain", session.painLevel)
+                    y: .value("Pain", painValue)
                 )
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [.blue, .purple],
+                        colors: [AppColors.accent, AppColors.accent.opacity(0.6)],
                         startPoint: .leading,
                         endPoint: .trailing
                     )
@@ -51,11 +113,11 @@ struct ProgressChartView: View {
 
                 AreaMark(
                     x: .value("Date", session.date),
-                    y: .value("Pain", session.painLevel)
+                    y: .value("Pain", painValue)
                 )
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [.blue.opacity(0.2), .blue.opacity(0.02)],
+                        colors: [AppColors.accent.opacity(0.2), AppColors.accent.opacity(0.02)],
                         startPoint: .top,
                         endPoint: .bottom
                     )
@@ -63,16 +125,16 @@ struct ProgressChartView: View {
 
                 PointMark(
                     x: .value("Date", session.date),
-                    y: .value("Pain", session.painLevel)
+                    y: .value("Pain", painValue)
                 )
-                .foregroundStyle(.blue)
+                .foregroundStyle(AppColors.accent)
                 .symbolSize(30)
             }
             .chartYScale(domain: 0...10)
             .chartYAxis {
                 AxisMarks(values: [0, 2, 4, 6, 8, 10]) { value in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [4]))
-                        .foregroundStyle(Color.gray.opacity(0.3))
+                        .foregroundStyle(AppColors.mutedText.opacity(0.3))
                     AxisValueLabel()
                         .foregroundStyle(.secondary)
                 }
@@ -87,13 +149,29 @@ struct ProgressChartView: View {
         }
     }
 
+    /// Sessions filtered by selected region (or all if no region selected)
+    private var filteredChartData: [WorkoutSession] {
+        guard let region = selectedRegion else {
+            return viewModel.sessions
+        }
+        return viewModel.sessions.filter { $0.regionPainLevels?[region] != nil }
+    }
+
+    /// Get the pain value for chart based on selected region filter
+    private func painValueForChart(_ session: WorkoutSession) -> Double {
+        if let region = selectedRegion, let regionPain = session.regionPainLevels?[region] {
+            return regionPain
+        }
+        return session.painLevel
+    }
+
     // MARK: - Summary Stats
 
     private var summaryStats: some View {
         HStack(spacing: AppSpacing.md) {
             statCard(
                 icon: "number",
-                color: .blue,
+                color: AppColors.accent,
                 value: "\(viewModel.sessions.count)",
                 label: "Sessions"
             )
@@ -107,7 +185,7 @@ struct ProgressChartView: View {
 
             statCard(
                 icon: "clock",
-                color: .orange,
+                color: AppColors.warning,
                 value: "\(totalMinutes)",
                 label: "Total Min"
             )
@@ -125,17 +203,17 @@ struct ProgressChartView: View {
 
             Text(value)
                 .font(.system(size: 22, weight: .bold, design: .rounded))
-                .foregroundColor(.primary)
+                .foregroundColor(AppColors.primaryText)
 
             Text(label)
                 .font(.caption2)
-                .foregroundColor(.secondary)
+                .foregroundColor(AppColors.secondaryText)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, AppSpacing.lg)
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.card)
-        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 
     // MARK: - Computed Properties
@@ -148,9 +226,9 @@ struct ProgressChartView: View {
 
     private var averagePainColor: Color {
         switch Int(averagePain) {
-        case 0...3: return .green
-        case 4...6: return .orange
-        default: return .red
+        case 0...3: return AppColors.success
+        case 4...6: return AppColors.warning
+        default: return AppColors.danger
         }
     }
 

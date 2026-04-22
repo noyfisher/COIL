@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PT Helper — Navigation Redesign Pitch</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #1a1a2e;
+    color: #e0e0e0;
+    overflow-x: hidden;
+  }
+
+  /* ── Title Slide ── */
+  .title-slide {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  }
+  .title-slide h1 {
+    font-size: 56px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #6B7F6B, #9B8F80);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 16px;
+  }
+  .title-slide .subtitle {
+    font-size: 24px;
+    color: #9B8F80;
+    font-weight: 300;
+    margin-bottom: 48px;
+  }
+  .title-slide .scroll-hint {
+    font-size: 14px;
+    color: #666;
+    animation: bounce 2s infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(8px); }
+  }
+
+  /* ── Section Headers ── */
+  .section {
+    padding: 80px 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .section-label {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #6B7F6B;
+    margin-bottom: 12px;
+  }
+  .section h2 {
+    font-size: 40px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .section .desc {
+    font-size: 18px;
+    color: #999;
+    max-width: 700px;
+    line-height: 1.6;
+    margin-bottom: 48px;
+  }
+
+  /* ── Comparison Slide ── */
+  .comparison {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .compare-box {
+    flex: 1;
+    min-width: 300px;
+    max-width: 500px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 32px;
+  }
+  .compare-box.old { border-color: rgba(220,80,80,0.3); }
+  .compare-box.new { border-color: rgba(107,127,107,0.5); }
+  .compare-box h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+  .compare-box.old h3 { color: #dc5050; }
+  .compare-box.new h3 { color: #6B7F6B; }
+  .compare-box .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .compare-box.old .tag { background: rgba(220,80,80,0.15); color: #dc5050; }
+  .compare-box.new .tag { background: rgba(107,127,107,0.2); color: #8fa88f; }
+  .tab-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .tab-pill {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.06);
+    color: #aaa;
+  }
+  .tab-pill.active-old { background: rgba(220,80,80,0.15); color: #dc5050; }
+  .tab-pill.active-new { background: rgba(107,127,107,0.2); color: #8fa88f; }
+  .metric-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 14px;
+  }
+  .metric-row span:first-child { color: #888; }
+  .metric-row span:last-child { font-weight: 600; color: #e0e0e0; }
+
+  /* ── Phone Mockups ── */
+  .phones-row {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  .phone-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .phone-group .phone-label {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #6B7F6B;
+  }
+  .phone-group .phone-sublabel {
+    font-size: 12px;
+    color: #777;
+    margin-top: -8px;
+    font-style: italic;
+  }
+  .phone {
+    width: 280px;
+    height: 580px;
+    background: #F5F2EC;
+    border-radius: 36px;
+    border: 3px solid #333;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  .phone .status-bar {
+    height: 44px;
+    background: rgba(0,0,0,0.03);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #3D3D3D;
+  }
+  .phone .screen-content {
+    padding: 12px 16px;
+    height: calc(100% - 44px - 64px);
+    overflow-y: auto;
+  }
+  .phone .tab-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: #fff;
+    border-top: 1px solid #E8E3DA;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 8px;
+  }
+  .tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 10px;
+    color: #999;
+  }
+  .tab-item.active { color: #6B7F6B; }
+  .tab-item .tab-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+  .tab-item.active .tab-icon { background: #6B7F6B; color: white; }
+
+  /* ── Screen Elements ── */
+  .screen-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #3D3D3D;
+    margin-bottom: 12px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #3D3D3D;
+    margin-bottom: 6px;
+  }
+  .card-text {
+    font-size: 11px;
+    color: #888;
+    line-height: 1.4;
+  }
+  .card-hero {
+    background: linear-gradient(135deg, #6B7F6B, #7d917d);
+    color: white;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 10px;
+  }
+  .card-hero .card-title { color: white; font-size: 15px; }
+  .card-hero .card-text { color: rgba(255,255,255,0.8); }
+  .btn-primary {
+    display: block;
+    background: #6B7F6B;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 8px;
+    width: 100%;
+  }
+  .btn-outline {
+    display: block;
+    background: transparent;
+    color: #6B7F6B;
+    border: 1.5px solid #6B7F6B;
+    border-radius: 12px;
+    padding: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 8px;
+    width: 100%;
+  }
+  .chip-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .chip {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(107,127,107,0.12);
+    color: #6B7F6B;
+  }
+  .chip.stone { background: rgba(155,143,128,0.15); color: #9B8F80; }
+  .stat-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .stat-card {
+    flex: 1;
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px 8px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .stat-card .stat-num {
+    font-size: 18px;
+    font-weight: 700;
+    color: #3D3D3D;
+  }
+  .stat-card .stat-label {
+    font-size: 9px;
+    color: #999;
+    margin-top: 2px;
+  }
+  .bodymap-placeholder {
+    width: 100%;
+    height: 220px;
+    background: linear-gradient(180deg, #e8e3da 0%, #F5F2EC 100%);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .body-silhouette {
+    font-size: 100px;
+    opacity: 0.15;
+    user-select: none;
+  }
+  .region-dot {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(107,127,107,0.6);
+    border: 2px solid #6B7F6B;
+    animation: pulse-dot 2s infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.2); opacity: 1; }
+  }
+  .chart-placeholder {
+    width: 100%;
+    height: 130px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .chart-line {
+    position: absolute;
+    bottom: 20px;
+    left: 14px;
+    right: 14px;
+    height: 80px;
+  }
+  .chart-line svg { width: 100%; height: 100%; }
+  .exercise-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #fff;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .exercise-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: #e8e3da;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .exercise-info {
+    flex: 1;
+  }
+  .exercise-info .name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #3D3D3D;
+  }
+  .exercise-info .detail {
+    font-size: 10px;
+    color: #999;
+  }
+  .divider {
+    height: 1px;
+    background: #E8E3DA;
+    margin: 12px 0;
+  }
+  .section-header {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #9B8F80;
+    margin-bottom: 8px;
+    margin-top: 4px;
+  }
+  .reassess-card {
+    background: linear-gradient(135deg, rgba(107,127,107,0.1), rgba(155,143,128,0.1));
+    border: 1.5px dashed #6B7F6B;
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .reassess-card .card-title { color: #6B7F6B; }
+  .settings-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #E8E3DA;
+  }
+  .settings-row .s-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    background: rgba(107,127,107,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+  }
+  .settings-row .s-label {
+    font-size: 13px;
+    color: #3D3D3D;
+    flex: 1;
+  }
+  .settings-row .s-arrow {
+    font-size: 12px;
+    color: #ccc;
+  }
+
+  /* ── Flow Arrows ── */
+  .flow-section {
+    padding: 60px 40px 80px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .flow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 32px;
+  }
+  .flow-phone {
+    width: 200px;
+    height: 400px;
+    background: #F5F2EC;
+    border-radius: 28px;
+    border: 2px solid #333;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    flex-shrink: 0;
+  }
+  .flow-phone .fp-header {
+    height: 36px;
+    background: rgba(0,0,0,0.03);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #3D3D3D;
+  }
+  .flow-phone .fp-content {
+    padding: 8px 12px;
+    height: calc(100% - 36px - 48px);
+    overflow: hidden;
+  }
+  .flow-phone .fp-tab-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 48px;
+    background: #fff;
+    border-top: 1px solid #E8E3DA;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    font-size: 8px;
+    color: #999;
+  }
+  .flow-phone .fp-tab-bar .ft-active { color: #6B7F6B; font-weight: 600; }
+  .flow-arrow {
+    font-size: 28px;
+    color: #6B7F6B;
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+  .flow-label {
+    font-size: 10px;
+    color: #9B8F80;
+    text-align: center;
+    margin-top: -8px;
+    font-weight: 500;
+  }
+  .flow-arrow-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .mini-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .mini-card .mc-title {
+    font-size: 10px;
+    font-weight: 600;
+    color: #3D3D3D;
+  }
+  .mini-card .mc-text {
+    font-size: 8px;
+    color: #999;
+  }
+  .mini-btn {
+    background: #6B7F6B;
+    color: white;
+    border-radius: 8px;
+    padding: 6px;
+    font-size: 9px;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 4px;
+  }
+  .mini-btn-outline {
+    border: 1px solid #6B7F6B;
+    color: #6B7F6B;
+    border-radius: 8px;
+    padding: 5px;
+    font-size: 9px;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 4px;
+  }
+  .mini-chip {
+    display: inline-block;
+    font-size: 8px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    background: rgba(107,127,107,0.12);
+    color: #6B7F6B;
+    margin-right: 3px;
+  }
+  .mini-body {
+    width: 100%;
+    height: 120px;
+    background: linear-gradient(180deg, #e8e3da, #F5F2EC);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    opacity: 0.2;
+    margin-bottom: 6px;
+  }
+  .mini-chart {
+    width: 100%;
+    height: 60px;
+    background: #fff;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    padding: 6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .mini-chart svg { width: 100%; height: 100%; }
+  .mini-stat-row {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+  .mini-stat {
+    flex: 1;
+    background: #fff;
+    border-radius: 6px;
+    padding: 4px;
+    text-align: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .mini-stat .ms-num { font-size: 12px; font-weight: 700; color: #3D3D3D; }
+  .mini-stat .ms-label { font-size: 7px; color: #999; }
+
+  /* ── Loop Diagram ── */
+  .loop-section {
+    padding: 80px 40px;
+    text-align: center;
+  }
+  .loop-diagram {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    margin-top: 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .loop-node {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+  }
+  .loop-node.assess {
+    background: linear-gradient(135deg, rgba(107,127,107,0.15), rgba(107,127,107,0.05));
+    border: 2px solid #6B7F6B;
+  }
+  .loop-node.plan {
+    background: linear-gradient(135deg, rgba(155,143,128,0.15), rgba(155,143,128,0.05));
+    border: 2px solid #9B8F80;
+  }
+  .loop-node.progress {
+    background: linear-gradient(135deg, rgba(78,115,163,0.15), rgba(78,115,163,0.05));
+    border: 2px solid #4e73a3;
+  }
+  .loop-node .ln-emoji { font-size: 32px; margin-bottom: 6px; }
+  .loop-node .ln-title { font-size: 16px; font-weight: 700; color: #fff; }
+  .loop-node .ln-sub { font-size: 11px; color: #999; margin-top: 2px; }
+  .loop-arrow {
+    font-size: 36px;
+    margin: 0 20px;
+  }
+  .loop-arrow.forward { color: #6B7F6B; }
+  .loop-arrow.back { color: #9B8F80; }
+  .loop-return {
+    display: block;
+    margin-top: 24px;
+    font-size: 14px;
+    color: #9B8F80;
+    font-style: italic;
+  }
+
+  /* ── Separator ── */
+  .sep {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(107,127,107,0.3), transparent);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    padding: 60px 40px;
+    color: #555;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════ TITLE SLIDE ════════════════════ -->
+<div class="title-slide">
+  <h1>PT Helper</h1>
+  <div class="subtitle">Navigation Redesign — 3-Tab Flow</div>
+  <div style="display:flex;gap:24px;margin-bottom:48px;">
+    <div style="text-align:center;">
+      <div style="font-size:48px;font-weight:800;color:#dc5050;">4</div>
+      <div style="font-size:13px;color:#888;">tabs today</div>
+    </div>
+    <div style="font-size:36px;color:#555;align-self:center;">→</div>
+    <div style="text-align:center;">
+      <div style="font-size:48px;font-weight:800;color:#6B7F6B;">3</div>
+      <div style="font-size:13px;color:#888;">tabs proposed</div>
+    </div>
+  </div>
+  <div class="scroll-hint">↓ Scroll to explore</div>
+</div>
+
+<!-- ════════════════════ COMPARISON ════════════════════ -->
+<div class="section">
+  <div class="section-label">The Problem</div>
+  <h2>Current vs. Proposed</h2>
+  <div class="desc">Four tabs with overlapping responsibilities versus three tabs with clear ownership.</div>
+
+  <div class="comparison">
+    <div class="compare-box old">
+      <h3>Current — 4 Tabs</h3>
+      <div class="tag">Scattered</div>
+      <div class="tab-row">
+        <div class="tab-pill active-old">Home</div>
+        <div class="tab-pill">Analyze</div>
+        <div class="tab-pill">Plans</div>
+        <div class="tab-pill">Progress</div>
+      </div>
+      <div class="metric-row"><span>Tabs</span><span>4</span></div>
+      <div class="metric-row"><span>Screens</span><span>22</span></div>
+      <div class="metric-row"><span>Home outgoing edges</span><span style="color:#dc5050;">8</span></div>
+      <div class="metric-row"><span>Max nav depth</span><span>6 levels</span></div>
+      <div class="metric-row"><span>Duplicate content</span><span style="color:#dc5050;">Plans on 2 tabs</span></div>
+      <div class="metric-row"><span>Progress tab actions</span><span style="color:#dc5050;">0 (dead end)</span></div>
+      <div class="metric-row"><span>New user experience</span><span style="color:#dc5050;">Empty dashboard</span></div>
+    </div>
+
+    <div class="compare-box new">
+      <h3>Proposed — 3 Tabs</h3>
+      <div class="tag">Focused</div>
+      <div class="tab-row">
+        <div class="tab-pill active-new">Assess</div>
+        <div class="tab-pill">My Plan</div>
+        <div class="tab-pill">Progress</div>
+      </div>
+      <div class="metric-row"><span>Tabs</span><span>3</span></div>
+      <div class="metric-row"><span>Screens</span><span>~18</span></div>
+      <div class="metric-row"><span>Hub screen edges</span><span style="color:#6B7F6B;">0 (no hub needed)</span></div>
+      <div class="metric-row"><span>Max nav depth</span><span>4 levels</span></div>
+      <div class="metric-row"><span>Duplicate content</span><span style="color:#6B7F6B;">None</span></div>
+      <div class="metric-row"><span>Progress tab actions</span><span style="color:#6B7F6B;">Re-assess loop</span></div>
+      <div class="metric-row"><span>New user experience</span><span style="color:#6B7F6B;">Body map ready</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- ════════════════════ TAB 1: ASSESS ════════════════════ -->
+<div class="section">
+  <div class="section-label">Tab 1</div>
+  <h2>Assess — "What do you need?"</h2>
+  <div class="desc">Two hero cards. Two paths. One purpose: figure out what the user needs and build them a plan. Both flows end at the same destination — a personalized plan that lands in My Plan tab.</div>
+
+  <div class="phones-row">
+    <!-- Gateway -->
+    <div class="phone-group">
+      <div class="phone-label">Gateway</div>
+      <div class="phone-sublabel">Choose your path</div>
+      <div class="phone">
+        <div class="status-bar">9:41</div>
+        <div class="screen-content">
+          <div class="screen-title">Assess</div>
+          <div style="font-size:13px;color:#888;margin-bottom:14px;">What can we help with?</div>
+          <!-- Something Hurts card -->
+          <div style="background:linear-gradient(135deg,rgba(220,80,80,0.08),rgba(220,80,80,0.03));border:1.5px solid rgba(220,80,80,0.25);border-radius:16px;padding:16px;margin-bottom:10px;cursor:pointer;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+              <div style="width:36px;height:36px;border-radius:10px;background:rgba(220,80,80,0.12);display:flex;align-items:center;justify-content:center;font-size:18px;">🩹</div>
+              <div>
+                <div style="font-size:15px;font-weight:700;color:#3D3D3D;">Something Hurts</div>
+                <div style="font-size:11px;color:#999;">Pain or injury assessment</div>
+              </div>
+              <div style="margin-left:auto;font-size:16px;color:#ccc;">›</div>
+            </div>
+            <div style="font-size:11px;color:#888;line-height:1.4;">Select body regions on the 3D map, describe your pain, and get AI-powered condition analysis.</div>
+          </div>
+          <!-- Improve My Life card -->
+          <div style="background:linear-gradient(135deg,rgba(107,127,107,0.08),rgba(107,127,107,0.03));border:1.5px solid rgba(107,127,107,0.25);border-radius:16px;padding:16px;margin-bottom:14px;cursor:pointer;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+              <div style="width:36px;height:36px;border-radius:10px;background:rgba(107,127,107,0.12);display:flex;align-items:center;justify-content:center;font-size:18px;">✨</div>
+              <div>
+                <div style="font-size:15px;font-weight:700;color:#3D3D3D;">Improve My Life</div>
+                <div style="font-size:11px;color:#999;">Wellness & mobility goals</div>
+              </div>
+              <div style="margin-left:auto;font-size:16px;color:#ccc;">›</div>
+            </div>
+            <div style="font-size:11px;color:#888;line-height:1.4;">Pick goals like better sleep, posture, or flexibility. Get a personalized wellness plan.</div>
+          </div>
+          <div class="divider"></div>
+          <div style="font-size:11px;color:#9B8F80;text-align:center;">Both paths generate a personalized plan with guided workouts</div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab-item active"><div class="tab-icon">🔍</div>Assess</div>
+          <div class="tab-item"><div class="tab-icon">📋</div>My Plan</div>
+          <div class="tab-item"><div class="tab-icon">📊</div>Progress</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Body Map (Pain path) -->
+    <div class="phone-group">
+      <div class="phone-label" style="color:#dc5050;">Pain Path</div>
+      <div class="phone-sublabel">3D Body Map</div>
+      <div class="phone">
+        <div class="status-bar">9:41</div>
+        <div class="screen-content">
+          <div style="font-size:12px;color:#6B7F6B;font-weight:600;margin-bottom:4px;">← Back</div>
+          <div class="screen-title">Select Regions</div>
+          <div class="bodymap-placeholder">
+            <div class="body-silhouette">🧍</div>
+            <div class="region-dot" style="top:80px;left:100px;"></div>
+            <div class="region-dot" style="top:140px;right:90px;"></div>
+          </div>
+          <div class="chip-row">
+            <div class="chip">Left Shoulder ✕</div>
+            <div class="chip">Lower Back ✕</div>
+          </div>
+          <div class="btn-primary">Continue →</div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab-item active"><div class="tab-icon">🔍</div>Assess</div>
+          <div class="tab-item"><div class="tab-icon">📋</div>My Plan</div>
+          <div class="tab-item"><div class="tab-icon">📊</div>Progress</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Goal Picker (Wellness path) -->
+    <div class="phone-group">
+      <div class="phone-label" style="color:#6B7F6B;">Wellness Path</div>
+      <div class="phone-sublabel">Goal Picker</div>
+      <div class="phone">
+        <div class="status-bar">9:41</div>
+        <div class="screen-content">
+          <div style="font-size:12px;color:#6B7F6B;font-weight:600;margin-bottom:4px;">← Back</div>
+          <div class="screen-title">Pick Your Goals</div>
+          <div style="font-size:12px;color:#888;margin-bottom:12px;">Select what you'd like to improve</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="background:#fff;border-radius:12px;padding:12px 10px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.05);border:1.5px solid rgba(107,127,107,0.3);">
+              <div style="font-size:20px;margin-bottom:4px;">😴</div>
+              <div style="font-size:11px;font-weight:600;color:#3D3D3D;">Better Sleep</div>
+            </div>
+            <div style="background:#fff;border-radius:12px;padding:12px 10px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+              <div style="font-size:20px;margin-bottom:4px;">🧍</div>
+              <div style="font-size:11px;font-weight:600;color:#3D3D3D;">Posture</div>
+            </div>
+            <div style="background:#fff;border-radius:12px;padding:12px 10px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.05);border:1.5px solid rgba(107,127,107,0.3);">
+              <div style="font-size:20px;margin-bottom:4px;">🤸</div>
+              <div style="font-size:11px;font-weight:600;color:#3D3D3D;">Flexibility</div>
+            </div>
+            <div style="background:#fff;border-radius:12px;padding:12px 10px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+              <div style="font-size:20px;margin-bottom:4px;">💪</div>
+              <div style="font-size:11px;font-weight:600;color:#3D3D3D;">Core & Balance</div>
+            </div>
+            <div style="background:#fff;border-radius:12px;padding:12px 10px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+              <div style="font-size:20px;margin-bottom:4px;">🏃</div>
+              <div style="font-size:11px;font-weight:600;color:#3D3D3D;">Stay Active</div>
+            </div>
+            <div style="background:#fff;border-radius:12px;padding:12px 10px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+              <div style="font-size:20px;margin-bottom:4px;">🪑</div>
+              <div style="font-size:11px;font-weight:600;color:#3D3D3D;">Sit Pain-Free</div>
+            </div>
+          </div>
+          <div class="btn-primary" style="margin-top:12px;">Continue with 2 Goals →</div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab-item active"><div class="tab-icon">🔍</div>Assess</div>
+          <div class="tab-item"><div class="tab-icon">📋</div>My Plan</div>
+          <div class="tab-item"><div class="tab-icon">📊</div>Progress</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pain Detail -->
+    <div class="phone-group">
+      <div class="phone-label">Pain Detail</div>
+      <div class="phone-sublabel">Per region</div>
+      <div class="phone">
+        <div class="status-bar">9:41</div>
+        <div class="screen-content">
+          <div style="font-size:12px;color:#6B7F6B;font-weight:600;margin-bottom:4px;">← Back</div>
+          <div class="screen-title">Left Shoulder</div>
+          <div class="card">
+            <div class="card-title">Pain Type</div>
+            <div class="chip-row">
+              <div class="chip" style="background:rgba(107,127,107,0.3);">Sharp</div>
+              <div class="chip">Dull</div>
+              <div class="chip">Burning</div>
+              <div class="chip">Throbbing</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Intensity</div>
+            <div style="height:24px;background:linear-gradient(90deg,#6B7F6B,#e8c44a,#dc5050);border-radius:12px;position:relative;margin-top:4px;">
+              <div style="position:absolute;left:55%;top:-2px;width:20px;height:28px;background:#fff;border-radius:10px;border:2px solid #6B7F6B;"></div>
+            </div>
+            <div style="text-align:center;font-size:22px;font-weight:700;color:#e8c44a;margin-top:6px;">6/10</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Duration</div>
+            <div class="chip-row">
+              <div class="chip">< 1 week</div>
+              <div class="chip" style="background:rgba(107,127,107,0.3);">1-4 weeks</div>
+              <div class="chip">1-3 months</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">What makes it worse?</div>
+            <div class="chip-row">
+              <div class="chip" style="background:rgba(107,127,107,0.3);">Overhead reach</div>
+              <div class="chip" style="background:rgba(107,127,107,0.3);">Sleeping on it</div>
+              <div class="chip">Lifting</div>
+            </div>
+          </div>
+          <div class="btn-primary">Analyze →</div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab-item active"><div class="tab-icon">🔍</div>Assess</div>
+          <div class="tab-item"><div class="tab-icon">📋</div>My Plan</div>
+          <div class="tab-item"><div class="tab-icon">📊</div>Progress</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analysis Results -->
+    <div class="phone-group">
+      <div class="phone-label">Results</div>
+      <div class="phone-sublabel">AI analysis</div>
+      <div class="phone">
+        <div class="status-bar">9:41</div>
+        <div class="screen-content">
+          <div class="screen-title">Analysis Results</div>
+          <div class="card" style="border-left:3px solid #6B7F6B;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div class="card-title">Rotator Cuff Tendinopathy</div>
+              <div style="font-size:13px;font-weight:700;color:#6B7F6B;">78%</div>
+            </div>
+            <div class="card-text">Overuse injury affecting the tendons of the rotator cuff muscles</div>
+            <div style="height:4px;background:#e8e3da;border-radius:2px;margin-top:8px;">
+              <div style="height:4px;background:#6B7F6B;border-radius:2px;width:78%;"></div>
+            </div>
+          </div>
+          <div class="card" style="border-left:3px solid #9B8F80;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div class="card-title">Shoulder Impingement</div>
+              <div style="font-size:13px;font-weight:700;color:#9B8F80;">65%</div>
+            </div>
+            <div class="card-text">Compression of tendons between bones in the shoulder</div>
+            <div style="height:4px;background:#e8e3da;border-radius:2px;margin-top:8px;">
+              <div style="height:4px;background:#9B8F80;border-radius:2px;width:65%;"></div>
+            </div>
+          </div>
+          <div class="card" style="border-left:3px solid #ccc;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div class="card-title">Biceps Tendinitis</div>
+              <div style="font-size:13px;font-weight:700;color:#aaa;">42%</div>
+            </div>
+            <div class="card-text">Inflammation of the biceps tendon at the shoulder</div>
+            <div style="height:4px;background:#e8e3da;border-radius:2px;margin-top:8px;">
+              <div style="height:4px;background:#ccc;border-radius:2px;width:42%;"></div>
+            </div>
+          </div>
+          <div class="btn-primary">Build Rehab Plan →</div>
+          <div class="btn-outline" style="margin-top:6px;">Back to Assessment</div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab-item active"><div class="tab-icon">🔍</div>Assess</div>
+          <div class="tab-item"><div class="tab-icon">📋</div>My Plan</div>
+          <div class="tab-item"><div class="tab-icon">📊</div>Progress</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- ════════════════════ TAB 2: MY PLAN ════════════════════ -->
+<div class="section">
+  <div class="section-label">Tab 2</div>
+  <h2>My Plan — "What do I do?"</h2>
+  <div class="desc">The daily driver. Active plan front and center with a big workout button. Saved plans listed below. This is where most app sessions happen.</div>
+
+  <div class="phones-row">
+    <!-- Plan View -->
+    <div class="phone-group">
+      <div class="phone-label">My Plan</div>
+      <div class="phone-sublabel">Active plan hero</div>
+      <div class="phone">
+        <div class="status-bar">9:41</div>
+        <div class="screen-content">
+          <div class="screen-title">My Plan</div>
+          <div class="card-hero">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <div>
+                <div class="card-title">Shoulder Recovery Plan</div>
+                <div class="card-text">Week 2 of 6 · 8 exercises</div>
+              </div>
+              <div style="font-size:11px;background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:20px;">Active</div>
+            </div>
+            <div style="display:flex;gap:16px;margin-top:12px;">
+              <div style="text-align:center;">
+                <div style="font-size:20px;font-weight:700;">12</div>
+                <div style="font-size:9px;opacity:0.7;">Sessions</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:20px;font-weight:700;">3.2</div>
+                <div style="font-size:9px;opacity:0.7;">Avg Pain</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:20px;font-weight:700;">85%</div>
+                <div style="font-size:9px;opacity:0.7;">Adherence</div>
+              </div>
+            </div>
+          </div>
+          <div class="btn-primary" style="margin-top:0;margin-bottom:12px;">▶  Start Guided Workout</div>
+
+          <div class="section-header">Today's Exercises</div>
+          <div class="exercise-row">
+            <div class="exercise-thumb">🏋️</div>
+            <div class="exercise-info">
+              <div class="name">External Rotation</div>
+              <div class="detail">3 × 12 reps · Resistance band</div>
+            </div>
+          </div>
+          <div class="exercise-row">
+            <div class="exercise-thumb">🧘</div>
+            <div class="exercise-info">
+              <div class="name">Pendulum Swings</div>
+              <div class="detail">3 × 30 sec · No equipment</div>
+            </div>
+          </div>
+          <div class="exercise-row">
+            <div class="exercise-thumb">💪</div>
+            <div class="exercise-info">
+              <div class="name">Scapular Squeeze</div>
+              <div class="detail">3 × 15 reps · No equipment</div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="section-header">Saved Plans</div>
+          <div class="card">
+            <div class="card-title">Knee Rehab (Completed)</div>
+            <div class="card-text">6 weeks · 10 exercises · Finished Mar 15</div>
+          </div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab-item"><div class="tab-icon">🔍</div>Assess</div>
+          <div class="tab-item active"><div class="tab-icon">📋</div>My Plan</div>
+          <div class="tab-item"><div class="tab-icon">📊</div>Progress</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Guided Workout -->
+    <div class="phone-group">
+      <div class="phone-label">Guided Workout</div>
+      <div class="phone-sublabel">Exercise in progress</div>
+      <div class="phone">
+        <div class="status-bar">9:41</div>
+        <div class="screen-content">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div style="font-size:12px;color:#dc5050;font-weight:600;">End</div>
+            <div style="font-size:12px;color:#3D3D3D;font-weight:600;">Exercise 2 of 8</div>
+            <div style="font-size:12px;color:#6B7F6B;font-weight:600;">⏸ Pause</div>
+          </div>
+          <div style="height:4px;background:#e8e3da;border-radius:2px;margin-bottom:14px;">
+            <div style="height:4px;background:#6B7F6B;border-radius:2px;width:25%;"></div>
+          </div>
+          <div style="background:#fff;border-radius:14px;overflow:hidden;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+            <div style="height:180px;background:linear-gradient(135deg,#e8e3da,#d4cfc7);display:flex;align-items:center;justify-content:center;font-size:64px;">🏋️</div>
+            <div style="padding:14px;">
+              <div style="font-size:16px;font-weight:700;color:#3D3D3D;">External Rotation</div>
+              <div style="font-size:12px;color:#888;margin-top:2px;">Set 1 of 3 · 12 reps</div>
+              <div style="font-size:11px;color:#6B7F6B;margin-top:8px;line-height:1.5;">
+                Stand with elbow at 90°. Rotate forearm outward, keeping elbow tucked to your side.
+              </div>
+            </div>
+          </div>
+          <div class="btn-primary">✓ Complete Set</div>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <div class="btn-outline" style="flex:1;">Check Form</div>
+            <div class="btn-outline" style="flex:1;">Swap</div>
+            <div class="btn-outline" style="flex:1;color:#999;border-color:#ddd;">Skip</div>
+          </div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab-item"><div class="tab-icon">🔍</div>Assess</div>
+          <div class="tab-item active"><div class="tab-icon">📋</div>My Plan</div>
+          <div class="tab-item"><div class="tab-icon">📊</div>Progress</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="phone-group">
+      <div class="phone-label">Empty State</div>
+      <div class="phone-sublabel">No plan yet</div>
+      <div class="phone">
+        <div class="status-bar">9:41</div>
+        <div class="screen-content" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+          <div style="font-size:64px;margin-bottom:16px;opacity:0.3;">📋</div>
+          <div style="font-size:18px;font-weight:700;color:#3D3D3D;margin-bottom:8px;">No Plan Yet</div>
+          <div style="font-size:13px;color:#999;line-height:1.5;margin-bottom:24px;">Start with an assessment to get a personalized rehab plan tailored to your condition.</div>
+          <div class="btn-primary" style="width:200px;">Start Assessment →</div>
+          <div style="font-size:11px;color:#9B8F80;margin-top:8px;">Switches to Assess tab</div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab-item"><div class="tab-icon">🔍</div>Assess</div>
+          <div class="tab-item active"><div class="tab-icon">📋</div>My Plan</div>
+          <div class="tab-item"><div class="tab-icon">📊</div>Progress</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- ════════════════════ TAB 3: PROGRESS ════════════════════ -->
+<div class="section">
+  <div class="section-label">Tab 3</div>
+  <h2>Progress — "How am I doing?"</h2>
+  <div class="desc">Reflection, insights, and the re-assessment loop. No longer a dead end — the "Re-assess" prompt closes the rehabilitation cycle. Profile and settings live here naturally.</div>
+
+  <div class="phones-row">
+    <!-- Progress Main -->
+    <div class="phone-group">
+      <div class="phone-label">Progress</div>
+      <div class="phone-sublabel">Charts + insights</div>
+      <div class="phone">
+        <div class="status-bar">9:41</div>
+        <div class="screen-content">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div class="screen-title" style="margin-bottom:0;">Progress</div>
+            <div style="width:32px;height:32px;border-radius:50%;background:#6B7F6B;display:flex;align-items:center;justify-content:center;color:white;font-size:14px;">⚙</div>
+          </div>
+          <div class="chip-row">
+            <div class="chip" style="background:rgba(107,127,107,0.3);">Overall</div>
+            <div class="chip">L. Shoulder</div>
+            <div class="chip">Lower Back</div>
+          </div>
+          <div class="chart-placeholder">
+            <div style="font-size:10px;font-weight:600;color:#3D3D3D;margin-bottom:4px;">Pain Trend</div>
+            <div class="chart-line">
+              <svg viewBox="0 0 240 70" fill="none">
+                <defs>
+                  <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#6B7F6B" stop-opacity="0.3"/>
+                    <stop offset="100%" stop-color="#6B7F6B" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0,45 C30,50 50,35 80,40 C110,45 130,25 160,20 C190,15 210,18 240,12" stroke="#6B7F6B" stroke-width="2.5" fill="none"/>
+                <path d="M0,45 C30,50 50,35 80,40 C110,45 130,25 160,20 C190,15 210,18 240,12 L240,70 L0,70 Z" fill="url(#g1)"/>
+                <circle cx="0" cy="45" r="3" fill="#6B7F6B"/>
+                <circle cx="80" cy="40" r="3" fill="#6B7F6B"/>
+                <circle cx="160" cy="20" r="3" fill="#6B7F6B"/>
+                <circle cx="240" cy="12" r="3" fill="#6B7F6B"/>
+              </svg>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-card"><div class="stat-num">18</div><div class="stat-label">Sessions</div></div>
+            <div class="stat-card"><div class="stat-num" style="color:#6B7F6B;">3.2</div><div class="stat-label">Avg Pain</div></div>
+            <div class="stat-card"><div class="stat-num">247</div><div class="stat-label">Minutes</div></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Recovery Insights</div>
+            <div class="card-text" style="line-height:1.5;">Your shoulder pain is trending down 22% over the past 2 weeks. External rotation strength improving steadily.</div>
+            <div class="chip-row" style="margin-top:8px;">
+              <div class="chip">↘ Pain improving</div>
+              <div class="chip stone">85% adherence</div>
+            </div>
+          </div>
+          <div class="reassess-card">
+            <div class="card-title">Time for a Re-Assessment?</div>
+            <div class="card-text" style="margin-top:4px;">It's been 14 days since your last assessment</div>
+            <div class="btn-outline" style="border-style:solid;width:160px;margin:8px auto 0;">Re-Assess Now →</div>
+          </div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab-item"><div class="tab-icon">🔍</div>Assess</div>
+          <div class="tab-item"><div class="tab-icon">📋</div>My Plan</div>
+          <div class="tab-item active"><div class="tab-icon">📊</div>Progress</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings (from Progress) -->
+    <div class="phone-group">
+      <div class="phone-label">Settings</div>
+      <div class="phone-sublabel">From profile icon</div>
+      <div class="phone">
+        <div class="status-bar">9:41</div>
+        <div class="screen-content">
+          <div class="screen-title">Settings</div>
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+              <div style="width:48px;height:48px;border-radius:50%;background:#6B7F6B;display:flex;align-items:center;justify-content:center;color:white;font-size:20px;">NF</div>
+              <div>
+                <div style="font-size:15px;font-weight:600;color:#3D3D3D;">Noy Fisher</div>
+                <div style="font-size:11px;color:#999;">noyfisher2003@gmail.com</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:8px;">
+            <div class="settings-row"><div class="s-icon">📝</div><div class="s-label">Edit Health Profile</div><div class="s-arrow">›</div></div>
+            <div class="settings-row"><div class="s-icon">🔔</div><div class="s-label">Notifications</div><div class="s-arrow">›</div></div>
+            <div class="settings-row"><div class="s-icon">📖</div><div class="s-label">Recovery Notes</div><div class="s-arrow">›</div></div>
+            <div class="settings-row"><div class="s-icon">🏆</div><div class="s-label">Achievements</div><div class="s-arrow">›</div></div>
+            <div class="settings-row"><div class="s-icon">🔒</div><div class="s-label">Privacy Policy</div><div class="s-arrow">›</div></div>
+            <div class="settings-row"><div class="s-icon">📄</div><div class="s-label">Terms of Service</div><div class="s-arrow">›</div></div>
+            <div class="settings-row"><div class="s-icon">🐛</div><div class="s-label">Export Debug Log</div><div class="s-arrow">›</div></div>
+          </div>
+          <div style="margin-top:24px;">
+            <div style="text-align:center;font-size:13px;color:#dc5050;font-weight:600;padding:12px;border:1px solid rgba(220,80,80,0.2);border-radius:12px;">Sign Out</div>
+          </div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab-item"><div class="tab-icon">🔍</div>Assess</div>
+          <div class="tab-item"><div class="tab-icon">📋</div>My Plan</div>
+          <div class="tab-item active"><div class="tab-icon">📊</div>Progress</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- ════════════════════ THE LOOP ════════════════════ -->
+<div class="loop-section">
+  <div class="section-label">The Rehabilitation Loop</div>
+  <h2 style="font-size:40px;font-weight:700;color:#fff;margin-bottom:8px;">Assess → Plan → Progress → Repeat</h2>
+  <div class="desc" style="margin:0 auto 0;color:#999;font-size:16px;">Each tab feeds into the next. Progress closes the loop with a re-assessment prompt.</div>
+
+  <div class="loop-diagram">
+    <div class="loop-node assess">
+      <div class="ln-emoji">🔍</div>
+      <div class="ln-title">Assess</div>
+      <div class="ln-sub">"What's wrong?"</div>
+    </div>
+    <div class="loop-arrow forward">→</div>
+    <div class="loop-node plan">
+      <div class="ln-emoji">📋</div>
+      <div class="ln-title">My Plan</div>
+      <div class="ln-sub">"What do I do?"</div>
+    </div>
+    <div class="loop-arrow forward">→</div>
+    <div class="loop-node progress">
+      <div class="ln-emoji">📊</div>
+      <div class="ln-title">Progress</div>
+      <div class="ln-sub">"How am I doing?"</div>
+    </div>
+  </div>
+  <div class="loop-return">↩ "Re-Assess Now" sends users back to Assess after 14 days</div>
+</div>
+
+<div class="sep"></div>
+
+<!-- ════════════════════ FULL FLOW DIAGRAM ════════════════════ -->
+<div class="flow-section">
+  <div class="section-label">Complete Flow</div>
+  <h2 style="font-size:40px;font-weight:700;color:#fff;margin-bottom:8px;">Screen-to-Screen Navigation</h2>
+  <div class="desc" style="color:#999;font-size:16px;margin-bottom:48px;">Every screen and where it leads. Arrows show the primary user journey.</div>
+
+  <!-- Assess Gateway -->
+  <div style="margin-bottom:24px;">
+    <div style="font-size:14px;font-weight:600;color:#6B7F6B;margin-bottom:16px;text-align:center;">ASSESS TAB — Dual gateway, two paths, one destination</div>
+    <div class="flow-row">
+      <div class="flow-phone" style="border-color:#6B7F6B;">
+        <div class="fp-header" style="color:#6B7F6B;">Gateway</div>
+        <div class="fp-content">
+          <div style="font-size:10px;font-weight:600;color:#888;margin-bottom:6px;">What can we help with?</div>
+          <div style="background:rgba(220,80,80,0.06);border:1px solid rgba(220,80,80,0.2);border-radius:8px;padding:8px;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:14px;">🩹</span>
+              <div><div style="font-size:10px;font-weight:600;color:#3D3D3D;">Something Hurts</div><div style="font-size:8px;color:#999;">Pain or injury</div></div>
+              <span style="margin-left:auto;color:#ccc;font-size:10px;">›</span>
+            </div>
+          </div>
+          <div style="background:rgba(107,127,107,0.06);border:1px solid rgba(107,127,107,0.2);border-radius:8px;padding:8px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:14px;">✨</span>
+              <div><div style="font-size:10px;font-weight:600;color:#3D3D3D;">Improve My Life</div><div style="font-size:8px;color:#999;">Wellness goals</div></div>
+              <span style="margin-left:auto;color:#ccc;font-size:10px;">›</span>
+            </div>
+          </div>
+        </div>
+        <div class="fp-tab-bar"><span class="ft-active">Assess</span><span>My Plan</span><span>Progress</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pain Path -->
+  <div style="margin-bottom:16px;">
+    <div style="font-size:12px;font-weight:600;color:#dc5050;margin-bottom:12px;text-align:center;">🩹 PAIN PATH — "Something Hurts"</div>
+    <div class="flow-row">
+      <div class="flow-phone">
+        <div class="fp-header" style="color:#dc5050;">Body Map</div>
+        <div class="fp-content">
+          <div class="mini-body">🧍</div>
+          <div style="display:flex;gap:4px;margin-bottom:4px;">
+            <div class="mini-chip">L. Shoulder ✕</div>
+            <div class="mini-chip">Lower Back ✕</div>
+          </div>
+          <div class="mini-btn">Continue →</div>
+        </div>
+        <div class="fp-tab-bar"><span class="ft-active">Assess</span><span>My Plan</span><span>Progress</span></div>
+      </div>
+
+      <div class="flow-arrow-group">
+        <div class="flow-arrow">→</div>
+        <div class="flow-label">push</div>
+      </div>
+
+      <div class="flow-phone">
+        <div class="fp-header">Pain Detail</div>
+        <div class="fp-content">
+          <div class="mini-card"><div class="mc-title">Pain Type</div><div style="display:flex;gap:3px;margin-top:3px;"><div class="mini-chip">Sharp</div><div class="mini-chip">Dull</div></div></div>
+          <div class="mini-card"><div class="mc-title">Intensity</div><div style="height:12px;background:linear-gradient(90deg,#6B7F6B,#e8c44a,#dc5050);border-radius:6px;margin-top:3px;"></div></div>
+          <div class="mini-card"><div class="mc-title">Aggravating</div><div style="display:flex;gap:3px;margin-top:3px;"><div class="mini-chip">Overhead</div><div class="mini-chip">Sleep</div></div></div>
+          <div class="mini-btn">Analyze →</div>
+        </div>
+        <div class="fp-tab-bar"><span class="ft-active">Assess</span><span>My Plan</span><span>Progress</span></div>
+      </div>
+
+      <div class="flow-arrow-group">
+        <div class="flow-arrow">→</div>
+        <div class="flow-label">AI</div>
+      </div>
+
+      <div class="flow-phone">
+        <div class="fp-header">Conditions</div>
+        <div class="fp-content">
+          <div class="mini-card" style="border-left:2px solid #6B7F6B;"><div class="mc-title">Rotator Cuff Tendinopathy</div><div style="font-size:10px;color:#6B7F6B;font-weight:600;">78%</div></div>
+          <div class="mini-card" style="border-left:2px solid #9B8F80;"><div class="mc-title">Shoulder Impingement</div><div style="font-size:10px;color:#9B8F80;font-weight:600;">65%</div></div>
+          <div class="mini-card" style="border-left:2px solid #ccc;"><div class="mc-title">Biceps Tendinitis</div><div style="font-size:10px;color:#aaa;font-weight:600;">42%</div></div>
+          <div class="mini-btn">Build Rehab Plan →</div>
+        </div>
+        <div class="fp-tab-bar"><span class="ft-active">Assess</span><span>My Plan</span><span>Progress</span></div>
+      </div>
+
+      <div class="flow-arrow-group">
+        <div class="flow-arrow">→</div>
+        <div class="flow-label">generate</div>
+      </div>
+
+      <div class="flow-phone" style="border-color:#6B7F6B;">
+        <div class="fp-header" style="background:rgba(107,127,107,0.08);color:#6B7F6B;">Rehab Plan ✓</div>
+        <div class="fp-content">
+          <div class="mini-card" style="background:#6B7F6B;"><div class="mc-title" style="color:white;">Shoulder Recovery</div><div class="mc-text" style="color:rgba(255,255,255,0.7);">6 weeks · 8 exercises</div></div>
+          <div class="mini-card"><div class="mc-title">External Rotation</div><div class="mc-text">3×12 · Band</div></div>
+          <div class="mini-card"><div class="mc-title">Pendulum Swings</div><div class="mc-text">3×30s · None</div></div>
+          <div class="mini-btn">Save → My Plan Tab</div>
+          <div class="mini-btn-outline" style="font-size:8px;">🏠 Back to Assess</div>
+        </div>
+        <div class="fp-tab-bar"><span class="ft-active">Assess</span><span>My Plan</span><span>Progress</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wellness Path -->
+  <div style="margin-bottom:48px;">
+    <div style="font-size:12px;font-weight:600;color:#6B7F6B;margin-bottom:12px;text-align:center;">✨ WELLNESS PATH — "Improve My Life"</div>
+    <div class="flow-row">
+      <div class="flow-phone">
+        <div class="fp-header" style="color:#6B7F6B;">Goal Picker</div>
+        <div class="fp-content">
+          <div style="font-size:9px;color:#888;margin-bottom:4px;">Select your goals</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+            <div style="background:#fff;border:1px solid rgba(107,127,107,0.3);border-radius:6px;padding:6px;text-align:center;"><div style="font-size:14px;">😴</div><div style="font-size:8px;font-weight:600;">Sleep</div></div>
+            <div style="background:#fff;border-radius:6px;padding:6px;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,0.05);"><div style="font-size:14px;">🧍</div><div style="font-size:8px;font-weight:600;">Posture</div></div>
+            <div style="background:#fff;border-radius:6px;padding:6px;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,0.05);"><div style="font-size:14px;">🤸</div><div style="font-size:8px;font-weight:600;">Flexibility</div></div>
+            <div style="background:#fff;border:1px solid rgba(107,127,107,0.3);border-radius:6px;padding:6px;text-align:center;"><div style="font-size:14px;">💪</div><div style="font-size:8px;font-weight:600;">Core</div></div>
+          </div>
+          <div class="mini-btn" style="margin-top:6px;">Continue with 2 →</div>
+        </div>
+        <div class="fp-tab-bar"><span class="ft-active">Assess</span><span>My Plan</span><span>Progress</span></div>
+      </div>
+
+      <div class="flow-arrow-group">
+        <div class="flow-arrow">→</div>
+        <div class="flow-label">push</div>
+      </div>
+
+      <div class="flow-phone">
+        <div class="fp-header">Questionnaire</div>
+        <div class="fp-content">
+          <div style="height:3px;background:#e8e3da;border-radius:2px;margin-bottom:6px;"><div style="height:3px;background:#6B7F6B;border-radius:2px;width:50%;"></div></div>
+          <div style="font-size:10px;font-weight:600;color:#3D3D3D;margin-bottom:4px;">Goal 1 of 2: Better Sleep</div>
+          <div class="mini-card"><div class="mc-title">Impact Level</div><div style="display:flex;gap:3px;margin-top:3px;"><div class="mini-chip">Mild</div><div class="mini-chip" style="background:rgba(107,127,107,0.3);">Moderate</div></div></div>
+          <div class="mini-card"><div class="mc-title">How long?</div><div style="display:flex;gap:3px;margin-top:3px;"><div class="mini-chip">Weeks</div><div class="mini-chip">Months</div></div></div>
+          <div class="mini-card"><div class="mc-title">Daily time?</div><div style="display:flex;gap:3px;margin-top:3px;"><div class="mini-chip" style="background:rgba(107,127,107,0.3);">10 min</div><div class="mini-chip">15 min</div></div></div>
+          <div class="mini-btn">Next Goal →</div>
+        </div>
+        <div class="fp-tab-bar"><span class="ft-active">Assess</span><span>My Plan</span><span>Progress</span></div>
+      </div>
+
+      <div class="flow-arrow-group">
+        <div class="flow-arrow">→</div>
+        <div class="flow-label">AI</div>
+      </div>
+
+      <div class="flow-phone">
+        <div class="fp-header">Recommendations</div>
+        <div class="fp-content">
+          <div style="font-size:9px;color:#888;margin-bottom:6px;">AI Wellness Insights</div>
+          <div class="mini-card" style="border-left:2px solid #6B7F6B;">
+            <div class="mc-title">Better Sleep</div>
+            <div class="mc-text">Evening mobility routine reduces cortisol and improves sleep onset</div>
+            <div style="font-size:8px;color:#6B7F6B;margin-top:3px;">Timeline: 2-3 weeks</div>
+          </div>
+          <div class="mini-card" style="border-left:2px solid #9B8F80;">
+            <div class="mc-title">Core Strength</div>
+            <div class="mc-text">Progressive core work builds stability for daily activities</div>
+            <div style="font-size:8px;color:#9B8F80;margin-top:3px;">Timeline: 4-6 weeks</div>
+          </div>
+          <div class="mini-btn">Build Wellness Plan →</div>
+        </div>
+        <div class="fp-tab-bar"><span class="ft-active">Assess</span><span>My Plan</span><span>Progress</span></div>
+      </div>
+
+      <div class="flow-arrow-group">
+        <div class="flow-arrow">→</div>
+        <div class="flow-label">generate</div>
+      </div>
+
+      <div class="flow-phone" style="border-color:#6B7F6B;">
+        <div class="fp-header" style="background:rgba(107,127,107,0.08);color:#6B7F6B;">Wellness Plan ✓</div>
+        <div class="fp-content">
+          <div class="mini-card" style="background:#6B7F6B;"><div class="mc-title" style="color:white;">Sleep & Core Plan</div><div class="mc-text" style="color:rgba(255,255,255,0.7);">4 weeks · 6 exercises</div></div>
+          <div class="mini-card"><div class="mc-title">Evening Stretch</div><div class="mc-text">10 min · No equipment</div></div>
+          <div class="mini-card"><div class="mc-title">Dead Bug</div><div class="mc-text">3×10 · No equipment</div></div>
+          <div class="mini-btn">Save → My Plan Tab</div>
+          <div class="mini-btn-outline" style="font-size:8px;">🏠 Back to Assess</div>
+        </div>
+        <div class="fp-tab-bar"><span class="ft-active">Assess</span><span>My Plan</span><span>Progress</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Plan Flow -->
+  <div style="margin-bottom:48px;">
+    <div style="font-size:14px;font-weight:600;color:#9B8F80;margin-bottom:16px;text-align:center;">MY PLAN TAB — Daily workout flow</div>
+    <div class="flow-row">
+      <div class="flow-phone">
+        <div class="fp-header">My Plan</div>
+        <div class="fp-content">
+          <div class="mini-card" style="background:#6B7F6B;"><div class="mc-title" style="color:white;">Shoulder Recovery</div><div class="mc-text" style="color:rgba(255,255,255,0.7);">Week 2/6 · 8 exercises</div></div>
+          <div class="mini-btn" style="margin-top:0;margin-bottom:6px;">▶ Start Workout</div>
+          <div style="font-size:8px;font-weight:600;color:#9B8F80;text-transform:uppercase;letter-spacing:1px;margin:8px 0 4px;">Today's Exercises</div>
+          <div class="mini-card"><div class="mc-title">External Rotation</div><div class="mc-text">3×12 · Band</div></div>
+          <div class="mini-card"><div class="mc-title">Pendulum Swings</div><div class="mc-text">3×30s</div></div>
+          <div style="font-size:8px;font-weight:600;color:#9B8F80;text-transform:uppercase;letter-spacing:1px;margin:8px 0 4px;">Saved Plans</div>
+          <div class="mini-card"><div class="mc-title">Knee Rehab</div><div class="mc-text">Completed · Mar 15</div></div>
+        </div>
+        <div class="fp-tab-bar"><span>Assess</span><span class="ft-active">My Plan</span><span>Progress</span></div>
+      </div>
+
+      <div class="flow-arrow-group">
+        <div class="flow-arrow">→</div>
+        <div class="flow-label">push</div>
+      </div>
+
+      <div class="flow-phone">
+        <div class="fp-header">Guided Workout</div>
+        <div class="fp-content">
+          <div style="display:flex;justify-content:space-between;font-size:8px;color:#888;margin-bottom:4px;"><span style="color:#dc5050;">End</span><span>2 of 8</span><span style="color:#6B7F6B;">⏸</span></div>
+          <div style="height:3px;background:#e8e3da;border-radius:2px;margin-bottom:8px;"><div style="height:3px;background:#6B7F6B;border-radius:2px;width:25%;"></div></div>
+          <div style="height:110px;background:#e8e3da;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:6px;">🏋️</div>
+          <div style="font-size:12px;font-weight:600;color:#3D3D3D;">External Rotation</div>
+          <div style="font-size:9px;color:#888;margin-bottom:6px;">Set 1 of 3 · 12 reps</div>
+          <div class="mini-btn">✓ Complete Set</div>
+          <div style="display:flex;gap:4px;margin-top:4px;">
+            <div class="mini-btn-outline" style="flex:1;font-size:8px;">Form</div>
+            <div class="mini-btn-outline" style="flex:1;font-size:8px;">Swap</div>
+            <div class="mini-btn-outline" style="flex:1;font-size:8px;color:#999;border-color:#ddd;">Skip</div>
+          </div>
+        </div>
+        <div class="fp-tab-bar"><span>Assess</span><span class="ft-active">My Plan</span><span>Progress</span></div>
+      </div>
+
+      <div class="flow-arrow-group">
+        <div class="flow-arrow">→</div>
+        <div class="flow-label">completes</div>
+      </div>
+
+      <div class="flow-phone">
+        <div class="fp-header">Summary</div>
+        <div class="fp-content" style="text-align:center;">
+          <div style="font-size:48px;margin:16px 0;">🎉</div>
+          <div style="font-size:16px;font-weight:700;color:#3D3D3D;margin-bottom:4px;">Workout Complete!</div>
+          <div style="font-size:11px;color:#888;margin-bottom:16px;">Great session — you're making progress</div>
+          <div class="mini-stat-row">
+            <div class="mini-stat"><div class="ms-num">24</div><div class="ms-label">Minutes</div></div>
+            <div class="mini-stat"><div class="ms-num">6/8</div><div class="ms-label">Exercises</div></div>
+            <div class="mini-stat"><div class="ms-num">3</div><div class="ms-label">Pain Level</div></div>
+          </div>
+          <div class="mini-btn" style="margin-top:16px;">Save & Done</div>
+        </div>
+        <div class="fp-tab-bar"><span>Assess</span><span class="ft-active">My Plan</span><span>Progress</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress Flow -->
+  <div>
+    <div style="font-size:14px;font-weight:600;color:#4e73a3;margin-bottom:16px;text-align:center;">PROGRESS TAB — Reflection + re-assessment loop</div>
+    <div class="flow-row">
+      <div class="flow-phone">
+        <div class="fp-header">Progress</div>
+        <div class="fp-content">
+          <div class="mini-chart">
+            <svg viewBox="0 0 170 40" fill="none">
+              <path d="M0,30 C25,32 40,22 60,25 C80,28 100,15 120,12 C140,9 155,10 170,6" stroke="#6B7F6B" stroke-width="1.5" fill="none"/>
+            </svg>
+          </div>
+          <div class="mini-stat-row">
+            <div class="mini-stat"><div class="ms-num">18</div><div class="ms-label">Sessions</div></div>
+            <div class="mini-stat"><div class="ms-num" style="color:#6B7F6B;">3.2</div><div class="ms-label">Avg Pain</div></div>
+            <div class="mini-stat"><div class="ms-num">247</div><div class="ms-label">Min</div></div>
+          </div>
+          <div class="mini-card"><div class="mc-title">Recovery Insights</div><div class="mc-text">Pain trending down 22%</div></div>
+          <div style="background:rgba(107,127,107,0.08);border:1px dashed #6B7F6B;border-radius:8px;padding:8px;text-align:center;margin-top:6px;">
+            <div style="font-size:10px;font-weight:600;color:#6B7F6B;">Re-Assess?</div>
+            <div style="font-size:8px;color:#888;">14 days since last check</div>
+            <div class="mini-btn-outline" style="font-size:8px;width:100px;margin:4px auto 0;">Re-Assess →</div>
+          </div>
+        </div>
+        <div class="fp-tab-bar"><span>Assess</span><span>My Plan</span><span class="ft-active">Progress</span></div>
+      </div>
+
+      <div class="flow-arrow-group">
+        <div class="flow-arrow" style="color:#9B8F80;">⟲</div>
+        <div class="flow-label">tab switch</div>
+      </div>
+
+      <div class="flow-phone" style="border-color:#6B7F6B;">
+        <div class="fp-header" style="color:#6B7F6B;">↩ Back to Assess</div>
+        <div class="fp-content">
+          <div class="mini-body">🧍</div>
+          <div style="display:flex;gap:4px;margin-bottom:4px;">
+            <div class="mini-chip">L. Shoulder ✕</div>
+          </div>
+          <div class="mini-btn">Continue →</div>
+          <div style="text-align:center;font-size:8px;color:#9B8F80;margin-top:6px;">Re-assessment cycle begins</div>
+        </div>
+        <div class="fp-tab-bar"><span class="ft-active">Assess</span><span>My Plan</span><span>Progress</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- ════════════════════ FOOTER ════════════════════ -->
+<div class="footer">
+  <div style="color:#6B7F6B;font-weight:600;font-size:15px;margin-bottom:8px;">PT Helper — Navigation Redesign</div>
+  <div>3 tabs · ~18 screens · 4 levels max depth · Zero dead ends</div>
+</div>
+
+</body>
+</html>

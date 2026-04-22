@@ -1,0 +1,140 @@
+{
+  "exercises": [
+    {
+      "name": "glute-bridges",
+      "original_failure": "API_ERROR \u2014 Gemini QA service returning JSON parse error (None input) on all 9 checks",
+      "attempts": [
+        {
+          "strategy": "Re-QA only (transient API error check)",
+          "result": "FAIL",
+          "model": "kontext-pro"
+        },
+        {
+          "strategy": "Regenerate with seed_offset=0, re-QA",
+          "result": "FAIL",
+          "model": "kontext-pro"
+        },
+        {
+          "strategy": "Regenerate with seed_offset=2000, re-QA",
+          "result": "FAIL",
+          "model": "kontext-pro"
+        }
+      ],
+      "final_status": "flagged_manual"
+    },
+    {
+      "name": "childs-pose",
+      "original_failure": "API_ERROR \u2014 Gemini QA service returning JSON parse error (None input) on all 9 checks",
+      "attempts": [
+        {
+          "strategy": "Re-QA only (transient API error check)",
+          "result": "FAIL",
+          "model": "kontext-pro"
+        },
+        {
+          "strategy": "Regenerate with seed_offset=0, re-QA",
+          "result": "FAIL",
+          "model": "kontext-pro"
+        },
+        {
+          "strategy": "Regenerate with seed_offset=2000, re-QA",
+          "result": "FAIL",
+          "model": "kontext-pro"
+        }
+      ],
+      "final_status": "flagged_manual"
+    },
+    {
+      "name": "standing-hip-adduction",
+      "original_failure": "POSE_ACCURACY \u2014 Figure performing figure-four stretch instead of hip adduction sweep",
+      "attempts": [
+        {
+          "strategy": "Regenerate with seed_offset=1000, re-QA",
+          "result": "PASS",
+          "pose_score": 2,
+          "model": "kontext-pro"
+        }
+      ],
+      "final_status": "fixed"
+    },
+    {
+      "name": "standing-quad-stretch",
+      "original_failure": "API_ERROR \u2014 Gemini QA service returning JSON parse error (None input) on all 9 checks",
+      "attempts": [
+        {
+          "strategy": "Re-QA only (transient API error check)",
+          "result": "FAIL",
+          "model": "kontext-pro"
+        },
+        {
+          "strategy": "Regenerate with seed_offset=0, re-QA",
+          "result": "FAIL",
+          "model": "kontext-pro"
+        },
+        {
+          "strategy": "Regenerate with seed_offset=2000, re-QA",
+          "result": "FAIL",
+          "model": "kontext-pro"
+        }
+      ],
+      "final_status": "flagged_manual"
+    },
+    {
+      "name": "reverse-wrist-curls",
+      "original_failure": "POSE_ACCURACY \u2014 Figure performing bicep curl (palm-up) instead of reverse wrist curl (palm-down, forearm supported)",
+      "attempts": [
+        {
+          "strategy": "Regenerate with seed_offset=1000 (kontext-pro)",
+          "result": "FAIL",
+          "pose_score": 1,
+          "model": "kontext-pro"
+        },
+        {
+          "strategy": "Model switch to flux2-pro, seed_offset=0",
+          "result": "FAIL",
+          "pose_score": 1,
+          "model": "flux2-pro"
+        },
+        {
+          "strategy": "Model switch to flux2-pro, seed_offset=1000",
+          "result": "FAIL",
+          "pose_score": 1,
+          "model": "flux2-pro"
+        }
+      ],
+      "final_status": "flagged_manual"
+    },
+    {
+      "name": "childs-pose-with-side-reach",
+      "original_failure": "API_ERROR \u2014 Gemini QA service returning JSON parse error (None input) on all 9 checks",
+      "attempts": [
+        {
+          "strategy": "Re-QA only (transient API error check)",
+          "result": "FAIL",
+          "model": "kontext-pro"
+        },
+        {
+          "strategy": "Regenerate with seed_offset=0, re-QA",
+          "result": "FAIL",
+          "model": "kontext-pro"
+        },
+        {
+          "strategy": "Regenerate with seed_offset=2000, re-QA",
+          "result": "FAIL",
+          "model": "kontext-pro"
+        }
+      ],
+      "final_status": "flagged_manual"
+    }
+  ],
+  "summary": {
+    "fixed": 1,
+    "still_failing": 0,
+    "flagged_manual": 5
+  },
+  "status": "completed",
+  "run_timestamp": "2026-04-13T00:05:54.006320+00:00",
+  "elapsed_seconds": 246,
+  "total_input": 6,
+  "dry_run": false
+}

@@ -1,0 +1,26 @@
+{
+  "ankle-dorsiflexion-band": {
+    "status": "regen",
+    "notes": "1. Chair is gone.\n2. band is not properly around one ankle in either picture\n3. ankle needs be pointing down in one picture and up in another."
+  },
+  "ankle-inversion-eversion": {
+    "status": "regen",
+    "notes": "1. one picture is on a chair the other is sitting down\n2. Does not show the difference in the ankles which is the point of the exercise\n3. ankle must be turned in in one picture and out in the other the person can be sitting on the ground for this"
+  },
+  "arch-doming-foot-intrinsics": {
+    "status": "regen",
+    "notes": "camera angle shifted\nthis exercise is about the foot arch exercise and there are shoes on, shoes should be off and one picture should demonstrate the foot at a base position and the other the flexing of the foot inwards"
+  },
+  "band-reverse-fly": {
+    "status": "regen",
+    "notes": "the camera angle changed, the body of the person changed and again the band starts under the feet and ends up not under the feet. The person must also be bent over in an Romanian deadlift position for the reverse flies."
+  },
+  "median-nerve-gliding": {
+    "status": "regen",
+    "notes": "camera angle is wrong again arm position is completely off in the start position and the x-ray on the arm in the end should not be there"
+  },
+  "forearm-plank-knees": {
+    "status": "regen",
+    "notes": "the person is not on their forearms. This is a holding position so this would actually only need one image and the person must be more forward while leaning on their forearms with their knees on the ground."
+  }
+}

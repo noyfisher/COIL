@@ -2,7 +2,7 @@ import Foundation
 
 struct PainAssessment: Codable, Identifiable {
     enum PainType: String, Codable, CaseIterable {
-        case sharp, dull, burning, throbbing, aching, stabbing, tingling
+        case sharp, dull, burning, throbbing, aching, stabbing, tingling, tightness
         var displayName: String {
             switch self {
             case .sharp: return "Sharp"
@@ -12,6 +12,7 @@ struct PainAssessment: Codable, Identifiable {
             case .aching: return "Aching"
             case .stabbing: return "Stabbing"
             case .tingling: return "Tingling"
+            case .tightness: return "Tightness"
             }
         }
     }
@@ -55,14 +56,25 @@ struct PainAssessment: Codable, Identifiable {
 
     let id: UUID
     let selectedRegion: BodyRegion
-    let painType: PainType
+    let painTypes: [String]
+    let customPainDescription: String?
     let painIntensity: Int
-    let painDuration: PainDuration
-    let painFrequency: PainFrequency
-    let painOnset: PainOnset
+    let painDurations: [String]
+    let painFrequencies: [String]
+    let painOnsets: [String]
     let aggravatingFactors: [String]
     let relievingFactors: [String]
     let additionalNotes: String?
+    let currentTreatment: CurrentTreatment?
+}
+
+struct CurrentTreatment: Codable {
+    var hasSeenDoctor: Bool = false
+    var imagingDone: [String] = []       // "X-ray", "MRI", "CT Scan", "Ultrasound"
+    var hasDiagnosis: Bool = false
+    var diagnosisText: String?
+    var currentlyReceivingTreatment: Bool = false
+    var treatmentDetails: String?
 }
 
 struct ConditionResult: Codable, Identifiable {

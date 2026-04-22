@@ -3,10 +3,11 @@ import SwiftUI
 struct BodyMapView: View {
     @StateObject private var viewModel = BodyMapViewModel()
     @State private var navigateToPainDetail = false
+    @State private var showPulseHint = true
 
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground)
+            AppColors.bgGradient
                 .ignoresSafeArea()
 
             VStack(spacing: 16) {
@@ -14,10 +15,10 @@ struct BodyMapView: View {
                 VStack(spacing: 6) {
                     Text("Where does it hurt?")
                         .font(.title2.weight(.bold))
-                        .foregroundColor(.primary)
+                        .foregroundColor(AppColors.primaryText)
                     Text("Tap all areas where you feel pain or discomfort")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                         .multilineTextAlignment(.center)
                 }
                 .padding(.top, 20)
@@ -29,6 +30,7 @@ struct BodyMapView: View {
                 }
                 .pickerStyle(.segmented)
                 .padding(.horizontal, 20)
+                .accessibilityIdentifier("bodyMap.frontBackToggle")
 
                 // Body map
                 GeometryReader { geometry in
@@ -45,10 +47,10 @@ struct BodyMapView: View {
                             VStack {
                                 Text("BACK VIEW")
                                     .font(.caption2.weight(.bold))
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(AppColors.secondaryText)
                                     .padding(.horizontal, 8)
                                     .padding(.vertical, 4)
-                                    .background(Color(.systemGray5))
+                                    .background(AppColors.elevatedSurface)
                                     .cornerRadius(AppCorners.small)
                                 Spacer()
                             }
@@ -63,30 +65,47 @@ struct BodyMapView: View {
                                 )
 
                                 Button(action: {
-                                    let impact = UIImpactFeedbackGenerator(style: .light)
+                                    let style: UIImpactFeedbackGenerator.FeedbackStyle = region.isSelected ? .soft : .light
+                                    let impact = UIImpactFeedbackGenerator(style: style)
                                     impact.impactOccurred()
                                     withAnimation(.spring(response: 0.3)) {
                                         viewModel.toggleSelection(for: region)
                                     }
+                                    showPulseHint = false
                                 }) {
                                     VStack(spacing: 2) {
-                                        Circle()
-                                            .fill(region.isSelected ? Color.blue : Color.blue.opacity(0.15))
-                                            .frame(width: 44, height: 44)
-                                            .overlay(
+                                        ZStack {
+                                            // Pulse ring hint for unselected on first view
+                                            if showPulseHint && !region.isSelected {
                                                 Circle()
-                                                    .stroke(Color.blue, lineWidth: region.isSelected ? 0 : 1.5)
-                                            )
-                                            .overlay(
-                                                Image(systemName: region.isSelected ? "checkmark" : "plus")
-                                                    .font(.system(size: 14, weight: .bold))
-                                                    .foregroundColor(region.isSelected ? .white : .blue)
-                                            )
-                                            .scaleEffect(region.isSelected ? 1.1 : 1.0)
+                                                    .stroke(AppColors.accent.opacity(0.3), lineWidth: 2)
+                                                    .frame(width: 56, height: 56)
+                                                    .scaleEffect(showPulseHint ? 1.15 : 1.0)
+                                                    .opacity(showPulseHint ? 0.6 : 0)
+                                                    .animation(
+                                                        .easeInOut(duration: 1.2).repeatCount(3, autoreverses: true),
+                                                        value: showPulseHint
+                                                    )
+                                            }
+
+                                            Circle()
+                                                .fill(region.isSelected ? AppColors.accent : AppColors.accentTint)
+                                                .frame(width: 48, height: 48)
+                                                .overlay(
+                                                    Circle()
+                                                        .stroke(AppColors.accent, lineWidth: region.isSelected ? 0 : 1.5)
+                                                )
+                                                .overlay(
+                                                    Image(systemName: region.isSelected ? "checkmark" : "plus")
+                                                        .font(.system(size: 15, weight: .bold))
+                                                        .foregroundColor(region.isSelected ? AppColors.ctaText : AppColors.accent)
+                                                )
+                                                .scaleEffect(region.isSelected ? 1.1 : 1.0)
+                                        }
 
                                         Text(region.name)
-                                            .font(.system(size: 8, weight: .medium))
-                                            .foregroundColor(region.isSelected ? .blue : .secondary)
+                                            .font(.system(size: 9, weight: .medium))
+                                            .foregroundColor(region.isSelected ? AppColors.accent : AppColors.secondaryText)
                                             .lineLimit(1)
                                     }
                                 }
@@ -102,7 +121,7 @@ struct BodyMapView: View {
                 .padding(AppSpacing.lg)
                 .background(AppColors.cardBackground)
                 .cornerRadius(AppCorners.large)
-                .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+                .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
                 .padding(.horizontal, 20)
 
                 // Summary bar and actions
@@ -110,26 +129,15 @@ struct BodyMapView: View {
                     HStack {
                         Text("\(viewModel.selectedRegions.count) area(s) selected")
                             .font(.subheadline.weight(.medium))
-                            .foregroundColor(.primary)
+                            .foregroundColor(AppColors.primaryText)
                         Spacer()
                         if !viewModel.selectedRegions.isEmpty {
                             Button(action: { viewModel.clearAll() }) {
                                 Text("Clear All")
                             }
                             .buttonStyle(DestructiveButtonStyle())
+                            .accessibilityIdentifier("bodyMap.clearAllButton")
                         }
-                    }
-
-                    NavigationLink(
-                        destination: PainDetailView(
-                            viewModel: InjuryAnalysisViewModel(
-                                userProfile: viewModel.userProfile,
-                                selectedRegions: viewModel.selectedRegions
-                            )
-                        ),
-                        isActive: $navigateToPainDetail
-                    ) {
-                        EmptyView()
                     }
 
                     Button(action: { navigateToPainDetail = true }) {
@@ -141,6 +149,7 @@ struct BodyMapView: View {
                     }
                     .buttonStyle(PrimaryButtonStyle(isDisabled: viewModel.selectedRegions.isEmpty))
                     .disabled(viewModel.selectedRegions.isEmpty)
+                    .accessibilityIdentifier("bodyMap.continueButton")
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 30)
@@ -148,5 +157,14 @@ struct BodyMapView: View {
         }
         .navigationTitle("Body Map")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $navigateToPainDetail) {
+            PainDetailView(
+                viewModel: InjuryAnalysisViewModel(
+                    userProfile: viewModel.userProfile,
+                    selectedRegions: viewModel.selectedRegions
+                )
+            )
+        }
+        .trackScreen("BodyMap")
     }
 }

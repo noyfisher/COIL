@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0">
+<title>Annotated Exercise Close-Up</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+  :root {
+    --accent: #5E8C5A;
+    --accent-tint: rgba(94,140,90,0.10);
+    --cta-bg: #3A5E36;
+    --cta-text: #F2F5EE;
+    --primary-text: #1E2B1A;
+    --secondary-text: #556B4A;
+    --muted-text: #8A9A7E;
+    --card-bg: #FAFCF8;
+    --page-bg: #E8F0E9;
+    --elevated: #E2E8DA;
+    --card-border: rgba(75,100,65,0.10);
+    --card-shadow: rgba(45,60,35,0.05);
+    --success: #5E8C5A;
+    --danger: #B85C5C;
+    --corner-card: 20px;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--page-bg);
+    width: 375px;
+    height: 812px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    height: 54px; background: var(--page-bg);
+    display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 8px; font-size: 15px; font-weight: 600; color: var(--primary-text);
+    flex-shrink: 0;
+  }
+
+  .header-bar {
+    padding: 8px 20px 16px;
+    flex-shrink: 0;
+  }
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--primary-text);
+    margin-bottom: 4px;
+  }
+  .header-sub {
+    font-size: 13px;
+    color: var(--secondary-text);
+    font-weight: 500;
+  }
+
+  .scrollable { flex: 1; overflow-y: auto; padding: 0 20px; }
+
+  /* Large annotated image */
+  .annotated-image {
+    width: 100%;
+    height: 340px;
+    border-radius: var(--corner-card);
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  }
+  .annotated-image img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+
+  /* Annotation styles */
+  .ann-badge {
+    position: absolute;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+    backdrop-filter: blur(6px);
+    border: 1.5px solid rgba(255,255,255,0.5);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .ann-badge.correct {
+    background: rgba(94,140,90,0.88);
+    color: white;
+  }
+  .ann-badge.warning {
+    background: rgba(184,92,92,0.88);
+    color: white;
+  }
+  .ann-badge.info {
+    background: rgba(30,43,26,0.75);
+    color: white;
+  }
+
+  .ann-angle {
+    position: absolute;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    border: 3px solid rgba(94,140,90,0.95);
+    background: rgba(94,140,90,0.25);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+
+  .ann-arrow {
+    position: absolute;
+    font-size: 32px;
+    color: rgba(255,255,255,0.85);
+    text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    line-height: 1;
+  }
+
+  .ann-line {
+    position: absolute;
+    border: none;
+    height: 0;
+    border-top: 2.5px dashed rgba(255,255,255,0.5);
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--secondary-text);
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .legend-dot.green { background: var(--success); }
+  .legend-dot.red { background: var(--danger); }
+  .legend-dot.gray { background: var(--muted-text); }
+
+  /* Key points card */
+  .key-points-card {
+    background: var(--card-bg);
+    border-radius: var(--corner-card);
+    padding: 16px;
+    border: 1px solid var(--card-border);
+    box-shadow: 0 2px 8px var(--card-shadow);
+    margin-bottom: 16px;
+  }
+  .kp-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary-text);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .kp-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .kp-icon {
+    width: 28px; height: 28px; min-width: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+  .kp-icon.green { background: rgba(94,140,90,0.12); }
+  .kp-icon.red { background: rgba(184,92,92,0.12); }
+  .kp-text { font-size: 13px; color: var(--secondary-text); line-height: 1.4; }
+  .kp-text strong { color: var(--primary-text); font-weight: 600; }
+
+  .screen-label {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: var(--accent);
+    color: white; text-align: center; padding: 4px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+<div class="screen-label">✦ ANNOTATED IMAGE — Visual Form Cues</div>
+
+<div class="status-bar">9:41</div>
+
+<div class="header-bar">
+  <div class="header-title">Wall Sits</div>
+  <div class="header-sub">Key form checkpoints</div>
+</div>
+
+<div class="scrollable">
+  <!-- Large annotated image -->
+  <div class="annotated-image">
+    <img src="img/wall-sits.png" alt="Wall Sits">
+
+    <!-- Correct form cues -->
+    <div class="ann-badge correct" style="top: 12%; left: 8%;">✓ Back flat</div>
+    <div class="ann-badge correct" style="top: 32%; right: 8%;">✓ Core engaged</div>
+
+    <!-- Angle indicator -->
+    <div class="ann-angle" style="top: 52%; left: 55%;">90°</div>
+
+    <!-- Warning cues -->
+    <div class="ann-badge warning" style="bottom: 20%; left: 8%;">✕ Don't cave knees</div>
+    <div class="ann-badge info" style="bottom: 8%; right: 8%;">2ft from wall</div>
+
+    <!-- Alignment line -->
+    <div class="ann-line" style="top: 25%; left: 20%; width: 60%; transform: rotate(0deg);"></div>
+
+    <!-- Movement arrow -->
+    <div class="ann-arrow" style="top: 38%; left: 18%;">↕</div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot green"></div> Correct form</div>
+    <div class="legend-item"><div class="legend-dot red"></div> Common mistake</div>
+    <div class="legend-item"><div class="legend-dot gray"></div> Measurement</div>
+  </div>
+
+  <!-- Key form points card -->
+  <div class="key-points-card">
+    <div class="kp-title">🎯 Form Checkpoints</div>
+
+    <div class="kp-row">
+      <div class="kp-icon green">✓</div>
+      <div class="kp-text"><strong>Back flat against wall</strong> — no gap between lower back and wall surface</div>
+    </div>
+
+    <div class="kp-row">
+      <div class="kp-icon green">✓</div>
+      <div class="kp-text"><strong>Knees at 90°</strong> — thighs parallel to ground, shins vertical</div>
+    </div>
+
+    <div class="kp-row">
+      <div class="kp-icon red">✕</div>
+      <div class="kp-text"><strong>Knees caving inward</strong> — keep aligned with toes, push outward slightly</div>
+    </div>
+
+    <div class="kp-row">
+      <div class="kp-icon red">✕</div>
+      <div class="kp-text"><strong>Knees past toes</strong> — move feet further from wall if needed</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

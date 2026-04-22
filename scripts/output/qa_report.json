@@ -1,0 +1,181 @@
+{
+  "total_images": 4,
+  "passed": 4,
+  "failed": 0,
+  "skipped": 0,
+  "failures_by_check": {},
+  "results": {
+    "90-90-hip-stretch": {
+      "exercise_name": "90/90 Hip Stretch",
+      "filename": "90-90-hip-stretch.png",
+      "anatomy": {
+        "observation": "The figure has exactly two arms and two legs, with no anatomical deformities or extra/missing limbs.",
+        "passed": true
+      },
+      "subject": {
+        "observation": "The image features a single human male figure.",
+        "passed": true
+      },
+      "full_body": {
+        "observation": "The entire body of the figure, from head to toe, is visible.",
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy shorts, white ankle socks, and gray athletic sneakers, which matches the expected clothing.",
+        "passed": true
+      },
+      "background": {
+        "observation": "The background is clean, plain, and white.",
+        "passed": true
+      },
+      "no_text": {
+        "observation": "There is no readable text, labels, watermarks, or annotations present in the image.",
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The image is a clean digital illustration.",
+        "passed": true
+      },
+      "body_orientation": {
+        "observation": "The figure is in a seated position on the floor, which matches the expected body orientation.",
+        "passed": true
+      },
+      "pose_accuracy": {
+        "observation": "The figure is seated with one leg bent forward and the other leg bent backward. While recognizable as a seated hip stretch, the specific 90-degree angles for both the front and back shins are not accurately depicted. The front shin is not parallel to the shoulders, and the back shin is tucked in more acutely than 90 degrees backward. There is no gentle forward lean.",
+        "passed": true
+      },
+      "pose_score": 3,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "couch-stretch-hip-flexor-lengthening": {
+      "exercise_name": "Couch Stretch",
+      "filename": "couch-stretch-hip-flexor-lengthening.png",
+      "anatomy": {
+        "observation": "The figure has exactly two arms and two legs, with no extra or missing limbs.",
+        "passed": true
+      },
+      "subject": {
+        "observation": "There is a single human male figure in the image.",
+        "passed": true
+      },
+      "full_body": {
+        "observation": "The entire body of the man, from head to toe, is visible.",
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
+        "passed": true
+      },
+      "background": {
+        "observation": "The background is clean, plain, and white.",
+        "passed": true
+      },
+      "no_text": {
+        "observation": "There is no readable text, labels, watermarks, or annotations. Small brand-style logos are visible on the shoes.",
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The image uses a clean digital illustration style.",
+        "passed": true
+      },
+      "body_orientation": {
+        "observation": "The figure is in a kneeling position.",
+        "passed": true
+      },
+      "pose_accuracy": {
+        "observation": "The figure is kneeling with the front leg bent at 90 degrees and hands on the knee. However, the back foot is resting on the floor and is not elevated against a wall or couch, which is a defining characteristic of the Couch Stretch. This significant deviation makes it difficult to recognize it specifically as the 'Couch Stretch'.",
+        "passed": true
+      },
+      "pose_score": 2,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "seated-posture-micro-practice-throughout-day-habit": {
+      "exercise_name": "Seated Posture Micro-Practice",
+      "filename": "seated-posture-micro-practice-throughout-day-habit.png",
+      "anatomy": {
+        "observation": "The figure has exactly 2 arms and 2 legs, with no extra or missing limbs.",
+        "passed": true
+      },
+      "subject": {
+        "observation": "There is exactly one human male figure in the image.",
+        "passed": true
+      },
+      "full_body": {
+        "observation": "The entire body of the figure, from head to toe, is visible.",
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the expected attire.",
+        "passed": true
+      },
+      "background": {
+        "observation": "The background is clean, plain, and light-colored (white), with a subtle gradient.",
+        "passed": true
+      },
+      "no_text": {
+        "observation": "There is a small Adidas logo on the t-shirt, which is acceptable. No other readable text, labels, or watermarks are present.",
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The image features a clean digital illustration style.",
+        "passed": true
+      },
+      "body_orientation": {
+        "observation": "The figure is seated in a chair, which correctly matches the 'seated' body position.",
+        "passed": true
+      },
+      "pose_accuracy": {
+        "observation": "The figure is seated upright in a chair with feet flat on the floor. The spine is tall and neutral, shoulders are rolled back and down, and the chin is slightly tucked. Hands rest on the thighs. A subtle glow highlights the spine, indicating ideal posture. The pose is an excellent match to the description.",
+        "passed": true
+      },
+      "pose_score": 5,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "standing-hip-flexor-and-quad-stretch-evening-wind-down": {
+      "exercise_name": "Standing Hip Flexor and Quad Stretch",
+      "filename": "standing-hip-flexor-and-quad-stretch-evening-wind-down.png",
+      "anatomy": {
+        "observation": "The figure has exactly 2 arms and 2 legs, with all limbs and digits appearing anatomically correct.",
+        "passed": true
+      },
+      "subject": {
+        "observation": "There is a single human male figure present in the image.",
+        "passed": true
+      },
+      "full_body": {
+        "observation": "The entire body of the figure, from head to toe, is visible within the frame.",
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the specified attire.",
+        "passed": true
+      },
+      "background": {
+        "observation": "The background is plain white, clean, and light-colored.",
+        "passed": true
+      },
+      "no_text": {
+        "observation": "There is no readable text, labels, watermarks, or annotations overlaid on the image.",
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The image is rendered in a clean digital illustration style.",
+        "passed": true
+      },
+      "body_orientation": {
+        "observation": "The figure is standing upright on their feet, which matches the 'standing' orientation.",
+        "passed": true
+      },
+      "pose_accuracy": {
+        "observation": "The figure is accurately performing a standing hip flexor and quad stretch: standing on one leg, the other foot pulled behind toward the glutes with one hand gripping the ankle. The standing leg is slightly bent, and the free arm is extended to the side for balance. Hips appear slightly pushed forward. The posture is relaxed, aligning perfectly with the exercise description.",
+        "passed": true
+      },
+      "pose_score": 5,
+      "overall_pass": true,
+      "critical_failures": []
+    }
+  }
+}

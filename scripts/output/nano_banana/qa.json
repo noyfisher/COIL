@@ -1,0 +1,237 @@
+{
+  "cat-camel-stretch": {
+    "generated": true,
+    "path": "/Users/noyfisher/IOS-Projects/PT-Helper-Agent-v1/scripts/output/nano_banana/cat-camel-stretch.png",
+    "qa": {
+      "exercise_name": "Cat-Camel Stretch",
+      "filename": "nb_cat-camel-stretch.png",
+      "anatomy": {
+        "observation": "The figure has exactly two arms and two legs.",
+        "passed": true
+      },
+      "subject": {
+        "observation": "The image features a single human male figure.",
+        "passed": true
+      },
+      "full_body": {
+        "observation": "The entire body of the figure, from head to feet, is visible.",
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
+        "passed": true
+      },
+      "background": {
+        "observation": "The background is a clean, plain, white color.",
+        "passed": true
+      },
+      "no_text": {
+        "observation": "There is no readable text, labels, watermarks, or annotations overlaid on the image.",
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The image is a clean digital illustration.",
+        "passed": true
+      },
+      "body_orientation": {
+        "observation": "The figure is in a quadruped position, on hands and knees on the ground.",
+        "passed": true
+      },
+      "pose_accuracy": {
+        "observation": "The figure is in a quadruped position with hands under shoulders, knees under hips, a neutral spine, and the head in neutral alignment, perfectly matching the description for the starting pose of a Cat-Camel Stretch.",
+        "passed": true
+      },
+      "pose_score": 5,
+      "overall_pass": true,
+      "critical_failures": []
+    }
+  },
+  "eccentric-hamstring-curls": {
+    "generated": true,
+    "path": "/Users/noyfisher/IOS-Projects/PT-Helper-Agent-v1/scripts/output/nano_banana/eccentric-hamstring-curls.png",
+    "qa": {
+      "exercise_name": "Eccentric Hamstring Curls",
+      "filename": "nb_eccentric-hamstring-curls.png",
+      "anatomy": {
+        "observation": "The figure has 2 arms and 2 legs.",
+        "passed": true
+      },
+      "subject": {
+        "observation": "There is exactly one human male figure in the image.",
+        "passed": true
+      },
+      "full_body": {
+        "observation": "The entire body of the figure, from head to toe, is visible.",
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
+        "passed": true
+      },
+      "background": {
+        "observation": "The background is clean, plain, and white.",
+        "passed": true
+      },
+      "no_text": {
+        "observation": "There is no readable text, labels, watermarks, or annotations present in the image.",
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The image features a clean digital illustration style.",
+        "passed": true
+      },
+      "body_orientation": {
+        "observation": "The figure is lying prone (face down) on a bench.",
+        "passed": true
+      },
+      "pose_accuracy": {
+        "observation": "The figure is correctly positioned prone on a bench with legs extended and hands by their sides, matching the exercise description.",
+        "passed": true
+      },
+      "pose_score": 5,
+      "overall_pass": true,
+      "critical_failures": []
+    }
+  },
+  "dumbbell-goblet-squats": {
+    "generated": true,
+    "path": "/Users/noyfisher/IOS-Projects/PT-Helper-Agent-v1/scripts/output/nano_banana/dumbbell-goblet-squats.png",
+    "qa": {
+      "exercise_name": "Dumbbell Goblet Squats",
+      "filename": "nb_dumbbell-goblet-squats.png",
+      "anatomy": {
+        "observation": "The figure has exactly 2 arms and 2 legs. The anatomy appears correct with no extra or missing limbs.",
+        "passed": true
+      },
+      "subject": {
+        "observation": "There is a single human male figure in the image.",
+        "passed": true
+      },
+      "full_body": {
+        "observation": "The entire body of the figure, from head to toe, is visible.",
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, which matches the expected attire.",
+        "passed": true
+      },
+      "background": {
+        "observation": "The background is clean, plain, and white.",
+        "passed": true
+      },
+      "no_text": {
+        "observation": "There is no readable text, labels, watermarks, or annotations present in the image.",
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The image is a clean digital illustration.",
+        "passed": true
+      },
+      "body_orientation": {
+        "observation": "The figure is standing upright on his feet, matching the 'standing' orientation.",
+        "passed": true
+      },
+      "pose_accuracy": {
+        "observation": "The figure is standing with feet shoulder-width apart, holding a dumbbell vertically at chest height with both hands, with his chest up and core engaged. This is an excellent match to the expected pose description.",
+        "passed": true
+      },
+      "pose_score": 5,
+      "overall_pass": true,
+      "critical_failures": []
+    }
+  },
+  "ankle-inversion-eversion": {
+    "generated": true,
+    "path": "/Users/noyfisher/IOS-Projects/PT-Helper-Agent-v1/scripts/output/nano_banana/ankle-inversion-eversion.png",
+    "qa": {
+      "exercise_name": "Seated Ankle Inversion and Eversion",
+      "filename": "nb_ankle-inversion-eversion.png",
+      "anatomy": {
+        "observation": "The figure has exactly 2 arms and 2 legs. All digits appear normal.",
+        "passed": true
+      },
+      "subject": {
+        "observation": "There is exactly one human male figure present in the image.",
+        "passed": true
+      },
+      "full_body": {
+        "observation": "The entire body of the figure, from head to toe, is visible within the frame.",
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the specified attire.",
+        "passed": true
+      },
+      "background": {
+        "observation": "The background is clean, plain, and white.",
+        "passed": true
+      },
+      "no_text": {
+        "observation": "There is no readable text, labels, watermarks, or annotations visible in the image.",
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The image is a clean digital illustration.",
+        "passed": true
+      },
+      "body_orientation": {
+        "observation": "The figure is seated on a chair.",
+        "passed": true
+      },
+      "pose_accuracy": {
+        "observation": "The figure is seated with their back against a chair. One leg is extended with the foot resting on a stool, and the other leg is bent with the foot flat on the floor. This perfectly matches the exercise description.",
+        "passed": true
+      },
+      "pose_score": 5,
+      "overall_pass": true,
+      "critical_failures": []
+    }
+  },
+  "isometric-quad-contraction": {
+    "generated": true,
+    "path": "/Users/noyfisher/IOS-Projects/PT-Helper-Agent-v1/scripts/output/nano_banana/isometric-quad-contraction.png",
+    "qa": {
+      "exercise_name": "Isometric Quad Contraction",
+      "filename": "nb_isometric-quad-contraction.png",
+      "anatomy": {
+        "observation": "The figure has exactly 2 arms and 2 legs.",
+        "passed": true
+      },
+      "subject": {
+        "observation": "There is exactly one human male figure in the image.",
+        "passed": true
+      },
+      "full_body": {
+        "observation": "The entire body of the figure is visible from head to toe.",
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
+        "passed": true
+      },
+      "background": {
+        "observation": "The background is clean, plain, and white.",
+        "passed": true
+      },
+      "no_text": {
+        "observation": "The image is free of readable text, labels, watermarks, or annotations. Small brand logos on shoes are present but acceptable.",
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The image is a clean digital illustration.",
+        "passed": true
+      },
+      "body_orientation": {
+        "observation": "The figure is lying on his back, face up, which matches the supine orientation.",
+        "passed": true
+      },
+      "pose_accuracy": {
+        "observation": "The pose perfectly matches the description: the subject is supine, with a rolled towel under one knee, the knee pressing down, heel slightly lifted, ankle dorsiflexed, and the opposite leg extended.",
+        "passed": true
+      },
+      "pose_score": 5,
+      "overall_pass": true,
+      "critical_failures": []
+    }
+  }
+}

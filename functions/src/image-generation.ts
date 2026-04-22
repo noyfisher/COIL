@@ -1,0 +1,788 @@
+/**
+ * On-demand exercise image generation Cloud Function.
+ *
+ * Flow:
+ * 1. Mapping intelligence check (alias/fuzzy match before generating)
+ * 2. BFL FLUX 2 Pro image generation
+ * 3. Gemini 2.5 Flash QA gate
+ * 4. Upload to Firebase Storage + update mapping
+ */
+
+import * as admin from "firebase-admin";
+
+// Lazy-initialized to avoid "no default app" error at import time
+// (admin.initializeApp() is called in index.ts before these are used)
+function getDb() { return admin.firestore(); }
+function getStorage() { return admin.storage(); }
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+interface GenerateRequest {
+  exerciseName: string;
+  exerciseCategory?: string;
+  targetArea?: string;
+  bodyPosition?: string;
+  poseDescription?: string;
+}
+
+interface GenerateResponse {
+  status: "success" | "already_exists" | "alias_added" | "generation_failed" | "qa_failed" | "rate_limited" | "locked";
+  key?: string;
+  imageUrl?: string;
+  matchType?: string;
+  retryable?: boolean;
+  message?: string;
+  qaSkipped?: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// Name normalization (matches ExerciseImageService.normalizeName() in Swift)
+// ---------------------------------------------------------------------------
+
+export function normalizeName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/['ʼ']/g, "") // straight + curly apostrophes
+    .split(/[^a-z0-9-]+/)
+    .filter((s) => s.length > 0)
+    .join("-");
+}
+
+// ---------------------------------------------------------------------------
+// Synonyms and viewing angle heuristics
+// ---------------------------------------------------------------------------
+
+const SYNONYMS: Record<string, string> = {
+  quadriceps: "quad",
+  quadricep: "quad",
+  hamstrings: "hamstring",
+  calves: "calf",
+  abdominals: "abdominal",
+};
+
+const SIDE_KEYWORDS = [
+  "squat", "lunge", "deadlift", "plank", "push-up", "pushup",
+  "bird dog", "cat-cow", "bridge", "superman", "step-up",
+  "heel slide", "leg raise", "hamstring curl", "calf raise",
+  "wall sit", "prone", "quadruped", "child", "cobra", "pike",
+];
+const THREE_QUARTER_KEYWORDS = [
+  "row", "press", "curl", "extension", "rotation",
+  "fly", "raise", "pull", "swing", "chop", "kickback",
+];
+const FRONT_KEYWORDS = [
+  "stretch", "standing", "balance", "abduction", "adduction",
+  "clamshell", "fire hydrant", "monster walk", "band walk",
+  "shoulder shrug", "neck", "wrist", "hand", "finger",
+];
+
+function getViewingAngle(name: string): string {
+  const lower = name.toLowerCase();
+  if (SIDE_KEYWORDS.some((kw) => lower.includes(kw))) return "side profile";
+  if (THREE_QUARTER_KEYWORDS.some((kw) => lower.includes(kw)))
+    return "three-quarter (45-degree)";
+  if (FRONT_KEYWORDS.some((kw) => lower.includes(kw))) return "front-facing";
+  return "three-quarter (45-degree)";
+}
+
+const BODY_POSITION_DESCRIPTIONS: Record<string, string> = {
+  supine: "lying flat on his back on the ground, face up",
+  prone: "lying flat on his stomach, face down, chest and belly on the floor",
+  side_lying: "lying on his side on the ground",
+  quadruped: "on all fours with both hands and knees on the floor in a tabletop position",
+  standing: "standing upright",
+  seated: "seated, sitting down",
+  kneeling: "kneeling on the ground",
+  foam_roller: "on the ground with a cylindrical foam roller",
+  wall_sit: "in a wall sit with back against a wall, knees bent at 90 degrees",
+};
+
+// ---------------------------------------------------------------------------
+// Fuzzy matching (7-layer, matches Swift ExerciseImageService)
+// ---------------------------------------------------------------------------
+
+function longestPrefixMatch(name: string, keys: Set<string>): string | null {
+  let best: string | null = null;
+  for (const k of keys) {
+    if (name.startsWith(k + "-") && (!best || k.length > best.length)) {
+      best = k;
+    }
+  }
+  return best;
+}
+
+function suffixMatch(name: string, keys: Set<string>): string | null {
+  let best: string | null = null;
+  for (const k of keys) {
+    if (k.endsWith("-" + name) && (!best || k.length < best.length)) {
+      best = k;
+    }
+  }
+  return best;
+}
+
+function applySynonyms(name: string): string {
+  const tokens = name.split("-");
+  let changed = false;
+  for (let i = 0; i < tokens.length; i++) {
+    const syn = SYNONYMS[tokens[i]];
+    if (syn) {
+      tokens[i] = syn;
+      changed = true;
+    }
+  }
+  return changed ? tokens.join("-") : name;
+}
+
+interface MatchResult {
+  key: string;
+  matchType: string;
+}
+
+function fuzzyMatch(
+  normalized: string,
+  mappingKeys: Set<string>,
+  aliasMap: Record<string, string>,
+): MatchResult | null {
+  // Layer 1-3: exact matches handled by caller
+
+  // Layer 4: Longest prefix
+  let match = longestPrefixMatch(normalized, mappingKeys);
+  if (match) return { key: match, matchType: "prefixFuzzy" };
+
+  // Layer 5: Suffix
+  match = suffixMatch(normalized, mappingKeys);
+  if (match) return { key: match, matchType: "suffixFuzzy" };
+
+  // Layer 6: Plural/singular toggle
+  const toggled = normalized.endsWith("s")
+    ? normalized.slice(0, -1)
+    : normalized + "s";
+  if (mappingKeys.has(toggled)) return { key: toggled, matchType: "pluralToggle" };
+  match = longestPrefixMatch(toggled, mappingKeys);
+  if (match) return { key: match, matchType: "pluralToggle" };
+  match = suffixMatch(toggled, mappingKeys);
+  if (match) return { key: match, matchType: "pluralToggle" };
+
+  // Layer 7: Synonym expansion
+  const expanded = applySynonyms(normalized);
+  if (expanded !== normalized) {
+    if (mappingKeys.has(expanded))
+      return { key: expanded, matchType: "synonymExpansion" };
+    match = longestPrefixMatch(expanded, mappingKeys);
+    if (match) return { key: match, matchType: "synonymExpansion" };
+    match = suffixMatch(expanded, mappingKeys);
+    if (match) return { key: match, matchType: "synonymExpansion" };
+    const expandedToggled = expanded.endsWith("s")
+      ? expanded.slice(0, -1)
+      : expanded + "s";
+    if (mappingKeys.has(expandedToggled))
+      return { key: expandedToggled, matchType: "synonymExpansion" };
+    match = longestPrefixMatch(expandedToggled, mappingKeys);
+    if (match) return { key: match, matchType: "synonymExpansion" };
+    match = suffixMatch(expandedToggled, mappingKeys);
+    if (match) return { key: match, matchType: "synonymExpansion" };
+  }
+
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Mapping cache (in-memory, 5-min TTL)
+// ---------------------------------------------------------------------------
+
+let mappingCache: Record<string, { name: string; filename: string; category: string; target_area: string }> | null = null;
+let mappingCacheTime = 0;
+const MAPPING_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+async function loadMapping(): Promise<Record<string, { name: string; filename: string; category: string; target_area: string }>> {
+  const now = Date.now();
+  if (mappingCache && now - mappingCacheTime < MAPPING_CACHE_TTL) {
+    return mappingCache;
+  }
+
+  try {
+    const bucket = getStorage().bucket();
+    const file = bucket.file("exercise-images/exercise_image_mapping.json");
+    const [contents] = await file.download();
+    mappingCache = JSON.parse(contents.toString());
+    mappingCacheTime = now;
+    return mappingCache!;
+  } catch {
+    // Fall back to empty mapping if file doesn't exist yet
+    if (!mappingCache) mappingCache = {};
+    return mappingCache;
+  }
+}
+
+// Alias cache (from Firestore, 5-min TTL)
+let aliasCache: Record<string, string> | null = null;
+let aliasCacheTime = 0;
+
+async function loadAliases(): Promise<Record<string, string>> {
+  const now = Date.now();
+  if (aliasCache && now - aliasCacheTime < MAPPING_CACHE_TTL) {
+    return aliasCache;
+  }
+
+  try {
+    const doc = await getDb().collection("config").doc("exerciseImageAliases").get();
+    if (doc.exists) {
+      aliasCache = (doc.data()?.aliases as Record<string, string>) || {};
+    } else {
+      aliasCache = {};
+    }
+    aliasCacheTime = now;
+    return aliasCache;
+  } catch {
+    if (!aliasCache) aliasCache = {};
+    return aliasCache;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Mapping intelligence: resolve or auto-alias
+// ---------------------------------------------------------------------------
+
+async function resolveOrAlias(
+  exerciseName: string,
+  imageFileName?: string,
+): Promise<{ found: true; key: string; matchType: string } | { found: false }> {
+  const mapping = await loadMapping();
+  const aliases = await loadAliases();
+  const mappingKeys = new Set(Object.keys(mapping));
+
+  // Layer 1: Explicit imageFileName
+  if (imageFileName && mappingKeys.has(imageFileName)) {
+    return { found: true, key: imageFileName, matchType: "exact" };
+  }
+
+  // Layer 2: Normalized name
+  const normalized = normalizeName(exerciseName);
+  if (mappingKeys.has(normalized)) {
+    return { found: true, key: normalized, matchType: "exact" };
+  }
+
+  // Layer 3: Alias map
+  const aliasTarget = aliases[normalized];
+  if (aliasTarget && mappingKeys.has(aliasTarget)) {
+    return { found: true, key: aliasTarget, matchType: "exact" };
+  }
+
+  // Layers 4-7: Fuzzy
+  const fuzzyResult = fuzzyMatch(normalized, mappingKeys, aliases);
+  if (fuzzyResult) {
+    // Auto-add alias so future lookups are instant
+    try {
+      await getDb().collection("config").doc("exerciseImageAliases").set(
+        { aliases: { [normalized]: fuzzyResult.key }, updatedAt: admin.firestore.FieldValue.serverTimestamp() },
+        { merge: true },
+      );
+      // Invalidate alias cache
+      aliasCacheTime = 0;
+    } catch (err) {
+      console.warn("Failed to auto-add alias:", err);
+    }
+    return { found: true, key: fuzzyResult.key, matchType: fuzzyResult.matchType };
+  }
+
+  return { found: false };
+}
+
+// ---------------------------------------------------------------------------
+// BFL FLUX 2 Pro API
+// ---------------------------------------------------------------------------
+
+function buildFlux2Prompt(
+  exerciseName: string,
+  bodyPosition: string,
+  poseDescription: string,
+  category?: string,
+  targetArea?: string,
+): string {
+  const positionDesc = BODY_POSITION_DESCRIPTIONS[bodyPosition] || "standing upright";
+  const angle = getViewingAngle(exerciseName);
+
+  const pose = poseDescription || (
+    `Performing a ${category || "general"} exercise targeting the ${targetArea || "General"} with proper form and controlled positioning.`
+  );
+
+  const prompt = {
+    scene: "Clean fitness studio with plain white background, no furniture, no equipment except what is described",
+    subjects: [{
+      type: "athletic young man",
+      description: (
+        `Short dark hair, lean fit build, wearing fitted light gray ` +
+        `athletic t-shirt, dark navy compression shorts, white ankle ` +
+        `socks, and gray athletic sneakers. ` +
+        `Body position: ${positionDesc}. ` +
+        `Exercise: ${exerciseName}. ${pose}`
+      ),
+      position: "centered, full body visible from head to toe",
+    }],
+    style: "Clean professional fitness illustration, digital art, soft even lighting",
+    lighting: "Soft, even studio lighting, no harsh shadows",
+    camera: { angle, lens: "50mm", "f-number": "f/5.6" },
+    composition: "Single figure centered, full body visible, no text, no labels, no watermarks, no arrows, no annotations",
+  };
+
+  return JSON.stringify(prompt);
+}
+
+async function callBflApi(
+  prompt: string,
+  apiKey: string,
+  seed?: number,
+): Promise<Buffer | null> {
+  const submitUrl = "https://api.bfl.ai/v1/flux-2-pro";
+
+  // Submit generation request
+  const submitBody: Record<string, unknown> = {
+    prompt,
+    width: 1024,
+    height: 1024,
+    prompt_upsampling: false,
+    output_format: "png",
+  };
+  if (seed !== undefined) submitBody.seed = seed;
+
+  const submitResp = await fetch(submitUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Key": apiKey,
+    },
+    body: JSON.stringify(submitBody),
+  });
+
+  if (!submitResp.ok) {
+    const errText = await submitResp.text();
+    console.error(`BFL submit failed (${submitResp.status}): ${errText}`);
+    return null;
+  }
+
+  const { id: taskId } = (await submitResp.json()) as { id: string };
+
+  // Poll for completion (max 3 minutes)
+  const pollUrl = `https://api.bfl.ai/v1/get_result?id=${taskId}`;
+  const maxAttempts = 120;
+  const pollInterval = 1500;
+
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise((r) => setTimeout(r, pollInterval));
+
+    const pollResp = await fetch(pollUrl);
+    if (!pollResp.ok) continue;
+
+    const result = (await pollResp.json()) as { status: string; result?: { sample: string } };
+
+    if (result.status === "Ready" && result.result?.sample) {
+      // Download the image
+      const imgResp = await fetch(result.result.sample);
+      if (imgResp.ok) {
+        const arrayBuf = await imgResp.arrayBuffer();
+        return Buffer.from(arrayBuf);
+      }
+      return null;
+    }
+
+    if (result.status === "Error" || result.status === "Request Moderated") {
+      console.error(`BFL generation failed: ${result.status}`);
+      return null;
+    }
+  }
+
+  console.error("BFL polling timed out");
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Gemini QA
+// ---------------------------------------------------------------------------
+
+async function runGeminiQA(
+  imageBuffer: Buffer,
+  exerciseName: string,
+  bodyPosition: string,
+  poseDescription: string,
+  geminiApiKey: string,
+): Promise<{ passed: boolean; failures: string[] }> {
+  const positionDesc = BODY_POSITION_DESCRIPTIONS[bodyPosition] || "standing upright";
+  const base64Image = imageBuffer.toString("base64");
+
+  const prompt = `You are a quality assurance inspector for physical therapy exercise illustrations.
+
+Analyze this image against the following specifications.
+
+## Expected Exercise
+- Exercise Name: ${exerciseName}
+- Expected Body Position: ${bodyPosition} (${positionDesc})
+- Expected Pose: ${poseDescription || "Standard form for this exercise"}
+
+## Checks
+For each check, respond with "pass" or "fail":
+
+1. ANATOMY: Figure has exactly 2 arms and 2 legs
+2. SUBJECT: Single human male figure
+3. FULL_BODY: Full body visible head to toe
+4. CLOTHING: Wearing t-shirt and shorts
+5. BACKGROUND: Clean, plain, light background
+6. NO_TEXT: No text, labels, or watermarks (small clothing logos OK)
+7. ART_STYLE: Photo-realistic or clean digital illustration
+8. BODY_ORIENTATION: Body position matches "${bodyPosition}"
+9. POSE_ACCURACY: Recognizable as the expected exercise (score 1-5, pass if >= 2)
+
+Return ONLY a JSON object with this exact format:
+{"anatomy":"pass","subject":"pass","full_body":"pass","clothing":"pass","background":"pass","no_text":"pass","art_style":"pass","body_orientation":"pass","pose_score":3,"overall_pass":true,"failures":[]}
+
+Set overall_pass to true only if ALL checks pass AND pose_score >= 2. List failed check names in "failures".`;
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`;
+
+  try {
+    const resp = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { text: prompt },
+            { inlineData: { mimeType: "image/png", data: base64Image } },
+          ],
+        }],
+        generationConfig: {
+          responseMimeType: "application/json",
+        },
+      }),
+    });
+
+    if (!resp.ok) {
+      console.error(`Gemini QA failed (${resp.status}): ${await resp.text()}`);
+      return { passed: true, failures: [] }; // Skip QA on API failure
+    }
+
+    const data = (await resp.json()) as {
+      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+    };
+
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) {
+      console.warn("Gemini returned empty response, skipping QA");
+      return { passed: true, failures: [] };
+    }
+
+    const result = JSON.parse(text) as {
+      overall_pass?: boolean;
+      failures?: string[];
+    };
+
+    return {
+      passed: result.overall_pass !== false,
+      failures: result.failures || [],
+    };
+  } catch (err) {
+    console.error("Gemini QA error:", err);
+    return { passed: true, failures: [] }; // Skip QA on error
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Upload to Firebase Storage + update mapping
+// ---------------------------------------------------------------------------
+
+async function uploadAndUpdateMapping(
+  imageBuffer: Buffer,
+  normalizedKey: string,
+  exerciseName: string,
+  category: string,
+  targetArea: string,
+): Promise<string> {
+  const bucket = getStorage().bucket();
+  const filename = `${normalizedKey}.png`;
+  const filePath = `exercise-images/${filename}`;
+
+  // Upload image. Do NOT call makePublic() — clients authenticate via the
+  // Firebase Storage SDK and the storage.rules gate (`allow read: if
+  // request.auth != null`). Making the object public would bypass the rule
+  // and allow unauthenticated DoS against the GCS bucket.
+  const file = bucket.file(filePath);
+  await file.save(imageBuffer, {
+    metadata: { contentType: "image/png" },
+  });
+
+  const imageUrl = `gs://${bucket.name}/${filePath}`;
+
+  // Update mapping in Storage
+  const mapping = await loadMapping();
+  mapping[normalizedKey] = {
+    name: exerciseName,
+    filename,
+    category: category || "general",
+    target_area: targetArea || "General",
+  };
+
+  const mappingFile = bucket.file("exercise-images/exercise_image_mapping.json");
+  await mappingFile.save(JSON.stringify(mapping, null, 2), {
+    metadata: { contentType: "application/json" },
+  });
+
+  // Invalidate mapping cache
+  mappingCacheTime = 0;
+
+  return imageUrl;
+}
+
+// ---------------------------------------------------------------------------
+// Rate limiting (stricter than claudeProxy: 3 per hour for image gen)
+// ---------------------------------------------------------------------------
+
+const imageGenRateMap = new Map<string, number[]>();
+const IMAGE_GEN_RATE_LIMIT = 3;
+const IMAGE_GEN_RATE_WINDOW = 60 * 60 * 1000; // 1 hour
+
+function isImageGenRateLimited(uid: string): boolean {
+  const now = Date.now();
+  const timestamps = imageGenRateMap.get(uid) || [];
+  const recent = timestamps.filter((t) => now - t < IMAGE_GEN_RATE_WINDOW);
+
+  if (recent.length >= IMAGE_GEN_RATE_LIMIT) {
+    imageGenRateMap.set(uid, recent);
+    return true;
+  }
+
+  recent.push(now);
+  imageGenRateMap.set(uid, recent);
+  return false;
+}
+
+// ---------------------------------------------------------------------------
+// Per-user daily quota (separate from the global DAILY_BUDGET below).
+// Prevents one user from draining the global 50/day pool; Firestore-backed
+// so it survives Cloud Function scale-out.
+// ---------------------------------------------------------------------------
+const DAILY_USER_IMAGE_QUOTA = 5;
+
+type UserImageQuotaResult =
+  | { ok: true; remaining: number }
+  | { ok: false; limit: number };
+
+async function checkAndIncrementUserImageQuota(uid: string): Promise<UserImageQuotaResult> {
+  const ref = getDb().doc(`users/${uid}/quotas/images`);
+  const dayKey = new Date().toISOString().slice(0, 10);
+
+  return getDb().runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const data = snap.exists ? snap.data() || {} : {};
+    const count = data.dayKey === dayKey ? (data.dayCount || 0) : 0;
+
+    if (count >= DAILY_USER_IMAGE_QUOTA) {
+      return { ok: false, limit: DAILY_USER_IMAGE_QUOTA } as UserImageQuotaResult;
+    }
+
+    tx.set(ref, {
+      dayKey,
+      dayCount: count + 1,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+
+    return { ok: true, remaining: DAILY_USER_IMAGE_QUOTA - count - 1 } as UserImageQuotaResult;
+  });
+}
+
+// Daily global budget
+const DAILY_BUDGET = 50;
+
+async function checkDailyBudget(): Promise<boolean> {
+  const today = new Date().toISOString().slice(0, 10);
+  const counterRef = getDb().collection("config").doc("imageGenBudget");
+  const doc = await counterRef.get();
+  const data = doc.data();
+
+  if (data?.date === today && data?.count >= DAILY_BUDGET) {
+    return false; // Budget exhausted
+  }
+
+  if (data?.date !== today) {
+    await counterRef.set({ date: today, count: 1 });
+  } else {
+    await counterRef.update({ count: admin.firestore.FieldValue.increment(1) });
+  }
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+// Generation lock (Firestore-based, 10-min TTL)
+// ---------------------------------------------------------------------------
+
+const LOCK_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
+async function acquireGenerationLock(normalizedKey: string): Promise<boolean> {
+  const docRef = getDb().collection("missingExerciseImages").doc(normalizedKey);
+  const doc = await docRef.get();
+  const data = doc.data();
+
+  if (data?.status === "generating") {
+    const startedAt = data.generatingStartedAt?.toMillis?.() || 0;
+    if (Date.now() - startedAt < LOCK_TTL_MS) {
+      return false; // Another instance is generating
+    }
+    // Lock expired, take over
+  }
+
+  await docRef.set(
+    {
+      status: "generating",
+      generatingStartedAt: admin.firestore.FieldValue.serverTimestamp(),
+    },
+    { merge: true },
+  );
+  return true;
+}
+
+async function markGenerated(normalizedKey: string): Promise<void> {
+  await getDb().collection("missingExerciseImages").doc(normalizedKey).set(
+    { status: "generated", generatedAt: admin.firestore.FieldValue.serverTimestamp() },
+    { merge: true },
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main handler
+// ---------------------------------------------------------------------------
+
+export async function handleGenerateExerciseImage(
+  req: { body: GenerateRequest; uid: string },
+): Promise<GenerateResponse> {
+  const { exerciseName, exerciseCategory, targetArea, bodyPosition, poseDescription } = req.body;
+
+  if (!exerciseName) {
+    return { status: "generation_failed", message: "exerciseName is required" };
+  }
+
+  // Rate limit
+  if (isImageGenRateLimited(req.uid)) {
+    return { status: "rate_limited", message: "Max 3 image generation requests per hour" };
+  }
+
+  // Step 1: Mapping intelligence — check if image already exists
+  // (No quota cost: cache hits don't trigger generation.)
+  const resolution = await resolveOrAlias(exerciseName);
+  if (resolution.found) {
+    return {
+      status: resolution.matchType === "exact" ? "already_exists" : "alias_added",
+      key: resolution.key,
+      matchType: resolution.matchType,
+    };
+  }
+
+  // Step 2a: Per-user daily quota (caps cost per user; prevents a single
+  // user from draining the global DAILY_BUDGET pool).
+  const userQuota = await checkAndIncrementUserImageQuota(req.uid);
+  if (!userQuota.ok) {
+    return {
+      status: "rate_limited",
+      message: `Daily image generation limit reached (${userQuota.limit} per user). Please try again tomorrow.`,
+      retryable: false,
+    };
+  }
+
+  // Step 2b: Check global daily budget
+  const budgetOk = await checkDailyBudget();
+  if (!budgetOk) {
+    return { status: "generation_failed", message: "Daily generation budget exhausted", retryable: false };
+  }
+
+  // Step 3: Acquire generation lock
+  const normalizedKey = normalizeName(exerciseName);
+  const locked = await acquireGenerationLock(normalizedKey);
+  if (!locked) {
+    return { status: "locked", message: "Image generation already in progress for this exercise" };
+  }
+
+  // Step 4: Generate image via FLUX 2 Pro
+  const bflApiKey = process.env.BFL_API_KEY;
+  const geminiApiKey = process.env.GEMINI_API_KEY;
+
+  if (!bflApiKey) {
+    return { status: "generation_failed", message: "BFL_API_KEY not configured", retryable: false };
+  }
+
+  const resolvedBodyPosition = bodyPosition || "standing";
+  const resolvedPoseDescription = poseDescription || "";
+
+  const prompt = buildFlux2Prompt(
+    exerciseName,
+    resolvedBodyPosition,
+    resolvedPoseDescription,
+    exerciseCategory,
+    targetArea,
+  );
+
+  let imageBuffer = await callBflApi(prompt, bflApiKey);
+
+  if (!imageBuffer) {
+    return { status: "generation_failed", message: "Image generation failed", retryable: true };
+  }
+
+  // Step 5: QA gate
+  if (geminiApiKey) {
+    const qa = await runGeminiQA(
+      imageBuffer,
+      exerciseName,
+      resolvedBodyPosition,
+      resolvedPoseDescription,
+      geminiApiKey,
+    );
+
+    if (!qa.passed) {
+      // Retry once with different seed
+      console.log(`QA failed for ${exerciseName} (failures: ${qa.failures.join(", ")}), retrying with different seed`);
+      imageBuffer = await callBflApi(prompt, bflApiKey, 42);
+
+      if (!imageBuffer) {
+        return { status: "generation_failed", message: "Retry generation failed", retryable: true };
+      }
+
+      const retryQa = await runGeminiQA(
+        imageBuffer,
+        exerciseName,
+        resolvedBodyPosition,
+        resolvedPoseDescription,
+        geminiApiKey,
+      );
+
+      if (!retryQa.passed) {
+        return {
+          status: "qa_failed",
+          message: `Image quality check failed: ${retryQa.failures.join(", ")}`,
+          retryable: true,
+        };
+      }
+    }
+  }
+
+  // Step 6: Upload and update mapping
+  try {
+    const imageUrl = await uploadAndUpdateMapping(
+      imageBuffer,
+      normalizedKey,
+      exerciseName,
+      exerciseCategory || "general",
+      targetArea || "General",
+    );
+
+    await markGenerated(normalizedKey);
+
+    return {
+      status: "success",
+      key: normalizedKey,
+      imageUrl,
+      qaSkipped: !geminiApiKey,
+    };
+  } catch (err) {
+    console.error("Upload/mapping update failed:", err);
+    return { status: "generation_failed", message: "Failed to upload image", retryable: true };
+  }
+}

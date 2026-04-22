@@ -4,10 +4,11 @@ struct OnboardingView: View {
     var onComplete: (() -> Void)? = nil
     var onSkip: (() -> Void)? = nil
     @StateObject private var viewModel = OnboardingViewModel()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground)
+            AppColors.bgGradient
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -15,11 +16,16 @@ struct OnboardingView: View {
                 HStack {
                     Spacer()
                     if let onSkip = onSkip {
-                        Button(action: onSkip) {
+                        Button(action: {
+                            AnalyticsService.shared.log(.onboardingSkipped, parameters: ["skipped_at_step": viewModel.currentStep])
+                            OnboardingViewModel.clearDraft()
+                            onSkip()
+                        }) {
                             Text("Skip")
                                 .font(.subheadline.weight(.medium))
-                                .foregroundColor(.secondary)
+                                .foregroundColor(AppColors.secondaryText)
                         }
+                        .accessibilityIdentifier("onboarding.skipButton")
                     }
                 }
                 .padding(.horizontal, AppSpacing.xl)
@@ -30,31 +36,32 @@ struct OnboardingView: View {
                     Text("Step \(viewModel.currentStep) of 6")
                         .font(.caption)
                         .fontWeight(.semibold)
-                        .foregroundColor(.white)
+                        .foregroundColor(AppColors.ctaText)
                         .padding(.horizontal, AppSpacing.md)
                         .padding(.vertical, AppSpacing.xs)
-                        .background(Color.blue)
-                        .cornerRadius(AppCorners.medium)
+                        .background(AppColors.accent)
+                        .clipShape(Capsule())
+                        .accessibilityIdentifier("onboarding.stepIndicator")
 
                     HStack(spacing: 6) {
                         ForEach(1...6, id: \.self) { step in
                             Capsule()
-                                .fill(step <= viewModel.currentStep ? Color.blue : Color.gray.opacity(0.25))
+                                .fill(step <= viewModel.currentStep ? AppColors.accent : AppColors.elevatedSurface)
                                 .frame(height: 5)
                                 .animation(.spring(response: 0.35), value: viewModel.currentStep)
                         }
                     }
-                    .padding(.horizontal, 32)
+                    .padding(.horizontal, AppSpacing.xxl)
 
                     Text(stepTitle)
-                        .font(.title2)
-                        .fontWeight(.bold)
+                        .font(AppFonts.sectionTitle)
+                        .foregroundColor(AppColors.primaryText)
 
                     Text(stepSubtitle)
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AppColors.secondaryText)
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal, 32)
+                        .padding(.horizontal, AppSpacing.xxl)
                 }
                 .padding(.bottom, AppSpacing.sm)
 
@@ -81,25 +88,41 @@ struct OnboardingView: View {
                             }
                         }
                         .buttonStyle(SecondaryButtonStyle())
+                        .accessibilityIdentifier("onboarding.backButton")
                     }
 
                     if viewModel.currentStep < 6 {
-                        Button(action: { viewModel.nextStep() }) {
+                        Button(action: {
+                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                            viewModel.nextStep()
+                        }) {
                             HStack(spacing: AppSpacing.xs) {
                                 Text("Continue")
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 13, weight: .bold))
                             }
                         }
-                        .buttonStyle(PrimaryButtonStyle())
+                        .buttonStyle(PrimaryButtonStyle(isDisabled: !viewModel.canProceedFromCurrentStep))
                         .disabled(!viewModel.canProceedFromCurrentStep)
-                        .opacity(viewModel.canProceedFromCurrentStep ? 1.0 : 0.5)
+                        .accessibilityIdentifier("onboarding.continueButton")
                     }
                 }
                 .padding(.horizontal, AppSpacing.xl)
                 .padding(.bottom, AppSpacing.xxl)
             }
         }
+        .onAppear {
+            AnalyticsService.shared.log(.onboardingStarted)
+            if viewModel.loadDraft() {
+                AppLogger.data.info("Resumed onboarding draft at step \(viewModel.currentStep)")
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .background {
+                viewModel.saveDraft()
+            }
+        }
+        .trackScreen("Onboarding")
     }
 
     private var stepTitle: String {

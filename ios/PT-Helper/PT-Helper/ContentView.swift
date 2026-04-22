@@ -1,54 +1,44 @@
 import SwiftUI
 import FirebaseAuth
-import FirebaseFirestore
 
-struct ContentView: View {
-    @StateObject private var savedPlansViewModel = SavedPlansViewModel()
-    @State private var userName: String = ""
+struct HomeTab: View {
+    @EnvironmentObject private var savedPlansViewModel: SavedPlansViewModel
+    @EnvironmentObject private var workoutViewModel: WorkoutViewModel
+    @EnvironmentObject private var tabSelection: TabSelection
+    @EnvironmentObject private var insightsVM: RecoveryInsightsViewModel
+    @ObservedObject private var streakService = StreakService.shared
     @State private var showOnboarding = false
-    @State private var navigationId = UUID()
-    @State private var planToDelete: RehabPlan? = nil
-    @State private var showDeleteConfirmation = false
-    @State private var showSignOutConfirmation = false
-    @State private var showSignOutError = false
-    @State private var signOutErrorMessage = ""
+    @State private var showSettings = false
+    @State private var animateEntrance = false
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
-                Color(.systemGroupedBackground)
+                AppColors.pageBackground
                     .ignoresSafeArea()
 
                 ScrollView {
                     VStack(spacing: AppSpacing.xl) {
-                        // Welcome header
-                        VStack(spacing: 6) {
-                            Text(greetingText)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
+                        // Hero greeting card
+                        heroGreeting
+                            .padding(.horizontal, AppSpacing.xl)
+                            .opacity(animateEntrance ? 1 : 0)
+                            .offset(y: animateEntrance ? 0 : 20)
 
-                            Text(userName.isEmpty ? "Welcome!" : "Hi, \(userName)!")
-                                .font(.largeTitle)
-                                .fontWeight(.bold)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.top, AppSpacing.xl)
-                        .padding(.bottom, AppSpacing.sm)
+                        // At-a-glance stats
+                        statsRow
+                            .padding(.horizontal, AppSpacing.xl)
+                            .opacity(animateEntrance ? 1 : 0)
+                            .offset(y: animateEntrance ? 0 : 20)
+                            .animation(AppAnimations.smooth.delay(0.1), value: animateEntrance)
 
-                        // Quick Actions header
+                        // Quick Actions
                         SectionHeader(icon: "bolt.fill", color: .blue, title: "Quick Actions")
                             .padding(.horizontal, AppSpacing.xl)
+                            .opacity(animateEntrance ? 1 : 0)
+                            .animation(AppAnimations.smooth.delay(0.2), value: animateEntrance)
 
-                        // Quick actions
                         VStack(spacing: AppSpacing.md) {
-                            QuickActionCard(
-                                icon: "figure.run.circle",
-                                gradientColors: [.red, .orange],
-                                title: "Injury Analysis",
-                                subtitle: "Assess pain and get guidance",
-                                destination: BodyMapView()
-                            )
-
                             QuickActionButton(
                                 icon: "heart.text.clipboard",
                                 gradientColors: [.blue, .cyan],
@@ -56,6 +46,9 @@ struct ContentView: View {
                                 subtitle: "Review or update your health profile",
                                 action: { showOnboarding = true }
                             )
+                            .opacity(animateEntrance ? 1 : 0)
+                            .offset(y: animateEntrance ? 0 : 15)
+                            .animation(AppAnimations.smooth.delay(0.25), value: animateEntrance)
 
                             QuickActionCard(
                                 icon: "note.text",
@@ -64,6 +57,9 @@ struct ContentView: View {
                                 subtitle: "Track your recovery journey",
                                 destination: NotesView()
                             )
+                            .opacity(animateEntrance ? 1 : 0)
+                            .offset(y: animateEntrance ? 0 : 15)
+                            .animation(AppAnimations.smooth.delay(0.35), value: animateEntrance)
 
                             QuickActionCard(
                                 icon: "figure.strengthtraining.traditional",
@@ -72,171 +68,255 @@ struct ContentView: View {
                                 subtitle: "Record a workout session",
                                 destination: WorkoutSessionView()
                             )
+                            .opacity(animateEntrance ? 1 : 0)
+                            .offset(y: animateEntrance ? 0 : 15)
+                            .animation(AppAnimations.smooth.delay(0.45), value: animateEntrance)
 
-                            QuickActionCard(
-                                icon: "chart.line.uptrend.xyaxis",
-                                gradientColors: [.teal, .blue],
-                                title: "Progress",
-                                subtitle: "View your pain trends and stats",
-                                destination: ProgressChartView()
-                            )
+                            // Recovery Insights teaser (shown when not yet eligible)
+                            if insightsVM.insight == nil && !workoutViewModel.sessions.isEmpty {
+                                let recentCount = workoutViewModel.sessions.filter {
+                                    $0.date > Calendar.current.date(byAdding: .day, value: -14, to: Date()) ?? Date()
+                                }.count
+                                if recentCount < 3 {
+                                    HStack(spacing: AppSpacing.sm) {
+                                        Image(systemName: "brain.head.profile")
+                                            .font(.system(size: 14))
+                                            .foregroundColor(.purple)
+                                        Text("Complete \(3 - recentCount) more workout\(3 - recentCount == 1 ? "" : "s") to unlock AI Recovery Insights")
+                                            .font(.caption)
+                                            .foregroundColor(AppColors.secondaryText)
+                                        Spacer()
+                                        HStack(spacing: 4) {
+                                            ForEach(0..<3, id: \.self) { i in
+                                                Circle()
+                                                    .fill(i < recentCount ? Color.purple : Color(.systemGray4))
+                                                    .frame(width: 6, height: 6)
+                                            }
+                                        }
+                                    }
+                                    .padding(AppSpacing.md)
+                                    .background(Color.purple.opacity(0.06))
+                                    .cornerRadius(AppCorners.medium)
+                                    .opacity(animateEntrance ? 1 : 0)
+                                    .animation(AppAnimations.smooth.delay(0.55), value: animateEntrance)
+                                }
+                            }
+
+                            // Recovery Digest quick action (shown when insights are available)
+                            if insightsVM.insight != nil {
+                                QuickActionButton(
+                                    icon: "brain.head.profile",
+                                    gradientColors: [.purple, .pink],
+                                    title: "Recovery Digest",
+                                    subtitle: insightsVM.insight?.headline ?? "View your weekly insights",
+                                    action: { tabSelection.selectedTab = 3 }
+                                )
+                                .opacity(animateEntrance ? 1 : 0)
+                                .offset(y: animateEntrance ? 0 : 15)
+                                .animation(AppAnimations.smooth.delay(0.55), value: animateEntrance)
+                            }
                         }
                         .padding(.horizontal, AppSpacing.xl)
 
-                        // My Rehab Plans section
-                        myRehabPlansSection
-                            .padding(.horizontal, AppSpacing.xl)
+                        // Recent Plans preview (compact)
+                        if !savedPlansViewModel.rehabPlans.isEmpty {
+                            recentPlansPreview
+                                .padding(.horizontal, AppSpacing.xl)
+                                .opacity(animateEntrance ? 1 : 0)
+                                .offset(y: animateEntrance ? 0 : 15)
+                                .animation(AppAnimations.smooth.delay(0.65), value: animateEntrance)
+                        }
 
                         Spacer(minLength: 40)
-
-                        // Sign out
-                        Button(action: {
-                            showSignOutConfirmation = true
-                        }) {
-                            HStack(spacing: 6) {
-                                Image(systemName: "rectangle.portrait.and.arrow.right")
-                                Text("Sign Out")
-                            }
-                        }
-                        .buttonStyle(DestructiveButtonStyle())
-
-                        // App version
-                        Text(appVersionText)
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, AppSpacing.xxl)
                     }
+                    .padding(.top, AppSpacing.md)
                 }
                 .refreshable {
                     savedPlansViewModel.fetchRehabPlans()
-                    fetchUserName()
+                    await UserProfileService.shared.reload()
+                    let haptic = UINotificationFeedbackGenerator()
+                    haptic.notificationOccurred(.success)
                 }
             }
             .navigationTitle("PT Helper")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: { showSettings = true }) {
+                        // Profile avatar
+                        Text(avatarInitials)
+                            .font(.system(size: 12, weight: .bold, design: .rounded))
+                            .foregroundColor(AppColors.ctaText)
+                            .frame(width: 32, height: 32)
+                            .background(
+                                Circle()
+                                    .fill(AppColors.primaryGradient)
+                            )
+                    }
+                }
+            }
             .onAppear {
-                fetchUserName()
+                withAnimation(AppAnimations.smooth) {
+                    animateEntrance = true
+                }
             }
             .fullScreenCover(isPresented: $showOnboarding) {
                 OnboardingEditView()
             }
-            .onReceive(NotificationCenter.default.publisher(for: .popToRoot)) { _ in
-                navigationId = UUID()
-            }
-            .confirmationDialog("Sign Out", isPresented: $showSignOutConfirmation, titleVisibility: .visible) {
-                Button("Sign Out", role: .destructive) {
-                    do {
-                        try Auth.auth().signOut()
-                    } catch {
-                        signOutErrorMessage = error.localizedDescription
-                        showSignOutError = true
-                    }
-                }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("Are you sure you want to sign out?")
-            }
-            .alert("Sign Out Failed", isPresented: $showSignOutError) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(signOutErrorMessage)
+            .sheet(isPresented: $showSettings) {
+                SettingsView(
+                    userName: profileName,
+                    onEditProfile: { showOnboarding = true }
+                )
             }
         }
-        .id(navigationId)
+        .id(tabSelection.homeNavigationId)
+        .trackScreen("Home")
     }
 
-    // MARK: - My Rehab Plans
+    // MARK: - Hero Greeting
 
-    private var myRehabPlansSection: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.md) {
-            SectionHeader(icon: "list.clipboard.fill", color: .purple, title: "My Rehab Plans")
-
-            if savedPlansViewModel.isLoading {
-                HStack {
-                    Spacer()
-                    ProgressView()
-                    Spacer()
-                }
-                .padding(.vertical, AppSpacing.xl)
-            } else if let error = savedPlansViewModel.loadError {
-                VStack(spacing: AppSpacing.md) {
-                    Image(systemName: "wifi.exclamationmark")
-                        .font(.title2)
-                        .foregroundColor(.orange)
-                    Text(error)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                    Button("Retry") {
-                        savedPlansViewModel.fetchRehabPlans()
-                    }
-                    .buttonStyle(SecondaryButtonStyle())
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, AppSpacing.xl)
-            } else if savedPlansViewModel.rehabPlans.isEmpty {
-                EmptyStateView(
-                    icon: "figure.run",
-                    title: "No Rehab Plans Yet",
-                    subtitle: "Complete an injury analysis to get a personalized plan"
-                )
-            } else {
-                ForEach(savedPlansViewModel.rehabPlans) { plan in
-                    NavigationLink(destination: RehabPlanView(existingPlan: plan)) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                                Text(plan.planName)
-                                    .font(.body.weight(.semibold))
-                                    .foregroundColor(.primary)
-                                HStack(spacing: 6) {
-                                    ForEach(plan.conditions, id: \.self) { condition in
-                                        Text(condition)
-                                            .font(.caption2)
-                                            .padding(.horizontal, AppSpacing.sm)
-                                            .padding(.vertical, 3)
-                                            .background(Color.blue.opacity(0.1))
-                                            .foregroundColor(.blue)
-                                            .cornerRadius(AppCorners.small)
-                                    }
-                                }
-                                Text(plan.createdDate.formatted(date: .abbreviated, time: .omitted))
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            Spacer()
-                            Button {
-                                planToDelete = plan
-                                showDeleteConfirmation = true
-                            } label: {
-                                Image(systemName: "trash")
-                                    .font(.body)
-                                    .foregroundColor(.red.opacity(0.7))
-                                    .padding(AppSpacing.sm)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .cardStyle()
-                    }
-                }
-            }
+    private var heroGreeting: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            Text(greetingText)
+                .font(.subheadline)
+                .foregroundColor(AppColors.ctaText.opacity(0.8))
+            Text(profileName.isEmpty ? "Welcome!" : "Hi, \(profileName)!")
+                .font(AppFonts.heroTitle)
+                .foregroundColor(AppColors.ctaText)
         }
-        .alert("Delete Plan", isPresented: $showDeleteConfirmation) {
-            Button("Cancel", role: .cancel) {
-                planToDelete = nil
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(AppSpacing.xl)
+        .padding(.vertical, AppSpacing.sm)
+        .background(
+            RoundedRectangle(cornerRadius: AppCorners.xl)
+                .fill(AppColors.primaryGradient)
+        )
+        .shadow(color: .blue.opacity(0.15), radius: 12, y: 6)
+    }
+
+    // MARK: - Stats Row
+
+    private var statsRow: some View {
+        HStack(spacing: AppSpacing.md) {
+            miniStatCard(
+                icon: "list.clipboard.fill",
+                color: .purple,
+                value: "\(savedPlansViewModel.rehabPlans.count)",
+                label: "Active Plans"
+            )
+
+            miniStatCard(
+                icon: "waveform.path.ecg",
+                color: lastPainColor,
+                value: lastPainText,
+                label: "Last Pain"
+            )
+
+            NavigationLink(destination: AchievementsView(streakService: streakService)) {
+                StreakBadgeView(streakService: streakService)
             }
-            Button("Delete", role: .destructive) {
-                if let plan = planToDelete {
-                    savedPlansViewModel.deletePlan(plan)
-                    planToDelete = nil
+            .buttonStyle(.plain)
+        }
+    }
+
+    private func miniStatCard(icon: String, color: Color, value: String, label: String) -> some View {
+        VStack(spacing: AppSpacing.sm) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(color)
+                .frame(width: 28, height: 28)
+                .background(color.opacity(0.12))
+                .clipShape(Circle())
+
+            Text(value)
+                .font(AppFonts.statNumber)
+                .foregroundColor(AppColors.primaryText)
+                .lineLimit(1)
+
+            Text(label)
+                .font(.caption2)
+                .foregroundColor(AppColors.secondaryText)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, AppSpacing.lg)
+        .background(AppColors.cardBackground)
+        .cornerRadius(AppCorners.card)
+        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+    }
+
+    private var lastPainText: String {
+        guard let lastSession = workoutViewModel.sessions.last else { return "-" }
+        return "\(Int(lastSession.painLevel))"
+    }
+
+    private var lastPainColor: Color {
+        guard let lastSession = workoutViewModel.sessions.last else { return .secondary }
+        switch Int(lastSession.painLevel) {
+        case 0...3: return .green
+        case 4...6: return .orange
+        default: return .red
+        }
+    }
+
+    private var sessionsThisWeek: Int {
+        let calendar = Calendar.current
+        let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date())) ?? Date()
+        return workoutViewModel.sessions.filter { $0.date >= startOfWeek }.count
+    }
+
+    // MARK: - Recent Plans Preview
+
+    private var recentPlansPreview: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
+            HStack {
+                SectionHeader(icon: "list.clipboard.fill", color: .purple, title: "Recent Plans")
+                Button("See All") {
+                    tabSelection.selectedTab = 2
+                }
+                .font(.caption.weight(.medium))
+                .foregroundColor(.blue)
+            }
+
+            ForEach(savedPlansViewModel.rehabPlans.prefix(2)) { plan in
+                NavigationLink(destination: RehabPlanView(existingPlan: plan)) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                            Text(plan.planName)
+                                .font(AppFonts.cardTitle)
+                                .foregroundColor(AppColors.primaryText)
+                            Text("\(plan.exercises.count) exercises")
+                                .font(.caption)
+                                .foregroundColor(AppColors.secondaryText)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(.gray)
+                    }
+                    .padding(AppSpacing.lg)
+                    .background(AppColors.cardBackground)
+                    .cornerRadius(AppCorners.card)
+                    .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
                 }
             }
-        } message: {
-            Text("Are you sure you want to delete \"\(planToDelete?.planName ?? "this plan")\"? This cannot be undone.")
         }
     }
 
     // MARK: - Helpers
+
+    /// User's display name from the shared profile service (no extra Firestore read)
+    private var profileName: String {
+        UserProfileService.shared.firstName
+    }
+
+    private var avatarInitials: String {
+        let parts = profileName.split(separator: " ")
+        if parts.count >= 2 {
+            return String(parts[0].prefix(1) + parts[1].prefix(1)).uppercased()
+        }
+        return profileName.isEmpty ? "PT" : String(profileName.prefix(2)).uppercased()
+    }
 
     private var greetingText: String {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -245,25 +325,6 @@ struct ContentView: View {
         case 12..<17: return "Good afternoon"
         case 17..<22: return "Good evening"
         default: return "Good night"
-        }
-    }
-
-    private var appVersionText: String {
-        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
-        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
-        return "PT Helper v\(version) (\(build))"
-    }
-
-    private func fetchUserName() {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
-        let db = Firestore.firestore()
-        db.collection("users").document(uid).collection("profile").document("health").getDocument { snapshot, error in
-            if let error = error {
-                print("Error fetching user name: \(error.localizedDescription)")
-            } else if let snapshot = snapshot, let data = snapshot.data() {
-                let first = data["firstName"] as? String ?? ""
-                userName = first.isEmpty ? (data["name"] as? String ?? "") : first
-            }
         }
     }
 }
@@ -307,16 +368,16 @@ struct OnboardingEditView: View {
                         Text("Step \(viewModel.currentStep) of 6")
                             .font(.caption)
                             .fontWeight(.semibold)
-                            .foregroundColor(.white)
+                            .foregroundColor(AppColors.ctaText)
                             .padding(.horizontal, AppSpacing.md)
                             .padding(.vertical, AppSpacing.xs)
-                            .background(Color.blue)
-                            .cornerRadius(AppCorners.medium)
+                            .background(AppColors.accent)
+                            .clipShape(Capsule())
 
                         HStack(spacing: 6) {
                             ForEach(1...6, id: \.self) { step in
                                 Capsule()
-                                    .fill(step <= viewModel.currentStep ? Color.blue : Color.gray.opacity(0.25))
+                                    .fill(step <= viewModel.currentStep ? AppColors.accent : AppColors.elevatedSurface)
                                     .frame(height: 5)
                                     .animation(.spring(response: 0.35), value: viewModel.currentStep)
                             }
@@ -329,7 +390,7 @@ struct OnboardingEditView: View {
 
                         Text(stepSubtitle)
                             .font(.subheadline)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AppColors.secondaryText)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 32)
                     }
@@ -363,16 +424,17 @@ struct OnboardingEditView: View {
                         }
 
                         if viewModel.currentStep < 6 {
-                            Button(action: { viewModel.nextStep() }) {
+                            Button(action: {
+                                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                                viewModel.nextStep()
+                            }) {
                                 HStack(spacing: AppSpacing.xs) {
                                     Text("Continue")
                                     Image(systemName: "chevron.right")
                                         .font(.system(size: 13, weight: .bold))
                                 }
                             }
-                            .buttonStyle(PrimaryButtonStyle())
-                            .disabled(!viewModel.canProceedFromCurrentStep)
-                            .opacity(viewModel.canProceedFromCurrentStep ? 1.0 : 0.5)
+                            .buttonStyle(PrimaryButtonStyle(isDisabled: !viewModel.canProceedFromCurrentStep))
                         }
                     }
                     .padding(.horizontal, AppSpacing.xl)
@@ -403,9 +465,9 @@ struct OnboardingEditView: View {
     private var stepSubtitle: String {
         switch viewModel.currentStep {
         case 1: return "Let's start with some basic information"
-        case 2: return "Select any conditions that apply to you"
-        case 3: return "Tell us about any past surgical procedures"
-        case 4: return "Any current or previous injuries?"
+        case 2: return "Adding your medical history helps our AI provide safer, more accurate recommendations"
+        case 3: return "Past surgeries help us avoid exercises that could cause re-injury"
+        case 4: return "Current or past injuries help us tailor your rehab plan"
         case 5: return "How active are you day to day?"
         case 6: return "Make sure everything looks correct"
         default: return ""

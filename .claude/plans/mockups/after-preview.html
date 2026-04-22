@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0">
+<title>Pre-Exercise Form Preview</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+  :root {
+    --accent: #5E8C5A;
+    --accent-tint: rgba(94,140,90,0.10);
+    --cta-bg: #3A5E36;
+    --cta-text: #F2F5EE;
+    --primary-text: #1E2B1A;
+    --secondary-text: #556B4A;
+    --muted-text: #8A9A7E;
+    --card-bg: #FAFCF8;
+    --page-bg: #E8F0E9;
+    --elevated: #E2E8DA;
+    --card-border: rgba(75,100,65,0.10);
+    --card-shadow: rgba(45,60,35,0.05);
+    --danger: #B85C5C;
+    --warning: #B8963D;
+    --corner-card: 20px;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--page-bg);
+    width: 375px;
+    height: 812px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    height: 54px; background: var(--page-bg);
+    display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 8px; font-size: 15px; font-weight: 600; color: var(--primary-text);
+    flex-shrink: 0;
+  }
+
+  .header {
+    padding: 8px 20px 4px;
+    flex-shrink: 0;
+  }
+  .header-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-tint);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    margin-bottom: 8px;
+  }
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--primary-text);
+    margin-bottom: 4px;
+  }
+  .header-sub {
+    font-size: 14px;
+    color: var(--secondary-text);
+    margin-bottom: 16px;
+  }
+
+  .scrollable { flex: 1; overflow-y: auto; padding: 0 20px; }
+
+  /* Demo image */
+  .demo-image {
+    width: 100%;
+    height: 200px;
+    border-radius: var(--corner-card);
+    overflow: hidden;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .demo-image img { width: 100%; height: 100%; object-fit: cover; }
+  .anim-badge {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(30,43,26,0.8);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 100px;
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Phase steps */
+  .phases {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .phase-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .phase-num {
+    width: 32px; height: 32px; min-width: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+  }
+  .phase-num.s1 { background: var(--accent); }
+  .phase-num.s2 { background: var(--warning); }
+  .phase-num.s3 { background: var(--accent); }
+  .phase-body { flex: 1; }
+  .phase-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+  .phase-label.s1 { color: var(--accent); }
+  .phase-label.s2 { color: var(--warning); }
+  .phase-label.s3 { color: var(--accent); }
+  .phase-text {
+    font-size: 14px;
+    color: var(--primary-text);
+    line-height: 1.4;
+  }
+
+  /* Common mistakes */
+  .mistakes-card {
+    background: var(--card-bg);
+    border-radius: var(--corner-card);
+    padding: 16px;
+    border: 1px solid var(--card-border);
+    box-shadow: 0 2px 8px var(--card-shadow);
+    margin-bottom: 20px;
+  }
+  .mistakes-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary-text);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .mistake-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  .mistake-row:last-child { margin-bottom: 0; }
+  .mistake-icon {
+    width: 24px; height: 24px; min-width: 24px;
+    border-radius: 6px;
+    background: rgba(184,92,92,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: var(--danger);
+    font-weight: 700;
+  }
+  .mistake-text {
+    font-size: 13px;
+    color: var(--secondary-text);
+    line-height: 1.4;
+  }
+  .mistake-text strong { color: var(--primary-text); }
+
+  /* Tempo preview */
+  .tempo-preview {
+    background: var(--card-bg);
+    border-radius: var(--corner-card);
+    padding: 14px 16px;
+    border: 1px solid var(--card-border);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .tempo-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted-text);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .tempo-beats {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .beat {
+    padding: 4px 8px;
+    border-radius: 8px;
+  }
+  .beat.down { background: rgba(94,140,90,0.15); color: var(--accent); }
+  .beat.hold { background: rgba(184,150,61,0.15); color: var(--warning); }
+  .beat.up { background: rgba(94,140,90,0.15); color: var(--accent); }
+
+  /* Bottom bar */
+  .bottom-bar {
+    flex-shrink: 0;
+    background: var(--card-bg);
+    border-top: 1px solid var(--card-border);
+    padding: 12px 20px 34px;
+    box-shadow: 0 -4px 16px var(--card-shadow);
+  }
+  .btn-primary {
+    width: 100%;
+    padding: 16px;
+    background: var(--cta-bg);
+    color: var(--cta-text);
+    border: none;
+    border-radius: 100px;
+    font-size: 17px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .screen-label {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: #3A5E36;
+    color: white; text-align: center; padding: 4px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+<div class="screen-label">✦ PRE-EXERCISE PREVIEW — First Encounter with New Exercise</div>
+
+<div class="status-bar">9:41</div>
+
+<div class="header">
+  <div class="header-badge">🆕 New Exercise</div>
+  <div class="header-title">Wall Sits</div>
+  <div class="header-sub">Let's review the form before you start</div>
+</div>
+
+<div class="scrollable">
+  <!-- Demo image -->
+  <div class="demo-image">
+    <img src="img/wall-sits.png" alt="Wall Sits">
+    <div class="anim-badge">▶ Animated demo</div>
+  </div>
+
+  <!-- Phase breakdown -->
+  <div class="phases">
+    <div class="phase-row">
+      <div class="phase-num s1">1</div>
+      <div class="phase-body">
+        <div class="phase-label s1">Setup</div>
+        <div class="phase-text">Stand with back flat against wall, feet shoulder-width apart, 2 feet from wall</div>
+      </div>
+    </div>
+    <div class="phase-row">
+      <div class="phase-num s2">2</div>
+      <div class="phase-body">
+        <div class="phase-label s2">Movement</div>
+        <div class="phase-text">Slowly slide down until thighs are parallel to ground (90° knee bend)</div>
+      </div>
+    </div>
+    <div class="phase-row">
+      <div class="phase-num s3">3</div>
+      <div class="phase-body">
+        <div class="phase-label s3">Return</div>
+        <div class="phase-text">Hold position, then slowly slide back up to standing</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Common mistakes -->
+  <div class="mistakes-card">
+    <div class="mistakes-title">⚠️ Common Mistakes</div>
+    <div class="mistake-row">
+      <div class="mistake-icon">✕</div>
+      <div class="mistake-text"><strong>Knees past toes</strong> — move feet further from wall</div>
+    </div>
+    <div class="mistake-row">
+      <div class="mistake-icon">✕</div>
+      <div class="mistake-text"><strong>Lower back arching</strong> — press back firmly into wall</div>
+    </div>
+    <div class="mistake-row">
+      <div class="mistake-icon">✕</div>
+      <div class="mistake-text"><strong>Knees caving inward</strong> — push knees out over toes</div>
+    </div>
+  </div>
+
+  <!-- Tempo preview -->
+  <div class="tempo-preview">
+    <div class="tempo-label">Audio Tempo Pattern</div>
+    <div class="tempo-beats">
+      <span class="beat down">Down 2 3 4</span>
+      <span class="beat hold">Hold 2 3 ...</span>
+      <span class="beat up">Up 2 3 4</span>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom bar -->
+<div class="bottom-bar">
+  <button class="btn-primary">💪 Ready — Start Exercise</button>
+</div>
+
+</body>
+</html>

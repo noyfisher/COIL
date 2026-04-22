@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.892493410961-lk7q8lkeacp2ur7nfnojvipa95j2cn4q</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+		</dict>
+	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>PT Helper uses your camera to record exercise videos and analyze your form with AI-powered feedback.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Microphone access is required for video recording.</string>
+</dict>
+</plist>

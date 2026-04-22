@@ -1,26 +1,38 @@
-# Xcode
-build/
-DerivedData/
-*.xcuserstate
-*.xcscmblueprint
-xcuserdata/
+# Firebase credentials
+*service-account*.json
+
+# Python
+__pycache__/
+*.pyc
 
 # macOS
 .DS_Store
-*.swp
-*~
 
-# CocoaPods
-Pods/
+# Xcode user data
+xcuserdata/
+*.xcuserstate
 
-# SPM
-.build/
-Package.resolved
+# Fastlane
+ios/PT-Helper/vendor/
+ios/PT-Helper/fastlane/report.xml
+ios/PT-Helper/fastlane/Preview.html
+ios/PT-Helper/fastlane/screenshots
+ios/PT-Helper/fastlane/test_output
+ios/PT-Helper/fastlane/AuthKey*.p8
+ios/PT-Helper/build/
+.env
 
-# Firebase
-GoogleService-Info.plist
-.firebase/
+# Office temp/lock files
+~$*
 
-# Firebase Functions
-functions/lib/
-functions/node_modules/
+# Claude scratch
+.claude/worktrees/
+.claude/scheduled_tasks.lock
+
+# Exercise image pipeline — local iteration artifacts (not shipped)
+scripts/output/_auto_prompt_backup/
+scripts/output/_flux_backup/
+scripts/output/_best_of_three/
+scripts/output/_nb_round1_backup/
+scripts/output/_sample_pass_fail/
+scripts/output/_nb_score5_contact_sheet.png
