@@ -1,0 +1,386 @@
+import SwiftUI
+
+// MARK: - Wizard Step Views
+
+extension PainDetailView {
+
+    // MARK: Step 0 — Pain Type
+
+    var painTypeStepView: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: AppSpacing.xl) {
+                questionTitle("What type of pain\nare you feeling?")
+                painTypeSelection
+            }
+            .padding(.horizontal, AppSpacing.xl)
+            .padding(.top, AppSpacing.md)
+            .padding(.bottom, 140)
+        }
+        .scrollDismissesKeyboard(.interactively)
+    }
+
+    // MARK: Step 1 — Pain Intensity
+
+    var intensityStepView: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: AppSpacing.xl) {
+                questionTitle("How intense\nis the pain?")
+                painIntensitySlider
+            }
+            .padding(.horizontal, AppSpacing.xl)
+            .padding(.top, AppSpacing.md)
+            .padding(.bottom, 140)
+        }
+        .scrollDismissesKeyboard(.interactively)
+    }
+
+    // MARK: Step 2 — Duration
+
+    var durationStepView: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: AppSpacing.xl) {
+                questionTitle("How long have\nyou had this pain?")
+                painDurationPicker
+            }
+            .padding(.horizontal, AppSpacing.xl)
+            .padding(.top, AppSpacing.md)
+            .padding(.bottom, 140)
+        }
+        .scrollDismissesKeyboard(.interactively)
+    }
+
+    // MARK: Step 3 — Frequency
+
+    var frequencyStepView: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: AppSpacing.xl) {
+                questionTitle("How often do\nyou feel it?")
+                painFrequencyPicker
+            }
+            .padding(.horizontal, AppSpacing.xl)
+            .padding(.top, AppSpacing.md)
+            .padding(.bottom, 140)
+        }
+        .scrollDismissesKeyboard(.interactively)
+    }
+
+    // MARK: Step 4 — Onset
+
+    var onsetStepView: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: AppSpacing.xl) {
+                questionTitle("How did this\npain start?")
+                painOnsetPicker
+            }
+            .padding(.horizontal, AppSpacing.xl)
+            .padding(.top, AppSpacing.md)
+            .padding(.bottom, 140)
+        }
+        .scrollDismissesKeyboard(.interactively)
+    }
+
+    // MARK: Step 5 — Aggravating Factors
+
+    var aggravatingStepView: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: AppSpacing.xl) {
+                questionTitle("What makes\nit worse?")
+                aggravatingFactorsSelection
+            }
+            .padding(.horizontal, AppSpacing.xl)
+            .padding(.top, AppSpacing.md)
+            .padding(.bottom, 140)
+        }
+        .scrollDismissesKeyboard(.interactively)
+    }
+
+    // MARK: Step 6 — Relieving Factors
+
+    var relievingStepView: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: AppSpacing.xl) {
+                questionTitle("What helps\nrelieve it?")
+                relievingFactorsSelection
+            }
+            .padding(.horizontal, AppSpacing.xl)
+            .padding(.top, AppSpacing.md)
+            .padding(.bottom, 140)
+        }
+        .scrollDismissesKeyboard(.interactively)
+    }
+
+    // MARK: Step 7 — Summary
+
+    var summaryStepView: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                    Text("Review Your\nAssessment")
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(AppColors.primaryText)
+                    if let region = viewModel.currentRegion {
+                        Text(region.name)
+                            .font(.subheadline)
+                            .foregroundColor(AppColors.secondaryText)
+                    }
+                }
+                .padding(.top, AppSpacing.sm)
+                .accessibilityIdentifier("painDetail.summaryCard")
+
+                CardSection(icon: "bolt.fill", color: AppColors.accent, title: "Pain Type & Intensity") {
+                    VStack(spacing: AppSpacing.md) {
+                        summaryChipsRow(label: "Type", values: painTypes)
+                        summaryRow(
+                            label: "Intensity",
+                            value: "\(Int(painIntensity)) / 10 — \(painDescription)",
+                            valueColor: painColor
+                        )
+                    }
+                }
+
+                CardSection(icon: "clock.fill", color: AppColors.warning, title: "Duration & Frequency") {
+                    VStack(spacing: AppSpacing.md) {
+                        summaryRow(label: "Duration", value: painDurations.first ?? "—")
+                        summaryChipsRow(label: "Frequency", values: painFrequencies)
+                    }
+                }
+
+                CardSection(icon: "arrow.triangle.2.circlepath", color: AppColors.danger, title: "Onset & Triggers") {
+                    VStack(spacing: AppSpacing.md) {
+                        summaryChipsRow(label: "Started", values: painOnsets)
+                        summaryChipsRow(label: "Worsened by", values: aggravatingFactors)
+                        summaryChipsRow(label: "Relieved by", values: relievingFactors)
+                    }
+                }
+
+                CardSection(icon: "note.text", color: AppColors.secondaryText, title: "Additional Notes") {
+                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                        Text("Optional — anything else you'd like to add")
+                            .font(.caption)
+                            .foregroundColor(AppColors.secondaryText)
+                        TextField(
+                            "",
+                            text: $additionalNotes,
+                            prompt: Text("e.g., worse in the morning, started after exercise...").foregroundColor(AppColors.mutedText),
+                            axis: .vertical
+                        )
+                        .lineLimit(2...4)
+                        .foregroundColor(AppColors.primaryText)
+                        .padding(AppSpacing.md)
+                        .background(AppColors.inputBackground)
+                        .cornerRadius(AppCorners.medium)
+                    }
+                }
+
+                if viewModel.hasMultipleRegions {
+                    Button(action: { showApplyToAllConfirmation = true }) {
+                        HStack(spacing: AppSpacing.sm) {
+                            Image(systemName: "doc.on.doc")
+                            Text("Apply to All \(viewModel.totalRegions) Regions & Analyze")
+                        }
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(AppColors.ctaText)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, AppSpacing.md)
+                        .background(AppColors.healingGradient)
+                        .cornerRadius(AppCorners.large)
+                    }
+                    .accessibilityIdentifier("painDetail.applyToAllButton")
+                }
+
+                Spacer(minLength: 140)
+            }
+            .padding(.horizontal, AppSpacing.xl)
+            .padding(.top, AppSpacing.md)
+        }
+        .scrollDismissesKeyboard(.interactively)
+    }
+
+    // MARK: - Option Card
+
+    func optionCard(label: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: AppSpacing.md) {
+                Text(label)
+                    .font(.body.weight(isSelected ? .semibold : .regular))
+                    .foregroundColor(AppColors.primaryText)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Image(systemName: iconForOption(label))
+                    .font(.system(size: 19, weight: .light))
+                    .foregroundColor(isSelected ? AppColors.primaryText : AppColors.secondaryText)
+            }
+            .padding(.vertical, AppSpacing.lg)
+            .overlay(alignment: .bottom) {
+                Rectangle()
+                    .fill(isSelected ? AppColors.primaryText : AppColors.elevatedSurface)
+                    .frame(height: isSelected ? 2 : 1)
+            }
+        }
+        .buttonStyle(.plain)
+        .animation(AppAnimations.springy, value: isSelected)
+    }
+
+    // MARK: - Option Icon Lookup
+
+    func iconForOption(_ label: String) -> String {
+        switch label {
+        // Pain types
+        case "Sharp":       return "bolt.fill"
+        case "Dull":        return "circle.fill"
+        case "Burning":     return "flame.fill"
+        case "Throbbing":   return "heart.fill"
+        case "Aching":      return "waveform.path.ecg"
+        case "Stabbing":    return "arrow.up.right"
+        case "Tingling":    return "sparkles"
+        case "Tightness":   return "arrow.up.and.down"
+        // Duration
+        case "Today":               return "sun.max.fill"
+        case "A Few Days":          return "calendar"
+        case "1-2 Weeks":           return "calendar.badge.clock"
+        case "2-4 Weeks":           return "calendar.badge.plus"
+        case "Over a Month":        return "calendar.badge.exclamationmark"
+        case "Over 3 Months":       return "clock.badge.exclamationmark"
+        // Frequency
+        case "Constant":            return "repeat"
+        case "Intermittent":        return "arrow.triangle.2.circlepath"
+        case "Only with Activity":  return "figure.run"
+        case "Only at Rest":        return "bed.double.fill"
+        case "At Night":            return "moon.fill"
+        // Onset
+        case "Sudden":          return "bolt.circle.fill"
+        case "Gradual":         return "chart.line.uptrend.xyaxis"
+        case "After Injury":    return "bandage.fill"
+        case "After Surgery":   return "cross.case.fill"
+        case "Unknown":         return "questionmark.circle"
+        // Movement / aggravating
+        case "Walking":                         return "figure.walk"
+        case "Running":                         return "figure.run"
+        case "Sitting", "Sitting long",
+             "Sitting at desk":                 return "person.crop.rectangle"
+        case "Lifting", "Lifting overhead":     return "dumbbell.fill"
+        case "Twisting":                        return "arrow.clockwise"
+        case "Standing long":                   return "figure.stand"
+        case "Climbing stairs":                 return "stairs"
+        case "Squatting":                       return "figure.strengthtraining.functional"
+        case "Jumping":                         return "figure.jumprope"
+        case "Pushing", "Push-ups":             return "arrow.right.circle"
+        case "Pulling":                         return "arrow.left.circle"
+        case "Reaching overhead":               return "arrow.up.circle"
+        case "Reaching forward":                return "arrow.forward.circle"
+        case "Reaching behind back":            return "arrow.backward.circle"
+        case "Gripping":                        return "hand.grip"
+        case "Typing", "Writing":               return "keyboard"
+        case "Driving":                         return "car.fill"
+        case "Turning head":                    return "arrow.counterclockwise.circle"
+        case "Looking up":                      return "arrow.up"
+        case "Looking down":                    return "arrow.down"
+        case "Sleeping position":               return "moon.zzz.fill"
+        case "Deep breathing":                  return "lungs.fill"
+        case "Coughing", "Coughing/sneezing":   return "waveform"
+        case "Bending forward":                 return "arrow.down.forward"
+        case "Getting out of bed":              return "sunrise.fill"
+        case "Throwing", "Kicking":             return "figure.baseball"
+        case "Carrying", "Carrying bags":       return "bag.fill"
+        case "Crossing legs":                   return "person.fill"
+        case "First steps in morning":          return "sunrise"
+        case "Uneven surfaces":                 return "map.fill"
+        case "Using phone":                     return "iphone"
+        case "Opening jars":                    return "cylinder.fill"
+        case "Using tools":                     return "wrench.and.screwdriver.fill"
+        case "Bright lights":                   return "sun.max.fill"
+        case "Stress/tension":                  return "brain.head.profile"
+        case "Lack of sleep":                   return "zzz"
+        case "Physical exertion":               return "bolt.heart.fill"
+        case "Concentrating":                   return "eye.fill"
+        case "Looking at screens":              return "display"
+        case "Eating":                          return "fork.knife"
+        // Relieving
+        case "Rest":                            return "bed.double.fill"
+        case "Ice":                             return "snowflake"
+        case "Heat":                            return "flame.fill"
+        case "Medication":                      return "pills.fill"
+        case "Elevation":                       return "arrow.up.circle.fill"
+        case "Stretching", "Gentle stretching",
+             "Stretching calves", "Stretching forearm": return "figure.flexibility"
+        case "Massage":                         return "hand.raised.fill"
+        case "Foam rolling":                    return "oval.fill"
+        case "Compression", "Compression wrap": return "bandage.fill"
+        case "Posture correction":              return "person.fill.checkmark"
+        case "Hydration":                       return "drop.fill"
+        case "Sleep":                           return "moon.zzz.fill"
+        case "Lying down":                      return "bed.double.fill"
+        case "Ergonomic adjustments":           return "chair.lounge.fill"
+        case "Upright position":                return "arrow.up.circle"
+        case "Quiet dark room":                 return "moon.fill"
+        case "Reducing screen time":            return "display.trianglebadge.exclamationmark"
+        case "Neck support pillow":             return "moon.zzz.fill"
+        case "Lumbar support":                  return "rectangle.portrait.fill"
+        case "Knee brace", "Wrist brace/splint",
+             "Ankle brace", "Arm support/sling",
+             "Forearm brace":                   return "bandage.fill"
+        case "Gentle walking":                  return "figure.walk"
+        case "Gentle movement",
+             "Avoiding triggers",
+             "Avoiding overhead reach",
+             "Avoiding lifting",
+             "Avoiding gripping",
+             "Avoiding sitting long":           return "hand.raised.slash"
+        case "Gentle breathing exercises":      return "lungs.fill"
+        case "Cold compress":                   return "snowflake"
+        case "Avoiding stairs":                 return "stairs"
+        case "Supportive shoes":                return "shoeprints.fill"
+        default:                                return "circle"
+        }
+    }
+
+    // MARK: - Question Title
+
+    func questionTitle(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 28, weight: .bold))
+            .foregroundColor(AppColors.primaryText)
+            .fixedSize(horizontal: false, vertical: true)
+            .lineSpacing(2)
+    }
+
+    // MARK: - Summary Row Helpers
+
+    func summaryRow(label: String, value: String, valueColor: Color = AppColors.primaryText) -> some View {
+        HStack(alignment: .top, spacing: AppSpacing.sm) {
+            Text(label)
+                .font(.caption.weight(.semibold))
+                .foregroundColor(AppColors.secondaryText)
+                .frame(width: 90, alignment: .leading)
+            Text(value.isEmpty ? "—" : value)
+                .font(.subheadline)
+                .foregroundColor(valueColor)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    func summaryChipsRow(label: String, values: [String]) -> some View {
+        HStack(alignment: .top, spacing: AppSpacing.sm) {
+            Text(label)
+                .font(.caption.weight(.semibold))
+                .foregroundColor(AppColors.secondaryText)
+                .frame(width: 90, alignment: .leading)
+            if values.isEmpty {
+                Text("—")
+                    .font(.subheadline)
+                    .foregroundColor(AppColors.primaryText)
+            } else {
+                FlowLayout(spacing: AppSpacing.xs) {
+                    ForEach(values, id: \.self) { value in
+                        Text(value)
+                            .font(.caption.weight(.medium))
+                            .foregroundColor(AppColors.accent)
+                            .padding(.horizontal, AppSpacing.sm)
+                            .padding(.vertical, AppSpacing.xs)
+                            .background(AppColors.accentTint)
+                            .clipShape(Capsule())
+                    }
+                }
+            }
+        }
+    }
+}

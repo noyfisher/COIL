@@ -2,135 +2,49 @@ import SwiftUI
 
 struct PainDetailView: View {
     @ObservedObject var viewModel: InjuryAnalysisViewModel
-    @State private var painTypes: [String] = []
-    @State private var customPainType: String = ""
-    @State private var customPainDescription: String = ""
-    @State private var painIntensity: Double = 5
-    @State private var painDurations: [String] = []
-    @State private var painFrequencies: [String] = []
-    @State private var customFrequency: String = ""
-    @State private var painOnsets: [String] = []
-    @State private var customOnset: String = ""
-    @State private var aggravatingFactors: [String] = []
-    @State private var relievingFactors: [String] = []
-    @State private var customAggravating: String = ""
-    @State private var customRelieving: String = ""
-    @State private var additionalNotes: String = ""
-    @State private var showApplyToAllConfirmation: Bool = false
-    @State private var showMoreDetails: Bool = false
-    // Treatment history state
-    @State private var hasSeenDoctor: Bool = false
-    @State private var imagingDone: [String] = []
-    @State private var hasDiagnosis: Bool = false
-    @State private var diagnosisText: String = ""
-    @State private var currentlyReceivingTreatment: Bool = false
-    @State private var treatmentDetails: String = ""
+
+    // MARK: - Pain Assessment State
+    @State var painTypes: [String] = []
+    @State var painIntensity: Double = 5
+    @State var painDurations: [String] = []
+    @State var painFrequencies: [String] = []
+    @State var painOnsets: [String] = []
+    @State var aggravatingFactors: [String] = []
+    @State var relievingFactors: [String] = []
+    @State var additionalNotes: String = ""
+
+    // MARK: - Wizard State
+    @State private var currentStep: Int = 0
+    @State private var isNavigatingBack: Bool = false
+    @State var showApplyToAllConfirmation: Bool = false
+
+    // MARK: - Custom Entry Popup
+    private enum CustomField: Identifiable {
+        case painType, frequency, onset, aggravating, relieving
+        var id: Self { self }
+    }
+    @State private var activeCustomField: CustomField? = nil
+    @State private var customInputText: String = ""
 
     var body: some View {
-        ZStack {
-            AppColors.bgGradient.ignoresSafeArea()
+        ZStack(alignment: .bottom) {
+            AssessmentGrowthBackground(step: currentStep)
 
-            ScrollViewReader { proxy in
-                ScrollView {
-                    VStack(spacing: AppSpacing.lg) {
-                        // Progress indicator
-                        if !viewModel.selectedRegionNames.isEmpty {
-                            VStack(spacing: AppSpacing.sm) {
-                                HStack {
-                                    Text("Region \(viewModel.currentRegionIndex + 1) of \(viewModel.totalRegions)")
-                                        .font(.caption.weight(.semibold))
-                                        .foregroundColor(AppColors.ctaText)
-                                        .padding(.horizontal, AppSpacing.md)
-                                        .padding(.vertical, AppSpacing.xs)
-                                        .background(AppColors.accent)
-                                        .cornerRadius(AppCorners.medium)
-                                    Spacer()
-                                    // Encouraging micro-copy
-                                    Text(encouragingText)
-                                        .font(.caption)
-                                        .foregroundColor(AppColors.secondaryText)
-                                        .transition(.opacity)
-                                        .animation(AppAnimations.smooth, value: formCompletionFields)
-                                }
-
-                                // Form completion mini-bar
-                                GeometryReader { geo in
-                                    ZStack(alignment: .leading) {
-                                        Capsule()
-                                            .fill(AppColors.elevatedSurface)
-                                            .frame(height: 3)
-                                        Capsule()
-                                            .fill(AppColors.accent)
-                                            .frame(width: geo.size.width * formCompletionProgress, height: 3)
-                                            .animation(AppAnimations.smooth, value: formCompletionProgress)
-                                    }
-                                }
-                                .frame(height: 3)
-                            }
-                            .id("top")
-                        }
-
-                        if let currentRegion = viewModel.currentRegion {
-                            CardSection(icon: "figure.walk", color: AppColors.accent, title: "Assessing: \(currentRegion.name)") {
-                                VStack(alignment: .leading, spacing: AppSpacing.xl) {
-                                    // Essential fields — always visible
-                                    painTypeSelection
-                                    painIntensitySlider
-                                    painDurationPicker
-                                    painFrequencyPicker
-                                    painOnsetPicker
-                                    aggravatingFactorsSelection
-                                    relievingFactorsSelection
-
-                                    // Collapsible section for optional details
-                                    Button(action: {
-                                        withAnimation(AppAnimations.springy) {
-                                            showMoreDetails.toggle()
-                                        }
-                                    }) {
-                                        HStack {
-                                            Image(systemName: showMoreDetails ? "chevron.up.circle.fill" : "plus.circle.fill")
-                                                .foregroundColor(AppColors.accent)
-                                            Text(showMoreDetails ? "Hide Additional Details" : "Add More Details")
-                                                .font(.subheadline.weight(.medium))
-                                                .foregroundColor(AppColors.accent)
-                                            Spacer()
-                                            if !showMoreDetails && hasOptionalContent {
-                                                Text("Has content")
-                                                    .font(.caption2)
-                                                    .foregroundColor(AppColors.success)
-                                            }
-                                        }
-                                        .padding(AppSpacing.md)
-                                        .background(AppColors.accentTint)
-                                        .cornerRadius(AppCorners.medium)
-                                    }
-                                    .buttonStyle(.plain)
-
-                                    if showMoreDetails {
-                                        customPainDescriptionField
-                                        treatmentHistorySection
-                                        additionalNotesField
-                                    }
-                                }
-                            }
-                            navigationButtons
-                        } else {
-                            Text("No region selected")
-                                .foregroundColor(AppColors.secondaryText)
-                        }
-                    }
+            VStack(spacing: 0) {
+                wizardHeader
                     .padding(.horizontal, AppSpacing.xl)
-                    .padding(.vertical, AppSpacing.md)
+                    .padding(.top, AppSpacing.md)
+                    .padding(.bottom, AppSpacing.sm)
+
+                ZStack {
+                    currentStepView
+                        .id(currentStep)
+                        .transition(.opacity)
                 }
-                .scrollDismissesKeyboard(.interactively)
-                .onChange(of: viewModel.currentRegionIndex) { _, _ in
-                    restoreFormState()
-                    withAnimation {
-                        proxy.scrollTo("top", anchor: .top)
-                    }
-                }
+                .animation(.easeInOut(duration: 0.35), value: currentStep)
             }
+
+            wizardNavigationBar
         }
         .navigationTitle("Pain Assessment")
         .navigationBarTitleDisplayMode(.inline)
@@ -141,9 +55,6 @@ struct PainDetailView: View {
             restoreFormState()
         }
         .onDisappear {
-            // Only reset if we're NOT currently navigating to the analyzing screen.
-            // Without this guard, navigating TO the AnalyzingView kills the in-flight
-            // analysis task because PainDetailView disappears from the nav stack.
             if !viewModel.showAnalyzingScreen && !viewModel.isAnalyzing {
                 viewModel.resetAnalysisState()
             }
@@ -152,10 +63,7 @@ struct PainDetailView: View {
             AnalyzingView(viewModel: viewModel)
         }
         .trackScreen("PainDetail")
-        .alert(
-            "Apply to All Regions?",
-            isPresented: $showApplyToAllConfirmation
-        ) {
+        .alert("Apply to All Regions?", isPresented: $showApplyToAllConfirmation) {
             Button("Cancel", role: .cancel) {}
             Button("Apply to All") {
                 guard let assessment = buildAssessment() else { return }
@@ -164,136 +72,283 @@ struct PainDetailView: View {
         } message: {
             Text("This will copy your current pain details to all \(viewModel.totalRegions) selected regions and start analysis.")
         }
+        .alert(customFieldTitle, isPresented: Binding(
+            get: { activeCustomField != nil },
+            set: { if !$0 { activeCustomField = nil } }
+        )) {
+            TextField(customFieldPlaceholder, text: $customInputText)
+            Button("Add") { addCustomEntry() }
+            Button("Cancel", role: .cancel) { activeCustomField = nil }
+        }
+        .onChange(of: viewModel.currentRegionIndex) { _, _ in
+            restoreFormState()
+            if isNavigatingBack {
+                currentStep = 7
+                isNavigatingBack = false
+            } else {
+                currentStep = 0
+            }
+        }
+    }
+
+    // MARK: - Wizard Header
+
+    private var wizardHeader: some View {
+        VStack(spacing: AppSpacing.sm) {
+            HStack(alignment: .center) {
+                if viewModel.hasMultipleRegions {
+                    Text("Region \(viewModel.currentRegionIndex + 1) of \(viewModel.totalRegions)")
+                        .font(.caption.weight(.semibold))
+                        .foregroundColor(AppColors.ctaText)
+                        .padding(.horizontal, AppSpacing.md)
+                        .padding(.vertical, AppSpacing.xs)
+                        .background(AppColors.accent)
+                        .clipShape(Capsule())
+                }
+                Spacer()
+                Text("\(currentStep + 1) / 8")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundColor(AppColors.secondaryText)
+                    .accessibilityIdentifier("painDetail.stepIndicator")
+            }
+
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(AppColors.elevatedSurface)
+                        .frame(height: 4)
+                    Capsule()
+                        .fill(AppColors.accent)
+                        .frame(width: geo.size.width * CGFloat(currentStep + 1) / 8.0, height: 4)
+                        .animation(AppAnimations.smooth, value: currentStep)
+                }
+            }
+            .frame(height: 4)
+        }
+    }
+
+    // MARK: - Wizard Navigation Bar
+
+    private var wizardNavigationBar: some View {
+        VStack(spacing: AppSpacing.xs) {
+            if currentStep < 7 {
+                Button(action: handleContinue) {
+                    Text("Continue")
+                }
+                .buttonStyle(PrimaryButtonStyle(isDisabled: !canContinue))
+                .disabled(!canContinue)
+                .accessibilityIdentifier("painDetail.continueButton")
+            } else {
+                if viewModel.isLastRegion {
+                    Button(action: {
+                        guard let assessment = buildAssessment() else { return }
+                        viewModel.saveAndAnalyze(assessment)
+                    }) {
+                        HStack(spacing: AppSpacing.sm) {
+                            Image(systemName: "sparkles")
+                            Text("Review & Analyze")
+                        }
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .accessibilityIdentifier("painDetail.analyzeButton")
+                } else {
+                    Button(action: {
+                        guard let assessment = buildAssessment() else { return }
+                        viewModel.saveAndAdvance(assessment)
+                        currentStep = 0
+                    }) {
+                        HStack(spacing: AppSpacing.sm) {
+                            Text("Next Region")
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 13, weight: .bold))
+                        }
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                }
+            }
+
+            if currentStep > 0 || !viewModel.isFirstRegion {
+                Button(action: handleBack) {
+                    Text("Back")
+                        .font(.body.weight(.medium))
+                        .foregroundColor(AppColors.secondaryText)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, AppSpacing.md)
+                }
+                .accessibilityIdentifier("painDetail.backButton")
+            }
+        }
+        .padding(.horizontal, AppSpacing.xl)
+        .padding(.top, AppSpacing.sm)
+        .padding(.bottom, AppSpacing.lg)
+        .background(.ultraThinMaterial)
+    }
+
+    // MARK: - Current Step View
+
+    @ViewBuilder
+    var currentStepView: some View {
+        switch currentStep {
+        case 0: painTypeStepView
+        case 1: intensityStepView
+        case 2: durationStepView
+        case 3: frequencyStepView
+        case 4: onsetStepView
+        case 5: aggravatingStepView
+        case 6: relievingStepView
+        default: summaryStepView
+        }
+    }
+
+    // MARK: - Continue Validation
+
+    private var canContinue: Bool {
+        switch currentStep {
+        case 0: return !painTypes.isEmpty
+        case 1: return true
+        case 2: return !painDurations.isEmpty
+        case 3: return !painFrequencies.isEmpty
+        case 4: return !painOnsets.isEmpty
+        case 5: return !aggravatingFactors.isEmpty
+        case 6: return !relievingFactors.isEmpty
+        default: return true
+        }
+    }
+
+    // MARK: - Navigation Handlers
+
+    private func handleBack() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        if currentStep > 0 {
+            currentStep -= 1
+        } else {
+            isNavigatingBack = true
+            guard let assessment = buildAssessment() else { return }
+            viewModel.saveAndGoBack(assessment)
+        }
+    }
+
+    private func handleContinue() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        currentStep += 1
     }
 
     // MARK: - Form State Management
 
-    /// Build a PainAssessment from the current form values.
     private func buildAssessment() -> PainAssessment? {
         guard let region = viewModel.currentRegion else { return nil }
-        let trimmedDescription = customPainDescription.trimmingCharacters(in: .whitespaces)
-        let trimmedDiagnosis = diagnosisText.trimmingCharacters(in: .whitespaces)
-        let trimmedTreatment = treatmentDetails.trimmingCharacters(in: .whitespaces)
-
-        // Only include treatment if any data was entered
-        let treatment: CurrentTreatment? = hasSeenDoctor || currentlyReceivingTreatment
-            ? CurrentTreatment(
-                hasSeenDoctor: hasSeenDoctor,
-                imagingDone: imagingDone,
-                hasDiagnosis: hasDiagnosis,
-                diagnosisText: trimmedDiagnosis.isEmpty ? nil : trimmedDiagnosis,
-                currentlyReceivingTreatment: currentlyReceivingTreatment,
-                treatmentDetails: trimmedTreatment.isEmpty ? nil : trimmedTreatment
-            )
-            : nil
-
+        let trimmedNotes = additionalNotes.trimmingCharacters(in: .whitespaces)
         return PainAssessment(
             id: UUID(),
             selectedRegion: region,
             painTypes: painTypes,
-            customPainDescription: trimmedDescription.isEmpty ? nil : trimmedDescription,
+            customPainDescription: nil,
             painIntensity: Int(painIntensity),
             painDurations: painDurations,
             painFrequencies: painFrequencies,
             painOnsets: painOnsets,
             aggravatingFactors: aggravatingFactors,
             relievingFactors: relievingFactors,
-            additionalNotes: additionalNotes,
-            currentTreatment: treatment
+            additionalNotes: trimmedNotes.isEmpty ? nil : trimmedNotes,
+            currentTreatment: nil
         )
     }
 
-    /// Restore form fields from a previously saved assessment, or reset to defaults.
     private func restoreFormState() {
         if let saved = viewModel.currentAssessment {
             painTypes = saved.painTypes
-            customPainType = ""
-            customPainDescription = saved.customPainDescription ?? ""
             painIntensity = Double(saved.painIntensity)
             painDurations = saved.painDurations
             painFrequencies = saved.painFrequencies
-            customFrequency = ""
             painOnsets = saved.painOnsets
-            customOnset = ""
             aggravatingFactors = saved.aggravatingFactors
             relievingFactors = saved.relievingFactors
             additionalNotes = saved.additionalNotes ?? ""
-            // Treatment history
-            hasSeenDoctor = saved.currentTreatment?.hasSeenDoctor ?? false
-            imagingDone = saved.currentTreatment?.imagingDone ?? []
-            hasDiagnosis = saved.currentTreatment?.hasDiagnosis ?? false
-            diagnosisText = saved.currentTreatment?.diagnosisText ?? ""
-            currentlyReceivingTreatment = saved.currentTreatment?.currentlyReceivingTreatment ?? false
-            treatmentDetails = saved.currentTreatment?.treatmentDetails ?? ""
-            // Auto-expand if optional sections have content
-            showMoreDetails = !(saved.customPainDescription ?? "").isEmpty ||
-                (saved.currentTreatment?.hasSeenDoctor ?? false) ||
-                (saved.currentTreatment?.currentlyReceivingTreatment ?? false) ||
-                !(saved.additionalNotes ?? "").isEmpty
         } else {
             painTypes = []
-            customPainType = ""
-            customPainDescription = ""
             painIntensity = 5
             painDurations = []
             painFrequencies = []
-            customFrequency = ""
             painOnsets = []
-            customOnset = ""
             aggravatingFactors = []
             relievingFactors = []
             additionalNotes = ""
-            hasSeenDoctor = false
-            imagingDone = []
-            hasDiagnosis = false
-            diagnosisText = ""
-            currentlyReceivingTreatment = false
-            treatmentDetails = ""
-            showMoreDetails = false
         }
     }
 
-    // MARK: - Form Completion Tracking
+    // MARK: - Custom Entry Popup Helpers
 
-    /// Whether any optional (collapsed) fields have content
-    private var hasOptionalContent: Bool {
-        !customPainDescription.trimmingCharacters(in: .whitespaces).isEmpty ||
-        hasSeenDoctor || currentlyReceivingTreatment ||
-        !additionalNotes.trimmingCharacters(in: .whitespaces).isEmpty
-    }
-
-    private var formCompletionFields: Int {
-        var count = 0
-        if !painTypes.isEmpty { count += 1 }
-        if painIntensity != 5 { count += 1 }  // intensity changed from default
-        if !painDurations.isEmpty { count += 1 }
-        if !painFrequencies.isEmpty { count += 1 }
-        if !painOnsets.isEmpty { count += 1 }
-        if !aggravatingFactors.isEmpty { count += 1 }
-        if !relievingFactors.isEmpty { count += 1 }
-        if !additionalNotes.trimmingCharacters(in: .whitespaces).isEmpty { count += 1 }
-        if !customPainDescription.trimmingCharacters(in: .whitespaces).isEmpty { count += 1 }
-        return count
-    }
-
-    private var formCompletionProgress: CGFloat {
-        CGFloat(formCompletionFields) / 9.0  // 9 total fields
-    }
-
-    private var encouragingText: String {
-        let factorCount = aggravatingFactors.count + relievingFactors.count
-        if viewModel.currentRegionIndex == viewModel.totalRegions - 1 && viewModel.totalRegions > 1 {
-            return "Last one!"
-        } else if factorCount >= 4 {
-            return "Great detail!"
-        } else if formCompletionFields >= 7 {
-            return "Almost done!"
-        } else {
-            return ""
+    private var customFieldTitle: String {
+        switch activeCustomField {
+        case .painType:    return "Add Pain Type"
+        case .frequency:   return "Add Frequency"
+        case .onset:       return "Add Onset"
+        case .aggravating: return "Add Aggravating Factor"
+        case .relieving:   return "Add Relieving Factor"
+        case nil:          return "Add your own"
         }
     }
 
-    // MARK: - Pain Type (multi-select chips + custom)
+    private var customFieldPlaceholder: String {
+        switch activeCustomField {
+        case .painType:    return "e.g., Shooting, Pressure..."
+        case .frequency:   return "e.g., After meals, Mornings..."
+        case .onset:       return "e.g., After sleeping..."
+        case .aggravating: return "e.g., Cold weather, Stress..."
+        case .relieving:   return "e.g., Hot bath, Elevation..."
+        case nil:          return "Describe..."
+        }
+    }
+
+    private func addCustomEntry() {
+        let trimmed = customInputText.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else { return }
+        switch activeCustomField {
+        case .painType:
+            if !painTypes.contains(trimmed) { painTypes.append(trimmed) }
+        case .frequency:
+            if !painFrequencies.contains(trimmed) { painFrequencies.append(trimmed) }
+        case .onset:
+            if !painOnsets.contains(trimmed) { painOnsets.append(trimmed) }
+        case .aggravating:
+            if !aggravatingFactors.contains(trimmed) { aggravatingFactors.append(trimmed) }
+        case .relieving:
+            if !relievingFactors.contains(trimmed) { relievingFactors.append(trimmed) }
+        case nil:
+            break
+        }
+        customInputText = ""
+        activeCustomField = nil
+    }
+
+    // MARK: - Add More Button (dashed card)
+
+    @ViewBuilder
+    private func addCustomButton(field: CustomField) -> some View {
+        Button(action: {
+            customInputText = ""
+            activeCustomField = field
+        }) {
+            HStack(spacing: AppSpacing.md) {
+                Text("Add more")
+                    .font(.body)
+                    .foregroundColor(AppColors.secondaryText)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Image(systemName: "plus")
+                    .font(.system(size: 19, weight: .light))
+                    .foregroundColor(AppColors.secondaryText)
+            }
+            .padding(.vertical, AppSpacing.lg)
+            .overlay(alignment: .bottom) {
+                Rectangle()
+                    .fill(AppColors.elevatedSurface)
+                    .frame(height: 1)
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Pain Type (multi-select cards + custom)
 
     private var painTypeOptions: [String] {
         PainAssessment.PainType.allCases.map { $0.displayName }
@@ -303,127 +358,97 @@ struct PainDetailView: View {
         painTypes.filter { !painTypeOptions.contains($0) }
     }
 
-    private func addCustomPainType() {
-        let trimmed = customPainType.trimmingCharacters(in: .whitespaces)
-        guard !trimmed.isEmpty, !painTypes.contains(trimmed) else { return }
-        painTypes.append(trimmed)
-        customPainType = ""
-    }
-
-    private var painTypeSelection: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            Text("Pain Type")
-                .font(.headline)
-                .foregroundColor(AppColors.primaryText)
-            FlowLayout(spacing: AppSpacing.sm) {
-                ForEach(painTypeOptions, id: \.self) { type in
-                    ChipButton(
-                        label: type,
-                        isSelected: painTypes.contains(type),
-                        action: {
-                            if painTypes.contains(type) {
-                                painTypes.removeAll { $0 == type }
-                            } else {
-                                painTypes.append(type)
-                            }
+    var painTypeSelection: some View {
+        VStack(spacing: AppSpacing.sm) {
+            ForEach(painTypeOptions, id: \.self) { type in
+                optionCard(
+                    label: type,
+                    isSelected: painTypes.contains(type),
+                    action: {
+                        if painTypes.contains(type) {
+                            painTypes.removeAll { $0 == type }
+                        } else {
+                            painTypes.append(type)
                         }
-                    )
-                }
-                ForEach(customPainTypeEntries, id: \.self) { entry in
-                    ChipButton(
-                        label: "✕ " + entry,
-                        isSelected: true,
-                        action: { painTypes.removeAll { $0 == entry } }
-                    )
+                    }
+                )
+            }
+            ForEach(customPainTypeEntries, id: \.self) { entry in
+                optionCard(label: entry, isSelected: true) {
+                    painTypes.removeAll { $0 == entry }
                 }
             }
-            HStack(spacing: AppSpacing.sm) {
-                TextField("", text: $customPainType, prompt: Text("Add your own...").foregroundColor(AppColors.mutedText))
-                    .font(.subheadline)
-                    .foregroundColor(AppColors.primaryText)
-                    .padding(.horizontal, AppSpacing.md)
-                    .padding(.vertical, AppSpacing.sm)
-                    .background(AppColors.inputBackground)
-                    .cornerRadius(AppCorners.small)
-                    .submitLabel(.done)
-                    .onSubmit { addCustomPainType() }
-                Button(action: addCustomPainType) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title3)
-                        .foregroundColor(customPainType.trimmingCharacters(in: .whitespaces).isEmpty ? AppColors.mutedText : AppColors.accent)
-                }
-                .disabled(customPainType.trimmingCharacters(in: .whitespaces).isEmpty)
-            }
+            addCustomButton(field: .painType)
         }
     }
 
     // MARK: - Pain Intensity
 
-    private var painIntensitySlider: some View {
+    var painIntensitySlider: some View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            Text("Pain Intensity")
-                .font(.headline)
-                .foregroundColor(AppColors.primaryText)
             HStack {
                 Text("\(Int(painIntensity))")
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .font(.system(size: 40, weight: .bold, design: .rounded))
                     .foregroundColor(painColor)
                 Text("/ 10")
-                    .font(.subheadline)
+                    .font(.title3)
                     .foregroundColor(AppColors.secondaryText)
                 Spacer()
                 Text(painDescription)
-                    .font(.caption.weight(.medium))
+                    .font(.subheadline.weight(.semibold))
                     .foregroundColor(painColor)
-                    .padding(.horizontal, AppSpacing.sm)
-                    .padding(.vertical, AppSpacing.xs)
+                    .padding(.horizontal, AppSpacing.md)
+                    .padding(.vertical, AppSpacing.sm)
                     .background(painColor.opacity(0.12))
-                    .cornerRadius(AppCorners.small)
+                    .cornerRadius(AppCorners.medium)
             }
             Slider(value: $painIntensity, in: 1...10, step: 1)
                 .tint(painColor)
+                .padding(.vertical, AppSpacing.sm)
             HStack {
                 Text("Mild")
-                    .font(.caption2)
+                    .font(.caption)
                     .foregroundColor(AppColors.secondaryText)
                 Spacer()
                 Text("Severe")
-                    .font(.caption2)
+                    .font(.caption)
                     .foregroundColor(AppColors.secondaryText)
             }
         }
+        .padding(AppSpacing.xl)
+        .background(AppColors.cardBackground)
+        .cornerRadius(AppCorners.card)
+        .overlay(
+            RoundedRectangle(cornerRadius: AppCorners.card)
+                .stroke(AppColors.elevatedSurface, lineWidth: 1.5)
+        )
     }
 
-    // MARK: - Pain Duration (single-select chips)
+    // MARK: - Pain Duration (single-select cards)
 
     private var painDurationOptions: [String] {
         PainAssessment.PainDuration.allCases.map { $0.displayName }
     }
 
-    private var painDurationPicker: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            Text("Pain Duration")
-                .font(.headline)
-                .foregroundColor(AppColors.primaryText)
-            FlowLayout(spacing: AppSpacing.sm) {
-                ForEach(painDurationOptions, id: \.self) { duration in
-                    ChipButton(
-                        label: duration,
-                        isSelected: painDurations.contains(duration),
-                        action: {
-                            if painDurations.contains(duration) {
-                                painDurations = []
-                            } else {
-                                painDurations = [duration]
-                            }
+    var painDurationPicker: some View {
+        VStack(spacing: AppSpacing.sm) {
+            ForEach(painDurationOptions, id: \.self) { duration in
+                optionCard(
+                    label: duration,
+                    isSelected: painDurations.contains(duration),
+                    action: {
+                        if painDurations.contains(duration) {
+                            painDurations = []
+                        } else {
+                            painDurations = [duration]
                         }
-                    )
-                }
+                    }
+                )
             }
         }
     }
 
-    // MARK: - Pain Frequency (multi-select chips + custom)
+    // MARK: - Pain Frequency (multi-select cards + custom)
 
     private var painFrequencyOptions: [String] {
         PainAssessment.PainFrequency.allCases.map { $0.displayName }
@@ -433,61 +458,31 @@ struct PainDetailView: View {
         painFrequencies.filter { !painFrequencyOptions.contains($0) }
     }
 
-    private func addCustomFrequency() {
-        let trimmed = customFrequency.trimmingCharacters(in: .whitespaces)
-        guard !trimmed.isEmpty, !painFrequencies.contains(trimmed) else { return }
-        painFrequencies.append(trimmed)
-        customFrequency = ""
-    }
-
-    private var painFrequencyPicker: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            Text("Pain Frequency")
-                .font(.headline)
-                .foregroundColor(AppColors.primaryText)
-            FlowLayout(spacing: AppSpacing.sm) {
-                ForEach(painFrequencyOptions, id: \.self) { frequency in
-                    ChipButton(
-                        label: frequency,
-                        isSelected: painFrequencies.contains(frequency),
-                        action: {
-                            if painFrequencies.contains(frequency) {
-                                painFrequencies.removeAll { $0 == frequency }
-                            } else {
-                                painFrequencies.append(frequency)
-                            }
+    var painFrequencyPicker: some View {
+        VStack(spacing: AppSpacing.sm) {
+            ForEach(painFrequencyOptions, id: \.self) { frequency in
+                optionCard(
+                    label: frequency,
+                    isSelected: painFrequencies.contains(frequency),
+                    action: {
+                        if painFrequencies.contains(frequency) {
+                            painFrequencies.removeAll { $0 == frequency }
+                        } else {
+                            painFrequencies.append(frequency)
                         }
-                    )
-                }
-                ForEach(customFrequencyEntries, id: \.self) { entry in
-                    ChipButton(
-                        label: "✕ " + entry,
-                        isSelected: true,
-                        action: { painFrequencies.removeAll { $0 == entry } }
-                    )
+                    }
+                )
+            }
+            ForEach(customFrequencyEntries, id: \.self) { entry in
+                optionCard(label: entry, isSelected: true) {
+                    painFrequencies.removeAll { $0 == entry }
                 }
             }
-            HStack(spacing: AppSpacing.sm) {
-                TextField("", text: $customFrequency, prompt: Text("Add your own...").foregroundColor(AppColors.mutedText))
-                    .font(.subheadline)
-                    .foregroundColor(AppColors.primaryText)
-                    .padding(.horizontal, AppSpacing.md)
-                    .padding(.vertical, AppSpacing.sm)
-                    .background(AppColors.inputBackground)
-                    .cornerRadius(AppCorners.small)
-                    .submitLabel(.done)
-                    .onSubmit { addCustomFrequency() }
-                Button(action: addCustomFrequency) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title3)
-                        .foregroundColor(customFrequency.trimmingCharacters(in: .whitespaces).isEmpty ? AppColors.mutedText : AppColors.accent)
-                }
-                .disabled(customFrequency.trimmingCharacters(in: .whitespaces).isEmpty)
-            }
+            addCustomButton(field: .frequency)
         }
     }
 
-    // MARK: - Pain Onset (multi-select chips + custom)
+    // MARK: - Pain Onset (multi-select cards + custom)
 
     private var painOnsetOptions: [String] {
         PainAssessment.PainOnset.allCases.map { $0.displayName }
@@ -497,195 +492,95 @@ struct PainDetailView: View {
         painOnsets.filter { !painOnsetOptions.contains($0) }
     }
 
-    private func addCustomOnset() {
-        let trimmed = customOnset.trimmingCharacters(in: .whitespaces)
-        guard !trimmed.isEmpty, !painOnsets.contains(trimmed) else { return }
-        painOnsets.append(trimmed)
-        customOnset = ""
-    }
-
-    private var painOnsetPicker: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            Text("Pain Onset")
-                .font(.headline)
-                .foregroundColor(AppColors.primaryText)
-            FlowLayout(spacing: AppSpacing.sm) {
-                ForEach(painOnsetOptions, id: \.self) { onset in
-                    ChipButton(
-                        label: onset,
-                        isSelected: painOnsets.contains(onset),
-                        action: {
-                            if painOnsets.contains(onset) {
-                                painOnsets.removeAll { $0 == onset }
-                            } else {
-                                painOnsets.append(onset)
-                            }
+    var painOnsetPicker: some View {
+        VStack(spacing: AppSpacing.sm) {
+            ForEach(painOnsetOptions, id: \.self) { onset in
+                optionCard(
+                    label: onset,
+                    isSelected: painOnsets.contains(onset),
+                    action: {
+                        if painOnsets.contains(onset) {
+                            painOnsets.removeAll { $0 == onset }
+                        } else {
+                            painOnsets.append(onset)
                         }
-                    )
-                }
-                ForEach(customOnsetEntries, id: \.self) { entry in
-                    ChipButton(
-                        label: "✕ " + entry,
-                        isSelected: true,
-                        action: { painOnsets.removeAll { $0 == entry } }
-                    )
+                    }
+                )
+            }
+            ForEach(customOnsetEntries, id: \.self) { entry in
+                optionCard(label: entry, isSelected: true) {
+                    painOnsets.removeAll { $0 == entry }
                 }
             }
-            HStack(spacing: AppSpacing.sm) {
-                TextField("", text: $customOnset, prompt: Text("Add your own...").foregroundColor(AppColors.mutedText))
-                    .font(.subheadline)
-                    .foregroundColor(AppColors.primaryText)
-                    .padding(.horizontal, AppSpacing.md)
-                    .padding(.vertical, AppSpacing.sm)
-                    .background(AppColors.inputBackground)
-                    .cornerRadius(AppCorners.small)
-                    .submitLabel(.done)
-                    .onSubmit { addCustomOnset() }
-                Button(action: addCustomOnset) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title3)
-                        .foregroundColor(customOnset.trimmingCharacters(in: .whitespaces).isEmpty ? AppColors.mutedText : AppColors.accent)
-                }
-                .disabled(customOnset.trimmingCharacters(in: .whitespaces).isEmpty)
-            }
+            addCustomButton(field: .onset)
         }
     }
 
-    // MARK: - Aggravating Factors (toggle chips, region-specific + custom)
+    // MARK: - Aggravating Factors (multi-select cards + custom)
 
-    private var aggravatingFactorsSelection: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            Text("What Makes It Worse?")
-                .font(.headline)
-                .foregroundColor(AppColors.primaryText)
-            FlowLayout(spacing: AppSpacing.sm) {
-                ForEach(aggravatingOptions, id: \.self) { factor in
-                    ChipButton(
-                        label: factor,
-                        isSelected: aggravatingFactors.contains(factor),
-                        action: {
-                            if aggravatingFactors.contains(factor) {
-                                aggravatingFactors.removeAll { $0 == factor }
-                            } else {
-                                aggravatingFactors.append(factor)
-                            }
-                        }
-                    )
-                }
-                // Show custom entries as removable chips
-                ForEach(customAggravatingEntries, id: \.self) { factor in
-                    ChipButton(
-                        label: "✕ " + factor,
-                        isSelected: true,
-                        action: {
+    var aggravatingFactorsSelection: some View {
+        VStack(spacing: AppSpacing.sm) {
+            ForEach(aggravatingOptions, id: \.self) { factor in
+                optionCard(
+                    label: factor,
+                    isSelected: aggravatingFactors.contains(factor),
+                    action: {
+                        if aggravatingFactors.contains(factor) {
                             aggravatingFactors.removeAll { $0 == factor }
+                        } else {
+                            aggravatingFactors.append(factor)
                         }
-                    )
+                    }
+                )
+            }
+            ForEach(customAggravatingEntries, id: \.self) { factor in
+                optionCard(label: factor, isSelected: true) {
+                    aggravatingFactors.removeAll { $0 == factor }
                 }
             }
-            // Custom input
-            HStack(spacing: AppSpacing.sm) {
-                TextField("", text: $customAggravating, prompt: Text("Add your own...").foregroundColor(AppColors.mutedText))
-                    .font(.subheadline)
-                    .foregroundColor(AppColors.primaryText)
-                    .padding(.horizontal, AppSpacing.md)
-                    .padding(.vertical, AppSpacing.sm)
-                    .background(AppColors.inputBackground)
-                    .cornerRadius(AppCorners.small)
-                    .submitLabel(.done)
-                    .onSubmit { addCustomAggravating() }
-                Button(action: addCustomAggravating) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title3)
-                        .foregroundColor(customAggravating.trimmingCharacters(in: .whitespaces).isEmpty ? AppColors.mutedText : AppColors.accent)
-                }
-                .disabled(customAggravating.trimmingCharacters(in: .whitespaces).isEmpty)
-            }
+            addCustomButton(field: .aggravating)
         }
     }
 
-    // MARK: - Relieving Factors (toggle chips, region-specific + custom)
+    // MARK: - Relieving Factors (multi-select cards + custom)
 
-    private var relievingFactorsSelection: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            Text("What Helps?")
-                .font(.headline)
-                .foregroundColor(AppColors.primaryText)
-            FlowLayout(spacing: AppSpacing.sm) {
-                ForEach(relievingOptions, id: \.self) { factor in
-                    ChipButton(
-                        label: factor,
-                        isSelected: relievingFactors.contains(factor),
-                        action: {
-                            if relievingFactors.contains(factor) {
-                                relievingFactors.removeAll { $0 == factor }
-                            } else {
-                                relievingFactors.append(factor)
-                            }
-                        }
-                    )
-                }
-                // Show custom entries as removable chips
-                ForEach(customRelievingEntries, id: \.self) { factor in
-                    ChipButton(
-                        label: "✕ " + factor,
-                        isSelected: true,
-                        action: {
+    var relievingFactorsSelection: some View {
+        VStack(spacing: AppSpacing.sm) {
+            ForEach(relievingOptions, id: \.self) { factor in
+                optionCard(
+                    label: factor,
+                    isSelected: relievingFactors.contains(factor),
+                    action: {
+                        if relievingFactors.contains(factor) {
                             relievingFactors.removeAll { $0 == factor }
+                        } else {
+                            relievingFactors.append(factor)
                         }
-                    )
+                    }
+                )
+            }
+            ForEach(customRelievingEntries, id: \.self) { factor in
+                optionCard(label: factor, isSelected: true) {
+                    relievingFactors.removeAll { $0 == factor }
                 }
             }
-            // Custom input
-            HStack(spacing: AppSpacing.sm) {
-                TextField("", text: $customRelieving, prompt: Text("Add your own...").foregroundColor(AppColors.mutedText))
-                    .font(.subheadline)
-                    .foregroundColor(AppColors.primaryText)
-                    .padding(.horizontal, AppSpacing.md)
-                    .padding(.vertical, AppSpacing.sm)
-                    .background(AppColors.inputBackground)
-                    .cornerRadius(AppCorners.small)
-                    .submitLabel(.done)
-                    .onSubmit { addCustomRelieving() }
-                Button(action: addCustomRelieving) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title3)
-                        .foregroundColor(customRelieving.trimmingCharacters(in: .whitespaces).isEmpty ? AppColors.mutedText : AppColors.accent)
-                }
-                .disabled(customRelieving.trimmingCharacters(in: .whitespaces).isEmpty)
-            }
+            addCustomButton(field: .relieving)
         }
     }
 
     // MARK: - Custom Factor Helpers
 
-    /// Custom aggravating entries (ones the user typed, not from the preset list)
-    private var customAggravatingEntries: [String] {
+    var customAggravatingEntries: [String] {
         aggravatingFactors.filter { !aggravatingOptions.contains($0) }
     }
 
-    /// Custom relieving entries (ones the user typed, not from the preset list)
-    private var customRelievingEntries: [String] {
+    var customRelievingEntries: [String] {
         relievingFactors.filter { !relievingOptions.contains($0) }
-    }
-
-    private func addCustomAggravating() {
-        let trimmed = customAggravating.trimmingCharacters(in: .whitespaces)
-        guard !trimmed.isEmpty, !aggravatingFactors.contains(trimmed) else { return }
-        aggravatingFactors.append(trimmed)
-        customAggravating = ""
-    }
-
-    private func addCustomRelieving() {
-        let trimmed = customRelieving.trimmingCharacters(in: .whitespaces)
-        guard !trimmed.isEmpty, !relievingFactors.contains(trimmed) else { return }
-        relievingFactors.append(trimmed)
-        customRelieving = ""
     }
 
     // MARK: - Region-Specific Factor Options
 
-    private var aggravatingOptions: [String] {
+    var aggravatingOptions: [String] {
         guard let region = viewModel.currentRegion else {
             return ["Walking", "Sitting", "Lifting", "Running"]
         }
@@ -731,7 +626,7 @@ struct PainDetailView: View {
         }
     }
 
-    private var relievingOptions: [String] {
+    var relievingOptions: [String] {
         guard let region = viewModel.currentRegion else {
             return ["Rest", "Ice", "Heat", "Stretching", "Medication"]
         }
@@ -777,199 +672,9 @@ struct PainDetailView: View {
         }
     }
 
-    // MARK: - Treatment History
-
-    private let imagingOptions = ["X-ray", "MRI", "CT Scan", "Ultrasound"]
-
-    private var treatmentHistorySection: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.md) {
-            Text("Treatment History")
-                .font(.headline)
-                .foregroundColor(AppColors.primaryText)
-            Text("Optional — helps provide better recommendations")
-                .font(.caption)
-                .foregroundColor(AppColors.secondaryText)
-
-            // Seen a doctor toggle
-            Toggle("Have you seen a doctor for this pain?", isOn: $hasSeenDoctor)
-                .font(.subheadline)
-                .foregroundColor(AppColors.primaryText)
-                .tint(AppColors.accent)
-
-            if hasSeenDoctor {
-                // Imaging
-                VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                    Text("Imaging done")
-                        .font(.subheadline)
-                        .foregroundColor(AppColors.secondaryText)
-                    FlowLayout(spacing: AppSpacing.sm) {
-                        ForEach(imagingOptions, id: \.self) { option in
-                            ChipButton(
-                                label: option,
-                                isSelected: imagingDone.contains(option),
-                                action: {
-                                    if imagingDone.contains(option) {
-                                        imagingDone.removeAll { $0 == option }
-                                    } else {
-                                        imagingDone.append(option)
-                                    }
-                                }
-                            )
-                        }
-                    }
-                }
-
-                // Diagnosis
-                Toggle("Were you given a diagnosis?", isOn: $hasDiagnosis)
-                    .font(.subheadline)
-                    .foregroundColor(AppColors.primaryText)
-                    .tint(AppColors.accent)
-
-                if hasDiagnosis {
-                    TextField("", text: $diagnosisText, prompt: Text("What was the diagnosis?").foregroundColor(AppColors.mutedText))
-                        .font(.subheadline)
-                        .foregroundColor(AppColors.primaryText)
-                        .padding(AppSpacing.md)
-                        .background(AppColors.inputBackground)
-                        .cornerRadius(AppCorners.medium)
-                }
-            }
-
-            // Currently receiving treatment
-            Toggle("Currently receiving treatment?", isOn: $currentlyReceivingTreatment)
-                .font(.subheadline)
-                .foregroundColor(AppColors.primaryText)
-                .tint(AppColors.accent)
-
-            if currentlyReceivingTreatment {
-                TextField("", text: $treatmentDetails, prompt: Text("Describe your current treatment").foregroundColor(AppColors.mutedText), axis: .vertical)
-                    .lineLimit(2...3)
-                    .font(.subheadline)
-                    .foregroundColor(AppColors.primaryText)
-                    .padding(AppSpacing.md)
-                    .background(AppColors.inputBackground)
-                    .cornerRadius(AppCorners.medium)
-            }
-        }
-    }
-
-    // MARK: - Additional Notes
-
-    private var additionalNotesField: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            Text("Additional Notes")
-                .font(.headline)
-                .foregroundColor(AppColors.primaryText)
-            TextField("", text: $additionalNotes, prompt: Text("Enter any additional notes").foregroundColor(AppColors.mutedText), axis: .vertical)
-                .lineLimit(2...4)
-                .foregroundColor(AppColors.primaryText)
-                .padding(AppSpacing.md)
-                .background(AppColors.inputBackground)
-                .cornerRadius(AppCorners.medium)
-        }
-    }
-
-    // MARK: - Navigation
-
-    private var navigationButtons: some View {
-        VStack(spacing: AppSpacing.sm) {
-            // "Apply to All Regions" — shown on every region when multiple exist
-            if viewModel.hasMultipleRegions {
-                Button(action: {
-                    showApplyToAllConfirmation = true
-                }) {
-                    HStack(spacing: AppSpacing.sm) {
-                        Image(systemName: "doc.on.doc")
-                        Text("Apply to All \(viewModel.totalRegions) Regions & Analyze")
-                    }
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundColor(AppColors.ctaText)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, AppSpacing.md)
-                    .background(AppColors.healingGradient)
-                    .cornerRadius(AppCorners.large)
-                }
-                .accessibilityIdentifier("painDetail.applyToAllButton")
-            }
-
-            // Existing navigation row
-            HStack(spacing: AppSpacing.md) {
-                if viewModel.currentRegionIndex > 0 {
-                    Button(action: {
-                        guard let assessment = buildAssessment() else { return }
-                        viewModel.saveAndGoBack(assessment)
-                    }) {
-                        HStack(spacing: AppSpacing.xs) {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 13, weight: .bold))
-                            Text("Back")
-                        }
-                    }
-                    .buttonStyle(SecondaryButtonStyle())
-                }
-
-                if viewModel.isLastRegion {
-                    Button(action: {
-                        guard let assessment = buildAssessment() else { return }
-                        viewModel.saveAndAnalyze(assessment)
-                    }) {
-                        HStack(spacing: AppSpacing.sm) {
-                            Image(systemName: "sparkles")
-                            Text("Review & Analyze")
-                        }
-                    }
-                    .buttonStyle(PrimaryButtonStyle())
-                    .accessibilityIdentifier("painDetail.analyzeButton")
-                } else {
-                    Button(action: {
-                        guard let assessment = buildAssessment() else { return }
-                        viewModel.saveAndAdvance(assessment)
-                    }) {
-                        HStack(spacing: AppSpacing.sm) {
-                            Text("Next")
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 13, weight: .bold))
-                        }
-                    }
-                    .buttonStyle(PrimaryButtonStyle())
-                }
-            }
-        }
-    }
-
     // MARK: - Helpers
 
-    private var customPainDescriptionField: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            Text("Describe Your Pain")
-                .font(.headline)
-                .foregroundColor(AppColors.primaryText)
-            Text("Optional — describe what your pain feels like in your own words")
-                .font(.caption)
-                .foregroundColor(AppColors.secondaryText)
-            TextField("", text: $customPainDescription, prompt: Text("e.g., feels like pressure, stiffness in the morning...").foregroundColor(AppColors.mutedText), axis: .vertical)
-                .lineLimit(2...3)
-                .foregroundColor(AppColors.primaryText)
-                .padding(AppSpacing.md)
-                .background(AppColors.inputBackground)
-                .cornerRadius(AppCorners.medium)
-        }
-    }
-
-    private func iconName(for type: PainAssessment.PainType) -> String {
-        switch type {
-        case .sharp: return "bolt.fill"
-        case .dull: return "cloud.fill"
-        case .burning: return "flame.fill"
-        case .throbbing: return "waveform.path.ecg"
-        case .aching: return "tortoise.fill"
-        case .stabbing: return "scissors"
-        case .tingling: return "sparkles"
-        case .tightness: return "arrow.up.left.and.arrow.down.right"
-        }
-    }
-
-    private var painColor: Color {
+    var painColor: Color {
         switch Int(painIntensity) {
         case 1...3: return AppColors.success
         case 4...6: return AppColors.warning
@@ -977,7 +682,7 @@ struct PainDetailView: View {
         }
     }
 
-    private var painDescription: String {
+    var painDescription: String {
         switch Int(painIntensity) {
         case 1...3: return "Mild"
         case 4...6: return "Moderate"
@@ -986,5 +691,3 @@ struct PainDetailView: View {
         }
     }
 }
-
-// ChipButton and FlowLayout moved to DesignSystem.swift

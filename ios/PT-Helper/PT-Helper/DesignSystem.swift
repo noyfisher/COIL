@@ -579,6 +579,7 @@ struct ChipButton: View {
 
 struct FlowLayout: Layout {
     var spacing: CGFloat = 8
+    var alignment: HorizontalAlignment = .leading
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
         let result = arrangeSubviews(proposal: proposal, subviews: subviews)
@@ -597,32 +598,52 @@ struct FlowLayout: Layout {
 
     private func arrangeSubviews(proposal: ProposedViewSize, subviews: Subviews) -> ArrangementResult {
         let maxWidth = proposal.width ?? .infinity
-        var positions: [CGPoint] = []
-        var sizes: [CGSize] = []
-        var currentX: CGFloat = 0
-        var currentY: CGFloat = 0
-        var rowHeight: CGFloat = 0
+        let subviewSizes = subviews.map { $0.sizeThatFits(.unspecified) }
 
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            sizes.append(size)
+        // Pass 1: group indices into rows and measure row content widths
+        var rows: [[Int]] = []
+        var rowContentWidths: [CGFloat] = []
+        var currentRow: [Int] = []
+        var currentRowWidth: CGFloat = 0
 
-            if currentX + size.width > maxWidth && currentX > 0 {
-                currentX = 0
-                currentY += rowHeight + spacing
-                rowHeight = 0
+        for (index, size) in subviewSizes.enumerated() {
+            let itemWidth = size.width
+            let spaceNeeded = currentRow.isEmpty ? itemWidth : currentRowWidth + spacing + itemWidth
+            if spaceNeeded > maxWidth && !currentRow.isEmpty {
+                rows.append(currentRow)
+                rowContentWidths.append(currentRowWidth)
+                currentRow = []
+                currentRowWidth = 0
             }
-
-            positions.append(CGPoint(x: currentX, y: currentY))
-            rowHeight = max(rowHeight, size.height)
-            currentX += size.width + spacing
+            currentRow.append(index)
+            currentRowWidth = currentRow.count == 1 ? itemWidth : currentRowWidth + spacing + itemWidth
+        }
+        if !currentRow.isEmpty {
+            rows.append(currentRow)
+            rowContentWidths.append(currentRowWidth)
         }
 
-        let totalHeight = currentY + rowHeight
+        // Pass 2: compute positions with optional centering
+        var positions = Array(repeating: CGPoint.zero, count: subviews.count)
+        var currentY: CGFloat = 0
+
+        for (rowIndex, row) in rows.enumerated() {
+            let rowWidth = rowContentWidths[rowIndex]
+            let startX: CGFloat = alignment == .center ? max(0, (maxWidth - rowWidth) / 2) : 0
+            let rowHeight = row.map { subviewSizes[$0].height }.max() ?? 0
+            var x = startX
+            for itemIndex in row {
+                positions[itemIndex] = CGPoint(x: x, y: currentY)
+                x += subviewSizes[itemIndex].width + spacing
+            }
+            currentY += rowHeight + spacing
+        }
+
+        let totalHeight = max(0, currentY - spacing)
         return ArrangementResult(
             size: CGSize(width: maxWidth, height: totalHeight),
             positions: positions,
-            sizes: sizes
+            sizes: subviewSizes
         )
     }
 
