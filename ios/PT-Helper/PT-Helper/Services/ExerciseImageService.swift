@@ -34,6 +34,7 @@ final class ExerciseImageService: @unchecked Sendable {
         case suffixFuzzy        // Layer 5: suffixMatch
         case pluralToggle       // Layer 6: plural/singular toggle
         case synonymExpansion   // Layer 7: body-part synonym expansion
+        case stripped           // Layer 8: parentheticals + qualifier tokens removed, then retry
     }
 
     /// Result of resolving an exercise to an image key, including how it was matched.
@@ -464,6 +465,16 @@ final class ExerciseImageService: @unchecked Sendable {
         "wrist-flexion-extension": "wrist-curls",
         // Copenhagen adduction variants
         "copenhagen-adduction-side-lying-hip-adductor-squeeze": "copenhagen-adduction",
+        // AI-generated long-form names confirmed missing in user-reported plans (2026-04-22)
+        "prone-i-y-t-shoulder-series": "prone-i-y-t-shoulder-activation",
+        "half-kneeling-shoulder-stability-hold": "quadruped-shoulder-stability-hold",
+        "standing-band-free-shoulder-external-rotation": "external-rotation",
+        "knee-flexion-wall-slide-lying-supine": "wall-slides",
+        "kneeling-hip-flexor-stretch": "hip-flexor-stretch",
+        "right-shoulder-scapular-stability-floor-prone-shoulder-taps": "prone-scapular-retraction",
+        "right-shoulder-sleeper-stretch-lying": "sleeper-stretch",
+        "straight-leg-raise-supine": "straight-leg-raises",
+        "supine-spinal-twist-lower-back-mobility": "lumbar-rotation-stretch",
     ]
 
     /// Body-part synonyms for token-level replacement.
@@ -503,15 +514,87 @@ final class ExerciseImageService: @unchecked Sendable {
             return ImageMatch(key: remoteAlias, matchType: .exact)
         }
 
-        // 4-7. Fuzzy matching (cached)
+        // 4-8. Fuzzy matching + stripped fallback (cached under original `normalized` key)
         return lock.withLock {
             if let cached = fuzzyMatchCache[normalized] {
                 return cached
             }
-            let result = fuzzyMatch(normalized)
+            // Layers 4-7: existing fuzzy matcher on the original normalized form
+            var result = fuzzyMatch(normalized)
+            // Layer 8: strip qualifiers (parentheticals, em-dashes, qualifier tokens) and retry
+            // alias + fuzzy lookup against the stripped form. Calls helpers directly (NOT
+            // resolveImageMatch) to avoid polluting fuzzyMatchCache with stripped-key entries.
+            if result == nil {
+                let stripped = strippedKey(for: exercise.name)
+                if !stripped.isEmpty && stripped != normalized {
+                    if mapping[stripped] != nil {
+                        result = ImageMatch(key: stripped, matchType: .stripped)
+                    } else if let alias = Self.aliasMap[stripped], mapping[alias] != nil {
+                        result = ImageMatch(key: alias, matchType: .stripped)
+                    } else if let fuzzy = fuzzyMatch(stripped) {
+                        // Re-tag as .stripped so callers know how the match was derived.
+                        result = ImageMatch(key: fuzzy.key, matchType: .stripped)
+                    }
+                }
+            }
             fuzzyMatchCache[normalized] = result
             return result
         }
+    }
+
+    // MARK: - Qualifier Stripping (Layer 8)
+
+    /// Tokens that carry no anatomical or movement information — safe to drop before re-matching.
+    /// Kept conservative: never strips body parts, positions (supine/prone/standing), or movements.
+    private static let qualifierTokens: Set<String> = [
+        "free",         // "Band-Free"
+        "modified",
+        "bodyweight",
+        "bilateral",
+        "progressive",
+        "progression",
+        "eccentric",
+        "isometric",
+        "controlled",
+        "gentle",
+        "emphasis",
+        "focus",
+        "advanced",
+        "beginner",
+        "intermediate",
+        "weeks",        // "Weeks 3-6"
+        "week",
+    ]
+
+    /// Strip parentheticals, em/en-dashes, and qualifier tokens from a raw exercise name,
+    /// then return the normalized hyphen-delimited key.
+    /// e.g. "Standing Band-Free Shoulder ER (Isometric)" → "standing-shoulder-er"
+    /// e.g. "Right Shoulder – Sleeper Stretch (Lying)" → "right-shoulder-sleeper-stretch-lying"
+    private func strippedKey(for rawName: String) -> String {
+        // 1. Remove anything between parentheses (including the parens themselves).
+        var s = rawName
+        while let openIdx = s.firstIndex(of: "(") {
+            if let closeIdx = s[openIdx...].firstIndex(of: ")") {
+                s.removeSubrange(openIdx...closeIdx)
+            } else {
+                // Unmatched "(" — bail out and use what we have.
+                s.removeSubrange(openIdx...)
+                break
+            }
+        }
+        // 2. Em/en-dashes act as separators, not hyphens — replace with spaces so they
+        // don't get folded into adjacent tokens by normalizeName.
+        s = s.replacingOccurrences(of: "–", with: " ")
+              .replacingOccurrences(of: "—", with: " ")
+        // 3. Standard normalization to hyphen-delimited lowercase.
+        let normalized = normalizeName(s)
+        // 4. Drop qualifier tokens. Single-character tokens (artifacts of compound forms
+        // like "I-Y-T") are also dropped — multi-letter abbreviations are preserved.
+        let tokens = normalized.split(separator: "-").map(String.init)
+        let filtered = tokens.filter { tok in
+            !Self.qualifierTokens.contains(tok) && tok.count > 1
+        }
+        return filtered.joined(separator: "-")
     }
 
     // MARK: - Fuzzy Matching
@@ -679,8 +762,15 @@ final class ExerciseImageService: @unchecked Sendable {
     func logMissingImageIfNeeded(for exercise: RehabExercise) {
         let match = resolveImageMatch(for: exercise)
 
-        // Exact matches have a proper image — nothing to log
-        if match?.matchType == .exact { return }
+        // Any layer that resolves to a real image is "good enough" — the user sees the
+        // picture. Only `pluralToggle`, `synonymExpansion`, and unmatched (nil) get logged,
+        // so we still capture the strong signal of completely-novel AI names.
+        switch match?.matchType {
+        case .exact, .prefixFuzzy, .suffixFuzzy, .stripped:
+            return
+        case .pluralToggle, .synonymExpansion, .none:
+            break
+        }
 
         let normalized = normalizeName(exercise.name)
 

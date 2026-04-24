@@ -136,6 +136,11 @@ def main() -> int:
 
     meta = json.loads(METADATA.read_text())
     meta_by = {e["normalized_filename"]: e for e in meta["exercises"]}
+    # Track stockpile-origin entries so we can route description updates back
+    # to both the stockpile file (source of truth for those exercises) and
+    # meta["exercises"] (for in-place persistence on write-back).
+    stock = None
+    stock_entry_by_img: dict[str, dict] = {}
     if STOCKPILE.exists():
         stock = json.loads(STOCKPILE.read_text())
         for k, e in stock.get("all_exercises", {}).items():
@@ -149,6 +154,7 @@ def main() -> int:
                     "body_position": e.get("bodyPosition", ""),
                     "pose_description": e.get("startPoseDescription", ""),
                 }
+                stock_entry_by_img[img_name] = e
 
     names = [n.strip() for n in args.only.split(",")] if args.only else pick_targets()
     if not names:
@@ -159,6 +165,7 @@ def main() -> int:
     client = genai.Client(api_key=args.api_key)
     triage = {}
     updates = 0
+    updated_stock_names: set[str] = set()
     for idx, name in enumerate(names, 1):
         ex = meta_by.get(name)
         if not ex:
@@ -177,6 +184,12 @@ def main() -> int:
             if new_desc and cls in {"description_wrong", "both_wrong"} and not args.no_write_metadata:
                 old = ex.get("pose_description", "")
                 ex["pose_description"] = new_desc
+                # If this entry came from stockpile, also update the stockpile
+                # source so the change is persisted on that side.
+                stock_entry = stock_entry_by_img.get(name)
+                if stock_entry is not None:
+                    stock_entry["startPoseDescription"] = new_desc
+                    updated_stock_names.add(name)
                 updates += 1
                 print(f"    old desc: {old[:120]}...")
                 print(f"    new desc: {new_desc[:120]}...")
@@ -192,15 +205,21 @@ def main() -> int:
     print(f"\nTriage written: {TRIAGE_OUT}")
 
     if updates and not args.no_write_metadata:
-        # Merge any stockpile-origin entries (with updated descriptions) back
-        # into meta["exercises"] so they persist. Otherwise they live only in
-        # the meta_by lookup and are lost on write.
+        # Only *updated* stockpile-origin entries get appended to
+        # meta["exercises"] — avoids bloating the unified metadata file with
+        # hundreds of unchanged stockpile exercises on every run.
         existing = {e["normalized_filename"] for e in meta["exercises"]}
-        for n, m in meta_by.items():
+        for n in updated_stock_names:
             if n not in existing:
-                meta["exercises"].append(m)
+                meta["exercises"].append(meta_by[n])
         METADATA.write_text(json.dumps(meta, indent=2))
         print(f"Updated {updates} descriptions in {METADATA}")
+        # Stockpile is the source of truth for stockpile-only exercises —
+        # persist description edits there too so future runs see them even
+        # before the unified metadata file is rebuilt.
+        if stock is not None and updated_stock_names:
+            STOCKPILE.write_text(json.dumps(stock, indent=2))
+            print(f"Updated {len(updated_stock_names)} stockpile descriptions in {STOCKPILE}")
 
     # Summary by classification
     counts = {}

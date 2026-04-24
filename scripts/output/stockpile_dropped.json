@@ -1,0 +1,284 @@
+{
+  "dropped": [
+    {
+      "canonical": null,
+      "key": "thermal-moist-heat-relaxation",
+      "reason": "noise"
+    },
+    {
+      "canonical": null,
+      "key": "warm-compress-rest",
+      "reason": "noise"
+    },
+    {
+      "canonical": null,
+      "key": "mirror-facial-awareness",
+      "reason": "noise"
+    },
+    {
+      "canonical": null,
+      "key": "seated-sleeper-stretch",
+      "reason": "noise"
+    },
+    {
+      "canonical": "wrist-flexion-stretch",
+      "key": "gentle-wrist-flexion-stretch",
+      "reason": "near_duplicate"
+    },
+    {
+      "canonical": "wrist-isometric-hold",
+      "key": "isometric-wrist-hold",
+      "reason": "near_duplicate"
+    },
+    {
+      "canonical": "dumbbell-deadlifts",
+      "key": "dumbbell-deadlifts-light",
+      "reason": "near_duplicate"
+    },
+    {
+      "canonical": "standing-quad-sets-with-band",
+      "key": "standing-quad-sets-band",
+      "reason": "near_duplicate"
+    },
+    {
+      "canonical": "forearm-pronation-supination",
+      "key": "forearm-pronation-supination-mobility",
+      "reason": "near_duplicate"
+    },
+    {
+      "canonical": "seated-shoulder-rolls",
+      "key": "shoulder-rolls-seated",
+      "reason": "near_duplicate"
+    },
+    {
+      "canonical": "seated-torso-twist",
+      "key": "seated-torso-twist-gentle",
+      "reason": "near_duplicate"
+    },
+    {
+      "canonical": "neck-lateral-flexion-stretch",
+      "key": "lateral-neck-flexion-stretch",
+      "reason": "near_duplicate"
+    },
+    {
+      "canonical": "seated-resistance-band-rows",
+      "key": "resistance-band-rows-seated",
+      "reason": "near_duplicate"
+    },
+    {
+      "canonical": "neck-flexion-extension",
+      "key": "gentle-neck-flexion-extension",
+      "reason": "near_duplicate"
+    },
+    {
+      "canonical": "calf-raises-on-step",
+      "key": "calf-raises-step",
+      "reason": "near_duplicate"
+    },
+    {
+      "canonical": "radial-ulnar-deviation-lightweight",
+      "key": "radial-ulnar-deviation",
+      "reason": "alias"
+    },
+    {
+      "canonical": "finger-flexion-exercises",
+      "key": "gentle-finger-flexion",
+      "reason": "alias"
+    },
+    {
+      "canonical": "thoracic-rotation-seated",
+      "key": "seated-thoracic-rotation",
+      "reason": "alias"
+    },
+    {
+      "canonical": "dumbbell-single-leg-deadlift",
+      "key": "single-leg-dumbbell-deadlift",
+      "reason": "alias"
+    },
+    {
+      "canonical": "quadruped-thoracic-rotation",
+      "key": "thoracic-rotation-quadruped",
+      "reason": "alias"
+    },
+    {
+      "canonical": "lateral-lunge-dumbbell",
+      "key": "dumbbell-lateral-lunge",
+      "reason": "alias"
+    },
+    {
+      "canonical": "heel-toe-walking",
+      "key": "heel-to-toe-walking",
+      "reason": "alias"
+    },
+    {
+      "canonical": "scapular-retraction-squeeze",
+      "key": "scapular-squeeze-retraction",
+      "reason": "alias"
+    },
+    {
+      "canonical": "knee-flexion-rom",
+      "key": "knee-rom-flexion",
+      "reason": "alias"
+    },
+    {
+      "canonical": "seated-calf-raises",
+      "key": "calf-raises-seated",
+      "reason": "alias"
+    },
+    {
+      "canonical": "wrist-pronation-supination",
+      "key": "pronation-supination",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "supine-glute-bridge",
+      "key": "supine-bridge",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "resistance-band-shoulder-internal-rotation",
+      "key": "resistance-band-internal-rotation",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "doorway-stretch",
+      "key": "doorway-shoulder-stretch",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "thoracic-extension",
+      "key": "thoracic-extension-stretch",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "doorway-stretch",
+      "key": "doorway-pectoral-stretch",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "prone-iyt-holds",
+      "key": "prone-t-y-i-holds",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "cross-body-stretch",
+      "key": "shoulder-cross-body-stretch",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "prone-horizontal-abduction",
+      "key": "prone-shoulder-horizontal-abduction",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "single-leg-deadlift",
+      "key": "single-leg-romanian-deadlift",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "dumbbell-step-ups",
+      "key": "step-up-dumbbell",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "standing-rotation-band",
+      "key": "standing-torso-rotation-with-band",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "seated-figure-four-stretch",
+      "key": "seated-figure-four-hip-stretch",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "wrist-circles",
+      "key": "hand-wrist-circles",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "pendulum-swings",
+      "key": "shoulder-pendulum-swings",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "knee-flexion-stretch",
+      "key": "gentle-knee-flexion",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "toe-raises",
+      "key": "heel-toe-raises",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "band-external-rotation",
+      "key": "band-shoulder-external-rotation",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "cervical-rotation-stretch",
+      "key": "cervical-rotation",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "cervical-isometric-lateral-flexion",
+      "key": "cervical-lateral-flexion",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "standing-heel-raises",
+      "key": "standing-heel-toe-raises",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "chin-tucks",
+      "key": "postural-chin-tucks",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "cervical-isometric-neck-flexion",
+      "key": "neck-isometric-flexion",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "standing-marching",
+      "key": "big-standing-marching",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "standing-rotation-band",
+      "key": "standing-core-rotation-band",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "band-internal-rotation",
+      "key": "shoulder-internal-rotation-band",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "pec-stretch",
+      "key": "doorway-pec-stretch",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "plantar-fascia-stretch",
+      "key": "plantar-fascia-foot-stretch",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "isometric-thumb-hold",
+      "key": "thumb-cmc-isometric-hold",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "grip-strengthening",
+      "key": "graded-grip-strengthening",
+      "reason": "review_merge"
+    },
+    {
+      "canonical": "standing-quad-sets-against-wall",
+      "key": "standing-quad-sets-wall",
+      "reason": "review_merge"
+    }
+  ]
+}

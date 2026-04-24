@@ -1,0 +1,310 @@
+{
+  "total_needs": 601,
+  "noise": [
+    {
+      "key": "warm-compress-rest",
+      "name": "Warm Compress and Rest"
+    },
+    {
+      "key": "thermal-moist-heat-relaxation",
+      "name": "Thermal Moist Heat Application with Relaxation"
+    },
+    {
+      "key": "mirror-facial-awareness",
+      "name": "Mirror Facial Awareness"
+    },
+    {
+      "key": "seated-sleeper-stretch",
+      "name": "Seated Sleeper Stretch"
+    }
+  ],
+  "generic": [
+    {
+      "key": "thumb-opposition-exercises",
+      "name": "Thumb Opposition Exercises"
+    },
+    {
+      "key": "ulnar-nerve-gliding",
+      "name": "Nerve Gliding Exercises"
+    },
+    {
+      "key": "hip-abduction",
+      "name": "Hip Abduction Exercises"
+    },
+    {
+      "key": "supine-breathing-exercises",
+      "name": "Supine Breathing Exercises"
+    }
+  ],
+  "near_duplicates": [
+    {
+      "tokens": [
+        "flexion",
+        "stretch",
+        "wrist"
+      ],
+      "items": [
+        {
+          "key": "gentle-wrist-flexion-stretch",
+          "name": "Gentle Wrist Flexion Stretch"
+        },
+        {
+          "key": "wrist-flexion-stretch",
+          "name": "Wrist Flexion Stretch"
+        }
+      ]
+    },
+    {
+      "tokens": [
+        "hold",
+        "isometric",
+        "wrist"
+      ],
+      "items": [
+        {
+          "key": "wrist-isometric-hold",
+          "name": "Wrist Isometric Hold"
+        },
+        {
+          "key": "isometric-wrist-hold",
+          "name": "Isometric Wrist Hold"
+        }
+      ]
+    },
+    {
+      "tokens": [
+        "deadlifts",
+        "dumbbell"
+      ],
+      "items": [
+        {
+          "key": "dumbbell-deadlifts-light",
+          "name": "Dumbbell Deadlifts (Light)"
+        },
+        {
+          "key": "dumbbell-deadlifts",
+          "name": "Dumbbell Deadlifts"
+        }
+      ]
+    },
+    {
+      "tokens": [
+        "band",
+        "quad",
+        "sets",
+        "standing"
+      ],
+      "items": [
+        {
+          "key": "standing-quad-sets-band",
+          "name": "Standing Quad Sets with Band"
+        },
+        {
+          "key": "standing-quad-sets-with-band",
+          "name": "Standing Quad Sets with Band"
+        }
+      ]
+    },
+    {
+      "tokens": [
+        "forearm",
+        "pronation",
+        "supination"
+      ],
+      "items": [
+        {
+          "key": "forearm-pronation-supination",
+          "name": "Forearm Pronation and Supination"
+        },
+        {
+          "key": "forearm-pronation-supination-mobility",
+          "name": "Forearm Pronation Supination Mobility"
+        }
+      ]
+    },
+    {
+      "tokens": [
+        "rolls",
+        "seated",
+        "shoulder"
+      ],
+      "items": [
+        {
+          "key": "seated-shoulder-rolls",
+          "name": "Seated Shoulder Rolls"
+        },
+        {
+          "key": "shoulder-rolls-seated",
+          "name": "Shoulder Rolls - Seated"
+        }
+      ]
+    },
+    {
+      "tokens": [
+        "seated",
+        "torso",
+        "twist"
+      ],
+      "items": [
+        {
+          "key": "seated-torso-twist",
+          "name": "Seated Torso Twist"
+        },
+        {
+          "key": "seated-torso-twist-gentle",
+          "name": "Seated Torso Twist - Gentle"
+        }
+      ]
+    },
+    {
+      "tokens": [
+        "band",
+        "external",
+        "rotation",
+        "shoulder"
+      ],
+      "items": [
+        {
+          "key": "band-shoulder-external-rotation",
+          "name": "Band-Resisted Shoulder External Rotation"
+        },
+        {
+          "key": "band-assisted-shoulder-external-rotation",
+          "name": "Band-Assisted Shoulder External Rotation"
+        }
+      ]
+    },
+    {
+      "tokens": [
+        "flexion",
+        "lateral",
+        "neck",
+        "stretch"
+      ],
+      "items": [
+        {
+          "key": "neck-lateral-flexion-stretch",
+          "name": "Neck Lateral Flexion Stretch"
+        },
+        {
+          "key": "lateral-neck-flexion-stretch",
+          "name": "Lateral Neck Flexion - Stretch"
+        }
+      ]
+    },
+    {
+      "tokens": [
+        "band",
+        "resistance",
+        "rows",
+        "seated"
+      ],
+      "items": [
+        {
+          "key": "seated-resistance-band-rows",
+          "name": "Seated Resistance Band Rows"
+        },
+        {
+          "key": "resistance-band-rows-seated",
+          "name": "Resistance Band Rows - Seated"
+        }
+      ]
+    },
+    {
+      "tokens": [
+        "extension",
+        "flexion",
+        "neck"
+      ],
+      "items": [
+        {
+          "key": "neck-flexion-extension",
+          "name": "Neck Flexion and Extension"
+        },
+        {
+          "key": "gentle-neck-flexion-extension",
+          "name": "Gentle Neck Flexion and Extension"
+        }
+      ]
+    },
+    {
+      "tokens": [
+        "calf",
+        "raises",
+        "step"
+      ],
+      "items": [
+        {
+          "key": "calf-raises-step",
+          "name": "Calf Raises on Step"
+        },
+        {
+          "key": "calf-raises-on-step",
+          "name": "Calf Raises on Step"
+        }
+      ]
+    }
+  ],
+  "compound": [
+    {
+      "key": "warm-compress-rest",
+      "name": "Warm Compress and Rest"
+    },
+    {
+      "key": "forearm-rotation-pronation-supination",
+      "name": "Supination and Pronation"
+    },
+    {
+      "key": "neck-shoulder-relaxation",
+      "name": "Neck and Shoulder Relaxation"
+    },
+    {
+      "key": "leg-swings-forward-back",
+      "name": "Leg Swings Forward and Back"
+    },
+    {
+      "key": "quadruped-arm-and-leg-lifts",
+      "name": "Quadruped Arm and Leg Lifts"
+    },
+    {
+      "key": "neck-shoulder-stretch",
+      "name": "Neck and Shoulder Stretch"
+    },
+    {
+      "key": "hand-wrist-circles",
+      "name": "Gentle Hand and Wrist Circles"
+    },
+    {
+      "key": "jaw-relaxation-opening",
+      "name": "Jaw Relaxation and Gentle Opening"
+    },
+    {
+      "key": "eye-closure-blinking",
+      "name": "Eye Closure and Blinking"
+    },
+    {
+      "key": "finger-spread-squeeze",
+      "name": "Finger Spread and Squeeze"
+    },
+    {
+      "key": "supine-hip-knee-flexion",
+      "name": "Supine Hip and Knee Flexion"
+    },
+    {
+      "key": "finger-flexor-extensor",
+      "name": "Finger Flexor and Extensor Exercises"
+    },
+    {
+      "key": "hand-opening-closing",
+      "name": "Gentle Hand Opening and Closing"
+    },
+    {
+      "key": "thumb-wrist-stretch",
+      "name": "Thumb and Wrist Stretch"
+    },
+    {
+      "key": "standing-calf-stretch",
+      "name": "Standing Gastrocnemius and Soleus Stretch"
+    }
+  ]
+}

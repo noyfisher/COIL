@@ -1,0 +1,1264 @@
+[
+  {
+    "needs_key": "grip-strengthening-dumbbell",
+    "needs_name": "Gentle Grip Strengthening with Dumbbell",
+    "candidates": [
+      {
+        "key": "grip-strengthening",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "radial-ulnar-deviation",
+    "needs_name": "Radial and Ulnar Deviation",
+    "candidates": [
+      {
+        "key": "radial-ulnar-deviation-lightweight",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "wrist-radial-deviation-band",
+    "needs_name": "Wrist Radial Deviation with Band",
+    "candidates": [
+      {
+        "key": "wrist-deviation-band",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "pronation-supination",
+    "needs_name": "Pronation and Supination",
+    "candidates": [
+      {
+        "key": "wrist-pronation-supination",
+        "jaccard": 0.67
+      },
+      {
+        "key": "pronation-supination-strengthening",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-hip-flexor-stretch",
+    "needs_name": "Seated Hip Flexor Stretch",
+    "candidates": [
+      {
+        "key": "hip-flexor-stretch",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "dumbbell-deadlifts-light",
+    "needs_name": "Dumbbell Deadlifts (Light)",
+    "candidates": [
+      {
+        "key": "dumbbell-romanian-deadlifts",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "supine-hip-rotation-band",
+    "needs_name": "Supine Hip Internal/External Rotation",
+    "candidates": [
+      {
+        "key": "supine-hip-rotation",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "supine-shoulder-shrugs",
+    "needs_name": "Supine Shoulder Shrugs",
+    "candidates": [
+      {
+        "key": "shoulder-shrugs",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "standing-wall-slides",
+    "needs_name": "Standing Wall Slides",
+    "candidates": [
+      {
+        "key": "wall-slides",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "lying-side-rotation",
+    "needs_name": "Lying Affected Side Rotation with Pillow",
+    "candidates": [
+      {
+        "key": "side-lying-external-rotation",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-chin-tucks",
+    "needs_name": "Seated Chin Tucks",
+    "candidates": [
+      {
+        "key": "chin-tucks",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "supine-bridge",
+    "needs_name": "Supine Bridge",
+    "candidates": [
+      {
+        "key": "supine-glute-bridge",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "gentle-finger-flexion",
+    "needs_name": "Gentle Finger Flexion Exercises",
+    "candidates": [
+      {
+        "key": "finger-flexion-exercises",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "supine-ankle-dorsiflexion-band",
+    "needs_name": "Supine Ankle Dorsiflexion with Band",
+    "candidates": [
+      {
+        "key": "ankle-dorsiflexion-band",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "standing-supported-marching",
+    "needs_name": "Standing Supported Marching",
+    "candidates": [
+      {
+        "key": "standing-marching",
+        "jaccard": 1.0
+      },
+      {
+        "key": "standing-wall-marching",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "standing-hip-hinge",
+    "needs_name": "Standing Hip Hinge",
+    "candidates": [
+      {
+        "key": "hip-hinge",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "tibialis-anterior-strengthening",
+    "needs_name": "Tibialis Anterior Strengthening",
+    "candidates": [
+      {
+        "key": "seated-anterior-tibialis-strengthening",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "resistance-band-internal-rotation",
+    "needs_name": "Resistance Band Internal Rotation",
+    "candidates": [
+      {
+        "key": "resistance-band-shoulder-internal-rotation",
+        "jaccard": 0.8
+      },
+      {
+        "key": "band-internal-rotation",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "doorway-shoulder-stretch",
+    "needs_name": "Doorway Shoulder Stretch",
+    "candidates": [
+      {
+        "key": "doorway-stretch",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "prone-shoulder-blade-squeezes",
+    "needs_name": "Prone Shoulder Blade Squeezes",
+    "candidates": [
+      {
+        "key": "shoulder-blade-squeezes",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "posterior-shoulder-doorway-stretch",
+    "needs_name": "Posterior Shoulder Doorway Stretch",
+    "candidates": [
+      {
+        "key": "posterior-shoulder-stretch",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "ankle-inversion-band",
+    "needs_name": "Lateral Ankle Inversion with Resistance Band",
+    "candidates": [
+      {
+        "key": "seated-ankle-inversion-with-band",
+        "jaccard": 0.75
+      },
+      {
+        "key": "resistance-band-ankle-inversion",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "ankle-eversion-band",
+    "needs_name": "Lateral Ankle Eversion with Resistance Band",
+    "candidates": [
+      {
+        "key": "standing-ankle-eversion-with-band",
+        "jaccard": 0.75
+      },
+      {
+        "key": "resistance-band-ankle-eversion",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-figure-4-stretch",
+    "needs_name": "Seated Figure-4 Stretch",
+    "candidates": [
+      {
+        "key": "seated-figure-four-stretch",
+        "jaccard": 0.75
+      },
+      {
+        "key": "figure-4-stretch",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "resistance-band-reverse-fly",
+    "needs_name": "Resistance Band Reverse Fly",
+    "candidates": [
+      {
+        "key": "band-reverse-fly",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "thoracic-extension-stretch",
+    "needs_name": "Thoracic Spine Extension Stretch",
+    "candidates": [
+      {
+        "key": "thoracic-extension",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "prone-shoulder-squeeze",
+    "needs_name": "Prone Shoulder Squeeze",
+    "candidates": [
+      {
+        "key": "prone-shoulder-squeeze-on-pillow",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-thoracic-rotation",
+    "needs_name": "Seated Thoracic Rotation",
+    "candidates": [
+      {
+        "key": "thoracic-rotation-seated",
+        "jaccard": 1.0
+      }
+    ]
+  },
+  {
+    "needs_key": "doorway-pectoral-stretch",
+    "needs_name": "Doorway Pectoral Stretch",
+    "candidates": [
+      {
+        "key": "doorway-stretch",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "single-leg-dumbbell-deadlift",
+    "needs_name": "Single-Leg Dumbbell Deadlift",
+    "candidates": [
+      {
+        "key": "dumbbell-single-leg-deadlift",
+        "jaccard": 1.0
+      },
+      {
+        "key": "single-leg-deadlift",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "90-90-hip-flexor-stretch",
+    "needs_name": "90-90 Hip Flexor Stretch",
+    "candidates": [
+      {
+        "key": "hip-flexor-stretch",
+        "jaccard": 1.0
+      },
+      {
+        "key": "quadruped-hip-flexor-stretch",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "thoracic-rotation-quadruped",
+    "needs_name": "Thoracic Rotation in Quadruped",
+    "candidates": [
+      {
+        "key": "quadruped-thoracic-rotation",
+        "jaccard": 1.0
+      }
+    ]
+  },
+  {
+    "needs_key": "standing-doorway-chest-stretch",
+    "needs_name": "Standing Doorway Chest Stretch",
+    "candidates": [
+      {
+        "key": "doorway-chest-stretch",
+        "jaccard": 0.75
+      },
+      {
+        "key": "chest-doorway-stretch",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "dumbbell-lateral-lunge",
+    "needs_name": "Dumbbell Lateral Lunges",
+    "candidates": [
+      {
+        "key": "lateral-lunge-dumbbell",
+        "jaccard": 1.0
+      }
+    ]
+  },
+  {
+    "needs_key": "prone-t-y-i-holds",
+    "needs_name": "Prone T-Y-I Holds",
+    "candidates": [
+      {
+        "key": "prone-iyt-holds",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "banded-pallof-press",
+    "needs_name": "Banded Pallof Press",
+    "candidates": [
+      {
+        "key": "pallof-press",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "shoulder-cross-body-stretch",
+    "needs_name": "Shoulder Cross Body Stretch",
+    "candidates": [
+      {
+        "key": "supine-cross-body-shoulder-stretch",
+        "jaccard": 0.8
+      },
+      {
+        "key": "cross-body-stretch",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "heel-to-toe-walking",
+    "needs_name": "Heel-to-Toe Walking",
+    "candidates": [
+      {
+        "key": "heel-toe-walking",
+        "jaccard": 1.0
+      }
+    ]
+  },
+  {
+    "needs_key": "modified-wall-push-ups",
+    "needs_name": "Modified Wall Push-ups",
+    "candidates": [
+      {
+        "key": "wall-push-ups",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "weighted-step-ups",
+    "needs_name": "Weighted Step-ups",
+    "candidates": [
+      {
+        "key": "step-ups",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "banded-bicep-curls",
+    "needs_name": "Banded Bicep Curls",
+    "candidates": [
+      {
+        "key": "bicep-curls",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "banded-glute-bridges",
+    "needs_name": "Banded Glute Bridges",
+    "candidates": [
+      {
+        "key": "glute-bridges",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "banded-shoulder-external-rotation",
+    "needs_name": "Banded Shoulder External Rotation",
+    "candidates": [
+      {
+        "key": "banded-external-rotation-90-90",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "prone-shoulder-horizontal-abduction",
+    "needs_name": "Prone Shoulder Horizontal Abduction",
+    "candidates": [
+      {
+        "key": "prone-horizontal-abduction",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "single-leg-romanian-deadlift",
+    "needs_name": "Single Leg Romanian Deadlift",
+    "candidates": [
+      {
+        "key": "single-leg-deadlift",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "step-up-dumbbell",
+    "needs_name": "Step-Up with Dumbbell",
+    "candidates": [
+      {
+        "key": "dumbbell-step-ups",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "assisted-cat-cow-stretch",
+    "needs_name": "Assisted Cat-Cow Stretch",
+    "candidates": [
+      {
+        "key": "supported-cat-cow-stretch",
+        "jaccard": 1.0
+      },
+      {
+        "key": "cat-cow-stretch",
+        "jaccard": 1.0
+      }
+    ]
+  },
+  {
+    "needs_key": "standing-torso-rotation-with-band",
+    "needs_name": "Standing Torso Rotation with Band",
+    "candidates": [
+      {
+        "key": "standing-rotation-band",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "gentle-spinal-twist",
+    "needs_name": "Gentle Spinal Twist",
+    "candidates": [
+      {
+        "key": "seated-spinal-twist",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "supine-knee-to-chest-stretch",
+    "needs_name": "Supine Knee to Chest Stretch",
+    "candidates": [
+      {
+        "key": "knee-to-chest-stretch",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-figure-four-hip-stretch",
+    "needs_name": "Seated Figure Four Hip Stretch",
+    "candidates": [
+      {
+        "key": "seated-figure-four-stretch",
+        "jaccard": 0.8
+      }
+    ]
+  },
+  {
+    "needs_key": "standing-wall-supported-marching",
+    "needs_name": "Standing Wall Supported Marching",
+    "candidates": [
+      {
+        "key": "standing-wall-marching",
+        "jaccard": 1.0
+      },
+      {
+        "key": "standing-marching",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "hand-wrist-circles",
+    "needs_name": "Gentle Hand and Wrist Circles",
+    "candidates": [
+      {
+        "key": "wrist-circles",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "shoulder-pendulum-swings",
+    "needs_name": "Shoulder Pendulum Swings",
+    "candidates": [
+      {
+        "key": "pendulum-swings",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "hip-abduction-lying",
+    "needs_name": "Hip Abduction Lying",
+    "candidates": [
+      {
+        "key": "side-lying-hip-abduction",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "banded-glute-bridge",
+    "needs_name": "Banded Glute Bridge",
+    "candidates": [
+      {
+        "key": "glute-bridge",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "banded-standing-hip-abduction",
+    "needs_name": "Banded Standing Hip Abduction",
+    "candidates": [
+      {
+        "key": "standing-hip-abduction",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "standing-quad-sets",
+    "needs_name": "Standing Quad Sets",
+    "candidates": [
+      {
+        "key": "quad-sets",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "banded-standing-hip-extension",
+    "needs_name": "Banded Standing Hip Extension",
+    "candidates": [
+      {
+        "key": "standing-hip-extension",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "gentle-knee-flexion",
+    "needs_name": "Gentle Knee Flexion",
+    "candidates": [
+      {
+        "key": "prone-knee-flexion",
+        "jaccard": 0.67
+      },
+      {
+        "key": "knee-flexion-stretch",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "supine-hip-circles",
+    "needs_name": "Supine Hip Circles",
+    "candidates": [
+      {
+        "key": "hip-circles",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-ankle-circles",
+    "needs_name": "Seated Ankle Circles",
+    "candidates": [
+      {
+        "key": "ankle-circles",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-bicep-curls",
+    "needs_name": "Seated Bicep Curls",
+    "candidates": [
+      {
+        "key": "bicep-curls",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-tricep-extensions",
+    "needs_name": "Seated Tricep Extensions",
+    "candidates": [
+      {
+        "key": "tricep-extensions",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "resistance-band-wrist-extension",
+    "needs_name": "Resistance Band Wrist Extension",
+    "candidates": [
+      {
+        "key": "wrist-extension-band",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "heel-toe-raises",
+    "needs_name": "Heel-Toe Raises",
+    "candidates": [
+      {
+        "key": "toe-raises",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "hip-abduction",
+    "needs_name": "Hip Abduction Exercises",
+    "candidates": [
+      {
+        "key": "supine-hip-abduction",
+        "jaccard": 0.67
+      },
+      {
+        "key": "standing-hip-abduction",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "prone-y-t-w-raises-band",
+    "needs_name": "Prone Y-T-W Raises with Band",
+    "candidates": [
+      {
+        "key": "prone-y-raises",
+        "jaccard": 0.67
+      },
+      {
+        "key": "prone-t-raises",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "dumbbell-bulgarian-split-squat",
+    "needs_name": "Dumbbell Bulgarian Split Squat",
+    "candidates": [
+      {
+        "key": "bulgarian-split-squat",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "band-shoulder-external-rotation",
+    "needs_name": "Band-Resisted Shoulder External Rotation",
+    "candidates": [
+      {
+        "key": "resistance-band-shoulder-external-rotation",
+        "jaccard": 0.8
+      },
+      {
+        "key": "band-external-rotation",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-cat-cow-stretch",
+    "needs_name": "Seated Cat-Cow Stretch",
+    "candidates": [
+      {
+        "key": "supported-cat-cow-stretch",
+        "jaccard": 0.75
+      },
+      {
+        "key": "cat-cow-stretch",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "supported-wall-push-up",
+    "needs_name": "Supported Wall Push-Up",
+    "candidates": [
+      {
+        "key": "wall-push-ups",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "prone-hip-flexor-stretch",
+    "needs_name": "Prone Hip Flexor Stretch",
+    "candidates": [
+      {
+        "key": "hip-flexor-stretch",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "cervical-rotation",
+    "needs_name": "Cervical Range of Motion - Rotation",
+    "candidates": [
+      {
+        "key": "cervical-rotation-stretch",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "cervical-lateral-flexion",
+    "needs_name": "Cervical Range of Motion - Lateral Flexion",
+    "candidates": [
+      {
+        "key": "cervical-isometric-lateral-flexion",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "standing-heel-toe-raises",
+    "needs_name": "Standing Heel-Toe Raises",
+    "candidates": [
+      {
+        "key": "standing-heel-raises",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-quad-sets",
+    "needs_name": "Seated Quad Sets",
+    "candidates": [
+      {
+        "key": "quad-sets",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "postural-chin-tucks",
+    "needs_name": "Postural Chin Tucks",
+    "candidates": [
+      {
+        "key": "chin-tucks",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "scapular-squeeze-retraction",
+    "needs_name": "Scapular Squeeze with Retraction",
+    "candidates": [
+      {
+        "key": "scapular-retraction-squeeze",
+        "jaccard": 1.0
+      }
+    ]
+  },
+  {
+    "needs_key": "neck-isometric-flexion",
+    "needs_name": "Neck Isometric Flexion",
+    "candidates": [
+      {
+        "key": "cervical-isometric-neck-flexion",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "standing-lateral-band-walks",
+    "needs_name": "Standing Lateral Band Walks",
+    "candidates": [
+      {
+        "key": "lateral-band-walks",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "standing-hip-flexor-stretch-with-band",
+    "needs_name": "Standing Hip Flexor Stretch with Band",
+    "candidates": [
+      {
+        "key": "band-assisted-hip-flexor-stretch",
+        "jaccard": 0.8
+      },
+      {
+        "key": "kneeling-hip-flexor-stretch-band",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "big-standing-marching",
+    "needs_name": "Big Standing Marching",
+    "candidates": [
+      {
+        "key": "standing-marching",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-dorsiflexion",
+    "needs_name": "Seated Dorsiflexion",
+    "candidates": [
+      {
+        "key": "seated-dorsiflexion-band",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "standing-core-rotation-band",
+    "needs_name": "Standing Core Rotation with Band",
+    "candidates": [
+      {
+        "key": "standing-rotation-band",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "lying-it-band-stretch",
+    "needs_name": "Lying IT Band Stretch",
+    "candidates": [
+      {
+        "key": "it-band-stretch",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "hip-internal-rotation-band",
+    "needs_name": "Hip Internal Rotation with Band",
+    "candidates": [
+      {
+        "key": "band-internal-rotation",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "band-resisted-shoulder-internal-rotation",
+    "needs_name": "Band-Resisted Shoulder Internal Rotation",
+    "candidates": [
+      {
+        "key": "resistance-band-shoulder-internal-rotation",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "dumbbell-deadlifts",
+    "needs_name": "Dumbbell Deadlifts",
+    "candidates": [
+      {
+        "key": "dumbbell-romanian-deadlifts",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "supported-childs-pose",
+    "needs_name": "Supported Child's Pose",
+    "candidates": [
+      {
+        "key": "childs-pose",
+        "jaccard": 1.0
+      }
+    ]
+  },
+  {
+    "needs_key": "band-assisted-shoulder-external-rotation",
+    "needs_name": "Band-Assisted Shoulder External Rotation",
+    "candidates": [
+      {
+        "key": "resistance-band-shoulder-external-rotation",
+        "jaccard": 0.8
+      },
+      {
+        "key": "band-external-rotation",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "shoulder-internal-rotation-band",
+    "needs_name": "Shoulder Internal Rotation with Band",
+    "candidates": [
+      {
+        "key": "resistance-band-shoulder-internal-rotation",
+        "jaccard": 0.8
+      },
+      {
+        "key": "band-internal-rotation",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "doorway-pec-stretch",
+    "needs_name": "Doorway Pec Stretch",
+    "candidates": [
+      {
+        "key": "doorway-pec-stretch-rotation",
+        "jaccard": 0.75
+      },
+      {
+        "key": "pec-stretch",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "plantar-fascia-foot-stretch",
+    "needs_name": "Plantar Fascia Foot Stretch",
+    "candidates": [
+      {
+        "key": "plantar-fascia-stretch",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-foot-intrinsic-strengthening",
+    "needs_name": "Seated Foot Intrinsic Strengthening",
+    "candidates": [
+      {
+        "key": "intrinsic-foot-strengthening",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-ankle-alphabet",
+    "needs_name": "Seated Ankle Alphabet",
+    "candidates": [
+      {
+        "key": "ankle-alphabet",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "heel-raises-supported",
+    "needs_name": "Heel Raises - Supported",
+    "candidates": [
+      {
+        "key": "standing-heel-raises",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "supine-hip-knee-flexion",
+    "needs_name": "Supine Hip and Knee Flexion",
+    "candidates": [
+      {
+        "key": "supine-hip-flexion",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "knee-rom-flexion",
+    "needs_name": "Knee Range of Motion Flexion",
+    "candidates": [
+      {
+        "key": "knee-flexion-rom",
+        "jaccard": 1.0
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-dumbbell-shoulder-press",
+    "needs_name": "Seated Dumbbell Shoulder Press",
+    "candidates": [
+      {
+        "key": "seated-shoulder-press",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "prone-dumbbell-rows",
+    "needs_name": "Prone Dumbbell Rows",
+    "candidates": [
+      {
+        "key": "dumbbell-rows",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "standing-dumbbell-goblet-squats",
+    "needs_name": "Standing Dumbbell Goblet Squats",
+    "candidates": [
+      {
+        "key": "dumbbell-goblet-squats",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-cross-body-shoulder-stretch",
+    "needs_name": "Seated Cross-Body Shoulder Stretch",
+    "candidates": [
+      {
+        "key": "supine-cross-body-shoulder-stretch",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-shoulder-external-rotation-band",
+    "needs_name": "Seated Shoulder External Rotation with Band",
+    "candidates": [
+      {
+        "key": "resistance-band-shoulder-external-rotation",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-scapular-squeezes",
+    "needs_name": "Seated Scapular Squeezes",
+    "candidates": [
+      {
+        "key": "scapular-squeezes",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-shoulder-internal-rotation-band",
+    "needs_name": "Seated Shoulder Internal Rotation with Band",
+    "candidates": [
+      {
+        "key": "resistance-band-shoulder-internal-rotation",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "calf-raises-seated",
+    "needs_name": "Calf Raises - Seated",
+    "candidates": [
+      {
+        "key": "seated-calf-raises",
+        "jaccard": 1.0
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-shoulder-blade-squeezes",
+    "needs_name": "Seated Shoulder Blade Squeezes",
+    "candidates": [
+      {
+        "key": "shoulder-blade-squeezes",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "forearm-rotation",
+    "needs_name": "Forearm Pronation and Supination",
+    "candidates": [
+      {
+        "key": "forearm-rotation-band",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "thumb-cmc-isometric-hold",
+    "needs_name": "Thumb CMC Joint Isometric Hold",
+    "candidates": [
+      {
+        "key": "isometric-thumb-hold",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "graded-grip-strengthening",
+    "needs_name": "Graded Grip Strengthening",
+    "candidates": [
+      {
+        "key": "grip-strengthening",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "standing-quad-sets-wall",
+    "needs_name": "Standing Quad Sets with Wall Support",
+    "candidates": [
+      {
+        "key": "standing-quad-sets-against-wall",
+        "jaccard": 0.8
+      }
+    ]
+  },
+  {
+    "needs_key": "hip-abduction-band-standing",
+    "needs_name": "Band-Resisted Hip Abduction Standing",
+    "candidates": [
+      {
+        "key": "standing-hip-abduction",
+        "jaccard": 0.75
+      },
+      {
+        "key": "hip-abduction-with-band",
+        "jaccard": 0.75
+      }
+    ]
+  },
+  {
+    "needs_key": "seated-sleeper-stretch",
+    "needs_name": "Seated Sleeper Stretch",
+    "candidates": [
+      {
+        "key": "sleeper-stretch",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "standing-scapular-squeezes",
+    "needs_name": "Standing Scapular Squeezes",
+    "candidates": [
+      {
+        "key": "scapular-squeezes",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "standing-calf-stretch",
+    "needs_name": "Standing Gastrocnemius and Soleus Stretch",
+    "candidates": [
+      {
+        "key": "calf-stretch",
+        "jaccard": 0.67
+      }
+    ]
+  },
+  {
+    "needs_key": "band-shoulder-abduction",
+    "needs_name": "Band Shoulder Abduction",
+    "candidates": [
+      {
+        "key": "band-resisted-shoulder-abduction",
+        "jaccard": 0.75
+      },
+      {
+        "key": "shoulder-abduction",
+        "jaccard": 0.67
+      }
+    ]
+  }
+]
