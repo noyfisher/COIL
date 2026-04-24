@@ -15,25 +15,73 @@ export { onBudgetAlert } from "./billing-shutoff";
 admin.initializeApp();
 
 // ---------------------------------------------------------------------------
-// In-memory rate limiter (per Cloud Function instance)
+// Distributed rate limiter (Tier 2 PR B — Firestore-backed)
 // ---------------------------------------------------------------------------
-const rateLimitMap = new Map<string, number[]>();
-const RATE_LIMIT_MAX = 20; // max requests per window
-const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
+//
+// Previously this was an in-memory Map that lived on each Cloud Function
+// instance. With horizontal autoscale that meant a single user could burst
+// past 20/min by getting routed to multiple instances. This replacement
+// uses a Firestore transactional counter keyed by uid + ISO-minute bucket,
+// which is atomic across all instances.
+//
+// Doc path: `rateLimits/{uid}/windows/{ISO-minute}`
+// Fields: `count` (Int), `firstSeenAt`, `lastSeenAt` (timestamps for TTL)
+//
+// Contention: each minute bucket is a separate doc. A single user's 20
+// req/min all hit one doc — Firestore handles this comfortably (ceiling
+// ~500 writes/sec per doc).
+//
+// Storage cleanup: TTL policy via `lastSeenAt` field deletes stale docs
+// after 2 minutes. TTL is cosmetic only — the ISO-minute key provides
+// the correctness guarantee (next-minute requests hit a different doc).
+//
+// Latency: one extra Firestore transaction per claudeProxy request
+// (~50-150ms). This is on top of the existing `checkAndIncrementQuota`
+// transaction. Different docs, so no contention between them.
+export const RATE_LIMIT_MAX = 20; // max requests per window
+export const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute — documents purpose of the ISO-minute bucket
 
-function isRateLimited(uid: string): boolean {
-  const now = Date.now();
-  const timestamps = rateLimitMap.get(uid) || [];
-  const recent = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+/** ISO-minute bucket key for a given timestamp. */
+export function rateLimitWindowKey(now: Date = new Date()): string {
+  // YYYY-MM-DDTHH:MM
+  return now.toISOString().slice(0, 16);
+}
 
-  if (recent.length >= RATE_LIMIT_MAX) {
-    rateLimitMap.set(uid, recent);
-    return true;
-  }
+/**
+ * Atomically check-and-increment the rate-limit counter for `uid` in the
+ * current ISO-minute bucket. Returns `true` if the user is currently OVER
+ * the limit (request should be rejected with 429), `false` otherwise.
+ *
+ * Visible for testing via `__testing__.isRateLimitedWith` below.
+ */
+export async function isRateLimited(
+  uid: string,
+  now: Date = new Date(),
+  db: admin.firestore.Firestore = admin.firestore(),
+): Promise<boolean> {
+  const windowKey = rateLimitWindowKey(now);
+  const ref = db.collection("rateLimits").doc(uid)
+    .collection("windows").doc(windowKey);
 
-  recent.push(now);
-  rateLimitMap.set(uid, recent);
-  return false;
+  return db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const current = (snap.exists ? (snap.data()?.count as number | undefined) : 0) ?? 0;
+
+    if (current >= RATE_LIMIT_MAX) {
+      // Do not increment — user is already over.
+      return true;
+    }
+
+    tx.set(ref, {
+      count: admin.firestore.FieldValue.increment(1),
+      firstSeenAt: snap.exists
+        ? (snap.data()?.firstSeenAt ?? admin.firestore.FieldValue.serverTimestamp())
+        : admin.firestore.FieldValue.serverTimestamp(),
+      lastSeenAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+
+    return false;
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -654,7 +702,7 @@ export const claudeProxy = functions
     // -----------------------------------------------------------------------
     // 2. Rate limit
     // -----------------------------------------------------------------------
-    if (isRateLimited(uid)) {
+    if (await isRateLimited(uid)) {
       res.status(429).json({ error: "Rate limit exceeded. Please wait and try again." });
       return;
     }
@@ -863,7 +911,7 @@ export const crossVerify = functions
     // -----------------------------------------------------------------------
     // 2. Rate limit (shares the same limiter as claudeProxy)
     // -----------------------------------------------------------------------
-    if (isRateLimited(uid)) {
+    if (await isRateLimited(uid)) {
       res.status(429).json({ error: "Rate limit exceeded. Please wait and try again." });
       return;
     }
@@ -1321,7 +1369,7 @@ export const agentInsights = functions
     }
 
     // 2. Rate limit
-    if (isRateLimited(uid)) {
+    if (await isRateLimited(uid)) {
       res.status(429).json({ error: "Rate limit exceeded. Please wait and try again." });
       return;
     }
