@@ -162,6 +162,12 @@ class FormAnalysisViewModel: ObservableObject {
         } catch {
             state = .error(error.localizedDescription)
 
+            // Tier 1: ai_response_invalid breadcrumb (server Zod rejection).
+            if let apiError = error as? ClaudeAPIError, apiError.isResponseInvalid {
+                SessionLogger.shared.log(.errorOccurred, category: .api,
+                    message: "Form analysis rejected by server schema (ai_response_invalid)",
+                    metadata: ["error_kind": "ai_response_invalid"])
+            }
             SessionLogger.shared.log(.errorOccurred, category: .error,
                                       message: "Form analysis failed",
                                       metadata: ["error": error.localizedDescription])

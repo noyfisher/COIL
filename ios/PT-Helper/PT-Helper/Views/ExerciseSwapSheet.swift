@@ -22,6 +22,8 @@ struct ExerciseSwapSheet: View {
                     loadingView
                 } else if !vm.substitutes.isEmpty {
                     substituteListView
+                } else if vm.noSafeSubstituteAvailable {
+                    noSafeSubstituteView
                 } else {
                     reasonSelectionView
                 }
@@ -141,6 +143,52 @@ struct ExerciseSwapSheet: View {
             ProgressView()
                 .scaleEffect(1.2)
                 .tint(AppColors.success)
+
+            Spacer()
+            Spacer()
+        }
+        .padding(AppSpacing.xl)
+    }
+
+    // MARK: - No Safe Substitute Available (Tier 1)
+
+    /// Shown when `fetchSubstitutes` exhausted `maxSaferSubstituteRetries` retries and
+    /// every candidate in every batch was contraindicated by the knowledge graph against
+    /// at least one of the user's conditions.
+    private var noSafeSubstituteView: some View {
+        VStack(spacing: AppSpacing.xl) {
+            Spacer()
+
+            Image(systemName: "person.fill.questionmark")
+                .font(.system(size: 60))
+                .foregroundColor(AppColors.warning)
+
+            VStack(spacing: AppSpacing.sm) {
+                Text("No safe substitute available")
+                    .font(.system(.title3, design: .serif).weight(.bold))
+                    .foregroundColor(AppColors.primaryText)
+                    .multilineTextAlignment(.center)
+
+                Text("We couldn't find a safe alternative for \(vm.exercise.name) given your conditions. Please contact your physical therapist for a tailored swap.")
+                    .font(.subheadline)
+                    .foregroundColor(AppColors.secondaryText)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, AppSpacing.xl)
+            }
+
+            Button(action: {
+                vm.noSafeSubstituteAvailable = false
+                vm.selectedReason = nil
+            }) {
+                Text("Try a different reason")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, AppSpacing.xxl)
+                    .padding(.vertical, AppSpacing.md)
+                    .background(AppColors.ctaBackground)
+                    .cornerRadius(AppCorners.pill)
+            }
+            .accessibilityIdentifier("exerciseSwap.tryDifferentReason")
 
             Spacer()
             Spacer()

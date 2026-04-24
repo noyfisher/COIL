@@ -29,6 +29,14 @@ class WellnessAnalyzer {
     /// Result of a validated wellness analysis.
     struct ValidatedWellnessAnalysis {
         let result: WellnessAnalysisResult
+        /// Validation warnings from `WellnessAnalysisValidator`. Empty in the happy path.
+        /// Emergency-severity entries here should be routed to `EmergencyRedirectView` by
+        /// the caller (same pattern as `InjuryAnalysisViewModel`).
+        let warnings: [ValidationWarning]
+        /// Convenience — highest severity across `warnings`, or `.info` if none.
+        var worstSeverity: ValidationSeverity {
+            warnings.map(\.severity).max() ?? .info
+        }
     }
 
     /// Analyze wellness assessments using a two-call AI pipeline.
@@ -87,7 +95,16 @@ class WellnessAnalyzer {
             synthesizedResult = primaryResult
         }
 
-        return ValidatedWellnessAnalysis(result: synthesizedResult)
+        // Run validation on whichever result we landed on (verified or primary fallback).
+        // Tier 1: wellness-analysis validation covers bounds + red-flag scan + confidence.
+        // Per-exercise contraindication happens later in `WellnessPlanValidator`.
+        let (validatedResult, validation) = WellnessAnalysisValidator.validate(
+            synthesizedResult,
+            assessments: assessments
+        )
+        logger.info("Wellness analysis validation complete: \(validation.warnings.count) warnings, worstSeverity=\(validation.worstSeverity.rawValue)")
+
+        return ValidatedWellnessAnalysis(result: validatedResult, warnings: validation.warnings)
     }
 
     // MARK: - User Message Construction

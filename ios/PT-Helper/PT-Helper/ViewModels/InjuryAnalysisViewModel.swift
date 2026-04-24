@@ -11,6 +11,7 @@ class InjuryAnalysisViewModel: ObservableObject {
     @Published var isAnalyzing: Bool = false
     @Published var analysisError: String? = nil
     @Published var showAnalyzingScreen: Bool = false
+    @Published var currentStage: InjuryAnalyzer.Stage? = nil
 
     let userProfile: UserProfile
     let selectedRegions: [BodyRegion]
@@ -86,6 +87,7 @@ class InjuryAnalysisViewModel: ObservableObject {
         isAnalyzing = false
         analysisError = nil
         showAnalyzingScreen = false
+        currentStage = nil
     }
 
     /// Reset all analysis state (used when navigating back to body map).
@@ -96,6 +98,7 @@ class InjuryAnalysisViewModel: ObservableObject {
         analysisError = nil
         analysisResult = nil
         showAnalyzingScreen = false
+        currentStage = nil
     }
 
     private func startAnalysis() {
@@ -124,6 +127,7 @@ class InjuryAnalysisViewModel: ObservableObject {
         isAnalyzing = true
         analysisError = nil
         showAnalyzingScreen = true
+        currentStage = nil
 
         AnalyticsService.shared.log(.assessmentCompleted, parameters: ["region_count": completed.count])
         AppLogger.rehab.info("Starting analysis: \(completed.count) region(s) — \(regionNames.joined(separator: ", "))")
@@ -134,21 +138,30 @@ class InjuryAnalysisViewModel: ObservableObject {
                                     "missingFields": missingFields.isEmpty ? "none" : missingFields.joined(separator: "; ")
                                   ])
 
-        analysisTask = Task {
+        analysisTask = Task { [weak self] in
+            let stageHandler: @Sendable (InjuryAnalyzer.Stage) -> Void = { stage in
+                Task { @MainActor [weak self] in
+                    self?.currentStage = stage
+                }
+            }
+
             do {
                 let validated = try await InjuryAnalyzer.analyze(
                     assessments: completed,
                     profile: userProfile,
-                    apiService: self.apiService
+                    apiService: self?.apiService ?? ClaudeAPIService.shared,
+                    onStage: stageHandler
                 )
                 guard !Task.isCancelled else {
                     AppLogger.rehab.info("Analysis task was cancelled after completion")
                     return
                 }
+                guard let self = self else { return }
                 self.analysisResult = validated.result
                 self.validationWarnings = validated.validation.warnings
                 self.redFlagAlerts = validated.redFlagAlerts
                 self.isAnalyzing = false
+                self.currentStage = nil
 
                 AnalyticsService.shared.log(.analysisCompleted, parameters: [
                     "condition_count": validated.result.conditions.count,
@@ -172,9 +185,19 @@ class InjuryAnalysisViewModel: ObservableObject {
                     AppLogger.rehab.info("Analysis task cancelled (error after cancel: \(error.localizedDescription))")
                     return
                 }
+                guard let self = self else { return }
                 self.analysisError = error.localizedDescription
                 self.isAnalyzing = false
+                self.currentStage = nil
 
+                // Tier 1: dedicated breadcrumb when the server rejected Claude's output
+                // via Zod response-schema validation (ai_response_invalid → HTTP 502).
+                // Helps distinguish schema failures from network/quota errors in telemetry.
+                if let apiError = error as? ClaudeAPIError, apiError.isResponseInvalid {
+                    SessionLogger.shared.log(.errorOccurred, category: .api,
+                        message: "Injury analysis rejected by server schema (ai_response_invalid)",
+                        metadata: ["error_kind": "ai_response_invalid"])
+                }
                 AnalyticsService.shared.log(.analysisFailed, parameters: ["error_type": String(describing: type(of: error))])
                 AppLogger.rehab.error("Analysis failed: \(error.localizedDescription)")
                 SessionLogger.shared.logError(error, context: "InjuryAnalysis.startAnalysis")

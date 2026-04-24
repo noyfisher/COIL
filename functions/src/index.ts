@@ -6,6 +6,7 @@ import { fetchRecoveryInsightsData, MINIMUM_SESSION_COUNT } from "./firestore-qu
 import { runRecoveryInsightsAgent, validateInsightResult } from "./managed-agent";
 import { handleGenerateExerciseImage } from "./image-generation";
 import { newRequestContext, logCompleted, logError, logWarn } from "./logger";
+import { validateClaudeResponse } from "./response-schemas";
 
 // Hard billing shutoff (Pub/Sub triggered). Exported so firebase-tools
 // picks it up on deploy. See billing-shutoff.ts for arming instructions.
@@ -775,6 +776,40 @@ export const claudeProxy = functions
         ctx.metadata.tokensOut = responseData.usage.output_tokens;
         ctx.metadata.cacheCreateTokens = responseData.usage.cache_creation_input_tokens;
         ctx.metadata.cacheReadTokens = responseData.usage.cache_read_input_tokens;
+      }
+
+      // Tier 1: validate the AI response against the per-type Zod schema before
+      // passing it back. If validation fails, bump a counter and return HTTP 502
+      // so the iOS client surfaces a retry state rather than crashing on bad data.
+      const schemaCheck = validateClaudeResponse(body.requestType, responseData);
+      if (!schemaCheck.ok) {
+        logWarn(ctx, "AI response rejected by schema validation", {
+          requestType: body.requestType,
+          reason: schemaCheck.reason,
+        });
+        try {
+          await admin
+            .firestore()
+            .collection("responseValidationFailures")
+            .doc(body.requestType)
+            .set({
+              count: admin.firestore.FieldValue.increment(1),
+              lastReason: schemaCheck.reason,
+              lastFailureAt: admin.firestore.FieldValue.serverTimestamp(),
+            }, { merge: true });
+        } catch (counterError) {
+          // Counter is telemetry — never let its failure block the error response.
+          logError(ctx, counterError, { stage: "response_validation_counter" });
+        }
+        // Quota already consumed (we did reach Anthropic) — do NOT refund. Treat
+        // this as "we wasted a request" for quota purposes. 502 so the client
+        // categorizes it as a server issue, matching existing invalidResponse(5xx)
+        // handling in ClaudeAPIService.
+        res.status(502).json({
+          error: "ai_response_invalid",
+          reason: schemaCheck.reason,
+        });
+        return;
       }
 
       res.status(200).json(responseData);

@@ -13,6 +13,17 @@ enum ClaudeAPIError: LocalizedError {
     case rateLimited
     case authenticationRequired
 
+    /// Tier 1: true when the server rejected Claude's output via Zod response-schema
+    /// validation (see functions/src/response-schemas.ts). ViewModels should render a
+    /// specific "response was malformed — try again" state rather than the default
+    /// cryptic error string.
+    var isResponseInvalid: Bool {
+        if case let .invalidResponse(statusCode, details) = self {
+            return statusCode == 502 && details.contains("ai_response_invalid")
+        }
+        return false
+    }
+
     var errorDescription: String? {
         switch self {
         case .invalidURL:
@@ -20,6 +31,10 @@ enum ClaudeAPIError: LocalizedError {
         case .networkError(let error):
             return "Network error: \(error.localizedDescription). Please check your internet connection."
         case .invalidResponse(let statusCode, let details):
+            // Tier 1: ai_response_invalid gets a user-friendly message first.
+            if statusCode == 502 && details.contains("ai_response_invalid") {
+                return "The AI response was malformed. Please try again."
+            }
             // Parse Anthropic-style error: { "error": { "message": "..." } }
             if let data = details.data(using: .utf8),
                let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],

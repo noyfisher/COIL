@@ -27,6 +27,13 @@ private struct AIConditionResult: Decodable {
 
 class InjuryAnalyzer {
 
+    /// Backend stages reported to progress callbacks so the UI can reflect real work.
+    enum Stage {
+        case primaryAnalysis
+        case verifyingResults
+        case validating
+    }
+
     /// Result of a validated analysis including any safety warnings.
     struct ValidatedAnalysis {
         let result: AnalysisResult
@@ -39,13 +46,22 @@ class InjuryAnalyzer {
     /// Call 1 (Primary Analysis): Structured clinical reasoning with top 5 conditions.
     /// Call 2 (Verification): Devil's advocate review that challenges and refines to top 3.
     /// If Call 2 fails, gracefully falls back to Call 1's result.
-    static func analyze(assessments: [PainAssessment], profile: UserProfile, apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.shared) async throws -> ValidatedAnalysis {
+    ///
+    /// - Parameter onStage: Optional callback invoked when the pipeline enters a new stage.
+    ///   Called from a background task; handlers that touch UI state should hop to the main actor.
+    static func analyze(
+        assessments: [PainAssessment],
+        profile: UserProfile,
+        apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.shared,
+        onStage: (@Sendable (Stage) -> Void)? = nil
+    ) async throws -> ValidatedAnalysis {
 
         // --- Call 1: Primary Analysis ---
         logger.info("Building primary analysis prompt for \(assessments.count) region(s)")
         let userMessage = buildUserMessage(assessments: assessments, profile: profile)
         logger.debug("Prompt length: \(userMessage.count) characters")
 
+        onStage?(.primaryAnalysis)
         logger.info("Sending primary analysis request to Claude API...")
         let primaryResponseText = try await apiService.sendMessage(
             requestType: .analysis,
@@ -66,6 +82,7 @@ class InjuryAnalyzer {
             )
             logger.debug("Verification message length: \(verificationMessage.count) characters")
 
+            onStage?(.verifyingResults)
             logger.info("Sending verification request to Claude API...")
             let verifyResponseText = try await apiService.sendMessage(
                 requestType: .analysis_verify,
@@ -91,6 +108,7 @@ class InjuryAnalyzer {
         }
 
         // Run validation pipeline (same as before)
+        onStage?(.validating)
         logger.info("Running validation pipeline...")
         let (validatedResult, validation, redFlags) = ResponseValidationPipeline.validateAnalysis(
             synthesizedResult,

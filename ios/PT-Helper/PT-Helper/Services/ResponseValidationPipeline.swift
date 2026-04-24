@@ -1,6 +1,37 @@
 import Foundation
 import os
 
+// MARK: - Validation Severity (top-level, Comparable)
+
+/// Severity of a validation finding. Ordered: info < caution < serious < urgent < emergency.
+///
+/// Tier 1 meaning:
+/// - `.info`     — purely informational (e.g. "very high AI confidence, interpret with caution").
+/// - `.caution`  — advisory; shown inline. Examples: age ≥ 65 + advanced exercise, unverified-by-KG.
+/// - `.serious`  — contraindication requiring explicit user acknowledgement before plan display.
+///                 Examples: osteoporosis + impact, blood-thinners + balance, KG-contraindicated substitute.
+/// - `.urgent`   — condition-level red flag (AI-flagged red-flag condition without a message, etc.).
+/// - `.emergency`— symptom-level red flag requiring immediate medical referral.
+///                 Examples: cardiac pattern, cauda equina, stroke signs, DVT signs.
+///
+/// UI treatment (`AnalyzingView` / `RehabPlanView`):
+/// - `.emergency` → redirect to `EmergencyRedirectView` (no normal result shown).
+/// - `.serious`   → `SeriousWarningModal` acknowledgement gate (gated behind feature flag).
+/// - `.urgent`    → inline warning banner (existing behavior).
+/// - `.caution`   → inline badge.
+/// - `.info`      → inline badge.
+enum ValidationSeverity: Int, Comparable {
+    case info = 0
+    case caution = 1
+    case serious = 2
+    case urgent = 3
+    case emergency = 4
+
+    static func < (lhs: ValidationSeverity, rhs: ValidationSeverity) -> Bool {
+        lhs.rawValue < rhs.rawValue
+    }
+}
+
 // MARK: - Validation Result
 
 struct ValidationResult {
@@ -9,16 +40,19 @@ struct ValidationResult {
     let appliedFixes: [String]
 
     var hasWarnings: Bool { !warnings.isEmpty }
+
+    /// Highest severity across all warnings, or `.info` if no warnings.
+    /// Used to drive navigation routing (emergency redirect vs. serious modal vs. inline display).
+    var worstSeverity: ValidationSeverity {
+        warnings.map(\.severity).max() ?? .info
+    }
 }
 
 struct ValidationWarning {
-    enum Severity {
-        case info        // Minor issue, informational
-        case caution     // Should be noted to the user
-        case urgent      // Requires immediate user attention (red flag)
-    }
+    /// Source-compat alias so existing `ValidationWarning.Severity` references keep working.
+    typealias Severity = ValidationSeverity
 
-    let severity: Severity
+    let severity: ValidationSeverity
     let message: String
 }
 
@@ -102,7 +136,7 @@ struct AnalysisContentValidator {
             warnings.append(ValidationWarning(severity: .caution, message: "The analysis summary was empty."))
         }
 
-        let isValid = warnings.filter({ $0.severity == .urgent }).isEmpty
+        let isValid = warnings.filter({ $0.severity >= .serious }).isEmpty
         return ValidationResult(isValid: isValid, warnings: warnings, appliedFixes: fixes)
     }
 }
@@ -118,39 +152,51 @@ struct MedicalRedFlagDetector {
 
     /// Symptom combination patterns that ALWAYS require urgent care referral,
     /// regardless of what the AI returns.
-    private static let symptomPatterns: [(keywords: [String], region: String?, message: String)] = [
-        // Cardiac
+    ///
+    /// Severity classification (Tier 1):
+    /// - `.emergency` — 911-level: cardiac, stroke, meningitis, cauda equina, DVT. These trigger
+    ///                  `EmergencyRedirectView` and the normal analysis result is NOT shown.
+    /// - `.urgent`    — ER/provider visit but not 911-level: suspected fracture. Shown as a banner.
+    private static let symptomPatterns: [(keywords: [String], region: String?, severity: ValidationSeverity, message: String)] = [
+        // Cardiac — 911
         (["chest pain", "shortness of breath"],
          "chest",
+         .emergency,
          "Chest pain with difficulty breathing may indicate a cardiac emergency. Please call 911 or go to the ER immediately."),
 
-        // Stroke
+        // Stroke — 911
         (["sudden weakness", "numbness", "one side"],
          nil,
+         .emergency,
          "Sudden weakness or numbness on one side could be signs of a stroke. Please call 911 immediately."),
 
-        // Meningitis (keywords are specific enough — trigger regardless of selected region)
+        // Meningitis — ER
         (["severe headache", "stiff neck", "fever"],
          nil,
+         .emergency,
          "A severe headache with neck stiffness and fever could indicate meningitis. Seek emergency medical care."),
 
-        // Cauda Equina Syndrome
+        // Cauda Equina Syndrome — ER
         (["loss of bladder", "back pain", "leg weakness"],
          "lower_back",
+         .emergency,
          "Loss of bladder or bowel control with back pain and leg weakness may indicate cauda equina syndrome. This is a medical emergency — go to the ER immediately."),
 
         (["saddle numbness", "back pain"],
          "lower_back",
+         .emergency,
          "Numbness in the saddle area with back pain may indicate cauda equina syndrome. This is a medical emergency."),
 
-        // DVT
+        // DVT — ER (blood clot risk)
         (["calf pain", "swelling", "redness"],
          nil,
-         "Calf pain with swelling and redness could indicate a blood clot (DVT). Please seek medical attention promptly."),
+         .emergency,
+         "Calf pain with swelling and redness could indicate a blood clot (DVT). Please seek immediate medical attention."),
 
-        // Fracture indicators
+        // Fracture indicators — urgent provider visit, not 911
         (["deformity", "unable to bear weight"],
          nil,
+         .urgent,
          "Visible deformity or inability to bear weight may indicate a fracture. Please seek medical evaluation."),
     ]
 
@@ -200,11 +246,43 @@ struct MedicalRedFlagDetector {
             }
 
             if allKeywordsMatch && regionMatches {
-                alerts.append(ValidationWarning(severity: .urgent, message: pattern.message))
+                alerts.append(ValidationWarning(severity: pattern.severity, message: pattern.message))
             }
         }
 
-        // Night pain + weight loss pattern (from assessment notes/custom description)
+        // Night pain + weight loss — suspicious for tumor/infection workup. Urgent provider visit
+        // (not 911-level emergency).
+        if allText.contains("night pain") && allText.contains("weight loss") {
+            alerts.append(ValidationWarning(
+                severity: .urgent,
+                message: "Persistent night pain combined with unexplained weight loss needs medical evaluation to rule out serious conditions. Please see a doctor."
+            ))
+        }
+
+        return RedFlagResult(triggered: !alerts.isEmpty, alerts: alerts)
+    }
+
+    /// Overload for the wellness flow: run the same 7-pattern symptom match on free-form
+    /// strings (user goal descriptions, stated concerns, custom fields). The injury flow
+    /// extracts these from `PainAssessment.aggravatingFactors` / `.relievingFactors` /
+    /// `.additionalNotes`; the wellness flow has no such structure, so we accept the
+    /// strings directly.
+    ///
+    /// Note: region-scoped patterns (e.g. cauda equina requires `"lower_back"` region)
+    /// cannot fire from this entry point because wellness has no region data. That's the
+    /// intended behavior — if a user types symptoms that match a region-bound pattern,
+    /// they should be in the injury flow, not the wellness flow.
+    static func check(symptomStrings: [String]) -> RedFlagResult {
+        var alerts: [ValidationWarning] = []
+        let allText = symptomStrings.joined(separator: " ").lowercased()
+
+        for pattern in symptomPatterns where pattern.region == nil {
+            let allKeywordsMatch = pattern.keywords.allSatisfy { allText.contains($0) }
+            if allKeywordsMatch {
+                alerts.append(ValidationWarning(severity: pattern.severity, message: pattern.message))
+            }
+        }
+
         if allText.contains("night pain") && allText.contains("weight loss") {
             alerts.append(ValidationWarning(
                 severity: .urgent,
@@ -279,8 +357,12 @@ struct ExerciseContraindicationChecker {
 
                 let exerciseBlocked = blockedExercises.contains(where: { exerciseLower.contains($0) })
                 if exerciseBlocked {
+                    // Tier 1 severity: contraindicated exercises against a user's condition are
+                    // `.serious` — the user must acknowledge the risk before the plan is shown,
+                    // OR request a safer plan. Previously this was `.caution` and silently passed
+                    // through as an inline note.
                     warnings.append(ValidationWarning(
-                        severity: .caution,
+                        severity: .serious,
                         message: "\"\(exercise.name)\" may not be appropriate given your condition. Please consult a physical therapist before attempting this exercise."
                     ))
                 }
@@ -429,10 +511,13 @@ struct KnowledgeGraphValidator {
         let verification = knowledgeGraph.verifyPlan(plan, conditions: conditions)
         var warnings: [ValidationWarning] = []
 
-        // Add warnings for contraindicated exercises
-        for (exercise, reason) in verification.contraindicatedExercises {
+        // Add warnings for contraindicated exercises.
+        // Tier 1 severity: knowledge-graph-contraindicated → `.serious` (modal gate required).
+        // The `exercise` variable is intentionally unused: the `reason` string already names
+        // the exercise and condition.
+        for (_, reason) in verification.contraindicatedExercises {
             warnings.append(ValidationWarning(
-                severity: .caution,
+                severity: .serious,
                 message: reason
             ))
         }
@@ -450,6 +535,104 @@ struct KnowledgeGraphValidator {
         }
 
         return (warnings, verification)
+    }
+}
+
+// MARK: - Wellness Validators
+
+/// Validates a wellness analysis result (the "what's going on" recommendations stage —
+/// before any exercise plan is generated).
+///
+/// Scope: bounds + red-flag scan of user-supplied strings + confidence cap. The
+/// `WellnessRecommendation` model carries no exercises, so per-exercise contraindication
+/// checks happen later in `WellnessPlanValidator`.
+struct WellnessAnalysisValidator {
+
+    /// Collect free-text strings from a wellness assessment to feed into the red-flag
+    /// detector. Covers: custom goal text, specific context, additional notes.
+    private static func symptomStrings(from assessments: [WellnessAssessment]) -> [String] {
+        var out: [String] = []
+        for a in assessments {
+            if let s = a.customGoalText, !s.isEmpty { out.append(s) }
+            if let s = a.specificContext, !s.isEmpty { out.append(s) }
+            if let s = a.additionalNotes, !s.isEmpty { out.append(s) }
+        }
+        return out
+    }
+
+    /// Run the full wellness analysis validation pipeline.
+    /// Returns the (unchanged) result + a `ValidationResult` carrying any warnings.
+    static func validate(
+        _ result: WellnessAnalysisResult,
+        assessments: [WellnessAssessment]
+    ) -> (result: WellnessAnalysisResult, validation: ValidationResult) {
+
+        var warnings: [ValidationWarning] = []
+        var fixes: [String] = []
+
+        // 1. Content bounds: recommendations 1–5, each non-empty title + assessment.
+        if result.recommendations.isEmpty {
+            warnings.append(ValidationWarning(severity: .caution, message: "No wellness recommendations were generated."))
+        }
+        if result.recommendations.count > 5 {
+            fixes.append("Trimmed wellness recommendations from \(result.recommendations.count) to 5")
+        }
+        for rec in result.recommendations {
+            if rec.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                warnings.append(ValidationWarning(severity: .info, message: "A wellness recommendation was missing a title."))
+            }
+            if rec.currentStateAssessment.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                warnings.append(ValidationWarning(severity: .info, message: "A wellness recommendation was missing a state assessment."))
+            }
+        }
+
+        // 2. Summary must be non-empty.
+        if result.overallSummary.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            warnings.append(ValidationWarning(severity: .caution, message: "The wellness summary was empty."))
+        }
+
+        // 3. Red-flag scan over user-supplied strings. Emergency hits surface via
+        //    `redFlags` return (parallel to the injury flow) so the caller can route
+        //    to `EmergencyRedirectView`.
+        let redFlags = MedicalRedFlagDetector.check(symptomStrings: symptomStrings(from: assessments))
+        warnings.append(contentsOf: redFlags.alerts)
+
+        let isValid = warnings.filter({ $0.severity >= .serious }).isEmpty
+        let validation = ValidationResult(isValid: isValid, warnings: warnings, appliedFixes: fixes)
+        return (result, validation)
+    }
+}
+
+/// Validates a generated wellness plan — the stage after recommendations, once concrete
+/// exercises exist. Runs KG-based contraindication check against the user's medical
+/// conditions (same pattern as `ExerciseSwapViewModel.verifySubstitutes`).
+struct WellnessPlanValidator {
+
+    /// Run KG-based contraindication check on each exercise against every condition.
+    /// Worst tier wins. `.contraindicated` → `.serious` severity.
+    static func validate(
+        exercises: [RehabExercise],
+        conditions: [String],
+        knowledgeGraph: KnowledgeGraphService = .shared
+    ) -> [ValidationWarning] {
+
+        // Empty conditions array = nothing to check against. Return cleanly — this is
+        // the common case for wellness users (they haven't declared medical conditions).
+        guard !conditions.isEmpty else { return [] }
+
+        var warnings: [ValidationWarning] = []
+
+        for exercise in exercises {
+            for condition in conditions {
+                let tier = knowledgeGraph.verify(exercise: exercise.name, forCondition: condition)
+                if case .contraindicated(let reason) = tier {
+                    warnings.append(ValidationWarning(severity: .serious, message: reason))
+                    break  // first hit per exercise is enough
+                }
+            }
+        }
+
+        return warnings
     }
 }
 
@@ -555,7 +738,7 @@ struct ResponseValidationPipeline {
         }
 
         let validation = ValidationResult(
-            isValid: allWarnings.filter({ $0.severity == .urgent }).isEmpty,
+            isValid: allWarnings.filter({ $0.severity >= .serious }).isEmpty,
             warnings: allWarnings,
             appliedFixes: allFixes
         )
@@ -634,8 +817,11 @@ struct ResponseValidationPipeline {
                 return nameLower.contains("jump") || nameLower.contains("plyometric") || nameLower.contains("impact") || nameLower.contains("running")
             })
             if hasImpact {
+                // Tier 1 severity: osteoporosis + impact is a well-documented contraindication
+                // (fracture risk). Route through `SeriousWarningModal` — user acknowledges or
+                // requests a safer plan.
                 warnings.append(ValidationWarning(
-                    severity: .urgent,
+                    severity: .serious,
                     message: "High-impact exercises are not recommended with osteoporosis. Please consult your doctor before performing any impact-based exercises."
                 ))
             }
@@ -658,8 +844,10 @@ struct ResponseValidationPipeline {
                 return n.contains("jump") || n.contains("plyometric") || n.contains("balance") || n.contains("single-leg")
             })
             if hasImpactOrFall {
+                // Tier 1 severity: blood-thinners + fall-risk exercises → `.serious`
+                // (bleeding risk from any fall). Acknowledgement required.
                 warnings.append(ValidationWarning(
-                    severity: .caution,
+                    severity: .serious,
                     message: "You take blood thinners. Be extra cautious with balance and impact exercises to avoid falls or bruising. Consider performing these near a wall or support."
                 ))
             }

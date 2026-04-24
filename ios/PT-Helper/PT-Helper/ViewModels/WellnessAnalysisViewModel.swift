@@ -10,6 +10,15 @@ class WellnessAnalysisViewModel: ObservableObject {
     @Published var analysisError: String? = nil
     @Published var showAnalyzingScreen: Bool = false
 
+    // MARK: - Tier 1 validation surface
+    /// Validation warnings from `WellnessAnalysisValidator`. Published so views can
+    /// route on `worstSeverity` (same pattern as `InjuryAnalysisViewModel.redFlagAlerts`).
+    @Published var validationWarnings: [ValidationWarning] = []
+    /// Convenience: highest severity across `validationWarnings`, or `.info` if none.
+    var worstSeverity: ValidationSeverity {
+        validationWarnings.map(\.severity).max() ?? .info
+    }
+
     let userProfile: UserProfile
     let selectedGoals: [GoalSelection]
     private let apiService: ClaudeAPIServiceProtocol
@@ -113,11 +122,13 @@ class WellnessAnalysisViewModel: ObservableObject {
                     return
                 }
                 self.analysisResult = validated.result
+                self.validationWarnings = validated.warnings
                 self.isAnalyzing = false
 
                 AnalyticsService.shared.log(.analysisCompleted, parameters: [
                     "recommendation_count": validated.result.recommendations.count,
-                    "type": "wellness"
+                    "type": "wellness",
+                    "worst_severity": validated.worstSeverity.rawValue
                 ])
                 let recTitles = validated.result.recommendations.map { $0.title }
                 AppLogger.rehab.info("Wellness analysis completed: \(recTitles.joined(separator: ", "))")
@@ -137,6 +148,12 @@ class WellnessAnalysisViewModel: ObservableObject {
                 self.analysisError = error.localizedDescription
                 self.isAnalyzing = false
 
+                // Tier 1: ai_response_invalid breadcrumb (server Zod rejection).
+                if let apiError = error as? ClaudeAPIError, apiError.isResponseInvalid {
+                    SessionLogger.shared.log(.errorOccurred, category: .api,
+                        message: "Wellness analysis rejected by server schema (ai_response_invalid)",
+                        metadata: ["error_kind": "ai_response_invalid"])
+                }
                 AnalyticsService.shared.log(.analysisFailed, parameters: ["error_type": String(describing: type(of: error)), "type": "wellness"])
                 AppLogger.rehab.error("Wellness analysis failed: \(error.localizedDescription)")
                 SessionLogger.shared.logError(error, context: "WellnessAnalysis.startAnalysis")

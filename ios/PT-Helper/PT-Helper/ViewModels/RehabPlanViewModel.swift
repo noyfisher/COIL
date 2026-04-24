@@ -68,6 +68,17 @@ class RehabPlanViewModel: ObservableObject {
     @Published var generationError: String? = nil
     @Published var preferences = RehabPlanPreferences()
 
+    // MARK: - Safer-plan retry (Tier 1)
+    /// Count of safer-plan retries already attempted for the current analysis.
+    /// Max 2 — after that, surface "Contact your PT".
+    @Published var saferPlanRetryCount: Int = 0
+    /// Cached analysis result + original warnings so a retry can rebuild the prompt with
+    /// a "do not recommend these exercises" constraint appended.
+    private var originalAnalysisResult: AnalysisResult?
+    private var originalFlaggedExerciseNames: [String] = []
+    /// Max retries before giving up and recommending PT consultation.
+    static let maxSaferPlanRetries = 2
+
     // MARK: - Exercise Verification State
     /// Verification status for each exercise (keyed by exercise name)
     @Published var exerciseVerifications: [String: ExerciseVerificationStatus] = [:]
@@ -126,6 +137,11 @@ class RehabPlanViewModel: ObservableObject {
     func generateRehabPlan(from analysisResult: AnalysisResult) {
         guard !isGenerating else { return }
         let conditions = analysisResult.conditions.map { $0.conditionName }
+
+        // Cache original result for potential safer-plan retries.
+        self.originalAnalysisResult = analysisResult
+        self.saferPlanRetryCount = 0
+        self.originalFlaggedExerciseNames = []
 
         isGenerating = true
         generationError = nil
@@ -189,6 +205,13 @@ class RehabPlanViewModel: ObservableObject {
             } catch {
                 // Fallback to hardcoded database
                 AppLogger.rehab.warning("AI rehab generation failed, using fallback: \(error.localizedDescription)")
+                // Tier 1 breadcrumb: distinguish schema failures (ai_response_invalid)
+                // from network/quota errors in telemetry.
+                if let apiError = error as? ClaudeAPIError, apiError.isResponseInvalid {
+                    SessionLogger.shared.log(.errorOccurred, category: .api,
+                        message: "Rehab plan rejected by server schema (ai_response_invalid)",
+                        metadata: ["error_kind": "ai_response_invalid"])
+                }
                 SessionLogger.shared.log(.stateUpdated, category: .stateChange, message: "Rehab plan using fallback",
                                           metadata: ["source": "fallback", "reason": error.localizedDescription])
 
@@ -469,9 +492,85 @@ class RehabPlanViewModel: ObservableObject {
         message += "\n- Preferred Session Length: \(preferences.sessionLength.rawValue)"
         message += "\n- Difficulty Preference: \(preferences.difficulty.rawValue)"
 
+        // Safer-plan retry constraint (Tier 1): appended when the user rejected a previous
+        // plan that contained contraindicated exercises. We list the flagged names by hand,
+        // but the real safety net is the downstream KG + contraindication validation — the
+        // AI isn't perfectly reliable at following name-based avoid-lists, so the validator
+        // re-runs on the retry output.
+        if !originalFlaggedExerciseNames.isEmpty {
+            let list = originalFlaggedExerciseNames.joined(separator: ", ")
+            message += "\n\nIMPORTANT SAFETY CONSTRAINT: The prior plan included exercises incompatible with this patient's condition(s) or medications. Do NOT return these exercises, their variants, or movements in the same pattern: \(list). Use only safer alternatives that work the same movement category but at safe loading, impact, or stability levels."
+        }
+
         message += "\nPlease create a personalized rehabilitation exercise plan for this patient, taking into account their equipment availability, preferred session length, and difficulty preference."
 
         return message
+    }
+
+    // MARK: - Safer-plan retry (Tier 1)
+
+    /// Regenerate the current plan with a safety constraint instructing Claude to avoid the
+    /// specific exercises flagged as `.serious` in the prior plan. Preserves the user's
+    /// `preferences` (equipment, session length, difficulty) on the retry.
+    ///
+    /// Max `maxSaferPlanRetries` attempts; after that, surface a "Contact your PT" state via
+    /// `generationError`.
+    func regenerateSaferPlan() {
+        guard let analysisResult = originalAnalysisResult else {
+            AppLogger.rehab.warning("regenerateSaferPlan called with no cached analysis result")
+            return
+        }
+        guard saferPlanRetryCount < Self.maxSaferPlanRetries else {
+            generationError = "We weren't able to build a safer plan after multiple attempts. Please contact your physical therapist for a tailored program."
+            return
+        }
+
+        // Collect exercise names flagged as .serious from the current warnings. The
+        // `ExerciseContraindicationChecker` and KG-contraindicated messages embed the
+        // exercise name in quotes — parse them out for the avoid-list.
+        let flaggedNames = rehabPlanWarnings
+            .filter { $0.severity >= .serious }
+            .compactMap { extractExerciseName(from: $0.message) }
+        // Merge with any prior-round flags so the avoid-list grows monotonically.
+        originalFlaggedExerciseNames = Array(Set(originalFlaggedExerciseNames + flaggedNames)).sorted()
+        saferPlanRetryCount += 1
+
+        AppLogger.rehab.info("Safer-plan retry \(self.saferPlanRetryCount)/\(Self.maxSaferPlanRetries) — avoiding: \(self.originalFlaggedExerciseNames.joined(separator: ", "))")
+        SessionLogger.shared.log(.stateUpdated, category: .stateChange, message: "Safer-plan retry requested",
+                                  metadata: [
+                                    "retryCount": "\(saferPlanRetryCount)",
+                                    "avoided": originalFlaggedExerciseNames.joined(separator: ", ")
+                                  ])
+
+        // Clear current plan state and regenerate via the same entry point — the avoid-list
+        // is consumed by `buildRehabUserMessage` via `originalFlaggedExerciseNames`.
+        rehabPlan = nil
+        rehabPlanWarnings = []
+        generationError = nil
+        isGenerating = false  // reset so the guard in generateRehabPlan allows entry
+
+        // Preserve retry state across the generateRehabPlan reset by snapshotting.
+        let savedRetryCount = saferPlanRetryCount
+        let savedAvoidList = originalFlaggedExerciseNames
+
+        generateRehabPlan(from: analysisResult)
+
+        // Restore — generateRehabPlan resets these fields on entry.
+        saferPlanRetryCount = savedRetryCount
+        originalFlaggedExerciseNames = savedAvoidList
+    }
+
+    /// Parse an exercise name out of a warning message. Warning messages from
+    /// `ExerciseContraindicationChecker` and `KnowledgeGraphValidator` include the name
+    /// in quotes (e.g., `"\"Deep Squat\" may not be appropriate..."`). Returns nil if no
+    /// quoted name is present.
+    private func extractExerciseName(from message: String) -> String? {
+        guard let firstQuote = message.firstIndex(of: "\""),
+              let lastQuote = message[message.index(after: firstQuote)...].firstIndex(of: "\"")
+        else { return nil }
+        let name = message[message.index(after: firstQuote)..<lastQuote]
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : String(trimmed)
     }
 
     private func parseRehabPlanResponse(_ text: String, conditions: [String], activityLevel: String) throws -> RehabPlan {
