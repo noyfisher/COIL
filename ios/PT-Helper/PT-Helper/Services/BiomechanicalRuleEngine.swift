@@ -16,7 +16,28 @@ class BiomechanicalRuleEngine {
         let name = exercise.name.lowercased()
         let target = exercise.targetArea.lowercased()
 
-        // Match by exercise name first, then fall back to target area
+        // Match by exercise name first, then fall back to target area.
+        // Order matters: more specific patterns must come before broader ones
+        // (e.g. "heel slide" before "calf…heel", "wall slide" before "squat"
+        //  which catches "wall sit" via squat; "step up" before "push up").
+
+        // Tier 2 additions — specific patterns (must come before generic matches).
+        if name.contains("straight") && name.contains("leg") && name.contains("raise") {
+            return straightLegRaiseRules
+        }
+        if name.contains("heel") && name.contains("slide") {
+            return heelSlideRules
+        }
+        if name.contains("wall") && name.contains("slide") {
+            return wallSlideRules
+        }
+        if name.contains("dead bug") || name.contains("deadbug") || name.contains("dead-bug") {
+            return deadBugRules
+        }
+        if (name.contains("step-up") || name.contains("step up") || name.contains("stepup")) && !name.contains("push") {
+            return stepUpRules
+        }
+
         if name.contains("squat") {
             return squatRules
         }
@@ -447,6 +468,185 @@ class BiomechanicalRuleEngine {
                 shoulderLevelMeters: 0.06,
                 hipLevelMeters: 0.03,
                 trunkLeanMeters: 0.12
+            )
+        )
+    }
+
+    // MARK: - Tier 2 named rules
+
+    /// Straight leg raise (SLR) — supine, one leg straight, active hip flexion
+    /// with knee extended throughout. Common early-stage knee/quad rehab.
+    /// Key safety check: the lifting leg's knee must stay nearly fully
+    /// extended (knee flexion defeats the purpose and can indicate
+    /// compensation).
+    private var straightLegRaiseRules: ExerciseFormRules {
+        ExerciseFormRules(
+            expectedAngleRanges: [
+                // Active hip flexion range — typically 45° lift (hip ≈ 135°)
+                // to start (hip ≈ 180°).
+                "left_hip": 100...180,
+                "right_hip": 100...180,
+                // Knee should stay nearly fully extended (allow a small
+                // deviation for soft-tissue slack).
+                "left_knee": 160...180,
+                "right_knee": 160...180,
+            ],
+            safetyConstraints: [
+                SafetyConstraint(name: "slr_knee_flexion") { metrics in
+                    // If knee ROM during the lift is > 15°, the user is
+                    // bending the knee instead of holding it locked.
+                    let kneeROMs = metrics.repMetrics.compactMap { $0.keyAngles["left_knee"]?.rangeOfMotion }
+                    let avgKneeROM = kneeROMs.isEmpty ? 0 : kneeROMs.reduce(0, +) / Double(kneeROMs.count)
+                    if avgKneeROM > 15 {
+                        return .caution("Knee is bending during the lift (avg \(Int(avgKneeROM))° ROM). Keep the leg straight — tighten the quad and lift from the hip.")
+                    }
+                    return .pass
+                },
+            ],
+            minimumRepROM: 20,
+            alignmentThresholds: AlignmentThresholds(
+                shoulderLevelMeters: 0.05,
+                hipLevelMeters: 0.04,
+                trunkLeanMeters: 0.12
+            )
+        )
+    }
+
+    /// Heel slide — supine knee flexion by sliding the heel toward the
+    /// buttock. Common early post-op knee ROM drill. Key safety: movement
+    /// must be slow / controlled (tempo), not ballistic.
+    private var heelSlideRules: ExerciseFormRules {
+        ExerciseFormRules(
+            expectedAngleRanges: [
+                // Wide knee range because the exercise IS about regaining
+                // flexion ROM.
+                "left_knee": 60...180,
+                "right_knee": 60...180,
+            ],
+            safetyConstraints: [
+                SafetyConstraint(name: "heel_slide_tempo") { metrics in
+                    // Heel slides should be deliberate — average tempo below
+                    // 2.0s per rep suggests ballistic movement.
+                    guard let avg = metrics.averageTempo, metrics.detectedRepCount >= 2 else { return .pass }
+                    if avg < 2.0 {
+                        return .caution("Heel slides are moving quickly (avg \(String(format: "%.1f", avg))s per rep). Slow down — aim for smooth controlled motion.")
+                    }
+                    return .pass
+                },
+            ],
+            minimumRepROM: 15,
+            alignmentThresholds: AlignmentThresholds(
+                shoulderLevelMeters: 0.06,
+                hipLevelMeters: 0.05,
+                trunkLeanMeters: 0.15
+            )
+        )
+    }
+
+    /// Wall slide — upper-body shoulder ROM / scapular retraction drill.
+    /// Back against the wall, arms in goal-post position, slide overhead
+    /// and back. Key safety: shoulder symmetry (can't hitch one side) +
+    /// elbow stays near 90° during the lower portion.
+    private var wallSlideRules: ExerciseFormRules {
+        ExerciseFormRules(
+            expectedAngleRanges: [
+                // Arms raise from ~90° (at the goal-post start) toward 180°.
+                "left_shoulder": 80...180,
+                "right_shoulder": 80...180,
+                // Elbow bends vary during the slide — wide range is fine.
+                "left_elbow": 60...180,
+                "right_elbow": 60...180,
+            ],
+            safetyConstraints: [
+                SafetyConstraint(name: "wall_slide_shoulder_symmetry") { metrics in
+                    guard let sym = metrics.symmetry?.differencesDegrees["shoulder"], sym > 12 else { return .pass }
+                    return .caution("Shoulder asymmetry during wall slide (\(Int(sym))°). Both arms should move together along the wall.")
+                },
+            ],
+            minimumRepROM: 20,
+            alignmentThresholds: AlignmentThresholds(
+                shoulderLevelMeters: 0.04,
+                hipLevelMeters: 0.05,
+                trunkLeanMeters: 0.10
+            )
+        )
+    }
+
+    /// Dead bug — supine, opposite arm / leg extension. Anti-extension core
+    /// stability drill. Key safety: lower back must stay flat against the
+    /// floor; if it arches, the exercise becomes counter-productive.
+    private var deadBugRules: ExerciseFormRules {
+        ExerciseFormRules(
+            expectedAngleRanges: [
+                // Extending leg drops from ~90° hip flexion toward 180° (flat).
+                "left_hip": 90...180,
+                "right_hip": 90...180,
+                // Extending arm moves from overhead (180°) toward ~90°.
+                "left_shoulder": 90...180,
+                "right_shoulder": 90...180,
+            ],
+            safetyConstraints: [
+                SafetyConstraint(name: "deadbug_trunk_stability") { metrics in
+                    // Back should stay flat. Any flagged trunk misalignment
+                    // here typically means the lumbar spine is arching.
+                    let hasTrunkIssue = metrics.alignment.contains { $0.description.lowercased().contains("trunk") }
+                    if hasTrunkIssue {
+                        return .caution("Lower back is arching during dead bug. Press your lower back firmly into the floor throughout the movement.")
+                    }
+                    return .pass
+                },
+                SafetyConstraint(name: "deadbug_tempo") { metrics in
+                    guard let avg = metrics.averageTempo, metrics.detectedRepCount >= 2 else { return .pass }
+                    if avg < 1.5 {
+                        return .caution("Dead bug is moving quickly (avg \(String(format: "%.1f", avg))s per rep). Slow down — the point is controlled core stability, not reps.")
+                    }
+                    return .pass
+                },
+            ],
+            minimumRepROM: 20,
+            alignmentThresholds: AlignmentThresholds(
+                shoulderLevelMeters: 0.05,
+                hipLevelMeters: 0.03,
+                trunkLeanMeters: 0.08
+            )
+        )
+    }
+
+    /// Step-up — unilateral hip/knee extension stepping onto a platform.
+    /// Common knee / hip rehab. Key safety: knee tracking (shouldn't collapse
+    /// inward) and symmetry between legs.
+    private var stepUpRules: ExerciseFormRules {
+        ExerciseFormRules(
+            expectedAngleRanges: [
+                // Working leg: knee bent ~90° at start, extended ~170° at top.
+                "left_knee": 80...180,
+                "right_knee": 80...180,
+                "left_hip": 80...180,
+                "right_hip": 80...180,
+                "trunk": 150...180,
+            ],
+            safetyConstraints: [
+                SafetyConstraint(name: "stepup_knee_symmetry") { metrics in
+                    // Side-to-side knee asymmetry indicates the user is
+                    // favoring one leg (common strength imbalance).
+                    guard let sym = metrics.symmetry?.differencesDegrees["knee"], sym > 15 else { return .pass }
+                    return .caution("Knee asymmetry during step-ups (\(Int(sym))°). One leg may be weaker — consider a lower step or extra reps on the weaker side.")
+                },
+                SafetyConstraint(name: "stepup_trunk_lean") { metrics in
+                    // Excessive forward lean suggests using momentum.
+                    let trunkAngles = metrics.repMetrics.compactMap { $0.keyAngles["trunk"]?.minDegrees }
+                    let minTrunk = trunkAngles.min() ?? 180
+                    if minTrunk < 140 {
+                        return .caution("Leaning forward during step-up (trunk angle: \(Int(minTrunk))°). Drive up through the front heel without pitching forward.")
+                    }
+                    return .pass
+                },
+            ],
+            minimumRepROM: 20,
+            alignmentThresholds: AlignmentThresholds(
+                shoulderLevelMeters: 0.05,
+                hipLevelMeters: 0.04,
+                trunkLeanMeters: 0.15
             )
         )
     }

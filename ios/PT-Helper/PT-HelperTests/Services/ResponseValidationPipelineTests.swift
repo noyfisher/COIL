@@ -599,7 +599,10 @@ final class ResponseValidationPipelineTests: XCTestCase {
         XCTAssertFalse(warnings.contains(where: { $0.message.contains("advanced") }))
     }
 
-    func testValidateRehabPlan_osteoporosisWithJumping_urgent() {
+    func testValidateRehabPlan_osteoporosisWithJumping_serious() {
+        // Tier 1 reclassified this pairing from `.urgent` → `.serious` — it's a
+        // plan-level contraindication (fracture risk) that now routes through
+        // the acknowledgement modal rather than just flashing a red banner.
         let exercises = [makeExercise(name: "Jump Squat")]
         let plan = makePlan(exercises: exercises)
         let profile = makeProfile(medicalConditions: ["Osteoporosis"])
@@ -608,7 +611,7 @@ final class ResponseValidationPipelineTests: XCTestCase {
             plan, conditions: ["Knee Pain"], userProfile: profile
         )
 
-        XCTAssertTrue(warnings.contains(where: { $0.severity == .urgent && $0.message.contains("osteoporosis") }))
+        XCTAssertTrue(warnings.contains(where: { $0.severity == .serious && $0.message.contains("osteoporosis") }))
     }
 
     func testValidateRehabPlan_cardiacHistory_warns() {

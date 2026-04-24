@@ -1,5 +1,7 @@
 import Foundation
 import os
+import FirebaseAuth
+import FirebaseFirestore
 
 // MARK: - Validation Severity (top-level, Comparable)
 
@@ -201,10 +203,56 @@ struct MedicalRedFlagDetector {
     ]
 
     /// Conditions that should NEVER be self-managed with home exercises alone.
+    ///
+    /// Sources: APTA red-flag screening checklists, Goodman & Snyder
+    /// (Differential Diagnosis for Physical Therapists, 6th ed.),
+    /// standard clinical red-flag screens.
+    ///
+    /// Tier 2 expansion (from 13 → 26 keywords). Additions target conditions
+    /// that should route the user to a clinician rather than self-managed
+    /// exercise, but were missing from the previous list.
     static let noSelfManageKeywords: Set<String> = [
-        "fracture", "dislocation", "cauda equina", "spinal cord",
-        "infection", "septic", "tumor", "cancer", "dvt", "embolism",
-        "compartment syndrome", "avascular necrosis", "osteomyelitis"
+        // Structural injury (original set)
+        "fracture",
+        "dislocation",
+        "cauda equina",          // spinal-cord compression emergency
+        "spinal cord",           // any spinal-cord involvement
+        "compartment syndrome",  // vascular compromise
+        "avascular necrosis",    // bone infarction
+
+        // Infection (original set + additions)
+        "infection",
+        "septic",                // covers "septic joint" via substring match
+        "osteomyelitis",         // bone infection
+
+        // Oncologic (original)
+        "tumor",
+        "cancer",
+
+        // Vascular (original)
+        "dvt",                   // deep vein thrombosis
+        "embolism",
+
+        // Neurologic (Tier 2 additions — APTA red-flag screen)
+        "neuropathy",            // peripheral neuropathy: sensory/motor deficit
+        "radiculopathy",         // nerve-root compression symptoms
+        "myelopathy",            // spinal-cord dysfunction
+
+        // Structural instability (Tier 2 additions)
+        "subluxation",           // partial dislocation
+        "ligament rupture",      // complete ligament tear
+        "tendon rupture",        // complete tendon tear
+        "complete labral tear",  // labral disruption requiring imaging/surgical eval
+
+        // Pain syndromes that need medical workup (Tier 2 additions)
+        "fibromyalgia",                     // requires medical management
+        "crps",                             // complex regional pain syndrome
+        "complex regional pain syndrome",
+        "reflex sympathetic dystrophy",     // older name for CRPS type I
+
+        // Inflammatory flares requiring meds (Tier 2 additions)
+        "rheumatoid flare",                 // RA exacerbation
+        "gout flare",                       // acute gout attack
     ]
 
     /// Check assessments for hardcoded red flag patterns.
@@ -373,6 +421,16 @@ struct ExerciseContraindicationChecker {
     }
 
     /// Validate exercise parameter ranges are reasonable.
+    ///
+    /// Tier 2: also parses and range-checks `reps`. `reps` is a `String` on
+    /// `RehabExercise` because the AI emits varied formats — "10", "10-15",
+    /// "Hold 30s", "As needed", etc. Each shape is parsed separately:
+    /// - numeric reps → clamp 1–30 warning
+    /// - rep range "N-M" → flag if BOTH endpoints are out of 1–30 (the
+    ///   "30-40" case is legitimate — low end is fine)
+    /// - duration in seconds → clamp 5–120 warning
+    /// - unrecognized spec → silent telemetry, NOT a user-visible caution
+    ///   (wellness plans commonly use "As needed"/"Daily"/"As tolerated").
     static func validateParameters(_ exercises: [RehabExercise]) -> [String] {
         var fixes: [String] = []
 
@@ -383,9 +441,150 @@ struct ExerciseContraindicationChecker {
             if exercise.restSeconds < 0 || exercise.restSeconds > 300 {
                 fixes.append("Exercise \"\(exercise.name)\" has unusual rest period: \(exercise.restSeconds)s")
             }
+
+            switch RepSpecParser.parse(exercise.reps) {
+            case .reps(let n):
+                if n < 1 || n > 30 {
+                    fixes.append("Exercise \"\(exercise.name)\" has unusual rep count: \(n)")
+                }
+            case .repsRange(let low, let high):
+                // Only flag when BOTH endpoints fall outside the reasonable band.
+                // A spec like "30-40" has a legitimate low end — don't false-clamp.
+                if (low < 1 && high < 1) || (low > 30 && high > 30) {
+                    fixes.append("Exercise \"\(exercise.name)\" has unusual rep range: \(low)-\(high)")
+                }
+            case .duration(let seconds):
+                if seconds < 5 || seconds > 120 {
+                    fixes.append("Exercise \"\(exercise.name)\" has unusual hold duration: \(seconds)s")
+                }
+            case .unknown:
+                // Telemetry-only — don't flood the UI with warnings on
+                // "As needed" / "Daily" / "As tolerated" wellness specs.
+                RepSpecTelemetry.recordUnknown(exerciseName: exercise.name, rawSpec: exercise.reps)
+            }
         }
 
         return fixes
+    }
+}
+
+// MARK: - Rep Spec Parsing (Tier 2)
+
+/// Result of parsing a `RehabExercise.reps` string. The AI returns this field
+/// in multiple shapes depending on exercise type, so we classify it.
+enum RepSpecResult: Equatable {
+    /// A single numeric rep count, e.g. "10".
+    case reps(Int)
+    /// A rep range, e.g. "10-15" or "10 to 15" or "10–15".
+    case repsRange(low: Int, high: Int)
+    /// A time-held duration, e.g. "Hold 30s", "30 seconds", "Hold 3 minutes".
+    /// Normalized to seconds.
+    case duration(seconds: Int)
+    /// Non-numeric spec, e.g. "As needed", "Daily", "As tolerated".
+    case unknown
+}
+
+/// Pure parser for AI-emitted rep specs. Ordering matters — duration match
+/// runs first because strings like "Hold 30s" contain a leading digit that
+/// would otherwise parse as a rep count.
+enum RepSpecParser {
+    static func parse(_ raw: String) -> RepSpecResult {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return .unknown }
+
+        // 1. Duration form: "(N) (s|sec|second|seconds|min|minute|minutes|m)"
+        //    — NOT required to be at start of string ("Hold 30 seconds" works).
+        let durationRegex = try? NSRegularExpression(
+            pattern: #"(\d+)\s*(m\b|mins?|minutes?|s\b|secs?|seconds?)"#,
+            options: [.caseInsensitive]
+        )
+        if let regex = durationRegex,
+           let match = regex.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)),
+           match.numberOfRanges == 3,
+           let numRange = Range(match.range(at: 1), in: trimmed),
+           let unitRange = Range(match.range(at: 2), in: trimmed),
+           let num = Int(trimmed[numRange]) {
+            let unit = trimmed[unitRange].lowercased()
+            let seconds = unit.hasPrefix("m") ? num * 60 : num
+            return .duration(seconds: seconds)
+        }
+
+        // 2. Rep range form: "N-M", "N to M", "N–M" (en dash), "N — M" (em dash)
+        let rangeRegex = try? NSRegularExpression(
+            pattern: #"^\s*(\d+)\s*(?:-|–|—|to)\s*(\d+)\s*$"#,
+            options: [.caseInsensitive]
+        )
+        if let regex = rangeRegex,
+           let match = regex.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)),
+           match.numberOfRanges == 3,
+           let lowRange = Range(match.range(at: 1), in: trimmed),
+           let highRange = Range(match.range(at: 2), in: trimmed),
+           let low = Int(trimmed[lowRange]),
+           let high = Int(trimmed[highRange]) {
+            return .repsRange(low: low, high: high)
+        }
+
+        // 3. Bare numeric form: "10" (with optional surrounding whitespace).
+        let intRegex = try? NSRegularExpression(pattern: #"^\s*(\d+)\s*$"#)
+        if let regex = intRegex,
+           let match = regex.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)),
+           match.numberOfRanges == 2,
+           let numRange = Range(match.range(at: 1), in: trimmed),
+           let num = Int(trimmed[numRange]) {
+            return .reps(num)
+        }
+
+        return .unknown
+    }
+}
+
+/// Fire-and-forget Firestore counter for unknown rep-spec shapes. The plan
+/// intentionally does NOT surface these as user-visible warnings — wellness
+/// plans routinely use "As needed" / "Daily" / "As tolerated". Instead we
+/// count them centrally so we can decide later whether to expand the parser
+/// or tighten the server prompt.
+///
+/// Runs from a detached `Task` so it never blocks validation. Auth-safe: if
+/// `Auth.auth().currentUser` is nil (cold-start before sign-in completes),
+/// the write is skipped to avoid a permission-denied error.
+enum RepSpecTelemetry {
+    static func recordUnknown(exerciseName: String, rawSpec: String) {
+        // Slugify to a safe Firestore doc-id: lowercased, letters/digits/hyphen only.
+        let slug = exerciseName
+            .lowercased()
+            .unicodeScalars
+            .map { scalar -> String in
+                if ("a"..."z").contains(String(scalar)) || ("0"..."9").contains(String(scalar)) {
+                    return String(scalar)
+                }
+                return "-"
+            }
+            .joined()
+            .trimmingCharacters(in: CharacterSet(charactersIn: "-"))
+        let docId = slug.isEmpty ? "_empty" : String(slug.prefix(100))
+
+        Task.detached {
+            await _recordUnknown(docId: docId, rawSpec: rawSpec)
+        }
+    }
+
+    /// Extracted so the Firestore call site has a single entry point for tests
+    /// to stub or swap in future work.
+    private static func _recordUnknown(docId: String, rawSpec: String) async {
+        // Auth-gate: Firestore writes need an authenticated user in this project.
+        guard Auth.auth().currentUser != nil else { return }
+        do {
+            try await Firestore.firestore()
+                .collection("unknownRepSpecs")
+                .document(docId)
+                .setData([
+                    "count": FieldValue.increment(Int64(1)),
+                    "lastRawSpec": String(rawSpec.prefix(200)),
+                    "lastAt": FieldValue.serverTimestamp(),
+                ], merge: true)
+        } catch {
+            // Telemetry must never throw into validation. Swallow silently.
+        }
     }
 }
 
