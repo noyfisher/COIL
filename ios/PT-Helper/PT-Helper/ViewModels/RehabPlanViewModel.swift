@@ -342,24 +342,42 @@ class RehabPlanViewModel: ObservableObject {
                 }
             }
 
-            // Any unverified exercises not in results get marked as failed
+            // Any unverified exercises not in results get marked as failed.
+            // Tier 2 PR D: append a `.serious` warning so the acknowledgement
+            // modal surfaces via `rehabPlanWarnings`.
             for exercise in unverified {
                 if exerciseSafety[exercise.name] == nil {
                     exerciseVerifications[exercise.name] = .crossModelFailed
+                    appendCrossModelFailureWarning(exerciseName: exercise.name)
                 }
             }
 
             AppLogger.rehab.info("Cross-model verification complete: \(exerciseSafety.filter { $0.value.safe }.count) safe, \(exerciseSafety.filter { !$0.value.safe }.count) flagged")
         } catch {
             AppLogger.rehab.warning("Cross-model verification failed: \(error.localizedDescription)")
-            // Graceful degradation — mark all as failed, don't block the plan
+            // All retries exhausted → mark every unverified exercise failed.
+            // Tier 2 PR D: each failure now emits a `.serious` warning, which
+            // Tier 1's SeriousWarningModal picks up via `rehabPlanWarnings`.
             for exercise in unverified {
                 exerciseVerifications[exercise.name] = .crossModelFailed
+                appendCrossModelFailureWarning(exerciseName: exercise.name)
             }
         }
 
         isVerifyingUnknowns = false
         verificationComplete = true
+    }
+
+    /// Append a `.serious` warning for a cross-model verification failure, if
+    /// one isn't already present for this exercise. Deduplicates so repeated
+    /// cross-model runs don't pile up.
+    private func appendCrossModelFailureWarning(exerciseName: String) {
+        let warning = ResponseValidationPipeline.crossModelFailureWarning(exerciseName: exerciseName)
+        // Dedupe by exact message — the helper includes the exercise name in
+        // quotes, so message equality implies same exercise.
+        if !rehabPlanWarnings.contains(where: { $0.message == warning.message }) {
+            rehabPlanWarnings.append(warning)
+        }
     }
 
     // MARK: - AI Rehab Plan Generation

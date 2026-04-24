@@ -1082,4 +1082,30 @@ struct ResponseValidationPipeline {
 
         return (plan, warnings, graphVerification)
     }
+
+    // MARK: - Cross-model verification helpers (Tier 2 PR D)
+
+    /// Emit a `.serious` warning for an exercise whose cross-model safety check
+    /// failed after all retries exhausted. Compile-time references
+    /// `ValidationSeverity.serious` — if Tier 1 hasn't shipped the `.serious`
+    /// case, this file won't compile, which is the intended hard gate.
+    ///
+    /// Called from `RehabPlanViewModel.performCrossModelVerification` when an
+    /// exercise gets status `.crossModelFailed`. The view appends the warning
+    /// to `rehabPlanWarnings`, which Tier 1's `RehabPlanView.evaluateSeriousWarning`
+    /// picks up and routes through `SeriousWarningModal`.
+    ///
+    /// Rationale for `.serious` (not `.urgent`, not removal):
+    /// - We can't verify this exercise is safe, but also can't confirm it's
+    ///   unsafe — an acknowledgement modal ("unverified; talk to your PT") is
+    ///   the honest middle path.
+    /// - Removing the exercise from the rendered plan would require rewiring
+    ///   `RehabPlanView` and risks the plan shrinking silently on transient
+    ///   outages; explicitly out of scope for PR D.
+    static func crossModelFailureWarning(exerciseName: String) -> ValidationWarning {
+        ValidationWarning(
+            severity: ValidationSeverity.serious,
+            message: "\"\(exerciseName)\" couldn't be verified against our safety database right now. It may still be appropriate — but please confirm with your physical therapist before starting."
+        )
+    }
 }
