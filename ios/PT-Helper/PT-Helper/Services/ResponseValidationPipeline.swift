@@ -367,6 +367,197 @@ struct MedicalRedFlagDetector {
     }
 }
 
+// MARK: - Comorbidity Interaction Map (Tier 3 PR A)
+
+/// Order-independent pair of condition IDs. Sorts on init so `(a,b)` and
+/// `(b,a)` collide as the same key — interactions are symmetric.
+struct OrderedPair: Hashable {
+    let a: String
+    let b: String
+
+    init(_ x: String, _ y: String) {
+        if x <= y {
+            self.a = x
+            self.b = y
+        } else {
+            self.a = y
+            self.b = x
+        }
+    }
+}
+
+/// Loads `Resources/comorbidity_interactions.json` once at startup. Provides:
+///   - `canonicalize(_:)` — maps free-text user condition strings to canonical
+///     IDs (e.g., "PVD" → "peripheral_vascular_disease").
+///   - `interactionExercises(for:)` — for a pair of canonicalized condition
+///     IDs, returns the set of exercise-name keywords that should escalate to
+///     `.serious` severity when both conditions are present.
+///
+/// Bundle-membership note: the Xcode project uses
+/// `PBXFileSystemSynchronizedRootGroup` so the JSON file under `Resources/`
+/// auto-discovers. If the resource is missing at runtime (CI bundle issue,
+/// stripped artifact), the loader fails open — comorbidity checks become a
+/// no-op rather than crashing. A DEBUG `assertionFailure` surfaces the
+/// regression during development.
+enum ComorbidityInteractionMap {
+
+    fileprivate struct InteractionEntry: Decodable {
+        let condition_a: String
+        let condition_b: String
+        let exercises: [String]
+        let severity: String          // "serious" in v1; reserved for future tiers
+        let source: String?
+        let note: String?
+    }
+
+    fileprivate struct ComorbidityFile: Decodable {
+        let version: String
+        let aliases: [String: String]
+        let interactions: [InteractionEntry]
+    }
+
+    private static let _logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "com.pthelper",
+        category: "comorbidity"
+    )
+
+    private static let _state: (aliases: [String: String], interactions: [OrderedPair: Set<String>]) = load()
+
+    private static var aliasMap: [String: String] { _state.aliases }
+    private static var interactionLookup: [OrderedPair: Set<String>] { _state.interactions }
+
+    private static func load() -> ([String: String], [OrderedPair: Set<String>]) {
+        guard let url = Bundle.main.url(forResource: "comorbidity_interactions", withExtension: "json") else {
+            _logger.error("comorbidity_interactions.json not in bundle — comorbidity checks will be a no-op")
+            assertionFailure("comorbidity_interactions.json missing from bundle")
+            return ([:], [:])
+        }
+        do {
+            let data = try Data(contentsOf: url)
+            let file = try JSONDecoder().decode(ComorbidityFile.self, from: data)
+            // Filter out the "_NOTE" key from aliases (documentation-only).
+            let aliases = file.aliases.filter { !$0.key.hasPrefix("_") }
+            var lookup: [OrderedPair: Set<String>] = [:]
+            for entry in file.interactions {
+                let pair = OrderedPair(entry.condition_a, entry.condition_b)
+                let normalized = Set(entry.exercises.map { $0.lowercased() })
+                lookup[pair, default: []].formUnion(normalized)
+            }
+            _logger.info("Loaded comorbidity map (v\(file.version)): \(aliases.count) aliases, \(lookup.count) interaction pairs")
+            return (aliases, lookup)
+        } catch {
+            _logger.error("Failed to parse comorbidity_interactions.json: \(error.localizedDescription)")
+            assertionFailure("comorbidity_interactions.json parse error: \(error)")
+            return ([:], [:])
+        }
+    }
+
+    /// Map a free-text user condition string to a canonical ID.
+    ///
+    /// Matching strategy:
+    ///   1. Normalize input — lowercase, trim, collapse whitespace.
+    ///   2. Exact key lookup against the alias map.
+    ///   3. Multi-word aliases (contain whitespace): substring containment
+    ///      against the input. Safe because they're distinctive.
+    ///   4. Single-word aliases: match only as a WHOLE TOKEN of the input.
+    ///      Without this, short aliases like "ra" (rheumatoid arthritis) or
+    ///      "pad" (peripheral artery disease) would incorrectly substring-
+    ///      match unrelated inputs like "zebrafish" or "padding".
+    ///   5. Longest matching alias wins (more specific = better).
+    ///   6. Return nil on no match — caller logs to alias-miss telemetry.
+    static func canonicalize(_ userCondition: String) -> String? {
+        let normalized = userCondition
+            .lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .components(separatedBy: .whitespacesAndNewlines)
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+        guard !normalized.isEmpty else { return nil }
+
+        // 1. Exact match
+        if let canonical = aliasMap[normalized] {
+            return canonical
+        }
+
+        // 2 + 3. Token-level + multi-word substring match.
+        let inputTokens = Set(
+            normalized
+                .components(separatedBy: CharacterSet.alphanumerics.inverted)
+                .filter { !$0.isEmpty }
+        )
+
+        var bestMatch: (alias: String, canonical: String)? = nil
+        for (alias, canonical) in aliasMap {
+            // "Compound" = contains any non-alphanumeric (space, hyphen, etc.).
+            // These aliases are inherently distinctive ("post-op", "history of mi")
+            // and safe to substring-match.
+            let aliasIsCompound = alias.contains { !$0.isLetter && !$0.isNumber }
+            let matched: Bool
+            if aliasIsCompound {
+                matched = normalized.contains(alias) || alias.contains(normalized)
+            } else {
+                // Single-token alias: must appear as a whole token of the input.
+                // Without this, "ra" would falsely match "zebrafish" via substring.
+                matched = inputTokens.contains(alias)
+            }
+            if matched {
+                if bestMatch == nil || alias.count > bestMatch!.alias.count {
+                    bestMatch = (alias, canonical)
+                }
+            }
+        }
+        return bestMatch?.canonical
+    }
+
+    /// Exercise-name keywords that should fire a `.serious` warning when
+    /// both conditions in `pair` are present. Empty set if the pair has no
+    /// known interaction (the common case).
+    static func interactionExercises(for pair: OrderedPair) -> Set<String> {
+        interactionLookup[pair] ?? []
+    }
+}
+
+/// Fire-and-forget Firestore counter for canonicalize() misses. Lets us
+/// review monthly which user-entered condition strings aren't in the
+/// alias map and decide whether to expand it. Auth-safe: no-op if no
+/// authenticated user (cold start before sign-in).
+enum ComorbidityAliasMissTelemetry {
+    static func recordMiss(condition: String) {
+        let slug = condition
+            .lowercased()
+            .unicodeScalars
+            .map { scalar -> String in
+                if ("a"..."z").contains(String(scalar)) || ("0"..."9").contains(String(scalar)) {
+                    return String(scalar)
+                }
+                return "-"
+            }
+            .joined()
+            .trimmingCharacters(in: CharacterSet(charactersIn: "-"))
+        let docId = slug.isEmpty ? "_empty" : String(slug.prefix(100))
+
+        Task.detached {
+            await _record(docId: docId, original: condition)
+        }
+    }
+
+    private static func _record(docId: String, original: String) async {
+        guard Auth.auth().currentUser != nil else { return }
+        do {
+            try await Firestore.firestore()
+                .collection("comorbidityAliasMisses")
+                .document(docId)
+                .setData([
+                    "count": FieldValue.increment(Int64(1)),
+                    "lastOriginal": String(original.prefix(200)),
+                    "lastAt": FieldValue.serverTimestamp(),
+                ], merge: true)
+        } catch {
+            // Swallow — telemetry must never block validation.
+        }
+    }
+}
+
 // MARK: - Exercise Contraindication Checker
 
 struct ExerciseContraindicationChecker {
@@ -391,11 +582,20 @@ struct ExerciseContraindicationChecker {
     ]
 
     /// Validate that no exercises are contraindicated for the diagnosed conditions.
+    ///
+    /// Tier 3 PR A: in addition to the existing single-condition check, this
+    /// also runs a comorbidity interaction check. When the user has BOTH
+    /// conditions in a known interaction pair (e.g. osteoporosis + balance
+    /// disorder, blood-thinner + balance disorder), exercises matching the
+    /// pair's blocked-keyword set get a `.serious` warning EVEN IF neither
+    /// condition alone would block them. This is the core gap Tier 3 closes:
+    /// real patients have comorbidities, and risks compound.
     static func validate(exercises: [RehabExercise], conditions: [String]) -> [ValidationWarning] {
         var warnings: [ValidationWarning] = []
 
         let conditionsLower = conditions.map { $0.lowercased() }
 
+        // ---- Single-condition checks (existing behavior) ----
         for exercise in exercises {
             let exerciseLower = exercise.name.lowercased()
 
@@ -417,7 +617,72 @@ struct ExerciseContraindicationChecker {
             }
         }
 
+        // ---- Tier 3 PR A: comorbidity interaction check ----
+        warnings.append(contentsOf: comorbidityWarnings(exercises: exercises, conditions: conditions))
+
         return warnings
+    }
+
+    /// Comorbidity-pair check. Canonicalizes user conditions, then for every
+    /// unordered pair of canonicalized conditions, looks up the interaction
+    /// map and emits a `.serious` warning per matching exercise.
+    ///
+    /// Internal so `ComorbidityInteractionTests` can drive it directly.
+    static func comorbidityWarnings(
+        exercises: [RehabExercise],
+        conditions: [String]
+    ) -> [ValidationWarning] {
+        // Canonicalize everything once. Misses go to telemetry — they're not
+        // errors, just opportunities to expand the alias map.
+        var canonical: [String] = []
+        for original in conditions {
+            if let canon = ComorbidityInteractionMap.canonicalize(original) {
+                canonical.append(canon)
+            } else {
+                ComorbidityAliasMissTelemetry.recordMiss(condition: original)
+            }
+        }
+        // Dedupe — same user can list the same condition twice in different
+        // wording (e.g. "PVD" + "peripheral vascular disease" → both map to
+        // peripheral_vascular_disease).
+        let unique = Array(Set(canonical))
+        guard unique.count >= 2 else { return [] }
+
+        var warnings: [ValidationWarning] = []
+        // Track (exercise.id, pair-key) so we don't double-warn on the same
+        // exercise when multiple pairs match.
+        var emittedKeys: Set<String> = []
+
+        for i in 0..<unique.count {
+            for j in (i + 1)..<unique.count {
+                let pair = OrderedPair(unique[i], unique[j])
+                let blocked = ComorbidityInteractionMap.interactionExercises(for: pair)
+                guard !blocked.isEmpty else { continue }
+
+                for exercise in exercises {
+                    let exerciseLower = exercise.name.lowercased()
+                    let matched = blocked.contains(where: { exerciseLower.contains($0) })
+                    guard matched else { continue }
+
+                    let key = "\(exercise.id.uuidString)|\(pair.a)|\(pair.b)"
+                    if emittedKeys.contains(key) { continue }
+                    emittedKeys.insert(key)
+
+                    warnings.append(ValidationWarning(
+                        severity: .serious,
+                        message: "\"\(exercise.name)\" may not be appropriate given your combination of \(humanize(pair.a)) and \(humanize(pair.b)). The combined risk is higher than either condition alone — please consult your physical therapist before attempting this exercise."
+                    ))
+                }
+            }
+        }
+
+        return warnings
+    }
+
+    /// Convert a canonical ID like "peripheral_vascular_disease" to the
+    /// human form "peripheral vascular disease" for warning messages.
+    private static func humanize(_ canonicalID: String) -> String {
+        canonicalID.replacingOccurrences(of: "_", with: " ")
     }
 
     /// Validate exercise parameter ranges are reasonable.
