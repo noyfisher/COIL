@@ -7,6 +7,7 @@ import { runRecoveryInsightsAgent, validateInsightResult } from "./managed-agent
 import { handleGenerateExerciseImage } from "./image-generation";
 import { newRequestContext, logCompleted, logError, logWarn } from "./logger";
 import { validateClaudeResponse } from "./response-schemas";
+import { validateNightlyReport } from "./nightly-report-validator";
 
 // Hard billing shutoff (Pub/Sub triggered). Exported so firebase-tools
 // picks it up on deploy. See billing-shutoff.ts for arming instructions.
@@ -1282,6 +1283,49 @@ export const sendNightlyReport = onSchedule(
     } catch (err) {
       console.error("Claude API error:", err);
       summary = `Error generating AI summary. Raw metrics:\n\n${metricsText}`;
+    }
+
+    // --- 2.5 Tier 3 PR B: structural validation ---
+    // Catch malformed Claude output (truncated tables, empty code fences,
+    // dangling headings) before it ships to the inbox. On failure we send a
+    // degraded email instead so the recipient knows something went wrong but
+    // the cron job still completes (vs silently failing or sending garbage).
+    const reportValidation = validateNightlyReport(summary);
+    if (!reportValidation.ok) {
+      console.warn("Nightly report failed structural validation:", reportValidation.reasons);
+      // Bump the failure counter — fire-and-forget; counter problems must
+      // never block the email path.
+      try {
+        await admin
+          .firestore()
+          .collection("reportValidationFailures")
+          .doc("nightly_report")
+          .set(
+            {
+              count: admin.firestore.FieldValue.increment(1),
+              lastReasons: reportValidation.reasons,
+              lastFailureAt: admin.firestore.FieldValue.serverTimestamp(),
+            },
+            { merge: true },
+          );
+      } catch (counterError) {
+        console.error("Failed to bump reportValidationFailures counter:", counterError);
+      }
+      // Replace the summary with a degraded message that still includes the
+      // raw metrics so the recipient has SOMETHING actionable.
+      summary = [
+        "## Report generation issue",
+        "",
+        "Claude's nightly report failed structural validation. Reasons:",
+        "",
+        ...reportValidation.reasons.map((r) => `- ${r}`),
+        "",
+        "Raw metrics from collectMetrics() are below. The AI summary is omitted to avoid sending a malformed email.",
+        "",
+        "```",
+        metricsText,
+        "```",
+      ].join("\n");
     }
 
     // --- 3. Send email via SendGrid ---
