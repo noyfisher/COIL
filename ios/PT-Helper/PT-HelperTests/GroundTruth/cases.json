@@ -1,0 +1,207 @@
+{
+  "_NOTE": "Tier 3 PR E v1 ground-truth fixtures. THESE ARE ENGINEERING REGRESSION FIXTURES, NOT A CLINICALLY VALIDATED DATASET. Expected outcomes are approximate and set by engineering judgment, not PT review. Use this to detect PIPELINE drift (did our validators change behavior unexpectedly?), NOT to measure clinical accuracy. A PT-annotated 30+ case dataset is tracked as Tier 3B. Each case's `goldenAnalysisResponse` was hand-authored to match the AIAnalysisResponse shape so the runner can exercise the full validation pipeline without hitting the real API. Once we have an Anthropic key + budget, refresh these from real production runs at the pinned model version.",
+  "version": "1.0",
+  "modelVersion": "claude-haiku-4-5-20251001",
+  "cases": [
+    {
+      "id": "01-pfps-clean",
+      "description": "Patellofemoral pain syndrome — clean differential, no red flags, expected to pass validation cleanly.",
+      "patient": {
+        "age": 32,
+        "sex": "Female",
+        "primaryRegion": "knee",
+        "painIntensity": 5,
+        "painOnset": "Gradual",
+        "aggravatingFactors": ["stairs", "running"],
+        "relievingFactors": ["rest", "ice"],
+        "medicalConditions": [],
+        "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {
+            "conditionName": "Patellofemoral Pain Syndrome",
+            "commonName": "Runner's Knee",
+            "confidence": 75,
+            "explanation": "Pain around the kneecap that worsens with stairs and running fits the typical PFPS pattern.",
+            "whatItMeans": "The cushion under your kneecap is getting irritated from how it's tracking.",
+            "howToManage": "Strengthen your quads and modify activities that aggravate it.",
+            "isRedFlag": false,
+            "redFlagMessage": "",
+            "nextSteps": ["Quad strengthening exercises", "Reduce running volume", "Ice after activity"]
+          },
+          {
+            "conditionName": "Iliotibial Band Syndrome",
+            "commonName": "IT Band Syndrome",
+            "confidence": 45,
+            "explanation": "Lateral knee pain with running can also indicate IT band irritation.",
+            "whatItMeans": "The band on the outside of your thigh may be rubbing against the side of your knee.",
+            "howToManage": "Foam rolling and hip strengthening typically help.",
+            "isRedFlag": false,
+            "redFlagMessage": "",
+            "nextSteps": ["Foam roll the IT band", "Hip abductor strengthening"]
+          }
+        ],
+        "overallSummary": "Most likely runner's knee from training volume — manageable with strengthening and activity modification.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": {
+        "conditions": [
+          {
+            "conditionName": "Patellofemoral Pain Syndrome",
+            "commonName": "Runner's Knee",
+            "confidence": 72,
+            "explanation": "Pain around the kneecap with stairs and running matches PFPS — confirmed after review.",
+            "whatItMeans": "The cushion under your kneecap is irritated from how it's tracking during loading.",
+            "howToManage": "Strengthen quads and modify activities.",
+            "isRedFlag": false,
+            "redFlagMessage": "",
+            "nextSteps": ["Quad strengthening", "Activity modification"]
+          }
+        ],
+        "overallSummary": "Refined: most likely runner's knee from training overload.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "expectedOutcomes": {
+        "minConditionCount": 1,
+        "maxConditionCount": 3,
+        "expectedConditionKeywords": ["patellofemoral", "runner"],
+        "shouldHaveRedFlags": false,
+        "validationShouldBeValid": true
+      }
+    },
+    {
+      "id": "02-cardiac-emergency",
+      "description": "Symptom red flag for cardiac emergency — must surface .emergency severity from MedicalRedFlagDetector regardless of AI output.",
+      "patient": {
+        "age": 58,
+        "sex": "Male",
+        "primaryRegion": "chest",
+        "painIntensity": 8,
+        "painOnset": "Sudden",
+        "aggravatingFactors": ["chest pain", "shortness of breath"],
+        "relievingFactors": [],
+        "medicalConditions": [],
+        "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {
+            "conditionName": "Costochondritis",
+            "commonName": "Chest Wall Inflammation",
+            "confidence": 50,
+            "explanation": "Chest wall inflammation can cause sharp pain that worsens with movement.",
+            "whatItMeans": "The cartilage connecting your ribs to your sternum may be inflamed.",
+            "howToManage": "Anti-inflammatories and gentle stretching.",
+            "isRedFlag": false,
+            "redFlagMessage": "",
+            "nextSteps": ["See a doctor to rule out cardiac causes first"]
+          }
+        ],
+        "overallSummary": "Could be musculoskeletal but cardiac causes must be ruled out first.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {
+        "shouldTriggerSymptomRedFlag": true,
+        "expectedRedFlagSeverity": "emergency",
+        "expectedRedFlagKeywords": ["cardiac", "911"]
+      }
+    },
+    {
+      "id": "03-osteoporosis-balance-comorbidity",
+      "description": "Osteoporosis + balance disorder — the comorbidity interaction map must produce a .serious warning even though neither condition alone would.",
+      "patient": {
+        "age": 71,
+        "sex": "Female",
+        "primaryRegion": "lower_back",
+        "painIntensity": 4,
+        "painOnset": "Gradual",
+        "aggravatingFactors": ["standing for long periods"],
+        "relievingFactors": ["rest"],
+        "medicalConditions": ["Osteoporosis", "balance issues"],
+        "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {
+            "conditionName": "Lumbar Strain",
+            "commonName": "Lower Back Strain",
+            "confidence": 65,
+            "explanation": "Gradual onset back pain with prolonged standing is consistent with a muscle strain.",
+            "whatItMeans": "Muscles in your lower back have been overworked.",
+            "howToManage": "Gentle core strengthening and posture work.",
+            "isRedFlag": false,
+            "redFlagMessage": "",
+            "nextSteps": ["Core strengthening (avoiding loaded flexion)", "Posture awareness"]
+          }
+        ],
+        "overallSummary": "Likely a muscle strain from prolonged standing.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {
+        "minConditionCount": 1,
+        "expectedConditionKeywords": ["lumbar", "strain", "back"]
+      }
+    },
+    {
+      "id": "04-malformed-with-preamble",
+      "description": "Claude wrapped JSON in a leading prose preamble. Shadow-mode parser must rescue via fallback; strict-mode (when flag flips) would reject.",
+      "patient": {
+        "age": 28,
+        "sex": "Male",
+        "primaryRegion": "shoulder",
+        "painIntensity": 3,
+        "painOnset": "Gradual",
+        "aggravatingFactors": ["overhead motion"],
+        "relievingFactors": [],
+        "medicalConditions": [],
+        "medications": []
+      },
+      "rawGoldenResponse": "Here's what I think is going on: {\"conditions\":[{\"conditionName\":\"Shoulder Impingement Syndrome\",\"commonName\":\"Shoulder Impingement\",\"confidence\":70,\"explanation\":\"Overhead pain in a young patient with no trauma fits impingement.\",\"whatItMeans\":\"A tendon is getting pinched as you raise your arm.\",\"howToManage\":\"Avoid aggravating positions, work on scapular control.\",\"isRedFlag\":false,\"redFlagMessage\":\"\",\"nextSteps\":[\"Scapular control exercises\",\"Modify overhead activity\"]}],\"overallSummary\":\"Likely impingement from repetitive overhead motion.\",\"disclaimerText\":\"This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic.\"}",
+      "expectedOutcomes": {
+        "minConditionCount": 1,
+        "expectedConditionKeywords": ["impingement", "shoulder"],
+        "expectedShadowFallbackUsed": true
+      }
+    },
+    {
+      "id": "05-noselfmanage-keyword",
+      "description": "AI-returned condition contains a 'no self-manage' keyword (DVT). MedicalRedFlagDetector.checkConditions must add an .urgent warning.",
+      "patient": {
+        "age": 65,
+        "sex": "Female",
+        "primaryRegion": "calf",
+        "painIntensity": 7,
+        "painOnset": "Sudden",
+        "aggravatingFactors": ["calf swelling", "redness"],
+        "relievingFactors": [],
+        "medicalConditions": [],
+        "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {
+            "conditionName": "Deep Vein Thrombosis",
+            "commonName": "DVT (Blood Clot)",
+            "confidence": 70,
+            "explanation": "Calf swelling, redness, and sudden pain are classic DVT signs.",
+            "whatItMeans": "A blood clot may have formed in a deep vein in your leg.",
+            "howToManage": "This requires emergency medical evaluation.",
+            "isRedFlag": false,
+            "redFlagMessage": "",
+            "nextSteps": ["See a doctor immediately", "Do not massage the leg"]
+          }
+        ],
+        "overallSummary": "DVT presentation — emergency evaluation required.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {
+        "expectedConditionKeywords": ["dvt", "thrombosis"],
+        "shouldTriggerNoSelfManage": true
+      }
+    }
+  ]
+}
