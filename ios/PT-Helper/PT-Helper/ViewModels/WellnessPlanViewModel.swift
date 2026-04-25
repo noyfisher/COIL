@@ -272,31 +272,12 @@ class WellnessPlanViewModel: ObservableObject {
     }
 
     private func parseWellnessPlanResponse(_ text: String, goalCategories: [String], activityLevel: String) throws -> RehabPlan {
-        guard let jsonData = text.data(using: .utf8) else {
-            throw ClaudeAPIError.decodingError(NSError(domain: "WellnessPlan", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response encoding"]))
-        }
-
-        let aiResponse: AIWellnessPlanResponse
-        do {
-            aiResponse = try JSONDecoder().decode(AIWellnessPlanResponse.self, from: jsonData)
-        } catch let directError {
-            // Fallback: extract JSON between { and }
-            if let startIndex = text.firstIndex(of: "{"),
-               let endIndex = text.lastIndex(of: "}") {
-                let jsonSubstring = String(text[startIndex...endIndex])
-                if let fallbackData = jsonSubstring.data(using: .utf8) {
-                    do {
-                        aiResponse = try JSONDecoder().decode(AIWellnessPlanResponse.self, from: fallbackData)
-                    } catch let fallbackError {
-                        throw ClaudeAPIError.decodingError(fallbackError)
-                    }
-                } else {
-                    throw ClaudeAPIError.decodingError(directError)
-                }
-            } else {
-                throw ClaudeAPIError.decodingError(directError)
-            }
-        }
+        // Tier 3 PR C: shadow-mode strict parsing (see ShadowModeJSONParser).
+        let aiResponse = try ShadowModeJSONParser.parse(
+            text,
+            as: AIWellnessPlanResponse.self,
+            requestType: "wellness_plan"
+        )
 
         let exercises = aiResponse.exercises.map { aiExercise in
             let difficulty: RehabExercise.Difficulty

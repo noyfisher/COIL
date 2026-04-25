@@ -243,48 +243,12 @@ class WellnessAnalyzer {
     // MARK: - Response Parsing
 
     static func parseWellnessResponse(_ text: String, assessments: [WellnessAssessment], profile: UserProfile) throws -> WellnessAnalysisResult {
-        guard let jsonData = text.data(using: .utf8) else {
-            logger.error("Response text could not be converted to UTF-8 data")
-            throw ClaudeAPIError.decodingError(NSError(domain: "WellnessAnalyzer", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response text encoding"]))
-        }
-
-        let aiResponse: AIWellnessResponse
-        do {
-            aiResponse = try JSONDecoder().decode(AIWellnessResponse.self, from: jsonData)
-            logger.info("Direct JSON decode succeeded")
-        } catch let directError {
-            logger.warning("Direct JSON decode failed: \(directError.localizedDescription). Attempting fallback extraction...")
-            // Try to extract JSON between first { and last }
-            if let startIndex = text.firstIndex(of: "{"),
-               let endIndex = text.lastIndex(of: "}"),
-               startIndex <= endIndex {
-                let jsonSubstring = String(text[startIndex...endIndex])
-                logger.info("Extracted JSON substring: \(jsonSubstring.count) chars")
-                if let fallbackData = jsonSubstring.data(using: .utf8) {
-                    do {
-                        aiResponse = try JSONDecoder().decode(AIWellnessResponse.self, from: fallbackData)
-                        logger.info("Fallback JSON decode succeeded")
-                        Task { @MainActor in
-                            SessionLogger.shared.log(.stateUpdated, category: .api, message: "Wellness analysis used fallback JSON extraction",
-                                                      metadata: ["trimmedChars": "\(text.count - jsonSubstring.count)"])
-                        }
-                    } catch let fallbackError {
-                        logger.error("Fallback JSON decode also failed: \(fallbackError.localizedDescription)")
-                        let preview = String(jsonSubstring.prefix(200))
-                        logger.error("Response preview: \(preview)")
-                        throw ClaudeAPIError.decodingError(fallbackError)
-                    }
-                } else {
-                    logger.error("Fallback JSON substring could not be converted to UTF-8")
-                    throw ClaudeAPIError.decodingError(directError)
-                }
-            } else {
-                logger.error("No JSON object found in response")
-                let preview = String(text.prefix(200))
-                logger.error("Response preview: \(preview)")
-                throw ClaudeAPIError.decodingError(directError)
-            }
-        }
+        // Tier 3 PR C: shadow-mode strict parsing (see ShadowModeJSONParser).
+        let aiResponse = try ShadowModeJSONParser.parse(
+            text,
+            as: AIWellnessResponse.self,
+            requestType: "wellness_analysis"
+        )
 
         // Map AI response to our model types
         let recommendations = aiResponse.recommendations.map { aiRec in

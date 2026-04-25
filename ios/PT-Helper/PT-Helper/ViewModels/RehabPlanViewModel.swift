@@ -592,49 +592,13 @@ class RehabPlanViewModel: ObservableObject {
     }
 
     private func parseRehabPlanResponse(_ text: String, conditions: [String], activityLevel: String) throws -> RehabPlan {
-        guard let jsonData = text.data(using: .utf8) else {
-            AppLogger.rehab.error("Rehab response could not be converted to UTF-8 data")
-            throw ClaudeAPIError.decodingError(NSError(domain: "RehabPlan", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response encoding"]))
-        }
-
         AppLogger.rehab.info("Parsing rehab plan response: \(text.count) characters")
-
-        let aiResponse: AIRehabResponse
-        do {
-            aiResponse = try JSONDecoder().decode(AIRehabResponse.self, from: jsonData)
-            AppLogger.rehab.info("Direct JSON decode succeeded for rehab plan")
-        } catch let directError {
-            AppLogger.rehab.warning("Direct rehab JSON decode failed: \(directError.localizedDescription). Attempting fallback...")
-            // Fallback: extract JSON between { and }
-            if let startIndex = text.firstIndex(of: "{"),
-               let endIndex = text.lastIndex(of: "}") {
-                let jsonSubstring = String(text[startIndex...endIndex])
-                AppLogger.rehab.info("Extracted rehab JSON: \(jsonSubstring.count) chars (trimmed \(text.count - jsonSubstring.count))")
-                if let fallbackData = jsonSubstring.data(using: .utf8) {
-                    do {
-                        aiResponse = try JSONDecoder().decode(AIRehabResponse.self, from: fallbackData)
-                        AppLogger.rehab.info("Fallback rehab JSON decode succeeded")
-                        SessionLogger.shared.log(.stateUpdated, category: .api, message: "Rehab plan used fallback JSON extraction",
-                                                  metadata: ["trimmedChars": "\(text.count - jsonSubstring.count)"])
-                    } catch let fallbackError {
-                        AppLogger.rehab.error("Fallback rehab JSON decode also failed: \(fallbackError.localizedDescription)")
-                        let preview = String(jsonSubstring.prefix(300))
-                        AppLogger.rehab.error("Rehab response preview: \(preview)")
-                        SessionLogger.shared.logError(fallbackError, context: "RehabPlan.parseResponse.fallback")
-                        throw ClaudeAPIError.decodingError(fallbackError)
-                    }
-                } else {
-                    AppLogger.rehab.error("Fallback rehab JSON substring could not be converted to UTF-8")
-                    throw ClaudeAPIError.decodingError(directError)
-                }
-            } else {
-                AppLogger.rehab.error("No JSON object found in rehab response")
-                let preview = String(text.prefix(300))
-                AppLogger.rehab.error("Rehab response preview: \(preview)")
-                SessionLogger.shared.logError(directError, context: "RehabPlan.parseResponse.noJSON")
-                throw ClaudeAPIError.decodingError(directError)
-            }
-        }
+        // Tier 3 PR C: shadow-mode strict parsing (see ShadowModeJSONParser).
+        let aiResponse = try ShadowModeJSONParser.parse(
+            text,
+            as: AIRehabResponse.self,
+            requestType: "rehab_plan"
+        )
 
         // Map AI exercises to our model
         let exercises = aiResponse.exercises.map { aiExercise in

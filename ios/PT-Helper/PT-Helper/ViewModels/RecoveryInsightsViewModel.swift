@@ -296,30 +296,12 @@ class RecoveryInsightsViewModel: ObservableObject {
     // MARK: - Response Parsing
 
     func parseInsight(from text: String) throws -> RecoveryInsight {
-        guard let jsonData = text.data(using: .utf8) else {
-            throw ClaudeAPIError.decodingError(
-                NSError(domain: "RecoveryInsightsViewModel", code: -1,
-                        userInfo: [NSLocalizedDescriptionKey: "Invalid response text encoding"]))
-        }
-
-        let aiResponse: AIRecoveryInsightResponse
-        do {
-            aiResponse = try JSONDecoder().decode(AIRecoveryInsightResponse.self, from: jsonData)
-        } catch let directError {
-            // Fallback: extract JSON between first { and last }
-            if let startIndex = text.firstIndex(of: "{"),
-               let endIndex = text.lastIndex(of: "}"),
-               startIndex <= endIndex {
-                let jsonSubstring = String(text[startIndex...endIndex])
-                if let fallbackData = jsonSubstring.data(using: .utf8) {
-                    aiResponse = try JSONDecoder().decode(AIRecoveryInsightResponse.self, from: fallbackData)
-                } else {
-                    throw ClaudeAPIError.decodingError(directError)
-                }
-            } else {
-                throw ClaudeAPIError.decodingError(directError)
-            }
-        }
+        // Tier 3 PR C: shadow-mode strict parsing (see ShadowModeJSONParser).
+        let aiResponse = try ShadowModeJSONParser.parse(
+            text,
+            as: AIRecoveryInsightResponse.self,
+            requestType: "recovery_insights"
+        )
 
         return RecoveryInsight(
             id: UUID(),

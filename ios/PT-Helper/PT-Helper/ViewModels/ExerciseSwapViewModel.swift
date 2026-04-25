@@ -284,30 +284,12 @@ class ExerciseSwapViewModel: ObservableObject {
     // MARK: - Private — Response Parsing
 
     private func parseSubstitutes(from text: String) throws -> [RehabExercise] {
-        guard let jsonData = text.data(using: .utf8) else {
-            throw ClaudeAPIError.decodingError(
-                NSError(domain: "ExerciseSwapViewModel", code: -1,
-                        userInfo: [NSLocalizedDescriptionKey: "Invalid response text encoding"]))
-        }
-
-        let aiResponse: AISubstituteResponse
-        do {
-            aiResponse = try JSONDecoder().decode(AISubstituteResponse.self, from: jsonData)
-        } catch let directError {
-            // Fallback: extract JSON between first { and last }
-            if let startIndex = text.firstIndex(of: "{"),
-               let endIndex = text.lastIndex(of: "}"),
-               startIndex <= endIndex {
-                let jsonSubstring = String(text[startIndex...endIndex])
-                if let fallbackData = jsonSubstring.data(using: .utf8) {
-                    aiResponse = try JSONDecoder().decode(AISubstituteResponse.self, from: fallbackData)
-                } else {
-                    throw ClaudeAPIError.decodingError(directError)
-                }
-            } else {
-                throw ClaudeAPIError.decodingError(directError)
-            }
-        }
+        // Tier 3 PR C: shadow-mode strict parsing (see ShadowModeJSONParser).
+        let aiResponse = try ShadowModeJSONParser.parse(
+            text,
+            as: AISubstituteResponse.self,
+            requestType: "exercise_substitute"
+        )
 
         return aiResponse.substitutes.map { ai in
             let difficulty: RehabExercise.Difficulty = {
