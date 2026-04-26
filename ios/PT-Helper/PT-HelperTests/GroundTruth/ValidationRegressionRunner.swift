@@ -148,6 +148,27 @@ final class ValidationRegressionRunner: XCTestCase {
         try await runCase(id: "05-noselfmanage-keyword")
     }
 
+    func test_06_rotatorCuffStrain() async throws { try await runCase(id: "06-rotator-cuff-strain") }
+    func test_07_frozenShoulder() async throws { try await runCase(id: "07-frozen-shoulder") }
+    func test_08_meniscusTear() async throws { try await runCase(id: "08-meniscus-tear") }
+    func test_09_ankleSprain() async throws { try await runCase(id: "09-ankle-sprain") }
+    func test_10_tennisElbow() async throws { try await runCase(id: "10-tennis-elbow") }
+    func test_11_plantarFasciitis() async throws { try await runCase(id: "11-plantar-fasciitis") }
+    func test_12_cervicalRadiculopathy() async throws { try await runCase(id: "12-cervical-radiculopathy") }
+    func test_13_elderlyKneeOA() async throws { try await runCase(id: "13-elderly-knee-oa") }
+    func test_14_postpartumBack() async throws { try await runCase(id: "14-postpartum-back") }
+    func test_15_youngAthleteAclRecovery() async throws { try await runCase(id: "15-young-athlete-acl-recovery") }
+    func test_16_diabetesPvdFoot() async throws { try await runCase(id: "16-diabetes-pvd-foot") }
+    func test_17_cardiacHtnBack() async throws { try await runCase(id: "17-cardiac-htn-back") }
+    func test_18_bloodthinnerBalanceBack() async throws { try await runCase(id: "18-bloodthinner-balance-back") }
+    func test_19_postsurgicalCardiacShoulder() async throws { try await runCase(id: "19-postsurgical-cardiac-shoulder") }
+    func test_20_caudaEquinaSaddle() async throws { try await runCase(id: "20-cauda-equina-saddle") }
+    func test_21_strokeOnset() async throws { try await runCase(id: "21-stroke-onset") }
+    func test_22_fractureDeformity() async throws { try await runCase(id: "22-fracture-deformity") }
+    func test_23_recentAclSurgeryHistory() async throws { try await runCase(id: "23-recent-acl-surgery-history") }
+    func test_24_osteoporosisOnMedsKnee() async throws { try await runCase(id: "24-osteoporosis-on-meds-knee") }
+    func test_25_bloodthinnerFallHistory() async throws { try await runCase(id: "25-bloodthinner-fall-history") }
+
     // MARK: - Runner core
 
     private func runCase(id caseId: String) async throws {
