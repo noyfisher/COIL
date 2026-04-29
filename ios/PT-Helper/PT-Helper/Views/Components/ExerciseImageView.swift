@@ -7,12 +7,16 @@ struct ExerciseImageView: View {
     var isCompact: Bool = false
 
     @State private var startImage: UIImage?
+    @State private var endImage: UIImage?
+    @State private var showingEnd = false
     @State private var isGenerating = false
     @State private var generationFailed = false
-    @State private var hasCheckedImage = false
 
     private var imageSize: CGFloat { isCompact ? 50 : 280 }
     private var cornerRadius: CGFloat { isCompact ? 10 : 16 }
+
+    /// Cross-fade timing: hold each pose for this long, then fade for ~0.4s.
+    private let holdSeconds: Double = 1.5
 
     var body: some View {
         Group {
@@ -24,18 +28,18 @@ struct ExerciseImageView: View {
                 fallbackContent
             }
         }
-        .task {
-            guard !hasCheckedImage else { return }
-            hasCheckedImage = true
+        .task(id: exercise.id) {
+            // Reset state on exercise change so a recycled view doesn't show the prior image.
+            startImage = nil
+            endImage = nil
+            showingEnd = false
+            generationFailed = false
 
-            // Fetch Firestore aliases on first image load
             await ExerciseImageService.shared.fetchRemoteAliases()
 
-            // Try normal load
             startImage = await ExerciseImageService.shared.loadImage(for: exercise)
 
             if startImage == nil, !isCompact {
-                // No image found — trigger on-demand generation (full mode only)
                 isGenerating = true
                 let generated = await ExerciseImageService.shared.requestImageGeneration(for: exercise)
                 if let generated {
@@ -46,8 +50,24 @@ struct ExerciseImageView: View {
                 isGenerating = false
             }
 
-            // Log if missing or only fuzzy-matched
+            if !isCompact, startImage != nil {
+                endImage = await ExerciseImageService.shared.loadEndImage(for: exercise)
+                if endImage != nil {
+                    startCrossFadeLoop()
+                }
+            }
+
             ExerciseImageService.shared.logMissingImageIfNeeded(for: exercise)
+        }
+    }
+
+    private func startCrossFadeLoop() {
+        Task { @MainActor in
+            while endImage != nil && startImage != nil {
+                try? await Task.sleep(nanoseconds: UInt64(holdSeconds * 1_000_000_000))
+                guard endImage != nil else { break }
+                withAnimation(.easeInOut(duration: 0.4)) { showingEnd.toggle() }
+            }
         }
     }
 
@@ -76,16 +96,27 @@ struct ExerciseImageView: View {
 
     private func fullImageView(_ image: UIImage) -> some View {
         VStack(spacing: AppSpacing.md) {
-            Image(uiImage: image)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(maxWidth: imageSize, maxHeight: imageSize)
-                .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                        .stroke(difficultyColor.opacity(0.15), lineWidth: 2)
-                )
-                .shadow(color: .black.opacity(0.08), radius: 12, y: 4)
+            ZStack {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(maxWidth: imageSize, maxHeight: imageSize)
+                    .opacity(showingEnd && endImage != nil ? 0 : 1)
+
+                if let end = endImage {
+                    Image(uiImage: end)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: imageSize, maxHeight: imageSize)
+                        .opacity(showingEnd ? 1 : 0)
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .stroke(difficultyColor.opacity(0.15), lineWidth: 2)
+            )
+            .shadow(color: .black.opacity(0.08), radius: 12, y: 4)
 
             // Difficulty badge
             DifficultyBadge(difficulty: exercise.difficulty)
