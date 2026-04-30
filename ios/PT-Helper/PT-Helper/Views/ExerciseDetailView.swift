@@ -24,7 +24,7 @@ struct ExerciseDetailView: View {
     }
 
     private var demonstrationIcon: some View {
-        ExerciseImageView(exercise: exercise)
+        ExerciseImagePagerView(exercise: exercise)
     }
 
     private var positionGuide: some View {

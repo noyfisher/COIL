@@ -367,6 +367,18 @@ final class ExerciseImageService: @unchecked Sendable {
             }
             // Layers 4-7: existing fuzzy matcher on the original normalized form
             var result = fuzzyMatch(normalized)
+
+            // Layer 4b: Retry fuzzy matching against the AI-provided imageFileName.
+            // The AI often produces a high-quality kebab-case `imageFileName` that's a
+            // single transformation off canonical (plural toggle, prefix modifier, suffix
+            // qualifier). The original Layer 1 only does exact-match on imageFileName,
+            // so a near-correct guess was thrown away. Feed it back into Layers 4-7 as
+            // a secondary candidate before falling through to qualifier stripping.
+            if result == nil, let fileName = exercise.imageFileName, !fileName.isEmpty,
+               fileName != normalized {
+                result = fuzzyMatch(fileName)
+            }
+
             // Layer 8: strip qualifiers (parentheticals, em-dashes, qualifier tokens) and retry
             // alias + fuzzy lookup against the stripped form. Calls helpers directly (NOT
             // resolveImageMatch) to avoid polluting fuzzyMatchCache with stripped-key entries.
@@ -481,18 +493,41 @@ final class ExerciseImageService: @unchecked Sendable {
         return nil
     }
 
-    /// Find the longest mapping key that is a prefix of `name` at a hyphen boundary.
+    /// Find a mapping key with a prefix-relationship to `name` at a hyphen boundary.
+    /// Bidirectional: matches both `key` ⊂ `name` (e.g. "cat-cow-stretch" prefix of
+    /// "cat-cow-stretch-modified") AND `name` ⊂ `key` (e.g. "wall-pushups" is a prefix
+    /// of "wall-pushups-modified"). When `name` is the prefix, prefers the shortest
+    /// (least specialized) key. When `key` is the prefix, prefers the longest (most
+    /// specific) — preserves prior behavior for the common "AI tacked qualifiers
+    /// onto a known canonical name" case.
     private func longestPrefixMatch(_ name: String) -> String? {
-        mapping.keys
-            .filter { name.hasPrefix($0 + "-") }
-            .max(by: { $0.count < $1.count })
+        // Forward: existing key⊂name behavior — prefer longest (most specific).
+        if let m = mapping.keys
+            .filter({ name.hasPrefix($0 + "-") })
+            .max(by: { $0.count < $1.count }) {
+            return m
+        }
+        // Reverse: name⊂key — prefer shortest (least specialized variant).
+        return mapping.keys
+            .filter { $0.hasPrefix(name + "-") }
+            .min(by: { $0.count < $1.count })
     }
 
-    /// Find a mapping key where `name` appears as a suffix at a hyphen boundary.
-    /// Prefers the shortest (least specialized) key on ambiguity.
+    /// Find a mapping key with a suffix-relationship to `name` at a hyphen boundary.
+    /// Bidirectional: matches both `key` ⊂ `name` (e.g. "calf-raises" is a suffix of
+    /// "standing-calf-raises") AND `name` ⊂ `key` (e.g. "neck-rolls" is a suffix of
+    /// "seated-neck-rolls"). Prefers the shortest (least specialized) key in both cases.
     private func suffixMatch(_ name: String) -> String? {
-        let matches = mapping.keys.filter { $0.hasSuffix("-" + name) }
-        return matches.min(by: { $0.count < $1.count })
+        // Forward: existing key⊂name behavior.
+        if let m = mapping.keys
+            .filter({ $0.hasSuffix("-" + name) })
+            .min(by: { $0.count < $1.count }) {
+            return m
+        }
+        // Reverse: name⊂key.
+        return mapping.keys
+            .filter { name.hasSuffix("-" + $0) }
+            .min(by: { $0.count < $1.count })
     }
 
     /// Replace body-part synonym tokens in a hyphen-delimited name.

@@ -37,151 +37,16 @@ SYNONYMS = {
 }
 
 # Alias map: AI-generated exercise name variants → canonical image key.
-# Mirrors ExerciseImageService.swift aliasMap exactly.
-ALIAS_MAP = {
-    "calf-raises-bilateral-eccentric-focus": "double-leg-calf-raise",
-    "calf-raises-bilateral-to-single-leg-progression": "double-leg-calf-raise",
-    "calf-raises-double-leg-eccentric-emphasis": "double-leg-calf-raise",
-    "calf-raise-with-hamstring-co-activation-weeks-3-6": "double-leg-calf-raise",
-    "calf-raises-bilateral": "double-leg-calf-raise",
-    "band-pull-apart": "band-pull-aparts",
-    "half-kneeling-band-pull-aparts": "band-pull-aparts",
-    "band-pull-apart-external-rotation": "resistance-band-external-rotation-at-90-90",
-    "bird-dog-core-stabilizer": "bird-dog",
-    "quadruped-bird-dog": "bird-dog",
-    "quadruped-spinal-extensions-bird-dogs": "bird-dog",
-    "childs-pose-with-shoulder-reach": "childs-pose-with-side-reach",
-    "cat-cow-stretch-modified-for-lower-back-relief": "cat-cow-stretch",
-    "cat-cow-stretch-prone-hold-variation": "cat-cow-stretch",
-    "cat-cow-stretch-sequence": "cat-cow-stretch",
-    "cat-cow-stretch-spine-mobility": "cat-cow-stretch",
-    "clamshells-left-side-emphasis": "clamshells",
-    "clamshells-side-lying-hip-abduction": "clamshells",
-    "dead-bug-modified-for-core-stability-and-l4-protection": "dead-bug",
-    "dead-bug-core-stability-for-lower-back-support": "dead-bug",
-    "dead-bug-core-stability-hamstring-protection": "dead-bug",
-    "dead-bug-modified": "dead-bug",
-    "glute-bridge-with-core-hold": "glute-bridge-with-isometric-hold",
-    "supine-glute-bridge-with-hamstring-activation": "glute-bridge",
-    "glute-bridge-with-hamstring-engagement": "glute-bridge",
-    "glute-bridges-bilateral": "glute-bridges",
-    "supine-hip-bridge": "glute-bridge",
-    "banded-glute-kickbacks-standing-hip-extension": "standing-hip-extension",
-    "hamstring-and-calf-stretch-supine-strap-assist": "hamstring-stretch-with-strap",
-    "supine-hamstring-stretch-with-strap": "hamstring-stretch-with-strap",
-    "seated-forward-fold-hamstring-stretch": "seated-hamstring-stretch",
-    "lying-hamstring-and-hip-flexor-stretch-modified": "lying-hip-flexor-stretch",
-    "hamstring-stretch": "supine-hamstring-stretch",
-    "supine-hamstring-stretch-with-towel-strap": "supine-hamstring-stretch",
-    "nordic-hamstring-curl-assisted-weeks-4-6": "hamstring-curls",
-    "standing-hamstring-flexibility-walk": "walking",
-    "lateral-band-walk-glute-medius-hip-stability": "lateral-band-walks",
-    "monster-walks-resistance-band": "monster-walks",
-    "pendulum-shoulder-circles": "pendulum-swings",
-    "right-shoulder-pendulum-circles": "pendulum-swings",
-    "seated-shoulder-pendulum-circles": "pendulum-swings",
-    "plantar-fascia-and-soleus-stretch": "soleus-stretch",
-    "planks-modified-wall-or-incline": "plank",
-    "prone-plank-hold-beginner-progression": "plank",
-    "tall-plank-with-shoulder-blade-protraction": "plank",
-    "prone-hamstring-isometric-hold": "prone-hamstring-curl",
-    "prone-hip-extension-single-leg-for-glute-activation": "prone-hip-extension",
-    "prone-hip-extension-single-leg": "prone-hip-extension",
-    "prone-shoulder-external-rotation-with-elbow-support": "side-lying-external-rotation",
-    "prone-shoulder-i-y-t-raises": "prone-i-y-t-raises",
-    "prone-y-t-w-shoulder-activation": "prone-i-y-t-raises",
-    "lower-back-quadriceps-tightness---prone-quad-stretch": "standing-quad-stretch",
-    "prone-cobra-modified-sphinx": "prone-press-up",
-    "prone-cobra-or-modified-sphinx-lower-back-extension": "prone-press-up",
-    "prone-sphinx-stretch": "prone-press-up",
-    "prone-scapular-squeeze": "prone-scapular-retraction",
-    "prone-hip-internal-rotation-piriformis-stretch": "supine-piriformis-stretch",
-    "prone-quadriceps-stretch": "standing-quad-stretch",
-    "quad-sets-with-glute-activation": "quad-sets",
-    "quad-sets-with-vmo-focus": "quad-sets",
-    "quadriceps-sets-isometric": "quad-sets",
-    "quadriceps-sets-with-vmo-focus": "quad-sets",
-    "quadriceps-sets-bilateral": "quad-sets",
-    "quadriceps-strengthening": "quad-sets",
-    "quadriceps-and-patellar-tendon-eccentric-stretch": "standing-quad-stretch",
-    "quadriceps-eccentric-lowering-controlled-strength": "long-arc-quads",
-    "quadriceps-stretch": "standing-quad-stretch",
-    "quadriceps-stretch-standing": "standing-quad-stretch",
-    "quadriceps-hip-flexor-stretch-kneeling-lunge": "hip-flexor-stretch",
-    "quadruped-cat-cow-stretch": "cat-cow-stretch",
-    "thoracic-spine-rotation-quadruped-cat-cow": "quadruped-thoracic-rotation",
-    "quadruped-glute-squeeze-activation-endurance": "prone-glute-squeeze-holds",
-    "quadruped-hip-extension-glute-activation": "fire-hydrants",
-    "quadruped-hip-shoulder-rocks": "quadruped-rocking",
-    "quadruped-rocking-with-spinal-extension": "quadruped-rocking",
-    "external-rotation-with-elbow-bent-90-90-position": "external-rotation",
-    "right-shoulder-external-rotation-prone": "side-lying-external-rotation",
-    "scapular-push-up-hold": "wall-push-ups",
-    "scapular-push-up-plus": "wall-push-ups",
-    "scapular-push-up-plus-modified": "wall-push-ups",
-    "serratus-anterior-push-up-plus": "wall-push-ups",
-    "scapular-wall-slides": "wall-slides",
-    "single-leg-stance-on-firm-surface": "single-leg-balance",
-    "single-leg-balance-left-leg-emphasis": "single-leg-balance",
-    "single-leg-romanian-deadlift-light-load": "single-leg-deadlift",
-    "standing-single-leg-balance-with-hip-hinge": "single-leg-deadlift",
-    "standing-hamstring-curl-progressive": "standing-hamstring-curl",
-    "standing-chest-doorway-stretch": "doorway-stretch",
-    "standing-hip-flexor-stretch": "hip-flexor-stretch",
-    "shoulder-rolls": "shoulder-shrugs",
-    "straight-leg-raise-slr---supine": "straight-leg-raises",
-    "straight-leg-raise-left-leg": "straight-leg-raises",
-    "straight-leg-raises-supine": "straight-leg-raises",
-    "supine-lower-back-stretch": "knee-to-chest-stretch",
-    "supine-lower-back-rotation-stretch": "lumbar-rotation-stretch",
-    "supine-lower-back-rotation-stretch-spinal-mobility": "lumbar-rotation-stretch",
-    "supine-shoulder-external-rotation-90-90-position": "external-rotation",
-    "supine-shoulder-external-rotation-with-towel-roll": "external-rotation",
-    "supine-shoulder-flexion-with-dowel-or-pvc-pipe": "shoulder-flexion",
-    "supine-hip-flexor-stretch": "lying-hip-flexor-stretch",
-    "supine-figure-4-stretch-alternative-piriformis-stretch": "supine-figure-4-stretch-with-pelvic-mobilization",
-    "seated-knee-extension-with-asthma-pacing": "seated-knee-extension",
-    "eccentric-wrist-extensor-curls": "reverse-wrist-curls",
-    "forearm-pronation-supination": "wrist-pronation-supination",
-    "isometric-wrist-extensions": "reverse-wrist-curls",
-    "isometric-wrist-strengthening-4-direction": "wrist-curls",
-    "wrist-flexor-extensor-stretches": "wrist-extensor-stretch",
-    "wrist-flexor-stretches": "wrist-flexor-stretch",
-    "half-kneeling-thoracic-rotation-with-post": "quadruped-thoracic-rotation",
-    "thoracic-spine-extensions": "thoracic-extension",
-    "pigeon-pose-deep-hip-flexor-piriformis-stretch": "piriformis-stretch",
-    "sural-nerve-glide-neural-mobility-for-sural-nerve-irritation": "sciatic-nerve-glide",
-    "terminal-knee-extensions-tke": "terminal-knee-extension",
-    "calf-raises": "double-leg-calf-raise",
-    "cervical-gentle-rom-neck-mobility-check": "chin-tucks",
-    "prone-chin-tucks-cervical-posture-support": "chin-tucks",
-    "cross-body-shoulder-stretch": "cross-body-stretch",
-    "deep-hip-flexor-quad-stretch-90-90": "hip-flexor-stretch",
-    "tall-kneeling-hip-flexor-stretch": "hip-flexor-stretch",
-    "hamstring-calf-stretch-standing": "supine-hamstring-stretch",
-    "hamstring-sets-isometric": "prone-hamstring-curl",
-    "lying-hamstring-stretch-90-90-position": "supine-hamstring-stretch",
-    "lateral-band-walk-hip-abductor-activation": "lateral-band-walks",
-    "prone-cobra-posterior-chain-extension-low-back-mobility": "prone-press-up",
-    "prone-shoulder-blade-squeeze-isometric": "prone-scapular-retraction",
-    "prone-shoulder-i-y-t-raises-isometric-hold": "prone-i-y-t-raises",
-    "prone-shoulder-retraction-y-raises-prone": "prone-i-y-t-raises",
-    "prone-superman-hold": "superman-exercise",
-    "quadriceps-foam-roll": "foam-roller-quad",
-    "quadriceps-stretch-left-leg-kneeling": "standing-quad-stretch",
-    "quadruped-shoulder-blade-squeezes-scapular-stabilization": "quadruped-shoulder-taps",
-    "quadruped-shoulder-stability-taps": "quadruped-shoulder-taps",
-    "scapular-wall-slides-slow-controlled": "wall-slides",
-    "seated-knee-extensions-right-leg-focus": "seated-knee-extension",
-    "sidelying-external-rotation-90-90-position": "side-lying-external-rotation",
-    "single-leg-deadlifts-bodyweight": "single-leg-deadlift",
-    "single-leg-glute-bridge": "glute-bridge",
-    "standing-shoulder-external-rotation-band-free-isometric": "external-rotation",
-    "straight-leg-raise-quad-dominant": "straight-leg-raises",
-    "upper-back-postural-correction-standing-wall-hold": "wall-slides",
-    "wrist-flexion-extension": "wrist-curls",
-    "copenhagen-adduction-side-lying-hip-adductor-squeeze": "copenhagen-adduction",
-}
+#
+# PR 3 deleted the Swift `aliasMap` this used to mirror. Aliases now live in
+# `scripts/output/all_exercises_metadata.json` (per-entry `aliases` arrays) and
+# are propagated into `exercise_image_mapping.json` by `rebuild_image_mapping.py`.
+#
+# This stub is kept empty so existing imports of `ALIAS_MAP` from this module
+# don't break. New Python code should read aliases from the metadata JSON
+# instead. To migrate fully: refactor callers to load aliases dynamically and
+# delete this constant.
+ALIAS_MAP: dict[str, str] = {}
 
 
 def normalize_name(name: str) -> str:
@@ -202,16 +67,39 @@ def normalize_name(name: str) -> str:
 
 
 def _longest_prefix_match(name: str, mapping_keys: set) -> Optional[str]:
-    """Find the longest mapping key that is a prefix of `name` at a hyphen boundary."""
-    matches = [k for k in mapping_keys if name.startswith(k + "-")]
-    return max(matches, key=len) if matches else None
+    """Find a mapping key with a prefix-relationship to `name` at a hyphen boundary.
+
+    Bidirectional:
+    - Forward (key ⊂ name): `name.startswith(key + "-")` — AI tacked qualifiers onto a
+      known canonical name. Prefers longest (most specific) key.
+    - Reverse (name ⊂ key): `key.startswith(name + "-")` — AI generated a shorter
+      phrasing of an existing variant. Prefers shortest (least specialized) key.
+
+    Forward direction is tried first to preserve prior behavior for the common case.
+    """
+    forward = [k for k in mapping_keys if name.startswith(k + "-")]
+    if forward:
+        return max(forward, key=len)
+    reverse = [k for k in mapping_keys if k.startswith(name + "-")]
+    return min(reverse, key=len) if reverse else None
 
 
 def _suffix_match(name: str, mapping_keys: set) -> Optional[str]:
-    """Find a mapping key where `name` appears as a suffix at a hyphen boundary.
-    Prefers the shortest (least specialized) key on ambiguity."""
-    matches = [k for k in mapping_keys if k.endswith("-" + name)]
-    return min(matches, key=len) if matches else None
+    """Find a mapping key with a suffix-relationship to `name` at a hyphen boundary.
+
+    Bidirectional:
+    - Forward — AI gave a SHORTER form than canonical, canonical added a prefix.
+      `key.endswith("-" + name)`. e.g. name="calf-raises" → key="standing-calf-raises".
+    - Reverse — AI gave a LONGER form than canonical, AI added a prefix.
+      `name.endswith("-" + key)`. e.g. name="supine-clamshells" → key="clamshells".
+
+    Both prefer the shortest match (least specialized). Forward fires first.
+    """
+    forward = [k for k in mapping_keys if k.endswith("-" + name)]
+    if forward:
+        return min(forward, key=len)
+    reverse = [k for k in mapping_keys if name.endswith("-" + k)]
+    return min(reverse, key=len) if reverse else None
 
 
 def _apply_synonyms(name: str) -> str:
@@ -277,11 +165,20 @@ class FuzzyMatcher:
         if alias_target and alias_target in self.mapping_keys:
             return ImageMatch(key=alias_target, match_type=MatchType.EXACT)
 
-        # Layers 4-7: Fuzzy (cached)
+        # Layers 4-7: Fuzzy (cached on the normalized name)
         if normalized in self._cache:
             return self._cache[normalized]
 
         result = self._fuzzy_match(normalized)
+
+        # Layer 4b: Retry fuzzy on the AI-provided imageFileName.
+        # The AI often produces a high-quality kebab-case `imageFileName` that's a
+        # single transformation off canonical (plural toggle, prefix modifier, suffix
+        # qualifier). Layer 1 only does exact-match on imageFileName, so a near-correct
+        # guess is otherwise discarded. Feed it back into the fuzzy layers.
+        if result is None and image_file_name and image_file_name != normalized:
+            result = self._fuzzy_match(image_file_name)
+
         self._cache[normalized] = result
         return result
 

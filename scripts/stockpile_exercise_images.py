@@ -29,6 +29,7 @@ Usage:
 
 import argparse
 import json
+import random
 import sys
 import time
 from datetime import datetime
@@ -425,75 +426,117 @@ def save_progress(progress: dict):
         json.dump(progress, f, indent=2)
 
 
-def phase1_generate_plans(progress: dict, api_key: str, dry_run: bool = False):
-    """Phase 1: Generate plans for all conditions and collect unique exercises."""
+def phase1_generate_plans(
+    progress: dict,
+    api_key: str,
+    dry_run: bool = False,
+    shuffle: bool = False,
+    sample: int | None = None,
+    seed: int | None = None,
+):
+    """Phase 1: Generate plans for all conditions and collect unique exercises.
+
+    When `shuffle` is set, conditions within each category are randomly
+    ordered so each run hits different (condition, demographic) combinations.
+    When `sample` is set, only the first N conditions per category are
+    processed (after optional shuffle). When either flag is set, the
+    condition_key includes the demographic so new (condition, demographic)
+    combinations are processed even if the bare condition was already
+    completed in a prior deterministic run.
+    """
     from fuzzy_match import normalize_name
 
-    total_conditions = sum(len(v) for v in CONDITIONS.values())
+    rng = random.Random(seed) if seed is not None else random
+
+    # Build per-run iteration plan
+    plan: list[tuple[str, str]] = []  # (category, condition)
+    for category, conditions in CONDITIONS.items():
+        cs = list(conditions)
+        if shuffle:
+            rng.shuffle(cs)
+        if sample is not None:
+            cs = cs[:sample]
+        for c in cs:
+            plan.append((category, c))
+
+    include_demo_in_key = shuffle or sample is not None
+    total_conditions = len(plan)
     print(f"\n{'='*60}")
-    print(f"Phase 1: Generating plans for {total_conditions} conditions")
+    print(f"Phase 1: Generating plans for {total_conditions} conditions"
+          f" (shuffle={shuffle}, sample={sample}, demo_keyed={include_demo_in_key})")
     print(f"{'='*60}")
 
+    # Group printout by category for readable progress
+    last_category = None
     condition_count = 0
-    for category, conditions in CONDITIONS.items():
-        print(f"\n--- Category: {category} ({len(conditions)} conditions) ---")
+    for category, condition in plan:
+        if category != last_category:
+            cat_count = sum(1 for c, _ in plan if c == category)
+            print(f"\n--- Category: {category} ({cat_count} conditions this run) ---")
+            last_category = category
 
-        for condition in conditions:
+        # Pick demographic variation BEFORE building key (so demo is part of key)
+        demo = DEMOGRAPHICS[condition_count % len(DEMOGRAPHICS)]
+
+        if include_demo_in_key:
+            condition_key = (
+                f"{category}:{condition}"
+                f":age={demo['age']},equip={demo['equipment']}"
+            )
+        else:
             condition_key = f"{category}:{condition}"
 
-            if condition_key in progress["completed_conditions"]:
-                condition_count += 1
-                continue
-
-            # Pick a demographic variation
-            demo = DEMOGRAPHICS[condition_count % len(DEMOGRAPHICS)]
+        if condition_key in progress["completed_conditions"]:
             condition_count += 1
+            continue
+        condition_count += 1
 
-            print(f"  [{condition_count}/{total_conditions}] {condition} (age={demo['age']}, equip={demo['equipment']})")
+        print(f"  [{condition_count}/{total_conditions}] {condition} (age={demo['age']}, equip={demo['equipment']})")
 
-            if dry_run:
-                progress["completed_conditions"].append(condition_key)
-                continue
+        if dry_run:
+            progress["completed_conditions"].append(condition_key)
+            continue
 
-            exercises = generate_plan(condition, demo, api_key)
-            if not exercises:
-                print(f"    ⚠ Failed to generate plan")
-                progress["completed_conditions"].append(condition_key)
-                save_progress(progress)
-                time.sleep(2)
-                continue
-
-            # Collect unique exercises
-            new_count = 0
-            for ex in exercises:
-                normalized = normalize_name(ex.get("imageFileName") or ex["name"])
-                if normalized not in progress["all_exercises"]:
-                    progress["all_exercises"][normalized] = {
-                        "name": ex["name"],
-                        "imageFileName": ex.get("imageFileName", normalized),
-                        "category": ex.get("exerciseCategory", "general"),
-                        "targetArea": ex.get("targetArea", "General"),
-                        "bodyPosition": ex.get("bodyPosition", "standing"),
-                        "startPoseDescription": ex.get("startPoseDescription", ""),
-                        "endPoseDescription": ex.get("endPoseDescription", ""),
-                        "conditions_seen_in": [condition],
-                    }
-                    new_count += 1
-                else:
-                    # Track which conditions use this exercise
-                    seen = progress["all_exercises"][normalized].get("conditions_seen_in", [])
-                    if condition not in seen:
-                        seen.append(condition)
-                    # Update descriptions if better ones available
-                    if ex.get("startPoseDescription") and not progress["all_exercises"][normalized].get("startPoseDescription"):
-                        progress["all_exercises"][normalized]["startPoseDescription"] = ex["startPoseDescription"]
-                    if ex.get("endPoseDescription") and not progress["all_exercises"][normalized].get("endPoseDescription"):
-                        progress["all_exercises"][normalized]["endPoseDescription"] = ex["endPoseDescription"]
-
-            print(f"    ✓ {len(exercises)} exercises ({new_count} new, {len(progress['all_exercises'])} total unique)")
+        exercises = generate_plan(condition, demo, api_key)
+        if not exercises:
+            print(f"    ⚠ Failed to generate plan")
             progress["completed_conditions"].append(condition_key)
             save_progress(progress)
-            time.sleep(2)  # Rate limit
+            time.sleep(2)
+            continue
+
+        # Collect unique exercises
+        new_count = 0
+        for ex in exercises:
+            normalized = normalize_name(ex.get("imageFileName") or ex["name"])
+            if normalized not in progress["all_exercises"]:
+                progress["all_exercises"][normalized] = {
+                    "name": ex["name"],
+                    "imageFileName": ex.get("imageFileName", normalized),
+                    "category": ex.get("exerciseCategory", "general"),
+                    "targetArea": ex.get("targetArea", "General"),
+                    "bodyPosition": ex.get("bodyPosition", "standing"),
+                    "startPoseDescription": ex.get("startPoseDescription", ""),
+                    "endPoseDescription": ex.get("endPoseDescription", ""),
+                    "conditions_seen_in": [condition],
+                    "discovered_run": "shuffle" if shuffle else ("sample" if sample else "deterministic"),
+                }
+                new_count += 1
+            else:
+                # Track which conditions use this exercise
+                seen = progress["all_exercises"][normalized].get("conditions_seen_in", [])
+                if condition not in seen:
+                    seen.append(condition)
+                # Update descriptions if better ones available
+                if ex.get("startPoseDescription") and not progress["all_exercises"][normalized].get("startPoseDescription"):
+                    progress["all_exercises"][normalized]["startPoseDescription"] = ex["startPoseDescription"]
+                if ex.get("endPoseDescription") and not progress["all_exercises"][normalized].get("endPoseDescription"):
+                    progress["all_exercises"][normalized]["endPoseDescription"] = ex["endPoseDescription"]
+
+        print(f"    ✓ {len(exercises)} exercises ({new_count} new, {len(progress['all_exercises'])} total unique)")
+        progress["completed_conditions"].append(condition_key)
+        save_progress(progress)
+        time.sleep(2)  # Rate limit
 
     print(f"\nPhase 1 complete: {len(progress['all_exercises'])} unique exercises found")
 
@@ -744,6 +787,30 @@ def main():
     parser.add_argument("--images-only", action="store_true", help="Only generate images from existing progress")
     parser.add_argument("--limit", type=int, help="Max images to generate")
     parser.add_argument("--summary", action="store_true", help="Print summary of progress file")
+    parser.add_argument(
+        "--shuffle",
+        action="store_true",
+        help="Randomize condition order within each category. Demographic gets baked into "
+             "condition_key so previously-completed (condition, demo) pairs aren't re-skipped.",
+    )
+    parser.add_argument(
+        "--sample",
+        type=int,
+        metavar="N",
+        help="Cap conditions per category to N (after shuffle). Like --shuffle, this bakes "
+             "demographic into condition_key.",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        help="Seed for --shuffle (omit for true randomness).",
+    )
+    parser.add_argument(
+        "--report-new",
+        action="store_true",
+        help="After phase 1, print the list of newly-discovered exercise names that don't yet "
+             "resolve via the fuzzy matcher (so the user can approve before image generation).",
+    )
     args = parser.parse_args()
 
     OUTPUT_DIR.mkdir(exist_ok=True)
@@ -770,16 +837,51 @@ def main():
         print_summary(progress)
         return
 
+    # Snapshot exercise set before phase 1 so we can compute "new this run"
+    pre_run_keys = set(progress.get("all_exercises", {}).keys())
+
     # Phase 1: Generate plans
     if not args.images_only:
         if not args.anthropic_key:
             print("Error: --anthropic-key required for plan generation")
             sys.exit(1)
-        phase1_generate_plans(progress, args.anthropic_key, dry_run=args.dry_run)
+        phase1_generate_plans(
+            progress,
+            args.anthropic_key,
+            dry_run=args.dry_run,
+            shuffle=args.shuffle,
+            sample=args.sample,
+            seed=args.seed,
+        )
 
     # Phase 2: Gap analysis
     if progress["all_exercises"]:
         phase2_gap_analysis(progress)
+
+    # Optional: surface newly-discovered names (post-gap-analysis so we know
+    # which fail to resolve via fuzzy matching).
+    if args.report_new:
+        new_keys = sorted(set(progress["all_exercises"].keys()) - pre_run_keys)
+        gap = progress.get("gap_analysis", {})
+        unresolved = [k for k in new_keys if gap.get(k) == "needs_image"]
+        resolved = [k for k in new_keys if gap.get(k) != "needs_image"]
+        print(f"\n{'='*60}")
+        print(f"NEW EXERCISES THIS RUN: {len(new_keys)} discovered")
+        print(f"  Resolved via fuzzy match (no image needed): {len(resolved)}")
+        print(f"  Unresolved (would need new image generation): {len(unresolved)}")
+        print(f"{'='*60}")
+        if unresolved:
+            print("\nUNRESOLVED — needs image generation:")
+            for k in unresolved:
+                ex = progress["all_exercises"][k]
+                print(f"  {k}  ({ex.get('name')})  [{ex.get('targetArea')}]")
+        if resolved:
+            print(f"\nRESOLVED via fuzzy match (existing image will be used):")
+            for k in resolved[:30]:
+                ex = progress["all_exercises"][k]
+                print(f"  {k}  → matched ({ex.get('name')})")
+            if len(resolved) > 30:
+                print(f"  ... (+{len(resolved)-30} more)")
 
     # Phase 3: Generate images
     if not args.plans_only and not args.dry_run:
