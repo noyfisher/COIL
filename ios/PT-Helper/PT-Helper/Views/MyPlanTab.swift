@@ -42,7 +42,9 @@ struct MyPlanTab: View {
                 Button("Cancel", role: .cancel) { planToDelete = nil }
                 Button("Delete", role: .destructive) {
                     if let plan = planToDelete {
-                        savedPlansViewModel.deletePlan(plan)
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            savedPlansViewModel.deletePlan(plan)
+                        }
                         planToDelete = nil
                     }
                 }
@@ -83,7 +85,7 @@ struct MyPlanTab: View {
                                 Label("Delete", systemImage: "trash")
                             }
                         }
-                        .swipeActions(edge: .trailing) {
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                             Button(role: .destructive) {
                                 planToDelete = plan
                                 showDeleteConfirmation = true
