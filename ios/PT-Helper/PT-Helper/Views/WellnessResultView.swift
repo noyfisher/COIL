@@ -60,19 +60,13 @@ struct WellnessResultView: View {
     // MARK: - Overall Summary
 
     private var overallSummaryCard: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            Label("Summary", systemImage: "text.alignleft")
-                .font(.subheadline.weight(.semibold))
-                .foregroundColor(AppColors.accent)
-            Text(viewModel.analysisResult?.overallSummary ?? "")
-                .font(.body)
-                .lineSpacing(3)
-        }
-        .padding(AppSpacing.lg)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColors.cardBackground)
-        .cornerRadius(AppCorners.xl)
-        .shadow(color: AppColors.cardShadowColor, radius: 10, y: 3)
+        ExpandableSummaryView(
+            fullText: viewModel.analysisResult?.overallSummary ?? "",
+            presentation: .card(icon: "text.alignleft", iconColor: AppColors.accent, title: "Summary"),
+            detailTitle: "Summary",
+            detailAnalyticsName: "FullText.WellnessResult",
+            accessibilityPrefix: "wellnessResult"
+        )
     }
 
     // MARK: - Recommendation Card

@@ -105,12 +105,13 @@ struct AnalysisResultView: View {
     // MARK: - Summary
 
     private var overallSummaryCard: some View {
-        CardSection(icon: "heart.text.clipboard", color: AppColors.accent, title: "What We Found") {
-            Text(analysisResult.overallSummary)
-                .font(.body)
-                .foregroundColor(AppColors.primaryText)
-                .lineSpacing(3)
-        }
+        ExpandableSummaryView(
+            fullText: analysisResult.overallSummary,
+            presentation: .card(icon: "heart.text.clipboard", iconColor: AppColors.accent, title: "What We Found"),
+            detailTitle: "What We Found",
+            detailAnalyticsName: "FullText.AnalysisResult",
+            accessibilityPrefix: "analysisResult"
+        )
     }
 
     // MARK: - Condition Card

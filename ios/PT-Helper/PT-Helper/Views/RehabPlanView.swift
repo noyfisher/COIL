@@ -436,10 +436,16 @@ struct RehabPlanView: View {
                     .datePickerStyle(.compact)
                 }
                 if let notes = plan.notes, !notes.isEmpty {
-                    Text(notes)
-                        .font(.caption)
-                        .foregroundColor(AppColors.secondaryText)
-                        .padding(.top, AppSpacing.xs)
+                    ExpandableSummaryView(
+                        fullText: notes,
+                        presentation: .inline,
+                        detailTitle: "Plan Notes",
+                        detailAnalyticsName: "FullText.RehabPlanNotes",
+                        accessibilityPrefix: "rehabPlan",
+                        previewFont: .caption,
+                        previewColor: AppColors.secondaryText
+                    )
+                    .padding(.top, AppSpacing.xs)
                 }
             }
         }
