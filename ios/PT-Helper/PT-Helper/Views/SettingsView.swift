@@ -243,6 +243,30 @@ struct SettingsView: View {
                             }
                             .accessibilityIdentifier("settings.editProfileButton")
 
+                            #if DEBUG
+                            Divider().padding(.leading, 52)
+
+                            NavigationLink(destination: MissingImagesDebugView()) {
+                                HStack(spacing: AppSpacing.md) {
+                                    Image(systemName: "photo.badge.exclamationmark")
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(AppColors.warning)
+                                        .frame(width: 32, height: 32)
+                                        .background(AppColors.warning.opacity(0.12))
+                                        .cornerRadius(AppCorners.small)
+                                    Text("Image Diagnostics (DEBUG)")
+                                        .font(.body)
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .foregroundColor(AppColors.secondaryText)
+                                }
+                                .padding(.horizontal, AppSpacing.lg)
+                                .padding(.vertical, AppSpacing.md)
+                            }
+                            .accessibilityIdentifier("settings.imageDiagnosticsButton")
+                            #endif
+
                             Divider().padding(.leading, 52)
 
                             settingsRow(icon: "rectangle.portrait.and.arrow.right", color: AppColors.danger, title: "Sign Out") {

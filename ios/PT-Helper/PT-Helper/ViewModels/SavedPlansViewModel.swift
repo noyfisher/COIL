@@ -20,6 +20,14 @@ class SavedPlansViewModel: ObservableObject {
     /// `nonisolated(unsafe)` so deinit (which is nonisolated) can remove the listener.
     nonisolated(unsafe) private var listenerRegistration: ListenerRegistration?
 
+    /// PR 3: tracks plan IDs that have been repaired this app session, so the
+    /// snapshot listener doesn't re-trigger repair on its own write-back.
+    /// Cleared on cold start (initial value `[]`).
+    private var repairedThisSession: Set<UUID> = []
+    /// Hard cap to bound Firestore quota for users with many saved plans.
+    /// Once we hit the cap, remaining plans wait for the next cold start.
+    private static let maxRepairsPerSession = 5
+
     init() {
         if TestDataSeeder.isUITesting && TestDataSeeder.shouldSeedMockData {
             self.rehabPlans = TestDataSeeder.makeMockPlans()
@@ -96,7 +104,13 @@ class SavedPlansViewModel: ObservableObject {
                     self.loadError = nil
                     SessionLogger.shared.log(.firestoreRead, category: .data, message: "Rehab plans updated",
                                               metadata: ["count": "\(snapshot?.documents.count ?? 0)"])
-                    self.rehabPlans = self.parsePlans(from: snapshot)
+                    let parsed = self.parsePlans(from: snapshot)
+                    self.rehabPlans = parsed
+                    // PR 3: repair-on-load. Walk plans needing repair, rewrite
+                    // pre-substitution names to canonical catalog entries, and
+                    // batch-persist. Subsequent listener fires see schemaVersion=2
+                    // and skip; the in-session set guards against listener loops.
+                    self.runRepairPass(on: parsed)
                 }
             }
     }
@@ -151,7 +165,10 @@ class SavedPlansViewModel: ObservableObject {
                     movement: e["movement"] as? String,
                     endPosition: e["endPosition"] as? String,
                     exerciseCategory: e["exerciseCategory"] as? String,
-                    imageFileName: e["imageFileName"] as? String
+                    imageFileName: e["imageFileName"] as? String,
+                    catalogSubstitution: e["catalogSubstitution"] as? Bool,
+                    notes: e["notes"] as? String,
+                    originalAIName: e["originalAIName"] as? String
                 )
             }
 
@@ -173,7 +190,7 @@ class SavedPlansViewModel: ObservableObject {
                 weeklySchedule = []
             }
 
-            return RehabPlan(
+            var plan = RehabPlan(
                 id: id,
                 planName: planName,
                 conditions: data["conditions"] as? [String] ?? [],
@@ -185,7 +202,66 @@ class SavedPlansViewModel: ObservableObject {
                 startDate: (data["startDate"] as? Timestamp)?.dateValue(),
                 lastModifiedDate: (data["lastModifiedDate"] as? Timestamp)?.dateValue()
             )
+            plan.schemaVersion = data["schemaVersion"] as? Int ?? 1
+            return plan
         } ?? []
+    }
+
+    // MARK: - Repair-on-load (PR 3)
+
+    /// Walk plans that haven't been migrated to schemaVersion 2 yet, rewrite any
+    /// exercises whose names no longer resolve to a catalog image, and persist.
+    /// The repair pass uses the same `ImageAvailabilityValidator` as PR 2's
+    /// validateRehabPlan step so substitution choices are consistent.
+    private func runRepairPass(on plans: [RehabPlan]) {
+        var repairsThisCall = 0
+        for original in plans {
+            guard original.schemaVersion < 2 else { continue }
+            guard !repairedThisSession.contains(original.id) else { continue }
+            guard repairsThisCall < Self.maxRepairsPerSession else {
+                AppLogger.data.info("[parsePlans] repair cap (\(Self.maxRepairsPerSession)) reached; deferring remaining plans to next cold start")
+                break
+            }
+
+            // Mark BEFORE the write so a fast listener fire (which can re-enter
+            // parsePlans before our updatePlan completes) doesn't re-trigger.
+            repairedThisSession.insert(original.id)
+
+            // Run the same validation helper PR 2 uses for new plans. We don't
+            // have user conditions here (this runs at app cold start, before
+            // any analysis context is loaded), so pass empty arrays — the
+            // safety guards in `ImageAvailabilityValidator` will conservatively
+            // refuse to substitute exercises with safety-flagged keywords
+            // regardless of conditions.
+            let result = ImageAvailabilityValidator.validate(
+                exercises: original.exercises,
+                userConditions: [],
+                userPainRegions: []
+            )
+
+            if result.substitutionCount == 0 {
+                // Nothing to rewrite, but still bump schemaVersion so we don't
+                // re-attempt every cold start. Unrepairable cases also count as
+                // "we did the best we can" — no point retrying.
+                var bumped = original
+                bumped.schemaVersion = 2
+                updatePlan(bumped)
+                repairsThisCall += 1
+                AppLogger.data.info("[parsePlans] plan '\(original.planName)' marked v2 (no substitutions needed)")
+                continue
+            }
+
+            var repaired = original
+            repaired.exercises = result.rewritten
+            repaired.schemaVersion = 2
+            updatePlan(repaired)
+            repairsThisCall += 1
+            AppLogger.data.info("[parsePlans] plan '\(original.planName)' repaired: \(result.substitutionCount) substitutions, \(result.unrepairableCount) unrepairable → v2")
+        }
+        if repairsThisCall > 0 {
+            SessionLogger.shared.log(.firestoreWrite, category: .data,
+                                      message: "Repair-on-load: \(repairsThisCall) plan(s) migrated to schemaVersion 2")
+        }
     }
 
     /// Update an existing plan in Firestore (for edits, startDate changes, etc.)
@@ -217,6 +293,9 @@ class SavedPlansViewModel: ObservableObject {
             if let ep = e.endPosition { dict["endPosition"] = ep }
             if let ec = e.exerciseCategory { dict["exerciseCategory"] = ec }
             if let img = e.imageFileName { dict["imageFileName"] = img }
+            if let cs = e.catalogSubstitution { dict["catalogSubstitution"] = cs }
+            if let n = e.notes { dict["notes"] = n }
+            if let orig = e.originalAIName { dict["originalAIName"] = orig }
             return dict
         }
 
@@ -235,7 +314,8 @@ class SavedPlansViewModel: ObservableObject {
             "exercises": exercisesData,
             "weeklySchedule": scheduleDict,
             "totalWeeks": plan.totalWeeks,
-            "createdDate": Timestamp(date: plan.createdDate)
+            "createdDate": Timestamp(date: plan.createdDate),
+            "schemaVersion": plan.schemaVersion
         ]
         if let notes = plan.notes { planData["notes"] = notes }
         if let startDate = plan.startDate { planData["startDate"] = Timestamp(date: startDate) }

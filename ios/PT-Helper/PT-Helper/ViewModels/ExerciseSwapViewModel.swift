@@ -53,6 +53,9 @@ private struct AISubstituteExercise: Decodable {
     let exerciseCategory: String?
     let imageFileName: String?
     let whyItHelps: String?
+    // PR 2: server-side flag/notes for kinetic-chain substitutions.
+    let catalogSubstitution: Bool?
+    let notes: String?
 }
 
 // MARK: - ViewModel
@@ -316,7 +319,10 @@ class ExerciseSwapViewModel: ObservableObject {
                 movement: ai.movement,
                 endPosition: ai.endPosition,
                 exerciseCategory: ai.exerciseCategory,
-                imageFileName: ai.imageFileName
+                imageFileName: ai.imageFileName,
+                catalogSubstitution: ai.catalogSubstitution,
+                notes: ai.notes,
+                originalAIName: ai.name
             )
 
             // Store the whyItHelps text separately (not part of RehabExercise model)

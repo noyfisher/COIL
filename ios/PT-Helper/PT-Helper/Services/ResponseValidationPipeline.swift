@@ -950,6 +950,237 @@ struct AnatomicalRelevanceChecker {
     }
 }
 
+// MARK: - Image Availability Validator (PR 2)
+
+/// Validates every exercise resolves to a real catalog image, and substitutes
+/// the closest catalog match when it doesn't (or when the resolved image is
+/// for a wrong body region). Runs FIRST in `validateRehabPlan` so all
+/// downstream steps (KG, cross-model verification, contraindication) operate
+/// on canonical post-substitution names.
+struct ImageAvailabilityValidator {
+    private static let log = AppLogger.images
+
+    struct Result {
+        let rewritten: [RehabExercise]
+        let substitutionWarnings: [ValidationWarning]
+        let substitutionCount: Int
+        let unrepairableCount: Int
+    }
+
+    /// Lightweight catalog entry for substitution scoring. Decoded from the
+    /// bundled exercise_image_mapping.json once per call.
+    private struct CatalogEntry {
+        let key: String
+        let name: String
+        let category: String
+        let targetAreaTokens: Set<String>
+        let bodyPosition: String?
+    }
+
+    /// Loaded once per call; ~1225 entries, decode is <10ms on simulator.
+    private static func loadCatalog() -> [CatalogEntry] {
+        guard let url = Bundle.main.url(forResource: "exercise_image_mapping", withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let raw = try? JSONDecoder().decode([String: ExerciseImageService.ImageEntry].self, from: data)
+        else {
+            return []
+        }
+        return raw.map { (key, entry) in
+            CatalogEntry(
+                key: key,
+                name: entry.name,
+                category: entry.category,
+                targetAreaTokens: ExerciseImageService.normalizedTargetArea(entry.target_area),
+                bodyPosition: entry.body_position
+            )
+        }
+    }
+
+    static func validate(
+        exercises: [RehabExercise],
+        userConditions: [String],
+        userPainRegions: [String]
+    ) -> Result {
+        let catalog = loadCatalog()
+        let service = ExerciseImageService.shared
+        var rewritten: [RehabExercise] = []
+        var warnings: [ValidationWarning] = []
+        var substitutions = 0
+        var unrepairable = 0
+
+        for original in exercises {
+            let originalAreaTokens = ExerciseImageService.normalizedTargetArea(original.targetArea)
+
+            // Step 1: try the resolver.
+            let match = service.resolveImageMatch(for: original)
+            var needsSubstitution = false
+            if let m = match,
+               let entry = catalog.first(where: { $0.key == m.key }) {
+                // Step 2: anatomical-relevance check on successfully-resolved match.
+                // If the resolved image's target_area has no overlap with the
+                // exercise's targetArea, the resolver picked an anatomically
+                // wrong image — treat as needing substitution.
+                if entry.targetAreaTokens.isDisjoint(with: originalAreaTokens) && !originalAreaTokens.isEmpty {
+                    needsSubstitution = true
+                }
+            } else {
+                needsSubstitution = true
+            }
+
+            if !needsSubstitution {
+                rewritten.append(original)
+                continue
+            }
+
+            // Safety guard: if the ORIGINAL exercise would trigger any
+            // contraindication for the user's conditions, do NOT substitute.
+            // Substitution would silently mask the warning at downstream
+            // step 2/9 (e.g. "Jump Squat" → "Wall Sits" hides the osteoporosis
+            // jumping warning). Pass through unchanged so the safety pipeline
+            // fires on the original name; user falls back to SF Symbol if
+            // they acknowledge and proceed anyway.
+            let originalContraindications = ExerciseContraindicationChecker.validate(
+                exercises: [original], conditions: userConditions
+            )
+            if !originalContraindications.isEmpty {
+                rewritten.append(original)
+                continue
+            }
+            // Same guard for the medical-condition safety keyword set used by
+            // downstream steps 8/9 (osteoporosis+impact, blood-thinners+fall-risk).
+            // These checks operate on `userProfile.medicalConditions`/`.medications`
+            // which we don't have here, so we conservatively block substitution
+            // whenever the name contains any flagged keyword. Worst case: a
+            // healthy user with no flagged conditions sees an SF Symbol fallback
+            // for a jump exercise. Best case: a flagged user sees the safety
+            // warning we'd otherwise have hidden.
+            if hasSafetyFlaggedKeyword(original.name) {
+                rewritten.append(original)
+                continue
+            }
+
+            // Step 3-7: pick a substitute.
+            if let substitute = pickSubstitute(
+                for: original,
+                originalAreaTokens: originalAreaTokens,
+                catalog: catalog,
+                userConditions: userConditions
+            ) {
+                substitutions += 1
+                var rewrittenExercise = original
+                // Capture the AI's original name BEFORE rewriting (idempotent — only
+                // sets if not already set, in case validation runs more than once).
+                if rewrittenExercise.originalAIName == nil {
+                    rewrittenExercise.originalAIName = original.name
+                }
+                rewrittenExercise.name = substitute.name
+                rewrittenExercise.imageFileName = substitute.key
+                warnings.append(ValidationWarning(
+                    severity: .info,
+                    message: "Showing illustration for similar exercise: \(substitute.name) (instead of \(original.name))."
+                ))
+                log.info("Image substitution: '\(original.name)' → '\(substitute.name)' (key: \(substitute.key))")
+
+                // Telemetry: record the substitution in `missingExerciseImages` so
+                // the debug surface (PR 2.3) can surface it as a backlog item.
+                service.logMissingImageIfNeeded(for: original, substitutedTo: substitute.key)
+            } else {
+                // No catalog candidate survived the contraindication + KG filters.
+                // Keep the original; it'll fall through to SF Symbol fallback at
+                // display time. PR 3 will re-attempt this on saved-plan load.
+                unrepairable += 1
+                rewritten.append(original)
+                log.warning("Image substitution failed for '\(original.name)' — no safe candidate")
+            }
+        }
+
+        return Result(
+            rewritten: rewritten,
+            substitutionWarnings: warnings,
+            substitutionCount: substitutions,
+            unrepairableCount: unrepairable
+        )
+    }
+
+    /// Mirror of the safety-keyword sets used in `validateRehabPlan` steps 8/9.
+    /// Substitution refuses to rewrite names containing these keywords because
+    /// downstream checks fire on the name itself — silent rewrite would hide
+    /// safety warnings.
+    private static let safetyKeywords: Set<String> = [
+        "jump", "plyometric", "impact", "running", "balance", "single-leg"
+    ]
+
+    private static func hasSafetyFlaggedKeyword(_ name: String) -> Bool {
+        let lower = name.lowercased()
+        return safetyKeywords.contains(where: { lower.contains($0) })
+    }
+
+    /// Pick the best catalog substitute for an exercise that has no image.
+    /// Returns nil if no candidate survives the contraindication + KG filters.
+    private static func pickSubstitute(
+        for exercise: RehabExercise,
+        originalAreaTokens: Set<String>,
+        catalog: [CatalogEntry],
+        userConditions: [String]
+    ) -> CatalogEntry? {
+        let originalCategory = exercise.exerciseCategory?.lowercased()
+        let originalNameTokens = Set(
+            ExerciseImageService.shared.normalizeName(exercise.name).split(separator: "-").map(String.init)
+        )
+
+        // Candidates: any catalog entry that shares at least one target_area token.
+        let candidates = catalog.filter { candidate in
+            !candidate.targetAreaTokens.isDisjoint(with: originalAreaTokens)
+        }
+        if candidates.isEmpty { return nil }
+
+        // Filter out anything the hardcoded contraindication checker would reject
+        // for this user's conditions. Substitution must NEVER produce an exercise
+        // that triggers a `.serious` warning at downstream step 2/9.
+        let safeCandidates = candidates.filter { candidate in
+            let probe = RehabExercise(
+                id: UUID(),
+                name: candidate.name,
+                targetArea: exercise.targetArea,
+                description: "",
+                sets: 1, reps: "1", restSeconds: 0,
+                difficulty: .beginner,
+                demonstrationIcon: "figure.flexibility",
+                tips: [], contraindications: []
+            )
+            let warnings = ExerciseContraindicationChecker.validate(
+                exercises: [probe], conditions: userConditions
+            )
+            // Drop any candidate that produces ANY warning — substitutes must be clean.
+            return warnings.isEmpty
+        }
+        if safeCandidates.isEmpty { return nil }
+
+        // Score each surviving candidate.
+        let scored: [(CatalogEntry, Int)] = safeCandidates.map { candidate in
+            var score = 0
+            // target_area token overlap (3 per shared token, max 10)
+            let overlap = candidate.targetAreaTokens.intersection(originalAreaTokens).count
+            score += min(overlap * 3, 10)
+            // category exact match (5)
+            if let cat = originalCategory, candidate.category.lowercased() == cat {
+                score += 5
+            }
+            // name token overlap with original (1 per shared token, max 5)
+            let candidateNameTokens = Set(candidate.key.split(separator: "-").map(String.init))
+            let nameOverlap = candidateNameTokens.intersection(originalNameTokens).count
+            score += min(nameOverlap, 5)
+            return (candidate, score)
+        }
+
+        // Highest score wins; tiebreak alphabetically by canonical key (deterministic).
+        return scored.max(by: { lhs, rhs in
+            if lhs.1 != rhs.1 { return lhs.1 < rhs.1 }
+            return lhs.0.key > rhs.0.key
+        })?.0
+    }
+}
+
 // MARK: - Knowledge Graph Validator
 
 struct KnowledgeGraphValidator {
@@ -1215,27 +1446,47 @@ struct ResponseValidationPipeline {
     static func validateRehabPlan(
         _ plan: RehabPlan,
         conditions: [String],
-        userProfile: UserProfile
+        userProfile: UserProfile,
+        userPainRegions: [String] = []
     ) -> (plan: RehabPlan, warnings: [ValidationWarning], graphVerification: PlanVerificationResult?) {
 
         var warnings: [ValidationWarning] = []
         var graphVerification: PlanVerificationResult?
+        var workingPlan = plan
 
         logger.info("Starting rehab plan validation: \(plan.exercises.count) exercises, \(conditions.count) conditions")
 
-        // 1. Exercise contraindication check (hardcoded rules — safety net)
-        logger.debug("[Rehab 1/7] Checking hardcoded contraindications...")
-        let contraindicationWarnings = ExerciseContraindicationChecker.validate(
+        // 1.0/9. Image-availability + auto-substitute (runs FIRST so KG validation
+        // and cross-model verification operate on canonical post-substitution names).
+        logger.debug("[Rehab 1.0/9] Validating image availability + substituting where needed...")
+        let imageResult = ImageAvailabilityValidator.validate(
             exercises: plan.exercises,
+            userConditions: conditions,
+            userPainRegions: userPainRegions
+        )
+        workingPlan.exercises = imageResult.rewritten
+        warnings.append(contentsOf: imageResult.substitutionWarnings)
+        logger.debug("[Rehab 1.0/9] Substitutions: \(imageResult.substitutionCount), unrepairable: \(imageResult.unrepairableCount)")
+
+        // 2/9. Exercise contraindication check (hardcoded rules — safety net).
+        // Note: image-substitution candidates were already filtered by
+        // ExerciseContraindicationChecker before scoring (see
+        // ImageAvailabilityValidator), so substituted exercises will be clean.
+        // Original-AI exercises that survived (no substitution) still get checked
+        // here. The duplication is intentional — keep the existing safety net.
+        let contraindicationWarnings = ExerciseContraindicationChecker.validate(
+            exercises: workingPlan.exercises,
             conditions: conditions
         )
         warnings.append(contentsOf: contraindicationWarnings)
-        logger.debug("[Rehab 1/7] Contraindication warnings: \(contraindicationWarnings.count)")
+        logger.debug("[Rehab 2/9] Contraindication warnings: \(contraindicationWarnings.count)")
 
-        // 1.5. Knowledge graph validation (comprehensive, deterministic)
-        logger.debug("[Rehab 1.5/7] Running knowledge graph validation...")
+        // 3/9. Knowledge graph validation (comprehensive, deterministic).
+        // Now sees CANONICAL post-substitution names — `crossVerify` payload
+        // downstream uses these same names.
+        logger.debug("[Rehab 3/9] Running knowledge graph validation...")
         let graphResult = KnowledgeGraphValidator.validate(
-            exercises: plan.exercises,
+            exercises: workingPlan.exercises,
             conditions: conditions
         )
         warnings.append(contentsOf: graphResult.warnings)
@@ -1243,27 +1494,27 @@ struct ResponseValidationPipeline {
         let verified = graphResult.verification.exerciseResults.filter { $0.tier == .verified }.count
         let unverified = graphResult.verification.unverifiedExercises.count
         let contraindicated = graphResult.verification.contraindicatedExercises.count
-        logger.debug("[Rehab 1.5/7] Knowledge graph: \(verified) verified, \(contraindicated) contraindicated, \(unverified) unverified")
+        logger.debug("[Rehab 3/9] Knowledge graph: \(verified) verified, \(contraindicated) contraindicated, \(unverified) unverified")
 
-        // 2. Parameter range validation
-        let paramFixes = ExerciseContraindicationChecker.validateParameters(plan.exercises)
+        // 4/9. Parameter range validation
+        let paramFixes = ExerciseContraindicationChecker.validateParameters(workingPlan.exercises)
         for fix in paramFixes {
             warnings.append(ValidationWarning(severity: .info, message: fix))
         }
 
-        // 3. Exercise count check
-        if plan.exercises.isEmpty {
+        // 5/9. Exercise count check
+        if workingPlan.exercises.isEmpty {
             warnings.append(ValidationWarning(severity: .caution, message: "No exercises were generated. The fallback exercise database will be used."))
         }
 
-        // 4. Plan duration check
-        if plan.totalWeeks < 1 || plan.totalWeeks > 24 {
-            warnings.append(ValidationWarning(severity: .info, message: "Plan duration of \(plan.totalWeeks) weeks is unusual. Typical plans are 4-12 weeks."))
+        // 6/9. Plan duration check
+        if workingPlan.totalWeeks < 1 || workingPlan.totalWeeks > 24 {
+            warnings.append(ValidationWarning(severity: .info, message: "Plan duration of \(workingPlan.totalWeeks) weeks is unusual. Typical plans are 4-12 weeks."))
         }
 
-        // 5. Age-based safety checks
+        // 7/9. Age-based safety checks
         if userProfile.age >= 65 {
-            let hasHighIntensity = plan.exercises.contains(where: { $0.difficulty == .advanced })
+            let hasHighIntensity = workingPlan.exercises.contains(where: { $0.difficulty == .advanced })
             if hasHighIntensity {
                 warnings.append(ValidationWarning(
                     severity: .caution,
@@ -1272,11 +1523,11 @@ struct ResponseValidationPipeline {
             }
         }
 
-        // 6. Medical condition safety checks
+        // 8/9. Medical condition safety checks
         let medConditionsLower = userProfile.medicalConditions.map { $0.lowercased() }
 
         if medConditionsLower.contains(where: { $0.contains("osteoporosis") }) {
-            let hasImpact = plan.exercises.contains(where: {
+            let hasImpact = workingPlan.exercises.contains(where: {
                 let nameLower = $0.name.lowercased()
                 return nameLower.contains("jump") || nameLower.contains("plyometric") || nameLower.contains("impact") || nameLower.contains("running")
             })
@@ -1298,12 +1549,12 @@ struct ResponseValidationPipeline {
             ))
         }
 
-        // 7. Medication-aware safety checks
+        // 9/9. Medication + post-surgical safety checks
         let meds = userProfile.medications ?? []
         let medsLower = Set(meds.map { $0.lowercased() })
 
         if medsLower.contains("blood thinners") {
-            let hasImpactOrFall = plan.exercises.contains(where: {
+            let hasImpactOrFall = workingPlan.exercises.contains(where: {
                 let n = $0.name.lowercased()
                 return n.contains("jump") || n.contains("plyometric") || n.contains("balance") || n.contains("single-leg")
             })
@@ -1331,7 +1582,6 @@ struct ResponseValidationPipeline {
             ))
         }
 
-        // 8. Post-surgical restriction checks
         let activeSurgeries = userProfile.surgeries.filter {
             $0.recoveryStatus == "Still recovering" || $0.recoveryStatus == "Have restrictions"
         }
@@ -1343,9 +1593,13 @@ struct ResponseValidationPipeline {
             ))
         }
 
-        logger.info("Rehab plan validation: \(warnings.count) warnings for \(plan.exercises.count) exercises")
+        // PR 3: tag plans that survived the full pipeline as schemaVersion 2 so
+        // SavedPlansViewModel's repair-on-load skips them on subsequent fetches.
+        workingPlan.schemaVersion = 2
 
-        return (plan, warnings, graphVerification)
+        logger.info("Rehab plan validation: \(warnings.count) warnings for \(workingPlan.exercises.count) exercises")
+
+        return (workingPlan, warnings, graphVerification)
     }
 
     // MARK: - Cross-model verification helpers (Tier 2 PR D)

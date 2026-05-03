@@ -28,6 +28,11 @@ private struct AIRehabExercise: Decodable {
     let endPosition: String?
     let exerciseCategory: String?
     let imageFileName: String?
+    // PR 2: server-side flag/notes for kinetic-chain substitutions. Both optional
+    // so omission decodes cleanly. `originalAIName` is intentionally NOT here —
+    // it's a client-side-only field set during validation.
+    let catalogSubstitution: Bool?
+    let notes: String?
 }
 
 // MARK: - Rehab Plan Preferences
@@ -162,10 +167,12 @@ class RehabPlanViewModel: ObservableObject {
 
                 // Validate the plan (includes knowledge graph check)
                 AppLogger.rehab.info("Validating AI rehab plan...")
+                let painRegions = analysisResult.assessments.map { $0.selectedRegion.name }
                 let (validatedPlan, warnings, graphVerification) = ResponseValidationPipeline.validateRehabPlan(
                     plan,
                     conditions: conditions,
-                    userProfile: analysisResult.userProfileSnapshot
+                    userProfile: analysisResult.userProfileSnapshot,
+                    userPainRegions: painRegions
                 )
                 self.rehabPlan = validatedPlan
                 self.rehabPlanWarnings = warnings
@@ -252,7 +259,8 @@ class RehabPlanViewModel: ObservableObject {
                 let (validatedFallback, warnings, _) = ResponseValidationPipeline.validateRehabPlan(
                     fallbackPlan,
                     conditions: conditions,
-                    userProfile: analysisResult.userProfileSnapshot
+                    userProfile: analysisResult.userProfileSnapshot,
+                    userPainRegions: analysisResult.assessments.map { $0.selectedRegion.name }
                 )
                 self.rehabPlan = validatedFallback
                 self.rehabPlanWarnings = warnings
@@ -625,7 +633,13 @@ class RehabPlanViewModel: ObservableObject {
                 movement: aiExercise.movement,
                 endPosition: aiExercise.endPosition,
                 exerciseCategory: aiExercise.exerciseCategory,
-                imageFileName: aiExercise.imageFileName
+                imageFileName: aiExercise.imageFileName,
+                catalogSubstitution: aiExercise.catalogSubstitution,
+                notes: aiExercise.notes,
+                // Capture the original AI-generated name BEFORE any substitution
+                // rewrites happen in `validateRehabPlan`. Preserves the analytics
+                // signal "what did Claude generate that we had to substitute?"
+                originalAIName: aiExercise.name
             )
         }
 

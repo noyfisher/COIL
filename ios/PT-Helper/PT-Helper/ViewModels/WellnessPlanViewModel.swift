@@ -28,6 +28,9 @@ private struct AIWellnessExercise: Decodable {
     let endPosition: String?
     let exerciseCategory: String?
     let imageFileName: String?
+    // PR 2: server-side flag/notes for kinetic-chain substitutions.
+    let catalogSubstitution: Bool?
+    let notes: String?
 }
 
 @MainActor
@@ -303,7 +306,10 @@ class WellnessPlanViewModel: ObservableObject {
                 movement: aiExercise.movement,
                 endPosition: aiExercise.endPosition,
                 exerciseCategory: aiExercise.exerciseCategory,
-                imageFileName: aiExercise.imageFileName
+                imageFileName: aiExercise.imageFileName,
+                catalogSubstitution: aiExercise.catalogSubstitution,
+                notes: aiExercise.notes,
+                originalAIName: aiExercise.name
             )
         }
 

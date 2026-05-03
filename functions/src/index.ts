@@ -8,6 +8,7 @@ import { handleGenerateExerciseImage } from "./image-generation";
 import { newRequestContext, logCompleted, logError, logWarn } from "./logger";
 import { validateClaudeResponse } from "./response-schemas";
 import { validateNightlyReport } from "./nightly-report-validator";
+import { EXERCISE_CATALOG_CSV } from "./generated/exerciseCatalog";
 
 // Hard billing shutoff (Pub/Sub triggered). Exported so firebase-tools
 // picks it up on deploy. See billing-shutoff.ts for arming instructions.
@@ -313,11 +314,11 @@ RULES:
 - For movement: describe the motion step by step (1-2 sentences, simple language)
 - For endPosition: describe the end of the movement and how to return (1 sentence)
 - For exerciseCategory: choose ONE of: "stretch", "strength", "balance", "cardio", "mobility", "core", "yoga", "walking", "seated", "lying", "standing", "stair"
-- For imageFileName: create a normalized lowercase kebab-case filename for the exercise (e.g. "quad-sets", "glute-bridges", "cat-cow-stretch"). Use only lowercase letters, numbers, and hyphens.
-- For optional fields (startPosition, movement, endPosition, exerciseCategory, imageFileName, notes): provide the value if applicable, or use an empty string "" if not applicable. Never use null.
+- For name and imageFileName: select EXACTLY one entry from the EXERCISE CATALOG below. The "name" field MUST equal the catalog's display_name for the chosen row, and "imageFileName" MUST equal the normalized_filename. ONLY IF no entry in the catalog matches the patient's primary target_area, you MUST select an exercise targeting an anatomically adjacent region (one joint proximal or distal — e.g. hip exercises for knee issues), set "catalogSubstitution": true, and put a one-sentence explanation in the per-exercise "notes" field. NEVER substitute across major body segments (upper-extremity ↔ lower-extremity, or spine ↔ extremity) — if no near neighbor exists, pick the closest same-region entry instead. For normal selections (exact target_area match), set "catalogSubstitution": false and leave "notes" empty. NEVER invent exercise names not in the catalog. DO NOT reference, explain, or comment on catalog selections in any other text.
+- For optional fields (startPosition, movement, endPosition, exerciseCategory): provide the value if applicable, or use an empty string "" if not applicable. Never use null.
 
-RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure:
-{"planName":"...","exercises":[{"name":"...","targetArea":"...","description":"...","sets":3,"reps":"10","restSeconds":30,"difficulty":"beginner","demonstrationIcon":"figure.flexibility","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"stretch","imageFileName":"exercise-name"}],"totalWeeks":4,"notes":"..."}`,
+RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure (showing both the normal case and the kinetic-chain substitution case):
+{"planName":"...","exercises":[{"name":"Quad Sets","targetArea":"Knee","description":"...","sets":3,"reps":"10","restSeconds":30,"difficulty":"beginner","demonstrationIcon":"figure.flexibility","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"strength","imageFileName":"quad-sets","catalogSubstitution":false,"notes":""},{"name":"Glute Bridges","targetArea":"Knee","description":"...","sets":3,"reps":"12","restSeconds":30,"difficulty":"beginner","demonstrationIcon":"figure.strengthtraining.traditional","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"strength","imageFileName":"glute-bridges","catalogSubstitution":true,"notes":"Hip-driven exercise selected because no exact knee-targeted catalog entry fit; hip strength supports knee mechanics."}],"totalWeeks":4,"notes":"..."}`,
 
   exercise_substitute: `You are a PT rehabilitation specialist. The user cannot perform a specific exercise in their rehab plan and needs 2-3 substitute exercises that target the same muscle group and serve the same rehabilitation purpose. Educational purposes only.
 
@@ -334,13 +335,13 @@ RULES:
 - For movement: describe the motion step by step (1-2 sentences, simple language)
 - For endPosition: describe the end of the movement and how to return (1 sentence)
 - For exerciseCategory: choose ONE of: "stretch", "strength", "balance", "mobility", "core", "yoga", "seated", "lying", "standing"
-- For imageFileName: create a normalized lowercase kebab-case filename for the exercise (e.g. "quad-sets", "glute-bridges"). Use only lowercase letters, numbers, and hyphens.
-- For optional fields (startPosition, movement, endPosition, exerciseCategory, imageFileName): provide the value if applicable, or use an empty string "" if not applicable. Never use null.
+- For name and imageFileName: select EXACTLY one entry from the EXERCISE CATALOG below. The "name" field MUST equal the catalog's display_name, and "imageFileName" MUST equal the normalized_filename. ONLY IF no entry matches the original exercise's target_area, you MUST select from an anatomically adjacent region (one joint proximal or distal), set "catalogSubstitution": true, and explain in the per-exercise "notes" field. NEVER substitute across major body segments. For normal selections, set "catalogSubstitution": false and leave "notes" empty. NEVER invent names not in the catalog. DO NOT reference, explain, or comment on catalog selections outside of the JSON object.
+- For optional fields (startPosition, movement, endPosition, exerciseCategory): provide the value if applicable, or use an empty string "" if not applicable. Never use null.
 - Do NOT suggest the same exercise that is being replaced
 - Do NOT suggest exercises already in the user's plan
 
-RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure:
-{"substitutes":[{"name":"...","targetArea":"...","description":"...","sets":3,"reps":"10","restSeconds":30,"difficulty":"beginner","demonstrationIcon":"figure.flexibility","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"stretch","imageFileName":"exercise-name","whyItHelps":"..."}]}`,
+RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure (showing both the normal case and a kinetic-chain substitution case):
+{"substitutes":[{"name":"Wall Sits","targetArea":"Knee","description":"...","sets":3,"reps":"30 seconds","restSeconds":45,"difficulty":"beginner","demonstrationIcon":"figure.cooldown","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"strength","imageFileName":"wall-sits","catalogSubstitution":false,"notes":"","whyItHelps":"..."},{"name":"Glute Bridges","targetArea":"Knee","description":"...","sets":3,"reps":"12","restSeconds":30,"difficulty":"beginner","demonstrationIcon":"figure.strengthtraining.traditional","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"strength","imageFileName":"glute-bridges","catalogSubstitution":true,"notes":"Hip-driven substitute chosen because no exact knee-targeted catalog entry fit.","whyItHelps":"..."}]}`,
 
   recovery_insights: `You are a supportive recovery coach for a physical therapy patient. Analyze their recent workout data and produce a personalized weekly recovery digest. Write like a friendly coach — encouraging, specific, and actionable. This is educational only, not medical advice.
 
@@ -499,11 +500,11 @@ RULES:
 - For movement: describe the motion step by step (1-2 sentences)
 - For endPosition: describe the end of the movement and how to return (1 sentence)
 - For exerciseCategory: choose ONE of: "stretch", "strength", "balance", "cardio", "mobility", "core", "yoga", "walking", "seated", "lying", "standing", "stair"
-- For imageFileName: create a normalized lowercase kebab-case filename (e.g. "cat-cow-stretch", "desk-shoulder-rolls")
-- For optional fields: provide the value if applicable, or use an empty string "" if not applicable. Never use null.
+- For name and imageFileName: select EXACTLY one entry from the EXERCISE CATALOG below. The "name" field MUST equal the catalog's display_name, and "imageFileName" MUST equal the normalized_filename. ONLY IF no entry matches the goal's primary focus area, you MUST select an exercise targeting an anatomically adjacent region (one joint proximal or distal), set "catalogSubstitution": true, and explain in the per-exercise "notes" field. NEVER substitute across major body segments. For normal selections, set "catalogSubstitution": false and leave "notes" empty. NEVER invent names not in the catalog. DO NOT reference, explain, or comment on catalog selections outside of the JSON object.
+- For optional fields (startPosition, movement, endPosition, exerciseCategory): provide the value if applicable, or use an empty string "" if not applicable. Never use null.
 
-RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure:
-{"planName":"...","exercises":[{"name":"...","targetArea":"...","description":"...","sets":3,"reps":"10","restSeconds":30,"difficulty":"beginner","demonstrationIcon":"figure.flexibility","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"stretch","imageFileName":"exercise-name"}],"totalWeeks":4,"notes":"..."}`,
+RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure (showing both the normal case and a substitution case):
+{"planName":"...","exercises":[{"name":"Cat-Cow Stretch","targetArea":"Back","description":"...","sets":2,"reps":"10","restSeconds":20,"difficulty":"beginner","demonstrationIcon":"figure.flexibility","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"stretch","imageFileName":"cat-cow-stretch","catalogSubstitution":false,"notes":""},{"name":"Glute Bridges","targetArea":"Posture","description":"...","sets":3,"reps":"12","restSeconds":30,"difficulty":"beginner","demonstrationIcon":"figure.strengthtraining.traditional","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"strength","imageFileName":"glute-bridges","catalogSubstitution":true,"notes":"Hip strengthening selected as a posture support — no exact posture-coded catalog entry."}],"totalWeeks":4,"notes":"..."}`,
 
   nightly_report: `You are a product analytics assistant for PT Helper, a physical therapy iOS app.
 Given the following metrics from the past 24 hours, write a brief, scannable email report that a solo developer can read in 2 minutes over morning coffee.
@@ -784,6 +785,21 @@ export const claudeProxy = functions
     const systemPrompt = SYSTEM_PROMPTS[body.requestType];
     const config = MODEL_CONFIG[body.requestType];
 
+    // For request types that need exercise-name constraint, prepend the catalog as a
+    // separate cacheable block. Catalog FIRST so prompt edits don't invalidate the
+    // larger catalog cache. NEVER inject per-user content into either system block —
+    // user data goes in `messages`. Adding the catalog to other request types would
+    // waste ~18K tokens per call for no benefit.
+    const REQUEST_TYPES_WITH_CATALOG = new Set(["rehab_plan", "exercise_substitute", "wellness_plan"]);
+    const systemBlocks = REQUEST_TYPES_WITH_CATALOG.has(body.requestType)
+      ? [
+          { type: "text", text: EXERCISE_CATALOG_CSV, cache_control: { type: "ephemeral" } },
+          { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } },
+        ]
+      : [
+          { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } },
+        ];
+
     try {
       const anthropicResponse = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
@@ -796,9 +812,7 @@ export const claudeProxy = functions
           model: config.model,
           max_tokens: config.max_tokens,
           ...(config.temperature !== undefined && { temperature: config.temperature }),
-          system: [
-            { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } },
-          ],
+          system: systemBlocks,
           messages: body.messages,
         }),
       });

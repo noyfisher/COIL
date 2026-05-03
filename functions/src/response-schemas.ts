@@ -70,6 +70,12 @@ const exerciseSchema = z.object({
   endPosition: z.string().optional(),
   exerciseCategory: z.string().optional(),
   imageFileName: z.string().optional(),
+  // Catalog-substitution signal: true when Claude picked an anatomically-adjacent
+  // exercise because the patient's primary target_area had no exact match.
+  // Optional so older clients/responses without the field decode cleanly.
+  catalogSubstitution: z.boolean().optional(),
+  // Per-exercise notes — populated by Claude only when catalogSubstitution is true.
+  notes: z.string().optional(),
 });
 
 export const rehabPlanSchema = z.object({
