@@ -7,6 +7,7 @@ struct ProgressTab: View {
     @EnvironmentObject private var tabSelection: TabSelection
     @EnvironmentObject private var workoutViewModel: WorkoutViewModel
     @EnvironmentObject private var insightsVM: RecoveryInsightsViewModel
+    @EnvironmentObject private var savedPlansVM: SavedPlansViewModel
     @State private var showSettings = false
     @State private var showProfileEdit = false
 
@@ -16,6 +17,7 @@ struct ProgressTab: View {
                 tabSelection: tabSelection,
                 workoutViewModel: workoutViewModel,
                 insightsVM: insightsVM,
+                savedPlansVM: savedPlansVM,
                 onSettingsTapped: { showSettings = true }
             )
         }
@@ -43,12 +45,19 @@ struct ProgressTabContent: View {
     let tabSelection: TabSelection
     @ObservedObject var workoutViewModel: WorkoutViewModel
     @ObservedObject var insightsVM: RecoveryInsightsViewModel
+    @ObservedObject var savedPlansVM: SavedPlansViewModel
     @ObservedObject private var streakService = StreakService.shared
     var onSettingsTapped: () -> Void
 
     @State private var selectedRegion: String? = nil
     @State private var sessionToDelete: WorkoutSession?
     @State private var showDeleteConfirmation = false
+
+    /// Tier 3 PR D + followup: outcome-prompt visibility. Re-evaluated on
+    /// every render — when the user submits or dismisses the prompt,
+    /// `OutcomePromptView` calls our `onComplete` which bumps this counter
+    /// to force re-evaluation of `OutcomeRecorder.shouldShowPrompt`.
+    @State private var outcomePromptRefreshTick: Int = 0
 
     var body: some View {
         ScrollView {
@@ -73,6 +82,22 @@ struct ProgressTabContent: View {
 
                     // AI Recovery Insights
                     RecoveryInsightsCardView(vm: insightsVM)
+
+                    // Tier 3 PR D: outcome rating prompt — surfaces ≥7 days
+                    // after a plan starts, asks the user how accurate the
+                    // original AI analysis turned out to be. Hidden when
+                    // either no eligible plan exists or the rating's
+                    // already in. Re-renders on outcomePromptRefreshTick.
+                    if let target = outcomePromptTarget {
+                        OutcomePromptView(
+                            analysisId: target.analysisId,
+                            planId: target.plan.id,
+                            planAgeDays: OutcomeRecorder.planAgeDays(planStartDate: target.plan.startDate)
+                        ) {
+                            outcomePromptRefreshTick &+= 1
+                        }
+                        .id(outcomePromptRefreshTick)
+                    }
 
                     // Recent Workouts
                     recentWorkoutsSection
@@ -135,6 +160,31 @@ struct ProgressTabContent: View {
                 }
             }
         }
+    }
+
+    // MARK: - Outcome Prompt (Tier 3 PR D)
+
+    /// Target plan + analysisId for the outcome prompt. Returns nil when
+    /// no plan is eligible (no started plan, or all started plans already
+    /// rated). Picks the OLDEST eligible plan so a user with several
+    /// active plans gets asked about the most-experienced one first.
+    ///
+    /// `RehabPlan` doesn't carry a separate analysisId, so we use plan.id
+    /// as the rating identity — one rating per plan, deduped by the
+    /// `OutcomeRecorder` UserDefaults set.
+    private var outcomePromptTarget: (plan: RehabPlan, analysisId: UUID)? {
+        // Outcome rating only makes sense for started plans the user has
+        // actually been on for ≥ minimumPlanAgeDays (default 7).
+        let eligible = savedPlansVM.rehabPlans
+            .filter { plan in
+                OutcomeRecorder.shared.shouldShowPrompt(
+                    planStartDate: plan.startDate,
+                    analysisId: plan.id
+                )
+            }
+            .sorted { ($0.startDate ?? .distantFuture) < ($1.startDate ?? .distantFuture) }
+        guard let oldest = eligible.first else { return nil }
+        return (plan: oldest, analysisId: oldest.id)
     }
 
     // MARK: - Navigation Link Row

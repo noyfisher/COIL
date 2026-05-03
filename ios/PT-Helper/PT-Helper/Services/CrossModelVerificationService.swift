@@ -35,6 +35,17 @@ enum ExerciseVerificationStatus: Equatable {
     }
 }
 
+// MARK: - HTTP Session Abstraction (Tier 2 PR D)
+
+/// Minimal protocol that captures the single `URLSession` method the service
+/// uses. Makes `CrossModelVerificationService` testable by allowing tests to
+/// inject a mock session that controls failures, status codes, and latency.
+protocol HTTPSession: Sendable {
+    func data(for request: URLRequest) async throws -> (Data, URLResponse)
+}
+
+extension URLSession: HTTPSession {}
+
 // MARK: - Cross-Model Verification Service
 
 class CrossModelVerificationService {
@@ -43,7 +54,30 @@ class CrossModelVerificationService {
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.pthelper", category: "crossModel")
     private let crossVerifyURL = "https://us-central1-pt-helper-dev.cloudfunctions.net/crossVerify"
 
-    private init() {}
+    /// Injectable HTTP session. Defaults to `URLSession.shared` in production;
+    /// tests supply a mock implementation.
+    private let session: HTTPSession
+
+    /// Delay between retry attempts. Production uses exponential backoff
+    /// 1 s / 2 s / 4 s; tests inject zero delays so they don't drag.
+    private let retryDelays: [Duration]
+
+    /// Default production retry schedule — 3 total attempts.
+    /// Index i is the delay BEFORE attempt (i+1), so attempt 1 has no pre-delay.
+    static let defaultRetryDelays: [Duration] = [.seconds(1), .seconds(2), .seconds(4)]
+
+    /// Production initializer — uses `URLSession.shared` and default retry delays.
+    private init() {
+        self.session = URLSession.shared
+        self.retryDelays = Self.defaultRetryDelays
+    }
+
+    /// Testable initializer. Internal visibility so `@testable import`
+    /// can reach it without exposing to app code.
+    internal init(session: HTTPSession, retryDelays: [Duration]) {
+        self.session = session
+        self.retryDelays = retryDelays
+    }
 
     /// Maximum exercises per request (server enforces max 20).
     private let maxBatchSize = 20
@@ -67,7 +101,10 @@ class CrossModelVerificationService {
         logger.info("Splitting into \(batches.count) batch(es)")
         for (index, batch) in batches.enumerated() {
             logger.debug("Sending batch \(index + 1)/\(batches.count) with \(batch.count) exercise(s)")
-            let batchResults = try await sendBatch(exercises: batch, patientContext: patientContext)
+            // Tier 2 PR D: each batch goes through the retry wrapper, not raw
+            // sendBatch. A transient network blip on batch 2/3 won't now lose
+            // the whole verification for all exercises.
+            let batchResults = try await sendBatchWithRetry(exercises: batch, patientContext: patientContext)
             allResults.append(contentsOf: batchResults)
         }
 
@@ -75,7 +112,99 @@ class CrossModelVerificationService {
         return allResults
     }
 
+    // MARK: - Retry wrapper (Tier 2 PR D)
+
+    /// Wraps `sendBatch` with exponential-backoff retry on transient errors.
+    ///
+    /// Retry policy:
+    /// - Attempts: up to `retryDelays.count` (default 3).
+    /// - Back-off: pre-delay from `retryDelays[attemptIndex]` before each
+    ///   attempt EXCEPT the first.
+    /// - Retried: `networkError` + `serverError(5xx)`.
+    /// - NOT retried: `authenticationRequired`, `invalidURL`, 4xx server
+    ///   errors, `decodingError`, `invalidResponse` — these won't succeed
+    ///   on retry and would just waste the user's time.
+    ///
+    /// On exhausting all attempts, rethrows the last error. The caller
+    /// (`RehabPlanViewModel.performCrossModelVerification`) catches and marks
+    /// every exercise in `unverified` as `.crossModelFailed`, which Tier 2
+    /// PR D routes through `SeriousWarningModal` via `.serious` severity.
+    private func sendBatchWithRetry(
+        exercises: [(name: String, condition: String)],
+        patientContext: String
+    ) async throws -> [CrossModelResult] {
+        try await Self.withRetry(delays: retryDelays, logger: logger) {
+            try await self.sendBatch(exercises: exercises, patientContext: patientContext)
+        }
+    }
+
+    /// Pure retry helper. Extracted from `sendBatchWithRetry` so tests can
+    /// verify retry/backoff/error-classification behavior without needing
+    /// Firebase auth or live network.
+    ///
+    /// - Parameters:
+    ///   - delays: one entry per attempt. `delays[0]` is ignored (first attempt
+    ///     has no pre-delay); `delays[i>0]` is the pause before attempt (i+1).
+    ///     The COUNT of `delays` is the total attempt ceiling.
+    ///   - logger: optional OSLog logger for attempt-level breadcrumbs.
+    ///   - operation: the throwing async closure to run.
+    /// - Returns: the successful operation result.
+    /// - Throws: the last retryable error if all attempts failed, OR
+    ///   immediately rethrows any non-retryable error (per `isRetryable(_:)`).
+    static func withRetry<T>(
+        delays: [Duration],
+        logger: Logger? = nil,
+        operation: () async throws -> T
+    ) async throws -> T {
+        precondition(!delays.isEmpty, "withRetry requires at least one attempt")
+
+        var lastError: Error = CrossModelError.networkError(
+            NSError(domain: "CrossModel", code: -999,
+                    userInfo: [NSLocalizedDescriptionKey: "No attempt was made"])
+        )
+
+        for attemptIndex in 0..<delays.count {
+            if attemptIndex > 0 {
+                let delay = delays[attemptIndex]
+                logger?.debug("Retry attempt \(attemptIndex + 1)/\(delays.count) after \(String(describing: delay))")
+                try? await Task.sleep(for: delay)
+            }
+
+            do {
+                return try await operation()
+            } catch let error as CrossModelError where Self.isRetryable(error) {
+                lastError = error
+                logger?.warning("Cross-model attempt \(attemptIndex + 1)/\(delays.count) failed with retryable error: \(error.localizedDescription)")
+                continue
+            } catch {
+                // Non-retryable — rethrow immediately, don't consume attempts.
+                logger?.error("Cross-model non-retryable error: \(error.localizedDescription)")
+                throw error
+            }
+        }
+
+        logger?.error("Cross-model exhausted \(delays.count) retry attempts; final error: \(lastError.localizedDescription)")
+        throw lastError
+    }
+
+    /// Which errors are worth retrying. Transient network and 5xx: yes.
+    /// Everything else: no — subsequent attempts would fail the same way.
+    static func isRetryable(_ error: CrossModelError) -> Bool {
+        switch error {
+        case .networkError:
+            return true
+        case .serverError(let code):
+            return code >= 500
+        case .invalidURL, .authenticationRequired, .invalidResponse, .decodingError:
+            return false
+        }
+    }
+
     /// Send a single batch (max 20) to the crossVerify endpoint.
+    ///
+    /// Internal (not private) so `CrossModelVerificationRetryTests` can
+    /// exercise the retry wrapper via `verify()` end-to-end; kept at the
+    /// smallest possible scope otherwise.
     private func sendBatch(
         exercises: [(name: String, condition: String)],
         patientContext: String
@@ -115,11 +244,12 @@ class CrossModelVerificationService {
 
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
-        // Make request
+        // Make request. Uses the injected HTTPSession so tests can stub
+        // network responses without hitting the real endpoint.
         let data: Data
         let response: URLResponse
         do {
-            (data, response) = try await URLSession.shared.data(for: request)
+            (data, response) = try await session.data(for: request)
         } catch {
             logger.error("Cross-model network error: \(error.localizedDescription)")
             throw CrossModelError.networkError(error)

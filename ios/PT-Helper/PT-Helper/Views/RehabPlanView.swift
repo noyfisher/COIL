@@ -21,6 +21,10 @@ struct RehabPlanView: View {
     @State private var adaptiveRecommendation: ProgressionRecommendation?
     @State private var showProgressionBanner = true
 
+    // Tier 1 — serious-warning modal gating.
+    @AppStorage("strictValidationV1Enabled") private var strictValidationV1Enabled: Bool = true
+    @State private var showSeriousWarningModal: Bool = false
+
     /// Init for analysis flow — accepts a prefetched ViewModel (generation already in progress)
     init(viewModel: RehabPlanViewModel, analysisResult: AnalysisResult) {
         self.analysisResult = analysisResult
@@ -163,6 +167,33 @@ struct RehabPlanView: View {
                         .accessibilityIdentifier("rehabPlan.editButton")
                     }
                 }
+            }
+        }
+        // Tier 1 — gate plan display behind SeriousWarningModal when .serious findings
+        // are present AND the user hasn't acknowledged this plan. Emergency warnings
+        // are handled earlier by navigation routing (EmergencyRedirectView) and never
+        // reach here. The flag only gates the modal — detection always runs.
+        .onChange(of: viewModel.rehabPlan?.id) { _, _ in evaluateSeriousWarning() }
+        .onChange(of: viewModel.rehabPlanWarnings.count) { _, _ in evaluateSeriousWarning() }
+        .sheet(isPresented: $showSeriousWarningModal) {
+            if let plan = viewModel.rehabPlan {
+                SeriousWarningModal(
+                    planId: plan.id.uuidString,
+                    warningMessages: viewModel.rehabPlanWarnings
+                        .filter { $0.severity == .serious }
+                        .map(\.message),
+                    onAcknowledge: {
+                        showSeriousWarningModal = false
+                        // Acknowledgement persisted by SeriousWarningModal itself.
+                    },
+                    onRequestSaferPlan: {
+                        showSeriousWarningModal = false
+                        viewModel.regenerateSaferPlan()
+                    },
+                    onDismiss: {
+                        showSeriousWarningModal = false
+                    }
+                )
             }
         }
         .sheet(isPresented: $showEditSheet) {
@@ -405,10 +436,16 @@ struct RehabPlanView: View {
                     .datePickerStyle(.compact)
                 }
                 if let notes = plan.notes, !notes.isEmpty {
-                    Text(notes)
-                        .font(.caption)
-                        .foregroundColor(AppColors.secondaryText)
-                        .padding(.top, AppSpacing.xs)
+                    ExpandableSummaryView(
+                        fullText: notes,
+                        presentation: .inline,
+                        detailTitle: "Plan Notes",
+                        detailAnalyticsName: "FullText.RehabPlanNotes",
+                        accessibilityPrefix: "rehabPlan",
+                        previewFont: .caption,
+                        previewColor: AppColors.secondaryText
+                    )
+                    .padding(.top, AppSpacing.xs)
                 }
             }
         }
@@ -710,10 +747,14 @@ struct RehabPlanView: View {
 
     private var rehabWarningsBanner: some View {
         VStack(alignment: .leading, spacing: 8) {
-            let urgentWarnings = viewModel.rehabPlanWarnings.filter { $0.severity == .urgent }
+            // High-priority (.serious, .urgent, .emergency) — rendered as the red safety notice.
+            // `.emergency` is normally caught by navigation before the plan ever shows, but we
+            // keep it in this filter defensively.
+            let highPriorityWarnings = viewModel.rehabPlanWarnings.filter { $0.severity >= .serious }
             let cautionWarnings = viewModel.rehabPlanWarnings.filter { $0.severity == .caution }
+            let hasHighPriority = !highPriorityWarnings.isEmpty
 
-            if !urgentWarnings.isEmpty {
+            if hasHighPriority {
                 HStack(spacing: 8) {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundColor(AppColors.ctaText)
@@ -721,7 +762,7 @@ struct RehabPlanView: View {
                         .font(.subheadline.weight(.semibold))
                         .foregroundColor(AppColors.ctaText)
                 }
-                ForEach(Array(urgentWarnings.enumerated()), id: \.offset) { _, warning in
+                ForEach(Array(highPriorityWarnings.enumerated()), id: \.offset) { _, warning in
                     Text("• \(warning.message)")
                         .font(.caption)
                         .foregroundColor(AppColors.ctaText.opacity(0.95))
@@ -729,24 +770,24 @@ struct RehabPlanView: View {
             }
 
             if !cautionWarnings.isEmpty {
-                if urgentWarnings.isEmpty {
+                if !hasHighPriority {
                     HStack(spacing: 8) {
                         Image(systemName: "exclamationmark.circle.fill")
-                            .foregroundColor(urgentWarnings.isEmpty ? AppColors.warning : .white)
+                            .foregroundColor(AppColors.warning)
                         Text("Things to Keep in Mind")
                             .font(.subheadline.weight(.semibold))
-                            .foregroundColor(urgentWarnings.isEmpty ? .primary : .white)
+                            .foregroundColor(.primary)
                     }
                 }
                 ForEach(Array(cautionWarnings.enumerated()), id: \.offset) { _, warning in
                     Text("• \(warning.message)")
                         .font(.caption)
-                        .foregroundColor(urgentWarnings.isEmpty ? .secondary : .white.opacity(0.9))
+                        .foregroundColor(hasHighPriority ? .white.opacity(0.9) : .secondary)
                 }
             }
         }
         .padding()
-        .background(viewModel.rehabPlanWarnings.contains(where: { $0.severity == .urgent }) ? AppColors.danger : AppColors.warning.opacity(0.08))
+        .background(viewModel.rehabPlanWarnings.contains(where: { $0.severity >= .serious }) ? AppColors.danger : AppColors.warning.opacity(0.08))
         .cornerRadius(AppCorners.card)
     }
 
@@ -760,6 +801,21 @@ struct RehabPlanView: View {
             }
         }
         .buttonStyle(SecondaryButtonStyle())
+    }
+
+    /// Decide whether to present `SeriousWarningModal`. Fires on every plan change or
+    /// warning-count change. Gated by `strictValidationV1Enabled` — if the flag is off,
+    /// the modal never appears (detection still runs; warnings just render inline in the
+    /// banner). Already-acknowledged plans are also skipped.
+    private func evaluateSeriousWarning() {
+        guard strictValidationV1Enabled else { return }
+        guard let plan = viewModel.rehabPlan else {
+            showSeriousWarningModal = false
+            return
+        }
+        let hasSerious = viewModel.rehabPlanWarnings.contains(where: { $0.severity == .serious })
+        let alreadyAcked = SeriousWarningAcknowledgements.isAcknowledged(planId: plan.id.uuidString)
+        showSeriousWarningModal = hasSerious && !alreadyAcked
     }
 
     // MARK: - Adaptive Progression

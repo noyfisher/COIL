@@ -39,7 +39,7 @@ def main() -> int:
     print(f"Start PNGs on disk: {len(start_pngs)}")
 
     # 2) End PNGs for pair metadata
-    end_pngs = {p.stem.removesuffix("-end"): p.name for p in OUTPUT_DIR.glob("*-end.png")}
+    end_pngs = {p.stem.removesuffix("_end"): p.name for p in OUTPUT_DIR.glob("*_end.png")}
     if end_pngs:
         print(f"End PNGs on disk: {len(end_pngs)}")
 
@@ -73,6 +73,11 @@ def main() -> int:
                 "category": m.get("category", "general"),
                 "target_area": m.get("target_area") or m.get("targetArea", "General"),
             }
+            if m.get("body_position"):
+                entry["body_position"] = m["body_position"]
+            aliases = m.get("aliases") or []
+            if aliases:
+                entry["aliases"] = sorted(set(aliases))
         else:
             orphans.append(key)
             entry = {

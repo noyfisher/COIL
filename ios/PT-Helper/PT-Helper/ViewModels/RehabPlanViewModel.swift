@@ -28,6 +28,11 @@ private struct AIRehabExercise: Decodable {
     let endPosition: String?
     let exerciseCategory: String?
     let imageFileName: String?
+    // PR 2: server-side flag/notes for kinetic-chain substitutions. Both optional
+    // so omission decodes cleanly. `originalAIName` is intentionally NOT here —
+    // it's a client-side-only field set during validation.
+    let catalogSubstitution: Bool?
+    let notes: String?
 }
 
 // MARK: - Rehab Plan Preferences
@@ -67,6 +72,17 @@ class RehabPlanViewModel: ObservableObject {
     @Published var isGenerating: Bool = false
     @Published var generationError: String? = nil
     @Published var preferences = RehabPlanPreferences()
+
+    // MARK: - Safer-plan retry (Tier 1)
+    /// Count of safer-plan retries already attempted for the current analysis.
+    /// Max 2 — after that, surface "Contact your PT".
+    @Published var saferPlanRetryCount: Int = 0
+    /// Cached analysis result + original warnings so a retry can rebuild the prompt with
+    /// a "do not recommend these exercises" constraint appended.
+    private var originalAnalysisResult: AnalysisResult?
+    private var originalFlaggedExerciseNames: [String] = []
+    /// Max retries before giving up and recommending PT consultation.
+    static let maxSaferPlanRetries = 2
 
     // MARK: - Exercise Verification State
     /// Verification status for each exercise (keyed by exercise name)
@@ -127,6 +143,11 @@ class RehabPlanViewModel: ObservableObject {
         guard !isGenerating else { return }
         let conditions = analysisResult.conditions.map { $0.conditionName }
 
+        // Cache original result for potential safer-plan retries.
+        self.originalAnalysisResult = analysisResult
+        self.saferPlanRetryCount = 0
+        self.originalFlaggedExerciseNames = []
+
         isGenerating = true
         generationError = nil
 
@@ -146,10 +167,12 @@ class RehabPlanViewModel: ObservableObject {
 
                 // Validate the plan (includes knowledge graph check)
                 AppLogger.rehab.info("Validating AI rehab plan...")
+                let painRegions = analysisResult.assessments.map { $0.selectedRegion.name }
                 let (validatedPlan, warnings, graphVerification) = ResponseValidationPipeline.validateRehabPlan(
                     plan,
                     conditions: conditions,
-                    userProfile: analysisResult.userProfileSnapshot
+                    userProfile: analysisResult.userProfileSnapshot,
+                    userPainRegions: painRegions
                 )
                 self.rehabPlan = validatedPlan
                 self.rehabPlanWarnings = warnings
@@ -189,6 +212,13 @@ class RehabPlanViewModel: ObservableObject {
             } catch {
                 // Fallback to hardcoded database
                 AppLogger.rehab.warning("AI rehab generation failed, using fallback: \(error.localizedDescription)")
+                // Tier 1 breadcrumb: distinguish schema failures (ai_response_invalid)
+                // from network/quota errors in telemetry.
+                if let apiError = error as? ClaudeAPIError, apiError.isResponseInvalid {
+                    SessionLogger.shared.log(.errorOccurred, category: .api,
+                        message: "Rehab plan rejected by server schema (ai_response_invalid)",
+                        metadata: ["error_kind": "ai_response_invalid"])
+                }
                 SessionLogger.shared.log(.stateUpdated, category: .stateChange, message: "Rehab plan using fallback",
                                           metadata: ["source": "fallback", "reason": error.localizedDescription])
 
@@ -229,7 +259,8 @@ class RehabPlanViewModel: ObservableObject {
                 let (validatedFallback, warnings, _) = ResponseValidationPipeline.validateRehabPlan(
                     fallbackPlan,
                     conditions: conditions,
-                    userProfile: analysisResult.userProfileSnapshot
+                    userProfile: analysisResult.userProfileSnapshot,
+                    userPainRegions: analysisResult.assessments.map { $0.selectedRegion.name }
                 )
                 self.rehabPlan = validatedFallback
                 self.rehabPlanWarnings = warnings
@@ -319,24 +350,42 @@ class RehabPlanViewModel: ObservableObject {
                 }
             }
 
-            // Any unverified exercises not in results get marked as failed
+            // Any unverified exercises not in results get marked as failed.
+            // Tier 2 PR D: append a `.serious` warning so the acknowledgement
+            // modal surfaces via `rehabPlanWarnings`.
             for exercise in unverified {
                 if exerciseSafety[exercise.name] == nil {
                     exerciseVerifications[exercise.name] = .crossModelFailed
+                    appendCrossModelFailureWarning(exerciseName: exercise.name)
                 }
             }
 
             AppLogger.rehab.info("Cross-model verification complete: \(exerciseSafety.filter { $0.value.safe }.count) safe, \(exerciseSafety.filter { !$0.value.safe }.count) flagged")
         } catch {
             AppLogger.rehab.warning("Cross-model verification failed: \(error.localizedDescription)")
-            // Graceful degradation — mark all as failed, don't block the plan
+            // All retries exhausted → mark every unverified exercise failed.
+            // Tier 2 PR D: each failure now emits a `.serious` warning, which
+            // Tier 1's SeriousWarningModal picks up via `rehabPlanWarnings`.
             for exercise in unverified {
                 exerciseVerifications[exercise.name] = .crossModelFailed
+                appendCrossModelFailureWarning(exerciseName: exercise.name)
             }
         }
 
         isVerifyingUnknowns = false
         verificationComplete = true
+    }
+
+    /// Append a `.serious` warning for a cross-model verification failure, if
+    /// one isn't already present for this exercise. Deduplicates so repeated
+    /// cross-model runs don't pile up.
+    private func appendCrossModelFailureWarning(exerciseName: String) {
+        let warning = ResponseValidationPipeline.crossModelFailureWarning(exerciseName: exerciseName)
+        // Dedupe by exact message — the helper includes the exercise name in
+        // quotes, so message equality implies same exercise.
+        if !rehabPlanWarnings.contains(where: { $0.message == warning.message }) {
+            rehabPlanWarnings.append(warning)
+        }
     }
 
     // MARK: - AI Rehab Plan Generation
@@ -469,55 +518,95 @@ class RehabPlanViewModel: ObservableObject {
         message += "\n- Preferred Session Length: \(preferences.sessionLength.rawValue)"
         message += "\n- Difficulty Preference: \(preferences.difficulty.rawValue)"
 
+        // Safer-plan retry constraint (Tier 1): appended when the user rejected a previous
+        // plan that contained contraindicated exercises. We list the flagged names by hand,
+        // but the real safety net is the downstream KG + contraindication validation — the
+        // AI isn't perfectly reliable at following name-based avoid-lists, so the validator
+        // re-runs on the retry output.
+        if !originalFlaggedExerciseNames.isEmpty {
+            let list = originalFlaggedExerciseNames.joined(separator: ", ")
+            message += "\n\nIMPORTANT SAFETY CONSTRAINT: The prior plan included exercises incompatible with this patient's condition(s) or medications. Do NOT return these exercises, their variants, or movements in the same pattern: \(list). Use only safer alternatives that work the same movement category but at safe loading, impact, or stability levels."
+        }
+
         message += "\nPlease create a personalized rehabilitation exercise plan for this patient, taking into account their equipment availability, preferred session length, and difficulty preference."
 
         return message
     }
 
+    // MARK: - Safer-plan retry (Tier 1)
+
+    /// Regenerate the current plan with a safety constraint instructing Claude to avoid the
+    /// specific exercises flagged as `.serious` in the prior plan. Preserves the user's
+    /// `preferences` (equipment, session length, difficulty) on the retry.
+    ///
+    /// Max `maxSaferPlanRetries` attempts; after that, surface a "Contact your PT" state via
+    /// `generationError`.
+    func regenerateSaferPlan() {
+        guard let analysisResult = originalAnalysisResult else {
+            AppLogger.rehab.warning("regenerateSaferPlan called with no cached analysis result")
+            return
+        }
+        guard saferPlanRetryCount < Self.maxSaferPlanRetries else {
+            generationError = "We weren't able to build a safer plan after multiple attempts. Please contact your physical therapist for a tailored program."
+            return
+        }
+
+        // Collect exercise names flagged as .serious from the current warnings. The
+        // `ExerciseContraindicationChecker` and KG-contraindicated messages embed the
+        // exercise name in quotes — parse them out for the avoid-list.
+        let flaggedNames = rehabPlanWarnings
+            .filter { $0.severity >= .serious }
+            .compactMap { extractExerciseName(from: $0.message) }
+        // Merge with any prior-round flags so the avoid-list grows monotonically.
+        originalFlaggedExerciseNames = Array(Set(originalFlaggedExerciseNames + flaggedNames)).sorted()
+        saferPlanRetryCount += 1
+
+        AppLogger.rehab.info("Safer-plan retry \(self.saferPlanRetryCount)/\(Self.maxSaferPlanRetries) — avoiding: \(self.originalFlaggedExerciseNames.joined(separator: ", "))")
+        SessionLogger.shared.log(.stateUpdated, category: .stateChange, message: "Safer-plan retry requested",
+                                  metadata: [
+                                    "retryCount": "\(saferPlanRetryCount)",
+                                    "avoided": originalFlaggedExerciseNames.joined(separator: ", ")
+                                  ])
+
+        // Clear current plan state and regenerate via the same entry point — the avoid-list
+        // is consumed by `buildRehabUserMessage` via `originalFlaggedExerciseNames`.
+        rehabPlan = nil
+        rehabPlanWarnings = []
+        generationError = nil
+        isGenerating = false  // reset so the guard in generateRehabPlan allows entry
+
+        // Preserve retry state across the generateRehabPlan reset by snapshotting.
+        let savedRetryCount = saferPlanRetryCount
+        let savedAvoidList = originalFlaggedExerciseNames
+
+        generateRehabPlan(from: analysisResult)
+
+        // Restore — generateRehabPlan resets these fields on entry.
+        saferPlanRetryCount = savedRetryCount
+        originalFlaggedExerciseNames = savedAvoidList
+    }
+
+    /// Parse an exercise name out of a warning message. Warning messages from
+    /// `ExerciseContraindicationChecker` and `KnowledgeGraphValidator` include the name
+    /// in quotes (e.g., `"\"Deep Squat\" may not be appropriate..."`). Returns nil if no
+    /// quoted name is present.
+    private func extractExerciseName(from message: String) -> String? {
+        guard let firstQuote = message.firstIndex(of: "\""),
+              let lastQuote = message[message.index(after: firstQuote)...].firstIndex(of: "\"")
+        else { return nil }
+        let name = message[message.index(after: firstQuote)..<lastQuote]
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : String(trimmed)
+    }
+
     private func parseRehabPlanResponse(_ text: String, conditions: [String], activityLevel: String) throws -> RehabPlan {
-        guard let jsonData = text.data(using: .utf8) else {
-            AppLogger.rehab.error("Rehab response could not be converted to UTF-8 data")
-            throw ClaudeAPIError.decodingError(NSError(domain: "RehabPlan", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response encoding"]))
-        }
-
         AppLogger.rehab.info("Parsing rehab plan response: \(text.count) characters")
-
-        let aiResponse: AIRehabResponse
-        do {
-            aiResponse = try JSONDecoder().decode(AIRehabResponse.self, from: jsonData)
-            AppLogger.rehab.info("Direct JSON decode succeeded for rehab plan")
-        } catch let directError {
-            AppLogger.rehab.warning("Direct rehab JSON decode failed: \(directError.localizedDescription). Attempting fallback...")
-            // Fallback: extract JSON between { and }
-            if let startIndex = text.firstIndex(of: "{"),
-               let endIndex = text.lastIndex(of: "}") {
-                let jsonSubstring = String(text[startIndex...endIndex])
-                AppLogger.rehab.info("Extracted rehab JSON: \(jsonSubstring.count) chars (trimmed \(text.count - jsonSubstring.count))")
-                if let fallbackData = jsonSubstring.data(using: .utf8) {
-                    do {
-                        aiResponse = try JSONDecoder().decode(AIRehabResponse.self, from: fallbackData)
-                        AppLogger.rehab.info("Fallback rehab JSON decode succeeded")
-                        SessionLogger.shared.log(.stateUpdated, category: .api, message: "Rehab plan used fallback JSON extraction",
-                                                  metadata: ["trimmedChars": "\(text.count - jsonSubstring.count)"])
-                    } catch let fallbackError {
-                        AppLogger.rehab.error("Fallback rehab JSON decode also failed: \(fallbackError.localizedDescription)")
-                        let preview = String(jsonSubstring.prefix(300))
-                        AppLogger.rehab.error("Rehab response preview: \(preview)")
-                        SessionLogger.shared.logError(fallbackError, context: "RehabPlan.parseResponse.fallback")
-                        throw ClaudeAPIError.decodingError(fallbackError)
-                    }
-                } else {
-                    AppLogger.rehab.error("Fallback rehab JSON substring could not be converted to UTF-8")
-                    throw ClaudeAPIError.decodingError(directError)
-                }
-            } else {
-                AppLogger.rehab.error("No JSON object found in rehab response")
-                let preview = String(text.prefix(300))
-                AppLogger.rehab.error("Rehab response preview: \(preview)")
-                SessionLogger.shared.logError(directError, context: "RehabPlan.parseResponse.noJSON")
-                throw ClaudeAPIError.decodingError(directError)
-            }
-        }
+        // Tier 3 PR C: shadow-mode strict parsing (see ShadowModeJSONParser).
+        let aiResponse = try ShadowModeJSONParser.parse(
+            text,
+            as: AIRehabResponse.self,
+            requestType: "rehab_plan"
+        )
 
         // Map AI exercises to our model
         let exercises = aiResponse.exercises.map { aiExercise in
@@ -544,7 +633,13 @@ class RehabPlanViewModel: ObservableObject {
                 movement: aiExercise.movement,
                 endPosition: aiExercise.endPosition,
                 exerciseCategory: aiExercise.exerciseCategory,
-                imageFileName: aiExercise.imageFileName
+                imageFileName: aiExercise.imageFileName,
+                catalogSubstitution: aiExercise.catalogSubstitution,
+                notes: aiExercise.notes,
+                // Capture the original AI-generated name BEFORE any substitution
+                // rewrites happen in `validateRehabPlan`. Preserves the analytics
+                // signal "what did Claude generate that we had to substitute?"
+                originalAIName: aiExercise.name
             )
         }
 

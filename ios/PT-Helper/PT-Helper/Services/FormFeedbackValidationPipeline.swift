@@ -101,7 +101,7 @@ struct FormFeedbackValidationPipeline {
             ))
         }
 
-        let isValid = warnings.filter({ $0.severity == .urgent }).isEmpty
+        let isValid = warnings.filter({ $0.severity >= .serious }).isEmpty
         let validationResult = FormValidationResult(
             isValid: isValid,
             warnings: warnings,

@@ -47,6 +47,22 @@ npm run lint         # ESLint
 firebase deploy --only functions
 ```
 
+## Engineering Protocol (required)
+
+Follow these 5 rules on every code task. They minimize hallucinations and regressions in a codebase where working features must not break.
+
+**R1 — Grep before assert.** Before citing any named symbol, file, or line, grep for it this turn. Before editing, produce a blast-radius report (callers/usages found). Always verify before editing: signature/behavior/schema changes, shared types, renames/removals, files in `Services/`, `Models/`, `ViewModels/`, `functions/src/`, `Views/Components/`, `DesignSystem.swift`, app entry/navigation files, AI prompts, infra/config (`firebase.json`, `firestore.rules`, `.entitlements`, etc.), cross-system data files (`exercise_list.json`, `exercise_image_mapping.json`, metadata JSON), production-data-mutating scripts. Skip for single-file styling/copy/log/local-var tweaks and net-new code.
+
+**R2 — Blast-radius-gated planning.** R1's output decides plan mode. Low → proceed. Medium → 1-2 sentence plan in chat. High (5+ callers, shared type/prompt/schema change, deploy-impacting config, data mutation) → written plan, wait for approval. Escape hatch: user says "just do it" → drop to medium. **Plan audit:** whenever R2 produces a written plan, ALWAYS ask "Run plan-audit? (yes / skip)" before ExitPlanMode. Never assume — the prompt prevents forgetting. If yes → invoke `plan-audit` skill; if NEEDS REVISION, surface findings and ask revise-or-proceed.
+
+**R3 — Build-gated "done."** No completion claim without an artifact: `xcodebuild build` + tests for Swift, simulator run with logs for UI, `npm run build` for Cloud Functions, actual script run for Python. If verification isn't possible, say "written but unverified — you need to X to confirm."
+
+**R4 — Memory is assumed until re-read.** Anything from auto-memory is flagged "assumed." Before acting on a memory, re-read current state of the referenced file.
+
+**R5 — Anti-momentum checkpoint.** On unexpected error, mental-model contradiction, or second failed attempt at the same approach → stop and re-read actual code. No "slightly different version of the same idea."
+
+Full rules: `~/.claude/projects/-Users-noyfisher-IOS-Projects-PT-Helper-Agent-v1/memory/feedback_engineering_protocol.md`
+
 ## Architecture
 
 ### MVVM + Services Pattern

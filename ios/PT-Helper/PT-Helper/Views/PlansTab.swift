@@ -33,7 +33,9 @@ struct PlansTab: View {
                 }
                 Button("Delete", role: .destructive) {
                     if let plan = planToDelete {
-                        savedPlansViewModel.deletePlan(plan)
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            savedPlansViewModel.deletePlan(plan)
+                        }
                         planToDelete = nil
                     }
                 }

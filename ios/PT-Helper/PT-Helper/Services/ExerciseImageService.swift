@@ -17,13 +17,22 @@ final class ExerciseImageService: @unchecked Sendable {
     /// Loaded once from the bundled exercise_image_mapping.json.
     private var mapping: [String: ImageEntry] = [:]
 
-    private struct ImageEntry: Decodable {
+    struct ImageEntry: Decodable {
         let name: String
         let filename: String
         let category: String
         let target_area: String
         let end_filename: String?
+        let body_position: String?
+        let aliases: [String]?
     }
+
+    /// Bundled-alias lookup: alias-key → canonical-key. Built once from `mapping`
+    /// after `loadMapping()`. Source of truth is the bundled JSON's per-entry
+    /// `aliases` array (populated via `scripts/seed_aliases_from_swift.py` +
+    /// `scripts/rebuild_image_mapping.py`). PR 3 deleted the legacy hardcoded
+    /// Swift `aliasMap` — aliases now live entirely in reviewable JSON.
+    private var bundledAliases: [String: String] = [:]
 
     // MARK: - Image Match Metadata
 
@@ -34,6 +43,7 @@ final class ExerciseImageService: @unchecked Sendable {
         case suffixFuzzy        // Layer 5: suffixMatch
         case pluralToggle       // Layer 6: plural/singular toggle
         case synonymExpansion   // Layer 7: body-part synonym expansion
+        case stripped           // Layer 8: parentheticals + qualifier tokens removed, then retry
     }
 
     /// Result of resolving an exercise to an image key, including how it was matched.
@@ -167,7 +177,46 @@ final class ExerciseImageService: @unchecked Sendable {
               let endFilename = entry.end_filename else { return nil }
 
         let endKey = endFilename.replacingOccurrences(of: ".png", with: "")
-        return await loadImage(forKey: endKey)
+        return await loadImageByFilename(endFilename, cacheKey: endKey)
+    }
+
+    /// Cache + Firebase-Storage fetch keyed by an explicit filename. Used for end-frame
+    /// images, which don't have their own mapping entry (the start entry carries the
+    /// `end_filename` field, so a forKey: lookup would miss).
+    private func loadImageByFilename(_ filename: String, cacheKey: String) async -> UIImage? {
+        if let cached = memoryCache.object(forKey: cacheKey as NSString) {
+            return cached
+        }
+        if let diskImage = loadFromDisk(key: cacheKey) {
+            memoryCache.setObject(diskImage, forKey: cacheKey as NSString)
+            return diskImage
+        }
+        let task: Task<UIImage?, Never> = lock.withLock {
+            if let existing = activeDownloads[cacheKey] { return existing }
+            let new = Task<UIImage?, Never> {
+                let image = await self.downloadFromStorageByFilename(filename, cacheKey: cacheKey)
+                self.lock.withLock { self.activeDownloads.removeValue(forKey: cacheKey) }
+                return image
+            }
+            activeDownloads[cacheKey] = new
+            return new
+        }
+        return await task.value
+    }
+
+    private func downloadFromStorageByFilename(_ filename: String, cacheKey: String) async -> UIImage? {
+        let imageRef = storageRef.child(filename)
+        let maxSize: Int64 = 2 * 1024 * 1024
+        do {
+            let data = try await imageRef.data(maxSize: maxSize)
+            guard let image = UIImage(data: data) else { return nil }
+            memoryCache.setObject(image, forKey: cacheKey as NSString)
+            saveToDisk(key: cacheKey, data: data)
+            return image
+        } catch {
+            AppLogger.images.error("Download failed for \(filename): \(error.localizedDescription)")
+            return nil
+        }
     }
 
     // MARK: - On-Demand Image Generation
@@ -267,204 +316,6 @@ final class ExerciseImageService: @unchecked Sendable {
 
     // MARK: - Key Resolution
 
-    /// Alias map: AI-generated exercise name variants → canonical image key.
-    /// The AI often generates more specific exercise names (e.g., "Calf Raises (Bilateral, Eccentric Focus)")
-    /// that don't exactly match our 178-exercise image set. This maps them to the closest image.
-    private static let aliasMap: [String: String] = [
-        // Calf raise variants → closest image
-        "calf-raises-bilateral-eccentric-focus": "double-leg-calf-raise",
-        "calf-raises-bilateral-to-single-leg-progression": "double-leg-calf-raise",
-        "calf-raises-double-leg-eccentric-emphasis": "double-leg-calf-raise",
-        "calf-raise-with-hamstring-co-activation-weeks-3-6": "double-leg-calf-raise",
-        "calf-raises-bilateral": "double-leg-calf-raise",
-        // Band pull-apart variants
-        "band-pull-apart": "band-pull-aparts",
-        "half-kneeling-band-pull-aparts": "band-pull-aparts",
-        "band-pull-apart-external-rotation": "resistance-band-external-rotation-at-90-90",
-        // Bird dog variants
-        "bird-dog-core-stabilizer": "bird-dog",
-        "quadruped-bird-dog": "bird-dog",
-        "quadruped-spinal-extensions-bird-dogs": "bird-dog",
-        // Child's pose variants
-        "childs-pose-with-shoulder-reach": "childs-pose-with-side-reach",
-        // Cat-cow variants
-        "cat-cow-stretch-modified-for-lower-back-relief": "cat-cow-stretch",
-        "cat-cow-stretch-prone-hold-variation": "cat-cow-stretch",
-        "cat-cow-stretch-sequence": "cat-cow-stretch",
-        "cat-cow-stretch-spine-mobility": "cat-cow-stretch",
-        // Clamshell variants
-        "clamshells-left-side-emphasis": "clamshells",
-        "clamshells-side-lying-hip-abduction": "clamshells",
-        // Dead bug variants
-        "dead-bug-modified-for-core-stability-and-l4-protection": "dead-bug",
-        "dead-bug-core-stability-for-lower-back-support": "dead-bug",
-        "dead-bug-core-stability-hamstring-protection": "dead-bug",
-        "dead-bug-modified": "dead-bug",
-        // Glute bridge variants
-        "glute-bridge-with-core-hold": "glute-bridge-with-isometric-hold",
-        "supine-glute-bridge-with-hamstring-activation": "glute-bridge",
-        "glute-bridge-with-hamstring-engagement": "glute-bridge",
-        "glute-bridges-bilateral": "glute-bridges",
-        "supine-hip-bridge": "glute-bridge",
-        "banded-glute-kickbacks-standing-hip-extension": "standing-hip-extension",
-        // Hamstring stretch variants
-        "hamstring-and-calf-stretch-supine-strap-assist": "hamstring-stretch-with-strap",
-        "supine-hamstring-stretch-with-strap": "hamstring-stretch-with-strap",
-        "seated-forward-fold-hamstring-stretch": "seated-hamstring-stretch",
-        "lying-hamstring-and-hip-flexor-stretch-modified": "lying-hip-flexor-stretch",
-        "hamstring-stretch": "supine-hamstring-stretch",
-        "supine-hamstring-stretch-with-towel-strap": "supine-hamstring-stretch",
-        "nordic-hamstring-curl-assisted-weeks-4-6": "hamstring-curls",
-        "standing-hamstring-flexibility-walk": "walking",
-        // Lateral band walk variants
-        "lateral-band-walk-glute-medius-hip-stability": "lateral-band-walks",
-        // Monster walk variants
-        "monster-walks-resistance-band": "monster-walks",
-        // Pendulum variants
-        "pendulum-shoulder-circles": "pendulum-swings",
-        "right-shoulder-pendulum-circles": "pendulum-swings",
-        "seated-shoulder-pendulum-circles": "pendulum-swings",
-        // Plantar/soleus stretch variants
-        "plantar-fascia-and-soleus-stretch": "soleus-stretch",
-        // Plank variants
-        "planks-modified-wall-or-incline": "plank",
-        "prone-plank-hold-beginner-progression": "plank",
-        "tall-plank-with-shoulder-blade-protraction": "plank",
-        // Prone variants
-        "prone-hamstring-isometric-hold": "prone-hamstring-curl",
-        "prone-hip-extension-single-leg-for-glute-activation": "prone-hip-extension",
-        "prone-hip-extension-single-leg": "prone-hip-extension",
-        "prone-shoulder-external-rotation-with-elbow-support": "side-lying-external-rotation",
-        "prone-shoulder-i-y-t-raises": "prone-i-y-t-raises",
-        "prone-y-t-w-shoulder-activation": "prone-i-y-t-raises",
-        "lower-back-quadriceps-tightness---prone-quad-stretch": "standing-quad-stretch",
-        "prone-cobra-modified-sphinx": "prone-press-up",
-        "prone-cobra-or-modified-sphinx-lower-back-extension": "prone-press-up",
-        "prone-sphinx-stretch": "prone-press-up",
-        "prone-scapular-squeeze": "prone-scapular-retraction",
-        "prone-hip-internal-rotation-piriformis-stretch": "supine-piriformis-stretch",
-        "prone-quadriceps-stretch": "standing-quad-stretch",
-        // Quad sets variants
-        "quad-sets-with-glute-activation": "quad-sets",
-        "quad-sets-with-vmo-focus": "quad-sets",
-        "quadriceps-sets-isometric": "quad-sets",
-        "quadriceps-sets-with-vmo-focus": "quad-sets",
-        "quadriceps-sets-bilateral": "quad-sets",
-        "quadriceps-strengthening": "quad-sets",
-        "quadriceps-and-patellar-tendon-eccentric-stretch": "standing-quad-stretch",
-        "quadriceps-eccentric-lowering-controlled-strength": "long-arc-quads",
-        "quadriceps-stretch": "standing-quad-stretch",
-        "quadriceps-stretch-standing": "standing-quad-stretch",
-        "quadriceps-hip-flexor-stretch-kneeling-lunge": "hip-flexor-stretch",
-        // Quadruped variants
-        "quadruped-cat-cow-stretch": "cat-cow-stretch",
-        "thoracic-spine-rotation-quadruped-cat-cow": "quadruped-thoracic-rotation",
-        "quadruped-glute-squeeze-activation-endurance": "prone-glute-squeeze-holds",
-        "quadruped-hip-extension-glute-activation": "fire-hydrants",
-        "quadruped-hip-shoulder-rocks": "quadruped-rocking",
-        "quadruped-rocking-with-spinal-extension": "quadruped-rocking",
-        // External rotation variants
-        "external-rotation-with-elbow-bent-90-90-position": "external-rotation",
-        "right-shoulder-external-rotation-prone": "side-lying-external-rotation",
-        // Scapular variants
-        "scapular-push-up-hold": "wall-push-ups",
-        "scapular-push-up-plus": "wall-push-ups",
-        "scapular-push-up-plus-modified": "wall-push-ups",
-        "serratus-anterior-push-up-plus": "wall-push-ups",
-        "scapular-wall-slides": "wall-slides",
-        // Single leg balance/deadlift variants
-        "single-leg-stance-on-firm-surface": "single-leg-balance",
-        "single-leg-balance-left-leg-emphasis": "single-leg-balance",
-        "single-leg-romanian-deadlift-light-load": "single-leg-deadlift",
-        "standing-single-leg-balance-with-hip-hinge": "single-leg-deadlift",
-        // Standing variants
-        "standing-hamstring-curl-progressive": "standing-hamstring-curl",
-        "standing-chest-doorway-stretch": "doorway-stretch",
-        "standing-hip-flexor-stretch": "hip-flexor-stretch",
-        // Shoulder variants
-        "shoulder-rolls": "shoulder-shrugs",
-        // Straight leg raise variants
-        "straight-leg-raise-slr---supine": "straight-leg-raises",
-        "straight-leg-raise-left-leg": "straight-leg-raises",
-        "straight-leg-raises-supine": "straight-leg-raises",
-        // Supine stretch variants
-        "supine-lower-back-stretch": "knee-to-chest-stretch",
-        "supine-lower-back-rotation-stretch": "lumbar-rotation-stretch",
-        "supine-lower-back-rotation-stretch-spinal-mobility": "lumbar-rotation-stretch",
-        "supine-shoulder-external-rotation-90-90-position": "external-rotation",
-        "supine-shoulder-external-rotation-with-towel-roll": "external-rotation",
-        "supine-shoulder-flexion-with-dowel-or-pvc-pipe": "shoulder-flexion",
-        "supine-hip-flexor-stretch": "lying-hip-flexor-stretch",
-        "supine-figure-4-stretch-alternative-piriformis-stretch": "supine-figure-4-stretch-with-pelvic-mobilization",
-        // Seated variants
-        "seated-knee-extension-with-asthma-pacing": "seated-knee-extension",
-        // Wrist/forearm variants
-        "eccentric-wrist-extensor-curls": "reverse-wrist-curls",
-        "forearm-pronation-supination": "wrist-pronation-supination",
-        "isometric-wrist-extensions": "reverse-wrist-curls",
-        "isometric-wrist-strengthening-4-direction": "wrist-curls",
-        "wrist-flexor-extensor-stretches": "wrist-extensor-stretch",
-        "wrist-flexor-stretches": "wrist-flexor-stretch",
-        // Thoracic variants
-        "half-kneeling-thoracic-rotation-with-post": "quadruped-thoracic-rotation",
-        "thoracic-spine-extensions": "thoracic-extension",
-        // Pigeon pose → piriformis stretch
-        "pigeon-pose-deep-hip-flexor-piriformis-stretch": "piriformis-stretch",
-        // Nerve glide variants
-        "sural-nerve-glide-neural-mobility-for-sural-nerve-irritation": "sciatic-nerve-glide",
-        // Terminal knee extension variants
-        "terminal-knee-extensions-tke": "terminal-knee-extension",
-        // Calf raise variants (additional)
-        "calf-raises": "double-leg-calf-raise",
-        // Cervical / chin tuck variants
-        "cervical-gentle-rom-neck-mobility-check": "chin-tucks",
-        "prone-chin-tucks-cervical-posture-support": "chin-tucks",
-        // Cross-body stretch variants
-        "cross-body-shoulder-stretch": "cross-body-stretch",
-        // Deep hip flexor variants
-        "deep-hip-flexor-quad-stretch-90-90": "hip-flexor-stretch",
-        "tall-kneeling-hip-flexor-stretch": "hip-flexor-stretch",
-        // Hamstring variants (additional)
-        "hamstring-calf-stretch-standing": "supine-hamstring-stretch",
-        "hamstring-sets-isometric": "prone-hamstring-curl",
-        "lying-hamstring-stretch-90-90-position": "supine-hamstring-stretch",
-        // Lateral band walk variants (additional)
-        "lateral-band-walk-hip-abductor-activation": "lateral-band-walks",
-        // Prone cobra variants (additional)
-        "prone-cobra-posterior-chain-extension-low-back-mobility": "prone-press-up",
-        // Prone shoulder variants (additional)
-        "prone-shoulder-blade-squeeze-isometric": "prone-scapular-retraction",
-        "prone-shoulder-i-y-t-raises-isometric-hold": "prone-i-y-t-raises",
-        "prone-shoulder-retraction-y-raises-prone": "prone-i-y-t-raises",
-        // Superman variants
-        "prone-superman-hold": "superman-exercise",
-        // Foam roller variants
-        "quadriceps-foam-roll": "foam-roller-quad",
-        // Quad stretch variants (additional)
-        "quadriceps-stretch-left-leg-kneeling": "standing-quad-stretch",
-        // Quadruped shoulder variants
-        "quadruped-shoulder-blade-squeezes-scapular-stabilization": "quadruped-shoulder-taps",
-        "quadruped-shoulder-stability-taps": "quadruped-shoulder-taps",
-        // Scapular wall slides variants
-        "scapular-wall-slides-slow-controlled": "wall-slides",
-        // Seated knee extension variants (additional)
-        "seated-knee-extensions-right-leg-focus": "seated-knee-extension",
-        // Side-lying external rotation variants
-        "sidelying-external-rotation-90-90-position": "side-lying-external-rotation",
-        // Single-leg variants (additional)
-        "single-leg-deadlifts-bodyweight": "single-leg-deadlift",
-        "single-leg-glute-bridge": "glute-bridge",
-        // Standing shoulder variants
-        "standing-shoulder-external-rotation-band-free-isometric": "external-rotation",
-        // Straight leg raise variants (additional)
-        "straight-leg-raise-quad-dominant": "straight-leg-raises",
-        // Upper back / wall variants
-        "upper-back-postural-correction-standing-wall-hold": "wall-slides",
-        // Wrist variants (additional)
-        "wrist-flexion-extension": "wrist-curls",
-        // Copenhagen adduction variants
-        "copenhagen-adduction-side-lying-hip-adductor-squeeze": "copenhagen-adduction",
-    ]
 
     /// Body-part synonyms for token-level replacement.
     private static let synonyms: [String: String] = [
@@ -495,23 +346,113 @@ final class ExerciseImageService: @unchecked Sendable {
             return ImageMatch(key: normalized, matchType: .exact)
         }
 
-        // 3. Check alias map for AI-generated name variants (hardcoded + Firestore)
-        if let alias = Self.aliasMap[normalized], mapping[alias] != nil {
-            return ImageMatch(key: alias, matchType: .exact)
+        // 3. Check bundled aliases (per-entry `aliases` array in exercise_image_mapping.json).
+        // Source of truth as of PR 1. The legacy hardcoded Swift `aliasMap` was
+        // deleted in PR 3 — bundled aliases are functionally equivalent (seeded
+        // from the same source via `scripts/seed_aliases_from_swift.py`) and live
+        // in reviewable JSON instead of a 200-line Swift dictionary.
+        if let canonical = bundledAliases[normalized], mapping[canonical] != nil {
+            return ImageMatch(key: canonical, matchType: .exact)
         }
+
+        // 4. Firestore remote aliases (hot-fix lever for production-discovered names).
         if let remoteAlias = lock.withLock({ firestoreAliases?[normalized] }), mapping[remoteAlias] != nil {
             return ImageMatch(key: remoteAlias, matchType: .exact)
         }
 
-        // 4-7. Fuzzy matching (cached)
+        // 4-8. Fuzzy matching + stripped fallback (cached under original `normalized` key)
         return lock.withLock {
             if let cached = fuzzyMatchCache[normalized] {
                 return cached
             }
-            let result = fuzzyMatch(normalized)
+            // Layers 4-7: existing fuzzy matcher on the original normalized form
+            var result = fuzzyMatch(normalized)
+
+            // Layer 4b: Retry fuzzy matching against the AI-provided imageFileName.
+            // The AI often produces a high-quality kebab-case `imageFileName` that's a
+            // single transformation off canonical (plural toggle, prefix modifier, suffix
+            // qualifier). The original Layer 1 only does exact-match on imageFileName,
+            // so a near-correct guess was thrown away. Feed it back into Layers 4-7 as
+            // a secondary candidate before falling through to qualifier stripping.
+            if result == nil, let fileName = exercise.imageFileName, !fileName.isEmpty,
+               fileName != normalized {
+                result = fuzzyMatch(fileName)
+            }
+
+            // Layer 8: strip qualifiers (parentheticals, em-dashes, qualifier tokens) and retry
+            // alias + fuzzy lookup against the stripped form. Calls helpers directly (NOT
+            // resolveImageMatch) to avoid polluting fuzzyMatchCache with stripped-key entries.
+            if result == nil {
+                let stripped = strippedKey(for: exercise.name)
+                if !stripped.isEmpty && stripped != normalized {
+                    if mapping[stripped] != nil {
+                        result = ImageMatch(key: stripped, matchType: .stripped)
+                    } else if let canonical = bundledAliases[stripped], mapping[canonical] != nil {
+                        result = ImageMatch(key: canonical, matchType: .stripped)
+                    } else if let fuzzy = fuzzyMatch(stripped) {
+                        // Re-tag as .stripped so callers know how the match was derived.
+                        result = ImageMatch(key: fuzzy.key, matchType: .stripped)
+                    }
+                }
+            }
             fuzzyMatchCache[normalized] = result
             return result
         }
+    }
+
+    // MARK: - Qualifier Stripping (Layer 8)
+
+    /// Tokens that carry no anatomical or movement information — safe to drop before re-matching.
+    /// Kept conservative: never strips body parts, positions (supine/prone/standing), or movements.
+    private static let qualifierTokens: Set<String> = [
+        "free",         // "Band-Free"
+        "modified",
+        "bodyweight",
+        "bilateral",
+        "progressive",
+        "progression",
+        "eccentric",
+        "isometric",
+        "controlled",
+        "gentle",
+        "emphasis",
+        "focus",
+        "advanced",
+        "beginner",
+        "intermediate",
+        "weeks",        // "Weeks 3-6"
+        "week",
+    ]
+
+    /// Strip parentheticals, em/en-dashes, and qualifier tokens from a raw exercise name,
+    /// then return the normalized hyphen-delimited key.
+    /// e.g. "Standing Band-Free Shoulder ER (Isometric)" → "standing-shoulder-er"
+    /// e.g. "Right Shoulder – Sleeper Stretch (Lying)" → "right-shoulder-sleeper-stretch-lying"
+    private func strippedKey(for rawName: String) -> String {
+        // 1. Remove anything between parentheses (including the parens themselves).
+        var s = rawName
+        while let openIdx = s.firstIndex(of: "(") {
+            if let closeIdx = s[openIdx...].firstIndex(of: ")") {
+                s.removeSubrange(openIdx...closeIdx)
+            } else {
+                // Unmatched "(" — bail out and use what we have.
+                s.removeSubrange(openIdx...)
+                break
+            }
+        }
+        // 2. Em/en-dashes act as separators, not hyphens — replace with spaces so they
+        // don't get folded into adjacent tokens by normalizeName.
+        s = s.replacingOccurrences(of: "–", with: " ")
+              .replacingOccurrences(of: "—", with: " ")
+        // 3. Standard normalization to hyphen-delimited lowercase.
+        let normalized = normalizeName(s)
+        // 4. Drop qualifier tokens. Single-character tokens (artifacts of compound forms
+        // like "I-Y-T") are also dropped — multi-letter abbreviations are preserved.
+        let tokens = normalized.split(separator: "-").map(String.init)
+        let filtered = tokens.filter { tok in
+            !Self.qualifierTokens.contains(tok) && tok.count > 1
+        }
+        return filtered.joined(separator: "-")
     }
 
     // MARK: - Fuzzy Matching
@@ -552,18 +493,41 @@ final class ExerciseImageService: @unchecked Sendable {
         return nil
     }
 
-    /// Find the longest mapping key that is a prefix of `name` at a hyphen boundary.
+    /// Find a mapping key with a prefix-relationship to `name` at a hyphen boundary.
+    /// Bidirectional: matches both `key` ⊂ `name` (e.g. "cat-cow-stretch" prefix of
+    /// "cat-cow-stretch-modified") AND `name` ⊂ `key` (e.g. "wall-pushups" is a prefix
+    /// of "wall-pushups-modified"). When `name` is the prefix, prefers the shortest
+    /// (least specialized) key. When `key` is the prefix, prefers the longest (most
+    /// specific) — preserves prior behavior for the common "AI tacked qualifiers
+    /// onto a known canonical name" case.
     private func longestPrefixMatch(_ name: String) -> String? {
-        mapping.keys
-            .filter { name.hasPrefix($0 + "-") }
-            .max(by: { $0.count < $1.count })
+        // Forward: existing key⊂name behavior — prefer longest (most specific).
+        if let m = mapping.keys
+            .filter({ name.hasPrefix($0 + "-") })
+            .max(by: { $0.count < $1.count }) {
+            return m
+        }
+        // Reverse: name⊂key — prefer shortest (least specialized variant).
+        return mapping.keys
+            .filter { $0.hasPrefix(name + "-") }
+            .min(by: { $0.count < $1.count })
     }
 
-    /// Find a mapping key where `name` appears as a suffix at a hyphen boundary.
-    /// Prefers the shortest (least specialized) key on ambiguity.
+    /// Find a mapping key with a suffix-relationship to `name` at a hyphen boundary.
+    /// Bidirectional: matches both `key` ⊂ `name` (e.g. "calf-raises" is a suffix of
+    /// "standing-calf-raises") AND `name` ⊂ `key` (e.g. "neck-rolls" is a suffix of
+    /// "seated-neck-rolls"). Prefers the shortest (least specialized) key in both cases.
     private func suffixMatch(_ name: String) -> String? {
-        let matches = mapping.keys.filter { $0.hasSuffix("-" + name) }
-        return matches.min(by: { $0.count < $1.count })
+        // Forward: existing key⊂name behavior.
+        if let m = mapping.keys
+            .filter({ $0.hasSuffix("-" + name) })
+            .min(by: { $0.count < $1.count }) {
+            return m
+        }
+        // Reverse: name⊂key.
+        return mapping.keys
+            .filter { name.hasSuffix("-" + $0) }
+            .min(by: { $0.count < $1.count })
     }
 
     /// Replace body-part synonym tokens in a hyphen-delimited name.
@@ -666,7 +630,16 @@ final class ExerciseImageService: @unchecked Sendable {
         do {
             let data = try Data(contentsOf: url)
             mapping = try JSONDecoder().decode([String: ImageEntry].self, from: data)
-            AppLogger.images.info("Loaded mapping with \(self.mapping.count) exercises")
+            // Invert the per-entry `aliases` arrays into a flat alias-key → canonical-key index
+            // so resolveImageMatch can look up in O(1). Done once at load time.
+            var index: [String: String] = [:]
+            for (canonical, entry) in mapping {
+                for alias in entry.aliases ?? [] {
+                    index[alias] = canonical
+                }
+            }
+            bundledAliases = index
+            AppLogger.images.info("Loaded mapping with \(self.mapping.count) exercises, \(self.bundledAliases.count) bundled aliases")
         } catch {
             AppLogger.images.error("Failed to decode mapping: \(error.localizedDescription)")
         }
@@ -676,18 +649,34 @@ final class ExerciseImageService: @unchecked Sendable {
 
     /// Log exercise to Firestore `missingExerciseImages` if it doesn't have an exact image match.
     /// Deduplicates within the session — safe to call on every exercise display.
-    func logMissingImageIfNeeded(for exercise: RehabExercise) {
+    /// `substitutedTo`: PR 2 — set when the validation pipeline rewrote this exercise's
+    /// name/imageFileName to a canonical catalog entry. Distinguishes "shown SF Symbol
+    /// fallback" from "shown a substituted image" in the missing-images backlog.
+    func logMissingImageIfNeeded(for exercise: RehabExercise, substitutedTo: String? = nil) {
         let match = resolveImageMatch(for: exercise)
 
-        // Exact matches have a proper image — nothing to log
-        if match?.matchType == .exact { return }
+        // Any layer that resolves to a real image is "good enough" — the user sees the
+        // picture. Only `pluralToggle`, `synonymExpansion`, and unmatched (nil) get logged,
+        // so we still capture the strong signal of completely-novel AI names.
+        // Exception: validation-side substitutions ALWAYS log (the source field is
+        // `validation`, not `display`), even if the original name happened to fuzzy-match.
+        if substitutedTo == nil {
+            switch match?.matchType {
+            case .exact, .prefixFuzzy, .suffixFuzzy, .stripped:
+                return
+            case .pluralToggle, .synonymExpansion, .none:
+                break
+            }
+        }
 
         let normalized = normalizeName(exercise.name)
 
-        // Deduplicate within this session
+        // Deduplicate within this session — keyed on (normalizedKey, source) so a
+        // validation-time substitution and a later display-time log both get recorded.
+        let dedupKey = "\(normalized)|\(substitutedTo == nil ? "display" : "validation")"
         let alreadyLogged = lock.withLock {
-            if loggedThisSession.contains(normalized) { return true }
-            loggedThisSession.insert(normalized)
+            if loggedThisSession.contains(dedupKey) { return true }
+            loggedThisSession.insert(dedupKey)
             return false
         }
         guard !alreadyLogged else { return }
@@ -708,13 +697,16 @@ final class ExerciseImageService: @unchecked Sendable {
                 "matchType": matchTypeValue,
                 "exerciseCategory": exercise.exerciseCategory ?? "unknown",
                 "targetArea": exercise.targetArea,
-                "source": "display",
+                "source": substitutedTo == nil ? "display" : "validation",
                 "count": FieldValue.increment(Int64(1)),
                 "lastSeen": FieldValue.serverTimestamp(),
             ]
 
             if let matchedTo {
                 data["matchedTo"] = matchedTo
+            }
+            if let substitutedTo {
+                data["substitutedTo"] = substitutedTo
             }
 
             do {
@@ -741,5 +733,19 @@ final class ExerciseImageService: @unchecked Sendable {
             .components(separatedBy: CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-")).inverted)
             .filter { !$0.isEmpty }
             .joined(separator: "-")
+    }
+
+    /// Tokenize a target_area string into a Set of comparable terms.
+    /// Splits on `,`, `&`, `/`, and parentheses; lowercases; trims whitespace
+    /// so "Core (Transverse Abdominis)" → `{"core", "transverse abdominis"}`.
+    /// Used by the validation pipeline (PR 2) for substitution scoring + anatomical-relevance.
+    static func normalizedTargetArea(_ raw: String) -> Set<String> {
+        let separators = CharacterSet(charactersIn: ",&/()")
+        return Set(
+            raw.lowercased()
+                .components(separatedBy: separators)
+                .map { $0.trimmingCharacters(in: .whitespaces) }
+                .filter { !$0.isEmpty }
+        )
     }
 }

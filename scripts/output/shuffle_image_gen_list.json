@@ -1,0 +1,1440 @@
+{
+  "summary": {
+    "total": 143,
+    "from_NEW": 42,
+    "from_MAYBE": 90,
+    "from_reverted": 11
+  },
+  "exercises": [
+    {
+      "normalized_filename": "ankle-dorsiflexion-resistance",
+      "name": "Ankle Dorsiflexion with Resistance Band",
+      "category": "strength",
+      "target_area": "Ankle",
+      "body_position": "seated",
+      "pose_description": "Sit upright with your legs extended in front of you. Place a resistance band around the ball of your foot, holding the ends in your hands.",
+      "end_pose_description": "Pull your toes toward your shin against the band resistance, creating tension in the front of your ankle. Hold briefly at the top of the movement.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "anterior-tibialis-stretch",
+      "name": "Seated Anterior Tibialis Stretch",
+      "category": "stretch",
+      "target_area": "Ankle",
+      "body_position": "seated",
+      "pose_description": "Sit upright and cross one ankle over the opposite knee, creating a figure-4 position. Keep your back straight.",
+      "end_pose_description": "Gently press the top of the crossed foot downward and curl your toes toward the sole of your foot. Feel a stretch in the front of your ankle and shin.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "dorsiflexion-hold-gravity",
+      "name": "Dorsiflexion Hold Against Gravity",
+      "category": "strength",
+      "target_area": "Ankle",
+      "body_position": "supine",
+      "pose_description": "Lie on your back with both legs extended, feet pointing toward the ceiling. Keep your arms at your sides.",
+      "end_pose_description": "Pull both feet toward your shins against gravity, engaging your anterior tibialis muscles. Hold this dorsiflexed position for several seconds.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "double-leg-heel-raises-stairs",
+      "name": "Double Leg Heel Raises on Stairs",
+      "category": "strength",
+      "target_area": "Ankle",
+      "body_position": "standing",
+      "pose_description": "Stand on a stair or step with balls of feet on the edge and heels hanging off, holding a rail for light support. Feet are hip-width apart.",
+      "end_pose_description": "Rise up onto the balls of your feet, lifting heels as high as possible while maintaining ankle control. Lower heels below step level for a deeper stretch and stronger contraction.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "four-way-ankle-resistance",
+      "name": "Four-Way Ankle Resistance (with towel)",
+      "category": "strength",
+      "target_area": "Ankle",
+      "body_position": "seated",
+      "pose_description": "Sit in a chair with your injured leg extended in front of you. Loop a rolled towel around the ball of your foot, holding both ends with your hands for gentle resistance.",
+      "end_pose_description": "Perform ankle movements in four directions: point your toes down, pull toes up toward shin, turn sole inward, and turn sole outward. Hold each movement for 2 seconds against the towel resistance.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "inversion-eversion-strengthening",
+      "name": "Inversion and Eversion Strengthening",
+      "category": "strength",
+      "target_area": "Ankle",
+      "body_position": "seated",
+      "pose_description": "Sit upright with one leg extended and a resistance band looped around your forefoot. Hold both ends of the band.",
+      "end_pose_description": "Turn the sole of your foot inward (inversion), then outward (eversion) against the band resistance. Perform controlled movements through the full range available.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "isometric-achilles-contraction",
+      "name": "Isometric Achilles Contraction",
+      "category": "strength",
+      "target_area": "Ankle",
+      "body_position": "seated",
+      "pose_description": "Sit with your leg extended and loop a resistance band around the ball of your foot, holding the band firmly. Keep your knee straight.",
+      "end_pose_description": "Push your foot downward against the band's resistance without any movement, holding a strong contraction for 6-10 seconds. Relax and repeat.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "lateral-ankle-stability-reach",
+      "name": "Lateral Ankle Stability with Dumbbell Reach",
+      "category": "balance",
+      "target_area": "Ankle",
+      "body_position": "standing",
+      "pose_description": "Stand on one leg holding a light dumbbell at your side, keeping your core engaged and standing leg stable. Focus on the ankle of your support leg.",
+      "end_pose_description": "Reach the dumbbell across your body and toward the ground in a controlled manner, challenging your ankle stabilizers. Return to standing position.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "plantarflexion-dumbbell",
+      "name": "Plantarflexion with Dumbbell Weight",
+      "category": "strength",
+      "target_area": "Ankle",
+      "body_position": "seated",
+      "pose_description": "Sit upright with one leg extended and place a light dumbbell on top of your forefoot. Keep your leg relaxed on the chair.",
+      "end_pose_description": "Point your toes downward against the dumbbell weight, engaging your calf muscles. Hold the end position briefly before returning to start.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "seated-achilles-stretch",
+      "name": "Seated Achilles Stretch",
+      "category": "stretch",
+      "target_area": "Ankle",
+      "body_position": "seated",
+      "pose_description": "Sit on the floor with legs extended in front of you. Keep your back straight and shoulders relaxed.",
+      "end_pose_description": "Loop a resistance band around the ball of your foot and gently pull your toes toward your shin, feeling a stretch in the back of your calf and Achilles tendon. Hold the stretch for 30 seconds.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "standing-band-ankle-inversion-stability",
+      "name": "Standing Band Ankle Inversion with Stability",
+      "category": "strength",
+      "target_area": "Ankle",
+      "body_position": "standing",
+      "pose_description": "Stand upright holding onto a stable surface with one leg slightly lifted and a resistance band looped around the forefoot. Your stance leg is engaged with a slight knee bend.",
+      "end_pose_description": "Turn your foot inward against band resistance while maintaining balance and control. Your ankle movement is deliberate and stabilized by engagement of the surrounding muscles.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "wall-squat-hold",
+      "name": "Wall Squat Hold",
+      "category": "strength",
+      "target_area": "Ankle",
+      "body_position": "standing",
+      "pose_description": "Stand with your back against a wall, feet hip-width apart and positioned about 12 inches away from the wall. Hold dumbbells at your sides.",
+      "end_pose_description": "Slide down the wall until your thighs are parallel to the ground and knees bend at 90 degrees. Maintain this isometric position, keeping your chest upright and weight in your heels.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "gentle-isometric-arm-holds",
+      "name": "Gentle Isometric Arm Holds",
+      "category": "strength",
+      "target_area": "Arm",
+      "body_position": "seated",
+      "pose_description": "Sit upright with your affected arm bent at the elbow, held at chest height with palm facing inward. Use your other hand to support the affected arm from underneath.",
+      "end_pose_description": "Gently press your affected arm downward against the resistance of your supporting hand without moving. Hold this gentle isometric contraction for 3-5 seconds, then relax.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "prone-hand-elevation-relaxation",
+      "name": "Prone Hand Elevation and Relaxation",
+      "category": "mobility",
+      "target_area": "Arm",
+      "body_position": "prone",
+      "pose_description": "Lie face down on a bed or firm surface with pillows under your chest and affected arm resting below heart level. Keep your head turned to one side in a comfortable position.",
+      "end_pose_description": "Gently elevate your affected arm above heart level using pillows or cushions for support. Hold this elevated position to promote lymphatic drainage through gravity.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "seated-arm-compressions-towel",
+      "name": "Seated Arm Compressions with Towel Roll",
+      "category": "strength",
+      "target_area": "Arm",
+      "body_position": "seated",
+      "pose_description": "Sit upright in a chair with your affected arm extended in front of you at chest height. Imagine holding an imaginary towel roll along the length of your arm.",
+      "end_pose_description": "Gently squeeze your forearm and hand as if wringing out the imaginary towel from shoulder to fingertips. Release and repeat with gentle, rhythmic compressions moving downward.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "seated-tricep-extension-band",
+      "name": "Seated Tricep Extension with Band",
+      "category": "strength",
+      "target_area": "Arm",
+      "body_position": "seated",
+      "pose_description": "Sit upright and hold one end of a resistance band overhead with one arm bent at the elbow. Secure the other end under your seated position.",
+      "end_pose_description": "Straighten the overhead arm by extending the elbow upward against the band resistance. Lower slowly with control and repeat on both sides.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "banded-good-morning",
+      "name": "Banded Good Morning",
+      "category": "strength",
+      "target_area": "Back",
+      "body_position": "standing",
+      "pose_description": "Stand with feet shoulder-width apart and loop a resistance band around your neck and hold the ends. Keep your knees slightly bent and your spine neutral.",
+      "end_pose_description": "Hinge forward at the hips, lowering your torso while maintaining a straight back and neutral spine. Return to standing by driving through your heels and engaging your posterior chain.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "banded-quadruped-reach",
+      "name": "Banded Quadruped Reach",
+      "category": "core",
+      "target_area": "Back",
+      "body_position": "quadruped",
+      "pose_description": "Start on hands and knees with a resistance band looped around both feet. Keep your core tight and back flat.",
+      "end_pose_description": "Reach one arm forward while simultaneously sliding the opposite knee out to the side against the band. Return to center and alternate sides smoothly.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "banded-superman",
+      "name": "Banded Superman",
+      "category": "strength",
+      "target_area": "Back",
+      "body_position": "prone",
+      "pose_description": "Lie face down with a resistance band held in both hands extended above your head. Keep your legs straight and forehead neutral on the floor.",
+      "end_pose_description": "Pull the band down toward your sides while lifting your chest and legs off the ground. Squeeze your back muscles and hold briefly at the top.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "dumbbell-single-arm-row",
+      "name": "Dumbbell Single-Arm Row",
+      "category": "strength",
+      "target_area": "Back",
+      "body_position": "standing",
+      "pose_description": "Stand with feet hip-width apart, holding a dumbbell in your right hand with arm extended down. Hinge slightly at the hips with a neutral spine and brace your core.",
+      "end_pose_description": "Pull the dumbbell up toward your hip, driving your elbow back and squeezing your back muscles. Lower the dumbbell with control back to the starting position.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "lat-pulldown-machine",
+      "name": "Lat Pulldown Machine",
+      "category": "strength",
+      "target_area": "Back",
+      "body_position": "seated",
+      "pose_description": "Sit at the machine with thighs under the pad and feet flat on the floor. Reach up and grip the wide bar with hands slightly wider than shoulder-width.",
+      "end_pose_description": "Pull the bar down toward your chest by driving elbows down and back. Return the bar to the starting position with a controlled movement without fully straightening arms.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "modified-plank-hold",
+      "name": "Modified Plank Hold",
+      "category": "core",
+      "target_area": "Back",
+      "body_position": "prone",
+      "pose_description": "Begin on your forearms and knees with elbows under shoulders and knees under hips. Keep your neck neutral and core engaged.",
+      "end_pose_description": "Hold a straight line from your knees through your hips to your shoulders, maintaining tension in your core and avoiding sagging. Breathe steadily throughout the hold.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "posterior-chain-activation",
+      "name": "Posterior Chain Activation",
+      "category": "strength",
+      "target_area": "Back",
+      "body_position": "supine",
+      "pose_description": "Lie on your back with knees bent, feet flat on the floor hip-width apart, and arms at your sides with palms down. Keep your head neutral on the floor.",
+      "end_pose_description": "Squeeze your glutes and lift your hips toward the ceiling, creating a straight line from knees to shoulders. Hold briefly while maintaining engagement in your back and glutes.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "postural-correction-hold",
+      "name": "Postural Correction Hold",
+      "category": "core",
+      "target_area": "Back",
+      "body_position": "standing",
+      "pose_description": "Stand with feet hip-width apart, chest lifted, and shoulders back and down. Engage your core muscles as if bracing for impact.",
+      "end_pose_description": "Maintain this upright posture with your weight balanced evenly between both feet, shoulders relaxed but not rounded. Hold this corrected position for 30-60 seconds.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "prone-back-extension",
+      "name": "Prone Back Extension",
+      "category": "strength",
+      "target_area": "Back",
+      "body_position": "prone",
+      "pose_description": "Lie face down with your forehead resting on a small towel and arms at your sides with palms down. Keep your legs straight and relaxed with toes pointed.",
+      "end_pose_description": "Gently lift your chest and shoulders off the ground using your back muscles, keeping your neck neutral. Hold at the top for 2 seconds, then slowly lower back down without touching the floor completely.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "prone-thoracic-rotation-band",
+      "name": "Prone Thoracic Rotation with Band",
+      "category": "mobility",
+      "target_area": "Back",
+      "body_position": "prone",
+      "pose_description": "Lie face down with a resistance band held in both hands extended above your head on the ground. Keep your legs straight and core engaged.",
+      "end_pose_description": "Rotate your torso to one side, bringing the band toward the floor beside you, rotating through your mid-back. Return to center and repeat on the opposite side.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "resistance-band-reverse-pec-flyes",
+      "name": "Resistance Band Reverse Pec Flyes",
+      "category": "strength",
+      "target_area": "Back",
+      "body_position": "seated",
+      "pose_description": "Sit upright with feet flat on the floor and a resistance band anchored at chest height in front of you, holding both ends with arms extended forward. Your shoulders should be relaxed and spine neutral.",
+      "end_pose_description": "Pull the band outward and backward, squeezing your shoulder blades together as your arms move to your sides. Your chest opens and upper back engages fully.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "seated-row-machine",
+      "name": "Seated Row Machine",
+      "category": "strength",
+      "target_area": "Back",
+      "body_position": "seated",
+      "pose_description": "Sit at the machine with chest against the pad and feet flat on the floor. Extend arms forward to grip the handles with a neutral grip.",
+      "end_pose_description": "Pull the handles toward your torso by retracting shoulder blades and bending elbows. Extend arms back to the start with control, maintaining contact with the chest pad.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "standing-torso-twist",
+      "name": "Standing Torso Twist",
+      "category": "mobility",
+      "target_area": "Back",
+      "body_position": "standing",
+      "pose_description": "Stand with feet hip-width apart and place your hands behind your head with elbows out to the sides. Keep your hips still and facing forward.",
+      "end_pose_description": "Rotate your upper body to one side, moving only from the waist and rib cage. Return to center and twist to the opposite side in a controlled manner.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "supine-leg-slides",
+      "name": "Supine Leg Slides",
+      "category": "core",
+      "target_area": "Back",
+      "body_position": "supine",
+      "pose_description": "Lie on your back on a firm surface with your knees bent and feet flat on the floor, hip-width apart. Your arms rest at your sides with palms down, and your spine maintains its natural curve with a neutral pelvis.",
+      "end_pose_description": "Slowly slide one leg straight out along the floor, straightening the knee while maintaining contact with the ground. Keep your pelvis stable and your lower back neutral, then slide the leg back to the bent position.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "chest-press-machine",
+      "name": "Chest Press Machine",
+      "category": "strength",
+      "target_area": "Chest",
+      "body_position": "seated",
+      "pose_description": "Sit upright on the machine with back firmly against the pad and feet flat on the floor. Grip the handles at chest level with elbows bent at 90 degrees.",
+      "end_pose_description": "Push the handles forward in a controlled manner until arms are nearly straight without locking elbows. Slowly return to the starting position with control.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "standing-chest-opener-breathing",
+      "name": "Standing Chest Opener with Deep Breathing",
+      "category": "stretch",
+      "target_area": "Chest",
+      "body_position": "standing",
+      "pose_description": "Stand with feet shoulder-width apart and hold a dumbbell in each hand at waist level with arms extended forward. Your posture is upright with shoulders relaxed.",
+      "end_pose_description": "Open your arms out to the sides in a wide arc while inhaling deeply through your nose and expanding your ribcage. Exhale as you return to the starting position.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "standing-chest-squeeze",
+      "name": "Standing Chest Squeeze",
+      "category": "strength",
+      "target_area": "Chest",
+      "body_position": "standing",
+      "pose_description": "Stand upright with feet hip-width apart and bring your hands up to chest level with elbows bent at 90 degrees. Keep your shoulders relaxed and down.",
+      "end_pose_description": "Press your palms together firmly in front of your chest, squeezing your chest muscles. Hold the squeeze for 2-3 seconds, then release and repeat.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "anti-rotation-press",
+      "name": "Anti-Rotation Press with Rotation",
+      "category": "core",
+      "target_area": "Core",
+      "body_position": "standing",
+      "pose_description": "Stand perpendicular to a cable machine with feet shoulder-width apart, holding the handle at chest level with both hands. Engage your core and keep your shoulders level.",
+      "end_pose_description": "Press the cable away from your body while simultaneously rotating your torso toward the cable. Hold at full extension, then return to start with control.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "quadruped-alternating-leg-lifts",
+      "name": "Quadruped with Alternating Leg Lifts",
+      "category": "strength",
+      "target_area": "Core",
+      "body_position": "quadruped",
+      "pose_description": "Start on your hands and knees with wrists under shoulders and knees under hips. Maintain a neutral spine and engage your pelvic floor.",
+      "end_pose_description": "Extend one leg behind you while keeping the pelvic floor engaged and core tight. Return to start and alternate legs, avoiding any arching in the lower back.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "quadruped-breathing-arm-lifts",
+      "name": "Quadruped Breathing with Arm Lifts",
+      "category": "core",
+      "target_area": "Core",
+      "body_position": "quadruped",
+      "pose_description": "Start on your hands and knees with wrists under shoulders and knees under hips. Your spine is neutral and core is engaged.",
+      "end_pose_description": "Inhale and extend your right arm forward to shoulder height while maintaining spinal stability. Exhale as you return to start, then repeat on the left side.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "supine-core-engagement-neutral-spine",
+      "name": "Supine Core Engagement with Neutral Spine",
+      "category": "core",
+      "target_area": "Core",
+      "body_position": "supine",
+      "pose_description": "Lie on your back with knees bent, feet flat on the floor, and arms at your sides. Maintain a neutral spine with a small gap between your lower back and the floor.",
+      "end_pose_description": "Gently engage your core by drawing your lower ribs toward your pelvis without flattening your lower back. Breathe steadily and hold the contraction for 5-10 seconds.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "quadruped-band-balance",
+      "name": "Quadruped with Band-Assisted Balance",
+      "category": "balance",
+      "target_area": "Core, Hip Stabilizers, Ankles",
+      "body_position": "quadruped",
+      "pose_description": "Begin on hands and knees with a resistance band looped around your waist, anchored to a stable object at chest height for light support. Keep your core engaged and spine neutral.",
+      "end_pose_description": "Extend one leg straight back and the opposite arm straight forward, creating a diagonal line through your body. Hold briefly while maintaining balance with minimal band support, then return to starting position.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "dumbbell-farmers-walk",
+      "name": "Dumbbell Farmer's Walk",
+      "category": "strength",
+      "target_area": "Core/Grip",
+      "body_position": "standing",
+      "pose_description": "Stand upright holding a dumbbell in each hand at your sides with arms extended. Keep your shoulders relaxed and spine neutral.",
+      "end_pose_description": "Walk forward slowly while maintaining an upright posture and keeping dumbbells at arm's length. Engage your core and keep your gaze forward.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "elbow-extension-band",
+      "name": "Elbow Extension with Resistance Band",
+      "category": "strength",
+      "target_area": "Elbow",
+      "body_position": "seated",
+      "pose_description": "Sit upright with your affected arm bent at the elbow, keeping the upper arm stationary against your side. Loop a resistance band around your forearm and hold the other end with your opposite hand for resistance.",
+      "end_pose_description": "Slowly straighten your affected arm by extending the elbow against the band resistance. Hold the fully extended position for 1-2 seconds before returning to the start position.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "isometric-elbow-flexion",
+      "name": "Isometric Elbow Flexion",
+      "category": "strength",
+      "target_area": "Elbow",
+      "body_position": "seated",
+      "pose_description": "Sit with your affected elbow bent at approximately 90 degrees, tucked against your body. Place your opposite hand against your affected forearm for resistance.",
+      "end_pose_description": "Push your affected forearm upward into your opposite hand while maintaining the 90-degree elbow angle without any movement. Hold this static contraction for 5-10 seconds and relax.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "seated-elbow-flexion-band",
+      "name": "Seated Elbow Flexion with Band",
+      "category": "strength",
+      "target_area": "Elbow",
+      "body_position": "seated",
+      "pose_description": "Sit upright with feet flat on the floor, with the resistance band secured under your foot. Hold the band's handle in your affected hand with your arm extended downward.",
+      "end_pose_description": "Bend your elbow to bring your hand up toward your shoulder against the band's resistance. Lower your arm slowly to full extension with control.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "tricep-extension-band",
+      "name": "Tricep Extension with Band",
+      "category": "strength",
+      "target_area": "Elbow",
+      "body_position": "standing",
+      "pose_description": "Stand with feet shoulder-width apart and hold a resistance band overhead with both hands, elbows bent at 90 degrees behind your head. Keep your core engaged and upper arms pointing upward.",
+      "end_pose_description": "Extend your elbows upward to straighten your arms while holding the band overhead. Maintain control and return to the bent position without letting your elbows flare out to the sides.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "gaze-stabilization-smooth-pursuits",
+      "name": "Gaze Stabilization - Smooth Pursuits",
+      "category": "balance",
+      "target_area": "Eyes",
+      "body_position": "seated",
+      "pose_description": "Sit upright in a chair with your head still and neck neutral. Focus your eyes on a fixed point at eye level in front of you.",
+      "end_pose_description": "Slowly move your eyes to follow a moving target (imaginary or real) from left to right, then up and down, maintaining focus without moving your head. Keep your gaze locked on the target throughout the movement.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "supine-eye-movements",
+      "name": "Supine Eye Movements",
+      "category": "balance",
+      "target_area": "Eyes/Vestibular",
+      "body_position": "supine",
+      "pose_description": "Lie flat on your back with knees bent and feet flat on floor. Keep your head still and focus on a fixed point on the ceiling above.",
+      "end_pose_description": "Move only your eyes in horizontal, vertical, and diagonal directions while keeping your head completely still. Track slowly and deliberately in each direction.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "coordinated-facial-expression",
+      "name": "Neuromuscular Re-education - Coordinated Expressions",
+      "category": "mobility",
+      "target_area": "Face",
+      "body_position": "seated",
+      "pose_description": "Sit facing a mirror with a neutral expression and completely relaxed facial muscles. Keep your head still and your shoulders down.",
+      "end_pose_description": "Combine multiple movements: lift eyebrows, puff cheeks, and lift mouth corners simultaneously, then release. Hold the combined expression for 3-5 seconds, focusing on coordination and symmetry.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "eye-closure-blink",
+      "name": "Eye Closure Strengthening",
+      "category": "strength",
+      "target_area": "Face",
+      "body_position": "seated",
+      "pose_description": "Sit upright facing a mirror with eyes open and a neutral expression. Keep your head still and relaxed.",
+      "end_pose_description": "Slowly close both eyes together, squinting gently without excessive force. Hold for 2-3 seconds, then slowly open, ensuring equal movement on both sides of the face.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "facial-mirror-smile",
+      "name": "Facial Mirror Exercises - Smile",
+      "category": "mobility",
+      "target_area": "Face",
+      "body_position": "seated",
+      "pose_description": "Sit upright in front of a mirror with a neutral facial expression. Keep your head still and relaxed with your shoulders down.",
+      "end_pose_description": "Slowly lift both corners of your mouth upward into a smile, engaging the muscles on both sides of your face equally. Hold the smile for 3-5 seconds while observing symmetry in the mirror.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "lip-pucker-stretch",
+      "name": "Lip Pucker and Stretch",
+      "category": "mobility",
+      "target_area": "Face",
+      "body_position": "seated",
+      "pose_description": "Sit facing a mirror with a neutral facial expression and relaxed lips. Keep your head still and your shoulders down.",
+      "end_pose_description": "Pucker your lips forward as if to whistle, hold for 2-3 seconds, then stretch your lips into a wide smile. Alternate between positions for 12-15 repetitions.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "mouth-corner-lift-alternate",
+      "name": "Mouth Corner Lift - Alternating",
+      "category": "mobility",
+      "target_area": "Face",
+      "body_position": "seated",
+      "pose_description": "Sit facing a mirror with a neutral facial expression and relaxed lips. Keep your head still and your shoulders down.",
+      "end_pose_description": "Slowly lift one corner of your mouth upward, hold for 2 seconds, then release and repeat on the opposite side. Perform 10-15 alternating repetitions while monitoring symmetry.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "nose-wrinkle-raise",
+      "name": "Nose Wrinkle Exercise",
+      "category": "mobility",
+      "target_area": "Face",
+      "body_position": "seated",
+      "pose_description": "Sit upright facing a mirror with a neutral expression and your nose in a relaxed position. Keep your head still and shoulders down.",
+      "end_pose_description": "Wrinkle your nose upward by raising the muscles around the nasal bridge, creating creases across the bridge of your nose. Hold for 2-3 seconds, then relax and repeat 10-12 times.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "tongue-press-lateral",
+      "name": "Tongue Press and Lateral Movement",
+      "category": "strength",
+      "target_area": "Face",
+      "body_position": "seated",
+      "pose_description": "Sit upright with your mouth slightly open and your tongue in the center of your mouth. Keep your head still and shoulders relaxed.",
+      "end_pose_description": "Press your tongue firmly against one cheek from the inside, hold for 2 seconds, then move to the opposite cheek. Alternate sides for 12-15 repetitions.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "seated-toe-heel-taps-band",
+      "name": "Seated Toe and Heel Taps with Band Loop",
+      "category": "balance",
+      "target_area": "Feet, Ankles, Calves",
+      "body_position": "seated",
+      "pose_description": "Sit upright in a chair with feet flat on the floor, with a light resistance band looped around the front of both feet. Keep your hands on your thighs for stability.",
+      "end_pose_description": "Tap your toes upward against the band's resistance, lifting the balls of your feet while heels remain grounded. Then reverse the motion, pressing your toes down and lifting your heels to work the opposing muscles.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "pip-joint-extension-isometric",
+      "name": "PIP Joint Extension Isometric Hold",
+      "category": "strength",
+      "target_area": "Finger",
+      "body_position": "seated",
+      "pose_description": "Sit comfortably with your forearm resting on a table, palm facing down. Place your affected finger in a slightly flexed position with the PIP joint bent at approximately 30 degrees.",
+      "end_pose_description": "Gently press the top of your finger downward against resistance from your other hand while maintaining the PIP joint in extension. Hold this isometric contraction for the prescribed duration without allowing movement.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "protective-splinting-position",
+      "name": "Protective Finger Splinting Position Exercise",
+      "category": "mobility",
+      "target_area": "Finger",
+      "body_position": "seated",
+      "pose_description": "Sit comfortably with your hand resting on a table in a neutral position. Your affected finger should be relaxed and in its natural position.",
+      "end_pose_description": "Gently position your finger into the proper splinting alignment, with the PIP joint in slight extension and the DIP joint in slight flexion. Hold this therapeutic position for the prescribed duration to train proper joint mechanics.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "sustained-pip-extension-gravity",
+      "name": "Sustained PIP Extension with Gravity Resistance",
+      "category": "strength",
+      "target_area": "Finger",
+      "body_position": "seated",
+      "pose_description": "Sit with your arm extended forward and palm facing down at shoulder height. Allow your affected finger to hang in a slightly flexed position beneath your hand.",
+      "end_pose_description": "Extend the PIP joint against gravity to straighten the finger fully. Hold this extended position while fighting the natural tendency of the joint to flex, building endurance in the extensor mechanism.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "big-toe-joint-mobilization",
+      "name": "Big Toe Joint Mobilization",
+      "category": "mobility",
+      "target_area": "Foot",
+      "body_position": "seated",
+      "pose_description": "Sit in a chair with one leg crossed over the opposite knee, bringing the foot closer to your body. Grasp your big toe gently with your hand.",
+      "end_pose_description": "Slowly and gently dorsiflex (bend upward) and plantarflex (bend downward) the big toe through its available range of motion. Hold gentle stretches at the end of each direction for 2 seconds.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "plantar-fascia-release-with-ball",
+      "name": "Plantar Fascia Release with Ball",
+      "category": "mobility",
+      "target_area": "Foot",
+      "body_position": "seated",
+      "pose_description": "Sit in a chair with your foot flat on the ground or elevated slightly. Have a foam roller or massage ball ready.",
+      "end_pose_description": "Roll the ball along the arch of your foot from heel to toe, applying moderate pressure. Spend extra time on tender spots to release tension in the plantar fascia.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "seated-foot-rolls",
+      "name": "Seated Foot Rolls",
+      "category": "mobility",
+      "target_area": "Foot",
+      "body_position": "seated",
+      "pose_description": "Sit upright in a chair with both feet flat on the floor. Keep your back against the chair.",
+      "end_pose_description": "Slowly roll one foot inward and outward in circular motions, then reverse direction. Repeat for 15-20 rotations in each direction per foot.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "seated-plantar-fascia-stretch-with-band",
+      "name": "Seated Plantar Fascia Stretch with Band",
+      "category": "stretch",
+      "target_area": "Foot",
+      "body_position": "seated",
+      "pose_description": "Sit upright with one leg crossed over the opposite knee so the sole of your foot faces you. Loop a resistance band around the ball of the foot.",
+      "end_pose_description": "Gently pull the band toward your shin to dorsiflex the foot, creating a stretch along the bottom of the foot and arch. Hold the stretch for 30 seconds.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "eccentric-wrist-flexion",
+      "name": "Eccentric Wrist Flexion",
+      "category": "strength",
+      "target_area": "Forearm",
+      "body_position": "seated",
+      "pose_description": "Sit with your forearm supported on a table, holding a light dumbbell with your palm facing up and wrist bent upward. Your opposite hand assists to lift the weight.",
+      "end_pose_description": "Slowly lower the dumbbell by extending your wrist downward in a controlled eccentric motion over 3-5 seconds. Lower until your wrist is in slight extension.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "forearm-plank-hand-variation",
+      "name": "Forearm Plank with Hand Position Variation",
+      "category": "strength",
+      "target_area": "Forearm",
+      "body_position": "prone",
+      "pose_description": "Start in a forearm plank position with your forearms on the ground, shoulders directly above elbows, and your body in a straight line. Keep your core engaged and neutral spine.",
+      "end_pose_description": "Maintain the plank while alternately straightening each arm one at a time, supporting your weight on your hands in a modified push-up position. Return to forearm plank and alternate.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "supine-wrist-pronation-stretch",
+      "name": "Supine Wrist Pronation Stretch",
+      "category": "stretch",
+      "target_area": "Forearm",
+      "body_position": "supine",
+      "pose_description": "Lie on your back with your affected arm extended out to the side at shoulder height, elbow straight, and palm facing up. Keep your shoulder relaxed and stable.",
+      "end_pose_description": "Gently press your palm downward toward the floor to internally rotate your shoulder and stretch the forearm musculature. Hold the stretch for 20-30 seconds without forcing.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "finger-isolation-tapping",
+      "name": "Finger Isolation and Tapping",
+      "category": "strength",
+      "target_area": "Hand",
+      "body_position": "seated",
+      "pose_description": "Sit with your hand resting on a table, palm facing downward with the mallet finger splint in place. Your fingers are extended in a relaxed position.",
+      "end_pose_description": "Gently tap each unaffected finger one at a time on the table while keeping the others still. The splinted finger remains completely stationary in the protective splint throughout the exercise.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "grip-strength-with-ball",
+      "name": "Grip Strength with Ball",
+      "category": "strength",
+      "target_area": "Hand",
+      "body_position": "seated",
+      "pose_description": "Sit upright holding a soft therapy ball or stress ball in your palm with fingers relaxed around it. The splinted finger is protected and rests on top of the ball.",
+      "end_pose_description": "Gently squeeze the ball using your unaffected fingers and palm, keeping the splinted finger relaxed on top without flexing at the tip joint. Release and repeat for gentle grip training.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "hand-dexterity-drills",
+      "name": "Hand and Finger Dexterity Drills",
+      "category": "mobility",
+      "target_area": "Hand",
+      "body_position": "seated",
+      "pose_description": "Sit comfortably with your hands resting in your lap or on a table. Your fingers are relaxed and slightly spread apart.",
+      "end_pose_description": "Slowly tap each finger to your thumb in sequence, then reverse the pattern. Move gently and focus on controlled, deliberate movements.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "isolated-finger-lifts",
+      "name": "Isolated Finger Lifts",
+      "category": "strength",
+      "target_area": "Hand",
+      "body_position": "seated",
+      "pose_description": "Place your hand flat on a table with all fingers extended and relaxed. Keep your palm and other fingers in contact with the table surface.",
+      "end_pose_description": "Lift one finger at a time off the table while keeping the others down. Hold for 2 seconds at the top before lowering.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "banded-crab-walk",
+      "name": "Banded Crab Walk",
+      "category": "strength",
+      "target_area": "Hip",
+      "body_position": "standing",
+      "pose_description": "Loop a resistance band around your thighs just above the knees and stand with feet shoulder-width apart. Bend your knees slightly and hinge slightly forward at the hips.",
+      "end_pose_description": "Step backward at a diagonal angle while maintaining tension on the band and keeping your chest up. Continue stepping in reverse, maintaining band tension throughout.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "big-stepping-backward",
+      "name": "Big Stepping Backward",
+      "category": "mobility",
+      "target_area": "Hip",
+      "body_position": "standing",
+      "pose_description": "Stand upright with feet together and hands on a stable surface for support if needed. Maintain an upright posture and forward gaze.",
+      "end_pose_description": "Take a BIG step backward with one leg, extending the step as far as safely possible. Return to standing and alternate with the opposite leg.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "big-stepping-forward",
+      "name": "Big Stepping Forward",
+      "category": "mobility",
+      "target_area": "Hip",
+      "body_position": "standing",
+      "pose_description": "Stand upright with feet together and arms at your sides or extended forward for balance. Keep your chest upright and core engaged.",
+      "end_pose_description": "Take a BIG step forward with one leg, ensuring the step is exaggerated and covers substantial distance. Return to standing and repeat with the opposite leg.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "big-stepping-sideways",
+      "name": "Big Stepping Sideways",
+      "category": "mobility",
+      "target_area": "Hip",
+      "body_position": "standing",
+      "pose_description": "Stand upright with feet together and hands on a stable surface or extended for balance. Maintain an upright posture throughout.",
+      "end_pose_description": "Take a BIG step to one side, moving your leg as far as possible while keeping your trunk upright. Return to center and step to the opposite side.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "clams-resistance-band",
+      "name": "Clams with Resistance Band",
+      "category": "strength",
+      "target_area": "Hip",
+      "body_position": "side_lying",
+      "pose_description": "Lie on your side with a resistance band looped around both thighs just above the knees, hips and knees bent at 45 degrees, and feet together. Keep your core engaged and head supported on your lower arm.",
+      "end_pose_description": "Rotate your top knee upward against the band resistance while keeping your feet together and lower body stable. Pause at the top before slowly lowering back to the starting position.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "gluteal-sets",
+      "name": "Gluteal Sets",
+      "category": "strength",
+      "target_area": "Hip",
+      "body_position": "supine",
+      "pose_description": "Lie flat on your back with both knees bent and feet flat on the floor hip-width apart. Keep your arms at your sides with palms down.",
+      "end_pose_description": "Squeeze your buttock muscles as tightly as possible and hold the contraction. Maintain the squeeze for 3-5 seconds while keeping your hips level.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "lying-lateral-leg-lifts",
+      "name": "Lying Lateral Leg Lifts",
+      "category": "strength",
+      "target_area": "Hip",
+      "body_position": "side_lying",
+      "pose_description": "Lie on your side with your bottom leg bent for support and top leg extended straight. Keep your hips stacked and engage your pelvic floor.",
+      "end_pose_description": "Lift the top leg 12-18 inches while keeping it straight and maintaining core engagement. Return to start without dropping the leg and continue with controlled movements.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "seated-hip-marches",
+      "name": "Seated Hip Marches",
+      "category": "mobility",
+      "target_area": "Hip",
+      "body_position": "seated",
+      "pose_description": "Sit upright in a chair with both feet flat on the floor at hip-width apart. Maintain good posture with your back against the chair.",
+      "end_pose_description": "Lift one knee up toward the chest while keeping the other foot on the ground. Alternate lifting knees in a marching motion, moving at a comfortable pace.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "side-lying-leg-lifts",
+      "name": "Side-Lying Leg Lifts",
+      "category": "strength",
+      "target_area": "Hip",
+      "body_position": "side_lying",
+      "pose_description": "Lie on your side with your bottom arm extended and head resting on it, legs stacked together. Engage your core and keep your torso stable.",
+      "end_pose_description": "Lift your top leg to hip height while maintaining a slight forward angle of the leg, then lower it back down without touching your bottom leg. Keep your upper body still throughout.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "standing-hip-adductor-squeeze",
+      "name": "Standing Hip Adductor Squeeze",
+      "category": "strength",
+      "target_area": "Hip",
+      "body_position": "standing",
+      "pose_description": "Stand upright with feet hip-width apart, hands on a support or wall for balance. Place a small pillow or foam pad between your thighs.",
+      "end_pose_description": "Squeeze the pad firmly between your thighs while contracting pelvic floor muscles simultaneously. Hold the squeeze for 5 seconds, maintaining upright posture.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "standing-knee-lifts",
+      "name": "Standing Knee Lifts",
+      "category": "strength",
+      "target_area": "Hip",
+      "body_position": "standing",
+      "pose_description": "Stand upright with feet hip-width apart and hands resting on a chair back or wall for balance. Keep your core engaged and shoulders back.",
+      "end_pose_description": "Lift one knee up toward your chest while keeping your standing leg straight and core tight. Lower your leg back down with control and repeat before switching sides.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "standing-wall-squats-pelvic",
+      "name": "Standing Wall Squats with Pelvic Floor",
+      "category": "strength",
+      "target_area": "Hip",
+      "body_position": "standing",
+      "pose_description": "Stand with your back against a wall, feet hip-width apart and 12 inches from the wall. Engage your pelvic floor muscles before lowering.",
+      "end_pose_description": "Slide down the wall into a partial squat, keeping knees aligned over ankles and maintaining pelvic floor engagement. Hold briefly then slide back up, avoiding any bearing down sensation.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "isometric-jaw-clenching",
+      "name": "Isometric Jaw Clenching",
+      "category": "strength",
+      "target_area": "Jaw",
+      "body_position": "seated",
+      "pose_description": "Sit upright with your mouth closed in a relaxed position and your teeth slightly apart. Keep your shoulders and neck relaxed.",
+      "end_pose_description": "Gently clench your teeth together with about 50% of your maximum effort, engaging the jaw muscles moderately. Hold for 5 seconds, then completely relax.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "lateral-jaw-movement",
+      "name": "Lateral Jaw Movement",
+      "category": "mobility",
+      "target_area": "Jaw",
+      "body_position": "seated",
+      "pose_description": "Sit upright with your mouth slightly open, about a quarter-inch, in a relaxed neutral position. Keep your head still and stable.",
+      "end_pose_description": "Slowly slide your lower jaw to one side, moving it about one-quarter inch without opening your mouth further. Return to center and repeat on the other side.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "postural-neck-stretch",
+      "name": "Postural Neck Stretch",
+      "category": "stretch",
+      "target_area": "Jaw",
+      "body_position": "seated",
+      "pose_description": "Sit upright in a chair with your shoulders relaxed and your back supported against the chair. Look straight ahead.",
+      "end_pose_description": "Slowly turn your head to one side as far as comfortable, then tilt your chin down slightly toward your shoulder. Hold for 20-30 seconds and feel the stretch along the jaw and neck.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "relaxation-breathing-jaw-release",
+      "name": "Relaxation Breathing with Jaw Release",
+      "category": "mobility",
+      "target_area": "Jaw",
+      "body_position": "seated",
+      "pose_description": "Sit upright in a comfortable chair with your shoulders relaxed and your eyes either open or gently closed. Allow your jaw to rest naturally.",
+      "end_pose_description": "Inhale slowly through your nose for 4 counts, then exhale through your mouth for 6 counts while consciously letting your jaw muscles relax and drop slightly. Feel the tension release.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "tongue-to-palate",
+      "name": "Tongue-to-Palate Exercise",
+      "category": "strength",
+      "target_area": "Jaw",
+      "body_position": "seated",
+      "pose_description": "Sit upright with your mouth closed and your jaw relaxed in a neutral position. Breathe normally through your nose.",
+      "end_pose_description": "Place your tongue flat against the roof of your mouth and gently press upward with moderate pressure. Hold for 5 seconds while keeping your jaw relaxed.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "knee-flexion-band",
+      "name": "Knee Flexion with Resistance Band",
+      "category": "strength",
+      "target_area": "Knee",
+      "body_position": "standing",
+      "pose_description": "Stand upright facing a wall with a resistance band looped around the foot of one leg and held in your hand. Keep your standing leg slightly bent for stability.",
+      "end_pose_description": "Bend the knee, pulling your heel toward your buttocks against the band resistance while keeping your thigh stationary. Slowly return to the starting position.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "knee-flexion-extension",
+      "name": "Knee Flexion and Extension",
+      "category": "mobility",
+      "target_area": "Knee",
+      "body_position": "seated",
+      "pose_description": "Sit in a sturdy chair with your back against the backrest and both feet flat on the floor. Keep your torso upright and relaxed.",
+      "end_pose_description": "Slowly lift one foot off the floor by straightening the knee, then lower it back down in a controlled manner. Repeat the motion smoothly without locking the knee at full extension.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "seated-knee-to-chest",
+      "name": "Seated Knee to Chest",
+      "category": "mobility",
+      "target_area": "Knee",
+      "body_position": "seated",
+      "pose_description": "Sit upright in a sturdy chair with both feet flat on the floor. Keep your back against the chair and your other foot resting on the ground.",
+      "end_pose_description": "Slowly lift one knee toward your chest as far as comfortably possible. Gently pull your thigh toward your torso using your hands, feeling a stretch in the knee and hip area.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "single-leg-squats",
+      "name": "Single Leg Squats",
+      "category": "strength",
+      "target_area": "Knee",
+      "body_position": "standing",
+      "pose_description": "Stand upright on one leg with the other leg lifted slightly in front of you, arms extended forward for balance. Keep your chest upright and core engaged.",
+      "end_pose_description": "Lower your body by bending the standing leg's knee to approximately 45-60 degrees, keeping your torso upright and weight in your heel. The lifted leg remains extended or slightly bent for counterbalance.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "leg-press-machine",
+      "name": "Leg Press Machine",
+      "category": "strength",
+      "target_area": "Lower Body",
+      "body_position": "seated",
+      "pose_description": "Sit in the machine with back and head resting against the support pad and feet on the platform shoulder-width apart. Knees should be at approximately 90 degrees.",
+      "end_pose_description": "Push through your heels to extend the legs until knees are nearly straight but not locked. Slowly lower back to the starting position with controlled movement.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "seated-standing-march-band",
+      "name": "Seated Standing March with Resistance Band",
+      "category": "cardio",
+      "target_area": "Lower Body",
+      "body_position": "standing",
+      "pose_description": "Stand upright facing a sturdy chair with a resistance band around your thighs just above the knees. Maintain good posture with hands on the chair for light support.",
+      "end_pose_description": "March in place by lifting one knee up against the band resistance while maintaining balance. Alternate legs in a controlled, steady rhythm.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "stationary-cycling",
+      "name": "Low-Impact Cardio - Stationary Cycling",
+      "category": "cardio",
+      "target_area": "Lower Body",
+      "body_position": "seated",
+      "pose_description": "Sit on a stationary bike with your seat adjusted so your knee is slightly bent at the bottom of the pedal stroke. Grip the handlebars lightly with a neutral wrist position.",
+      "end_pose_description": "Pedal at a steady, moderate pace in smooth, controlled revolutions. Maintain an upright or slightly forward-leaning posture while keeping your head and gaze stable.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "slow-walking-visual-focus",
+      "name": "Slow Walking with Visual Focus",
+      "category": "balance",
+      "target_area": "Lower Body/Vestibular",
+      "body_position": "standing",
+      "pose_description": "Stand upright in an open area near support if needed. Focus your gaze on a fixed point at eye level ahead of you.",
+      "end_pose_description": "Walk slowly forward in a straight line while maintaining focus on your fixed point. Keep your gait smooth and controlled, using support as needed for safety.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "cervical-neck-stretches",
+      "name": "Cervical Neck Stretches",
+      "category": "stretch",
+      "target_area": "Neck",
+      "body_position": "seated",
+      "pose_description": "Sit upright in a chair with neutral posture and shoulders relaxed. Keep your hands resting in your lap or on your thighs.",
+      "end_pose_description": "Slowly tilt your right ear toward your right shoulder, feeling a gentle stretch on the left side of your neck. Hold briefly, then repeat on the opposite side.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "cervical-rotation-band",
+      "name": "Cervical Rotation with Band Support",
+      "category": "mobility",
+      "target_area": "Neck",
+      "body_position": "seated",
+      "pose_description": "Sit upright with a resistance band looped around your head, with the band positioned at your temples. Hold the band taut with both hands at chest level.",
+      "end_pose_description": "Slowly rotate your head to look over one shoulder while the band provides gentle resistance. Maintain the rotation for 2 seconds before returning to center.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "gentle-neck-rolls",
+      "name": "Gentle Neck Rolls",
+      "category": "mobility",
+      "target_area": "Neck",
+      "body_position": "seated",
+      "pose_description": "Sit upright in a chair with your feet flat on the floor and shoulders relaxed. Keep your spine neutral and look straight ahead.",
+      "end_pose_description": "Slowly roll your head in a complete circle, moving from chin toward chest, then to shoulder, back, and opposite shoulder. Move smoothly and gently without forcing the range of motion.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "neck-retraction",
+      "name": "Neck Retraction",
+      "category": "mobility",
+      "target_area": "Neck",
+      "body_position": "seated",
+      "pose_description": "Sit upright in a chair with shoulders relaxed and eyes facing forward. Keep your chin level and parallel to the ground.",
+      "end_pose_description": "Gently draw your chin straight backward, creating a double chin appearance. Hold this retracted position while keeping your gaze forward.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "neck-rotation-stretch-supine",
+      "name": "Neck Rotation Stretch - Supine",
+      "category": "stretch",
+      "target_area": "Neck",
+      "body_position": "supine",
+      "pose_description": "Lie on your back with knees bent and feet flat on the floor. Keep your head in neutral position resting on a low pillow or towel roll.",
+      "end_pose_description": "Gently rotate your head toward the unaffected side, allowing gravity to assist in the stretch. Hold this position to release tension in the affected sternocleidomastoid muscle.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "neck-stretch-sternocleidomastoid",
+      "name": "Neck Stretching - Sternocleidomastoid",
+      "category": "stretch",
+      "target_area": "Neck",
+      "body_position": "seated",
+      "pose_description": "Sit upright with good posture and shoulders relaxed. Keep your chin level and face forward.",
+      "end_pose_description": "Gently tilt your head toward the unaffected side (away from the tight muscle) while slightly rotating your chin upward. Hold this position to feel a stretch along the front and side of the affected neck.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "prone-head-turns",
+      "name": "Prone Head Turns",
+      "category": "mobility",
+      "target_area": "Neck",
+      "body_position": "prone",
+      "pose_description": "Lie face down on a firm surface with your forehead resting on a small rolled towel or pillow. Keep your arms relaxed alongside your body.",
+      "end_pose_description": "Slowly turn your head to one side, resting your cheek on the support while avoiding excessive rotation. Pause briefly, then turn to the opposite side in a controlled manner.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "bridging-pelvic-floor",
+      "name": "Bridging with Pelvic Floor Engagement",
+      "category": "strength",
+      "target_area": "Pelvic Floor",
+      "body_position": "supine",
+      "pose_description": "Lie on your back with knees bent, feet flat on the floor hip-width apart, and arms at your sides. Engage your pelvic floor muscles before initiating movement.",
+      "end_pose_description": "Lift your hips toward the ceiling while maintaining pelvic floor engagement and glute contraction. Hold briefly at the top while maintaining steady breathing.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "cat-cow-mobilization",
+      "name": "Cat-Cow Mobilization",
+      "category": "mobility",
+      "target_area": "Pelvic Floor",
+      "body_position": "quadruped",
+      "pose_description": "Start on your hands and knees with wrists under shoulders and knees under hips. Spine is in neutral position with gaze toward the ground.",
+      "end_pose_description": "Arch your back gently, lifting your gaze and chest toward the ceiling (cow), then reverse by rounding your spine and tucking your chin (cat). Move slowly with deep breathing to encourage pelvic floor relaxation.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "deep-squat-hold",
+      "name": "Deep Squat Hold with Relaxation",
+      "category": "mobility",
+      "target_area": "Pelvic Floor",
+      "body_position": "standing",
+      "pose_description": "Stand with feet shoulder-width apart, weight distributed evenly through both feet. Hands can be held in front for light support if needed.",
+      "end_pose_description": "Slowly lower into a deep squat position with weight in your heels, allowing your pelvic floor to relax and lengthen. Breathe deeply and hold this position for 20-30 seconds.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "quadruped-pelvic-floor-hold",
+      "name": "Quadruped Pelvic Floor Hold",
+      "category": "strength",
+      "target_area": "Pelvic Floor",
+      "body_position": "quadruped",
+      "pose_description": "Position yourself on hands and knees with wrists under shoulders and knees under hips. Maintain a neutral spine with core gently engaged.",
+      "end_pose_description": "Contract the pelvic floor muscles strongly while maintaining stable quadruped position for 5 seconds. Keep breathing steady and avoid holding your breath.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "seated-kegel-posture",
+      "name": "Seated Kegel with Posture Hold",
+      "category": "core",
+      "target_area": "Pelvic Floor",
+      "body_position": "seated",
+      "pose_description": "Sit upright on a chair with feet flat on the floor and good posture, maintaining neutral spine. Relax your breathing and prepare to engage the pelvic floor.",
+      "end_pose_description": "Contract your pelvic floor muscles for 5-8 seconds while maintaining upright posture and relaxed breathing. Release and rest for equal duration between repetitions.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "four-seven-eight-breathing",
+      "name": "4-7-8 Breathing Pattern",
+      "category": "core",
+      "target_area": "Respiratory System",
+      "body_position": "seated",
+      "pose_description": "Sit upright in a comfortable position with your spine neutral and shoulders relaxed. Rest your hands on your thighs.",
+      "end_pose_description": "Inhale through your nose for 4 counts, hold for 7 counts, then exhale through your mouth for 8 counts. Repeat the pattern for 4 complete cycles.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "side-lying-ribcage-expansion",
+      "name": "Side-Lying Ribcage Expansion",
+      "category": "mobility",
+      "target_area": "Ribcage",
+      "body_position": "side_lying",
+      "pose_description": "Lie on your left side with your left arm extended on the ground and right arm resting on your torso. Your hips and shoulders are stacked.",
+      "end_pose_description": "Inhale deeply while opening your right arm up and back, rotating your ribcage and thorax toward the ceiling. Exhale as you return your arm to your torso.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "arm-elevation-deep-breathing",
+      "name": "Arm Elevation with Deep Breathing",
+      "category": "mobility",
+      "target_area": "Shoulder",
+      "body_position": "standing",
+      "pose_description": "Stand upright with feet shoulder-width apart and arms relaxed at your sides. Keep your shoulders relaxed and take a deep breath in through your nose.",
+      "end_pose_description": "Slowly raise both arms out to the sides and overhead in a smooth arc while exhaling. Hold this elevated position briefly, then lower arms back down as you inhale.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "banded-shoulder-stabilization",
+      "name": "Banded Shoulder Stabilization",
+      "category": "strength",
+      "target_area": "Shoulder",
+      "body_position": "standing",
+      "pose_description": "Stand upright with feet shoulder-width apart and a resistance band looped around both wrists at chest height. Your arms are extended forward with a slight bend in the elbows, maintaining neutral posture.",
+      "end_pose_description": "Pull the band apart by moving your arms outward in a controlled motion, engaging your shoulder stabilizers. Your arms remain at chest height with elbows slightly bent as you create tension in the band.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "banded-triceps-extension",
+      "name": "Banded Triceps Extension",
+      "category": "strength",
+      "target_area": "Shoulder",
+      "body_position": "standing",
+      "pose_description": "Stand on one end of a resistance band with feet shoulder-width apart and hold the other end at shoulder height with your elbow bent. Keep your elbow close to your torso and upper arm stationary.",
+      "end_pose_description": "Extend your arm upward and slightly forward, straightening the elbow against the band resistance until your arm is nearly fully extended. Lower back to the starting position with controlled tension throughout.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "big-head-turns",
+      "name": "Big Head Turns",
+      "category": "mobility",
+      "target_area": "Shoulder",
+      "body_position": "seated",
+      "pose_description": "Sit upright in a chair with your head facing forward and shoulders relaxed. Keep your trunk stable and only move your head.",
+      "end_pose_description": "Turn your head as far as possible to one side in a BIG, exaggerated motion. Return to center and rotate to the opposite side with maximum range.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "big-reaching-overhead",
+      "name": "Big Reaching Overhead",
+      "category": "mobility",
+      "target_area": "Shoulder",
+      "body_position": "standing",
+      "pose_description": "Stand with feet shoulder-width apart and arms resting at your sides. Keep your posture upright with your core engaged.",
+      "end_pose_description": "Reach both arms BIG and high overhead, fully extending through your shoulders and standing tall on your toes if possible. Hold briefly at the top before lowering.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "breathing-exercises-arm-positioning",
+      "name": "Breathing Exercises with Arm Positioning",
+      "category": "cardio",
+      "target_area": "Shoulder",
+      "body_position": "seated",
+      "pose_description": "Sit upright in a comfortable chair with both feet flat on the floor and arms resting on your thighs. Close your eyes or maintain a soft gaze.",
+      "end_pose_description": "Slowly raise both arms out to shoulder height while inhaling deeply for a count of 4. Lower arms while exhaling slowly for a count of 4, promoting lymphatic circulation.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "crossbody-shoulder-stretch",
+      "name": "Crossbody Shoulder Stretch",
+      "category": "stretch",
+      "target_area": "Shoulder",
+      "body_position": "standing",
+      "pose_description": "Stand with feet hip-width apart and shoulders relaxed, with your affected arm hanging naturally at your side. Maintain an upright posture with your core engaged and gaze forward.",
+      "end_pose_description": "Use your opposite hand to gently grasp the elbow or upper arm of the affected side and pull it across your body toward your chest. Hold this position while maintaining an upright posture, feeling the stretch across the back of the shoulder and upper back.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "dumbbell-farmers-carries",
+      "name": "Dumbbell Farmer's Carries",
+      "category": "strength",
+      "target_area": "Shoulder",
+      "body_position": "standing",
+      "pose_description": "Stand upright with feet hip-width apart, holding a dumbbell in each hand at your sides with neutral wrist and shoulder position. Engage your core and maintain tall posture.",
+      "end_pose_description": "Walk forward maintaining upright posture, shoulders level, and neutral neck alignment. Focus on keeping both shoulders balanced and avoiding lateral neck flexion throughout the movement.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "dumbbell-shoulder-presses",
+      "name": "Dumbbell Shoulder Presses",
+      "category": "strength",
+      "target_area": "Shoulder",
+      "body_position": "seated",
+      "pose_description": "Sit upright with your back against a bench or chair, holding a dumbbell in each hand at shoulder height with elbows bent. Your core is engaged and your feet are flat on the floor.",
+      "end_pose_description": "Press the dumbbells overhead in a controlled motion until your arms are nearly fully extended. Lower them back to shoulder height with control.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "gentle-shoulder-circles",
+      "name": "Gentle Shoulder Circles",
+      "category": "mobility",
+      "target_area": "Shoulder",
+      "body_position": "standing",
+      "pose_description": "Stand with good posture, feet shoulder-width apart, and arms hanging naturally at your sides. Keep your neck neutral and gaze forward.",
+      "end_pose_description": "Slowly rotate both shoulders backward in small circles, moving up toward your ears, back, and down. Complete 8-10 circles, then reverse direction.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "half-kneeling-single-arm-row-band",
+      "name": "Half-Kneeling Single-Arm Row with Band",
+      "category": "strength",
+      "target_area": "Shoulder",
+      "body_position": "kneeling",
+      "pose_description": "Kneel on your right knee with left foot forward, holding a resistance band anchored at chest height in front of you. Your arm is extended straight out with the band at medium tension.",
+      "end_pose_description": "Pull the band toward your ribcage by driving your elbow back, squeezing your shoulder blade toward your spine. Your torso remains upright and stable with minimal rotation.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "lightweight-lateral-raises",
+      "name": "Lightweight Lateral Raises",
+      "category": "strength",
+      "target_area": "Shoulder",
+      "body_position": "standing",
+      "pose_description": "Stand upright with feet hip-width apart, holding light dumbbells at your sides with a neutral grip. Engage your core and keep shoulders down.",
+      "end_pose_description": "Raise both arms out to the sides in a slow, controlled motion until they reach shoulder height. Maintain a slight bend in your elbows throughout the movement.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "prone-reverse-fly",
+      "name": "Prone Reverse Fly",
+      "category": "strength",
+      "target_area": "Shoulder",
+      "body_position": "prone",
+      "pose_description": "Lie face down on an incline bench or floor with light dumbbells in each hand, arms hanging down with a slight elbow bend. Keep your forehead neutral and core engaged.",
+      "end_pose_description": "Raise both dumbbells out to the sides in a controlled arc, leading with your elbows and squeezing your rear delts. Pause briefly at shoulder height before lowering back down.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "prone-scapular-y-raises-with-band",
+      "name": "Prone Scapular Y-Raises with Band",
+      "category": "strength",
+      "target_area": "Shoulder",
+      "body_position": "prone",
+      "pose_description": "Lie face down on a comfortable surface with arms at your sides holding a light resistance band. Keep your forehead on a small pillow to maintain neutral cervical spine.",
+      "end_pose_description": "Raise both arms overhead in a Y-position while engaging your lower trapezius. Hold briefly at the top before lowering, avoiding excessive shoulder strain.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "resistance-band-face-pulls",
+      "name": "Resistance Band Face Pulls",
+      "category": "strength",
+      "target_area": "Shoulder",
+      "body_position": "standing",
+      "pose_description": "Stand tall with feet hip-width apart, holding a resistance band anchored at eye level with both hands, arms extended forward. The band should be taut with slight tension.",
+      "end_pose_description": "Pull the band toward your face, separating your hands as they approach, with elbows high and wide. Your shoulder blades squeeze together as the band reaches near your temples.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "reverse-machine-fly",
+      "name": "Reverse Machine Fly",
+      "category": "strength",
+      "target_area": "Shoulder",
+      "body_position": "seated",
+      "pose_description": "Sit upright at a reverse fly machine with your chest against the pad and feet flat on the ground. Grip the handles with a neutral grip at shoulder height.",
+      "end_pose_description": "Pull the handles back in a wide arc, squeezing your shoulder blades together and opening your chest. Your arms should form a wide V-shape at the end of the movement.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "seated-arm-lifts",
+      "name": "Seated Arm Lifts",
+      "category": "strength",
+      "target_area": "Shoulder",
+      "body_position": "seated",
+      "pose_description": "Sit upright in a firm chair with your feet flat on the floor and arms relaxed at your sides with elbows bent at 90 degrees. Keep your shoulders relaxed and chest open.",
+      "end_pose_description": "Slowly raise both arms up toward shoulder height with elbows bent, lifting hands toward your armpits. Lower your arms back down with control and repeat.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "seated-neck-relaxation",
+      "name": "Seated Neck Relaxation",
+      "category": "stretch",
+      "target_area": "Shoulder",
+      "body_position": "seated",
+      "pose_description": "Sit upright with shoulders relaxed and looking straight ahead. Keep your back tall and your hands resting on your thighs.",
+      "end_pose_description": "Slowly drop your right ear toward your right shoulder, feeling a gentle stretch along the left side of your neck. Breathe deeply and hold before returning to center.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "seated-scapular-stabilization",
+      "name": "Seated Scapular Stabilization",
+      "category": "strength",
+      "target_area": "Shoulder",
+      "body_position": "seated",
+      "pose_description": "Sit upright with good posture and feet flat on the floor. Hold a resistance band anchored at chest height with both hands, elbows bent at 90 degrees.",
+      "end_pose_description": "Gently press the band forward and slightly outward while squeezing your shoulder blades together. Hold this contraction for 2-3 seconds without hyperextending your shoulders.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "shoulder-shrug-release",
+      "name": "Shoulder Shrug and Release",
+      "category": "mobility",
+      "target_area": "Shoulder",
+      "body_position": "seated",
+      "pose_description": "Sit upright with arms at your sides and shoulders in a relaxed position. Keep your neck neutral and eyes forward.",
+      "end_pose_description": "Lift both shoulders up toward your ears in a shrug position, then release them downward with control. Allow the shoulders to drop back to their natural resting position.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "sidelying-external-rotation-band",
+      "name": "Sidelying External Rotation with Band",
+      "category": "strength",
+      "target_area": "Shoulder",
+      "body_position": "side_lying",
+      "pose_description": "Lie on your left side with your right shoulder flexed to 90 degrees and elbow bent to 90 degrees. Hold a resistance band with your right hand at chest level.",
+      "end_pose_description": "Externally rotate your shoulder by rotating your forearm upward against the band resistance. Keep your elbow fixed at your ribs and control the return to starting position.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "standing-cable-external-rotation-90",
+      "name": "Standing Cable External Rotation with Arm at 90 Degrees",
+      "category": "strength",
+      "target_area": "Shoulder",
+      "body_position": "standing",
+      "pose_description": "Stand sideways to a cable machine with your feet shoulder-width apart, elbow bent at 90 degrees and arm raised to shoulder height. Hold the cable handle with a neutral grip.",
+      "end_pose_description": "Rotate your forearm backward in an external rotation movement, creating resistance against the cable while maintaining your elbow position.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "supine-arm-slides",
+      "name": "Supine Arm Slides",
+      "category": "mobility",
+      "target_area": "Shoulder",
+      "body_position": "supine",
+      "pose_description": "Lie on your back on a firm surface with both arms at your sides, palms facing down. Keep your knees slightly bent with feet flat on the floor for comfort.",
+      "end_pose_description": "Slowly slide both arms overhead along the floor in a snow-angel motion, raising them above your head. Gently slide arms back down to your sides in a controlled manner.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "seated-knee-lifts",
+      "name": "Seated Knee Lifts",
+      "category": "strength",
+      "target_area": "Thigh",
+      "body_position": "seated",
+      "pose_description": "Sit upright in a firm chair with your back against the backrest and both feet flat on the floor. Keep your hands on your thighs or the sides of the chair.",
+      "end_pose_description": "Straighten one leg by lifting your foot up while keeping your thigh on the chair, fully extending your knee. Lower your foot back down and repeat on the opposite leg.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "thumb-abduction-resistance",
+      "name": "Thumb Abduction Against Resistance",
+      "category": "strength",
+      "target_area": "Thumb",
+      "body_position": "seated",
+      "pose_description": "Sit upright with your hand flat on a table, palm down. Your thumb is positioned close to your index finger in a neutral position.",
+      "end_pose_description": "Lift your thumb away from your index finger against light resistance from a therapy band or your opposite hand. Hold at end range for 2 seconds before returning.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "thumb-abduction-stretch",
+      "name": "Thumb Abduction Stretch",
+      "category": "stretch",
+      "target_area": "Thumb",
+      "body_position": "seated",
+      "pose_description": "Sit with your forearm resting on a table with your palm facing down. Your hand is relaxed in a neutral position.",
+      "end_pose_description": "Using your other hand, gently pull your thumb away from your fingers into a wide abduction position. Hold the stretch gently without forcing the joint.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "thumb-adduction-strengthening",
+      "name": "Thumb Adduction Strengthening",
+      "category": "strength",
+      "target_area": "Thumb",
+      "body_position": "seated",
+      "pose_description": "Sit with your hand flat on a table, palm down, with your thumb abducted away from your index finger. Place a soft object like a foam ball between thumb and palm.",
+      "end_pose_description": "Press your thumb inward against the resistance, squeezing the object gently. Hold for 3 seconds, focusing on controlled activation of the thumb muscles.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "thumb-cmc-stabilization",
+      "name": "Thumb CMC Joint Stabilization",
+      "category": "strength",
+      "target_area": "Thumb",
+      "body_position": "seated",
+      "pose_description": "Sit with your hand resting palm-up on a table. Your thumb is relaxed and positioned naturally away from your fingers.",
+      "end_pose_description": "Press your thumb firmly into the table surface and hold for 5 seconds without moving. Relax and repeat, maintaining gentle pressure throughout.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "thumb-isometric-stabilization",
+      "name": "Thumb Isometric Stabilization",
+      "category": "strength",
+      "target_area": "Thumb",
+      "body_position": "seated",
+      "pose_description": "Sit with your forearm supported and your hand open on a table. Place your other hand's index finger against the side of your thumb.",
+      "end_pose_description": "Press your thumb firmly against the resistance of your other hand without moving. Hold for 5 seconds, then release and rest.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "thumb-mcp-flexion-strengthening",
+      "name": "Thumb MCP Joint Flexion Strengthening",
+      "category": "strength",
+      "target_area": "Thumb",
+      "body_position": "seated",
+      "pose_description": "Sit with your forearm supported on a table, palm facing down. Your thumb is extended straight out from your hand with other fingers relaxed.",
+      "end_pose_description": "Curl your thumb downward at the middle knuckle joint, bending it across your palm. Hold this position briefly, then return to start maintaining control throughout.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "reverse-snow-angels",
+      "name": "Reverse Snow Angels",
+      "category": "strength",
+      "target_area": "Upper Back",
+      "body_position": "prone",
+      "pose_description": "Lie face-down on a bed or mat with arms at your sides and forehead resting on a small pillow. Keep your legs straight and relaxed.",
+      "end_pose_description": "Raise your arms out to the sides in a snow angel motion, squeezing your shoulder blades together. Your arms should form a 'T' shape with your body.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "finger-isolation-flexion",
+      "name": "Finger Isolation Flexion",
+      "category": "mobility",
+      "target_area": "Wrist",
+      "body_position": "seated",
+      "pose_description": "Sit upright with your hand resting on a table, palm facing down with fingers extended. Your wrist is in a neutral position.",
+      "end_pose_description": "Curl each finger individually into your palm one at a time, starting with the thumb, then release. Move slowly and deliberately through each finger.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "forearm-plank-wrist",
+      "name": "Forearm Plank with Wrist Awareness",
+      "category": "core",
+      "target_area": "Wrist",
+      "body_position": "prone",
+      "pose_description": "Lie face down with your forearms on the ground, elbows directly under your shoulders. Your body is straight from head to heels, supported on your forearms and toes.",
+      "end_pose_description": "Hold your body in a straight line, distributing weight evenly through your forearms and hands. Maintain neutral wrist position without excessive flexion or extension.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "grip-relaxation-technique",
+      "name": "Grip Relaxation Technique",
+      "category": "stretch",
+      "target_area": "Wrist",
+      "body_position": "seated",
+      "pose_description": "Sit upright with your arms resting on a table in front of you. Make a gentle fist with both hands, lightly squeezing your fingers into your palms.",
+      "end_pose_description": "Slowly open your hands fully, spreading all fingers wide apart and relaxing completely. Hold this open, relaxed position for 3-5 seconds before repeating.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "grip-strength-training",
+      "name": "Grip Strength Training with Adjustable Gripper",
+      "category": "strength",
+      "target_area": "Wrist",
+      "body_position": "seated",
+      "pose_description": "Sit upright with your arm relaxed at your side, holding an adjustable hand gripper in your right hand in the open position. Your fingers are extended.",
+      "end_pose_description": "Squeeze the gripper handles together using your grip strength, hold for 2 seconds, then slowly release. Keep your wrist in a neutral position throughout the movement.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "isometric-thumb-abduction",
+      "name": "Isometric Thumb Abduction",
+      "category": "strength",
+      "target_area": "Wrist",
+      "body_position": "seated",
+      "pose_description": "Sit upright with your forearm resting on a table, palm facing up. Your thumb is extended away from your fingers in a relaxed position.",
+      "end_pose_description": "Press your thumb firmly away from your fingers against resistance from your opposite hand, holding steady without movement. Maintain the contraction for 5 seconds.",
+      "source": "shuffle_discovery_2026-04-29"
+    },
+    {
+      "normalized_filename": "wrist-extension-thumb",
+      "name": "Wrist Extension with Thumb",
+      "category": "mobility",
+      "target_area": "Wrist",
+      "body_position": "seated",
+      "pose_description": "Sit upright with your forearm resting on a table, palm facing down. Your wrist and thumb are in a neutral, relaxed position.",
+      "end_pose_description": "Slowly lift your hand upward at the wrist, extending it gently while keeping your forearm on the table. Move through a comfortable range without forcing the motion.",
+      "source": "shuffle_discovery_2026-04-29"
+    }
+  ]
+}

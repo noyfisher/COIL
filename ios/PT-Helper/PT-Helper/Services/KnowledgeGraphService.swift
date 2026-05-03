@@ -1,5 +1,27 @@
 import Foundation
+import SwiftUI
 import os
+
+// MARK: - Tier 2 PR C-1: feature flag + v2 loader
+
+/// `@AppStorage` flag gating the v2 knowledge-graph file. Defaults OFF —
+/// enables the merge-with-fallback loader to silently include v2 entries
+/// alongside the existing v1 graph when present.
+///
+/// Flip to `true` only AFTER:
+/// 1. `scripts/expand_knowledge_graph.py` produced a complete v2 draft.
+/// 2. `scripts/review_kg_candidates.py` walked through every
+///    `contraindicated` verdict + 10% sample of `safe`.
+/// 3. The reviewed JSON was merged into
+///    `Resources/medical_knowledge_graph_v2.json`.
+///
+/// While OFF, the production graph is unchanged — only v1 contributes.
+enum KnowledgeGraphFeatureFlag {
+    static let key = "knowledgeGraphV2Enabled"
+    static var isEnabled: Bool {
+        UserDefaults.standard.bool(forKey: key)
+    }
+}
 
 // MARK: - Knowledge Graph Models
 
@@ -91,14 +113,28 @@ class KnowledgeGraphService {
 
         do {
             let data = try Data(contentsOf: url)
-            graph = try JSONDecoder().decode(KnowledgeGraph.self, from: data)
+            let v1 = try JSONDecoder().decode(KnowledgeGraph.self, from: data)
+
+            // Tier 2 PR C-1: opt-in merge with v2 file when present + flag on.
+            // The merger UNIONS condition entries (more aliases / more
+            // safe/unsafe exercises in either source = available in the
+            // result). v2 cannot SHRINK v1 — at worst an empty v2 is a no-op.
+            // While the feature flag is OFF, v2 is ignored entirely so the
+            // production graph is byte-identical to before this PR.
+            let v2: KnowledgeGraph? = KnowledgeGraphFeatureFlag.isEnabled
+                ? Self.loadV2(from: bundle)
+                : nil
+
+            self.graph = v2.map { Self.merge(v1: v1, v2: $0) } ?? v1
             isLoaded = true
             buildLookupTables()
+
             let condCount = self.graph?.conditions.count ?? 0
             let exCount = self.graph?.exercises?.count ?? 0
             let aliasCount = self.exerciseAliasMap.count
             let condAliasCount = self.conditionAliasMap.count
-            logger.info("✅ Knowledge graph loaded: \(condCount) conditions, \(exCount) explicit exercises, \(aliasCount) exercise aliases, \(condAliasCount) condition aliases")
+            let v2Note = v2 != nil ? " (v1 + v2 merged)" : ""
+            logger.info("✅ Knowledge graph loaded\(v2Note): \(condCount) conditions, \(exCount) explicit exercises, \(aliasCount) exercise aliases, \(condAliasCount) condition aliases")
             // Log a sample of exercise aliases for debugging
             let sampleAliases = Array(self.exerciseAliasMap.keys.prefix(10))
             logger.debug("📋 Sample exercise aliases: \(sampleAliases.joined(separator: ", "))")
@@ -107,6 +143,62 @@ class KnowledgeGraphService {
         } catch {
             logger.error("Failed to load knowledge graph: \(error.localizedDescription)")
         }
+    }
+
+    /// Best-effort load of the v2 file from the bundle. Returns nil if absent
+    /// or malformed — v1 alone is the safe fallback.
+    static func loadV2(from bundle: Bundle) -> KnowledgeGraph? {
+        guard let url = bundle.url(forResource: "medical_knowledge_graph_v2", withExtension: "json") else {
+            return nil
+        }
+        do {
+            let data = try Data(contentsOf: url)
+            return try JSONDecoder().decode(KnowledgeGraph.self, from: data)
+        } catch {
+            // Don't fail the whole app on a malformed v2 file — log and skip.
+            // v1 alone keeps the existing safety semantics.
+            return nil
+        }
+    }
+
+    /// Union v1 and v2 into a single graph.
+    /// - For overlapping condition IDs: v2's `safeExercises` and
+    ///   `unsafeExercises` are unioned with v1's, names are unioned, and
+    ///   `redFlags` / `referIfPresent` are unioned. ICD-10 + bodyRegions
+    ///   prefer v1 (the curated source of truth for those fields).
+    /// - Conditions only in v2 are added as-is.
+    /// - Exercise dict is unioned (v1 wins on overlap).
+    static func merge(v1: KnowledgeGraph, v2: KnowledgeGraph) -> KnowledgeGraph {
+        var mergedConditions = v1.conditions
+        for (key, v2Cond) in v2.conditions {
+            if let v1Cond = mergedConditions[key] {
+                mergedConditions[key] = KnownCondition(
+                    names: Array(Set(v1Cond.names + v2Cond.names)).sorted(),
+                    icd10: v1Cond.icd10.isEmpty ? v2Cond.icd10 : v1Cond.icd10,
+                    bodyRegions: Array(Set(v1Cond.bodyRegions + v2Cond.bodyRegions)).sorted(),
+                    safeExercises: Array(Set(v1Cond.safeExercises + v2Cond.safeExercises)).sorted(),
+                    unsafeExercises: Array(Set(v1Cond.unsafeExercises + v2Cond.unsafeExercises)).sorted(),
+                    redFlags: Array(Set(v1Cond.redFlags + v2Cond.redFlags)).sorted(),
+                    referIfPresent: Array(Set(v1Cond.referIfPresent + v2Cond.referIfPresent)).sorted()
+                )
+            } else {
+                mergedConditions[key] = v2Cond
+            }
+        }
+
+        // Union the exercise dicts. v1 entry wins on collision.
+        var mergedExercises = v1.exercises ?? [:]
+        if let v2Exercises = v2.exercises {
+            for (key, ex) in v2Exercises where mergedExercises[key] == nil {
+                mergedExercises[key] = ex
+            }
+        }
+
+        return KnowledgeGraph(
+            version: "merged(v1=\(v1.version), v2=\(v2.version))",
+            conditions: mergedConditions,
+            exercises: mergedExercises.isEmpty ? nil : mergedExercises
+        )
     }
 
     private func buildLookupTables() {

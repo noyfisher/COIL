@@ -28,6 +28,9 @@ private struct AIWellnessExercise: Decodable {
     let endPosition: String?
     let exerciseCategory: String?
     let imageFileName: String?
+    // PR 2: server-side flag/notes for kinetic-chain substitutions.
+    let catalogSubstitution: Bool?
+    let notes: String?
 }
 
 @MainActor
@@ -85,13 +88,24 @@ class WellnessPlanViewModel: ObservableObject {
                 let plan = try await generateAIWellnessPlan(from: wellnessResult)
                 AppLogger.rehab.info("AI returned wellness plan '\(plan.planName)' with \(plan.exercises.count) exercises")
 
-                // Validate the plan
+                // Validate the plan — two stages:
+                //   (a) validateRehabPlan runs the standard rehab-plan checks (age, meds,
+                //       post-surgical, parameter range). Conditions are goal categories so
+                //       contraindication lookups target goal names (mostly a no-op).
+                //   (b) WellnessPlanValidator re-runs KG contraindication against the user's
+                //       *actual* medical conditions, which is the safety-critical check.
+                //       Warnings from both stages are merged.
                 let conditions = goalCategories
-                let (validatedPlan, warnings, graphVerification) = ResponseValidationPipeline.validateRehabPlan(
+                let (validatedPlan, baseWarnings, graphVerification) = ResponseValidationPipeline.validateRehabPlan(
                     plan,
                     conditions: conditions,
                     userProfile: wellnessResult.userProfileSnapshot
                 )
+                let planValidatorWarnings = WellnessPlanValidator.validate(
+                    exercises: validatedPlan.exercises,
+                    conditions: wellnessResult.userProfileSnapshot.medicalConditions
+                )
+                let warnings = baseWarnings + planValidatorWarnings
                 self.wellnessPlan = validatedPlan
                 self.rehabPlanWarnings = warnings
                 self.isGenerating = false
@@ -123,6 +137,12 @@ class WellnessPlanViewModel: ObservableObject {
             } catch {
                 // Fallback
                 AppLogger.rehab.warning("AI wellness plan generation failed, using fallback: \(error.localizedDescription)")
+                // Tier 1: ai_response_invalid breadcrumb (server Zod rejection).
+                if let apiError = error as? ClaudeAPIError, apiError.isResponseInvalid {
+                    SessionLogger.shared.log(.errorOccurred, category: .api,
+                        message: "Wellness plan rejected by server schema (ai_response_invalid)",
+                        metadata: ["error_kind": "ai_response_invalid"])
+                }
 
                 let weeklySchedule = createWeeklySchedule(
                     for: wellnessFallbackExercises,
@@ -142,11 +162,16 @@ class WellnessPlanViewModel: ObservableObject {
                     sourceGoalCategories: goalCategories
                 )
 
-                let (validatedFallback, warnings, _) = ResponseValidationPipeline.validateRehabPlan(
+                let (validatedFallback, baseWarnings, _) = ResponseValidationPipeline.validateRehabPlan(
                     fallbackPlan,
                     conditions: goalCategories,
                     userProfile: wellnessResult.userProfileSnapshot
                 )
+                let planValidatorWarnings = WellnessPlanValidator.validate(
+                    exercises: validatedFallback.exercises,
+                    conditions: wellnessResult.userProfileSnapshot.medicalConditions
+                )
+                let warnings = baseWarnings + planValidatorWarnings
                 self.wellnessPlan = validatedFallback
                 self.rehabPlanWarnings = warnings
                 self.isGenerating = false
@@ -250,31 +275,12 @@ class WellnessPlanViewModel: ObservableObject {
     }
 
     private func parseWellnessPlanResponse(_ text: String, goalCategories: [String], activityLevel: String) throws -> RehabPlan {
-        guard let jsonData = text.data(using: .utf8) else {
-            throw ClaudeAPIError.decodingError(NSError(domain: "WellnessPlan", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response encoding"]))
-        }
-
-        let aiResponse: AIWellnessPlanResponse
-        do {
-            aiResponse = try JSONDecoder().decode(AIWellnessPlanResponse.self, from: jsonData)
-        } catch let directError {
-            // Fallback: extract JSON between { and }
-            if let startIndex = text.firstIndex(of: "{"),
-               let endIndex = text.lastIndex(of: "}") {
-                let jsonSubstring = String(text[startIndex...endIndex])
-                if let fallbackData = jsonSubstring.data(using: .utf8) {
-                    do {
-                        aiResponse = try JSONDecoder().decode(AIWellnessPlanResponse.self, from: fallbackData)
-                    } catch let fallbackError {
-                        throw ClaudeAPIError.decodingError(fallbackError)
-                    }
-                } else {
-                    throw ClaudeAPIError.decodingError(directError)
-                }
-            } else {
-                throw ClaudeAPIError.decodingError(directError)
-            }
-        }
+        // Tier 3 PR C: shadow-mode strict parsing (see ShadowModeJSONParser).
+        let aiResponse = try ShadowModeJSONParser.parse(
+            text,
+            as: AIWellnessPlanResponse.self,
+            requestType: "wellness_plan"
+        )
 
         let exercises = aiResponse.exercises.map { aiExercise in
             let difficulty: RehabExercise.Difficulty
@@ -300,7 +306,10 @@ class WellnessPlanViewModel: ObservableObject {
                 movement: aiExercise.movement,
                 endPosition: aiExercise.endPosition,
                 exerciseCategory: aiExercise.exerciseCategory,
-                imageFileName: aiExercise.imageFileName
+                imageFileName: aiExercise.imageFileName,
+                catalogSubstitution: aiExercise.catalogSubstitution,
+                notes: aiExercise.notes,
+                originalAIName: aiExercise.name
             )
         }
 

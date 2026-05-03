@@ -15,6 +15,26 @@ import * as admin from "firebase-admin";
 function getDb() { return admin.firestore(); }
 function getStorage() { return admin.storage(); }
 
+/**
+ * Tier 1: increment the `imageQAUnavailable/{exerciseKey}` counter when the Gemini
+ * QA API is down (HTTP error, empty response, or thrown exception). Fire-and-
+ * forget — counter failure must never block the generation response.
+ */
+async function bumpQaUnavailableCounter(exerciseKey: string, reason: string): Promise<void> {
+  try {
+    await getDb()
+      .collection("imageQAUnavailable")
+      .doc(exerciseKey)
+      .set({
+        count: admin.firestore.FieldValue.increment(1),
+        lastReason: reason,
+        lastAt: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
+  } catch (err) {
+    console.error("Failed to bump imageQAUnavailable counter:", err);
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -408,7 +428,7 @@ async function runGeminiQA(
   bodyPosition: string,
   poseDescription: string,
   geminiApiKey: string,
-): Promise<{ passed: boolean; failures: string[] }> {
+): Promise<{ passed: boolean; failures: string[]; unavailable?: boolean }> {
   const positionDesc = BODY_POSITION_DESCRIPTIONS[bodyPosition] || "standing upright";
   const base64Image = imageBuffer.toString("base64");
 
@@ -460,7 +480,10 @@ Set overall_pass to true only if ALL checks pass AND pose_score >= 2. List faile
 
     if (!resp.ok) {
       console.error(`Gemini QA failed (${resp.status}): ${await resp.text()}`);
-      return { passed: true, failures: [] }; // Skip QA on API failure
+      // Tier 1 fix: QA unavailable is NOT a pass. Returning `passed: true` here
+      // silently shipped bad images when Gemini was down. Treat as an unknown
+      // state — the caller will not upload and will surface `qa_failed`.
+      return { passed: false, failures: ["qa_unavailable"], unavailable: true };
     }
 
     const data = (await resp.json()) as {
@@ -469,8 +492,8 @@ Set overall_pass to true only if ALL checks pass AND pose_score >= 2. List faile
 
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!text) {
-      console.warn("Gemini returned empty response, skipping QA");
-      return { passed: true, failures: [] };
+      console.warn("Gemini returned empty response");
+      return { passed: false, failures: ["qa_empty_response"], unavailable: true };
     }
 
     const result = JSON.parse(text) as {
@@ -484,7 +507,8 @@ Set overall_pass to true only if ALL checks pass AND pose_score >= 2. List faile
     };
   } catch (err) {
     console.error("Gemini QA error:", err);
-    return { passed: true, failures: [] }; // Skip QA on error
+    // Same fix as the HTTP-error branch — don't silently ship on thrown exceptions.
+    return { passed: false, failures: ["qa_error"], unavailable: true };
   }
 }
 
@@ -736,6 +760,19 @@ export async function handleGenerateExerciseImage(
       geminiApiKey,
     );
 
+    // Tier 1: if QA is unavailable (API error, empty response, exception), DO NOT
+    // silently accept the image. Bump a telemetry counter and return qa_failed so
+    // the client can retry later when Gemini is reachable. Retrying with a different
+    // seed wouldn't help — QA would still be unavailable.
+    if (qa.unavailable) {
+      await bumpQaUnavailableCounter(normalizedKey, qa.failures.join(", "));
+      return {
+        status: "qa_failed",
+        message: "Image quality check is temporarily unavailable. Please try again in a minute.",
+        retryable: true,
+      };
+    }
+
     if (!qa.passed) {
       // Retry once with different seed
       console.log(`QA failed for ${exerciseName} (failures: ${qa.failures.join(", ")}), retrying with different seed`);
@@ -752,6 +789,15 @@ export async function handleGenerateExerciseImage(
         resolvedPoseDescription,
         geminiApiKey,
       );
+
+      if (retryQa.unavailable) {
+        await bumpQaUnavailableCounter(normalizedKey, retryQa.failures.join(", "));
+        return {
+          status: "qa_failed",
+          message: "Image quality check is temporarily unavailable. Please try again in a minute.",
+          retryable: true,
+        };
+      }
 
       if (!retryQa.passed) {
         return {

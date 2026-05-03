@@ -1,12 +1,56 @@
 import SwiftUI
 
+/// Destination of the analysis navigation push. `.analysis` is the normal result view;
+/// `.emergency` is the blocking full-screen takeover shown for `.emergency` severity
+/// findings (cardiac, stroke, cauda equina, DVT, meningitis).
+enum AnalysisDestination: Hashable {
+    case analysis
+    case emergency(warnings: [String])
+
+    static func == (lhs: AnalysisDestination, rhs: AnalysisDestination) -> Bool {
+        switch (lhs, rhs) {
+        case (.analysis, .analysis): return true
+        case let (.emergency(l), .emergency(r)): return l == r
+        default: return false
+        }
+    }
+
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case .analysis:
+            hasher.combine(0)
+        case .emergency(let msgs):
+            hasher.combine(1)
+            hasher.combine(msgs)
+        }
+    }
+}
+
 struct AnalyzingView: View {
     @ObservedObject var viewModel: InjuryAnalysisViewModel
-    @State private var animateSteps = false
-    @State private var navigateToResults = false
+    @State private var destination: AnalysisDestination?
     @State private var elapsedSeconds: Int = 0
     @State private var timer: Timer?
     @State private var showCompletionFlash = false
+
+    /// Order of stages, used to decide which step rows are completed vs active vs pending.
+    private static let stageOrder: [InjuryAnalyzer.Stage] = [
+        .primaryAnalysis, .verifyingResults, .validating
+    ]
+
+    /// Returns (isCompleted, isActive) for a given stage relative to the current one.
+    private func status(for stage: InjuryAnalyzer.Stage) -> (isCompleted: Bool, isActive: Bool) {
+        guard let current = viewModel.currentStage else {
+            return (false, false)
+        }
+        guard let currentIndex = Self.stageOrder.firstIndex(of: current),
+              let stageIndex = Self.stageOrder.firstIndex(of: stage) else {
+            return (false, false)
+        }
+        if stageIndex < currentIndex { return (true, false) }
+        if stageIndex == currentIndex { return (false, true) }
+        return (false, false)
+    }
 
     var body: some View {
         ZStack {
@@ -47,9 +91,6 @@ struct AnalyzingView: View {
             }
         }
         .onAppear {
-            withAnimation(.easeInOut(duration: 0.8).delay(0.5)) {
-                animateSteps = true
-            }
             // Start elapsed time counter
             elapsedSeconds = 0
             timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
@@ -70,19 +111,18 @@ struct AnalyzingView: View {
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                     showCompletionFlash = false
-                    navigateToResults = true
+                    destination = routingDestination()
                 }
             }
         }
-        .onChange(of: navigateToResults) { _, newValue in
-            // When user navigates back from results, also pop back to PainDetailView.
-            // Use Task + yield to let NavigationStack complete its transition before
-            // mutating the second navigation binding. This avoids the simultaneous
-            // navigation state mutation crash that a fixed-delay asyncAfter can cause.
-            if !newValue {
+        .onChange(of: destination) { _, newValue in
+            // When user navigates back (destination becomes nil), pop back to PainDetailView.
+            // Use Task + yield to let NavigationStack complete its transition before mutating
+            // the second navigation binding — avoids the simultaneous-state-mutation crash.
+            // Carried forward verbatim from the prior `navigateToResults` crash-guard.
+            if newValue == nil {
                 viewModel.analysisResult = nil
                 Task { @MainActor in
-                    // Yield twice to let the NavigationStack pop animation settle
                     await Task.yield()
                     await Task.yield()
                     try? await Task.sleep(for: .milliseconds(50))
@@ -90,18 +130,42 @@ struct AnalyzingView: View {
                 }
             }
         }
-        .navigationDestination(isPresented: $navigateToResults) {
-            AnalysisResultView(
-                analysisResult: viewModel.analysisResult ?? AnalysisResult(
-                    id: UUID(), assessments: [], conditions: [],
-                    overallSummary: "", disclaimerText: "",
-                    generatedDate: Date(), userProfileSnapshot: viewModel.userProfile
-                ),
-                validationWarnings: viewModel.validationWarnings,
-                redFlagAlerts: viewModel.redFlagAlerts
-            )
+        .navigationDestination(item: $destination) { dest in
+            switch dest {
+            case .analysis:
+                AnalysisResultView(
+                    analysisResult: viewModel.analysisResult ?? AnalysisResult(
+                        id: UUID(), assessments: [], conditions: [],
+                        overallSummary: "", disclaimerText: "",
+                        generatedDate: Date(), userProfileSnapshot: viewModel.userProfile
+                    ),
+                    validationWarnings: viewModel.validationWarnings,
+                    redFlagAlerts: viewModel.redFlagAlerts
+                )
+            case .emergency(let warnings):
+                EmergencyRedirectView(warningMessages: warnings) {
+                    // User tapped "Go Back" — clear destination to trigger the
+                    // same back-nav cleanup as an analysis dismiss.
+                    destination = nil
+                }
+            }
         }
         .trackScreen("Analyzing")
+    }
+
+    /// Decide which destination to push based on the worst validation severity.
+    /// `.emergency` findings trigger the redirect regardless of feature flags;
+    /// all others go to the normal result view where `.serious` findings get
+    /// handled as a modal gate.
+    private func routingDestination() -> AnalysisDestination {
+        let worst = viewModel.redFlagAlerts.map(\.severity).max() ?? .info
+        if worst == .emergency {
+            let msgs = viewModel.redFlagAlerts
+                .filter { $0.severity == .emergency }
+                .map(\.message)
+            return .emergency(warnings: msgs)
+        }
+        return .analysis
     }
 
     // MARK: - Loading View
@@ -144,31 +208,38 @@ struct AnalyzingView: View {
                     .monospacedDigit()
             }
 
-            // Animated step indicators
+            // Backend-synced step indicators
             VStack(alignment: .leading, spacing: AppSpacing.lg) {
+                // Step 0: always complete once this screen is shown — user did finish the form.
                 AnalysisStepRow(
                     icon: "checkmark.circle.fill",
                     text: "Pain data collected",
                     isCompleted: true,
                     isActive: true
                 )
+
+                let primary = status(for: .primaryAnalysis)
                 AnalysisStepRow(
                     icon: "gearshape.2.fill",
                     text: "Analyzing symptoms...",
-                    isCompleted: false,
-                    isActive: animateSteps
+                    isCompleted: primary.isCompleted,
+                    isActive: primary.isActive
                 )
+
+                let verify = status(for: .verifyingResults)
                 AnalysisStepRow(
                     icon: "checkmark.shield.fill",
                     text: "Verifying results...",
-                    isCompleted: false,
-                    isActive: false
+                    isCompleted: verify.isCompleted,
+                    isActive: verify.isActive
                 )
+
+                let validate = status(for: .validating)
                 AnalysisStepRow(
                     icon: "list.bullet.clipboard.fill",
                     text: "Generating recommendations",
-                    isCompleted: false,
-                    isActive: false
+                    isCompleted: validate.isCompleted,
+                    isActive: validate.isActive
                 )
             }
             .padding(AppSpacing.xl)
@@ -176,6 +247,7 @@ struct AnalyzingView: View {
             .cornerRadius(AppCorners.card)
             .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
             .padding(.horizontal, AppSpacing.xl)
+            .animation(AppAnimations.smooth, value: viewModel.currentStage)
 
             Spacer()
             Spacer()

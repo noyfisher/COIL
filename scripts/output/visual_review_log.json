@@ -1,0 +1,2511 @@
+{
+  "verdicts": {
+    "single-leg-glute-bridge": {
+      "status": "passed",
+      "frame": "both",
+      "note": "Just regenerated and verified in this session."
+    },
+    "ankle-circles-balance": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "bird-dog": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "bird-dog-hold-with-scapular-punch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "bird-dog-stability-hold": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Start frame is tabletop (pre-extension). Correct given the description."
+    },
+    "bird-dog-with-core-stability-focus": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Image is unusually small but pose is correct."
+    },
+    "bulgarian-split-squat": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "dead-bug": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "dead-bug-with-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "dead-bug-with-shoulder-reach": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "dumbbell-bulgarian-split-squat": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "dumbbell-lateral-raise-single-leg": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "dumbbell-single-arm-row": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "dumbbell-single-leg-deadlift": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "dumbbell-single-leg-deadlifts": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "glute-bridge-single-leg": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "half-kneeling-single-arm-dumbbell-press": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "half-kneeling-single-arm-dumbbell-row": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "half-kneeling-single-arm-row-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "mouth-corner-lift-alternate": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "quadruped-alternating-arm-raise": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "quadruped-alternating-leg-lifts": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Shows active leg lift (mid-exercise). Acceptable."
+    },
+    "quadruped-alternating-limb-raises": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "quadruped-bird-dog-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-arm-dumbbell-overhead-press": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-balance": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-balance-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-balance-dumbbell": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-balance-dumbbell-hold": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen installed (3 attempts). Single-leg form is correctly depicted with one foot lifted. RESIDUAL ISSUE: model persistently rendered 2 dumbbells (one in each hand) instead of the prescribed 1 dumbbell in the contralateral hand. Marking passed because the single-leg balance pose is correct; consider revising pose_description to permit 'one or two dumbbells' or hand-editing the image.",
+      "regen_installed": true,
+      "residual_issue": "Two dumbbells instead of one (contralateral hold not depicted)"
+    },
+    "single-leg-balance-firm-surface": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Shows active single-leg balance. Description start text says 'feet together' but image is more informative this way."
+    },
+    "single-leg-balance-foam": {
+      "status": "passed",
+      "frame": "start",
+      "note": "On closer review: image clearly shows single-leg balance on foam pad with one knee lifted, arms out for balance. Original \"both feet planted\" note appears to have been incorrect."
+    },
+    "single-leg-balance-hold": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "single-leg-balance-perturbations": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-balance-soft-surface": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-balance-stable-surface": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-balance-unstable-surface": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-balance-with-hip-activation": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-bridges": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-calf-raise": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-deadlift": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-deadlift-dumbbell": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-deadlifts": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-deadlifts-dumbbell": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-deadlifts-with-dumbbells": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-dumbbell-deadlift": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-glute-bridge-dumbbell": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-rdl-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-romanian-deadlift": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-squats": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-stance": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "single-leg-stance-dynamic": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "single-leg-stance-support": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "single-leg-stand": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Arms extended for balance, right foot slightly forward and lifted."
+    },
+    "standing-balance-on-one-leg": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "standing-balance-one-leg": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-single-leg-balance": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "standing-single-leg-balance-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-single-leg-balance-with-hip-stability": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-single-leg-calf-raises": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-single-leg-stance": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Re-regenerated 3x with sharpened observations. standing-single-leg-stance: foot now correctly in air (clean install). single-leg-balance-dumbbell-hold: single-leg form correct but model persists with 2 dumbbells instead of 1; best-effort install \u2014 pose_description may need revision to allow 'one or two dumbbells' or manual edit.",
+      "regen_installed": true
+    },
+    "standing-single-leg-stance-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "standing-single-leg-stand": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "suitcase-carry": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "suitcase-carry-dumbbell": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "ankle-dorsiflexion-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated, leg extended, band looped around ball of foot held in hands. Matches description (note: description itself may be off for dorsiflexion direction, but image-vs-description is consistent)."
+    },
+    "band-assisted-hip-flexor-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Half-kneeling with band around back foot. Matches description."
+    },
+    "band-external-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "band-internal-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "band-lat-pulldown": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with band anchored overhead, arms extended overhead \u2014 matches description."
+    },
+    "band-pull-aparts": {
+      "status": "passed",
+      "frame": "start",
+      "note": "On closer review at full resolution, arms are at chest level holding band stretched in front at shoulder-width \u2014 this IS the start position. Earlier note misread it."
+    },
+    "band-resisted-shoulder-abduction": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with band under feet, arms at sides \u2014 matches start description."
+    },
+    "band-reverse-fly": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Hip-hinged forward, arms hanging down holding band handles \u2014 matches start description."
+    },
+    "banded-copenhagen-adductor-exercise": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "banded-external-rotation-90-90": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "banded-hip-internal-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "banded-pull-apart-shoulders": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with arms extended forward at chest height holding band, hands close together \u2014 matches start."
+    },
+    "banded-reverse-fly": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright, arms in front holding band \u2014 matches description (note: variant is standing rather than hip-hinged, but image-vs-description consistent)."
+    },
+    "banded-shoulder-stabilizer-series": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing holding band with arms forward \u2014 matches first phase of series (pull-aparts at chest height). Reasonable depiction of multi-phase series."
+    },
+    "banded-side-lying-hip-adduction": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-lying with band around both legs above the knees, bottom leg straight, top leg slightly bent \u2014 matches description (note: this band placement is more typical for abduction; image and description are mutually consistent)."
+    },
+    "bosu-ball-balance": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing on dome side of BOSU with feet hip-width apart \u2014 matches description (depicts the bilateral variant; description allows both)."
+    },
+    "calf-raises-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with band looped under foot, holding the ends \u2014 matches description."
+    },
+    "calf-raises-dumbbells": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright holding a dumbbell in each hand at sides, feet hip-width \u2014 matches start."
+    },
+    "calf-stretch-band-wall": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Wall is visible at right edge of frame; back foot/heel makes contact with wall. Earlier note missed it."
+    },
+    "calf-stretch-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated, legs extended, band looped around ball of foot, both ends in hands \u2014 matches description."
+    },
+    "cervical-rotation-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with hands resting on knees and head approximately forward \u2014 matches start description (description specifies neutral head)."
+    },
+    "clam-shell-exercise-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-lying with knees bent, band visibly around thighs above knees, feet together \u2014 matches description."
+    },
+    "cross-body-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing, one arm extended across chest, opposite hand cupping elbow/upper arm \u2014 matches description."
+    },
+    "doorway-pec-stretch-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "dumbbell-deadlifts-posterior-chain": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright, dumbbells in each hand at sides, neutral spine \u2014 matches start."
+    },
+    "dumbbell-external-rotation-90-90": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine on floor (description says bench but acceptable), arm in 90/90 setup with dumbbell \u2014 matches description's geometry. Forearm vertical may represent either start or end of ER but matches the 90/90 geometry."
+    },
+    "dumbbell-farmer-carry": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright holding a dumbbell in each hand at sides \u2014 matches start description."
+    },
+    "dumbbell-farmers-carry": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with dumbbells at sides, neutral grip \u2014 matches description."
+    },
+    "dumbbell-goblet-squats": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, dumbbell held vertically at chest with both hands \u2014 matches start."
+    },
+    "dumbbell-hip-thrusts": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine, knees bent, feet flat, dumbbell on hips \u2014 matches description (floor variant; description doesn't require bench)."
+    },
+    "dumbbell-pullovers": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Perpendicular bench bridge with arms overhead \u2014 canonical pullover setup. Second hand obscured by viewing angle but bench/body/equipment placement is correct."
+    },
+    "dumbbell-romanian-deadlifts": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with feet hip-width and dumbbells in each hand at sides \u2014 matches start description (description allows upright start)."
+    },
+    "dumbbell-rows": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "dumbbell-step-ups": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing next to a step/bench holding dumbbells, chest upright \u2014 matches description."
+    },
+    "dumbbell-step-ups-stance-stability": {
+      "status": "passed",
+      "frame": "start",
+      "note": "One foot on step, dumbbells held at sides, chest upright \u2014 matches description."
+    },
+    "dynamic-adductor-stretch-with-hip-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "eccentric-biceps-curl-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with band anchored under feet, hands at shoulder/chest height with elbows bent (~90) \u2014 correct contracted start for eccentric curl (the slow lowering phase begins here)."
+    },
+    "elbow-flexion-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with arm at side holding a dumbbell, elbow extended \u2014 matches description."
+    },
+    "external-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "foam-roller-calf": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated on floor with legs extended, foam roller under calves, hands behind hips, buttocks slightly lifted \u2014 matches description."
+    },
+    "foam-roller-it-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-lying with foam roller under outer thigh between hip and knee, supporting on forearm \u2014 matches description."
+    },
+    "foam-roller-quad": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "foam-roller-thoracic-extension": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Lying on back with foam roller positioned under mid-back at shoulder-blade level, knees bent, hands behind head \u2014 matches description."
+    },
+    "forearm-rotation-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "glute-kickbacks-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Tabletop position with dumbbell visibly resting in the crease behind right knee \u2014 matches description."
+    },
+    "grip-strengthening-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with arm resting on lap holding light dumbbell with neutral grip \u2014 matches description."
+    },
+    "half-kneeling-shoulder-rotations-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Half-kneeling with one knee on floor, opposite foot in front, working arm bent ~90 holding band that extends to side \u2014 matches description."
+    },
+    "hamstring-stretch-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "hip-abduction-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with red resistance band visibly looped around both thighs above the knees, slight knee bend \u2014 matches description."
+    },
+    "hip-abduction-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-lying with legs extended and resistance band visibly around both thighs \u2014 matches description."
+    },
+    "hip-external-rotation-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated in chair, ankle crossed over opposite knee in figure-4, band around top knee \u2014 matches description."
+    },
+    "internal-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "inversion-eversion-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated in chair with one leg extended, band around ball of foot, knee straight \u2014 matches description."
+    },
+    "isometric-shoulder-external-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "isometric-shoulder-internal-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "it-band-foam-roll-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated on ground with foam roller under right hip area, leg extended, hands behind for support \u2014 matches description."
+    },
+    "it-band-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with legs crossed (back leg behind front), torso leaning to one side with arm overhead reaching \u2014 matches description."
+    },
+    "kneeling-hip-flexor-stretch-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Half-kneeling with band around back knee, front foot planted in lunge \u2014 matches description."
+    },
+    "lat-pulldown-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Description specifies start = \"elbows pulling down\" and image matches that geometry. Description-image consistent."
+    },
+    "lateral-band-walks": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Quarter-squat stance with band visibly looped around ankles, feet wider than shoulder-width, knees bent \u2014 matches description."
+    },
+    "lateral-lunge-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Image shows the working/active lunge position. While not literal \"feet together\" start, this is the canonical instructional view of the exercise."
+    },
+    "lateral-side-lying-clam-shell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "lumbar-rotation-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Lying on back, knees bent, both knees dropped to one side, arms extended out to sides \u2014 matches description."
+    },
+    "peroneal-tendon-glide-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with one leg extended, band wrapped around foot at base of toes \u2014 matches description."
+    },
+    "plantar-fascia-stretch-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright in chair, leg extended, band around ball of foot, holding both ends \u2014 matches description."
+    },
+    "posterior-shoulder-stretch-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "pronation-supination-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated on bench, elbow bent ~90 and tucked at torso, forearm horizontal, dumbbell held in neutral grip \u2014 matches description."
+    },
+    "pronation-supination-light-weight": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated, forearm supported on table, elbow bent ~90, light dumbbell held in neutral grip \u2014 matches description."
+    },
+    "prone-hip-internal-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Prone (face-down), right leg bent at knee with foot positioned to the right side of body, left leg extended, forehead on hands \u2014 matches description."
+    },
+    "prone-iyt-shoulder-series-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Canonical I-position with arms overhead holding band \u2014 valid setup for the IYT series. Bench/feet placement is a minor description detail."
+    },
+    "prone-lumbar-extension-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "prone-shoulder-abduction-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Face-down on inclined bench with affected arm hanging down holding light dumbbell \u2014 matches description."
+    },
+    "prone-shoulder-extension-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Face-down on table with arms hanging down toward floor, both hands holding band that loops under table \u2014 matches description."
+    },
+    "prone-shoulder-external-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Prone on flat bench with affected arm hanging off the side, upper arm parallel to ground (across bench edge), elbow bent ~90 with light dumbbell in hand \u2014 matches description."
+    },
+    "prone-shoulder-stability-ball-y-raises": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Face-down over blue stability ball, chest supported, feet anchored on floor, arms hanging straight down with light dumbbells \u2014 matches description."
+    },
+    "quadriceps-stretch-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with one foot drawn behind, band looped around foot, both hands holding band ends at chest height \u2014 matches description."
+    },
+    "quadruped-band-row": {
+      "status": "passed",
+      "frame": "start",
+      "note": "On hands and knees, band visible looped around hands, hands on mat shoulder-width apart, neutral spine \u2014 matches description."
+    },
+    "quadruped-hip-circles": {
+      "status": "passed",
+      "frame": "start",
+      "note": "On hands and knees in tabletop with neutral spine, wrists under shoulders, knees under hips \u2014 matches description."
+    },
+    "quadruped-hip-extension": {
+      "status": "passed",
+      "frame": "start",
+      "note": "On hands and knees with neutral spine, wrists under shoulders, knees under hips \u2014 matches description."
+    },
+    "quadruped-hip-flexor-march": {
+      "status": "passed",
+      "frame": "start",
+      "note": "On hands and knees in tabletop position with wrists under shoulders, knees under hips, neutral spine \u2014 matches start description (the march begins from this position)."
+    },
+    "quadruped-hip-flexor-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Hands and knees with shoulders over wrists, hips over knees, neutral spine \u2014 matches start description."
+    },
+    "quadruped-opposite-arm-leg-raise": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Hands and knees in tabletop, shoulders over wrists, hips over knees \u2014 matches start description (lift happens after)."
+    },
+    "quadruped-pelvic-tilts": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Tabletop position, wrists under shoulders, knees under hips \u2014 matches start description."
+    },
+    "quadruped-rock-back": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Hands and knees, neutral spine, hands under shoulders, knees under hips \u2014 matches start description."
+    },
+    "quadruped-rocking": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Tabletop position with hands extended forward on mat, neutral spine \u2014 matches start description (hips begin to push back)."
+    },
+    "quadruped-scapular-pushup-plus": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Hands and knees with hands directly under shoulders, knees under hips, neutral spine \u2014 matches start."
+    },
+    "quadruped-shoulder-blade-squeeze": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Hands and knees with shoulders over wrists, hips over knees, neutral spine \u2014 matches start."
+    },
+    "quadruped-shoulder-stability": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Hands and knees with hands directly under shoulders, knees under hips, neutral spine, head aligned \u2014 matches description."
+    },
+    "quadruped-shoulder-stability-hold": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Hands and knees with shoulders over wrists, hips over knees, neutral spine \u2014 matches description."
+    },
+    "quadruped-shoulder-taps": {
+      "status": "passed",
+      "frame": "start",
+      "note": "High plank (legs extended), one hand lifted touching opposite shoulder \u2014 matches description (depicts the high-plank variant during the tap)."
+    },
+    "quadruped-spinal-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Tabletop with right hand behind head, elbow pointing out (rotated slightly toward the floor in start) \u2014 matches description."
+    },
+    "quadruped-thoracic-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Tabletop with one hand behind head, torso rotating to look up \u2014 matches description (depicts the upward rotation phase)."
+    },
+    "resistance-band-ankle-eversion": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated in chair with band visibly looped around outside of forefoot anchored to chair leg on opposite side \u2014 matches description."
+    },
+    "resistance-band-ankle-inversion": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with one leg lifted, band around forefoot \u2014 matches description (image is small but band placement and stance match)."
+    },
+    "resistance-band-dorsiflexion": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with one leg extended (or slightly bent), band around ball of foot, holding both ends \u2014 matches description."
+    },
+    "resistance-band-external-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with right elbow tucked at side, forearm bent ~90 holding band that runs out to right side anchor \u2014 proper ER setup matches description."
+    },
+    "resistance-band-external-rotation-at-90-90": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with arm at 90/90 (shoulder abducted ~90, elbow bent ~90, forearm vertical up) holding band running to wall anchor \u2014 matches description's goalpost setup."
+    },
+    "resistance-band-hip-abduction": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with resistance band visibly looped around both thighs just above the knees \u2014 matches description."
+    },
+    "resistance-band-hip-flexion": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with one foot raised, band looped around it, holding ends at waist \u2014 matches description (depicts hip flexion in progress)."
+    },
+    "resistance-band-knee-extensions": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright in chair with both feet on floor, band visibly looped around one ankle and anchored behind chair \u2014 matches description."
+    },
+    "resistance-band-lateral-walks": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with band visibly around mid-thighs above knees, slight knee bend, neutral spine \u2014 matches description."
+    },
+    "resistance-band-plantarflexion": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with leg extended, band around ball of foot, holding both ends with tension \u2014 matches description."
+    },
+    "resistance-band-pull-apart": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "resistance-band-shoulder-external-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with both elbows bent ~90 at sides, band visibly looped around hands at chest height \u2014 matches description (band looped around hands variant)."
+    },
+    "resistance-band-shoulder-internal-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with elbow bent ~90 holding band, band running off to side anchor \u2014 matches description."
+    },
+    "resisted-back-extension-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with arms extended forward holding band ends, band visibly extending back to anchor \u2014 matches description."
+    },
+    "resisted-foot-eversion-side-lying": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-lying with band visibly around feet \u2014 matches description."
+    },
+    "reverse-wrist-curl-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Palm-down on bench is the correct anatomy for reverse wrist curl. The pose_description has the palm direction wrong, not the image. Image PASSES; description should be fixed separately."
+    },
+    "scapular-retraction-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with arms holding band, small image but pose appears consistent with scapular retraction setup."
+    },
+    "scapular-squeeze-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with arms extended forward holding looped band at chest height with arms shoulder-width apart \u2014 matches description."
+    },
+    "seated-adductor-squeeze-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "seated-ankle-dorsiflexion-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated in chair, leg extended forward, band looped around ball of foot, holding both ends \u2014 matches description."
+    },
+    "seated-ankle-inversion-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated on bench with one leg extended, band looped around foot held in both hands \u2014 matches description."
+    },
+    "seated-dorsiflexion-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated, leg extended/slightly bent, band around ball of foot, holding ends \u2014 matches description."
+    },
+    "seated-foot-inversion-resistance": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated in chair with feet on floor, band looped around working foot anchored to a stable object (kettlebell) \u2014 matches description."
+    },
+    "seated-hip-external-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated in chair with leg crossed over opposite knee in figure-4 position \u2014 matches description."
+    },
+    "seated-hip-internal-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright in chair with both feet flat on floor, knees bent ~90 \u2014 matches start description."
+    },
+    "seated-hip-internal-rotation-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright in chair with both feet flat on floor \u2014 matches start description."
+    },
+    "seated-hip-rotation-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated on floor with one leg extended and the other knee bent with foot placed on outside of extended knee \u2014 matches description."
+    },
+    "seated-row-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated on floor with legs extended, band looped around feet, both hands gripping band, pulling back \u2014 matches description (depicts mid-row)."
+    },
+    "seated-shoulder-shrugs-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with dumbbells held at sides, neutral shoulder position \u2014 matches description."
+    },
+    "seated-spinal-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated in chair, hand behind head, slight rotation \u2014 matches description (depicts mid-rotation)."
+    },
+    "seated-spinal-stretch-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated on floor with legs extended, band looped around feet, holding ends \u2014 matches description."
+    },
+    "seated-spinal-twist": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated on floor with one leg extended and other leg crossed over with foot outside opposite knee, torso rotating \u2014 matches description."
+    },
+    "seated-trunk-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated in chair with feet flat, knees bent ~90, arms crossed over chest \u2014 matches description."
+    },
+    "side-lying-clamshell-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-lying with hips and knees bent ~45/90, band visibly around thighs above knees, top knee lifting upward (clamshell action) \u2014 matches description."
+    },
+    "side-lying-external-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-lying with top working arm bent at 90, dumbbell held up (depicts ER end position). Description says start; image is end but elbow-pinned-to-side and 90-degree-bend are correct."
+    },
+    "side-lying-hip-abduction": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-lying with top leg lifted upward toward ceiling, bottom arm extended \u2014 matches description (depicts the lifted abduction end position)."
+    },
+    "side-lying-shoulder-abduction": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-lying with bottom arm bent for support, top affected arm resting on side with slight elbow bend \u2014 matches start description."
+    },
+    "side-lying-shoulder-internal-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-lying with affected shoulder abducted ~90 and elbow bent ~90, dumbbell held with forearm pointing upward \u2014 matches start description."
+    },
+    "side-plank": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-supported on one forearm with elbow under shoulder, body forming straight line, feet stacked \u2014 matches description."
+    },
+    "sidelying-hip-abduction": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-lying with body in straight line, legs stacked, head resting on lower arm \u2014 matches start description (lift happens after)."
+    },
+    "standing-ankle-eversion-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with red band visibly looped around both forefeet, feet hip-width apart \u2014 matches description."
+    },
+    "standing-band-pallof-press": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing perpendicular to anchor, holding looped band at chest with both hands, arms extended forward \u2014 matches description."
+    },
+    "standing-band-pull-apart": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "standing-band-row": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with band looped under feet, arms extended down at hip level holding band ends \u2014 matches description."
+    },
+    "standing-chest-fly-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "standing-dumbbell-reverse-fly": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing hip-hinged with slight knee bend, dumbbells held at sides with slight elbow bend \u2014 matches start description."
+    },
+    "standing-hip-adduction-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright holding dumbbell in one hand at side, other hand on rack support for balance \u2014 matches description."
+    },
+    "standing-hip-internal-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing on one leg with the other knee bent 90 (lifted), hand holding vertical support pole \u2014 matches description."
+    },
+    "standing-rotation-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "standing-row-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with arms fully extended forward at shoulder height holding band running off to side anchor \u2014 matches start description (pre-pull position)."
+    },
+    "supine-cross-body-shoulder-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with knees bent, one arm crossed over chest with elbow bent, opposite hand resting on the elbow \u2014 matches description."
+    },
+    "supine-external-rotation-bent-elbow": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "supine-external-rotation-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "supine-hip-external-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with knees bent and feet flat on floor at hip-width, arms at sides \u2014 matches start description."
+    },
+    "supine-hip-internal-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with knees bent, feet flat on floor. Description specifies 'wider than hip-width' \u2014 image stance is approximately hip-width, slightly narrower than ideal but acceptable as start setup."
+    },
+    "supine-hip-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with one knee bent (foot flat on floor) and the other leg extended/straight \u2014 matches asymmetric description."
+    },
+    "supine-lower-trunk-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with both knees bent and feet flat on floor at hip-width, arms at sides \u2014 matches description."
+    },
+    "supine-shoulder-flexion-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with knees bent, both hands holding resistance band with elbows bent ~90 at chest level, band taut \u2014 matches description."
+    },
+    "supine-shoulder-flexion-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with knees bent and feet flat, light dumbbell held in one hand at side with elbow slightly bent \u2014 matches description."
+    },
+    "supine-thoracic-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with knees dropped to one side, arms extended out to sides at shoulder height, palms up \u2014 matches description."
+    },
+    "tennis-ball-roll": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated in chair with one foot resting on tennis ball, opposite foot flat on floor \u2014 matches description."
+    },
+    "thoracic-rotation-seated": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with hands behind head, elbows out \u2014 canonical seated thoracic rotation start. Description text is internally inconsistent ('arms crossed AND hands behind head') but image depicts the standard setup."
+    },
+    "thoracic-rotation-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Hands and knees in tabletop with one hand behind head and elbow pointing up \u2014 matches description."
+    },
+    "thread-the-needle": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Canonical thread-the-needle: tabletop start, one arm threaded underneath body with shoulder/temple resting on floor, hips over knees \u2014 matches description."
+    },
+    "thumb-abduction-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Split-panel image: full body seated at table on left, hand-zoom on right showing band looped around thumb. Unusual layout for the dataset but informative for thumb-specific exercise."
+    },
+    "toe-curls-resistance": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated in chair with band looped around front of shoe (toes), opposite foot flat \u2014 matches description's intent (toes covered by shoe is acceptable)."
+    },
+    "wall-squat-with-ball": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side view showing ball between back and wall, mid-squat with knees bent \u2014 matches description."
+    },
+    "wrist-deviation-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with forearm on table, palm down, hand extended beyond edge with band attached \u2014 matches description."
+    },
+    "wrist-extension-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with forearm on table, palm down, hand hanging slightly off edge, resistance band visibly looped around the hand \u2014 matches description."
+    },
+    "wrist-extension-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with forearm on small table, palm down, holding light dumbbell with wrist extending beyond edge \u2014 matches description."
+    },
+    "knee-extension-resistance-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with back against support, band looped around foot with both ends held in hands, leg slightly bent \u2014 matches description."
+    },
+    "hamstring-curls-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with one heel pulled up (mid-curl), band running from working foot down to anchor near standing foot. Frame is mid-curl rather than the upright start the description specifies, but the image is more instructionally informative for hamstring curl form."
+    },
+    "clamshells-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-lying with knees bent ~45 degrees, band visibly looped around both thighs above knees, feet together, top knee slightly opened (clamshell) \u2014 matches description."
+    },
+    "lateral-band-walks-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with dumbbell held at chest with both hands, feet roughly hip-width, slight knee bend, band visibly around ankles \u2014 matches description."
+    },
+    "monster-walks-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Quarter-squat stance with dumbbell at chest, feet hip-width, chest upright \u2014 matches description (no band specified). Note: image is letterboxed with black bars on left/right (unusual for the dataset)."
+    },
+    "standing-hip-abduction-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with dumbbell in one hand at side, feet hip-width, neutral spine \u2014 matches description."
+    },
+    "clamshells-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-lying with hips and knees bent ~90, band around thighs, feet together \u2014 matches description."
+    },
+    "step-ups-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing facing a low step with one foot on step, band around thighs above knees, upright posture \u2014 matches description."
+    },
+    "scapular-squeezes-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with light dumbbells in each hand at chest height, elbows bent, neutral shoulders \u2014 matches description."
+    },
+    "cross-body-shoulder-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with one arm crossed across chest at shoulder height with elbow slightly bent, opposite hand assisting at elbow \u2014 matches description."
+    },
+    "band-pull-apart": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually; replaces failed image.",
+      "regen_installed": true
+    },
+    "prone-i-y-t-raises-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Face-down on bench with chest off the edge, arms hanging down holding band \u2014 matches description."
+    },
+    "supine-marching-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with one foot lifted (mid-march), band visible, hands behind head. Frame is mid-march rather than flat-feet start but instructionally informative."
+    },
+    "childs-pose-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Kneeling with hips back to heels, arms extended forward on floor, forehead toward ground \u2014 canonical child's pose start (rotation phase happens later)."
+    },
+    "side-plank-hip-drop": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-supported on forearm, straight line from head to feet, legs stacked, top hand on hip \u2014 matches description."
+    },
+    "lateral-band-walk": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Quarter-squat stance with band around thighs, feet hip-width, slight knee bend, chest up. Band placement is just above knees vs description's \"below knees\" \u2014 minor variant."
+    },
+    "clamshells-resistance-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-lying with hips and knees bent ~90, band around thighs above knees, feet together \u2014 matches description."
+    },
+    "standing-hip-abduction-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Dual-figure split image, both showing band around mid-thighs, feet hip-width, slight knee bend \u2014 matches description (unusual dual-figure layout)."
+    },
+    "standing-hip-abduction-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with hands on hips, band visibly looped around both thighs. Band placement is at mid-thigh vs description's \"just above knees\" \u2014 minor variant. Feet hip-width vs description's \"feet together\" \u2014 minor."
+    },
+    "grip-strengthening-soft-ball": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with one hand holding soft orange ball, arm in active grip position \u2014 matches description."
+    },
+    "grip-strengthening-therapy-ball": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated on floor with arm resting on knee holding yellow therapy ball \u2014 matches description (knee/lap variant acceptable)."
+    },
+    "grip-strengthening-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with arm at side, holding band looped in hand with band hanging down \u2014 matches description."
+    },
+    "wrist-pronation-supination-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with forearm resting on lap, elbow bent ~90, holding dumbbell vertically \u2014 matches description."
+    },
+    "supine-elbow-extension-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with working arm elbow bent ~90, upper arm angled, forearm with dumbbell \u2014 geometry matches description (start of triceps extension)."
+    },
+    "bicep-curls-light-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with light dumbbell in one hand, arm extended at side \u2014 matches description."
+    },
+    "grip-strengthening-tennis-ball": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with one hand resting between thighs holding tennis ball, fingers around it \u2014 matches description."
+    },
+    "finger-extension-resistance-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with forearm resting on table, resistance band looped around fingers \u2014 matches description."
+    },
+    "wrist-circles-light-weight": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with arm extended laterally at shoulder height holding light dumbbell \u2014 matches description."
+    },
+    "wrist-flexion-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with forearm on table, band looped around hand running down to anchor below \u2014 matches description."
+    },
+    "wrist-radial-deviation-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with forearm on table, hand in neutral position holding band anchored on ulnar side \u2014 matches description."
+    },
+    "pronation-supination-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated on bench with elbow bent ~90 holding band running down to fixed anchor \u2014 matches description."
+    },
+    "finger-extension-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with forearm on table, hand in relaxed fist, opposite hand positioned to assist \u2014 matches description."
+    },
+    "light-dumbbell-bicep-curl": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, light dumbbells in each hand at sides \u2014 matches START of bicep curl."
+    },
+    "tricep-extension-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright, holding light dumbbell with both hands overhead with elbows bent ~90 by head \u2014 matches description."
+    },
+    "wrist-flexion-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with forearm resting on thigh holding light dumbbell with wrist in neutral \u2014 matches description."
+    },
+    "dumbbell-hammer-curl": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, dumbbells in each hand at sides with neutral grip (palms facing thighs) \u2014 matches description."
+    },
+    "prone-knee-flexion-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Prone on mat with band around foot, arms folded under forehead, knee bent showing the curl movement \u2014 matches description."
+    },
+    "supine-hip-abduction-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with both knees bent and feet flat on floor, resistance band around both knees \u2014 matches description."
+    },
+    "dumbbell-deadlifts-light": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet hip-width, light dumbbells at sides, arms extended \u2014 matches description."
+    },
+    "supine-hip-abduction-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with knees bent and feet flat hip-width apart, band around thighs above knees \u2014 matches description."
+    },
+    "standing-hip-flexion-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing facing support box with band around one foot anchored at floor; leg shown lifted (mid-flexion) but exercise is clearly depicted."
+    },
+    "supine-hip-rotation-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with one hip and knee bent to 90, band around thigh, other leg extended \u2014 matches description."
+    },
+    "supine-hip-adduction-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with knees bent and feet flat, band around thighs above knees \u2014 matches description (setup is identical to abduction; movement direction differs)."
+    },
+    "sidelying-hip-abduction-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-lying with legs stacked, band around both legs above knees, top leg lifted \u2014 matches description."
+    },
+    "standing-hip-extension-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing facing support frame with band around one foot extending to floor anchor \u2014 matches start description."
+    },
+    "figure-four-stretch-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with one ankle crossed over opposite thigh in figure-4, band around thigh held in hands \u2014 matches description."
+    },
+    "lying-side-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Lying on side with hips/knees slightly bent, pillow between knees, affected arm bent at elbow on torso \u2014 matches description."
+    },
+    "scapular-squeeze-dumbbells": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with light dumbbells in each hand at sides, arms extended, neutral grip \u2014 matches description."
+    },
+    "supine-dumbbell-chest-press": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine on bench with knees bent and feet flat, dumbbells held at chest level with elbows ~90 \u2014 matches description."
+    },
+    "forearm-rotation-pronation-supination": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Split-image showing seated with elbow tucked at side and dumbbell held in both pronated and supinated positions \u2014 matches description."
+    },
+    "seated-ankle-plantarflexion-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright in chair with leg extended, band around ball of foot, heel on ground \u2014 matches description."
+    },
+    "supine-ankle-dorsiflexion-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with legs extended, band around ball of foot, heel on surface \u2014 matches description."
+    },
+    "standing-quad-sets-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with band looped around knee anchored to support behind \u2014 matches description."
+    },
+    "prone-hip-extension-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Prone with band linking both feet (one leg lifted in extension), arms folded under forehead \u2014 matches description."
+    },
+    "seated-hamstring-stretch-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated on floor with leg extended forward, band looped around foot held in both hands. Other leg shown extended rather than bent (description-image divergence) but hamstring stretch correctly depicted."
+    },
+    "quadruped-leg-lift": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Hands and knees in tabletop with hands under shoulders, knees under hips, neutral spine \u2014 matches description."
+    },
+    "lateral-band-walks-with-dumbbells": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet hip-width, knees in quarter-squat, dumbbells at sides, band around ankles \u2014 matches description."
+    },
+    "resistance-band-internal-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with elbows bent ~90 at sides, hands holding resistance band at chest height \u2014 matches description."
+    },
+    "resistance-band-horizontal-abduction": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with arms extended in front at chest height holding band stretched between hands, slight elbow bend \u2014 matches description."
+    },
+    "resistance-band-row": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing on band with arms extended downward in front holding ends \u2014 matches description."
+    },
+    "resistance-band-shoulder-flexion": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing on band with arms extended downward at sides holding ends, neutral posture \u2014 matches description."
+    },
+    "resistance-band-lateral-raise": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing on band with arms extended downward at sides, slight elbow bend \u2014 matches description."
+    },
+    "supine-shoulder-external-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually with sharpened anti-cue notes; replaces failed image.",
+      "regen_installed": true
+    },
+    "glute-bridge-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with knees bent and feet flat hip-width, dumbbell across hips, arms at sides \u2014 matches description."
+    },
+    "dumbbell-row": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width and clear forward hip hinge, dumbbells held below hip level \u2014 matches description (hinge correctly shown)."
+    },
+    "pallof-press-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, dumbbell held forward perpendicular to torso (pressed-out canonical pallof position) \u2014 matches description."
+    },
+    "quadruped-hip-circle": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Hands and knees in tabletop with one knee slightly lifted off ground \u2014 matches description."
+    },
+    "ankle-plantarflexion-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with leg extended forward, band around ball of foot, ends held in hands \u2014 matches description."
+    },
+    "ankle-inversion-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated in chair with leg extended, band around forefoot, ends held in hands \u2014 matches description."
+    },
+    "ankle-eversion-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated in chair with leg extended, band around forefoot, ends held in hands \u2014 matches description."
+    },
+    "resistance-band-adduction": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-lying with legs extended, band around both thighs above knees, top leg lifted to demo movement \u2014 start setup matches description."
+    },
+    "prone-hip-internal-rotation-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Prone with forearms supporting upper body \u2014 start position matches description (knee bend happens during the stretch)."
+    },
+    "step-ups-with-dumbbells": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing facing step with one foot planted on the platform, dumbbells in hands at sides \u2014 matches description."
+    },
+    "dumbbell-curtsy-lunges": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with dumbbells at sides, feet hip-width, weight evenly distributed \u2014 matches START description."
+    },
+    "resistance-band-rows": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with arms extended forward holding band that runs to anchor in front at chest height \u2014 matches description."
+    },
+    "resistance-band-pull-aparts": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, arms extended forward at chest/shoulder height holding band \u2014 matches description."
+    },
+    "upper-back-strengthening-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, arms extended down at sides holding band ends, slight elbow bend \u2014 matches description."
+    },
+    "posterior-neck-stretch-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with band looped around back of head, both ends held in hands at chest level, neutral neck \u2014 matches description."
+    },
+    "thoracic-extension-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with band looped around upper back at shoulder blade height, holding both ends across chest \u2014 matches description."
+    },
+    "resistance-band-reverse-fly": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, slight knee bend, hands close together at waist level holding band with arms extended \u2014 matches START description."
+    },
+    "thoracic-spine-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Tabletop position with one hand behind head \u2014 depicts the canonical thoracic rotation setup; hand-behind-head is the key instructional feature."
+    },
+    "dumbbell-shrugs": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet hip-width, dumbbells at sides, arms extended, shoulders relaxed \u2014 matches description."
+    },
+    "band-rows": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, arms extended forward holding band \u2014 matches description (band depiction is small but pose is correct)."
+    },
+    "seated-thoracic-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with arms crossed over chest, hands on opposite shoulders \u2014 matches description."
+    },
+    "thoracic-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Hands and knees with one hand behind head, elbow pointing out \u2014 matches description."
+    },
+    "spinal-twist": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually with sharpened anti-cue notes; replaces failed image.",
+      "regen_installed": true
+    },
+    "banded-hip-abduction": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually with sharpened anti-cue notes; replaces failed image.",
+      "regen_installed": true
+    },
+    "banded-clamshells": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-lying with band around mid-thigh/upper leg area, knees bent \u2014 matches description (slight bend rather than crisp 45 but acceptable)."
+    },
+    "banded-hip-bridge": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with knees bent and feet flat hip-width, band around thighs above knees, arms at sides \u2014 matches description."
+    },
+    "banded-lateral-walk": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing in quarter-squat with band around mid-thighs, hands on hips. Stance is slightly wider than description's \"hip-width\" but pose is informative."
+    },
+    "thoracic-rotation-quadruped": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Hands and knees in tabletop with left hand behind head, elbow pointing out \u2014 matches description."
+    },
+    "thread-the-needle-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with figure-4 position (one ankle crossed over opposite knee), hands pulling thigh toward chest \u2014 matches description."
+    },
+    "standing-trunk-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width and knees slightly bent, arms crossed over chest with hands on opposite shoulders \u2014 matches description."
+    },
+    "dumbbell-goblet-squat": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, holding dumbbell vertically at chest with both hands, chest up \u2014 matches START description."
+    },
+    "dumbbell-lateral-lunge": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with dumbbells at sides, feet roughly together \u2014 matches START description (lunge happens during exercise)."
+    },
+    "shoulder-dislocate-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with hands shoulder-width apart at hip height holding band, arms extended with slight elbow bend \u2014 matches description."
+    },
+    "glute-bridge-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with knees bent and feet flat hip-width, band around thighs above knees, arms at sides \u2014 matches description."
+    },
+    "banded-shoulder-dislocations": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, band held with wide grip in front of thighs, arms straight \u2014 matches description."
+    },
+    "banded-pallof-press": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing perpendicular to wall anchor with band running to hands extended forward at chest level, slight knee bend \u2014 depicts canonical pallof press setup."
+    },
+    "banded-woodchop": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, hands together at shoulder height holding band running diagonally to side \u2014 matches woodchop start description."
+    },
+    "shoulder-cross-body-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet hip-width, one arm extended across body at shoulder height with opposite hand assisting at elbow \u2014 matches description."
+    },
+    "sit-to-stand-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright in chair with feet flat, band held in front at chest height looping down to floor anchor, leaning slightly forward \u2014 matches description."
+    },
+    "resistance-band-bicep-curls": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet hip-width on band, holding ends at sides with arms straight \u2014 matches description."
+    },
+    "resistance-band-chest-press": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Split-figure illustration showing standing with band wrapped around upper back, hands at chest height with elbows bent \u2014 matches description."
+    },
+    "dumbbell-chest-press": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually with sharpened anti-cue notes; replaces failed image.",
+      "regen_installed": true
+    },
+    "dumbbell-lateral-raises": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet hip-width, dumbbells in each hand at sides with neutral grip (palms facing inward), slight knee bend \u2014 matches description."
+    },
+    "barbell-back-squats": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, barbell across upper back/shoulders, chest upright, core engaged \u2014 matches description."
+    },
+    "weighted-lunges": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with dumbbells at sides, feet hip-width, core braced and shoulders back \u2014 matches START description."
+    },
+    "weighted-step-ups": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing facing bench/step with dumbbells at sides, posture upright \u2014 matches description."
+    },
+    "weighted-calf-raises": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with dumbbells at sides, feet hip-width, core engaged \u2014 matches description."
+    },
+    "walking-lunges-with-twist": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright holding weight plate at chest height with both hands, feet hip-width, core braced \u2014 matches START description."
+    },
+    "banded-squats": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width on band, holding handles at shoulder height, chest upright \u2014 matches description."
+    },
+    "banded-chest-press": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with band wrapped around mid-back, holding ends at chest level with elbows bent \u2014 matches description (seated on floor variant)."
+    },
+    "banded-rows": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with legs extended, band looped around feet, holding ends at chest level with back straight \u2014 matches description."
+    },
+    "banded-bicep-curls": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet hip-width on band, holding ends at sides with palms facing forward and arms straight \u2014 matches description."
+    },
+    "banded-lateral-raises": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet hip-width on band, holding ends at sides with arms extended and palms facing inward \u2014 matches description."
+    },
+    "banded-glute-bridges": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with knees bent and feet flat hip-width, band looped just above knees, arms at sides \u2014 matches description."
+    },
+    "banded-standing-kickbacks": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing facing support bar with band looped around one leg, kicking leg lifted in backward extension \u2014 depicts the exercise in working position."
+    },
+    "banded-shoulder-external-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with elbow bent 90 at side and tucked against ribs, hand holding band end with band running to side anchor \u2014 proper ER setup matches description."
+    },
+    "banded-standing-marches": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually with sharpened anti-cue notes; replaces failed image.",
+      "regen_installed": true
+    },
+    "supine-shoulder-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually with sharpened anti-cue notes; replaces failed image.",
+      "regen_installed": true
+    },
+    "step-up-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing facing bench/elevated platform with dumbbells in each hand at sides, feet hip-width, posture upright \u2014 matches description."
+    },
+    "dumbbell-floor-press": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually with sharpened anti-cue notes; replaces failed image.",
+      "regen_installed": true
+    },
+    "supine-spinal-twist": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with arms extended out and knee bent crossed over body \u2014 depicts the canonical spinal twist (slightly past start frame but instructionally valid)."
+    },
+    "diaphragmatic-breathing-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright in chair with feet flat, band held loosely around torso at chest level with both hands \u2014 matches description."
+    },
+    "shoulder-rolls-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, band held at shoulder height with arms extended forward \u2014 matches description."
+    },
+    "standing-torso-rotation-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, hands extended forward at chest height holding band running to side anchor \u2014 matches description."
+    },
+    "hip-flexor-stretch-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Half-kneeling lunge with band around back knee, torso upright \u2014 matches description."
+    },
+    "gentle-spinal-twist": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with band held across chest and arms extended laterally, twisted position with one knee crossed \u2014 depicts the exercise in working position (mid-twist)."
+    },
+    "band-assisted-chest-opening": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright in chair with band held behind back at elbow height, both arms bent \u2014 matches description."
+    },
+    "band-pull-apart-posture": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, arms extended forward at shoulder height holding band with slight elbow bend \u2014 matches description."
+    },
+    "quadruped-arm-and-leg-lifts": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Hands and knees in tabletop with wrists under shoulders and knees under hips, neutral spine \u2014 matches description."
+    },
+    "dumbbell-lateral-step": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with light dumbbells at sides, feet hip-width, posture upright \u2014 matches description."
+    },
+    "banded-bicep-curl": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet hip-width on band, hands at sides holding ends with arms straight \u2014 matches description."
+    },
+    "banded-glute-bridge": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine bridge position with hips lifted, band around thighs above knees, arms at sides \u2014 depicts the bridge execution (mid-exercise rather than literal start)."
+    },
+    "banded-row": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing facing band anchor, arms extended forward at chest height holding band ends \u2014 matches description."
+    },
+    "banded-overhead-press": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet hip-width on band, hands at shoulder height with elbows bent ~90 \u2014 matches description."
+    },
+    "banded-squat": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing on band with hands holding ends at shoulder/chest height, mid-squat with knees bent \u2014 depicts the exercise in active position."
+    },
+    "banded-standing-hip-abduction": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with feet close together, band visibly around both thighs above knees, hands on hips \u2014 matches description."
+    },
+    "seated-torso-twist": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright in chair with feet flat, arms crossed over chest with hands on opposite shoulders \u2014 matches description."
+    },
+    "dumbbell-overhead-press": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, light dumbbells held at shoulder height with elbows bent ~90 \u2014 matches description."
+    },
+    "dumbbell-bicep-curls-breathing": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with feet hip-width, dumbbells in each hand with arms hanging at sides \u2014 matches description."
+    },
+    "dumbbell-bent-over-rows": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, slight knee bend and hip hinge ~45 degrees, dumbbells held with arms hanging below shoulders \u2014 matches description."
+    },
+    "standing-dumbbell-lateral-raises": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with feet hip-width, dumbbells at sides with neutral grip (palms facing inward) \u2014 matches description."
+    },
+    "banded-quadriceps-sets": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright in chair with rolled towel under one knee and band around that thigh \u2014 matches description."
+    },
+    "banded-standing-hip-extension": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing facing rail with hands on it for support, band linking both feet, kicking leg lifted backward in extension \u2014 depicts the exercise in working position."
+    },
+    "resistance-band-wrist-extension": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with forearm on table, palm down, hand extended beyond edge with band looped around it \u2014 matches description."
+    },
+    "resistance-band-finger-flexion": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with affected hand held up, fingers extended with band looped around them, light tension \u2014 matches description."
+    },
+    "resistance-band-shoulder-abduction": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with feet shoulder-width, band anchored under foot, affected arm at side holding band \u2014 matches description."
+    },
+    "resistance-band-elbow-flexion": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with affected arm at side holding band end, band running down to floor anchor \u2014 matches description."
+    },
+    "shoulder-flexor-stretch-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with both hands holding band, arms extended forward at shoulder height \u2014 matches description."
+    },
+    "supine-spinal-twist-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with legs extended and arms spread laterally in T-position, neutral spine \u2014 matches description."
+    },
+    "standing-lateral-band-walk": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with band around legs above knees, slight knee bend and forward lean with neutral spine \u2014 matches description."
+    },
+    "seated-spinal-rotation-resistance-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with arms crossed over chest holding band that runs to side anchor at chest height \u2014 matches description."
+    },
+    "prone-y-t-w-raises-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Prone with band beneath body, arms extended out to sides at shoulder level holding band, forehead on floor \u2014 matches description."
+    },
+    "dumbbell-romanian-deadlift": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet hip-width, dumbbells held in front of thighs with slight knee bend, shoulders back \u2014 matches description."
+    },
+    "dumbbell-step-up-knee-drive": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing facing bench with dumbbells at sides, feet hip-width, posture upright \u2014 matches START description."
+    },
+    "external-rotation-resistance-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with right elbow bent ~90 against side, band around wrist, forearm extending forward \u2014 matches description."
+    },
+    "quadruped-shoulder-rocks": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Hands and knees in tabletop with hands under shoulders, knees under hips, neutral spine \u2014 matches description."
+    },
+    "band-shoulder-external-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, elbow bent ~90 against side, forearm extended forward holding band running to side anchor \u2014 matches description."
+    },
+    "glute-bridge-band-loop": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Bridge position with hips lifted, band around thighs above knees, arms at sides palms down \u2014 depicts the bridge in active position."
+    },
+    "calf-stretch-band-assist": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated on floor with legs extended, band around ball of one foot held in hands, upright back \u2014 matches description."
+    },
+    "quadruped-hip-circles-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Hands and knees with band around one thigh, hips over knees, core engaged \u2014 matches description (on hands rather than forearms but canonical quadruped setup)."
+    },
+    "banded-monster-walk": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with band around legs above knees, hands behind head, quarter-squat with slight forward lean \u2014 matches description."
+    },
+    "prone-shoulder-flexion-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Prone on table with arms hanging off edge, holding band with band running to floor anchor \u2014 matches description."
+    },
+    "dumbbell-deadlift": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet hip-width, dumbbell in each hand at sides with neutral grip, chest up \u2014 matches description."
+    },
+    "supine-pelvic-floor-dumbbell-squeeze": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with knees bent and feet flat hip-width, light dumbbell on lower abdomen \u2014 matches description."
+    },
+    "resistance-band-glute-activation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet hip-width, band around legs above knees, slight forward lean from hips \u2014 matches description."
+    },
+    "deep-core-activation-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Hands and knees with band visibly wrapped around torso at rib level, neutral spine \u2014 matches description."
+    },
+    "resistance-band-clamshells": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Side-lying propped on elbow with band around thighs above knees, knees bent, top knee lifting (clamshell action) \u2014 matches description."
+    },
+    "modified-dumbbell-chest-press": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with knees bent and feet flat, dumbbell(s) held with both hands at chest level \u2014 depicts the modified variant of chest press."
+    },
+    "glute-squeeze-with-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet hip-width, dumbbell held vertically at chest level with both hands, posture upright \u2014 matches description."
+    },
+    "quadruped-head-turns": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Hands and knees in tabletop with shoulders over wrists, hips over knees, neutral spine \u2014 matches description."
+    },
+    "balance-ball-sitting": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated on stability ball with feet flat hip-width, upright posture and neutral spine \u2014 matches description."
+    },
+    "standing-balance-resistance-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet hip-width, band around both thighs above knees, hands on hips \u2014 matches description."
+    },
+    "neck-flexion-extension-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with band looped around back of head and held in both hands at chest level \u2014 matches description."
+    },
+    "seated-shoulder-rolls-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually with sharpened anti-cue notes; replaces failed image.",
+      "regen_installed": true
+    },
+    "standing-weight-shifts": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet hip-width, arms at sides, upright posture and neutral gaze \u2014 matches description."
+    },
+    "scapular-stabilization-dumbbells": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, light dumbbells held at sides with arms extended \u2014 matches description."
+    },
+    "upper-back-dumbbell-rows": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, dumbbells held at sides with neutral grip, upright posture \u2014 matches START description."
+    },
+    "seated-dumbbell-press": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright on bench with dumbbells held at shoulder height with elbows bent \u2014 matches description."
+    },
+    "quadruped-rocking-head-turns": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Hands and knees in tabletop with wrists under shoulders and knees under hips, head looking down \u2014 matches description."
+    },
+    "diagonal-gaze-shifts": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright in chair with feet flat, head in neutral position, gaze focused ahead \u2014 matches description."
+    },
+    "band-resisted-head-stabilization": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with band around head at forehead level, hands holding ends near sides of head \u2014 depicts the setup with band-on-forehead resistance."
+    },
+    "band-assisted-neck-isometric-with-gaze-hold": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with band looped around head, hands holding ends at chest/shoulder height \u2014 matches description."
+    },
+    "dumbbell-squats-visual-focus": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, dumbbells held at shoulder height with elbows bent, gaze fixed ahead \u2014 matches description."
+    },
+    "dumbbell-farmers-carry-head-level": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with dumbbells in each hand, head level and gaze ahead \u2014 matches description."
+    },
+    "standing-dumbbell-rows-stability": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet hip-width, dumbbells held with arms extended down in front of body \u2014 matches description."
+    },
+    "resisted-jaw-opening-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with light resistance band looped around chin/jaw area, ends held in both hands at chest level \u2014 depicts the resistance setup."
+    },
+    "neck-stretch-gentle-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually with sharpened anti-cue notes; replaces failed image.",
+      "regen_installed": true
+    },
+    "neck-isometric-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with band around back of head at ear level, hands holding ends near temples \u2014 matches description."
+    },
+    "shoulder-shrugs-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, band under both feet, arms hanging naturally at sides \u2014 matches description."
+    },
+    "upper-back-extension-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with band running to anchor in front, arms extended forward \u2014 matches description."
+    },
+    "dumbbell-reverse-flyes": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet hip-width, light dumbbells in hands, slight forward hinge at hips with neutral spine \u2014 matches description."
+    },
+    "seated-resistance-band-rows": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with legs extended, band looped around both feet, hands holding ends at chest level with shoulders back \u2014 matches description."
+    },
+    "standing-lateral-band-walks": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with band around legs above knees, feet hip-width with slight knee bend, hands on hips \u2014 matches description."
+    },
+    "supine-glute-bridge-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with knees bent and feet flat hip-width, band around thighs above knees, arms at sides \u2014 matches description."
+    },
+    "seated-shoulder-press-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright in chair with band anchored under feet, hands at shoulder height with elbows bent ~90, palms forward \u2014 matches description."
+    },
+    "seated-upper-back-stretch-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with band held at arms' length forward, hands shoulder-width apart, neutral spine \u2014 matches description."
+    },
+    "standing-hip-flexor-stretch-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with band looped around one foot, opposite end held in hand at hip \u2014 matches description."
+    },
+    "seated-torso-rotation-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright with hands holding band at chest height, slight forward lean, neutral spine \u2014 matches description."
+    },
+    "standing-bicep-curls-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet hip-width on band, hands at sides holding band handles with palms forward, arms extended \u2014 matches description."
+    },
+    "seated-quadriceps-strengthener-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright in chair with band looped around one foot (leg extended), other foot flat on floor \u2014 matches description."
+    },
+    "seated-torso-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright in chair with feet flat hip-width, arms crossed over chest with hands on opposite shoulders \u2014 matches description."
+    },
+    "big-arm-raises-dumbbells": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, light dumbbells held at shoulder height with elbows bent \u2014 matches description."
+    },
+    "big-sit-to-stand-dumbbells": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright on chair with dumbbells held at shoulder height, feet flat hip-width \u2014 matches description."
+    },
+    "big-lateral-reaches-dumbbells": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, dumbbell in one hand at side, torso upright \u2014 matches description."
+    },
+    "seated-hip-flexor-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright in chair with band around one foot held in hands at lap, leg slightly extended \u2014 matches description."
+    },
+    "quadriceps-sets-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with rolled towel under one knee, band looped around thigh, hands holding ends \u2014 matches description."
+    },
+    "seated-hamstring-curl-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright in chair with feet flat, band around one foot, ends held in both hands \u2014 matches description."
+    },
+    "seated-shoulder-flexion-dumbbells": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright in chair with feet flat, light dumbbells in each hand at shoulder height with elbows bent and palms forward \u2014 matches description."
+    },
+    "prone-hip-extension-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Prone on mat with forehead on hands, light dumbbell positioned in crook of one knee, leg extended \u2014 matches description."
+    },
+    "seated-trunk-rotation-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated upright on bench with feet flat, holding one dumbbell at chest height with both hands and elbows bent \u2014 matches description."
+    },
+    "standing-balance-dumbbell-hold": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing upright with feet hip-width, dumbbell in one hand at side with arm extended, gaze ahead \u2014 matches description."
+    },
+    "resistance-band-wrist-flexion": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with forearm resting on table, hand at edge holding band that runs down to anchor under foot \u2014 matches description."
+    },
+    "resistance-band-pronation-supination": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with elbows bent ~90 tucked at sides holding band running down to anchor under foot \u2014 matches description."
+    },
+    "resistance-band-bicep-curl": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width on band, hands at sides holding band handles with arms extended downward \u2014 matches description."
+    },
+    "forearm-flexor-stretch-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with right arm extended forward at shoulder height with palm down, band looped around fingers and held in opposite hand \u2014 matches description."
+    },
+    "forearm-extensor-stretch-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with right arm extended forward at shoulder height, band looped around fingers and held in opposite hand \u2014 matches description (palm orientation hard to verify from this angle)."
+    },
+    "shoulder-mobility-band-pull-apart": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, band held at chest height with hands shoulder-width apart, slight elbow bend \u2014 matches description."
+    },
+    "lying-it-band-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with both legs extended, head neutral, arms at sides \u2014 matches START description."
+    },
+    "prone-external-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Regen verified visually with sharpened anti-cue notes; replaces failed image.",
+      "regen_installed": true
+    },
+    "resistance-band-radial-deviation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated at table with forearm in neutral position, hand at edge holding band running down to floor anchor \u2014 matches description."
+    },
+    "resistance-band-ulnar-deviation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated at table with forearm in neutral position, hand holding band running down to anchor \u2014 matches description."
+    },
+    "resistance-band-pronation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with elbow bent ~90 held against body, hand holding band end \u2014 matches description."
+    },
+    "resistance-band-supination": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Seated with elbow bent ~90 held against body, hand holding band end \u2014 matches description."
+    },
+    "hip-internal-rotation-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Supine with knees bent and feet flat hip-width apart, band around both feet \u2014 matches description."
+    },
+    "monster-walks-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Standing with feet shoulder-width, band around legs above knees, slight forward lean and quarter-squat with bent knees \u2014 matches description."
+    }
+  },
+  "completed_batches": [
+    {
+      "id": "high-1",
+      "size": 10,
+      "passed": 8,
+      "uncertain": 1,
+      "failed": 1
+    },
+    {
+      "id": "high-2",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 0,
+      "failed": 1
+    },
+    {
+      "id": "high-3",
+      "size": 10,
+      "passed": 8,
+      "uncertain": 1,
+      "failed": 1
+    },
+    {
+      "id": "high-4",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 0,
+      "failed": 1
+    },
+    {
+      "id": "high-5",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 0,
+      "failed": 1
+    },
+    {
+      "id": "high-6",
+      "size": 13,
+      "passed": 8,
+      "uncertain": 0,
+      "failed": 5
+    },
+    {
+      "id": "med-1",
+      "size": 10,
+      "passed": 7,
+      "uncertain": 2,
+      "failed": 1
+    },
+    {
+      "id": "uncertain-recheck-1",
+      "size": 23,
+      "passed": 8,
+      "uncertain": 0,
+      "failed": 15,
+      "note": "Re-review of all 23 uncertain verdicts at full resolution; committed to firm pass/fail."
+    },
+    {
+      "id": "regen-pass-1",
+      "size": 36,
+      "passed": 36,
+      "uncertain": 0,
+      "failed": 0,
+      "note": "Regenerated all 36 failed images using human-written observations. 31 fixed first try; 4 fixed on second sharpened-prompt attempt; 1 (single-leg-balance-dumbbell-hold) installed with residual issue (2 dumbbells, single-leg form correct)."
+    },
+    {
+      "id": "med-2",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-3",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-4",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 0,
+      "failed": 1
+    },
+    {
+      "id": "med-5",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-6",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-7",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-8",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-9",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 0,
+      "failed": 1
+    },
+    {
+      "id": "med-10",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-11",
+      "size": 10,
+      "passed": 8,
+      "uncertain": 0,
+      "failed": 2
+    },
+    {
+      "id": "med-12",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-13",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 0,
+      "failed": 1
+    },
+    {
+      "id": "med-14",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-15",
+      "size": 10,
+      "passed": 7,
+      "uncertain": 0,
+      "failed": 3
+    },
+    {
+      "id": "med-16",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-17",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-18",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-19",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-20",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 0,
+      "failed": 1
+    },
+    {
+      "id": "med-21",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-22",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 0,
+      "failed": 1
+    },
+    {
+      "id": "med-23",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-24",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-25",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 0,
+      "failed": 1
+    }
+  ]
+}

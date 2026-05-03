@@ -117,6 +117,17 @@ class RecoveryInsightsViewModel: ObservableObject {
         do {
             let response = try await apiService.requestAgentInsights()
             let parsed = try parseInsight(from: response)
+            // Tier 1: client-side schema sanity check even though the server schema-validates.
+            // If the payload is malformed (unknown enum, out-of-range scores, empty arrays),
+            // fall through to the single-call fallback path rather than rendering a broken card.
+            if let reason = Self.validationError(for: parsed) {
+                SessionLogger.shared.log(.errorOccurred, category: .error,
+                                          message: "Agent insights rejected by client validator",
+                                          metadata: ["reason": reason, "source": "agent"])
+                throw ClaudeAPIError.decodingError(
+                    NSError(domain: "RecoveryInsightsViewModel", code: -10,
+                            userInfo: [NSLocalizedDescriptionKey: reason]))
+            }
             self.insight = parsed
             self.lastGeneratedDate = Date()
             self.isLoading = false
@@ -146,6 +157,17 @@ class RecoveryInsightsViewModel: ObservableObject {
                 userMessage: message
             )
             let parsed = try parseInsight(from: response)
+            // Tier 1: same client-side validator as the agent path. A malformed fallback
+            // surfaces a user-friendly error state instead of a broken card.
+            if let reason = Self.validationError(for: parsed) {
+                SessionLogger.shared.log(.errorOccurred, category: .error,
+                                          message: "Recovery insights rejected by client validator",
+                                          metadata: ["reason": reason, "source": "fallback"])
+                self.error = "Recovery insights unavailable. Please try again later."
+                self.isLoading = false
+                self.stopLoadingMessages()
+                return
+            }
             self.insight = parsed
             self.lastGeneratedDate = Date()
             self.isLoading = false
@@ -165,6 +187,13 @@ class RecoveryInsightsViewModel: ObservableObject {
             self.isLoading = false
             self.stopLoadingMessages()
 
+            // Tier 1: ai_response_invalid breadcrumb (server Zod rejection on the
+            // fallback single-call path — the agent path is validated by managed-agent.ts).
+            if let apiError = error as? ClaudeAPIError, apiError.isResponseInvalid {
+                SessionLogger.shared.log(.errorOccurred, category: .api,
+                    message: "Recovery insights rejected by server schema (ai_response_invalid)",
+                    metadata: ["error_kind": "ai_response_invalid"])
+            }
             SessionLogger.shared.log(.errorOccurred, category: .error,
                                       message: "Recovery insights generation failed",
                                       metadata: ["error": error.localizedDescription])
@@ -237,33 +266,42 @@ class RecoveryInsightsViewModel: ObservableObject {
         """
     }
 
+    // MARK: - Tier 1 client-side validation
+
+    /// Swift mirror of `functions/src/managed-agent.ts:validateInsightResult`. Defends
+    /// against a buggy / modified server that returns a payload matching our Codable
+    /// shape but with out-of-range numbers, unknown enum values, or empty arrays.
+    ///
+    /// Returns nil on success; on failure returns a short reason string suitable for
+    /// logging (not user-facing).
+    static func validationError(for insight: RecoveryInsight) -> String? {
+        let validTrends: Set<String> = ["improving", "stable", "worsening"]
+        if insight.headline.isEmpty { return "empty headline" }
+        if insight.summary.isEmpty { return "empty summary" }
+        if !validTrends.contains(insight.painAnalysis.trendDirection) {
+            return "invalid trendDirection: \(insight.painAnalysis.trendDirection)"
+        }
+        if insight.painAnalysis.averagePain < 0 || insight.painAnalysis.averagePain > 10 {
+            return "averagePain out of range: \(insight.painAnalysis.averagePain)"
+        }
+        if insight.adherenceAnalysis.score < 0 || insight.adherenceAnalysis.score > 100 {
+            return "adherence score out of range: \(insight.adherenceAnalysis.score)"
+        }
+        if insight.keyWins.isEmpty { return "empty keyWins" }
+        if insight.focusAreas.isEmpty { return "empty focusAreas" }
+        if insight.recommendations.isEmpty { return "empty recommendations" }
+        return nil
+    }
+
     // MARK: - Response Parsing
 
     func parseInsight(from text: String) throws -> RecoveryInsight {
-        guard let jsonData = text.data(using: .utf8) else {
-            throw ClaudeAPIError.decodingError(
-                NSError(domain: "RecoveryInsightsViewModel", code: -1,
-                        userInfo: [NSLocalizedDescriptionKey: "Invalid response text encoding"]))
-        }
-
-        let aiResponse: AIRecoveryInsightResponse
-        do {
-            aiResponse = try JSONDecoder().decode(AIRecoveryInsightResponse.self, from: jsonData)
-        } catch let directError {
-            // Fallback: extract JSON between first { and last }
-            if let startIndex = text.firstIndex(of: "{"),
-               let endIndex = text.lastIndex(of: "}"),
-               startIndex <= endIndex {
-                let jsonSubstring = String(text[startIndex...endIndex])
-                if let fallbackData = jsonSubstring.data(using: .utf8) {
-                    aiResponse = try JSONDecoder().decode(AIRecoveryInsightResponse.self, from: fallbackData)
-                } else {
-                    throw ClaudeAPIError.decodingError(directError)
-                }
-            } else {
-                throw ClaudeAPIError.decodingError(directError)
-            }
-        }
+        // Tier 3 PR C: shadow-mode strict parsing (see ShadowModeJSONParser).
+        let aiResponse = try ShadowModeJSONParser.parse(
+            text,
+            as: AIRecoveryInsightResponse.self,
+            requestType: "recovery_insights"
+        )
 
         return RecoveryInsight(
             id: UUID(),

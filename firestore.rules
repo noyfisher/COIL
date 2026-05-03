@@ -18,5 +18,14 @@ service cloud.firestore {
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
       allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
     }
+
+    // Rate-limit counters (Tier 2 PR B). Only the Cloud Function Admin SDK
+    // touches these — clients must NEVER be able to decrement or delete them
+    // to sidestep the 20/min limit. Explicit deny for clarity; the default
+    // would also be deny, but this prevents a future refactor from leaving
+    // the path open.
+    match /rateLimits/{uid}/windows/{windowKey} {
+      allow read, write: if false;
+    }
   }
 }

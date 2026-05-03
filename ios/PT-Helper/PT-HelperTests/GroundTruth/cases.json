@@ -1,0 +1,607 @@
+{
+  "_NOTE": "Tier 3 PR E v1 ground-truth fixtures. THESE ARE ENGINEERING REGRESSION FIXTURES, NOT A CLINICALLY VALIDATED DATASET. Expected outcomes are approximate and set by engineering judgment, not PT review. Use this to detect PIPELINE drift (did our validators change behavior unexpectedly?), NOT to measure clinical accuracy. A PT-annotated 30+ case dataset is tracked as Tier 3B. Each case's `goldenAnalysisResponse` was hand-authored to match the AIAnalysisResponse shape so the runner can exercise the full validation pipeline without hitting the real API. Once we have an Anthropic key + budget, refresh these from real production runs at the pinned model version.",
+  "version": "1.0",
+  "modelVersion": "claude-haiku-4-5-20251001",
+  "cases": [
+    {
+      "id": "01-pfps-clean",
+      "description": "Patellofemoral pain syndrome — clean differential, no red flags, expected to pass validation cleanly.",
+      "patient": {
+        "age": 32,
+        "sex": "Female",
+        "primaryRegion": "knee",
+        "painIntensity": 5,
+        "painOnset": "Gradual",
+        "aggravatingFactors": ["stairs", "running"],
+        "relievingFactors": ["rest", "ice"],
+        "medicalConditions": [],
+        "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {
+            "conditionName": "Patellofemoral Pain Syndrome",
+            "commonName": "Runner's Knee",
+            "confidence": 75,
+            "explanation": "Pain around the kneecap that worsens with stairs and running fits the typical PFPS pattern.",
+            "whatItMeans": "The cushion under your kneecap is getting irritated from how it's tracking.",
+            "howToManage": "Strengthen your quads and modify activities that aggravate it.",
+            "isRedFlag": false,
+            "redFlagMessage": "",
+            "nextSteps": ["Quad strengthening exercises", "Reduce running volume", "Ice after activity"]
+          },
+          {
+            "conditionName": "Iliotibial Band Syndrome",
+            "commonName": "IT Band Syndrome",
+            "confidence": 45,
+            "explanation": "Lateral knee pain with running can also indicate IT band irritation.",
+            "whatItMeans": "The band on the outside of your thigh may be rubbing against the side of your knee.",
+            "howToManage": "Foam rolling and hip strengthening typically help.",
+            "isRedFlag": false,
+            "redFlagMessage": "",
+            "nextSteps": ["Foam roll the IT band", "Hip abductor strengthening"]
+          }
+        ],
+        "overallSummary": "Most likely runner's knee from training volume — manageable with strengthening and activity modification.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": {
+        "conditions": [
+          {
+            "conditionName": "Patellofemoral Pain Syndrome",
+            "commonName": "Runner's Knee",
+            "confidence": 72,
+            "explanation": "Pain around the kneecap with stairs and running matches PFPS — confirmed after review.",
+            "whatItMeans": "The cushion under your kneecap is irritated from how it's tracking during loading.",
+            "howToManage": "Strengthen quads and modify activities.",
+            "isRedFlag": false,
+            "redFlagMessage": "",
+            "nextSteps": ["Quad strengthening", "Activity modification"]
+          }
+        ],
+        "overallSummary": "Refined: most likely runner's knee from training overload.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "expectedOutcomes": {
+        "minConditionCount": 1,
+        "maxConditionCount": 3,
+        "expectedConditionKeywords": ["patellofemoral", "runner"],
+        "shouldHaveRedFlags": false,
+        "validationShouldBeValid": true
+      }
+    },
+    {
+      "id": "02-cardiac-emergency",
+      "description": "Symptom red flag for cardiac emergency — must surface .emergency severity from MedicalRedFlagDetector regardless of AI output.",
+      "patient": {
+        "age": 58,
+        "sex": "Male",
+        "primaryRegion": "chest",
+        "painIntensity": 8,
+        "painOnset": "Sudden",
+        "aggravatingFactors": ["chest pain", "shortness of breath"],
+        "relievingFactors": [],
+        "medicalConditions": [],
+        "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {
+            "conditionName": "Costochondritis",
+            "commonName": "Chest Wall Inflammation",
+            "confidence": 50,
+            "explanation": "Chest wall inflammation can cause sharp pain that worsens with movement.",
+            "whatItMeans": "The cartilage connecting your ribs to your sternum may be inflamed.",
+            "howToManage": "Anti-inflammatories and gentle stretching.",
+            "isRedFlag": false,
+            "redFlagMessage": "",
+            "nextSteps": ["See a doctor to rule out cardiac causes first"]
+          }
+        ],
+        "overallSummary": "Could be musculoskeletal but cardiac causes must be ruled out first.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {
+        "shouldTriggerSymptomRedFlag": true,
+        "expectedRedFlagSeverity": "emergency",
+        "expectedRedFlagKeywords": ["cardiac", "911"]
+      }
+    },
+    {
+      "id": "03-osteoporosis-balance-comorbidity",
+      "description": "Osteoporosis + balance disorder — the comorbidity interaction map must produce a .serious warning even though neither condition alone would.",
+      "patient": {
+        "age": 71,
+        "sex": "Female",
+        "primaryRegion": "lower_back",
+        "painIntensity": 4,
+        "painOnset": "Gradual",
+        "aggravatingFactors": ["standing for long periods"],
+        "relievingFactors": ["rest"],
+        "medicalConditions": ["Osteoporosis", "balance issues"],
+        "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {
+            "conditionName": "Lumbar Strain",
+            "commonName": "Lower Back Strain",
+            "confidence": 65,
+            "explanation": "Gradual onset back pain with prolonged standing is consistent with a muscle strain.",
+            "whatItMeans": "Muscles in your lower back have been overworked.",
+            "howToManage": "Gentle core strengthening and posture work.",
+            "isRedFlag": false,
+            "redFlagMessage": "",
+            "nextSteps": ["Core strengthening (avoiding loaded flexion)", "Posture awareness"]
+          }
+        ],
+        "overallSummary": "Likely a muscle strain from prolonged standing.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {
+        "minConditionCount": 1,
+        "expectedConditionKeywords": ["lumbar", "strain", "back"]
+      }
+    },
+    {
+      "id": "04-malformed-with-preamble",
+      "description": "Claude wrapped JSON in a leading prose preamble. Shadow-mode parser must rescue via fallback; strict-mode (when flag flips) would reject.",
+      "patient": {
+        "age": 28,
+        "sex": "Male",
+        "primaryRegion": "shoulder",
+        "painIntensity": 3,
+        "painOnset": "Gradual",
+        "aggravatingFactors": ["overhead motion"],
+        "relievingFactors": [],
+        "medicalConditions": [],
+        "medications": []
+      },
+      "rawGoldenResponse": "Here's what I think is going on: {\"conditions\":[{\"conditionName\":\"Shoulder Impingement Syndrome\",\"commonName\":\"Shoulder Impingement\",\"confidence\":70,\"explanation\":\"Overhead pain in a young patient with no trauma fits impingement.\",\"whatItMeans\":\"A tendon is getting pinched as you raise your arm.\",\"howToManage\":\"Avoid aggravating positions, work on scapular control.\",\"isRedFlag\":false,\"redFlagMessage\":\"\",\"nextSteps\":[\"Scapular control exercises\",\"Modify overhead activity\"]}],\"overallSummary\":\"Likely impingement from repetitive overhead motion.\",\"disclaimerText\":\"This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic.\"}",
+      "expectedOutcomes": {
+        "minConditionCount": 1,
+        "expectedConditionKeywords": ["impingement", "shoulder"],
+        "expectedShadowFallbackUsed": true
+      }
+    },
+    {
+      "id": "05-noselfmanage-keyword",
+      "description": "AI-returned condition contains a 'no self-manage' keyword (DVT). MedicalRedFlagDetector.checkConditions must add an .urgent warning.",
+      "patient": {
+        "age": 65,
+        "sex": "Female",
+        "primaryRegion": "calf",
+        "painIntensity": 7,
+        "painOnset": "Sudden",
+        "aggravatingFactors": ["calf swelling", "redness"],
+        "relievingFactors": [],
+        "medicalConditions": [],
+        "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {
+            "conditionName": "Deep Vein Thrombosis",
+            "commonName": "DVT (Blood Clot)",
+            "confidence": 70,
+            "explanation": "Calf swelling, redness, and sudden pain are classic DVT signs.",
+            "whatItMeans": "A blood clot may have formed in a deep vein in your leg.",
+            "howToManage": "This requires emergency medical evaluation.",
+            "isRedFlag": false,
+            "redFlagMessage": "",
+            "nextSteps": ["See a doctor immediately", "Do not massage the leg"]
+          }
+        ],
+        "overallSummary": "DVT presentation — emergency evaluation required.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {
+        "expectedConditionKeywords": ["dvt", "thrombosis"],
+        "shouldTriggerNoSelfManage": true
+      }
+    },
+    {
+      "id": "06-rotator-cuff-strain",
+      "description": "Rotator cuff strain — single-condition shoulder case, validates clean.",
+      "patient": {
+        "age": 45, "sex": "Male", "primaryRegion": "shoulder",
+        "painIntensity": 5, "painOnset": "Gradual",
+        "aggravatingFactors": ["overhead reaching", "lifting"],
+        "relievingFactors": ["rest"],
+        "medicalConditions": [], "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Rotator Cuff Tendinopathy", "commonName": "Rotator Cuff Strain", "confidence": 70, "explanation": "Gradual shoulder pain with overhead activity is a classic rotator cuff pattern.", "whatItMeans": "The tendons in your shoulder are irritated.", "howToManage": "Rest from aggravating motions and start gentle strengthening.", "isRedFlag": false, "redFlagMessage": "", "nextSteps": ["Avoid overhead motion 2 weeks", "Begin scapular control exercises"]}
+        ],
+        "overallSummary": "Likely a rotator cuff strain from repetitive overhead work.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"expectedConditionKeywords": ["rotator", "cuff"], "validationShouldBeValid": true}
+    },
+    {
+      "id": "07-frozen-shoulder",
+      "description": "Frozen shoulder — single-condition with multi-month duration.",
+      "patient": {
+        "age": 52, "sex": "Female", "primaryRegion": "shoulder",
+        "painIntensity": 6, "painOnset": "Gradual",
+        "aggravatingFactors": ["any movement", "reaching back"],
+        "relievingFactors": ["heat"],
+        "medicalConditions": [], "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Adhesive Capsulitis", "commonName": "Frozen Shoulder", "confidence": 75, "explanation": "Progressive stiffness with multi-direction limitation matches frozen shoulder.", "whatItMeans": "The capsule around your shoulder joint has tightened.", "howToManage": "Gentle ROM work over months. Don't force it.", "isRedFlag": false, "redFlagMessage": "", "nextSteps": ["Daily gentle ROM", "Heat before exercises"]}
+        ],
+        "overallSummary": "Pattern fits frozen shoulder — recovery is slow but reliable.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"expectedConditionKeywords": ["frozen", "adhesive"], "validationShouldBeValid": true}
+    },
+    {
+      "id": "08-meniscus-tear",
+      "description": "Knee meniscus injury — clean differential.",
+      "patient": {
+        "age": 38, "sex": "Male", "primaryRegion": "knee",
+        "painIntensity": 6, "painOnset": "Sudden",
+        "aggravatingFactors": ["twisting", "squatting deep"],
+        "relievingFactors": ["rest"],
+        "medicalConditions": [], "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Medial Meniscus Tear", "commonName": "Meniscus Injury", "confidence": 70, "explanation": "Sudden twisting injury with squatting pain fits a meniscus tear.", "whatItMeans": "The cartilage cushion in your knee may be torn.", "howToManage": "Rest, ice, avoid deep squatting. See a PT for assessment.", "isRedFlag": false, "redFlagMessage": "", "nextSteps": ["Ice 20 min 3x daily", "Avoid deep squat", "PT consult"]}
+        ],
+        "overallSummary": "Mechanism + symptoms fit a meniscus tear.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"expectedConditionKeywords": ["meniscus"], "validationShouldBeValid": true}
+    },
+    {
+      "id": "09-ankle-sprain",
+      "description": "Acute ankle sprain — common single-diagnosis.",
+      "patient": {
+        "age": 27, "sex": "Female", "primaryRegion": "ankle",
+        "painIntensity": 7, "painOnset": "Sudden",
+        "aggravatingFactors": ["weight bearing", "stairs"],
+        "relievingFactors": ["elevation", "ice"],
+        "medicalConditions": [], "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Lateral Ankle Sprain", "commonName": "Sprained Ankle", "confidence": 80, "explanation": "Sudden onset with weight-bearing pain is a textbook ankle sprain.", "whatItMeans": "Ligaments on the outside of your ankle stretched or partially tore.", "howToManage": "RICE, then progressive loading.", "isRedFlag": false, "redFlagMessage": "", "nextSteps": ["RICE for 48-72h", "Begin gentle ROM"]}
+        ],
+        "overallSummary": "Lateral ankle sprain — most heal in 2-6 weeks with proper rehab.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"expectedConditionKeywords": ["ankle", "sprain"], "validationShouldBeValid": true}
+    },
+    {
+      "id": "10-tennis-elbow",
+      "description": "Lateral epicondylitis — single-condition with overuse pattern.",
+      "patient": {
+        "age": 41, "sex": "Male", "primaryRegion": "elbow",
+        "painIntensity": 4, "painOnset": "Gradual",
+        "aggravatingFactors": ["gripping", "wrist extension"],
+        "relievingFactors": ["rest"],
+        "medicalConditions": [], "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Lateral Epicondylitis", "commonName": "Tennis Elbow", "confidence": 70, "explanation": "Gradual pain with gripping and wrist extension is the classic pattern.", "whatItMeans": "The tendons that extend your wrist are inflamed where they attach to the elbow.", "howToManage": "Eccentric wrist exercises + activity modification.", "isRedFlag": false, "redFlagMessage": "", "nextSteps": ["Eccentric wrist extensions", "Modify gripping activities"]}
+        ],
+        "overallSummary": "Tennis elbow pattern — eccentric loading is the evidence-backed treatment.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"expectedConditionKeywords": ["epicondylitis", "tennis"], "validationShouldBeValid": true}
+    },
+    {
+      "id": "11-plantar-fasciitis",
+      "description": "Plantar fasciitis — heel pain with first-step pattern.",
+      "patient": {
+        "age": 48, "sex": "Female", "primaryRegion": "foot",
+        "painIntensity": 5, "painOnset": "Gradual",
+        "aggravatingFactors": ["first steps in morning", "after sitting"],
+        "relievingFactors": ["walking briefly"],
+        "medicalConditions": [], "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Plantar Fasciitis", "commonName": "Heel Pain Syndrome", "confidence": 80, "explanation": "First-step morning pain that eases with walking is the textbook plantar fasciitis pattern.", "whatItMeans": "The thick band on the bottom of your foot is inflamed.", "howToManage": "Calf stretching + plantar fascia stretching + supportive footwear.", "isRedFlag": false, "redFlagMessage": "", "nextSteps": ["Calf stretching 3x daily", "Plantar fascia stretch", "Supportive shoes"]}
+        ],
+        "overallSummary": "Classic plantar fasciitis presentation.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"expectedConditionKeywords": ["plantar"], "validationShouldBeValid": true}
+    },
+    {
+      "id": "12-cervical-radiculopathy",
+      "description": "Neck pain with arm radiation — pipeline should add 'professional medical treatment' warning via radiculopathy keyword in noSelfManageKeywords.",
+      "patient": {
+        "age": 50, "sex": "Male", "primaryRegion": "neck",
+        "painIntensity": 6, "painOnset": "Gradual",
+        "aggravatingFactors": ["looking up", "turning head"],
+        "relievingFactors": ["holding head with hands"],
+        "medicalConditions": [], "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Cervical Radiculopathy", "commonName": "Pinched Nerve in Neck", "confidence": 65, "explanation": "Neck pain with arm radiation suggests a nerve root is being compressed.", "whatItMeans": "A nerve as it exits your spine is being irritated, sending pain down your arm.", "howToManage": "See a clinician — needs proper assessment and likely imaging.", "isRedFlag": false, "redFlagMessage": "", "nextSteps": ["Avoid heavy lifting", "Schedule clinical evaluation"]}
+        ],
+        "overallSummary": "Likely a pinched nerve — get this evaluated by a provider.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"expectedConditionKeywords": ["radiculopathy", "nerve"], "shouldTriggerNoSelfManage": true}
+    },
+    {
+      "id": "13-elderly-knee-oa",
+      "description": "Elderly patient with knee OA — demographics test, no red flags.",
+      "patient": {
+        "age": 74, "sex": "Female", "primaryRegion": "knee",
+        "painIntensity": 5, "painOnset": "Gradual",
+        "aggravatingFactors": ["stairs", "standing too long"],
+        "relievingFactors": ["sitting"],
+        "medicalConditions": [], "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Knee Osteoarthritis", "commonName": "Knee Arthritis", "confidence": 80, "explanation": "Age + activity-related knee pain fits OA.", "whatItMeans": "The cartilage in your knee has thinned over time.", "howToManage": "Quad strengthening, low-impact aerobic activity.", "isRedFlag": false, "redFlagMessage": "", "nextSteps": ["Quad sets", "Stationary bike", "Avoid impact activities"]}
+        ],
+        "overallSummary": "Knee OA — low-impact strengthening is the foundation.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"expectedConditionKeywords": ["arthritis", "osteoarthritis"], "validationShouldBeValid": true}
+    },
+    {
+      "id": "14-postpartum-back",
+      "description": "Postpartum lower back pain — demographics test.",
+      "patient": {
+        "age": 33, "sex": "Female", "primaryRegion": "lower_back",
+        "painIntensity": 5, "painOnset": "Gradual",
+        "aggravatingFactors": ["lifting baby", "long sitting"],
+        "relievingFactors": ["lying on side"],
+        "medicalConditions": [], "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Postpartum Lumbopelvic Pain", "commonName": "Postpartum Back Pain", "confidence": 70, "explanation": "Postpartum back pain often relates to pelvic-floor and core changes.", "whatItMeans": "Your core stabilizers are still recovering from pregnancy and delivery.", "howToManage": "Gradual core re-engagement + ergonomics for baby care.", "isRedFlag": false, "redFlagMessage": "", "nextSteps": ["Pelvic-floor breathing exercises", "Modify baby-lifting posture"]}
+        ],
+        "overallSummary": "Common postpartum pattern — gradual core retraining helps.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"expectedConditionKeywords": ["postpartum", "lumbopelvic"], "validationShouldBeValid": true}
+    },
+    {
+      "id": "15-young-athlete-acl-recovery",
+      "description": "Young athlete recovering from ACL surgery — clean differential.",
+      "patient": {
+        "age": 22, "sex": "Male", "primaryRegion": "knee",
+        "painIntensity": 4, "painOnset": "Gradual",
+        "aggravatingFactors": ["jogging", "cutting"],
+        "relievingFactors": ["rest", "ice"],
+        "medicalConditions": [], "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Post-Surgical ACL Recovery Pain", "commonName": "ACL Rehab Pain", "confidence": 75, "explanation": "Persistent post-op pain with cutting movements is common during return-to-sport phases.", "whatItMeans": "Your knee is still rebuilding tolerance to dynamic loads.", "howToManage": "Stay in your PT's progression. Don't push past tolerance.", "isRedFlag": false, "redFlagMessage": "", "nextSteps": ["Follow PT progression", "Notify PT of pain level"]}
+        ],
+        "overallSummary": "Normal pattern in late-stage ACL recovery.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"expectedConditionKeywords": ["acl"], "validationShouldBeValid": true}
+    },
+    {
+      "id": "16-diabetes-pvd-foot",
+      "description": "Diabetes + peripheral vascular disease — comorbidity should fire when AI recommends a barefoot pressure exercise via the validateRehabPlan path. This case validates ANALYSIS only (clean output expected).",
+      "patient": {
+        "age": 65, "sex": "Male", "primaryRegion": "foot",
+        "painIntensity": 4, "painOnset": "Gradual",
+        "aggravatingFactors": ["walking long distances"],
+        "relievingFactors": ["sitting"],
+        "medicalConditions": ["Type 2 Diabetes", "PVD"], "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Diabetic Peripheral Neuropathy", "commonName": "Diabetic Foot Pain", "confidence": 65, "explanation": "Foot pain in diabetes patients is often nerve-related rather than musculoskeletal.", "whatItMeans": "Long-term diabetes can damage nerves in the feet.", "howToManage": "See an endocrinologist + podiatrist. Foot care matters.", "isRedFlag": false, "redFlagMessage": "", "nextSteps": ["Endocrinology follow-up", "Daily foot inspection"]}
+        ],
+        "overallSummary": "Likely diabetic neuropathy — needs medical management.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"expectedConditionKeywords": ["neuropathy", "diabetic"], "shouldTriggerNoSelfManage": true}
+    },
+    {
+      "id": "17-cardiac-htn-back",
+      "description": "Cardiac history + uncontrolled HTN with back pain — clean analysis output, comorbidity check fires only on plan stage.",
+      "patient": {
+        "age": 60, "sex": "Male", "primaryRegion": "lower_back",
+        "painIntensity": 5, "painOnset": "Gradual",
+        "aggravatingFactors": ["sitting too long"],
+        "relievingFactors": ["walking"],
+        "medicalConditions": ["history of MI", "uncontrolled hypertension"], "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Lumbar Strain", "commonName": "Back Strain", "confidence": 65, "explanation": "Sitting-induced back pain that eases with walking is a typical strain pattern.", "whatItMeans": "Muscles in your back are deconditioned from prolonged sitting.", "howToManage": "Movement breaks + gentle core strengthening.", "isRedFlag": false, "redFlagMessage": "", "nextSteps": ["Movement breaks every 30 min", "Gentle core work"]}
+        ],
+        "overallSummary": "Pattern fits a movement-deficient back strain.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"expectedConditionKeywords": ["strain", "lumbar"], "validationShouldBeValid": true}
+    },
+    {
+      "id": "18-bloodthinner-balance-back",
+      "description": "Anticoagulant + balance disorder — comorbidity check fires on plan stage exercises.",
+      "patient": {
+        "age": 70, "sex": "Female", "primaryRegion": "lower_back",
+        "painIntensity": 4, "painOnset": "Gradual",
+        "aggravatingFactors": ["bending"],
+        "relievingFactors": ["lying down"],
+        "medicalConditions": ["warfarin", "balance issues"], "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Lumbar Strain", "commonName": "Back Strain", "confidence": 60, "explanation": "Bending-induced back pain fits a strain.", "whatItMeans": "A muscle or ligament in your back is irritated.", "howToManage": "Gentle movement; supported balance work only.", "isRedFlag": false, "redFlagMessage": "", "nextSteps": ["Heat 15 min", "Gentle stretching"]}
+        ],
+        "overallSummary": "Likely a back strain — keep balance work supported.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"expectedConditionKeywords": ["strain"], "validationShouldBeValid": true}
+    },
+    {
+      "id": "19-postsurgical-cardiac-shoulder",
+      "description": "Recent surgery + cardiac history with shoulder pain — comorbidity case.",
+      "patient": {
+        "age": 62, "sex": "Female", "primaryRegion": "shoulder",
+        "painIntensity": 4, "painOnset": "Gradual",
+        "aggravatingFactors": ["lifting"],
+        "relievingFactors": ["rest"],
+        "medicalConditions": ["recent surgery", "cardiac"], "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Post-Surgical Shoulder Stiffness", "commonName": "Post-Op Shoulder Stiffness", "confidence": 70, "explanation": "Stiffness after surgery is normal during recovery.", "whatItMeans": "Tissues are healing and adapting.", "howToManage": "Follow surgeon's protocol; gentle ROM only.", "isRedFlag": false, "redFlagMessage": "", "nextSteps": ["Follow surgical protocol", "No high-intensity work yet"]}
+        ],
+        "overallSummary": "Normal post-op recovery pattern.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"expectedConditionKeywords": ["post"], "validationShouldBeValid": true}
+    },
+    {
+      "id": "20-cauda-equina-saddle",
+      "description": "Saddle anesthesia + lower back pain — must trigger cauda equina emergency redirect via MedicalRedFlagDetector region-bound pattern.",
+      "patient": {
+        "age": 55, "sex": "Male", "primaryRegion": "lower_back",
+        "painIntensity": 8, "painOnset": "Sudden",
+        "aggravatingFactors": ["saddle numbness", "back pain"],
+        "relievingFactors": [],
+        "medicalConditions": [], "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Lumbar Disc Herniation", "commonName": "Slipped Disc", "confidence": 60, "explanation": "Acute back pain with neurologic symptoms can indicate disc herniation.", "whatItMeans": "A spinal disc may be pressing on nerves.", "howToManage": "Emergency evaluation needed for neurologic symptoms.", "isRedFlag": true, "redFlagMessage": "Saddle numbness with back pain is a medical emergency.", "nextSteps": ["Go to ER immediately"]}
+        ],
+        "overallSummary": "Saddle numbness + back pain — emergency evaluation required.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"shouldTriggerSymptomRedFlag": true, "expectedRedFlagSeverity": "emergency", "expectedRedFlagKeywords": ["cauda equina"]}
+    },
+    {
+      "id": "21-stroke-onset",
+      "description": "Sudden one-sided weakness + numbness — must trigger stroke emergency.",
+      "patient": {
+        "age": 70, "sex": "Male", "primaryRegion": "shoulder",
+        "painIntensity": 6, "painOnset": "Sudden",
+        "aggravatingFactors": ["sudden weakness", "numbness", "one side"],
+        "relievingFactors": [],
+        "medicalConditions": [], "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Acute Cerebrovascular Event", "commonName": "Possible Stroke", "confidence": 70, "explanation": "Sudden one-sided weakness with numbness is a stroke pattern.", "whatItMeans": "Blood flow to part of your brain may be interrupted.", "howToManage": "Call 911 immediately.", "isRedFlag": true, "redFlagMessage": "Possible stroke — call 911 right now.", "nextSteps": ["Call 911"]}
+        ],
+        "overallSummary": "Stroke symptoms — emergency response required.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"shouldTriggerSymptomRedFlag": true, "expectedRedFlagSeverity": "emergency", "expectedRedFlagKeywords": ["stroke", "911"]}
+    },
+    {
+      "id": "22-fracture-deformity",
+      "description": "Visible deformity + can't bear weight — should trigger fracture .urgent (NOT emergency) per the symptom pattern map.",
+      "patient": {
+        "age": 35, "sex": "Female", "primaryRegion": "ankle",
+        "painIntensity": 9, "painOnset": "Sudden",
+        "aggravatingFactors": ["deformity", "unable to bear weight"],
+        "relievingFactors": [],
+        "medicalConditions": [], "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Possible Acute Lower Limb Injury", "commonName": "Acute Limb Injury", "confidence": 60, "explanation": "Sudden severe pain with inability to bear weight needs evaluation.", "whatItMeans": "Could be a fracture or significant ligament injury.", "howToManage": "Imaging required.", "isRedFlag": false, "redFlagMessage": "", "nextSteps": ["Get an x-ray today"]}
+        ],
+        "overallSummary": "Imaging-level injury — get evaluated today.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"shouldTriggerSymptomRedFlag": true, "expectedRedFlagSeverity": "urgent", "expectedRedFlagKeywords": ["fracture"]}
+    },
+    {
+      "id": "23-recent-acl-surgery-history",
+      "description": "Recent ACL reconstruction history affects analysis context.",
+      "patient": {
+        "age": 24, "sex": "Female", "primaryRegion": "knee",
+        "painIntensity": 4, "painOnset": "Gradual",
+        "aggravatingFactors": ["jogging"],
+        "relievingFactors": ["rest"],
+        "medicalConditions": ["recent surgery"], "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Post-Surgical Knee Soreness", "commonName": "Post-Op Knee", "confidence": 65, "explanation": "Soreness during return-to-running after ACL is common.", "whatItMeans": "Knee tissues still adapting to load.", "howToManage": "Follow PT's progression closely.", "isRedFlag": false, "redFlagMessage": "", "nextSteps": ["Stick to PT plan", "No early return to cutting"]}
+        ],
+        "overallSummary": "Normal post-ACL adaptation pain.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"expectedConditionKeywords": ["knee"], "validationShouldBeValid": true}
+    },
+    {
+      "id": "24-osteoporosis-on-meds-knee",
+      "description": "Osteoporosis on bisphosphonates with knee pain — analysis clean; risk shows up at plan stage.",
+      "patient": {
+        "age": 68, "sex": "Female", "primaryRegion": "knee",
+        "painIntensity": 4, "painOnset": "Gradual",
+        "aggravatingFactors": ["stairs"],
+        "relievingFactors": ["sitting"],
+        "medicalConditions": ["osteoporosis"], "medications": ["alendronate"]
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Knee Osteoarthritis", "commonName": "Knee Arthritis", "confidence": 70, "explanation": "Age + activity-related knee pain fits OA.", "whatItMeans": "Cartilage in your knee has thinned.", "howToManage": "Quad strengthening + low-impact aerobic.", "isRedFlag": false, "redFlagMessage": "", "nextSteps": ["Quad sets", "Stationary bike"]}
+        ],
+        "overallSummary": "Knee OA — strengthening helps.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"expectedConditionKeywords": ["arthritis"], "validationShouldBeValid": true}
+    },
+    {
+      "id": "25-bloodthinner-fall-history",
+      "description": "Anticoagulant + history of falls — high-risk patient. Analysis stage produces clean output; risk surfaces at plan generation.",
+      "patient": {
+        "age": 76, "sex": "Female", "primaryRegion": "hip",
+        "painIntensity": 5, "painOnset": "Gradual",
+        "aggravatingFactors": ["walking", "stairs"],
+        "relievingFactors": ["rest"],
+        "medicalConditions": ["history of falls", "warfarin"], "medications": []
+      },
+      "goldenAnalysisResponse": {
+        "conditions": [
+          {"conditionName": "Hip Bursitis", "commonName": "Lateral Hip Pain", "confidence": 60, "explanation": "Lateral hip pain with walking is a classic bursitis pattern.", "whatItMeans": "The cushion on the side of your hip is irritated.", "howToManage": "Hip strengthening + activity modification.", "isRedFlag": false, "redFlagMessage": "", "nextSteps": ["Side-lying hip abduction", "Avoid sleeping on affected side"]}
+        ],
+        "overallSummary": "Lateral hip bursitis pattern — manageable with strengthening.",
+        "disclaimerText": "This is not a medical diagnosis — it's a starting point to help you understand what might be going on. If your pain is severe, getting worse, or not improving, please see a doctor or visit an urgent care clinic."
+      },
+      "goldenVerifyResponse": null,
+      "expectedOutcomes": {"expectedConditionKeywords": ["hip", "bursitis"], "validationShouldBeValid": true}
+    }
+  ]
+}

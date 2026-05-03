@@ -13,6 +13,17 @@ enum ClaudeAPIError: LocalizedError {
     case rateLimited
     case authenticationRequired
 
+    /// Tier 1: true when the server rejected Claude's output via Zod response-schema
+    /// validation (see functions/src/response-schemas.ts). ViewModels should render a
+    /// specific "response was malformed — try again" state rather than the default
+    /// cryptic error string.
+    var isResponseInvalid: Bool {
+        if case let .invalidResponse(statusCode, details) = self {
+            return statusCode == 502 && details.contains("ai_response_invalid")
+        }
+        return false
+    }
+
     var errorDescription: String? {
         switch self {
         case .invalidURL:
@@ -20,6 +31,10 @@ enum ClaudeAPIError: LocalizedError {
         case .networkError(let error):
             return "Network error: \(error.localizedDescription). Please check your internet connection."
         case .invalidResponse(let statusCode, let details):
+            // Tier 1: ai_response_invalid gets a user-friendly message first.
+            if statusCode == 502 && details.contains("ai_response_invalid") {
+                return "The AI response was malformed. Please try again."
+            }
             // Parse Anthropic-style error: { "error": { "message": "..." } }
             if let data = details.data(using: .utf8),
                let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
@@ -93,6 +108,28 @@ protocol ClaudeAPIServiceProtocol {
 class ClaudeAPIService: ClaudeAPIServiceProtocol {
     static let shared = ClaudeAPIService()
 
+    /// Build the telemetry metadata dict logged with each API call event so we can
+    /// diagnose cellular vs. wifi latency. Pure for testability — caller passes
+    /// in the interface type rather than reading NetworkMonitor here.
+    static func makeTelemetryMetadata(
+        requestType: String,
+        interfaceType: String,
+        requestBytes: Int,
+        responseBytes: Int? = nil,
+        elapsedMs: Int? = nil,
+        extras: [String: String] = [:]
+    ) -> [String: String] {
+        var dict: [String: String] = [
+            "requestType": requestType,
+            "interfaceType": interfaceType,
+            "requestBytes": "\(requestBytes)",
+        ]
+        if let responseBytes { dict["responseBytes"] = "\(responseBytes)" }
+        if let elapsedMs { dict["elapsedMs"] = "\(elapsedMs)" }
+        for (k, v) in extras { dict[k] = v }
+        return dict
+    }
+
     private init() {}
 
     // MARK: - Background Task Support
@@ -159,10 +196,18 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
         let encoder = JSONEncoder()
         request.httpBody = try encoder.encode(requestBody)
 
+        let requestBytes = request.httpBody?.count ?? 0
+        let started = Date()
+        func elapsedMsInt() -> Int { Int(Date().timeIntervalSince(started) * 1000) }
+
         // Make the API call
         await MainActor.run {
+            let interfaceType = NetworkMonitor.shared.connectionType.description
             SessionLogger.shared.logAPI(.apiCallStarted, endpoint: "claudeProxy",
-                                         metadata: ["requestType": requestType.rawValue])
+                metadata: Self.makeTelemetryMetadata(
+                    requestType: requestType.rawValue,
+                    interfaceType: interfaceType,
+                    requestBytes: requestBytes))
         }
 
         let data: Data
@@ -170,10 +215,16 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
         do {
             (data, response) = try await URLSession.shared.data(for: request)
         } catch {
+            let elapsed = elapsedMsInt()
             await MainActor.run {
+                let interfaceType = NetworkMonitor.shared.connectionType.description
                 SessionLogger.shared.logAPI(.apiCallFailed, endpoint: "claudeProxy",
-                                             metadata: ["requestType": requestType.rawValue,
-                                                         "error": error.localizedDescription])
+                    metadata: Self.makeTelemetryMetadata(
+                        requestType: requestType.rawValue,
+                        interfaceType: interfaceType,
+                        requestBytes: requestBytes,
+                        elapsedMs: elapsed,
+                        extras: ["error": error.localizedDescription]))
             }
             throw ClaudeAPIError.networkError(error)
         }
@@ -187,26 +238,50 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
         case 200:
             break // Success
         case 401:
+            let elapsed = elapsedMsInt()
+            let responseBytes = data.count
             await MainActor.run {
+                let interfaceType = NetworkMonitor.shared.connectionType.description
                 SessionLogger.shared.logAPI(.apiCallFailed, endpoint: "claudeProxy",
-                                             metadata: ["requestType": requestType.rawValue,
-                                                         "statusCode": "401", "error": "authRequired"])
+                    metadata: Self.makeTelemetryMetadata(
+                        requestType: requestType.rawValue,
+                        interfaceType: interfaceType,
+                        requestBytes: requestBytes,
+                        responseBytes: responseBytes,
+                        elapsedMs: elapsed,
+                        extras: ["statusCode": "401", "error": "authRequired"]))
             }
             throw ClaudeAPIError.authenticationRequired
         case 429:
+            let elapsed = elapsedMsInt()
+            let responseBytes = data.count
             await MainActor.run {
+                let interfaceType = NetworkMonitor.shared.connectionType.description
                 SessionLogger.shared.logAPI(.apiCallFailed, endpoint: "claudeProxy",
-                                             metadata: ["requestType": requestType.rawValue,
-                                                         "statusCode": "429", "error": "rateLimited"])
+                    metadata: Self.makeTelemetryMetadata(
+                        requestType: requestType.rawValue,
+                        interfaceType: interfaceType,
+                        requestBytes: requestBytes,
+                        responseBytes: responseBytes,
+                        elapsedMs: elapsed,
+                        extras: ["statusCode": "429", "error": "rateLimited"]))
             }
             throw ClaudeAPIError.rateLimited
         default:
             let errorBody = String(data: data, encoding: .utf8) ?? "No error details"
             AppLogger.api.error("Claude Proxy Error (\(httpResponse.statusCode)): \(errorBody)")
+            let elapsed = elapsedMsInt()
+            let responseBytes = data.count
             await MainActor.run {
+                let interfaceType = NetworkMonitor.shared.connectionType.description
                 SessionLogger.shared.logAPI(.apiCallFailed, endpoint: "claudeProxy",
-                                             metadata: ["requestType": requestType.rawValue,
-                                                         "statusCode": "\(httpResponse.statusCode)"])
+                    metadata: Self.makeTelemetryMetadata(
+                        requestType: requestType.rawValue,
+                        interfaceType: interfaceType,
+                        requestBytes: requestBytes,
+                        responseBytes: responseBytes,
+                        elapsedMs: elapsed,
+                        extras: ["statusCode": "\(httpResponse.statusCode)"]))
             }
             throw ClaudeAPIError.invalidResponse(httpResponse.statusCode, errorBody)
         }
@@ -227,11 +302,19 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
             throw ClaudeAPIError.noContent
         }
 
+        let elapsed = elapsedMsInt()
+        let responseBytes = data.count
+        let textCount = text.count
         await MainActor.run {
+            let interfaceType = NetworkMonitor.shared.connectionType.description
             SessionLogger.shared.logAPI(.apiCallSucceeded, endpoint: "claudeProxy",
-                                         metadata: ["requestType": requestType.rawValue,
-                                                     "statusCode": "200",
-                                                     "responseLength": "\(text.count)"])
+                metadata: Self.makeTelemetryMetadata(
+                    requestType: requestType.rawValue,
+                    interfaceType: interfaceType,
+                    requestBytes: requestBytes,
+                    responseBytes: responseBytes,
+                    elapsedMs: elapsed,
+                    extras: ["statusCode": "200", "responseLength": "\(textCount)"]))
         }
 
         // Clean up the response — strip markdown code fences if present
@@ -267,9 +350,17 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = "{}".data(using: .utf8)
 
+        let requestBytes = request.httpBody?.count ?? 0
+        let started = Date()
+        func elapsedMsInt() -> Int { Int(Date().timeIntervalSince(started) * 1000) }
+
         await MainActor.run {
+            let interfaceType = NetworkMonitor.shared.connectionType.description
             SessionLogger.shared.logAPI(.apiCallStarted, endpoint: "agentInsights",
-                                         metadata: ["requestType": "recovery_insights_agent"])
+                metadata: Self.makeTelemetryMetadata(
+                    requestType: "recovery_insights_agent",
+                    interfaceType: interfaceType,
+                    requestBytes: requestBytes))
         }
 
         let data: Data
@@ -277,9 +368,16 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
         do {
             (data, response) = try await URLSession.shared.data(for: request)
         } catch {
+            let elapsed = elapsedMsInt()
             await MainActor.run {
+                let interfaceType = NetworkMonitor.shared.connectionType.description
                 SessionLogger.shared.logAPI(.apiCallFailed, endpoint: "agentInsights",
-                                             metadata: ["error": error.localizedDescription])
+                    metadata: Self.makeTelemetryMetadata(
+                        requestType: "recovery_insights_agent",
+                        interfaceType: interfaceType,
+                        requestBytes: requestBytes,
+                        elapsedMs: elapsed,
+                        extras: ["error": error.localizedDescription]))
             }
             throw ClaudeAPIError.networkError(error)
         }
@@ -314,9 +412,19 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
             throw ClaudeAPIError.noContent
         }
 
+        let elapsed = elapsedMsInt()
+        let responseBytes = data.count
+        let textCount = text.count
         await MainActor.run {
+            let interfaceType = NetworkMonitor.shared.connectionType.description
             SessionLogger.shared.logAPI(.apiCallSucceeded, endpoint: "agentInsights",
-                                         metadata: ["responseLength": "\(text.count)"])
+                metadata: Self.makeTelemetryMetadata(
+                    requestType: "recovery_insights_agent",
+                    interfaceType: interfaceType,
+                    requestBytes: requestBytes,
+                    responseBytes: responseBytes,
+                    elapsedMs: elapsed,
+                    extras: ["responseLength": "\(textCount)"]))
         }
 
         return ClaudeAPIService.cleanJSONResponse(text)

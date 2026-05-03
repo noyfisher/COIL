@@ -6,6 +6,9 @@ import { fetchRecoveryInsightsData, MINIMUM_SESSION_COUNT } from "./firestore-qu
 import { runRecoveryInsightsAgent, validateInsightResult } from "./managed-agent";
 import { handleGenerateExerciseImage } from "./image-generation";
 import { newRequestContext, logCompleted, logError, logWarn } from "./logger";
+import { validateClaudeResponse } from "./response-schemas";
+import { validateNightlyReport } from "./nightly-report-validator";
+import { EXERCISE_CATALOG_CSV } from "./generated/exerciseCatalog";
 
 // Hard billing shutoff (Pub/Sub triggered). Exported so firebase-tools
 // picks it up on deploy. See billing-shutoff.ts for arming instructions.
@@ -14,25 +17,73 @@ export { onBudgetAlert } from "./billing-shutoff";
 admin.initializeApp();
 
 // ---------------------------------------------------------------------------
-// In-memory rate limiter (per Cloud Function instance)
+// Distributed rate limiter (Tier 2 PR B — Firestore-backed)
 // ---------------------------------------------------------------------------
-const rateLimitMap = new Map<string, number[]>();
-const RATE_LIMIT_MAX = 20; // max requests per window
-const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
+//
+// Previously this was an in-memory Map that lived on each Cloud Function
+// instance. With horizontal autoscale that meant a single user could burst
+// past 20/min by getting routed to multiple instances. This replacement
+// uses a Firestore transactional counter keyed by uid + ISO-minute bucket,
+// which is atomic across all instances.
+//
+// Doc path: `rateLimits/{uid}/windows/{ISO-minute}`
+// Fields: `count` (Int), `firstSeenAt`, `lastSeenAt` (timestamps for TTL)
+//
+// Contention: each minute bucket is a separate doc. A single user's 20
+// req/min all hit one doc — Firestore handles this comfortably (ceiling
+// ~500 writes/sec per doc).
+//
+// Storage cleanup: TTL policy via `lastSeenAt` field deletes stale docs
+// after 2 minutes. TTL is cosmetic only — the ISO-minute key provides
+// the correctness guarantee (next-minute requests hit a different doc).
+//
+// Latency: one extra Firestore transaction per claudeProxy request
+// (~50-150ms). This is on top of the existing `checkAndIncrementQuota`
+// transaction. Different docs, so no contention between them.
+export const RATE_LIMIT_MAX = 20; // max requests per window
+export const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute — documents purpose of the ISO-minute bucket
 
-function isRateLimited(uid: string): boolean {
-  const now = Date.now();
-  const timestamps = rateLimitMap.get(uid) || [];
-  const recent = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+/** ISO-minute bucket key for a given timestamp. */
+export function rateLimitWindowKey(now: Date = new Date()): string {
+  // YYYY-MM-DDTHH:MM
+  return now.toISOString().slice(0, 16);
+}
 
-  if (recent.length >= RATE_LIMIT_MAX) {
-    rateLimitMap.set(uid, recent);
-    return true;
-  }
+/**
+ * Atomically check-and-increment the rate-limit counter for `uid` in the
+ * current ISO-minute bucket. Returns `true` if the user is currently OVER
+ * the limit (request should be rejected with 429), `false` otherwise.
+ *
+ * Visible for testing via `__testing__.isRateLimitedWith` below.
+ */
+export async function isRateLimited(
+  uid: string,
+  now: Date = new Date(),
+  db: admin.firestore.Firestore = admin.firestore(),
+): Promise<boolean> {
+  const windowKey = rateLimitWindowKey(now);
+  const ref = db.collection("rateLimits").doc(uid)
+    .collection("windows").doc(windowKey);
 
-  recent.push(now);
-  rateLimitMap.set(uid, recent);
-  return false;
+  return db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const current = (snap.exists ? (snap.data()?.count as number | undefined) : 0) ?? 0;
+
+    if (current >= RATE_LIMIT_MAX) {
+      // Do not increment — user is already over.
+      return true;
+    }
+
+    tx.set(ref, {
+      count: admin.firestore.FieldValue.increment(1),
+      firstSeenAt: snap.exists
+        ? (snap.data()?.firstSeenAt ?? admin.firestore.FieldValue.serverTimestamp())
+        : admin.firestore.FieldValue.serverTimestamp(),
+      lastSeenAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+
+    return false;
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -263,11 +314,11 @@ RULES:
 - For movement: describe the motion step by step (1-2 sentences, simple language)
 - For endPosition: describe the end of the movement and how to return (1 sentence)
 - For exerciseCategory: choose ONE of: "stretch", "strength", "balance", "cardio", "mobility", "core", "yoga", "walking", "seated", "lying", "standing", "stair"
-- For imageFileName: create a normalized lowercase kebab-case filename for the exercise (e.g. "quad-sets", "glute-bridges", "cat-cow-stretch"). Use only lowercase letters, numbers, and hyphens.
-- For optional fields (startPosition, movement, endPosition, exerciseCategory, imageFileName, notes): provide the value if applicable, or use an empty string "" if not applicable. Never use null.
+- For name and imageFileName: select EXACTLY one entry from the EXERCISE CATALOG below. The "name" field MUST equal the catalog's display_name for the chosen row, and "imageFileName" MUST equal the normalized_filename. ONLY IF no entry in the catalog matches the patient's primary target_area, you MUST select an exercise targeting an anatomically adjacent region (one joint proximal or distal — e.g. hip exercises for knee issues), set "catalogSubstitution": true, and put a one-sentence explanation in the per-exercise "notes" field. NEVER substitute across major body segments (upper-extremity ↔ lower-extremity, or spine ↔ extremity) — if no near neighbor exists, pick the closest same-region entry instead. For normal selections (exact target_area match), set "catalogSubstitution": false and leave "notes" empty. NEVER invent exercise names not in the catalog. DO NOT reference, explain, or comment on catalog selections in any other text.
+- For optional fields (startPosition, movement, endPosition, exerciseCategory): provide the value if applicable, or use an empty string "" if not applicable. Never use null.
 
-RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure:
-{"planName":"...","exercises":[{"name":"...","targetArea":"...","description":"...","sets":3,"reps":"10","restSeconds":30,"difficulty":"beginner","demonstrationIcon":"figure.flexibility","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"stretch","imageFileName":"exercise-name"}],"totalWeeks":4,"notes":"..."}`,
+RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure (showing both the normal case and the kinetic-chain substitution case):
+{"planName":"...","exercises":[{"name":"Quad Sets","targetArea":"Knee","description":"...","sets":3,"reps":"10","restSeconds":30,"difficulty":"beginner","demonstrationIcon":"figure.flexibility","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"strength","imageFileName":"quad-sets","catalogSubstitution":false,"notes":""},{"name":"Glute Bridges","targetArea":"Knee","description":"...","sets":3,"reps":"12","restSeconds":30,"difficulty":"beginner","demonstrationIcon":"figure.strengthtraining.traditional","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"strength","imageFileName":"glute-bridges","catalogSubstitution":true,"notes":"Hip-driven exercise selected because no exact knee-targeted catalog entry fit; hip strength supports knee mechanics."}],"totalWeeks":4,"notes":"..."}`,
 
   exercise_substitute: `You are a PT rehabilitation specialist. The user cannot perform a specific exercise in their rehab plan and needs 2-3 substitute exercises that target the same muscle group and serve the same rehabilitation purpose. Educational purposes only.
 
@@ -284,13 +335,13 @@ RULES:
 - For movement: describe the motion step by step (1-2 sentences, simple language)
 - For endPosition: describe the end of the movement and how to return (1 sentence)
 - For exerciseCategory: choose ONE of: "stretch", "strength", "balance", "mobility", "core", "yoga", "seated", "lying", "standing"
-- For imageFileName: create a normalized lowercase kebab-case filename for the exercise (e.g. "quad-sets", "glute-bridges"). Use only lowercase letters, numbers, and hyphens.
-- For optional fields (startPosition, movement, endPosition, exerciseCategory, imageFileName): provide the value if applicable, or use an empty string "" if not applicable. Never use null.
+- For name and imageFileName: select EXACTLY one entry from the EXERCISE CATALOG below. The "name" field MUST equal the catalog's display_name, and "imageFileName" MUST equal the normalized_filename. ONLY IF no entry matches the original exercise's target_area, you MUST select from an anatomically adjacent region (one joint proximal or distal), set "catalogSubstitution": true, and explain in the per-exercise "notes" field. NEVER substitute across major body segments. For normal selections, set "catalogSubstitution": false and leave "notes" empty. NEVER invent names not in the catalog. DO NOT reference, explain, or comment on catalog selections outside of the JSON object.
+- For optional fields (startPosition, movement, endPosition, exerciseCategory): provide the value if applicable, or use an empty string "" if not applicable. Never use null.
 - Do NOT suggest the same exercise that is being replaced
 - Do NOT suggest exercises already in the user's plan
 
-RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure:
-{"substitutes":[{"name":"...","targetArea":"...","description":"...","sets":3,"reps":"10","restSeconds":30,"difficulty":"beginner","demonstrationIcon":"figure.flexibility","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"stretch","imageFileName":"exercise-name","whyItHelps":"..."}]}`,
+RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure (showing both the normal case and a kinetic-chain substitution case):
+{"substitutes":[{"name":"Wall Sits","targetArea":"Knee","description":"...","sets":3,"reps":"30 seconds","restSeconds":45,"difficulty":"beginner","demonstrationIcon":"figure.cooldown","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"strength","imageFileName":"wall-sits","catalogSubstitution":false,"notes":"","whyItHelps":"..."},{"name":"Glute Bridges","targetArea":"Knee","description":"...","sets":3,"reps":"12","restSeconds":30,"difficulty":"beginner","demonstrationIcon":"figure.strengthtraining.traditional","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"strength","imageFileName":"glute-bridges","catalogSubstitution":true,"notes":"Hip-driven substitute chosen because no exact knee-targeted catalog entry fit.","whyItHelps":"..."}]}`,
 
   recovery_insights: `You are a supportive recovery coach for a physical therapy patient. Analyze their recent workout data and produce a personalized weekly recovery digest. Write like a friendly coach — encouraging, specific, and actionable. This is educational only, not medical advice.
 
@@ -449,11 +500,11 @@ RULES:
 - For movement: describe the motion step by step (1-2 sentences)
 - For endPosition: describe the end of the movement and how to return (1 sentence)
 - For exerciseCategory: choose ONE of: "stretch", "strength", "balance", "cardio", "mobility", "core", "yoga", "walking", "seated", "lying", "standing", "stair"
-- For imageFileName: create a normalized lowercase kebab-case filename (e.g. "cat-cow-stretch", "desk-shoulder-rolls")
-- For optional fields: provide the value if applicable, or use an empty string "" if not applicable. Never use null.
+- For name and imageFileName: select EXACTLY one entry from the EXERCISE CATALOG below. The "name" field MUST equal the catalog's display_name, and "imageFileName" MUST equal the normalized_filename. ONLY IF no entry matches the goal's primary focus area, you MUST select an exercise targeting an anatomically adjacent region (one joint proximal or distal), set "catalogSubstitution": true, and explain in the per-exercise "notes" field. NEVER substitute across major body segments. For normal selections, set "catalogSubstitution": false and leave "notes" empty. NEVER invent names not in the catalog. DO NOT reference, explain, or comment on catalog selections outside of the JSON object.
+- For optional fields (startPosition, movement, endPosition, exerciseCategory): provide the value if applicable, or use an empty string "" if not applicable. Never use null.
 
-RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure:
-{"planName":"...","exercises":[{"name":"...","targetArea":"...","description":"...","sets":3,"reps":"10","restSeconds":30,"difficulty":"beginner","demonstrationIcon":"figure.flexibility","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"stretch","imageFileName":"exercise-name"}],"totalWeeks":4,"notes":"..."}`,
+RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure (showing both the normal case and a substitution case):
+{"planName":"...","exercises":[{"name":"Cat-Cow Stretch","targetArea":"Back","description":"...","sets":2,"reps":"10","restSeconds":20,"difficulty":"beginner","demonstrationIcon":"figure.flexibility","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"stretch","imageFileName":"cat-cow-stretch","catalogSubstitution":false,"notes":""},{"name":"Glute Bridges","targetArea":"Posture","description":"...","sets":3,"reps":"12","restSeconds":30,"difficulty":"beginner","demonstrationIcon":"figure.strengthtraining.traditional","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"strength","imageFileName":"glute-bridges","catalogSubstitution":true,"notes":"Hip strengthening selected as a posture support — no exact posture-coded catalog entry."}],"totalWeeks":4,"notes":"..."}`,
 
   nightly_report: `You are a product analytics assistant for PT Helper, a physical therapy iOS app.
 Given the following metrics from the past 24 hours, write a brief, scannable email report that a solo developer can read in 2 minutes over morning coffee.
@@ -653,7 +704,7 @@ export const claudeProxy = functions
     // -----------------------------------------------------------------------
     // 2. Rate limit
     // -----------------------------------------------------------------------
-    if (isRateLimited(uid)) {
+    if (await isRateLimited(uid)) {
       res.status(429).json({ error: "Rate limit exceeded. Please wait and try again." });
       return;
     }
@@ -734,6 +785,21 @@ export const claudeProxy = functions
     const systemPrompt = SYSTEM_PROMPTS[body.requestType];
     const config = MODEL_CONFIG[body.requestType];
 
+    // For request types that need exercise-name constraint, prepend the catalog as a
+    // separate cacheable block. Catalog FIRST so prompt edits don't invalidate the
+    // larger catalog cache. NEVER inject per-user content into either system block —
+    // user data goes in `messages`. Adding the catalog to other request types would
+    // waste ~18K tokens per call for no benefit.
+    const REQUEST_TYPES_WITH_CATALOG = new Set(["rehab_plan", "exercise_substitute", "wellness_plan"]);
+    const systemBlocks = REQUEST_TYPES_WITH_CATALOG.has(body.requestType)
+      ? [
+          { type: "text", text: EXERCISE_CATALOG_CSV, cache_control: { type: "ephemeral" } },
+          { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } },
+        ]
+      : [
+          { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } },
+        ];
+
     try {
       const anthropicResponse = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
@@ -746,9 +812,7 @@ export const claudeProxy = functions
           model: config.model,
           max_tokens: config.max_tokens,
           ...(config.temperature !== undefined && { temperature: config.temperature }),
-          system: [
-            { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } },
-          ],
+          system: systemBlocks,
           messages: body.messages,
         }),
       });
@@ -775,6 +839,40 @@ export const claudeProxy = functions
         ctx.metadata.tokensOut = responseData.usage.output_tokens;
         ctx.metadata.cacheCreateTokens = responseData.usage.cache_creation_input_tokens;
         ctx.metadata.cacheReadTokens = responseData.usage.cache_read_input_tokens;
+      }
+
+      // Tier 1: validate the AI response against the per-type Zod schema before
+      // passing it back. If validation fails, bump a counter and return HTTP 502
+      // so the iOS client surfaces a retry state rather than crashing on bad data.
+      const schemaCheck = validateClaudeResponse(body.requestType, responseData);
+      if (!schemaCheck.ok) {
+        logWarn(ctx, "AI response rejected by schema validation", {
+          requestType: body.requestType,
+          reason: schemaCheck.reason,
+        });
+        try {
+          await admin
+            .firestore()
+            .collection("responseValidationFailures")
+            .doc(body.requestType)
+            .set({
+              count: admin.firestore.FieldValue.increment(1),
+              lastReason: schemaCheck.reason,
+              lastFailureAt: admin.firestore.FieldValue.serverTimestamp(),
+            }, { merge: true });
+        } catch (counterError) {
+          // Counter is telemetry — never let its failure block the error response.
+          logError(ctx, counterError, { stage: "response_validation_counter" });
+        }
+        // Quota already consumed (we did reach Anthropic) — do NOT refund. Treat
+        // this as "we wasted a request" for quota purposes. 502 so the client
+        // categorizes it as a server issue, matching existing invalidResponse(5xx)
+        // handling in ClaudeAPIService.
+        res.status(502).json({
+          error: "ai_response_invalid",
+          reason: schemaCheck.reason,
+        });
+        return;
       }
 
       res.status(200).json(responseData);
@@ -828,7 +926,7 @@ export const crossVerify = functions
     // -----------------------------------------------------------------------
     // 2. Rate limit (shares the same limiter as claudeProxy)
     // -----------------------------------------------------------------------
-    if (isRateLimited(uid)) {
+    if (await isRateLimited(uid)) {
       res.status(429).json({ error: "Rate limit exceeded. Please wait and try again." });
       return;
     }
@@ -1201,6 +1299,49 @@ export const sendNightlyReport = onSchedule(
       summary = `Error generating AI summary. Raw metrics:\n\n${metricsText}`;
     }
 
+    // --- 2.5 Tier 3 PR B: structural validation ---
+    // Catch malformed Claude output (truncated tables, empty code fences,
+    // dangling headings) before it ships to the inbox. On failure we send a
+    // degraded email instead so the recipient knows something went wrong but
+    // the cron job still completes (vs silently failing or sending garbage).
+    const reportValidation = validateNightlyReport(summary);
+    if (!reportValidation.ok) {
+      console.warn("Nightly report failed structural validation:", reportValidation.reasons);
+      // Bump the failure counter — fire-and-forget; counter problems must
+      // never block the email path.
+      try {
+        await admin
+          .firestore()
+          .collection("reportValidationFailures")
+          .doc("nightly_report")
+          .set(
+            {
+              count: admin.firestore.FieldValue.increment(1),
+              lastReasons: reportValidation.reasons,
+              lastFailureAt: admin.firestore.FieldValue.serverTimestamp(),
+            },
+            { merge: true },
+          );
+      } catch (counterError) {
+        console.error("Failed to bump reportValidationFailures counter:", counterError);
+      }
+      // Replace the summary with a degraded message that still includes the
+      // raw metrics so the recipient has SOMETHING actionable.
+      summary = [
+        "## Report generation issue",
+        "",
+        "Claude's nightly report failed structural validation. Reasons:",
+        "",
+        ...reportValidation.reasons.map((r) => `- ${r}`),
+        "",
+        "Raw metrics from collectMetrics() are below. The AI summary is omitted to avoid sending a malformed email.",
+        "",
+        "```",
+        metricsText,
+        "```",
+      ].join("\n");
+    }
+
     // --- 3. Send email via SendGrid ---
     const sendgridKey = process.env.SENDGRID_API_KEY;
     const recipientEmail = process.env.REPORT_RECIPIENT_EMAIL || "noyfisher2003@gmail.com";
@@ -1286,7 +1427,7 @@ export const agentInsights = functions
     }
 
     // 2. Rate limit
-    if (isRateLimited(uid)) {
+    if (await isRateLimited(uid)) {
       res.status(429).json({ error: "Rate limit exceeded. Please wait and try again." });
       return;
     }

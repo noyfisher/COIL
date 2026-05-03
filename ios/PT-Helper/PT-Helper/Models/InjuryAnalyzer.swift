@@ -27,6 +27,13 @@ private struct AIConditionResult: Decodable {
 
 class InjuryAnalyzer {
 
+    /// Backend stages reported to progress callbacks so the UI can reflect real work.
+    enum Stage {
+        case primaryAnalysis
+        case verifyingResults
+        case validating
+    }
+
     /// Result of a validated analysis including any safety warnings.
     struct ValidatedAnalysis {
         let result: AnalysisResult
@@ -39,13 +46,22 @@ class InjuryAnalyzer {
     /// Call 1 (Primary Analysis): Structured clinical reasoning with top 5 conditions.
     /// Call 2 (Verification): Devil's advocate review that challenges and refines to top 3.
     /// If Call 2 fails, gracefully falls back to Call 1's result.
-    static func analyze(assessments: [PainAssessment], profile: UserProfile, apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.shared) async throws -> ValidatedAnalysis {
+    ///
+    /// - Parameter onStage: Optional callback invoked when the pipeline enters a new stage.
+    ///   Called from a background task; handlers that touch UI state should hop to the main actor.
+    static func analyze(
+        assessments: [PainAssessment],
+        profile: UserProfile,
+        apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.shared,
+        onStage: (@Sendable (Stage) -> Void)? = nil
+    ) async throws -> ValidatedAnalysis {
 
         // --- Call 1: Primary Analysis ---
         logger.info("Building primary analysis prompt for \(assessments.count) region(s)")
         let userMessage = buildUserMessage(assessments: assessments, profile: profile)
         logger.debug("Prompt length: \(userMessage.count) characters")
 
+        onStage?(.primaryAnalysis)
         logger.info("Sending primary analysis request to Claude API...")
         let primaryResponseText = try await apiService.sendMessage(
             requestType: .analysis,
@@ -66,6 +82,7 @@ class InjuryAnalyzer {
             )
             logger.debug("Verification message length: \(verificationMessage.count) characters")
 
+            onStage?(.verifyingResults)
             logger.info("Sending verification request to Claude API...")
             let verifyResponseText = try await apiService.sendMessage(
                 requestType: .analysis_verify,
@@ -91,6 +108,7 @@ class InjuryAnalyzer {
         }
 
         // Run validation pipeline (same as before)
+        onStage?(.validating)
         logger.info("Running validation pipeline...")
         let (validatedResult, validation, redFlags) = ResponseValidationPipeline.validateAnalysis(
             synthesizedResult,
@@ -354,49 +372,16 @@ class InjuryAnalyzer {
     // MARK: - Response Parsing
 
     static func parseAnalysisResponse(_ text: String, assessments: [PainAssessment], profile: UserProfile) throws -> AnalysisResult {
-        guard let jsonData = text.data(using: .utf8) else {
-            logger.error("Response text could not be converted to UTF-8 data")
-            throw ClaudeAPIError.decodingError(NSError(domain: "InjuryAnalyzer", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response text encoding"]))
-        }
-
-        let aiResponse: AIAnalysisResponse
-        do {
-            aiResponse = try JSONDecoder().decode(AIAnalysisResponse.self, from: jsonData)
-            logger.info("Direct JSON decode succeeded")
-        } catch let directError {
-            logger.warning("Direct JSON decode failed: \(directError.localizedDescription). Attempting fallback extraction...")
-            // Try to extract JSON between first { and last }
-            if let startIndex = text.firstIndex(of: "{"),
-               let endIndex = text.lastIndex(of: "}"),
-               startIndex <= endIndex {
-                let jsonSubstring = String(text[startIndex...endIndex])
-                logger.info("Extracted JSON substring: \(jsonSubstring.count) chars (trimmed \(text.count - jsonSubstring.count) chars)")
-                if let fallbackData = jsonSubstring.data(using: .utf8) {
-                    do {
-                        aiResponse = try JSONDecoder().decode(AIAnalysisResponse.self, from: fallbackData)
-                        logger.info("Fallback JSON decode succeeded")
-                        let trimmed = text.count - jsonSubstring.count
-                        Task { @MainActor in
-                            SessionLogger.shared.log(.stateUpdated, category: .api, message: "Analysis used fallback JSON extraction",
-                                                      metadata: ["trimmedChars": "\(trimmed)"])
-                        }
-                    } catch let fallbackError {
-                        logger.error("Fallback JSON decode also failed: \(fallbackError.localizedDescription)")
-                        let preview = String(jsonSubstring.prefix(200))
-                        logger.error("Response preview: \(preview)")
-                        throw ClaudeAPIError.decodingError(fallbackError)
-                    }
-                } else {
-                    logger.error("Fallback JSON substring could not be converted to UTF-8")
-                    throw ClaudeAPIError.decodingError(directError)
-                }
-            } else {
-                logger.error("No JSON object found in response — no '{' or '}' braces")
-                let preview = String(text.prefix(200))
-                logger.error("Response preview: \(preview)")
-                throw ClaudeAPIError.decodingError(directError)
-            }
-        }
+        // Tier 3 PR C: shadow-mode strict parsing. In shadow mode (default),
+        // behavior is unchanged from before this PR — strict tried first,
+        // permissive fallback on failure, telemetry counter when fallback
+        // saves us. Behind `strictJsonParsingV1Enabled`, strict failure
+        // throws immediately.
+        let aiResponse = try ShadowModeJSONParser.parse(
+            text,
+            as: AIAnalysisResponse.self,
+            requestType: "analysis"
+        )
 
         // Map AI response to our model types
         let conditions = aiResponse.conditions.map { aiCondition in

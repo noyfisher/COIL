@@ -1,0 +1,141 @@
+{
+  "_NOTE": "Tier 3 PR A — comorbidity interaction map. When a user has BOTH conditions in a pair, the listed exercise patterns are flagged at .serious severity (modal acknowledgement gate) — even if neither condition alone would block the exercise. Sources cited per entry. v1 is dev-curated from APTA + Goodman & Snyder published guidelines; PT review is recommended but not required for these high-evidence common pairs.",
+  "version": "1.0",
+  "aliases": {
+    "_NOTE": "Maps user-entered free-text to canonical condition IDs used in interactions[]. Lowercase keys; matches via exact key OR substring containment AFTER lowercasing + collapsing whitespace to underscores.",
+    "osteoporosis": "osteoporosis",
+    "low bone density": "osteoporosis",
+    "osteopenia": "osteoporosis",
+    "balance disorder": "balance_disorder",
+    "balance issues": "balance_disorder",
+    "fall risk": "balance_disorder",
+    "vertigo": "balance_disorder",
+    "vestibular": "balance_disorder",
+    "history of falls": "balance_disorder",
+    "diabetes": "diabetes",
+    "type 2 diabetes": "diabetes",
+    "type 1 diabetes": "diabetes",
+    "diabetic": "diabetes",
+    "peripheral vascular disease": "peripheral_vascular_disease",
+    "pvd": "peripheral_vascular_disease",
+    "peripheral artery disease": "peripheral_vascular_disease",
+    "pad": "peripheral_vascular_disease",
+    "claudication": "peripheral_vascular_disease",
+    "cardiac": "cardiac_history",
+    "heart disease": "cardiac_history",
+    "history of mi": "cardiac_history",
+    "hx of mi": "cardiac_history",
+    "myocardial infarction": "cardiac_history",
+    "cabg": "cardiac_history",
+    "stent": "cardiac_history",
+    "coronary artery disease": "cardiac_history",
+    "uncontrolled hypertension": "uncontrolled_htn",
+    "uncontrolled htn": "uncontrolled_htn",
+    "high blood pressure": "uncontrolled_htn",
+    "corticosteroid use": "corticosteroid_use",
+    "prednisone": "corticosteroid_use",
+    "long-term steroids": "corticosteroid_use",
+    "recent injury": "recent_injury",
+    "acute injury": "recent_injury",
+    "blood thinner": "blood_thinner",
+    "blood thinners": "blood_thinner",
+    "warfarin": "blood_thinner",
+    "coumadin": "blood_thinner",
+    "eliquis": "blood_thinner",
+    "xarelto": "blood_thinner",
+    "anticoagulant": "blood_thinner",
+    "post-surgical": "post_surgical",
+    "post-op": "post_surgical",
+    "recent surgery": "post_surgical",
+    "post operative": "post_surgical",
+    "peripheral neuropathy": "peripheral_neuropathy",
+    "neuropathy": "peripheral_neuropathy",
+    "diabetic neuropathy": "peripheral_neuropathy",
+    "rheumatoid arthritis": "rheumatoid_arthritis",
+    "ra": "rheumatoid_arthritis",
+    "lupus": "autoimmune_inflammatory",
+    "psoriatic arthritis": "autoimmune_inflammatory"
+  },
+  "interactions": [
+    {
+      "condition_a": "osteoporosis",
+      "condition_b": "balance_disorder",
+      "exercises": ["single-leg", "single leg", "bosu", "balance board", "tandem stand", "tightrope walk", "wobble"],
+      "severity": "serious",
+      "source": "APTA fall-prevention guidelines + WHO Decade of Healthy Ageing",
+      "note": "Unsupported balance work raises fall risk above what bone density tolerates. Either condition alone is .caution; combined → .serious."
+    },
+    {
+      "condition_a": "diabetes",
+      "condition_b": "peripheral_vascular_disease",
+      "exercises": ["plantar pressure", "barefoot", "heel walk", "toe raise barefoot", "high impact", "running"],
+      "severity": "serious",
+      "source": "ADA + American Heart Association joint statement on diabetic foot care",
+      "note": "Plantar / weight-bearing impact work amplifies foot-injury risk in diabetic PVD. Inspection without sensation = unsafe."
+    },
+    {
+      "condition_a": "diabetes",
+      "condition_b": "peripheral_neuropathy",
+      "exercises": ["plantar pressure", "barefoot", "balance", "step-up", "high impact", "running", "single-leg"],
+      "severity": "serious",
+      "source": "ACSM Diabetes Position Statement",
+      "note": "Neuropathy + glycemic-related vascular fragility → undetected micro-trauma. Pool, recumbent, or seated alternatives required."
+    },
+    {
+      "condition_a": "cardiac_history",
+      "condition_b": "uncontrolled_htn",
+      "exercises": ["valsalva", "heavy lift", "isometric overhead hold", "deadlift", "max effort", "1rm"],
+      "severity": "serious",
+      "source": "AHA/ACC exercise prescription guidelines",
+      "note": "Valsalva-risk exercises spike systolic load. Both conditions independently are .caution; combined needs medical clearance."
+    },
+    {
+      "condition_a": "corticosteroid_use",
+      "condition_b": "recent_injury",
+      "exercises": ["heavy", "high load", "max effort", "plyometric", "rapid eccentric"],
+      "severity": "serious",
+      "source": "Goodman & Snyder, Differential Diagnosis 6e — chapter on tendon/ligament integrity under steroids",
+      "note": "Long-term steroids weaken tendon/ligament; combined with acute injury, heavy or eccentric loading risks rupture."
+    },
+    {
+      "condition_a": "blood_thinner",
+      "condition_b": "balance_disorder",
+      "exercises": ["single-leg", "bosu", "balance board", "tandem", "tightrope", "high impact"],
+      "severity": "serious",
+      "source": "AAOS + American Society of Hematology",
+      "note": "Any fall on anticoagulants risks intracranial / retroperitoneal bleed. Each alone is .caution; pair upgrades."
+    },
+    {
+      "condition_a": "post_surgical",
+      "condition_b": "cardiac_history",
+      "exercises": ["high intensity", "max effort", "valsalva", "interval", "hiit"],
+      "severity": "serious",
+      "source": "AACVPR cardiac rehab guidelines — postsurgical reentry protocols",
+      "note": "Post-surgical recovery + cardiac history requires HR / RPE monitoring and graded reentry. Skip high-intensity until cleared."
+    },
+    {
+      "condition_a": "osteoporosis",
+      "condition_b": "post_surgical",
+      "exercises": ["high impact", "jumping", "plyometric", "twisting under load", "loaded spinal flexion"],
+      "severity": "serious",
+      "source": "NOF Clinician's Guide to Prevention and Treatment of Osteoporosis",
+      "note": "Reduced bone density + post-op tissue healing = compounded fracture risk. Avoid loaded flexion / impact entirely until surgeon clears."
+    },
+    {
+      "condition_a": "rheumatoid_arthritis",
+      "condition_b": "corticosteroid_use",
+      "exercises": ["heavy", "high load", "plyometric", "rapid eccentric", "max effort"],
+      "severity": "serious",
+      "source": "ACR/EULAR exercise recommendations for inflammatory arthritis",
+      "note": "RA flare + chronic steroid use = compromised tendon integrity. Use lighter loading, slower tempo."
+    },
+    {
+      "condition_a": "blood_thinner",
+      "condition_b": "recent_injury",
+      "exercises": ["high impact", "contact", "plyometric", "rapid eccentric"],
+      "severity": "serious",
+      "source": "AAOS post-injury management",
+      "note": "Anticoagulants + recent soft-tissue injury = continued bleeding risk. Avoid impact / aggressive loading until cleared."
+    }
+  ]
+}

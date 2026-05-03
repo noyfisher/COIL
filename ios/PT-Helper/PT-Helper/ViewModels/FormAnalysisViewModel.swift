@@ -162,6 +162,12 @@ class FormAnalysisViewModel: ObservableObject {
         } catch {
             state = .error(error.localizedDescription)
 
+            // Tier 1: ai_response_invalid breadcrumb (server Zod rejection).
+            if let apiError = error as? ClaudeAPIError, apiError.isResponseInvalid {
+                SessionLogger.shared.log(.errorOccurred, category: .api,
+                    message: "Form analysis rejected by server schema (ai_response_invalid)",
+                    metadata: ["error_kind": "ai_response_invalid"])
+            }
             SessionLogger.shared.log(.errorOccurred, category: .error,
                                       message: "Form analysis failed",
                                       metadata: ["error": error.localizedDescription])
@@ -282,30 +288,12 @@ class FormAnalysisViewModel: ObservableObject {
     // MARK: - Response Parsing
 
     private func parseFormFeedback(from text: String, exerciseName: String) throws -> FormFeedback {
-        guard let jsonData = text.data(using: .utf8) else {
-            throw ClaudeAPIError.decodingError(
-                NSError(domain: "FormAnalysisViewModel", code: -1,
-                        userInfo: [NSLocalizedDescriptionKey: "Invalid response encoding"]))
-        }
-
-        let aiResponse: AIFormFeedbackResponse
-        do {
-            aiResponse = try JSONDecoder().decode(AIFormFeedbackResponse.self, from: jsonData)
-        } catch let directError {
-            // Fallback: extract JSON between first { and last }
-            if let startIndex = text.firstIndex(of: "{"),
-               let endIndex = text.lastIndex(of: "}"),
-               startIndex <= endIndex {
-                let jsonSubstring = String(text[startIndex...endIndex])
-                if let fallbackData = jsonSubstring.data(using: .utf8) {
-                    aiResponse = try JSONDecoder().decode(AIFormFeedbackResponse.self, from: fallbackData)
-                } else {
-                    throw ClaudeAPIError.decodingError(directError)
-                }
-            } else {
-                throw ClaudeAPIError.decodingError(directError)
-            }
-        }
+        // Tier 3 PR C: shadow-mode strict parsing (see ShadowModeJSONParser).
+        let aiResponse = try ShadowModeJSONParser.parse(
+            text,
+            as: AIFormFeedbackResponse.self,
+            requestType: "form_analysis"
+        )
 
         let verdict: FormFeedback.Verdict = {
             switch aiResponse.verdict.lowercased() {

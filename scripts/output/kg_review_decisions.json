@@ -1,0 +1,3831 @@
+{
+  "herniated-disc|prone-press-up": {
+    "decision": "flip",
+    "edited_reason": "Prone press-up is the McKenzie directional-preference treatment of choice for posterolateral disc derangement (Grade A evidence per JOSPT 2018 meta-analysis https://www.jospt.org/doi/10.2519/jospt.2018.7562). v1 KG already curates this as SAFE for herniated-disc. AI's 'absolute contraindication' contradicts both clinical practice and the existing curation."
+  },
+  "herniated-disc|standing-back-extension": {
+    "decision": "flip",
+    "edited_reason": "Extension-bias movement, supported as first-line for directional-preference responders per McKenzie/MDT (JOSPT 2018). v1 KG already curates this as SAFE for herniated-disc. NASS guideline (https://www.guidelinecentral.com/guideline/9905/) does not contraindicate any specific movement."
+  },
+  "herniated-disc|foam-roller-thoracic-extension": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: this is THORACIC extension over a foam roller, a routine posture/mobility drill. Lumbar lordosis impact is minimal with proper positioning. JOSPT 2021 LBP CPG (PMC10508241) does not prohibit thoracic mobility for lumbar disc patients."
+  },
+  "herniated-disc|marble-pickup": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: marble-pickup is a FOOT/TOE intrinsic exercise (scrunch marbles with toes from a seated position). Not a forward-bending lumbar exercise. AI mis-classified as loaded forward bend."
+  },
+  "herniated-disc|neck-rotations": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: cervical exercise, irrelevant to lumbar disc pathology. AI's 'shear/torsional forces increase disc herniation risk' fails to specify spinal level \u2014 cervical rotation does not load the lumbar disc."
+  },
+  "herniated-disc|neck-side-bends": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: cervical lateral flexion does not affect lumbar disc material. AI's reasoning conflates spinal levels."
+  },
+  "herniated-disc|seated-spinal-twist": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG curation (already in unsafeExercises). Loaded rotation through lumbar segments is a recognized provocateur for posterolateral disc."
+  },
+  "herniated-disc|lumbar-rotation-stretch": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises). Rotation under flexion is mechanistically high-risk for nuclear migration."
+  },
+  "herniated-disc|seated-long-sitting-stretch": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises). Sustained long-sitting flexion is a classic flexion-bias provocateur."
+  },
+  "herniated-disc|superman-exercise": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises). End-range loaded extension with arm + leg lift exceeds tolerable load for irritable disc patients (distinct from low-load prone-press-up)."
+  },
+  "herniated-disc|knee-to-chest-stretch": {
+    "decision": "approve"
+  },
+  "herniated-disc|seated-hamstring-stretch": {
+    "decision": "approve"
+  },
+  "herniated-disc|seated-trunk-rotation": {
+    "decision": "approve"
+  },
+  "herniated-disc|thread-the-needle": {
+    "decision": "approve"
+  },
+  "herniated-disc|hip-hinge": {
+    "decision": "approve"
+  },
+  "herniated-disc|single-leg-deadlift": {
+    "decision": "approve"
+  },
+  "herniated-disc|straight-leg-raises": {
+    "decision": "approve"
+  },
+  "herniated-disc|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "herniated-disc|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "herniated-disc|lower-back-release-roll": {
+    "decision": "approve"
+  },
+  "herniated-disc|90-90-hip-stretch": {
+    "decision": "reject"
+  },
+  "herniated-disc|bulgarian-split-squat": {
+    "decision": "reject"
+  },
+  "herniated-disc|fire-hydrants": {
+    "decision": "reject"
+  },
+  "herniated-disc|heel-drops": {
+    "decision": "reject"
+  },
+  "herniated-disc|prone-hamstring-curl": {
+    "decision": "reject"
+  },
+  "herniated-disc|prone-hip-extension": {
+    "decision": "reject"
+  },
+  "herniated-disc|prone-hip-extension-pulse": {
+    "decision": "reject"
+  },
+  "herniated-disc|prone-knee-flexion": {
+    "decision": "reject"
+  },
+  "herniated-disc|prone-shoulder-flexion": {
+    "decision": "reject"
+  },
+  "herniated-disc|prone-t-raises": {
+    "decision": "reject"
+  },
+  "herniated-disc|prone-y-raises": {
+    "decision": "reject"
+  },
+  "herniated-disc|standing-hip-flexor-and-quad-stretch-evening-wind-down": {
+    "decision": "reject"
+  },
+  "herniated-disc|standing-quad-stretch": {
+    "decision": "reject"
+  },
+  "herniated-disc|wall-sits": {
+    "decision": "reject"
+  },
+  "herniated-disc|wall-squat-with-ball": {
+    "decision": "reject"
+  },
+  "herniated-disc|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "herniated-disc|cat-cow-stretch": {
+    "decision": "approve"
+  },
+  "herniated-disc|childs-pose": {
+    "decision": "approve"
+  },
+  "herniated-disc|childs-pose-with-side-reach": {
+    "decision": "approve"
+  },
+  "herniated-disc|couch-stretch-hip-flexor-lengthening": {
+    "decision": "approve"
+  },
+  "herniated-disc|double-knee-to-chest": {
+    "decision": "approve"
+  },
+  "herniated-disc|glute-bridge": {
+    "decision": "approve"
+  },
+  "herniated-disc|glute-bridge-hold": {
+    "decision": "approve"
+  },
+  "herniated-disc|glute-bridge-with-isometric-hold": {
+    "decision": "approve"
+  },
+  "herniated-disc|glute-bridges": {
+    "decision": "approve"
+  },
+  "herniated-disc|hamstring-curls": {
+    "decision": "approve"
+  },
+  "herniated-disc|hamstring-stretch-with-strap": {
+    "decision": "approve"
+  },
+  "herniated-disc|hip-circles": {
+    "decision": "approve"
+  },
+  "herniated-disc|hip-flexor-stretch": {
+    "decision": "approve"
+  },
+  "herniated-disc|internal-rotation": {
+    "decision": "approve"
+  },
+  "herniated-disc|it-band-stretch": {
+    "decision": "approve"
+  },
+  "herniated-disc|lat-pulldown-with-band": {
+    "decision": "approve"
+  },
+  "herniated-disc|lat-stretches": {
+    "decision": "approve"
+  },
+  "herniated-disc|lateral-step-ups": {
+    "decision": "approve"
+  },
+  "herniated-disc|lying-hip-flexor-stretch": {
+    "decision": "approve"
+  },
+  "herniated-disc|open-book-stretch": {
+    "decision": "approve"
+  },
+  "herniated-disc|overhead-tricep-stretch": {
+    "decision": "approve"
+  },
+  "herniated-disc|piriformis-stretch": {
+    "decision": "approve"
+  },
+  "herniated-disc|plank": {
+    "decision": "approve"
+  },
+  "herniated-disc|prone-glute-squeeze-holds": {
+    "decision": "approve"
+  },
+  "herniated-disc|prone-i-y-t-raises": {
+    "decision": "approve"
+  },
+  "herniated-disc|prone-i-y-t-shoulder-activation": {
+    "decision": "approve"
+  },
+  "herniated-disc|prone-scapular-retraction": {
+    "decision": "approve"
+  },
+  "herniated-disc|quadruped-hip-flexor-march": {
+    "decision": "approve"
+  },
+  "herniated-disc|quadruped-thoracic-rotation": {
+    "decision": "approve"
+  },
+  "herniated-disc|sciatic-nerve-glide": {
+    "decision": "approve"
+  },
+  "herniated-disc|seated-figure-four-stretch": {
+    "decision": "approve"
+  },
+  "herniated-disc|seated-knee-extension": {
+    "decision": "approve"
+  },
+  "herniated-disc|seated-shoulder-press": {
+    "decision": "approve"
+  },
+  "herniated-disc|side-plank": {
+    "decision": "approve"
+  },
+  "herniated-disc|single-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "herniated-disc|standing-hip-flexion": {
+    "decision": "approve"
+  },
+  "herniated-disc|step-ups": {
+    "decision": "approve"
+  },
+  "herniated-disc|supine-figure-4-stretch-with-pelvic-mobilization": {
+    "decision": "approve"
+  },
+  "herniated-disc|supine-hip-flexion": {
+    "decision": "approve"
+  },
+  "herniated-disc|supine-iliopsoas-stretch": {
+    "decision": "approve"
+  },
+  "herniated-disc|supported-cat-cow-stretch": {
+    "decision": "approve"
+  },
+  "herniated-disc|tennis-ball-roll": {
+    "decision": "approve"
+  },
+  "herniated-disc|towel-curls": {
+    "decision": "approve"
+  },
+  "herniated-disc|wall-push-ups": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|knee-to-chest-stretch": {
+    "decision": "flip",
+    "edited_reason": "Lumbar flexion-bias exercises are FIRST-LINE for spinal stenosis \u2014 flexion increases spinal canal cross-section, while extension reduces it by 67% in stenotic spines (Ammendolia 2021 CPG https://www.jpain.org/article/S1526-5900(21)00188-7/fulltext). v1 KG curates this as SAFE for spinal-stenosis. AI's 'narrows canal' mechanism is inverted."
+  },
+  "spinal-stenosis|seated-spinal-twist": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates this as SAFE for spinal-stenosis. Rotation is not the primary biomechanical concern for stenosis (flexion-vs-extension is); foraminal narrowing from rotation alone is minor at the seated end-range used here."
+  },
+  "spinal-stenosis|wall-sits": {
+    "decision": "flip",
+    "edited_reason": "AI's mechanism is inverted: 'sustained lumbar flexion narrows canal' is wrong \u2014 flexion OPENS the stenotic canal (Ammendolia 2021). Wall sit's posterior pelvic tilt against the wall is a flexion-bias position therapeutic for stenosis."
+  },
+  "spinal-stenosis|wall-squat-with-ball": {
+    "decision": "flip",
+    "edited_reason": "Same inverted mechanism as wall-sits: lumbar flexion is therapeutic for stenosis, not contraindicated."
+  },
+  "spinal-stenosis|marble-pickup": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: marble-pickup is a foot/toe intrinsic exercise. Even taken at face value as 'forward bending,' flexion-bias is therapeutic for stenosis (Ammendolia 2021 CPG)."
+  },
+  "spinal-stenosis|neck-rotations": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: cervical exercise. v1 KG treats spinal-stenosis as lumbar (safeExercises includes lumbar flexion-bias drills like child's pose, knee-to-chest, prayer-stretch). Cervical rotation does not affect lumbar canal."
+  },
+  "spinal-stenosis|neck-side-bends": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: cervical lateral flexion does not affect lumbar canal in lumbar-spinal-stenosis (the v1 default interpretation)."
+  },
+  "spinal-stenosis|isometric-cervical-extension": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: cervical isometric work does not affect lumbar canal."
+  },
+  "spinal-stenosis|foam-roller-thoracic-extension": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: thoracic extension over a foam roller does not significantly affect lumbar canal cross-section."
+  },
+  "spinal-stenosis|prone-press-up": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises). Extension reduces stenotic canal cross-section by 67% (Ammendolia 2021); prone press-up is the maximal extension provocation."
+  },
+  "spinal-stenosis|standing-back-extension": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises). Direct lumbar extension reproduces neurogenic claudication."
+  },
+  "spinal-stenosis|superman-exercise": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises). End-range loaded extension."
+  },
+  "spinal-stenosis|prone-hip-extension": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|prone-hip-extension-pulse": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|prone-y-raises": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|prone-t-raises": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|prone-i-y-t-raises": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|prone-i-y-t-shoulder-activation": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|prone-knee-flexion": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|prone-hamstring-curl": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|prone-glute-squeeze-holds": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|prone-scapular-retraction": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|prone-shoulder-flexion": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|standing-hip-extension": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|standing-quad-stretch": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|standing-hip-flexor-and-quad-stretch-evening-wind-down": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|bulgarian-split-squat": {
+    "decision": "reject"
+  },
+  "spinal-stenosis|double-leg-calf-raise": {
+    "decision": "reject"
+  },
+  "spinal-stenosis|eccentric-calf-lowering": {
+    "decision": "reject"
+  },
+  "spinal-stenosis|heel-drops": {
+    "decision": "reject"
+  },
+  "spinal-stenosis|fire-hydrants": {
+    "decision": "reject"
+  },
+  "spinal-stenosis|lateral-step-ups": {
+    "decision": "reject"
+  },
+  "spinal-stenosis|lower-back-release-roll": {
+    "decision": "reject"
+  },
+  "spinal-stenosis|lumbar-rotation-stretch": {
+    "decision": "reject"
+  },
+  "spinal-stenosis|plank": {
+    "decision": "reject"
+  },
+  "spinal-stenosis|side-plank": {
+    "decision": "reject"
+  },
+  "spinal-stenosis|seated-trunk-rotation": {
+    "decision": "reject"
+  },
+  "spinal-stenosis|single-leg-deadlift": {
+    "decision": "reject"
+  },
+  "spinal-stenosis|straight-leg-raises": {
+    "decision": "reject"
+  },
+  "spinal-stenosis|thread-the-needle": {
+    "decision": "reject"
+  },
+  "spinal-stenosis|90-90-hip-stretch": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|cat-cow-stretch": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|foam-roller-it-band": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|foam-roller-quad": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|half-kneeling-pallof-press": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|hamstring-curls": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|heel-toe-walking": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|hip-flexor-stretch": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|it-band-stretch": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|lat-pulldown-with-band": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|median-nerve-glide": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|pallof-press": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|quadruped-thoracic-rotation": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|sciatic-nerve-glide": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|seated-figure-four-stretch": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|seated-long-sitting-stretch": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|single-leg-balance": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|single-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|standing-calf-raises": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|standing-hamstring-curl": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|step-ups": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|supported-cat-cow-stretch": {
+    "decision": "approve"
+  },
+  "spinal-stenosis|tennis-ball-roll": {
+    "decision": "approve"
+  },
+  "lumbar-strain|lumbar-rotation-stretch": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates this as SAFE for lumbar-strain (gentle rotation in supine is part of standard mobility rehab once acute phase passes). AI's 'rotation under stretch loads injured discs' conflates strain (soft-tissue) with disc pathology \u2014 different conditions."
+  },
+  "lumbar-strain|marble-pickup": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: marble-pickup is a FOOT/TOE intrinsic exercise, not a loaded forward-bending lumbar exercise."
+  },
+  "lumbar-strain|plank": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates plank as UNSAFE for lumbar-strain (acute phase isometric core loading is typically deferred). AI hedged 'unclear'; align with v1 and treat as contraindicated for acute strain."
+  },
+  "lumbar-strain|prone-press-up": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises). Maximal extension under load is contraindicated in acute strain (different rationale than for disc \u2014 here it's healing soft-tissue, not directional preference)."
+  },
+  "lumbar-strain|standing-back-extension": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "lumbar-strain|superman-exercise": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "lumbar-strain|bulgarian-split-squat": {
+    "decision": "approve"
+  },
+  "lumbar-strain|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "lumbar-strain|lower-back-release-roll": {
+    "decision": "approve"
+  },
+  "lumbar-strain|prone-t-raises": {
+    "decision": "approve"
+  },
+  "lumbar-strain|prone-y-raises": {
+    "decision": "approve"
+  },
+  "lumbar-strain|seated-long-sitting-stretch": {
+    "decision": "approve"
+  },
+  "lumbar-strain|seated-spinal-twist": {
+    "decision": "approve"
+  },
+  "lumbar-strain|seated-trunk-rotation": {
+    "decision": "approve"
+  },
+  "lumbar-strain|side-plank": {
+    "decision": "approve"
+  },
+  "lumbar-strain|single-leg-deadlift": {
+    "decision": "approve"
+  },
+  "lumbar-strain|straight-leg-raises": {
+    "decision": "approve"
+  },
+  "lumbar-strain|heel-drops": {
+    "decision": "reject"
+  },
+  "lumbar-strain|prone-shoulder-flexion": {
+    "decision": "reject"
+  },
+  "lumbar-strain|90-90-hip-stretch": {
+    "decision": "approve"
+  },
+  "lumbar-strain|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "lumbar-strain|copenhagen-adduction": {
+    "decision": "approve"
+  },
+  "lumbar-strain|double-knee-to-chest": {
+    "decision": "approve"
+  },
+  "lumbar-strain|fire-hydrants": {
+    "decision": "approve"
+  },
+  "lumbar-strain|hamstring-curls": {
+    "decision": "approve"
+  },
+  "lumbar-strain|heel-toe-walking": {
+    "decision": "approve"
+  },
+  "lumbar-strain|hip-circles": {
+    "decision": "approve"
+  },
+  "lumbar-strain|hip-hinge": {
+    "decision": "approve"
+  },
+  "lumbar-strain|knee-to-chest-stretch": {
+    "decision": "approve"
+  },
+  "lumbar-strain|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "lumbar-strain|lateral-step-ups": {
+    "decision": "approve"
+  },
+  "lumbar-strain|pallof-press": {
+    "decision": "approve"
+  },
+  "lumbar-strain|prone-hamstring-curl": {
+    "decision": "approve"
+  },
+  "lumbar-strain|prone-knee-flexion": {
+    "decision": "approve"
+  },
+  "lumbar-strain|quadruped-hip-flexor-march": {
+    "decision": "approve"
+  },
+  "lumbar-strain|quadruped-thoracic-rotation": {
+    "decision": "approve"
+  },
+  "lumbar-strain|sciatic-nerve-glide": {
+    "decision": "approve"
+  },
+  "lumbar-strain|seated-figure-four-stretch": {
+    "decision": "approve"
+  },
+  "lumbar-strain|seated-hamstring-stretch": {
+    "decision": "approve"
+  },
+  "lumbar-strain|seated-shoulder-press": {
+    "decision": "approve"
+  },
+  "lumbar-strain|side-lying-hip-abduction": {
+    "decision": "approve"
+  },
+  "lumbar-strain|single-leg-balance": {
+    "decision": "approve"
+  },
+  "lumbar-strain|single-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "lumbar-strain|step-ups": {
+    "decision": "approve"
+  },
+  "lumbar-strain|supine-figure-4-stretch-with-pelvic-mobilization": {
+    "decision": "approve"
+  },
+  "lumbar-strain|supine-hip-flexion": {
+    "decision": "approve"
+  },
+  "lumbar-strain|supported-cat-cow-stretch": {
+    "decision": "approve"
+  },
+  "lumbar-strain|tennis-ball-roll": {
+    "decision": "approve"
+  },
+  "lumbar-strain|wall-sits": {
+    "decision": "approve"
+  },
+  "lumbar-strain|wall-squat-with-ball": {
+    "decision": "approve"
+  },
+  "sciatica|seated-figure-four-stretch": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates this as SAFE for sciatica (piriformis stretch is part of the standard sciatica protocol along with sciatic-nerve-glide, supine-piriformis-stretch, knee-to-chest). AI's 'increases nerve tension' overlooks that this is a piriformis release used to RELIEVE piriformis-mediated sciatica."
+  },
+  "sciatica|seated-long-sitting-stretch": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises). Sustained slumped flexion with knees extended is the canonical sciatic nerve tension provocation."
+  },
+  "sciatica|superman-exercise": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "sciatica|straight-leg-raises": {
+    "decision": "approve",
+    "edited_reason": "SLR is the classic clinical neural tension test (Las\u00e8gue's sign); active SLR reproduces radicular symptoms in sciatica."
+  },
+  "sciatica|bulgarian-split-squat": {
+    "decision": "approve"
+  },
+  "sciatica|double-knee-to-chest": {
+    "decision": "approve"
+  },
+  "sciatica|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "sciatica|hip-flexor-stretch": {
+    "decision": "approve"
+  },
+  "sciatica|hip-hinge": {
+    "decision": "approve"
+  },
+  "sciatica|internal-rotation": {
+    "decision": "approve"
+  },
+  "sciatica|lower-back-release-roll": {
+    "decision": "approve"
+  },
+  "sciatica|lumbar-rotation-stretch": {
+    "decision": "approve"
+  },
+  "sciatica|prone-t-raises": {
+    "decision": "approve"
+  },
+  "sciatica|prone-y-raises": {
+    "decision": "approve"
+  },
+  "sciatica|seated-hamstring-stretch": {
+    "decision": "approve"
+  },
+  "sciatica|seated-spinal-twist": {
+    "decision": "approve"
+  },
+  "sciatica|seated-trunk-rotation": {
+    "decision": "approve"
+  },
+  "sciatica|single-leg-deadlift": {
+    "decision": "approve"
+  },
+  "sciatica|standing-back-extension": {
+    "decision": "approve"
+  },
+  "sciatica|standing-hamstring-curl": {
+    "decision": "approve"
+  },
+  "sciatica|supine-hamstring-stretch": {
+    "decision": "approve"
+  },
+  "sciatica|fire-hydrants": {
+    "decision": "reject"
+  },
+  "sciatica|heel-drops": {
+    "decision": "reject"
+  },
+  "sciatica|prone-knee-flexion": {
+    "decision": "reject"
+  },
+  "sciatica|prone-shoulder-flexion": {
+    "decision": "reject"
+  },
+  "sciatica|side-plank": {
+    "decision": "reject"
+  },
+  "sciatica|wall-sits": {
+    "decision": "reject"
+  },
+  "sciatica|wall-squat-with-ball": {
+    "decision": "reject"
+  },
+  "sciatica|90-90-hip-stretch": {
+    "decision": "approve"
+  },
+  "sciatica|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "sciatica|calf-stretch-on-step": {
+    "decision": "approve"
+  },
+  "sciatica|childs-pose": {
+    "decision": "approve"
+  },
+  "sciatica|childs-pose-with-side-reach": {
+    "decision": "approve"
+  },
+  "sciatica|copenhagen-adduction": {
+    "decision": "approve"
+  },
+  "sciatica|doorway-stretch": {
+    "decision": "approve"
+  },
+  "sciatica|foam-roller-it-band": {
+    "decision": "approve"
+  },
+  "sciatica|half-kneeling-pallof-press": {
+    "decision": "approve"
+  },
+  "sciatica|hamstring-curls": {
+    "decision": "approve"
+  },
+  "sciatica|hamstring-stretch-with-strap": {
+    "decision": "approve"
+  },
+  "sciatica|heel-toe-walking": {
+    "decision": "approve"
+  },
+  "sciatica|hip-circles": {
+    "decision": "approve"
+  },
+  "sciatica|knee-to-chest-stretch": {
+    "decision": "approve"
+  },
+  "sciatica|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "sciatica|lateral-step-ups": {
+    "decision": "approve"
+  },
+  "sciatica|lying-hip-flexor-stretch": {
+    "decision": "approve"
+  },
+  "sciatica|marble-pickup": {
+    "decision": "approve"
+  },
+  "sciatica|pallof-press": {
+    "decision": "approve"
+  },
+  "sciatica|plank": {
+    "decision": "approve"
+  },
+  "sciatica|prone-hamstring-curl": {
+    "decision": "approve"
+  },
+  "sciatica|prone-press-up": {
+    "decision": "approve"
+  },
+  "sciatica|quadruped-hip-flexor-march": {
+    "decision": "approve"
+  },
+  "sciatica|seated-knee-extension": {
+    "decision": "approve"
+  },
+  "sciatica|side-lying-external-rotation": {
+    "decision": "approve"
+  },
+  "sciatica|side-lying-hip-abduction": {
+    "decision": "approve"
+  },
+  "sciatica|single-leg-balance": {
+    "decision": "approve"
+  },
+  "sciatica|single-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "sciatica|soleus-stretch": {
+    "decision": "approve"
+  },
+  "sciatica|standing-calf-raises": {
+    "decision": "approve"
+  },
+  "sciatica|standing-hip-flexion": {
+    "decision": "approve"
+  },
+  "sciatica|standing-hip-flexor-and-quad-stretch-evening-wind-down": {
+    "decision": "approve"
+  },
+  "sciatica|standing-quad-stretch": {
+    "decision": "approve"
+  },
+  "sciatica|step-ups": {
+    "decision": "approve"
+  },
+  "sciatica|supine-figure-4-stretch-with-pelvic-mobilization": {
+    "decision": "approve"
+  },
+  "sciatica|supine-hip-external-rotation": {
+    "decision": "approve"
+  },
+  "sciatica|supine-hip-flexion": {
+    "decision": "approve"
+  },
+  "sciatica|supine-iliopsoas-stretch": {
+    "decision": "approve"
+  },
+  "sciatica|supine-piriformis-stretch": {
+    "decision": "approve"
+  },
+  "sciatica|supported-cat-cow-stretch": {
+    "decision": "approve"
+  },
+  "sciatica|tennis-ball-roll": {
+    "decision": "approve"
+  },
+  "sciatica|thread-the-needle": {
+    "decision": "approve"
+  },
+  "sciatica|wall-slides": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|prone-press-up": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates this as SAFE for referred-pain-lower-back. McKenzie extension-bias is appropriate for centralizing extension-responsive referral patterns."
+  },
+  "referred-pain-lower-back|lumbar-rotation-stretch": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates this as SAFE for referred-pain-lower-back. Gentle rotation under controlled stretch is part of the standard mobility set."
+  },
+  "referred-pain-lower-back|bulgarian-split-squat": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|lower-back-release-roll": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|prone-t-raises": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|prone-y-raises": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|seated-long-sitting-stretch": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|seated-spinal-twist": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|seated-trunk-rotation": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|single-leg-deadlift": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|straight-leg-raises": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|superman-exercise": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|heel-drops": {
+    "decision": "reject"
+  },
+  "referred-pain-lower-back|prone-shoulder-flexion": {
+    "decision": "reject"
+  },
+  "referred-pain-lower-back|90-90-hip-stretch": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|bird-dog-hold-with-scapular-punch": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|copenhagen-adduction": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|dead-bug-with-shoulder-reach": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|double-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|eccentric-calf-lowering": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|fire-hydrants": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|foam-roller-thoracic-extension": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|hamstring-curls": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|hamstring-stretch-with-strap": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|heel-toe-walking": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|hip-circles": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|hip-flexor-stretch": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|hip-hinge": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|internal-rotation": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|it-band-stretch": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|knee-to-chest-stretch": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|lateral-band-walks": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|lateral-step-ups": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|marble-pickup": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|pallof-press": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|plank": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|prone-glute-squeeze-holds": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|prone-hamstring-curl": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|prone-hip-extension": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|prone-hip-extension-pulse": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|prone-knee-flexion": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|quadruped-hip-flexor-march": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|quadruped-shoulder-taps": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|sciatic-nerve-glide": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|seated-figure-four-stretch": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|seated-hamstring-stretch": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|seated-knee-extension": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|side-plank": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|single-leg-balance": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|single-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|standing-back-extension": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|step-ups": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|supine-figure-4-stretch-with-pelvic-mobilization": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|supine-hamstring-stretch": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|supine-hip-external-rotation": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|supine-hip-flexion": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|supine-hip-internal-rotation": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|supine-iliopsoas-stretch": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|supine-piriformis-stretch": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|supported-cat-cow-stretch": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|tennis-ball-roll": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|wall-sits": {
+    "decision": "approve"
+  },
+  "referred-pain-lower-back|wall-squat-with-ball": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|sciatic-nerve-glide": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: sciatic nerve glide is a LUMBAR neural mobilization for sciatica/lumbar radiculopathy. Has no biomechanical impact on cervical nerve roots."
+  },
+  "cervical-radiculopathy|seated-spinal-twist": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: seated trunk rotation primarily loads lumbar/thoracic spine. Cervical contribution is minimal and v1 KG does not list it as a cervical-radiculopathy concern."
+  },
+  "cervical-radiculopathy|ulnar-nerve-glide": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates this as SAFE for cervical-radiculopathy. Gentle neural mobility is part of the standard protocol per JOSPT 2017 neck pain CPG (https://www.jospt.org/doi/10.2519/jospt.2017.0302) \u2014 recommended exercise category for radicular arm symptoms."
+  },
+  "cervical-radiculopathy|upper-trapezius-stretch": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates this as SAFE for cervical-radiculopathy. Gentle stretching is recommended per JOSPT 2017 neck pain CPG; AI overstates 'lateral flexion stretch increases nerve root tension.'"
+  },
+  "cervical-radiculopathy|seated-shoulder-press": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises). Overhead pressing produces cervical extension and compressive load on neural foramina."
+  },
+  "cervical-radiculopathy|bicep-curls": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|neck-rotations": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|neck-side-bends": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|prone-press-up": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|prone-shoulder-flexion": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|prone-t-raises": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|prone-y-raises": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|side-plank": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|sleeper-stretch": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|standing-back-extension": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|superman-exercise": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|band-pull-aparts": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|banded-shoulder-stabilizer-series": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|bird-dog-hold-with-scapular-punch": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|cat-cow-stretch": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|childs-pose-with-side-reach": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|cross-body-stretch": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|dead-bug-with-shoulder-reach": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|doorway-stretch": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|foam-roller-thoracic-extension": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|gentle-stretching": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|grip-strengthening": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|half-kneeling-pallof-press": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|half-kneeling-shoulder-rotations-with-band": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|internal-rotation": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|isometric-cervical-extension": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|lat-pulldown-with-band": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|levator-scapulae-stretch": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|marble-pickup": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|median-nerve-glide": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|overhead-tricep-stretch": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|plank": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|prone-i-y-t-raises": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|prone-i-y-t-shoulder-activation": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|quadruped-shoulder-taps": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|quadruped-thoracic-rotation": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|resistance-band-external-rotation-at-90-90": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|reverse-wrist-curls": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|seated-hamstring-stretch": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|seated-long-sitting-stretch": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|seated-row-with-band": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|seated-trunk-rotation": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|shoulder-abduction": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|shoulder-flexion": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|single-leg-deadlift": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|standing-chest-fly-with-band": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|standing-row-with-band": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|supported-cat-cow-stretch": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|swimmers-exercise": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|tennis-ball-roll": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|towel-curls": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|tricep-extensions": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|wall-angel": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|wall-push-ups": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|wall-slides": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|wrist-curls": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|wrist-extensor-stretch": {
+    "decision": "approve"
+  },
+  "cervical-radiculopathy|wrist-flexor-stretch": {
+    "decision": "approve"
+  },
+  "cervical-strain|lower-back-release-roll": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: lumbar foam rolling does not transmit meaningful compressive force to the cervical spine."
+  },
+  "cervical-strain|marble-pickup": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: marble-pickup is a foot/toe intrinsic exercise. Does not require sustained cervical flexion as AI claims."
+  },
+  "cervical-strain|shoulder-shrugs": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates shoulder-shrugs as SAFE for cervical-strain. Gentle scapular elevation is part of the postural retraining protocol per JOSPT 2017 neck pain CPG."
+  },
+  "cervical-strain|seated-shoulder-press": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates seated-shoulder-press as UNSAFE for cervical-strain (overhead loading increases upper-trap and cervical-extension strain). AI hedged 'unclear' \u2014 flip to contra to match v1."
+  },
+  "cervical-strain|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "cervical-strain|prone-press-up": {
+    "decision": "approve"
+  },
+  "cervical-strain|prone-shoulder-flexion": {
+    "decision": "approve"
+  },
+  "cervical-strain|prone-t-raises": {
+    "decision": "approve"
+  },
+  "cervical-strain|prone-y-raises": {
+    "decision": "approve"
+  },
+  "cervical-strain|side-plank": {
+    "decision": "approve"
+  },
+  "cervical-strain|sleeper-stretch": {
+    "decision": "approve"
+  },
+  "cervical-strain|superman-exercise": {
+    "decision": "approve"
+  },
+  "cervical-strain|seated-spinal-twist": {
+    "decision": "reject"
+  },
+  "cervical-strain|bicep-curls": {
+    "decision": "approve"
+  },
+  "cervical-strain|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "cervical-strain|childs-pose-with-side-reach": {
+    "decision": "approve"
+  },
+  "cervical-strain|cross-body-stretch": {
+    "decision": "approve"
+  },
+  "cervical-strain|doorway-stretch": {
+    "decision": "approve"
+  },
+  "cervical-strain|foam-roller-thoracic-extension": {
+    "decision": "approve"
+  },
+  "cervical-strain|internal-rotation": {
+    "decision": "approve"
+  },
+  "cervical-strain|isometric-cervical-extension": {
+    "decision": "approve"
+  },
+  "cervical-strain|isometric-cervical-flexion": {
+    "decision": "approve"
+  },
+  "cervical-strain|lat-pulldown-with-band": {
+    "decision": "approve"
+  },
+  "cervical-strain|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "cervical-strain|levator-scapulae-stretch": {
+    "decision": "approve"
+  },
+  "cervical-strain|median-nerve-glide": {
+    "decision": "approve"
+  },
+  "cervical-strain|neck-rotations": {
+    "decision": "approve"
+  },
+  "cervical-strain|neck-side-bends": {
+    "decision": "approve"
+  },
+  "cervical-strain|overhead-tricep-stretch": {
+    "decision": "approve"
+  },
+  "cervical-strain|plank": {
+    "decision": "approve"
+  },
+  "cervical-strain|prone-i-y-t-raises": {
+    "decision": "approve"
+  },
+  "cervical-strain|prone-i-y-t-shoulder-activation": {
+    "decision": "approve"
+  },
+  "cervical-strain|quadruped-shoulder-taps": {
+    "decision": "approve"
+  },
+  "cervical-strain|quadruped-thoracic-rotation": {
+    "decision": "approve"
+  },
+  "cervical-strain|resistance-band-external-rotation-at-90-90": {
+    "decision": "approve"
+  },
+  "cervical-strain|seated-long-sitting-stretch": {
+    "decision": "approve"
+  },
+  "cervical-strain|seated-row-with-band": {
+    "decision": "approve"
+  },
+  "cervical-strain|seated-trunk-rotation": {
+    "decision": "approve"
+  },
+  "cervical-strain|shoulder-abduction": {
+    "decision": "approve"
+  },
+  "cervical-strain|shoulder-flexion": {
+    "decision": "approve"
+  },
+  "cervical-strain|single-leg-deadlift": {
+    "decision": "approve"
+  },
+  "cervical-strain|standing-back-extension": {
+    "decision": "approve"
+  },
+  "cervical-strain|standing-chest-fly-with-band": {
+    "decision": "approve"
+  },
+  "cervical-strain|standing-row-with-band": {
+    "decision": "approve"
+  },
+  "cervical-strain|supported-cat-cow-stretch": {
+    "decision": "approve"
+  },
+  "cervical-strain|swimmers-exercise": {
+    "decision": "approve"
+  },
+  "cervical-strain|tennis-ball-roll": {
+    "decision": "approve"
+  },
+  "cervical-strain|ulnar-nerve-glide": {
+    "decision": "approve"
+  },
+  "cervical-strain|upper-trapezius-stretch": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|resistance-band-external-rotation-at-90-90": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: '90/90' in this exercise pool refers to SHOULDER ER positioning (90\u00b0 abduction, 90\u00b0 elbow flexion) \u2014 a banded rotator-cuff drill. AI mis-interpreted as hip ER. Has no biomechanical impact on piriformis."
+  },
+  "piriformis-syndrome|bulgarian-split-squat": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|external-rotation": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|fire-hydrants": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|lateral-step-ups": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|monster-walks": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|step-ups": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|superman-exercise": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|heel-drops": {
+    "decision": "reject"
+  },
+  "piriformis-syndrome|internal-rotation": {
+    "decision": "reject",
+    "edited_reason": "Defer: AI's 'absolute contra' for hip IR conflicts with v1 KG which has supine-hip-internal-rotation as SAFE. The two may refer to different exercise variants (loaded vs supine gentle); without clearer exercise definitions, drop and let v1 + cross-model handle at runtime."
+  },
+  "piriformis-syndrome|lumbar-rotation-stretch": {
+    "decision": "reject"
+  },
+  "piriformis-syndrome|side-lying-external-rotation": {
+    "decision": "reject"
+  },
+  "piriformis-syndrome|wall-sits": {
+    "decision": "reject"
+  },
+  "piriformis-syndrome|wall-squat-with-ball": {
+    "decision": "reject"
+  },
+  "piriformis-syndrome|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|copenhagen-adduction": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|doorway-stretch": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|hamstring-curls": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|heel-toe-walking": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|hip-circles": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|lateral-band-walks": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|lower-back-release-roll": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|mini-squats": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|pallof-press": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|plank": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|prone-hip-extension": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|prone-hip-extension-pulse": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|quadruped-hip-flexor-march": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|sciatic-nerve-glide": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|seated-spinal-twist": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|seated-trunk-rotation": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|side-plank": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|single-leg-balance": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|single-leg-deadlift": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|standing-hip-extension": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|standing-single-leg-balance-with-hip-stability": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|straight-leg-raises": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|supine-hip-internal-rotation": {
+    "decision": "approve"
+  },
+  "piriformis-syndrome|wall-slides": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|heel-drops": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Eccentric heel drops (Alfredson protocol) are the FIRST-LINE intervention for midportion Achilles tendinopathy per JOSPT 2018 CPG (https://www.jospt.org/doi/10.2519/jospt.2018.0302) \u2014 pain-monitored eccentric/HSR loading is therapeutic, not contraindicated."
+  },
+  "achilles-tendinopathy|foam-roller-calf": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Soft-tissue mobilization of calf musculature is appropriate adjunct treatment (foam rolling is on the gastroc/soleus belly, not directly on the inflamed tendon)."
+  },
+  "achilles-tendinopathy|resisted-ankle-plantarflexion": {
+    "decision": "flip",
+    "edited_reason": "Resisted plantarflexion is part of the heavy-slow-resistance protocol per JOSPT 2018 CPG. AI's 'directly loads tendon under resistance' is correct \u2014 that IS the therapeutic mechanism for tendinopathy."
+  },
+  "achilles-tendinopathy|single-leg-calf-raise": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises). Single-leg loading exceeds bilateral as a starting point for irritable tendinopathy."
+  },
+  "achilles-tendinopathy|bulgarian-split-squat": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|lateral-step-ups": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|monster-walks": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|step-ups": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|seated-toe-taps": {
+    "decision": "reject"
+  },
+  "achilles-tendinopathy|standing-calf-raises": {
+    "decision": "reject"
+  },
+  "achilles-tendinopathy|toe-raises": {
+    "decision": "reject"
+  },
+  "achilles-tendinopathy|wall-sits": {
+    "decision": "reject"
+  },
+  "achilles-tendinopathy|wall-squat-with-ball": {
+    "decision": "reject"
+  },
+  "achilles-tendinopathy|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|calf-stretch-on-step": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|double-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|gentle-stretching": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|hamstring-curls": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|hamstring-stretch-with-strap": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|heel-toe-walking": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|lateral-band-walks": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|marble-pickup": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|mini-squats": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|plank": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|prone-hamstring-curl": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|prone-knee-flexion": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|quadruped-rocking": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|sciatic-nerve-glide": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|seated-calf-raises": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|seated-long-sitting-stretch": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|side-plank": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|single-leg-balance": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|single-leg-deadlift": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|soleus-stretch": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|standing-hip-flexor-and-quad-stretch-evening-wind-down": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|standing-quad-stretch": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|standing-single-leg-balance-with-hip-stability": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|supine-marching": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|tennis-ball-roll": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|walking": {
+    "decision": "approve"
+  },
+  "achilles-tendinopathy|wall-slides": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|bicep-curls": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates bicep-curls as SAFE for biceps-tendinitis. Progressive loading of the affected tendon is the therapeutic protocol (eccentric/HSR per JOSPT tendinopathy guidelines) \u2014 NOT 'absolute' contra. AI inverted the treatment paradigm."
+  },
+  "biceps-tendinitis|internal-rotation": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates internal-rotation as SAFE for biceps-tendinitis. Shoulder IR ROM/activation is part of the standard rotator cuff coordination set; not a direct biceps load."
+  },
+  "biceps-tendinitis|towel-curls": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: towel-curls in this exercise pool is a FOOT/TOE intrinsic exercise, not a finger/wrist 'curl.' Has no biomechanical impact on biceps tendon."
+  },
+  "biceps-tendinitis|seated-shoulder-press": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises). Overhead pressing produces high biceps long-head tendon tension."
+  },
+  "biceps-tendinitis|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|lat-pulldown-with-band": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|prone-press-up": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|prone-shoulder-flexion": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|resistance-band-external-rotation-at-90-90": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|shoulder-abduction": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|shoulder-flexion": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|standing-chest-fly-with-band": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|swimmers-exercise": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|wrist-pronation-supination": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|grip-strengthening": {
+    "decision": "reject"
+  },
+  "biceps-tendinitis|seated-row-with-band": {
+    "decision": "reject"
+  },
+  "biceps-tendinitis|standing-row-with-band": {
+    "decision": "reject"
+  },
+  "biceps-tendinitis|wrist-curls": {
+    "decision": "reject"
+  },
+  "biceps-tendinitis|banded-shoulder-stabilizer-series": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|dead-bug-with-shoulder-reach": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|foam-roller-thoracic-extension": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|half-kneeling-shoulder-rotations-with-band": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|marble-pickup": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|median-nerve-glide": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|overhead-tricep-stretch": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|plank": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|prone-i-y-t-raises": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|prone-i-y-t-shoulder-activation": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|quadruped-rocking": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|quadruped-shoulder-taps": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|shoulder-shrugs": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|side-plank": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|superman-exercise": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|supported-cat-cow-stretch": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|thread-the-needle": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|ulnar-nerve-glide": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|wall-angel": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|wall-slides": {
+    "decision": "approve"
+  },
+  "biceps-tendinitis|wrist-flexor-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|hamstring-curls": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Progressive hamstring loading is the therapeutic protocol per JOSPT 2018 tendinopathy guidelines (eccentric/HSR with pain monitoring). AI inverted the treatment paradigm."
+  },
+  "hamstring-tendinopathy|hip-hinge": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates hip-hinge as SAFE. Pain-monitored hip-hinge is foundational hamstring loading; the controlled eccentric phase is therapeutic."
+  },
+  "hamstring-tendinopathy|prone-hamstring-curl": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Prone knee flexion is low-load isolated hamstring activation \u2014 appropriate early-phase loading."
+  },
+  "hamstring-tendinopathy|seated-hamstring-stretch": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Gentle hamstring stretching is part of the standard tendinopathy management; passive stretching becomes safer as irritability decreases."
+  },
+  "hamstring-tendinopathy|supine-hamstring-stretch": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Supine version is the gentlest hamstring stretch position \u2014 appropriate across phases."
+  },
+  "hamstring-tendinopathy|bulgarian-split-squat": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises). Heavy unilateral eccentric load exceeds tolerable load for irritable tendinopathy."
+  },
+  "hamstring-tendinopathy|single-leg-deadlift": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises). Loaded unilateral hip hinge with high eccentric demand."
+  },
+  "hamstring-tendinopathy|90-90-hip-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|double-knee-to-chest": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|knee-to-chest-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|lateral-step-ups": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|seated-figure-four-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|seated-long-sitting-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|step-ups": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|straight-leg-raises": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|superman-exercise": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|supine-figure-4-stretch-with-pelvic-mobilization": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|wall-sits": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|wall-squat-with-ball": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|heel-drops": {
+    "decision": "reject"
+  },
+  "hamstring-tendinopathy|prone-knee-flexion": {
+    "decision": "reject"
+  },
+  "hamstring-tendinopathy|seated-knee-extension": {
+    "decision": "reject"
+  },
+  "hamstring-tendinopathy|standing-hamstring-curl": {
+    "decision": "reject"
+  },
+  "hamstring-tendinopathy|standing-hip-extension": {
+    "decision": "reject"
+  },
+  "hamstring-tendinopathy|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|calf-stretch-on-step": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|childs-pose": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|childs-pose-with-side-reach": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|cross-body-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|doorway-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|double-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|gentle-stretching": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|hamstring-stretch-with-strap": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|heel-slides": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|internal-rotation": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|knee-flexion-rom": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|lower-back-release-roll": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|monster-walks": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|plank": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|prayer-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|prone-hip-extension": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|prone-hip-extension-pulse": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|quadruped-hip-flexor-march": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|sciatic-nerve-glide": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|seated-spinal-twist": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|side-plank": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|single-leg-balance": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|single-leg-balance-with-hip-activation": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|standing-back-extension": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|standing-hip-flexor-and-quad-stretch-evening-wind-down": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|standing-single-leg-balance-with-hip-stability": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|supine-hip-external-rotation": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|supine-hip-flexion": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|tennis-ball-roll": {
+    "decision": "approve"
+  },
+  "hamstring-tendinopathy|wall-slides": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|grip-strengthening": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Eccentric extensor loading (Tyler 2010 protocol https://www.jospt.org/doi/10.2519/jospt.2010.3186) is first-line treatment for lateral epicondylosis \u2014 grip strengthening loads the affected tendon therapeutically."
+  },
+  "lateral-epicondylitis|reverse-wrist-curls": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Wrist EXTENSION against resistance is the eccentric loading protocol for lateral (extensor) epicondylitis \u2014 therapeutic, not contraindicated."
+  },
+  "lateral-epicondylitis|marble-pickup": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: marble-pickup is a foot/toe intrinsic exercise, not a finger/wrist exercise."
+  },
+  "lateral-epicondylitis|towel-curls": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: towel-curls in this exercise pool is a foot/toe exercise."
+  },
+  "lateral-epicondylitis|seated-row-with-band": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates seated-row-with-band as UNSAFE for lateral-epicondylitis. AI hedged 'unclear' \u2014 flip to contra to match v1."
+  },
+  "lateral-epicondylitis|bicep-curls": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "lateral-epicondylitis|lat-pulldown-with-band": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "lateral-epicondylitis|standing-row-with-band": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "lateral-epicondylitis|wrist-curls": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "lateral-epicondylitis|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|plank": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|prone-press-up": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|tennis-ball-roll": {
+    "decision": "reject"
+  },
+  "lateral-epicondylitis|dead-bug-with-shoulder-reach": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|half-kneeling-pallof-press": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|half-kneeling-shoulder-rotations-with-band": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|median-nerve-glide": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|overhead-tricep-stretch": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|pallof-press": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|prone-i-y-t-raises": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|prone-i-y-t-shoulder-activation": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|quadruped-rocking": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|seated-shoulder-press": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|shoulder-abduction": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|shoulder-flexion": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|side-lying-external-rotation": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|side-plank": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|standing-chest-fly-with-band": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|supported-cat-cow-stretch": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|swimmers-exercise": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|tricep-extensions": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|wall-push-ups": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|wrist-circles": {
+    "decision": "approve"
+  },
+  "lateral-epicondylitis|wrist-pronation-supination": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|grip-strengthening": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Pain-monitored loading of flexor-pronator group is therapeutic for medial epicondylitis (analogous to Tyler/Stasinopoulos eccentric protocols)."
+  },
+  "medial-epicondylitis|wrist-curls": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Wrist FLEXION against resistance is the eccentric loading protocol for medial (flexor) epicondylitis \u2014 therapeutic, not 'absolute' contra."
+  },
+  "medial-epicondylitis|wrist-pronation-supination": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Gentle controlled rotation ROM is appropriate; pronation eccentric loading is part of standard rehab for pronator teres involvement."
+  },
+  "medial-epicondylitis|reverse-wrist-curls": {
+    "decision": "flip",
+    "edited_reason": "Mechanism inverted: reverse-wrist-curls load EXTENSORS, not flexors. For medial (flexor) epicondylitis, extensor loading is irrelevant."
+  },
+  "medial-epicondylitis|marble-pickup": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: foot/toe exercise."
+  },
+  "medial-epicondylitis|towel-curls": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: foot/toe exercise."
+  },
+  "medial-epicondylitis|bicep-curls": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises). Bicep loading transmits to flexor-pronator origin."
+  },
+  "medial-epicondylitis|lat-pulldown-with-band": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "medial-epicondylitis|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|seated-row-with-band": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|standing-row-with-band": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|wall-push-ups": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|cross-body-stretch": {
+    "decision": "reject"
+  },
+  "medial-epicondylitis|prone-press-up": {
+    "decision": "reject"
+  },
+  "medial-epicondylitis|doorway-stretch": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|half-kneeling-pallof-press": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|internal-rotation": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|median-nerve-glide": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|overhead-tricep-stretch": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|pallof-press": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|plank": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|seated-shoulder-press": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|shoulder-abduction": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|shoulder-flexion": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|side-plank": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|single-leg-deadlift": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|standing-chest-fly-with-band": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|superman-exercise": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|supported-cat-cow-stretch": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|swimmers-exercise": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|tricep-extensions": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|wall-slides": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|wrist-circles": {
+    "decision": "approve"
+  },
+  "medial-epicondylitis|wrist-flexor-stretch": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|seated-knee-extension": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Open-chain knee extension is foundational quad-loading exercise for patellar tendinopathy rehab (per HSR / eccentric protocols)."
+  },
+  "patellar-tendinitis|wall-sits": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Isometric quad loading at 45-90\u00b0 knee flexion (Holden/Rio/Cook 2017) is one of the most evidence-supported analgesic interventions for patellar tendinopathy."
+  },
+  "patellar-tendinitis|wall-squat-with-ball": {
+    "decision": "flip",
+    "edited_reason": "Functional equivalent of wall-sits (which v1 KG curates as SAFE). Sustained isometric knee flexion IS the analgesic loading position."
+  },
+  "patellar-tendinitis|bulgarian-split-squat": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "patellar-tendinitis|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|lateral-step-ups": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|single-leg-deadlift": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|step-ups": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|double-leg-calf-raise": {
+    "decision": "reject"
+  },
+  "patellar-tendinitis|hamstring-curls": {
+    "decision": "reject"
+  },
+  "patellar-tendinitis|heel-drops": {
+    "decision": "reject"
+  },
+  "patellar-tendinitis|plank": {
+    "decision": "reject"
+  },
+  "patellar-tendinitis|prone-hamstring-curl": {
+    "decision": "reject"
+  },
+  "patellar-tendinitis|prone-knee-flexion": {
+    "decision": "reject"
+  },
+  "patellar-tendinitis|single-leg-calf-raise": {
+    "decision": "reject"
+  },
+  "patellar-tendinitis|standing-calf-raises": {
+    "decision": "reject"
+  },
+  "patellar-tendinitis|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|double-knee-to-chest": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|eccentric-calf-lowering": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|foam-roller-quad": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|glute-bridge": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|glute-bridge-hold": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|glute-bridge-with-isometric-hold": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|glute-bridges": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|half-kneeling-pallof-press": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|heel-slides": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|internal-rotation": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|isometric-quad-contraction": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|knee-flexion-rom": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|lateral-band-walks": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|mini-squats": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|monster-walks": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|pallof-press": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|prone-press-up": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|quadruped-hip-flexor-march": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|quadruped-rocking": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|side-plank": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|single-leg-balance": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|standing-hamstring-curl": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|standing-hip-flexor-and-quad-stretch-evening-wind-down": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|standing-quad-stretch": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|supine-marching": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|toe-raises": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|walking": {
+    "decision": "approve"
+  },
+  "patellar-tendinitis|wall-slides": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|towel-curls": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: foot/toe exercise."
+  },
+  "rotator-cuff-tendinopathy|lat-pulldown-with-band": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as UNSAFE for rotator-cuff-tendinopathy. AI hedged 'unclear' \u2014 flip to contra to match v1."
+  },
+  "rotator-cuff-tendinopathy|wall-push-ups": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as UNSAFE. AI hedged 'unclear' \u2014 flip to contra to match v1."
+  },
+  "rotator-cuff-tendinopathy|seated-shoulder-press": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "rotator-cuff-tendinopathy|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|overhead-tricep-stretch": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|prone-press-up": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|shoulder-abduction": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|standing-chest-fly-with-band": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|superman-exercise": {
+    "decision": "reject"
+  },
+  "rotator-cuff-tendinopathy|bicep-curls": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|bird-dog-hold-with-scapular-punch": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|dead-bug-with-shoulder-reach": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|foam-roller-thoracic-extension": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|grip-strengthening": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|half-kneeling-pallof-press": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|internal-rotation": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|open-book-stretch": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|plank": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|prone-i-y-t-raises": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|prone-i-y-t-shoulder-activation": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|prone-shoulder-flexion": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|prone-t-raises": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|prone-y-raises": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|quadruped-rocking": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|quadruped-shoulder-taps": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|resistance-band-external-rotation-at-90-90": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|seated-row-with-band": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|seated-trunk-rotation": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|shoulder-flexion": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|side-plank": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|standing-row-with-band": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|supported-cat-cow-stretch": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|swimmers-exercise": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|tennis-ball-roll": {
+    "decision": "approve"
+  },
+  "rotator-cuff-tendinopathy|tricep-extensions": {
+    "decision": "approve"
+  },
+  "acl-sprain|prone-hamstring-curl": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Prone hamstring activation is PROTECTIVE for ACL (hamstrings are antagonist to ACL \u2014 co-contraction REDUCES anterior tibial shear). AI inverted the mechanism."
+  },
+  "acl-sprain|prone-knee-flexion": {
+    "decision": "flip",
+    "edited_reason": "Same mechanism as prone-hamstring-curl: knee flexion in prone activates hamstrings, which protect against anterior tibial translation. v1 SAFE for analogous hamstring-curls."
+  },
+  "acl-sprain|lateral-step-ups": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates lateral-step-ups as UNSAFE for ACL-sprain. AI hedged 'unclear' \u2014 flip to contra to match v1."
+  },
+  "acl-sprain|bulgarian-split-squat": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "acl-sprain|single-leg-deadlift": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "acl-sprain|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "acl-sprain|internal-rotation": {
+    "decision": "approve"
+  },
+  "acl-sprain|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "acl-sprain|heel-drops": {
+    "decision": "reject"
+  },
+  "acl-sprain|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "acl-sprain|copenhagen-adduction": {
+    "decision": "approve"
+  },
+  "acl-sprain|double-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "acl-sprain|eccentric-calf-lowering": {
+    "decision": "approve"
+  },
+  "acl-sprain|glute-bridge": {
+    "decision": "approve"
+  },
+  "acl-sprain|glute-bridge-hold": {
+    "decision": "approve"
+  },
+  "acl-sprain|glute-bridge-with-isometric-hold": {
+    "decision": "approve"
+  },
+  "acl-sprain|glute-bridges": {
+    "decision": "approve"
+  },
+  "acl-sprain|half-kneeling-pallof-press": {
+    "decision": "approve"
+  },
+  "acl-sprain|hamstring-curls": {
+    "decision": "approve"
+  },
+  "acl-sprain|hip-hinge": {
+    "decision": "approve"
+  },
+  "acl-sprain|lateral-band-walks": {
+    "decision": "approve"
+  },
+  "acl-sprain|pallof-press": {
+    "decision": "approve"
+  },
+  "acl-sprain|plank": {
+    "decision": "approve"
+  },
+  "acl-sprain|prone-press-up": {
+    "decision": "approve"
+  },
+  "acl-sprain|quadruped-hip-flexor-march": {
+    "decision": "approve"
+  },
+  "acl-sprain|sciatic-nerve-glide": {
+    "decision": "approve"
+  },
+  "acl-sprain|seated-figure-four-stretch": {
+    "decision": "approve"
+  },
+  "acl-sprain|seated-knee-extension": {
+    "decision": "approve"
+  },
+  "acl-sprain|side-plank": {
+    "decision": "approve"
+  },
+  "acl-sprain|single-leg-balance": {
+    "decision": "approve"
+  },
+  "acl-sprain|single-leg-balance-with-hip-activation": {
+    "decision": "approve"
+  },
+  "acl-sprain|single-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "acl-sprain|standing-calf-raises": {
+    "decision": "approve"
+  },
+  "acl-sprain|standing-hamstring-curl": {
+    "decision": "approve"
+  },
+  "acl-sprain|step-ups": {
+    "decision": "approve"
+  },
+  "acl-sprain|swimmers-exercise": {
+    "decision": "approve"
+  },
+  "acl-sprain|walking": {
+    "decision": "approve"
+  },
+  "acl-sprain|wall-sits": {
+    "decision": "approve"
+  },
+  "acl-sprain|wall-slides": {
+    "decision": "approve"
+  },
+  "acl-sprain|wall-squat-with-ball": {
+    "decision": "approve"
+  },
+  "meniscus-tear|hamstring-curls": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Open-chain knee flexion has minimal compressive load on meniscus (no weight-bearing); AI's 'compresses meniscus' is mechanism-confused."
+  },
+  "meniscus-tear|step-ups": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Step-ups at moderate height are part of standard return-to-function progression."
+  },
+  "meniscus-tear|marble-pickup": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: foot/toe exercise."
+  },
+  "meniscus-tear|towel-curls": {
+    "decision": "flip",
+    "edited_reason": "Body-region overreach: foot/toe exercise."
+  },
+  "meniscus-tear|bulgarian-split-squat": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "meniscus-tear|single-leg-deadlift": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "meniscus-tear|90-90-hip-stretch": {
+    "decision": "approve"
+  },
+  "meniscus-tear|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "meniscus-tear|internal-rotation": {
+    "decision": "approve"
+  },
+  "meniscus-tear|lateral-band-walks": {
+    "decision": "approve"
+  },
+  "meniscus-tear|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "meniscus-tear|lateral-step-ups": {
+    "decision": "approve"
+  },
+  "meniscus-tear|seated-figure-four-stretch": {
+    "decision": "approve"
+  },
+  "meniscus-tear|standing-hamstring-curl": {
+    "decision": "approve"
+  },
+  "meniscus-tear|wall-sits": {
+    "decision": "approve"
+  },
+  "meniscus-tear|wall-squat-with-ball": {
+    "decision": "approve"
+  },
+  "meniscus-tear|heel-drops": {
+    "decision": "reject"
+  },
+  "meniscus-tear|prone-hamstring-curl": {
+    "decision": "reject"
+  },
+  "meniscus-tear|prone-knee-flexion": {
+    "decision": "reject"
+  },
+  "meniscus-tear|single-leg-calf-raise": {
+    "decision": "reject"
+  },
+  "meniscus-tear|standing-calf-raises": {
+    "decision": "reject"
+  },
+  "meniscus-tear|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "meniscus-tear|childs-pose": {
+    "decision": "approve"
+  },
+  "meniscus-tear|childs-pose-with-side-reach": {
+    "decision": "approve"
+  },
+  "meniscus-tear|double-knee-to-chest": {
+    "decision": "approve"
+  },
+  "meniscus-tear|double-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "meniscus-tear|eccentric-calf-lowering": {
+    "decision": "approve"
+  },
+  "meniscus-tear|external-rotation": {
+    "decision": "approve"
+  },
+  "meniscus-tear|foam-roller-quad": {
+    "decision": "approve"
+  },
+  "meniscus-tear|glute-bridge": {
+    "decision": "approve"
+  },
+  "meniscus-tear|glute-bridge-hold": {
+    "decision": "approve"
+  },
+  "meniscus-tear|glute-bridge-with-isometric-hold": {
+    "decision": "approve"
+  },
+  "meniscus-tear|glute-bridges": {
+    "decision": "approve"
+  },
+  "meniscus-tear|half-kneeling-pallof-press": {
+    "decision": "approve"
+  },
+  "meniscus-tear|hip-hinge": {
+    "decision": "approve"
+  },
+  "meniscus-tear|it-band-stretch": {
+    "decision": "approve"
+  },
+  "meniscus-tear|knee-flexion-rom": {
+    "decision": "approve"
+  },
+  "meniscus-tear|knee-to-chest-stretch": {
+    "decision": "approve"
+  },
+  "meniscus-tear|mini-squats": {
+    "decision": "approve"
+  },
+  "meniscus-tear|pallof-press": {
+    "decision": "approve"
+  },
+  "meniscus-tear|piriformis-stretch": {
+    "decision": "approve"
+  },
+  "meniscus-tear|plank": {
+    "decision": "approve"
+  },
+  "meniscus-tear|prone-press-up": {
+    "decision": "approve"
+  },
+  "meniscus-tear|quadruped-hip-flexor-march": {
+    "decision": "approve"
+  },
+  "meniscus-tear|quadruped-rocking": {
+    "decision": "approve"
+  },
+  "meniscus-tear|sciatic-nerve-glide": {
+    "decision": "approve"
+  },
+  "meniscus-tear|seated-hamstring-stretch": {
+    "decision": "approve"
+  },
+  "meniscus-tear|seated-knee-extension": {
+    "decision": "approve"
+  },
+  "meniscus-tear|seated-long-sitting-stretch": {
+    "decision": "approve"
+  },
+  "meniscus-tear|side-plank": {
+    "decision": "approve"
+  },
+  "meniscus-tear|single-leg-balance": {
+    "decision": "approve"
+  },
+  "meniscus-tear|single-leg-balance-with-hip-activation": {
+    "decision": "approve"
+  },
+  "meniscus-tear|soleus-stretch": {
+    "decision": "approve"
+  },
+  "meniscus-tear|standing-hip-abduction": {
+    "decision": "approve"
+  },
+  "meniscus-tear|standing-hip-adduction": {
+    "decision": "approve"
+  },
+  "meniscus-tear|standing-single-leg-balance-with-hip-stability": {
+    "decision": "approve"
+  },
+  "meniscus-tear|supine-figure-4-stretch-with-pelvic-mobilization": {
+    "decision": "approve"
+  },
+  "meniscus-tear|supine-hip-flexion": {
+    "decision": "approve"
+  },
+  "meniscus-tear|supine-marching": {
+    "decision": "approve"
+  },
+  "meniscus-tear|supported-cat-cow-stretch": {
+    "decision": "approve"
+  },
+  "meniscus-tear|tennis-ball-roll": {
+    "decision": "approve"
+  },
+  "meniscus-tear|walking": {
+    "decision": "approve"
+  },
+  "meniscus-tear|wall-slides": {
+    "decision": "approve"
+  },
+  "patellofemoral-pain-syndrome|single-leg-deadlift": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as UNSAFE for PFPS. AI hedged 'unclear' \u2014 flip to contra to match v1."
+  },
+  "patellofemoral-pain-syndrome|bulgarian-split-squat": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "patellofemoral-pain-syndrome|heel-drops": {
+    "decision": "reject"
+  },
+  "patellofemoral-pain-syndrome|prone-knee-flexion": {
+    "decision": "reject"
+  },
+  "patellofemoral-pain-syndrome|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "patellofemoral-pain-syndrome|copenhagen-adduction": {
+    "decision": "approve"
+  },
+  "patellofemoral-pain-syndrome|double-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "patellofemoral-pain-syndrome|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "patellofemoral-pain-syndrome|hamstring-curls": {
+    "decision": "approve"
+  },
+  "patellofemoral-pain-syndrome|internal-rotation": {
+    "decision": "approve"
+  },
+  "patellofemoral-pain-syndrome|knee-flexion-rom": {
+    "decision": "approve"
+  },
+  "patellofemoral-pain-syndrome|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "patellofemoral-pain-syndrome|lateral-step-ups": {
+    "decision": "approve"
+  },
+  "patellofemoral-pain-syndrome|prone-hamstring-curl": {
+    "decision": "approve"
+  },
+  "patellofemoral-pain-syndrome|seated-knee-extension": {
+    "decision": "approve"
+  },
+  "patellofemoral-pain-syndrome|side-plank": {
+    "decision": "approve"
+  },
+  "patellofemoral-pain-syndrome|single-leg-balance": {
+    "decision": "approve"
+  },
+  "patellofemoral-pain-syndrome|single-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "patellofemoral-pain-syndrome|step-ups": {
+    "decision": "approve"
+  },
+  "patellofemoral-pain-syndrome|wall-sits": {
+    "decision": "approve"
+  },
+  "patellofemoral-pain-syndrome|wall-slides": {
+    "decision": "approve"
+  },
+  "patellofemoral-pain-syndrome|wall-squat-with-ball": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|bulgarian-split-squat": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|lateral-step-ups": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|heel-drops": {
+    "decision": "reject"
+  },
+  "it-band-syndrome|wall-sits": {
+    "decision": "reject"
+  },
+  "it-band-syndrome|wall-squat-with-ball": {
+    "decision": "reject"
+  },
+  "it-band-syndrome|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|double-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|eccentric-calf-lowering": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|foam-roller-it-band": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|hamstring-curls": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|internal-rotation": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|lower-back-release-roll": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|prone-hamstring-curl": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|prone-knee-flexion": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|sciatic-nerve-glide": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|seated-knee-extension": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|single-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|single-leg-deadlift": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|standing-calf-raises": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|standing-hip-flexion": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|step-ups": {
+    "decision": "approve"
+  },
+  "it-band-syndrome|wall-slides": {
+    "decision": "approve"
+  },
+  "hip-bursitis|fire-hydrants": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Progressive hip abductor loading is THE treatment for trochanteric bursitis (per Mellor 2018 LEAP trial / glute med strengthening protocols) \u2014 not contraindicated."
+  },
+  "hip-bursitis|side-lying-hip-abduction": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Side-lying abduction is the foundational glute med activation exercise for bursitis rehab."
+  },
+  "hip-bursitis|standing-hip-abduction": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Standing abductor strengthening is part of progressive loading protocol."
+  },
+  "hip-bursitis|foam-roller-it-band": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises) \u2014 direct compression on inflamed bursa."
+  },
+  "hip-bursitis|90-90-hip-stretch": {
+    "decision": "approve"
+  },
+  "hip-bursitis|bulgarian-split-squat": {
+    "decision": "approve"
+  },
+  "hip-bursitis|copenhagen-adduction": {
+    "decision": "approve"
+  },
+  "hip-bursitis|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "hip-bursitis|internal-rotation": {
+    "decision": "approve"
+  },
+  "hip-bursitis|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "hip-bursitis|lateral-step-ups": {
+    "decision": "approve"
+  },
+  "hip-bursitis|monster-walks": {
+    "decision": "approve"
+  },
+  "hip-bursitis|seated-figure-four-stretch": {
+    "decision": "approve"
+  },
+  "hip-bursitis|side-plank": {
+    "decision": "approve"
+  },
+  "hip-bursitis|single-leg-deadlift": {
+    "decision": "approve"
+  },
+  "hip-bursitis|standing-hip-adduction": {
+    "decision": "approve"
+  },
+  "hip-bursitis|step-ups": {
+    "decision": "approve"
+  },
+  "hip-bursitis|tennis-ball-roll": {
+    "decision": "approve"
+  },
+  "hip-bursitis|thread-the-needle": {
+    "decision": "approve"
+  },
+  "hip-bursitis|heel-drops": {
+    "decision": "reject"
+  },
+  "hip-bursitis|wall-sits": {
+    "decision": "reject"
+  },
+  "hip-bursitis|wall-slides": {
+    "decision": "reject"
+  },
+  "hip-bursitis|wall-squat-with-ball": {
+    "decision": "reject"
+  },
+  "hip-bursitis|bird-dog": {
+    "decision": "approve"
+  },
+  "hip-bursitis|bird-dog-hold-with-scapular-punch": {
+    "decision": "approve"
+  },
+  "hip-bursitis|bird-dog-with-core-stability-focus": {
+    "decision": "approve"
+  },
+  "hip-bursitis|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "hip-bursitis|childs-pose-with-side-reach": {
+    "decision": "approve"
+  },
+  "hip-bursitis|double-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "hip-bursitis|eccentric-calf-lowering": {
+    "decision": "approve"
+  },
+  "hip-bursitis|glute-bridge": {
+    "decision": "approve"
+  },
+  "hip-bursitis|glute-bridge-hold": {
+    "decision": "approve"
+  },
+  "hip-bursitis|glute-bridge-with-isometric-hold": {
+    "decision": "approve"
+  },
+  "hip-bursitis|glute-bridges": {
+    "decision": "approve"
+  },
+  "hip-bursitis|half-kneeling-pallof-press": {
+    "decision": "approve"
+  },
+  "hip-bursitis|hamstring-curls": {
+    "decision": "approve"
+  },
+  "hip-bursitis|heel-toe-walking": {
+    "decision": "approve"
+  },
+  "hip-bursitis|hip-circles": {
+    "decision": "approve"
+  },
+  "hip-bursitis|lateral-band-walks": {
+    "decision": "approve"
+  },
+  "hip-bursitis|lower-back-release-roll": {
+    "decision": "approve"
+  },
+  "hip-bursitis|mini-squats": {
+    "decision": "approve"
+  },
+  "hip-bursitis|pallof-press": {
+    "decision": "approve"
+  },
+  "hip-bursitis|plank": {
+    "decision": "approve"
+  },
+  "hip-bursitis|prone-hip-extension": {
+    "decision": "approve"
+  },
+  "hip-bursitis|prone-hip-extension-pulse": {
+    "decision": "approve"
+  },
+  "hip-bursitis|quadruped-hip-flexor-march": {
+    "decision": "approve"
+  },
+  "hip-bursitis|sciatic-nerve-glide": {
+    "decision": "approve"
+  },
+  "hip-bursitis|seated-spinal-twist": {
+    "decision": "approve"
+  },
+  "hip-bursitis|side-lying-external-rotation": {
+    "decision": "approve"
+  },
+  "hip-bursitis|single-leg-balance": {
+    "decision": "approve"
+  },
+  "hip-bursitis|single-leg-balance-with-hip-activation": {
+    "decision": "approve"
+  },
+  "hip-bursitis|single-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "hip-bursitis|standing-calf-raises": {
+    "decision": "approve"
+  },
+  "hip-bursitis|standing-hamstring-curl": {
+    "decision": "approve"
+  },
+  "hip-bursitis|standing-single-leg-balance-with-hip-stability": {
+    "decision": "approve"
+  },
+  "hip-bursitis|straight-leg-raises": {
+    "decision": "approve"
+  },
+  "hip-bursitis|supine-figure-4-stretch-with-pelvic-mobilization": {
+    "decision": "approve"
+  },
+  "hip-bursitis|supine-hip-external-rotation": {
+    "decision": "approve"
+  },
+  "hip-bursitis|supine-hip-internal-rotation": {
+    "decision": "approve"
+  },
+  "hip-bursitis|walking": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|lat-pulldown-with-band": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as UNSAFE. AI hedged 'unclear' \u2014 flip to contra to match v1."
+  },
+  "frozen-shoulder|seated-shoulder-press": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "frozen-shoulder|standing-chest-fly-with-band": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "frozen-shoulder|wall-push-ups": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "frozen-shoulder|childs-pose-with-side-reach": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|overhead-tricep-stretch": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|plank": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|prone-i-y-t-raises": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|prone-press-up": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|prone-shoulder-flexion": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|prone-t-raises": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|prone-y-raises": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|quadruped-shoulder-taps": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|resistance-band-external-rotation-at-90-90": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|side-plank": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|superman-exercise": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|band-pull-aparts": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|banded-shoulder-stabilizer-series": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|bicep-curls": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|bird-dog-hold-with-scapular-punch": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|cat-cow-stretch": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|chest-stretch-corner": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|childs-pose": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|cross-body-stretch": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|dead-bug-with-shoulder-reach": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|doorway-stretch": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|half-kneeling-pallof-press": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|internal-rotation": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|levator-scapulae-stretch": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|median-nerve-glide": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|pec-stretch": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|prayer-stretch": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|prone-i-y-t-shoulder-activation": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|prone-scapular-retraction": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|quadruped-rocking": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|quadruped-thoracic-rotation": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|resistance-band-pull-apart": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|seated-row-with-band": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|shoulder-abduction": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|shoulder-flexion": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|side-lying-external-rotation": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|sleeper-stretch": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|standing-back-extension": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|standing-row-with-band": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|supported-cat-cow-stretch": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|swimmers-exercise": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|tricep-extensions": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|wall-angel": {
+    "decision": "approve"
+  },
+  "frozen-shoulder|wall-slides": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|seated-shoulder-press": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "shoulder-impingement|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|lat-pulldown-with-band": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|overhead-tricep-stretch": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|prone-press-up": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|prone-shoulder-flexion": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|quadruped-shoulder-taps": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|resistance-band-external-rotation-at-90-90": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|shoulder-abduction": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|side-plank": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|standing-chest-fly-with-band": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|superman-exercise": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|bicep-curls": {
+    "decision": "reject"
+  },
+  "shoulder-impingement|bird-dog-hold-with-scapular-punch": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|cat-cow-stretch": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|childs-pose-with-side-reach": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|dead-bug-with-shoulder-reach": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|half-kneeling-pallof-press": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|internal-rotation": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|isometric-shoulder-internal-rotation": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|plank": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|prone-i-y-t-raises": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|prone-i-y-t-shoulder-activation": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|prone-t-raises": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|prone-y-raises": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|quadruped-rocking": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|seated-spinal-twist": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|shoulder-flexion": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|standing-row-with-band": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|supported-cat-cow-stretch": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|swimmers-exercise": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|towel-curls": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|tricep-extensions": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|upper-trapezius-stretch": {
+    "decision": "approve"
+  },
+  "shoulder-impingement|wall-push-ups": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|marble-pickup": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. Marble-pickup is intrinsic foot muscle strengthening \u2014 part of standard plantar fasciitis rehab (not contraindicated)."
+  },
+  "plantar-fasciitis|standing-calf-raises": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. High-load calf raises with rolled towel under toes (Rathleff 2014 protocol) is first-line treatment for plantar fasciitis."
+  },
+  "plantar-fasciitis|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|bulgarian-split-squat": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|double-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|heel-drops": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|lateral-step-ups": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|monster-walks": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|resistance-band-ankle-inversion": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|resisted-ankle-plantarflexion": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|single-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|single-leg-deadlift": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|step-ups": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|wall-sits": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|wall-slides": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|wall-squat-with-ball": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|half-kneeling-pallof-press": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|half-kneeling-shoulder-rotations-with-band": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|heel-toe-walking": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|lateral-band-walks": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|mini-squats": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|pallof-press": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|plank": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|quadruped-hip-flexor-march": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|quadruped-rocking": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|sciatic-nerve-glide": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|seated-calf-raises": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|seated-toe-taps": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|side-plank": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|single-leg-balance": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|single-leg-balance-with-hip-activation": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|soleus-stretch": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|standing-hamstring-curl": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|standing-hip-abduction": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|standing-single-leg-balance-with-hip-stability": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|toe-raises": {
+    "decision": "approve"
+  },
+  "plantar-fasciitis|walking": {
+    "decision": "approve"
+  },
+  "hamstring-strain|hamstring-curls": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE for hamstring-strain. Pain-monitored loading is part of standard return-to-activity rehab; Askling/Tyler protocols emphasize early loading."
+  },
+  "hamstring-strain|hip-hinge": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE for hamstring-strain. Controlled hip-hinge pattern is part of progressive loading rehab."
+  },
+  "hamstring-strain|prone-hamstring-curl": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE for hamstring-strain. Low-load prone knee flexion is appropriate early-phase isolated activation."
+  },
+  "hamstring-strain|bulgarian-split-squat": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "hamstring-strain|single-leg-deadlift": {
+    "decision": "approve",
+    "edited_reason": "Aligns with v1 KG (already unsafeExercises)."
+  },
+  "hamstring-strain|90-90-hip-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-strain|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "hamstring-strain|knee-to-chest-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-strain|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "hamstring-strain|lateral-step-ups": {
+    "decision": "approve"
+  },
+  "hamstring-strain|lying-hip-flexor-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-strain|monster-walks": {
+    "decision": "approve"
+  },
+  "hamstring-strain|seated-figure-four-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-strain|seated-long-sitting-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-strain|standing-hip-flexor-and-quad-stretch-evening-wind-down": {
+    "decision": "approve"
+  },
+  "hamstring-strain|step-ups": {
+    "decision": "approve"
+  },
+  "hamstring-strain|superman-exercise": {
+    "decision": "approve"
+  },
+  "hamstring-strain|thread-the-needle": {
+    "decision": "approve"
+  },
+  "hamstring-strain|wall-sits": {
+    "decision": "approve"
+  },
+  "hamstring-strain|wall-slides": {
+    "decision": "approve"
+  },
+  "hamstring-strain|wall-squat-with-ball": {
+    "decision": "approve"
+  },
+  "hamstring-strain|heel-drops": {
+    "decision": "reject"
+  },
+  "hamstring-strain|prone-knee-flexion": {
+    "decision": "reject"
+  },
+  "hamstring-strain|seated-knee-extension": {
+    "decision": "reject"
+  },
+  "hamstring-strain|standing-back-extension": {
+    "decision": "reject"
+  },
+  "hamstring-strain|standing-hamstring-curl": {
+    "decision": "reject"
+  },
+  "hamstring-strain|bird-dog": {
+    "decision": "approve"
+  },
+  "hamstring-strain|bird-dog-hold-with-scapular-punch": {
+    "decision": "approve"
+  },
+  "hamstring-strain|bird-dog-with-core-stability-focus": {
+    "decision": "approve"
+  },
+  "hamstring-strain|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "hamstring-strain|calf-stretch-on-step": {
+    "decision": "approve"
+  },
+  "hamstring-strain|childs-pose": {
+    "decision": "approve"
+  },
+  "hamstring-strain|childs-pose-with-side-reach": {
+    "decision": "approve"
+  },
+  "hamstring-strain|cross-body-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-strain|doorway-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-strain|fire-hydrants": {
+    "decision": "approve"
+  },
+  "hamstring-strain|gentle-stretching": {
+    "decision": "approve"
+  },
+  "hamstring-strain|glute-bridge": {
+    "decision": "approve"
+  },
+  "hamstring-strain|glute-bridge-hold": {
+    "decision": "approve"
+  },
+  "hamstring-strain|glute-bridge-with-isometric-hold": {
+    "decision": "approve"
+  },
+  "hamstring-strain|glute-bridges": {
+    "decision": "approve"
+  },
+  "hamstring-strain|half-kneeling-pallof-press": {
+    "decision": "approve"
+  },
+  "hamstring-strain|hamstring-stretch-with-strap": {
+    "decision": "approve"
+  },
+  "hamstring-strain|heel-slides": {
+    "decision": "approve"
+  },
+  "hamstring-strain|internal-rotation": {
+    "decision": "approve"
+  },
+  "hamstring-strain|it-band-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-strain|knee-flexion-rom": {
+    "decision": "approve"
+  },
+  "hamstring-strain|lateral-band-walks": {
+    "decision": "approve"
+  },
+  "hamstring-strain|lower-back-release-roll": {
+    "decision": "approve"
+  },
+  "hamstring-strain|lumbar-rotation-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-strain|mini-squats": {
+    "decision": "approve"
+  },
+  "hamstring-strain|pallof-press": {
+    "decision": "approve"
+  },
+  "hamstring-strain|plank": {
+    "decision": "approve"
+  },
+  "hamstring-strain|prayer-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-strain|prone-hip-extension": {
+    "decision": "approve"
+  },
+  "hamstring-strain|prone-hip-extension-pulse": {
+    "decision": "approve"
+  },
+  "hamstring-strain|quadruped-hip-flexor-march": {
+    "decision": "approve"
+  },
+  "hamstring-strain|quadruped-rocking": {
+    "decision": "approve"
+  },
+  "hamstring-strain|sciatic-nerve-glide": {
+    "decision": "approve"
+  },
+  "hamstring-strain|seated-hamstring-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-strain|side-plank": {
+    "decision": "approve"
+  },
+  "hamstring-strain|single-leg-balance": {
+    "decision": "approve"
+  },
+  "hamstring-strain|single-leg-balance-with-hip-activation": {
+    "decision": "approve"
+  },
+  "hamstring-strain|single-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "hamstring-strain|standing-hip-extension": {
+    "decision": "approve"
+  },
+  "hamstring-strain|straight-leg-raises": {
+    "decision": "approve"
+  },
+  "hamstring-strain|supine-figure-4-stretch-with-pelvic-mobilization": {
+    "decision": "approve"
+  },
+  "hamstring-strain|supine-hamstring-stretch": {
+    "decision": "approve"
+  },
+  "hamstring-strain|supine-hip-flexion": {
+    "decision": "approve"
+  },
+  "hamstring-strain|swimmers-exercise": {
+    "decision": "approve"
+  },
+  "hamstring-strain|tennis-ball-roll": {
+    "decision": "approve"
+  },
+  "hamstring-strain|towel-curls": {
+    "decision": "approve"
+  },
+  "hamstring-strain|walking": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|resistance-band-ankle-inversion": {
+    "decision": "flip",
+    "edited_reason": "v1 KG curates as SAFE. AI mis-interpreted the exercise: the band pulls the ankle into inversion, the patient resists by EVERTING \u2014 so this is an EVERTOR (peroneal) strengthening drill, which is the standard rehab for lateral ankle sprain (DiStefano 2009 protocol)."
+  },
+  "lateral-ankle-sprain|bulgarian-split-squat": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|heel-drops": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|lateral-band-walks": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|lateral-lunge-with-reach": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|lateral-step-ups": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|monster-walks": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|single-leg-deadlift": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|step-ups": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|ankle-alphabet": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|ankle-circles": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|bosu-ball-balance": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|calf-stretch-on-step": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|double-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|downward-facing-dog": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|eccentric-calf-lowering": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|external-rotation": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|foam-roller-calf": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|half-kneeling-pallof-press": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|half-kneeling-shoulder-rotations-with-band": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|heel-toe-walking": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|internal-rotation": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|marble-pickup": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|mini-squats": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|pallof-press": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|plank": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|prone-hamstring-curl": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|prone-knee-flexion": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|quadruped-hip-flexor-march": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|quadruped-rocking": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|seated-calf-raises": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|side-plank": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|single-leg-balance": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|single-leg-balance-with-hip-activation": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|single-leg-calf-raise": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|soleus-stretch": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|standing-calf-raises": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|standing-hamstring-curl": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|standing-hip-abduction": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|standing-hip-adduction": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|standing-hip-extension": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|standing-hip-flexion": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|standing-single-leg-balance-with-hip-stability": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|tennis-ball-roll": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|toe-raises": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|walking": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|wall-sits": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|wall-slides": {
+    "decision": "approve"
+  },
+  "lateral-ankle-sprain|wall-squat-with-ball": {
+    "decision": "approve"
+  }
+}

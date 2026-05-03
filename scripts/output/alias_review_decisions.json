@@ -1,0 +1,142 @@
+{
+  "band-shoulder-external-rotation": {
+    "canonical": "band-external-rotation",
+    "verdict": "merge"
+  },
+  "big-standing-marching": {
+    "canonical": "standing-marching",
+    "verdict": "merge"
+  },
+  "cervical-lateral-flexion": {
+    "canonical": "cervical-isometric-lateral-flexion",
+    "verdict": "merge"
+  },
+  "cervical-rotation": {
+    "canonical": "cervical-rotation-stretch",
+    "verdict": "merge"
+  },
+  "doorway-pec-stretch": {
+    "canonical": "pec-stretch",
+    "verdict": "merge"
+  },
+  "doorway-pectoral-stretch": {
+    "canonical": "doorway-stretch",
+    "verdict": "merge"
+  },
+  "doorway-shoulder-stretch": {
+    "canonical": "doorway-stretch",
+    "verdict": "merge"
+  },
+  "dumbbell-deadlifts": {
+    "canonical": "dumbbell-romanian-deadlifts",
+    "verdict": "skip"
+  },
+  "gentle-knee-flexion": {
+    "canonical": "knee-flexion-stretch",
+    "verdict": "merge"
+  },
+  "graded-grip-strengthening": {
+    "canonical": "grip-strengthening",
+    "verdict": "merge"
+  },
+  "hand-wrist-circles": {
+    "canonical": "wrist-circles",
+    "verdict": "merge"
+  },
+  "heel-toe-raises": {
+    "canonical": "toe-raises",
+    "verdict": "merge"
+  },
+  "hip-internal-rotation-band": {
+    "canonical": "band-internal-rotation",
+    "verdict": "skip"
+  },
+  "neck-isometric-flexion": {
+    "canonical": "cervical-isometric-neck-flexion",
+    "verdict": "merge"
+  },
+  "plantar-fascia-foot-stretch": {
+    "canonical": "plantar-fascia-stretch",
+    "verdict": "merge"
+  },
+  "posterior-shoulder-doorway-stretch": {
+    "canonical": "posterior-shoulder-stretch",
+    "verdict": "skip"
+  },
+  "postural-chin-tucks": {
+    "canonical": "chin-tucks",
+    "verdict": "merge"
+  },
+  "pronation-supination": {
+    "canonical": "wrist-pronation-supination",
+    "verdict": "merge"
+  },
+  "prone-shoulder-horizontal-abduction": {
+    "canonical": "prone-horizontal-abduction",
+    "verdict": "merge"
+  },
+  "prone-t-y-i-holds": {
+    "canonical": "prone-iyt-holds",
+    "verdict": "merge"
+  },
+  "resistance-band-internal-rotation": {
+    "canonical": "resistance-band-shoulder-internal-rotation",
+    "verdict": "merge"
+  },
+  "seated-figure-four-hip-stretch": {
+    "canonical": "seated-figure-four-stretch",
+    "verdict": "merge"
+  },
+  "shoulder-cross-body-stretch": {
+    "canonical": "cross-body-stretch",
+    "verdict": "merge"
+  },
+  "shoulder-internal-rotation-band": {
+    "canonical": "band-internal-rotation",
+    "verdict": "merge"
+  },
+  "shoulder-pendulum-swings": {
+    "canonical": "pendulum-swings",
+    "verdict": "merge"
+  },
+  "single-leg-romanian-deadlift": {
+    "canonical": "single-leg-deadlift",
+    "verdict": "merge"
+  },
+  "standing-core-rotation-band": {
+    "canonical": "standing-rotation-band",
+    "verdict": "merge"
+  },
+  "standing-heel-toe-raises": {
+    "canonical": "standing-heel-raises",
+    "verdict": "merge"
+  },
+  "standing-quad-sets-wall": {
+    "canonical": "standing-quad-sets-against-wall",
+    "verdict": "merge"
+  },
+  "standing-torso-rotation-with-band": {
+    "canonical": "standing-rotation-band",
+    "verdict": "merge"
+  },
+  "step-up-dumbbell": {
+    "canonical": "dumbbell-step-ups",
+    "verdict": "merge"
+  },
+  "supine-bridge": {
+    "canonical": "supine-glute-bridge",
+    "verdict": "merge"
+  },
+  "supine-hip-knee-flexion": {
+    "canonical": "supine-hip-flexion",
+    "verdict": "skip"
+  },
+  "thoracic-extension-stretch": {
+    "canonical": "thoracic-extension",
+    "verdict": "merge"
+  },
+  "thumb-cmc-isometric-hold": {
+    "canonical": "isometric-thumb-hold",
+    "verdict": "merge"
+  }
+}

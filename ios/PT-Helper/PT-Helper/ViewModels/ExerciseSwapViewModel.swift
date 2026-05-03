@@ -53,6 +53,9 @@ private struct AISubstituteExercise: Decodable {
     let exerciseCategory: String?
     let imageFileName: String?
     let whyItHelps: String?
+    // PR 2: server-side flag/notes for kinetic-chain substitutions.
+    let catalogSubstitution: Bool?
+    let notes: String?
 }
 
 // MARK: - ViewModel
@@ -68,6 +71,14 @@ class ExerciseSwapViewModel: ObservableObject {
     @Published var substitutes: [RehabExercise] = []
     @Published var substituteReasons: [UUID: String] = [:]  // exercise id → whyItHelps text
     @Published var verificationStatuses: [UUID: ExerciseVerificationStatus] = [:]
+    /// Tier 1: set true when every candidate across `maxSaferSubstituteRetries` retries
+    /// was contraindicated. UI should render a "No safe substitute available" empty state.
+    @Published var noSafeSubstituteAvailable: Bool = false
+
+    /// Max retries when the AI keeps returning contraindicated substitutes.
+    static let maxSaferSubstituteRetries = 3
+    /// Per-attempt API timeout (seconds). Total ceiling = 3 × 5s = 15s.
+    static let substituteFetchTimeoutSeconds: Double = 5.0
 
     // MARK: - Input
 
@@ -85,35 +96,143 @@ class ExerciseSwapViewModel: ObservableObject {
     // MARK: - Actions
 
     /// Fetch substitute exercises from the AI.
+    ///
+    /// Tier 1: runs KG contraindication verification SYNCHRONOUSLY before assigning
+    /// `substitutes`, filters out contraindicated candidates, and retries up to
+    /// `maxSaferSubstituteRetries` times (5s timeout per attempt) if every candidate in
+    /// a given batch was rejected. Sets `noSafeSubstituteAvailable = true` if retries
+    /// are exhausted; the view should render an empty-state card pointing to PT
+    /// consultation.
     func fetchSubstitutes() async {
         guard let reason = selectedReason else { return }
         isLoading = true
         error = nil
+        noSafeSubstituteAvailable = false
 
         SessionLogger.shared.log(.buttonTapped, category: .userAction,
                                   message: "Requested exercise swap",
                                   metadata: ["exercise": exercise.name,
                                               "reason": reason.rawValue])
 
-        do {
-            let message = buildUserMessage()
-            let response = try await apiService.sendMessage(
-                requestType: .exercise_substitute,
-                userMessage: message
-            )
+        let graph = KnowledgeGraphService.shared
+        var attemptsUsed = 0
+        var lastError: Error?
 
-            let parsed = try parseSubstitutes(from: response)
-            self.substitutes = parsed
-            verifySubstitutes(parsed)
-            isLoading = false
-        } catch {
-            self.error = error.localizedDescription
-            isLoading = false
+        while attemptsUsed < Self.maxSaferSubstituteRetries {
+            attemptsUsed += 1
+            do {
+                let response = try await fetchSubstituteResponseWithTimeout()
+                let parsed = try parseSubstitutes(from: response)
 
-            SessionLogger.shared.log(.errorOccurred, category: .error,
-                                      message: "Exercise swap fetch failed",
-                                      metadata: ["error": error.localizedDescription])
+                // Pre-display contraindication filter: drop any candidate flagged
+                // `.contraindicated` by the KG against ANY condition on the plan.
+                var safe: [RehabExercise] = []
+                var dropped: [RehabExercise] = []
+                for candidate in parsed {
+                    var isContra = false
+                    for condition in plan.conditions {
+                        if case .contraindicated = graph.verify(exercise: candidate.name, forCondition: condition) {
+                            isContra = true
+                            break
+                        }
+                    }
+                    if isContra { dropped.append(candidate) } else { safe.append(candidate) }
+                }
+
+                if !dropped.isEmpty {
+                    SessionLogger.shared.log(.stateUpdated, category: .api,
+                                              message: "Exercise swap dropped contraindicated candidates",
+                                              metadata: [
+                                                "attempt": "\(attemptsUsed)",
+                                                "droppedCount": "\(dropped.count)",
+                                                "droppedNames": dropped.map(\.name).joined(separator: ", ")
+                                              ])
+                }
+
+                if !safe.isEmpty {
+                    self.substitutes = safe
+                    verifySubstitutes(safe)
+                    self.isLoading = false
+                    return
+                }
+
+                // All candidates contraindicated — try again (up to max retries).
+                AppLogger.rehab.info("Exercise swap attempt \(attemptsUsed) returned only contraindicated substitutes; retrying")
+            } catch {
+                lastError = error
+                // Tier 1: ai_response_invalid breadcrumb (server Zod rejection).
+                if let apiError = error as? ClaudeAPIError, apiError.isResponseInvalid {
+                    SessionLogger.shared.log(.errorOccurred, category: .api,
+                        message: "Exercise swap rejected by server schema (ai_response_invalid)",
+                        metadata: ["error_kind": "ai_response_invalid", "attempt": "\(attemptsUsed)"])
+                }
+                SessionLogger.shared.log(.errorOccurred, category: .error,
+                                          message: "Exercise swap fetch attempt failed",
+                                          metadata: [
+                                            "attempt": "\(attemptsUsed)",
+                                            "error": error.localizedDescription
+                                          ])
+                // Break on non-transient errors to avoid hammering a down endpoint.
+                if !Self.isTransientError(error) {
+                    break
+                }
+            }
         }
+
+        // Retries exhausted.
+        self.isLoading = false
+        if let err = lastError {
+            self.error = err.localizedDescription
+        } else {
+            self.noSafeSubstituteAvailable = true
+            SessionLogger.shared.log(.stateUpdated, category: .api,
+                                      message: "Exercise swap exhausted retries — no safe substitute",
+                                      metadata: ["attempts": "\(attemptsUsed)"])
+        }
+    }
+
+    /// Race `apiService.sendMessage` against a 5s timeout using `withThrowingTaskGroup`.
+    /// Throws `ClaudeAPIError.networkError` on timeout, surfacing as a normal transient
+    /// error so the retry loop continues.
+    private func fetchSubstituteResponseWithTimeout() async throws -> String {
+        let message = buildUserMessage()
+        return try await withThrowingTaskGroup(of: String.self) { group in
+            group.addTask { [apiService] in
+                try await apiService.sendMessage(
+                    requestType: .exercise_substitute,
+                    userMessage: message
+                )
+            }
+            group.addTask {
+                try await Task.sleep(for: .seconds(Self.substituteFetchTimeoutSeconds))
+                throw ClaudeAPIError.networkError(
+                    NSError(domain: "ExerciseSwapViewModel", code: -2,
+                            userInfo: [NSLocalizedDescriptionKey: "Substitute request timed out after \(Self.substituteFetchTimeoutSeconds)s"]))
+            }
+            defer { group.cancelAll() }
+            guard let first = try await group.next() else {
+                throw ClaudeAPIError.networkError(
+                    NSError(domain: "ExerciseSwapViewModel", code: -3,
+                            userInfo: [NSLocalizedDescriptionKey: "Substitute fetch produced no result"]))
+            }
+            return first
+        }
+    }
+
+    /// Network/rate-limit errors are transient and worth retrying. 4xx, decode failures,
+    /// auth failures, and config errors are not.
+    private static func isTransientError(_ error: Error) -> Bool {
+        if let apiError = error as? ClaudeAPIError {
+            switch apiError {
+            case .networkError, .rateLimited:
+                return true
+            case .invalidResponse(let statusCode, _):
+                return statusCode >= 500  // 5xx is worth retrying; 4xx is not
+            case .invalidURL, .decodingError, .noContent, .authenticationRequired:
+                return false
+            }
+        }
+        return true  // unknown errors: retry conservatively
     }
 
     /// Replace the original exercise in the plan with the selected substitute.
@@ -168,30 +287,12 @@ class ExerciseSwapViewModel: ObservableObject {
     // MARK: - Private — Response Parsing
 
     private func parseSubstitutes(from text: String) throws -> [RehabExercise] {
-        guard let jsonData = text.data(using: .utf8) else {
-            throw ClaudeAPIError.decodingError(
-                NSError(domain: "ExerciseSwapViewModel", code: -1,
-                        userInfo: [NSLocalizedDescriptionKey: "Invalid response text encoding"]))
-        }
-
-        let aiResponse: AISubstituteResponse
-        do {
-            aiResponse = try JSONDecoder().decode(AISubstituteResponse.self, from: jsonData)
-        } catch let directError {
-            // Fallback: extract JSON between first { and last }
-            if let startIndex = text.firstIndex(of: "{"),
-               let endIndex = text.lastIndex(of: "}"),
-               startIndex <= endIndex {
-                let jsonSubstring = String(text[startIndex...endIndex])
-                if let fallbackData = jsonSubstring.data(using: .utf8) {
-                    aiResponse = try JSONDecoder().decode(AISubstituteResponse.self, from: fallbackData)
-                } else {
-                    throw ClaudeAPIError.decodingError(directError)
-                }
-            } else {
-                throw ClaudeAPIError.decodingError(directError)
-            }
-        }
+        // Tier 3 PR C: shadow-mode strict parsing (see ShadowModeJSONParser).
+        let aiResponse = try ShadowModeJSONParser.parse(
+            text,
+            as: AISubstituteResponse.self,
+            requestType: "exercise_substitute"
+        )
 
         return aiResponse.substitutes.map { ai in
             let difficulty: RehabExercise.Difficulty = {
@@ -218,7 +319,10 @@ class ExerciseSwapViewModel: ObservableObject {
                 movement: ai.movement,
                 endPosition: ai.endPosition,
                 exerciseCategory: ai.exerciseCategory,
-                imageFileName: ai.imageFileName
+                imageFileName: ai.imageFileName,
+                catalogSubstitution: ai.catalogSubstitution,
+                notes: ai.notes,
+                originalAIName: ai.name
             )
 
             // Store the whyItHelps text separately (not part of RehabExercise model)

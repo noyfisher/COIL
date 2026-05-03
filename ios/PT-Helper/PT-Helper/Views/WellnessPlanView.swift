@@ -78,16 +78,13 @@ struct WellnessPlanView: View {
 
                 // Notes
                 if let notes = plan.notes, !notes.isEmpty {
-                    HStack(alignment: .top, spacing: AppSpacing.sm) {
-                        Image(systemName: "info.circle.fill")
-                            .foregroundColor(AppColors.accent)
-                        Text(notes)
-                            .font(.subheadline)
-                    }
-                    .padding(AppSpacing.md)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(AppColors.accentTint)
-                    .cornerRadius(AppCorners.medium)
+                    ExpandableSummaryView(
+                        fullText: notes,
+                        presentation: .card(icon: "info.circle.fill", iconColor: AppColors.accent, title: "Notes"),
+                        detailTitle: "Plan Notes",
+                        detailAnalyticsName: "FullText.WellnessPlanNotes",
+                        accessibilityPrefix: "wellnessPlan"
+                    )
                 }
 
                 // Exercises

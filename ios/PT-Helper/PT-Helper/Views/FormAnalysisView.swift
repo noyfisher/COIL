@@ -197,14 +197,16 @@ struct FormAnalysisView: View {
                 // Score badge with confidence indicator
                 scoreHeader(feedback, confidenceLevel: validation.confidenceLevel)
 
-                // Contraindication / urgent warnings (red banner)
-                let urgentWarnings = validation.warnings.filter { $0.severity == .urgent }
-                if !urgentWarnings.isEmpty {
+                // Contraindication / serious+ warnings (red banner). Covers .serious, .urgent,
+                // and .emergency — all are high-priority and get the same strong banner here,
+                // since form analysis doesn't navigate to an emergency redirect.
+                let blockingWarnings = validation.warnings.filter { $0.severity >= .serious }
+                if !blockingWarnings.isEmpty {
                     VStack(alignment: .leading, spacing: AppSpacing.sm) {
                         Label("Important", systemImage: "exclamationmark.triangle.fill")
                             .font(.headline)
                             .foregroundColor(AppColors.ctaText)
-                        ForEach(urgentWarnings.map { $0.message }, id: \.self) { msg in
+                        ForEach(blockingWarnings.map { $0.message }, id: \.self) { msg in
                             Text(msg)
                                 .font(.subheadline)
                                 .foregroundColor(AppColors.ctaText.opacity(0.9))
