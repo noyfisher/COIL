@@ -1214,46 +1214,43 @@
       "exercise_name": "Band External Rotation",
       "filename": "band-external-rotation",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are identical between both images.",
+        "observation": "The camera angle, distance, and framing are identical between the start and end positions, providing a consistent viewpoint.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character is the same person in both images, with consistent face, hair, and body proportions.",
+        "observation": "The character is identical in both images, with consistent facial features, hair, skin tone, and body proportions.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The character's clothing (t-shirt, shorts, socks, shoes) is identical in both images.",
+        "observation": "The character's clothing (gray t-shirt, dark blue shorts, gray socks, gray shoes) is perfectly consistent in both images.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The art style, line work, shading, and color palette are perfectly consistent across both illustrations.",
+        "observation": "The art style, rendering quality, lighting, and detail are consistent across both images, maintaining a uniform aesthetic.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The background and the forearm attachment are consistent. However, the resistance band itself changes significantly in appearance from a single flat strap in the start image to two distinct round cords in the end image. This is a major inconsistency in the prop's rendering.",
-        "score": 2,
-        "passed": false
+        "observation": "The background is consistently white, and the bench is in the exact same position and appears identical in both images. The resistance band is also consistently depicted.",
+        "score": 5,
+        "passed": true
       },
       "body_anchoring": {
-        "observation": "All non-moving body parts (torso, left leg, right upper arm, head) remain perfectly anchored in the same position.",
+        "observation": "The torso, head, left arm (anchoring the band), and legs remain perfectly still. Crucially, the right upper arm and elbow are firmly anchored against the ribs in both frames, as required by the exercise description.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The movement logic for external rotation is clearly depicted, with the arm extending outwards to stretch the band. However, the visual inconsistency of the band's appearance slightly detracts from the overall clarity of the movement.",
-        "score": 3,
+        "observation": "The movement clearly shows the right forearm rotating outward from across the body to the side, with the elbow remaining tucked, which accurately represents an external rotation against band resistance.",
+        "score": 5,
         "passed": true
       },
-      "overall_consistency_score": 4.29,
-      "overall_pass": false,
-      "critical_failures": [
-        "SCENE_SETUP",
-        "MOVEMENT_LOGIC"
-      ]
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
     },
     "band-internal-rotation-zero-degrees": {
       "exercise_name": "Band Internal Rotation Zero Degrees",
@@ -2061,37 +2058,37 @@
       "exercise_name": "Banded Copenhagen Adductor Exercise",
       "filename": "banded-copenhagen-adductor-exercise",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are identical between the start and end positions.",
+        "observation": "Identical camera angle, distance, and framing.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent across both images.",
+        "observation": "The same person is depicted in both images.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The character's clothing (grey t-shirt, navy shorts, white socks, grey shoes, and blue resistance band) is identical in both images.",
+        "observation": "The model is wearing the exact same outfit, including the resistance band, in both images.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The art style, rendering, shading, and level of detail are perfectly consistent.",
+        "observation": "Both images are photographs with consistent lighting, color, and detail.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The background and the black step prop are in the exact same position and appear identical in both images.",
+        "observation": "The background, mat, and exercise bench are identical in position and appearance in both images.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "All non-moving body parts, including the supporting arm, torso, head, and the leg resting on the bench, remain perfectly anchored in the same position. Only the intended moving leg changes.",
+        "observation": "All non-moving body parts, including the head, torso, supporting arm, and top leg, are perfectly consistent between the start and end positions.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The movement of lifting the top leg clearly demonstrates the intended exercise movement, making the transition logical and easy to understand.",
+        "observation": "The end position shows the bottom leg lifted towards the top leg against the resistance band, which is the correct movement for the Copenhagen adductor exercise from the start position.",
         "score": 5,
         "passed": true
       },
@@ -2100,40 +2097,40 @@
       "critical_failures": []
     },
     "banded-external-rotation-90-90": {
-      "exercise_name": "Banded External Rotation 90 90",
+      "exercise_name": "Banded External Rotation at 90/90",
       "filename": "banded-external-rotation-90-90",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "observation": "Camera angle, distance, and framing are identical between the start and end images.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent in both images.",
+        "observation": "The character's identity, including face, hair, and body, is perfectly consistent.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The character's clothing (shirt, shorts, socks, shoes) is identical in style and color in both images.",
+        "observation": "The character's clothing and accessories are exactly the same in both images.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The artistic rendering, including 3D model, lighting, and detail, is perfectly consistent between the start and end images.",
+        "observation": "The art style, rendering, and lighting are consistent across both images.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The background is consistent (plain white), and the resistance band is present and consistent in its setup in both images.",
+        "observation": "The plain white background and the resistance band setup are identical.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "All non-moving body parts (torso, head, left arm, legs) are perfectly anchored and consistent. Only the right forearm and hand move as intended.",
+        "observation": "All body parts not involved in the exercise movement, including the torso, legs, left arm, and the right upper arm, are perfectly anchored.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The movement from the start to the end position clearly and logically depicts an external rotation, making the exercise easy to understand.",
+        "observation": "The movement logic is clear, demonstrating the external rotation of the forearm from pointing down to pointing up while the upper arm remains abducted.",
         "score": 5,
         "passed": true
       },
@@ -2315,37 +2312,37 @@
       "exercise_name": "Banded Hip Internal Rotation",
       "filename": "banded-hip-internal-rotation",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are perfectly consistent between the two images.",
+        "observation": "Perfect match in camera angle, distance, and framing between the start and end images.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's identity, including facial features, hair, skin tone, and body proportions, is perfectly consistent.",
+        "observation": "The character's identity, features, and build are perfectly consistent across both images.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The character's clothing, including shirt, shorts, socks, and shoes, is identical in both images.",
+        "observation": "Clothing is perfectly consistent; the gray t-shirt, dark blue shorts, and shoes are identical.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The art style, line work, shading, and color palette are perfectly consistent between the start and end images.",
+        "observation": "The art style, rendering, shading, and level of detail are perfectly consistent.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The bench and resistance band are set up identically in both images. The background is also consistent.",
+        "observation": "The scene setup, including the bench, resistance band, and background, is perfectly consistent.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "All non-moving body parts such as the torso, arms, head, and the supporting left leg are perfectly anchored and consistent between frames.",
+        "observation": "Non-moving body parts such as the torso, head, arms, and left leg/foot are perfectly anchored and consistent between images.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The movement logic is clear; the right foot has rotated inward, demonstrating hip internal rotation as expected for the exercise.",
+        "observation": "The movement logic clearly and accurately depicts banded hip internal rotation; the right foot rotates inward against the band while the left remains stationary, with the hip joint as the pivot.",
         "score": 5,
         "passed": true
       },
@@ -6219,40 +6216,40 @@
       ]
     },
     "dead-bug-with-dumbbell": {
-      "exercise_name": "Dead Bug With Dumbbell",
+      "exercise_name": "Dead Bug with Dumbbell",
       "filename": "dead-bug-with-dumbbell",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are identical between the start and end images.",
+        "observation": "Identical camera angle, distance, and framing for both start and end positions.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
+        "observation": "The same character is depicted in both images with no discernible changes in appearance.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The clothing, including shirt, shorts, socks, and shoes, is identical.",
+        "observation": "The character's outfit (shirt, shorts, shoes, socks) is perfectly consistent between both images.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The art style, lighting, and level of detail are perfectly consistent across both images.",
+        "observation": "The art style, rendering quality, lighting, and level of detail are consistent across both images.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The scene setup, including the background and the exercise mat, is consistent. The dumbbell is also identical.",
+        "observation": "The background and the exercise mat are identical and positioned consistently in both images.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "Body parts not involved in the movement (arms, torso, head, left leg) remain anchored in the same position. Only the right leg performs the movement.",
+        "observation": "The head, torso, and arms holding the dumbbell remain perfectly anchored. The non-moving leg also maintains its tabletop position consistently.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The movement from the start to the end position clearly illustrates one part of the Dead Bug exercise, making logical sense.",
+        "observation": "The transition from both legs in tabletop to one leg extended while the other remains in tabletop accurately depicts the intended movement for the Dead Bug exercise.",
         "score": 5,
         "passed": true
       },
@@ -6306,37 +6303,37 @@
       "exercise_name": "Dead Bug",
       "filename": "dead-bug",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are perfectly identical in both images.",
+        "observation": "The camera angle, distance, and framing are identical between the two images.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly identical.",
+        "observation": "The character is exactly the same in both images, with identical features, hair, and build.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The clothing (shirt, shorts, shoes, socks) is perfectly identical in color and style.",
+        "observation": "The clothing is perfectly identical in both images (grey t-shirt, dark blue shorts, grey socks and shoes).",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The art style, including rendering, shading, and level of detail, is perfectly identical.",
+        "observation": "The art style, rendering, shading, and level of detail are perfectly consistent across both images.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The plain white background is identical in both images.",
+        "observation": "The background is a plain white in both images, with no props or environmental differences.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "All body parts are in the exact same position, as the images are identical. This implies all non-moving parts are anchored perfectly.",
+        "observation": "All body parts are in the exact same position in both images. This means any parts that should not move are perfectly anchored.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The start and end positions are identical, showing no movement. This does not allow a user to understand the exercise movement.",
+        "observation": "The two images are identical. There is no depicted movement between the 'start' and 'end' positions, making it impossible to understand the exercise movement from this pair.",
         "score": 1,
         "passed": false
       },
@@ -6903,48 +6900,46 @@
       "critical_failures": []
     },
     "doorway-pec-stretch-rotation": {
-      "exercise_name": "Doorway Pec Stretch Rotation",
+      "exercise_name": "Doorway Pec Stretch with Rotation",
       "filename": "doorway-pec-stretch-rotation",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are identical between both images.",
+        "observation": "The camera angle, distance, and framing are identical between the start and end images.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
+        "observation": "The character is consistently the same person in both images, with identical features and build.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The character's clothing is identical in both images.",
+        "observation": "The character's outfit, including the shirt, shorts, shoes, and socks, is identical in both images.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The art style, including line work, shading, and color palette, is perfectly consistent.",
+        "observation": "The art style, rendering quality, lighting, and overall aesthetic are perfectly consistent across both images.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The scene setup, including the background and the wall, is identical.",
+        "observation": "The background and the doorframe prop are identical and positioned consistently in both images.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "The parts of the body not intended to move (feet, anchoring hand) are consistently positioned. The subtle rotation of the torso is the intended movement, not a failure of anchoring.",
+        "observation": "The right arm maintains its goal-post shape and contact with the doorframe. The left arm, legs, and feet positions are consistent, ensuring only the torso rotates as intended.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The change between the start and end images is extremely subtle, making it difficult to clearly understand the 'rotation' movement for the Doorway Pec Stretch. The end position does not show a significantly different stretch or rotation compared to the start.",
-        "score": 2,
-        "passed": false
+        "observation": "The sequence clearly shows the torso rotating away from the anchored right arm, illustrating the Doorway Pec Stretch with Rotation effectively and logically.",
+        "score": 5,
+        "passed": true
       },
-      "overall_consistency_score": 4.57,
-      "overall_pass": false,
-      "critical_failures": [
-        "MOVEMENT_LOGIC"
-      ]
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
     },
     "doorway-pectoral-stretch": {
       "exercise_name": "Doorway Pectoral Stretch",
@@ -10587,43 +10582,46 @@
       "exercise_name": "Foam Roller Quad",
       "filename": "foam-roller-quad",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "observation": "The camera angle, distance, and framing are highly consistent between the two images, maintaining a similar side view.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is identical in both images.",
+        "observation": "The same person is depicted in both start and end positions, maintaining consistent identity in appearance and body proportions.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The character's clothing, including shirt, shorts, and shoes, is exactly the same in both images.",
+        "observation": "The clothing (grey t-shirt, dark blue shorts, white socks, grey sneakers) is identical in both images.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The artistic rendering, line work, shading, and color palette are completely consistent.",
-        "score": 5,
-        "passed": true
+        "observation": "While both images are photorealistic, the lighting and overall color palette are distinctly different due to the change from a bright studio background to a darker, textured gym environment. This creates a noticeable inconsistency in the overall visual presentation.",
+        "score": 2,
+        "passed": false
       },
       "scene_setup": {
-        "observation": "The white background is consistent, and the foam roller, as the only prop, is present in both images, with its position being the subject of the movement.",
-        "score": 5,
-        "passed": true
+        "observation": "The background and floor surface are completely different. Image 1 has a plain white background and a grey yoga mat, while Image 2 features a gym interior with brick walls, windows, and gym equipment on a dark gym floor.",
+        "score": 1,
+        "passed": false
       },
       "body_anchoring": {
-        "observation": "The non-moving parts of the body, such as the hands, torso, and head, maintain their exact position and posture, demonstrating excellent body anchoring.",
+        "observation": "The non-moving body parts, such as the forearms, elbows, head, and lower legs, maintain consistent positioning relative to the torso and the ground in both images.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The transition from the foam roller being under the upper thighs/hips to being under the knees/lower thighs clearly illustrates the rolling movement for the Foam Roller Quad exercise.",
+        "observation": "The movement of the foam roller from the mid-thighs to the upper thighs/hip flexor crease is a logical and natural progression for a foam roller quad exercise, demonstrating a clear shift forward.",
         "score": 5,
         "passed": true
       },
-      "overall_consistency_score": 5.0,
-      "overall_pass": true,
-      "critical_failures": []
+      "overall_consistency_score": 4.0,
+      "overall_pass": false,
+      "critical_failures": [
+        "ART_STYLE",
+        "SCENE_SETUP"
+      ]
     },
     "foam-roller-thoracic-extension": {
       "exercise_name": "Foam Roller Thoracic Extension",
@@ -11004,40 +11002,40 @@
       "critical_failures": []
     },
     "forearm-rotation-band": {
-      "exercise_name": "Forearm Rotation Band",
+      "exercise_name": "Forearm Pronation/Supination with Band",
       "filename": "forearm-rotation-band",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are identical between the two images.",
+        "observation": "The camera angle, distance, and framing are identical between the start and end images.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's face, hair, skin tone, and body proportions are exactly the same in both images.",
+        "observation": "The character is identical in both images, including face, hair, and body proportions.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The clothing (gray t-shirt, blue shorts, gray shoes, white socks) is identical in both images.",
+        "observation": "The character's clothing (t-shirt, shorts, shoes, socks) is identical in color and style in both images.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The art style, line weight, shading, and color palette are consistent across both images.",
+        "observation": "The art style, lighting, and rendering are perfectly consistent between both images.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The white bench and the resistance band's position (anchored under the foot) are identical. The background is also consistent.",
+        "observation": "The background, bench, and resistance band are set up identically in both images.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "The parts of the body that should remain stationary (torso, left arm, legs, supporting right upper arm) are perfectly anchored. Only the right forearm and hand show movement.",
+        "observation": "The character's torso, head, left arm, left leg, right upper arm, and right elbow position relative to the body remain perfectly anchored and unchanged, as required. Only the forearm and wrist rotate.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The images clearly depict the forearm rotation movement. The end position is a natural progression from the start.",
+        "observation": "The movement from palm-down (pronated) to palm-up (supinated) with the elbow fixed is clearly and accurately depicted, making the exercise easy to understand.",
         "score": 5,
         "passed": true
       },
@@ -12318,37 +12316,37 @@
       "exercise_name": "Glute Bridge Single Leg",
       "filename": "glute-bridge-single-leg",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are identical between the start and end images.",
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character is the same person in both images, with consistent physical features.",
+        "observation": "The character's physical appearance, including face, hair, skin tone, and body proportions, is identical in both images.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The character's clothing, including shirt, shorts, socks, and shoes, is identical in both images.",
+        "observation": "The character's clothing (t-shirt, shorts, socks, shoes) is consistent in style and color across both images.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "Both images maintain the same photographic style, lighting, and level of detail.",
+        "observation": "The art style, including line work, shading, and color palette, is perfectly consistent between the two illustrations.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The background is consistently a plain white in both images.",
+        "observation": "The background and the exercise mat are consistent in position and appearance in both images.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "Non-moving body parts like the head, shoulders, arms, and the supporting right foot maintain consistent positions. The torso lifts appropriately for the exercise.",
+        "observation": "The head, torso, arms, and the lifted right leg maintain consistent positions relative to the ground (for arms/head) and to the body's overall structure. The left foot remains anchored throughout the movement.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The images clearly depict the glute bridge single leg movement, showing a logical and understandable transition from start to end.",
+        "observation": "The transition from lying supine with hips on the floor to a bridged position with hips raised, while keeping one leg lifted, accurately and logically depicts the Glute Bridge Single Leg exercise.",
         "score": 5,
         "passed": true
       },
@@ -36489,40 +36487,40 @@
       "critical_failures": []
     },
     "single-leg-balance-dumbbell-hold": {
-      "exercise_name": "Single Leg Balance Dumbbell Hold",
+      "exercise_name": "Single Leg Balance with Dumbbell Hold",
       "filename": "single-leg-balance-dumbbell-hold",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are perfectly consistent between the two images.",
+        "observation": "The camera angle, distance, and framing are identical in both images.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent across both images.",
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent between both images.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The character's clothing, including shirt, shorts, socks, and shoes, is identical in color and style in both images.",
+        "observation": "The character's clothing (shirt, shorts, shoes, socks) is identical in color and style across both images.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The artistic rendering, including line weight, shading technique, level of detail, and color palette, is perfectly consistent.",
+        "observation": "The art style, including line work, shading, detail level, and color palette, is perfectly consistent between the start and end images.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The scene setup is perfectly consistent with a plain white background and no additional props.",
+        "observation": "The background is plain white in both images and there are no props, ensuring perfect consistency.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "The supporting right leg remains anchored, and the way the dumbbells are held is consistent, only changing position as part of the exercise movement.",
+        "observation": "As this is a held position, all body parts are expected to remain static. The character's body is anchored identically in both images.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The transition from a single-leg balance with a raised knee to a single-leg hip hinge (like a Romanian deadlift) is a clear and logical movement progression for the exercise.",
+        "observation": "The exercise is described as a 'held' position, meaning no movement should occur between the start and end frames. The images accurately reflect this static hold, indicating perfect movement logic for the exercise.",
         "score": 5,
         "passed": true
       },
@@ -36618,40 +36616,40 @@
       "critical_failures": []
     },
     "single-leg-balance-foam": {
-      "exercise_name": "Single Leg Balance Foam",
+      "exercise_name": "Single-Leg Balance on Foam Pad",
       "filename": "single-leg-balance-foam",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are identical in both the start and end images.",
+        "observation": "The camera angle, distance, and framing are perfectly identical between the start and end images.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent between both images.",
+        "observation": "The character is identical in both images, with no discernible differences in appearance.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The character's outfit (gray t-shirt, dark blue shorts, gray and white shoes, white socks) is identical in both images.",
+        "observation": "The clothing is perfectly identical, including the shirt, shorts, socks, and shoes.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The art style, including line weight, shading, and color palette, is perfectly consistent across both images.",
+        "observation": "The art style and rendering are perfectly consistent, both appearing as high-quality photographs with identical lighting and detail.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The blue foam block prop is present and in the exact same position relative to the character in both images. The background is also consistent.",
+        "observation": "The background and the blue foam pad prop are perfectly identical in both images.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "The supporting leg (left leg), torso, arms, and head remain fixed. Only the right leg moves, indicating the intended exercise.",
+        "observation": "All body parts, including the standing leg, torso, arms, and the non-standing leg, are in precisely the same position in both images. There is no change whatsoever, indicating perfect anchoring for a static pose.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The movement from two feet on the foam block to one foot lifted off clearly demonstrates the single leg balance exercise.",
+        "observation": "The end position is identical to the start position. For a static balance exercise, this indicates perfect consistency, as the goal is to maintain the pose.",
         "score": 5,
         "passed": true
       },
@@ -36660,40 +36658,40 @@
       "critical_failures": []
     },
     "single-leg-balance-hold": {
-      "exercise_name": "Single Leg Balance Hold",
+      "exercise_name": "Single-Leg Balance Hold",
       "filename": "single-leg-balance-hold",
       "camera_angle": {
-        "observation": "Perfect match. Camera angle, distance, and framing are identical.",
+        "observation": "The camera angle, distance, and framing are identical in both the start and end images.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character is clearly the same person in both images.",
+        "observation": "The character's identity, including face, hair, and body proportions, is perfectly consistent between both images.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "Outfit is identical in both images.",
+        "observation": "The character's clothing (t-shirt, shorts, socks, and shoes) is identical in style and color across both images.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "Art style is perfectly consistent across both images.",
+        "observation": "The art style, rendering quality, lighting, and overall aesthetic are perfectly consistent between the two images.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "Scene setup is identical (plain white background) with no props.",
+        "observation": "The plain white background and overall scene setup are identical in both images.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "All body parts that are not part of the movement (torso, arms, supporting leg) remain anchored in the same position.",
+        "observation": "Both images depict the character in the exact same pose, with no changes in body anchoring or limb positions. This is appropriate for a 'hold' exercise.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The movement from standing to lifting one leg for a balance hold is logical and clearly depicted.",
+        "observation": "The images are identical, which perfectly conveys the 'hold' aspect of the Single-Leg Balance Hold exercise. No movement is expected, and none is shown.",
         "score": 5,
         "passed": true
       },
@@ -37338,7 +37336,7 @@
       ]
     },
     "single-leg-glute-bridge": {
-      "exercise_name": "Single Leg Glute Bridge",
+      "exercise_name": "Single-Leg Glute Bridge",
       "filename": "single-leg-glute-bridge",
       "camera_angle": {
         "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
@@ -37346,32 +37344,32 @@
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is identical in both images.",
+        "observation": "The character is identical in both images, with consistent face, hair, skin tone, and body proportions.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The character's clothing (grey t-shirt, dark shorts, grey shoes, white socks) is identical in both images.",
+        "observation": "The character's clothing (grey t-shirt, dark shorts, white socks, grey shoes) is exactly the same in both images.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The art style, including line weight, shading, and color palette, is perfectly consistent across both images.",
+        "observation": "The art style, including line work, shading, detail, and color palette, is perfectly consistent across both images.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The background and scene setup are identical, with a plain white background and no props.",
+        "observation": "The background and the grey exercise mat are identical in both the start and end images.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "The head, shoulders, arms, and the lifted right leg maintain consistent relative positions. The left foot remains anchored on the ground as the body lifts.",
+        "observation": "The head, shoulders, arms, and the lifted right leg maintain consistent positions relative to the torso, which is appropriate for the hip bridging movement. The planted left foot also remains stable.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The images clearly depict the start and end positions of a single leg glute bridge, showing a natural and logical movement from lying flat to lifting the hips.",
+        "observation": "The images clearly illustrate the Single-Leg Glute Bridge movement, transitioning from hips on the floor to a high bridged position with one leg lifted. The movement logic is excellent.",
         "score": 5,
         "passed": true
       },
@@ -37509,40 +37507,40 @@
       "critical_failures": []
     },
     "single-leg-stance-support": {
-      "exercise_name": "Single Leg Stance Support",
+      "exercise_name": "Single Leg Stance with Upper Body Support",
       "filename": "single-leg-stance-support",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "observation": "The camera angle, distance, and framing are identical between the start and end images.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
+        "observation": "The character is perfectly consistent in terms of appearance, including face, hair, and body proportions.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The character's clothing (shirt, shorts, socks, shoes) is identical in both images.",
+        "observation": "The character's clothing (shirt, shorts, shoes, socks) is identical in both images.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The art style, line weight, shading, and color palette are perfectly consistent across both images.",
+        "observation": "The art style, lighting, and rendering quality are perfectly consistent across both images.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The background and the support bar prop are identical in position and appearance in both images.",
+        "observation": "The plain white background and the metal railing prop are in the exact same position and appearance in both images.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "The parts of the body that should remain stationary (torso, head, arms, supporting right leg) are consistently anchored. Only the left leg moves as intended.",
+        "observation": "All body parts, including the supporting left leg, torso, and the right leg in the air, are anchored in the same position, which is consistent for a held stance.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The movement from standing on both feet to lifting one leg, supported by the bar, clearly and logically demonstrates the single leg stance support exercise.",
+        "observation": "The identical images accurately represent a 'held' position, clearly conveying that the exercise involves maintaining the single-leg stance rather than performing a movement between start and end.",
         "score": 5,
         "passed": true
       },
@@ -37554,7 +37552,7 @@
       "exercise_name": "Single Leg Stance",
       "filename": "single-leg-stance",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are identical between the start and end images.",
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
         "score": 5,
         "passed": true
       },
@@ -37564,27 +37562,27 @@
         "passed": true
       },
       "clothing": {
-        "observation": "The character's clothing (gray t-shirt, dark shorts, gray shoes, white socks) is identical in both images.",
+        "observation": "The character's clothing (shirt, shorts, socks, shoes) is identical in both style and color, showing perfect consistency.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The art style, line weight, shading, and color palette are perfectly consistent across both images.",
+        "observation": "The art style, including line work, shading, detail, and color palette, is perfectly consistent across both images.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The plain white background remains consistent; no props or changes in the scene setup.",
+        "observation": "The plain white background is consistent, and there are no props or scene elements that change.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "The non-moving parts, such as the arms and upper torso, are well anchored. There is a slight, natural shift in the hips and the supporting left leg to accommodate the lifted right leg, which is acceptable for this movement.",
+        "observation": "The standing leg, raised leg, and torso positions are consistent. However, the arm positions for balance have subtly shifted from being slightly forward to slightly more to the sides. This is a minor difference for a held stance.",
         "score": 4,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The transition from a two-legged stance to a single-legged stance is clear and logically depicts the 'Single Leg Stance' exercise.",
+        "observation": "The exercise is a 'held single-leg stance', and the end position accurately reflects a held version of the start position, with only minor adjustments in arm placement for balance. The core movement logic is consistent with a static hold.",
         "score": 5,
         "passed": true
       },
@@ -38313,40 +38311,40 @@
       "critical_failures": []
     },
     "standing-balance-on-one-leg": {
-      "exercise_name": "Standing Balance On One Leg",
+      "exercise_name": "Standing Balance on One Leg",
       "filename": "standing-balance-on-one-leg",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are identical between both images.",
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's face, hair, skin tone, and body proportions are identical in both images.",
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is identical in both images.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The character's clothing, including the t-shirt, shorts, socks, and shoes, is identical in both images.",
+        "observation": "The character's clothing (shirt, shorts, socks, shoes) is identical in color, style, and appearance in both images.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The art style, line weight, shading, level of detail, and color palette are perfectly consistent across both images.",
+        "observation": "The artistic rendering, line weight, shading, and color palette are perfectly consistent across both images.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The background, including the white space and the gray wall on the left, is identical in both images.",
+        "observation": "The background elements, including the wall, floor, and counter, are identical and in the same position in both images.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "The torso, arms (including the hand on the wall), and the supporting right leg remain perfectly anchored. Only the left leg moves.",
+        "observation": "All body parts, including the standing leg, lifted leg, torso, and arm resting on the counter, are in the exact same position in both images. This is consistent with a held balance exercise.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The transition from standing on two legs to lifting one leg off the ground clearly depicts the movement for 'Standing Balance On One Leg'.",
+        "observation": "The exercise describes a held position where the start and end positions are identical. The images accurately reflect this static hold, showing no movement, which is correct for the exercise's nature.",
         "score": 5,
         "passed": true
       },
@@ -41545,40 +41543,40 @@
       ]
     },
     "standing-single-leg-balance": {
-      "exercise_name": "Standing Single Leg Balance",
+      "exercise_name": "Standing Single-Leg Balance",
       "filename": "standing-single-leg-balance",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are identical in both images.",
+        "observation": "The camera angle, distance, and framing are identical in both images, providing a perfect match.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character is the same person in both images, with consistent facial features, hair, and body proportions.",
+        "observation": "The character is exactly the same in both images, with identical facial features, hair, skin tone, and body proportions.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The character's outfit, including the gray t-shirt, navy shorts, white socks, and gray shoes, is identical in both images.",
+        "observation": "The character's clothing (t-shirt, shorts, socks, shoes) is identical in color and style across both images.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The art style, lighting, and rendering are perfectly consistent between the two images.",
+        "observation": "The art style, rendering, lighting, and level of detail are perfectly consistent between the start and end images.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The background (white wall) and props (yoga mat and wooden chair) are exactly the same and in the same position in both images.",
+        "observation": "The plain white background and the brown wooden chair are in the exact same position and appear identical in both images.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "The head, torso, right arm, and the supporting right leg remain in the same position relative to the chair and the ground. Only the left leg moves as intended.",
+        "observation": "All body parts that are not meant to move (supporting leg, torso, head, non-moving arm) are perfectly anchored in the same position. The right hand on the chair also remains consistent.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The transition from standing with both feet on the ground to lifting one leg clearly illustrates the single leg balance movement.",
+        "observation": "The exercise is a 'held' balance. Both images depict the exact same static position, clearly indicating that the movement involves maintaining this balance, which is logically consistent with the exercise description.",
         "score": 5,
         "passed": true
       },
@@ -41629,40 +41627,40 @@
       "critical_failures": []
     },
     "standing-single-leg-stance-band": {
-      "exercise_name": "Standing Single Leg Stance Band",
+      "exercise_name": "Standing Single-Leg Stance with Band Support",
       "filename": "standing-single-leg-stance-band",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are identical between the start and end images.",
+        "observation": "The camera angle, distance, and framing are identical between the two images.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's identity, including face, hair, and body proportions, is perfectly consistent across both images.",
+        "observation": "The character's identity is perfectly consistent across both images.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The character's clothing (t-shirt, shorts, socks, shoes) is identical in both images.",
+        "observation": "The clothing is perfectly consistent, with no changes in color or style.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The artistic rendering, including line work, shading, and color palette, is perfectly consistent between the two images.",
+        "observation": "The art style is perfectly consistent, maintaining the same rendering and detail.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The background and the resistance band setup with the wall anchor are identical in both images.",
+        "observation": "The scene setup, including the background and resistance band, is identical.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "The supporting right leg, torso, arms, and head remain perfectly anchored in the same position, consistent with the exercise isolating movement to the left leg.",
+        "observation": "The body anchoring is perfect as both images show the exact same static pose, which is appropriate for this 'hold' exercise.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The movement of the left leg from a slightly backward position with tension on the band to a slightly more forward and relaxed position is a clear and logical transition for the exercise.",
+        "observation": "The images are identical, which is appropriate for an exercise defined as a 'hold' where the start and end positions are the same. A user would understand the goal is to maintain this stance.",
         "score": 5,
         "passed": true
       },
@@ -41671,48 +41669,51 @@
       "critical_failures": []
     },
     "standing-single-leg-stance": {
-      "exercise_name": "Standing Single Leg Stance",
+      "exercise_name": "Standing Single-Leg Stance",
       "filename": "standing-single-leg-stance",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are identical between the start and end images.",
-        "score": 5,
+        "observation": "The camera angle and framing are mostly consistent, but the character in the end image appears slightly closer and larger.",
+        "score": 3,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's identity, including face, hair, and body proportions, is perfectly consistent.",
-        "score": 5,
-        "passed": true
+        "observation": "Completely different characters; the start image features an illustrated Asian male, while the end image shows a photograph of a biracial male with different facial features and body build.",
+        "score": 1,
+        "passed": false
       },
       "clothing": {
-        "observation": "The character is wearing the exact same outfit, including shirt, shorts, socks, and shoes, in both images.",
-        "score": 5,
+        "observation": "The clothing items (light gray t-shirt, dark shorts, white socks, gray sneakers) are consistent in type and color, despite the differing art styles.",
+        "score": 4,
         "passed": true
       },
       "art_style": {
-        "observation": "The art style, rendering, lighting, and level of detail are consistent across both images.",
-        "score": 5,
-        "passed": true
+        "observation": "The art styles are entirely different; the start image is a stylized illustration, while the end image is a photorealistic rendering.",
+        "score": 1,
+        "passed": false
       },
       "scene_setup": {
-        "observation": "The plain white background is identical in both the start and end images.",
-        "score": 5,
-        "passed": true
+        "observation": "Both images feature a white background. However, the start image shows only the shadow of a chair, whereas the end image shows a physical wooden chair.",
+        "score": 2,
+        "passed": false
       },
       "body_anchoring": {
-        "observation": "In the start image, the character's hands are pressed against the wall for support. In the end image, his hands are at his sides, not touching the wall. This significant change in body anchoring (support mechanism) is inconsistent.",
-        "score": 2,
+        "observation": "As this is a static hold exercise, all body parts should ideally remain identical. However, due to the completely different character and art style, no body parts are visually 'in the same position' between the two images.",
+        "score": 1,
         "passed": false
       },
       "movement_logic": {
-        "observation": "The exercise is 'Standing Single Leg Stance'. The start image shows a supported stance (hands on wall), while the end image shows an unsupported stance (hands free). This fundamental change in support alters the nature of the exercise rather than illustrating a continuous movement or consistent position, making the transition unclear for a single exercise definition.",
-        "score": 2,
-        "passed": false
+        "observation": "Both images correctly depict the static single-leg stance, showing a consistent held position as required by the exercise.",
+        "score": 5,
+        "passed": true
       },
-      "overall_consistency_score": 4.14,
+      "overall_consistency_score": 2.43,
       "overall_pass": false,
       "critical_failures": [
-        "BODY_ANCHORING",
-        "MOVEMENT_LOGIC"
+        "CAMERA_ANGLE",
+        "CHARACTER_IDENTITY",
+        "ART_STYLE",
+        "SCENE_SETUP",
+        "BODY_ANCHORING"
       ]
     },
     "standing-single-leg-stand": {
@@ -51873,7 +51874,7 @@
   },
   "summary": {
     "total_pairs": 1221,
-    "consistent_pairs": 1221,
-    "average_score": 4.87
+    "consistent_pairs": 1220,
+    "average_score": 4.86
   }
 }

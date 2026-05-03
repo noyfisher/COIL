@@ -1,7 +1,7 @@
 {
   "total_images": 1368,
-  "passed": 1344,
-  "failed": 24,
+  "passed": 1343,
+  "failed": 25,
   "skipped": 0,
   "failures_by_check": {
     "NO_TEXT": 8,
@@ -362,7 +362,7 @@
       "exercise_name": "Band External Rotation",
       "filename": "band-external-rotation.png",
       "anatomy": {
-        "observation": "The figure has 2 arms and 2 legs.",
+        "observation": "The figure has exactly 2 arms and 2 legs, with no extra or missing limbs.",
         "passed": true
       },
       "subject": {
@@ -370,11 +370,11 @@
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the figure is visible from head to toe.",
+        "observation": "The entire body of the male figure is visible from head to toe.",
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
+        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the specified attire.",
         "passed": true
       },
       "background": {
@@ -382,19 +382,19 @@
         "passed": true
       },
       "no_text": {
-        "observation": "There is no readable text, labels, watermarks, or annotations in the image.",
+        "observation": "The image is free of any readable text, labels, watermarks, or annotations.",
         "passed": true
       },
       "art_style": {
-        "observation": "The image is a clean digital illustration.",
+        "observation": "The image is a clean digital illustration with a photo-realistic style.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is shown in a seated position.",
+        "observation": "The figure is seated upright on a bench, which matches the 'seated' body position.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is seated upright with the right elbow bent at 90 degrees, tucked against the side, and the forearm pointing forward. A resistance band is held in the right hand, with the other end anchored by the left hand resting on the left knee. This is an excellent match to the expected pose.",
+        "observation": "The pose is an excellent match for the Band External Rotation exercise. The subject is seated, right elbow tucked against the ribs, forearm bent at 90 degrees pointing forward, holding one end of the resistance band, while the left hand anchors the other end at hip level. The band runs horizontally across the body, and the right upper arm remains stationary against the torso.",
         "passed": true
       },
       "pose_score": 5,
@@ -620,7 +620,7 @@
       "exercise_name": "Banded Copenhagen Adductor Exercise",
       "filename": "banded-copenhagen-adductor-exercise.png",
       "anatomy": {
-        "observation": "The figure has two arms and two legs, with no extra or missing limbs.",
+        "observation": "The figure has two arms and two legs.",
         "passed": true
       },
       "subject": {
@@ -628,19 +628,19 @@
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the subject is visible from head to toe.",
+        "observation": "The entire body of the figure, from head to feet, is visible.",
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, which matches the description.",
+        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
         "passed": true
       },
       "background": {
-        "observation": "The background is clean, plain, and white.",
+        "observation": "The background is clean, plain, and light-colored (white).",
         "passed": true
       },
       "no_text": {
-        "observation": "The image is free of readable text, labels, watermarks, or annotations.",
+        "observation": "No readable text, labels, watermarks, or annotations are present on the image.",
         "passed": true
       },
       "art_style": {
@@ -648,11 +648,11 @@
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is in a side-lying position, propped up on his forearm.",
+        "observation": "The figure is in a side-lying position, supported on one forearm.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The pose perfectly matches the description: the figure is side-lying, propped on one forearm with hips stacked, top leg extended with shin on an elevated surface, and bottom leg extended straight below with a resistance band above the knees.",
+        "observation": "The figure is performing a side-lying side plank with the top leg elevated on a bench and a resistance band around both legs just above the knees. All critical aspects of the pose are accurately depicted, including being a side plank supported on one forearm with stacked hips.",
         "passed": true
       },
       "pose_score": 5,
@@ -663,7 +663,7 @@
       "exercise_name": "Banded External Rotation at 90/90",
       "filename": "banded-external-rotation-90-90.png",
       "anatomy": {
-        "observation": "The figure has exactly 2 arms and 2 legs, with all limbs naturally formed.",
+        "observation": "The figure has exactly 2 arms and 2 legs.",
         "passed": true
       },
       "subject": {
@@ -679,7 +679,7 @@
         "passed": true
       },
       "background": {
-        "observation": "The background is clean, plain, and light-colored (white/light gray) with no distracting elements. A resistance band is present as part of the exercise, not a complex background element.",
+        "observation": "The background is plain, clean, and white.",
         "passed": true
       },
       "no_text": {
@@ -687,15 +687,15 @@
         "passed": true
       },
       "art_style": {
-        "observation": "The image displays a clean digital illustration style with photo-realistic qualities.",
+        "observation": "The image is a clean digital illustration with a photo-realistic style.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is standing upright on his feet, which matches the 'standing' orientation.",
+        "observation": "The figure is standing upright on their feet, matching the expected 'standing' body position.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is standing with the right arm abducted to 90 degrees and the elbow bent at 90 degrees, holding a resistance band. The forearm points downward and the band is anchored at shoulder height to the side. This pose is an excellent match to the description.",
+        "observation": "The figure is standing with the right shoulder abducted to 90 degrees and the elbow bent to 90 degrees, forming an L-shape with the forearm pointing down. The right hand grips a resistance band anchored at shoulder height. The left arm hangs at the side. This pose perfectly matches the description.",
         "passed": true
       },
       "pose_score": 5,
@@ -706,7 +706,7 @@
       "exercise_name": "Banded Hip Internal Rotation",
       "filename": "banded-hip-internal-rotation.png",
       "anatomy": {
-        "observation": "The figure has exactly 2 arms and 2 legs, all anatomically correct.",
+        "observation": "The figure has exactly 2 arms and 2 legs, with no extra or missing limbs.",
         "passed": true
       },
       "subject": {
@@ -714,31 +714,31 @@
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the subject is visible from head to toe.",
+        "observation": "The entire body of the figure, from head to toe, is visible in the image.",
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the description.",
+        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the specified attire.",
         "passed": true
       },
       "background": {
-        "observation": "The background is clean, plain, and white.",
+        "observation": "The background is clean, plain, and white/light-colored.",
         "passed": true
       },
       "no_text": {
-        "observation": "There is no readable text, labels, watermarks, or annotations. Small brand-style logos on the shoes are present and acceptable.",
+        "observation": "There is no readable text, labels, watermarks, or annotations present in the image.",
         "passed": true
       },
       "art_style": {
-        "observation": "The image is a clean digital illustration style.",
+        "observation": "The image is rendered in a clean digital illustration style.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is seated upright on a bench, which matches the 'seated' orientation.",
+        "observation": "The figure is seated upright on a bench, which matches the 'seated' body position.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is seated upright on a bench, with knees bent at 90 degrees and feet flat on the floor. A resistance band is looped around both feet. The posture is upright and core engaged. This is an excellent match for the expected pose.",
+        "observation": "The figure is seated upright on a bench with the torso vertical, knees bent at 90 degrees, and feet flat on the floor, hip-width apart. A blue resistance band is clearly visible and correctly looped around both feet at the arches/instep. The arms rest at the sides. This is an excellent match to the expected pose.",
         "passed": true
       },
       "pose_score": 5,
@@ -2254,44 +2254,46 @@
       "exercise_name": "Dead Bug",
       "filename": "dead-bug.png",
       "anatomy": {
-        "observation": "The figure has exactly two arms and two legs, and all limbs appear anatomically correct.",
-        "passed": true
+        "observation": "API error: API call timed out",
+        "passed": false
       },
       "subject": {
-        "observation": "There is exactly one human male figure in the image.",
-        "passed": true
+        "observation": "API error: API call timed out",
+        "passed": false
       },
       "full_body": {
-        "observation": "The entire body of the figure, from head to toe, is visible within the frame.",
-        "passed": true
+        "observation": "API error: API call timed out",
+        "passed": false
       },
       "clothing": {
-        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, which matches the expected attire.",
-        "passed": true
+        "observation": "API error: API call timed out",
+        "passed": false
       },
       "background": {
-        "observation": "The background is plain white and clean.",
-        "passed": true
+        "observation": "API error: API call timed out",
+        "passed": false
       },
       "no_text": {
-        "observation": "There is no readable text, labels, watermarks, or annotations visible on the image.",
-        "passed": true
+        "observation": "API error: API call timed out",
+        "passed": false
       },
       "art_style": {
-        "observation": "The image is a clean digital illustration with a photo-realistic style.",
-        "passed": true
+        "observation": "API error: API call timed out",
+        "passed": false
       },
       "body_orientation": {
-        "observation": "The figure is lying on his back, face up, with his back on the ground, which is a supine position.",
-        "passed": true
+        "observation": "API error: API call timed out",
+        "passed": false
       },
       "pose_accuracy": {
-        "observation": "The figure is performing the Dead Bug exercise with one arm extended overhead and the opposite leg extended straight, while the other arm is extended towards the ceiling and the opposite leg is bent at 90 degrees. This is an excellent match to the expected pose.",
-        "passed": true
+        "observation": "API error: API call timed out",
+        "passed": false
       },
-      "pose_score": 5,
-      "overall_pass": true,
-      "critical_failures": []
+      "pose_score": 1,
+      "overall_pass": false,
+      "critical_failures": [
+        "API_ERROR"
+      ]
     },
     "dead-bug-with-shoulder-reach": {
       "exercise_name": "Dead Bug with Shoulder Reach",
@@ -2426,7 +2428,7 @@
       "exercise_name": "Doorway Pec Stretch with Rotation",
       "filename": "doorway-pec-stretch-rotation.png",
       "anatomy": {
-        "observation": "The figure has exactly 2 arms and 2 legs, with normal hands and feet.",
+        "observation": "The figure has exactly 2 arms and 2 legs.",
         "passed": true
       },
       "subject": {
@@ -2434,31 +2436,31 @@
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the figure, from head to toe, is visible.",
+        "observation": "The entire body of the figure, from head to toe, is visible within the frame.",
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the description.",
+        "observation": "The figure is wearing a light gray t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the description.",
         "passed": true
       },
       "background": {
-        "observation": "The background is clean, plain, and white, with a simple representation of a doorframe.",
+        "observation": "The background is a plain white wall with a simple wooden doorframe, which is clean, plain, and light-colored.",
         "passed": true
       },
       "no_text": {
-        "observation": "There is no readable text, labels, watermarks, or annotations overlaid on the image. Small brand-style logos on the shoes are present and acceptable.",
+        "observation": "There is no readable text, labels, watermarks, or annotations overlaid on the image.",
         "passed": true
       },
       "art_style": {
-        "observation": "The image is a clean digital illustration.",
+        "observation": "The image is a clean digital illustration with a photo-realistic quality.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is standing upright on his feet, which matches the 'standing' orientation.",
+        "observation": "The figure is standing upright on his feet.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is correctly performing a doorway pec stretch with one arm raised to 90 degrees, elbow bent, forearm against the doorframe, and one foot stepped forward, which is an excellent match to the description.",
+        "observation": "The figure is standing in a doorway with his right side angled towards the doorframe. His right arm is abducted to 90 degrees, with the elbow bent at 90 degrees, forming a goal-post shape against the doorframe. His right foot is stepped slightly forward. All critical elements of the pose are accurately depicted.",
         "passed": true
       },
       "pose_score": 5,
@@ -3974,7 +3976,7 @@
       "exercise_name": "Foam Roller Quad",
       "filename": "foam-roller-quad.png",
       "anatomy": {
-        "observation": "The figure has 2 arms, 2 legs, and proportionate features.",
+        "observation": "The figure has exactly 2 arms and 2 legs.",
         "passed": true
       },
       "subject": {
@@ -3982,11 +3984,11 @@
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the figure is visible from head to toe.",
+        "observation": "The entire body of the figure, from head to toe, is visible.",
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
+        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
         "passed": true
       },
       "background": {
@@ -3994,19 +3996,19 @@
         "passed": true
       },
       "no_text": {
-        "observation": "There is no readable text, labels, watermarks, or annotations in the image.",
+        "observation": "There is no readable text, labels, watermarks, or annotations overlaid on the image. Small brand logos on the shoes are present and acceptable.",
         "passed": true
       },
       "art_style": {
-        "observation": "The art style is a clean digital illustration.",
+        "observation": "The image has a photo-realistic art style.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is on the ground with a foam roller under his thighs, matching the 'foam_roller' orientation.",
+        "observation": "The figure is on the ground with a foam roller, lying face-down (prone), which matches the 'foam_roller' body position.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is lying face down in a modified plank position with a foam roller under the front of both thighs. His forearms support the upper body and his toes are off the ground, perfectly matching the described pose.",
+        "observation": "The figure is in a modified forearm plank, lying face-down. Both forearms are flat on the floor with elbows bent at approximately 90 degrees under the shoulders. The foam roller is correctly positioned horizontally under the front of both thighs (mid-quadriceps), well above the knees and below the hips. The lower legs extend straight back with toes on the floor. The body is nearly horizontal, perfectly matching the description.",
         "passed": true
       },
       "pose_score": 5,
@@ -4146,11 +4148,11 @@
       "exercise_name": "Forearm Pronation/Supination with Band",
       "filename": "forearm-rotation-band.png",
       "anatomy": {
-        "observation": "The figure has two arms and two legs.",
+        "observation": "The figure has exactly 2 arms and 2 legs.",
         "passed": true
       },
       "subject": {
-        "observation": "Exactly one human male figure is present.",
+        "observation": "There is exactly one human male figure.",
         "passed": true
       },
       "full_body": {
@@ -4158,30 +4160,30 @@
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
+        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
         "passed": true
       },
       "background": {
-        "observation": "The background is a clean, plain, and light-colored (white) studio setting.",
+        "observation": "The background is clean, plain, and white.",
         "passed": true
       },
       "no_text": {
-        "observation": "There is no readable text, labels, watermarks, or annotations present in the image.",
+        "observation": "There is no readable text, labels, watermarks, or annotations overlaid on the image.",
         "passed": true
       },
       "art_style": {
-        "observation": "The image is a clean digital illustration.",
+        "observation": "The image is a photo-realistic representation.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is in a seated position on a bench.",
+        "observation": "The figure is seated on a bench.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is seated with the left elbow bent at approximately 90 degrees, the upper arm close to the body, and the forearm parallel to the ground. The palm is facing down, holding a resistance band that is anchored under the foot. This closely matches the expected pose.",
+        "observation": "The figure is seated upright holding a resistance band. The right elbow is bent, and the right hand is pronated, gripping the band. However, the upper arm is not firmly tucked against the ribs, and the forearm is angled slightly downward instead of being horizontal and pointing straight forward.",
         "passed": true
       },
-      "pose_score": 5,
+      "pose_score": 3,
       "overall_pass": true,
       "critical_failures": []
     },
@@ -15518,35 +15520,35 @@
         "passed": true
       },
       "subject": {
-        "observation": "There is exactly one human male figure.",
+        "observation": "There is one human male figure in the image.",
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the male figure is visible from head to toe.",
+        "observation": "The entire body of the figure is visible from head to toe.",
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a light grey athletic t-shirt, dark navy compression shorts, white ankle socks, and grey athletic sneakers, matching the description.",
+        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, which matches the expected attire.",
         "passed": true
       },
       "background": {
-        "observation": "The background is clean, plain, and light-colored (white/light grey), with a light grey mat on the floor.",
+        "observation": "The background is clean, plain, and white.",
         "passed": true
       },
       "no_text": {
-        "observation": "The image is free of readable text, labels, watermarks, or annotations. Small brand logos are not visible.",
+        "observation": "The image is free of readable text, labels, watermarks, or annotations.",
         "passed": true
       },
       "art_style": {
-        "observation": "The image style is photo-realistic.",
+        "observation": "The image is photo-realistic.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is standing upright on their feet, matching the expected body position.",
+        "observation": "The figure is standing upright on his feet, matching the 'standing' orientation.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is standing upright with feet hip-width apart, with one hand resting on a sturdy chair, core engaged, and eyes focused forward. This perfectly matches the expected pose description.",
+        "observation": "The figure is standing on his left leg with a slight bend in the knee. His right foot is clearly lifted off the floor with the right knee bent at approximately 90 degrees. His right hand is resting on a sturdy chair for support. This is an excellent match to the expected pose.",
         "passed": true
       },
       "pose_score": 5,
@@ -21495,7 +21497,7 @@
       "exercise_name": "Dead Bug with Dumbbell",
       "filename": "dead-bug-with-dumbbell.png",
       "anatomy": {
-        "observation": "The figure has exactly 2 arms and 2 legs.",
+        "observation": "The figure has exactly two arms and two legs.",
         "passed": true
       },
       "subject": {
@@ -21503,31 +21505,31 @@
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the figure is visible from head to toe.",
+        "observation": "The entire body of the figure, from head to toe, is visible.",
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, which matches the expected t-shirt and shorts.",
+        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the description.",
         "passed": true
       },
       "background": {
-        "observation": "The background is clean, plain, and white, with a black mat on the floor.",
+        "observation": "The background is clean, plain, and white, with a light gray yoga mat on the floor.",
         "passed": true
       },
       "no_text": {
-        "observation": "The image is free of readable text, labels, watermarks, or annotations.",
+        "observation": "There is no readable text, labels, watermarks, or annotations present in the image.",
         "passed": true
       },
       "art_style": {
-        "observation": "The image style is photo-realistic.",
+        "observation": "The image is a photo-realistic digital illustration.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is lying on his back, face up, which is a supine body position.",
+        "observation": "The figure is lying on his back, face up, which is a supine position.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is lying on his back with arms extended straight up toward the ceiling holding a dumbbell. His hips and knees are bent at approximately 90 degrees. The lower back appears neutral against the floor. This is an excellent match to the expected pose for a Dead Bug with Dumbbell.",
+        "observation": "The figure is lying supine in a tabletop position with hips and knees bent at 90 degrees, shins parallel to the floor, and feet suspended in the air. Both arms are extended straight up, holding one dumbbell with both hands. The lower back appears neutral and pressed to the floor. This is an excellent match to the expected pose, including the critical details.",
         "passed": true
       },
       "pose_score": 5,
@@ -30314,7 +30316,7 @@
       "exercise_name": "Single Leg Balance with Dumbbell Hold",
       "filename": "single-leg-balance-dumbbell-hold.png",
       "anatomy": {
-        "observation": "The figure has exactly 2 arms and 2 legs.",
+        "observation": "The figure has exactly two arms and two legs.",
         "passed": true
       },
       "subject": {
@@ -30326,15 +30328,15 @@
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, which matches the expected clothing.",
+        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the expected attire.",
         "passed": true
       },
       "background": {
-        "observation": "The background is clean, plain, and white.",
+        "observation": "The background is plain white and clean.",
         "passed": true
       },
       "no_text": {
-        "observation": "There is no readable text, labels, watermarks, or annotations present in the image.",
+        "observation": "There is no readable text, labels, watermarks, or annotations overlaid on the image.",
         "passed": true
       },
       "art_style": {
@@ -30342,11 +30344,11 @@
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is standing upright on one foot, which matches the 'standing' orientation.",
+        "observation": "The figure is standing upright on one foot, matching the expected 'standing' orientation.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is standing on one leg with a slight knee bend, holding a dumbbell in the hand opposite the standing leg. The non-standing knee is lifted to hip height, creating an athletic stance. This is an excellent match to the description.",
+        "observation": "The figure is standing on the left leg with a slight knee bend, the right leg is lifted with the knee bent at approximately 90 degrees and the thigh raised to hip height. The dumbbell is correctly held in the right hand (opposite the standing leg) at the side of the body, and the left arm is also at the side. This is an excellent match to the exercise description, including the critical detail of the dumbbell being in the hand opposite the standing leg.",
         "passed": true
       },
       "pose_score": 5,
@@ -30369,27 +30371,27 @@
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the description.",
+        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
         "passed": true
       },
       "background": {
-        "observation": "The background is clean, plain, and white.",
+        "observation": "The background is clean, plain, and white. A blue foam pad is present as part of the exercise equipment.",
         "passed": true
       },
       "no_text": {
-        "observation": "There is no readable text, labels, watermarks, or annotations in the image.",
+        "observation": "The image is free of readable text, labels, watermarks, or annotations. Small brand logos on the shoes are present.",
         "passed": true
       },
       "art_style": {
-        "observation": "The art style is a clean digital illustration.",
+        "observation": "The image is photo-realistic.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is standing upright on his feet, matching the 'standing' orientation.",
+        "observation": "The figure is standing upright on one foot.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is standing upright on a foam balance pad with feet hip-width apart and arms at their sides, distributing weight evenly on both feet, which perfectly matches the initial pose description.",
+        "observation": "The figure is standing on a blue foam balance pad with the left foot, with the left knee slightly bent. The right foot is lifted off the pad with the right knee bent. Arms are extended outward for balance. This perfectly matches the exercise description.",
         "passed": true
       },
       "pose_score": 5,
@@ -30400,7 +30402,7 @@
       "exercise_name": "Single-Leg Balance Hold",
       "filename": "single-leg-balance-hold.png",
       "anatomy": {
-        "observation": "The figure has exactly 2 arms and 2 legs. No extra or missing limbs are present.",
+        "observation": "The figure has exactly 2 arms and 2 legs.",
         "passed": true
       },
       "subject": {
@@ -30412,27 +30414,27 @@
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the description.",
+        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the description.",
         "passed": true
       },
       "background": {
-        "observation": "The background is clean, plain, and white.",
+        "observation": "The background is a clean, plain, light gray/white studio background.",
         "passed": true
       },
       "no_text": {
-        "observation": "The image is free of any readable text, labels, watermarks, or annotations.",
+        "observation": "The image is free of readable text, labels, watermarks, or annotations. Small brand logos on shoes are present but acceptable.",
         "passed": true
       },
       "art_style": {
-        "observation": "The image is in a clean digital illustration style.",
+        "observation": "The image is photo-realistic.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is standing upright on their feet, which matches the expected body position.",
+        "observation": "The figure is standing upright on his feet, matching the 'standing' orientation.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is standing upright with feet hip-width apart and arms at their sides, with weight evenly distributed. This is an excellent match to the described starting pose for the exercise.",
+        "observation": "The figure is standing on his left leg with a slight bend in the knee. The right leg is lifted with the knee bent at approximately 90 degrees, and the right foot is clearly off the floor. Arms are extended outward for balance. This is an excellent match to the expected pose.",
         "passed": true
       },
       "pose_score": 5,
@@ -30701,7 +30703,7 @@
       "exercise_name": "Single-Leg Glute Bridge",
       "filename": "single-leg-glute-bridge.png",
       "anatomy": {
-        "observation": "The figure has 2 arms and 2 legs, with no extra or missing limbs.",
+        "observation": "The figure has exactly 2 arms and 2 legs, with no extra or missing limbs.",
         "passed": true
       },
       "subject": {
@@ -30713,15 +30715,15 @@
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the expected attire.",
+        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
         "passed": true
       },
       "background": {
-        "observation": "The background is clean, plain, and white.",
+        "observation": "The background is clean, plain, and white, with the figure on a light gray mat.",
         "passed": true
       },
       "no_text": {
-        "observation": "There is no readable text, labels, watermarks, or annotations overlaid on the image.",
+        "observation": "The image is free of any readable text, labels, watermarks, or annotations.",
         "passed": true
       },
       "art_style": {
@@ -30729,11 +30731,11 @@
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is lying on his back, face up, which matches the 'supine' orientation.",
+        "observation": "The figure is lying supine (on their back, face up) on a mat.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is lying on his back with both knees bent, the left foot planted, and the right foot slightly lifted off the ground, perfectly matching the exercise description.",
+        "observation": "The figure is lying supine with hips on the floor. The left foot is flat on the floor with the knee bent at approximately 90 degrees. The right leg is lifted into the air, with the foot suspended and the knee bent at roughly 90 degrees. Only one foot is on the floor, perfectly matching the description.",
         "passed": true
       },
       "pose_score": 5,
@@ -30787,7 +30789,7 @@
       "exercise_name": "Single Leg Stance",
       "filename": "single-leg-stance.png",
       "anatomy": {
-        "observation": "The figure has 2 arms and 2 legs, with no extra or missing limbs.",
+        "observation": "The figure has exactly 2 arms and 2 legs.",
         "passed": true
       },
       "subject": {
@@ -30799,7 +30801,7 @@
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the description.",
+        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
         "passed": true
       },
       "background": {
@@ -30815,11 +30817,11 @@
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is standing upright on his feet, matching the 'standing' body position.",
+        "observation": "The figure is standing upright on feet.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is standing with feet hip-width apart, arms at sides, and an upright posture, which perfectly matches the described starting pose for the Single Leg Stance.",
+        "observation": "The figure is standing on the left leg with a slight bend in the knee. The right foot is clearly lifted off the floor, with the right knee bent at approximately 90 degrees and the thigh raised to roughly hip height. The arms are extended slightly for balance. This closely matches the expected pose description.",
         "passed": true
       },
       "pose_score": 5,
@@ -31131,39 +31133,39 @@
       "exercise_name": "Standing Balance on One Leg",
       "filename": "standing-balance-on-one-leg.png",
       "anatomy": {
-        "observation": "The figure has exactly two arms and two legs.",
+        "observation": "The figure has exactly 2 arms and 2 legs, with no extra or missing limbs.",
         "passed": true
       },
       "subject": {
-        "observation": "There is exactly one human male figure present in the image.",
+        "observation": "There is exactly one human male figure in the image.",
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the figure, from head to toe, is visible.",
+        "observation": "The entire body of the figure is visible from head to toe.",
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
+        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, which matches the expected description.",
         "passed": true
       },
       "background": {
-        "observation": "The background is clean, plain, and light-colored (white/light gray).",
+        "observation": "The background is clean, plain, and light-colored, featuring a white wall and a light grey floor, with a light-colored counter on the right.",
         "passed": true
       },
       "no_text": {
-        "observation": "There is no readable text, labels, watermarks, or annotations present in the image.",
+        "observation": "There is no readable text, labels, watermarks, or annotations visible in the image.",
         "passed": true
       },
       "art_style": {
-        "observation": "The image is a clean digital illustration.",
+        "observation": "The image is a clean digital illustration, matching the expected art style.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is standing upright on their feet, which matches the 'standing' orientation.",
+        "observation": "The figure is standing upright on one foot, which matches the 'standing' body position.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is standing upright with one hand on a wall for light support, and weight is evenly distributed on both feet, which perfectly matches the described pose.",
+        "observation": "The figure is standing on the left leg, with the right hand lightly resting on a counter for support. The right foot is lifted with the knee bent at approximately 90 degrees, and the standing left knee is slightly bent. Only one foot is on the floor. This pose is an excellent match to the description.",
         "passed": true
       },
       "pose_score": 5,
@@ -39438,7 +39440,7 @@
       "exercise_name": "Glute Bridge Single Leg",
       "filename": "glute-bridge-single-leg.png",
       "anatomy": {
-        "observation": "The figure has exactly 2 arms and 2 legs.",
+        "observation": "The figure has exactly 2 arms and 2 legs, with no extra or missing limbs.",
         "passed": true
       },
       "subject": {
@@ -39446,7 +39448,7 @@
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the subject is visible from head to toe.",
+        "observation": "The entire body of the figure is visible from head to toe.",
         "passed": true
       },
       "clothing": {
@@ -39454,23 +39456,23 @@
         "passed": true
       },
       "background": {
-        "observation": "The background is clean, plain, and light-colored (white/near-white).",
+        "observation": "The background is clean, plain, and white.",
         "passed": true
       },
       "no_text": {
-        "observation": "The image is free of readable text, labels, watermarks, or annotations. Small brand logos on the shoes are present but acceptable.",
+        "observation": "The image is free of any readable text, labels, watermarks, or annotations.",
         "passed": true
       },
       "art_style": {
-        "observation": "The image is photo-realistic.",
+        "observation": "The image is a clean digital illustration.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is lying on his back, face up, which matches the 'supine' orientation.",
+        "observation": "The figure is lying on his back, face up, with his back on the ground, which is the supine position.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is lying on his back with knees bent, one foot flat on the ground, and the other leg slightly lifted and extended forward, perfectly matching the expected starting pose for a single leg glute bridge.",
+        "observation": "The figure is lying supine with hips on the floor. The left foot is flat on the floor with the knee bent at approximately 90 degrees. The right leg is lifted into the air with the right foot suspended above the floor and the knee bent at approximately 90 degrees, perfectly matching the description of the starting pose for a Glute Bridge Single Leg.",
         "passed": true
       },
       "pose_score": 5,
@@ -48132,35 +48134,35 @@
         "passed": true
       },
       "subject": {
-        "observation": "There is exactly one human male figure in the image.",
+        "observation": "There is exactly one human male figure.",
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the figure, from head to toe, is visible.",
+        "observation": "The entire body of the figure is visible from head to toe.",
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a light gray t-shirt, dark navy shorts, white ankle socks, and gray athletic sneakers.",
+        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
         "passed": true
       },
       "background": {
-        "observation": "The background is plain, clean, and white.",
+        "observation": "The background is clean, plain, and white.",
         "passed": true
       },
       "no_text": {
-        "observation": "The image is free of any readable text, labels, or watermarks.",
+        "observation": "The image is free of readable text, labels, watermarks, or annotations. Small brand-style logos are not present.",
         "passed": true
       },
       "art_style": {
-        "observation": "The art style is a clean digital illustration.",
+        "observation": "The image is a clean digital illustration with a photo-realistic style.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is standing upright on their feet, which matches the expected body position.",
+        "observation": "The figure is standing upright on their feet.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is standing facing a sturdy gym railing, with both hands lightly touching it for support. The feet are hip-width apart with weight evenly distributed, which perfectly matches the provided expected pose description.",
+        "observation": "The figure is standing on the left leg with the right foot lifted and the knee bent at approximately 90 degrees. The right hand is lightly touching a railing for support. The standing left knee has a slight bend. This perfectly matches the expected pose.",
         "passed": true
       },
       "pose_score": 5,
@@ -49551,7 +49553,7 @@
         "passed": true
       },
       "subject": {
-        "observation": "There is exactly one human male figure present in the image.",
+        "observation": "The image contains a single male human figure.",
         "passed": true
       },
       "full_body": {
@@ -49559,30 +49561,30 @@
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
+        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the description.",
         "passed": true
       },
       "background": {
-        "observation": "The background is a clean, plain, white wall.",
+        "observation": "The background is clean, plain, and light-colored (white) with a subtle shadow.",
         "passed": true
       },
       "no_text": {
-        "observation": "The image is free of readable text, labels, watermarks, or annotations. Small brand logos are visible on the shoes.",
+        "observation": "No readable text, labels, watermarks, or annotations are present in the image.",
         "passed": true
       },
       "art_style": {
-        "observation": "The image is photo-realistic.",
+        "observation": "The image is a clean digital illustration.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is standing upright on their feet.",
+        "observation": "The figure is standing upright on one foot, with the other leg lifted, which matches the 'standing' orientation.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is standing upright near a wall with one leg slightly lifted, indicating a single-leg stance. Hands are positioned for support, aligning with the description of being ready to grasp support.",
+        "observation": "The figure is standing on the left leg with the right foot lifted and the right knee bent at approximately 90 degrees. The arms are at the sides. Only one foot is on the floor, and the pose accurately reflects the description for a Standing Single-Leg Stance.",
         "passed": true
       },
-      "pose_score": 4,
+      "pose_score": 5,
       "overall_pass": true,
       "critical_failures": []
     },
@@ -49590,11 +49592,11 @@
       "exercise_name": "Standing Single-Leg Stance with Band Support",
       "filename": "standing-single-leg-stance-band.png",
       "anatomy": {
-        "observation": "The figure has exactly two arms and two legs.",
+        "observation": "The figure has exactly 2 arms and 2 legs, with normal proportions and no extra or missing limbs.",
         "passed": true
       },
       "subject": {
-        "observation": "The image features a single human male figure.",
+        "observation": "There is exactly one human male figure in the image.",
         "passed": true
       },
       "full_body": {
@@ -49602,11 +49604,11 @@
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
+        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the specified attire.",
         "passed": true
       },
       "background": {
-        "observation": "The background is a clean, plain, white surface.",
+        "observation": "The background is clean, plain, and white.",
         "passed": true
       },
       "no_text": {
@@ -49614,15 +49616,15 @@
         "passed": true
       },
       "art_style": {
-        "observation": "The image is rendered in a clean digital illustration style.",
+        "observation": "The image has a clean digital illustration style with photo-realistic qualities.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is standing upright on one leg, with the other foot slightly off the ground.",
+        "observation": "The figure is in a standing, upright position on their feet.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is in a single-leg stance, holding a resistance band looped around a wall-mounted post at waist height, providing support. This aligns well with the exercise name 'Standing Single-Leg Stance with Band Support', even though the textual pose description states 'Feet are together', which is inconsistent with the exercise name.",
+        "observation": "The figure is standing on the left leg with a slight bend in the knee. The right knee is bent at about 90 degrees, and the right foot is clearly lifted off the floor. A resistance band is looped around a wall post at waist height and held in both hands at the waist. The pose is an excellent match to the description.",
         "passed": true
       },
       "pose_score": 5,
