@@ -15591,46 +15591,43 @@
       "exercise_name": "Internal Rotation",
       "filename": "internal-rotation",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are identical between the start and end images.",
+        "observation": "Camera angle, distance, and framing are perfectly consistent between both images.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
+        "observation": "The character's identity, including facial features, hair, and body proportions, is perfectly consistent.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The character's clothing and shoes are identical in both images.",
+        "observation": "The clothing, including color and style, is perfectly consistent.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The art style, rendering, and detail level are perfectly consistent.",
+        "observation": "The art style, lighting, and level of detail are perfectly consistent.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The background is consistent. The resistance band is present in both, and its off-screen anchor point appears consistent. There's a minor visual difference in how the band is presented due to the character's changing grip.",
-        "score": 4,
+        "observation": "The plain white background and the resistance band setup are consistent.",
+        "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "The non-moving parts, specifically the left arm and hand, change significantly. In the start image, both hands hold the resistance band. In the end image, only the right hand holds the band, and the left arm is bent and free, completely changing its role and position.",
-        "score": 2,
-        "passed": false
+        "observation": "All non-moving body parts, particularly the critical right upper arm and elbow, remain consistently anchored, with only the forearm rotating.",
+        "score": 5,
+        "passed": true
       },
       "movement_logic": {
-        "observation": "While the right arm's movement shows internal rotation, the drastic change in how the resistance band is held (from two hands in the start to one hand in the end) makes the overall movement logic and exercise setup unclear and confusing for the user.",
-        "score": 2,
-        "passed": false
+        "observation": "The images clearly and accurately depict the internal rotation movement from the described start to end position, with the forearm moving across the body while the upper arm stays tucked.",
+        "score": 5,
+        "passed": true
       },
-      "overall_consistency_score": 4.0,
-      "overall_pass": false,
-      "critical_failures": [
-        "BODY_ANCHORING",
-        "MOVEMENT_LOGIC"
-      ]
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
     },
     "intrinsic-finger-flexion": {
       "exercise_name": "Intrinsic Finger Flexion",
@@ -16062,41 +16059,41 @@
       "exercise_name": "Isometric Shoulder External Rotation",
       "filename": "isometric-shoulder-external-rotation",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are identical between the start and end images.",
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent in both images.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The character's clothing (shirt, shorts, socks, and shoes) is identical in both images.",
+        "observation": "The character's clothing, including shirt, shorts, socks, and shoes, is identical in both images.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The artistic rendering, line weight, shading technique, and color palette are consistent. The muscle highlight in the end image is an intentional instructional element and not a change in art style.",
+        "observation": "The art style, rendering, line work, shading, and color palette are perfectly consistent across both images.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The background and the wall prop are identical and in the same position in both images.",
+        "observation": "The background and scene setup, including the wall, are identical and consistent between the start and end images.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "All non-exercising body parts (left arm, torso, legs) and the position of the exercising arm relative to the wall remain perfectly anchored.",
+        "observation": "All non-moving body parts are perfectly anchored. The right elbow is correctly pinned at the side at waist height, and the forearm maintains its horizontal position consistently.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "As an isometric exercise, there is no physical change in pose. However, the end image effectively conveys the 'movement' by highlighting the engaged shoulder muscles, helping the user understand where to focus the contraction.",
-        "score": 4,
+        "observation": "As an isometric exercise, the end position is expected to be identical to the start, depicting a sustained hold. Both images accurately reflect this, showing no movement and maintaining the described position.",
+        "score": 5,
         "passed": true
       },
-      "overall_consistency_score": 4.86,
+      "overall_consistency_score": 5.0,
       "overall_pass": true,
       "critical_failures": []
     },
@@ -17300,37 +17297,37 @@
       "exercise_name": "Lateral Side-Lying Clam Shell",
       "filename": "lateral-side-lying-clam-shell",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "observation": "The camera angle, distance, and framing are identical between the two images, providing a consistent viewpoint of the exercise.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent in both images.",
+        "observation": "The character's identity, including facial features, hair, skin tone, and body proportions, is perfectly consistent across both images.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The clothing, including the grey t-shirt, dark blue shorts, white socks, grey shoes, and blue resistance band, is identical in both images.",
+        "observation": "The character's clothing (t-shirt, shorts, socks, shoes) and the resistance band are identical in style and color in both the start and end positions.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The artistic rendering, including line work, shading, detail, and color palette, is perfectly consistent.",
+        "observation": "The artistic rendering, including line work, shading, level of detail, and color palette, is perfectly consistent between both images.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The plain white background and the placement of the resistance band are consistent in both images.",
+        "observation": "The plain white background is consistently maintained in both images, with no changes to the scene setup.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "All non-moving body parts (head, torso, arms, and bottom leg) remain perfectly anchored and consistent between the start and end positions. Only the top leg moves as intended.",
+        "observation": "The supporting arm, torso, hips, and bottom leg remain perfectly anchored. Crucially, the feet stay together, touching each other, as the top knee opens.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The transition from the start position (top leg resting) to the end position (top knee raised, feet together) accurately and clearly depicts the Lateral Side-Lying Clam Shell exercise.",
+        "observation": "The transition from the start (knees bent, feet together) to the end (top knee raised, feet still together) clearly and accurately depicts the clam shell movement for this exercise.",
         "score": 5,
         "passed": true
       },
@@ -51875,6 +51872,6 @@
   "summary": {
     "total_pairs": 1221,
     "consistent_pairs": 1220,
-    "average_score": 4.86
+    "average_score": 4.87
   }
 }

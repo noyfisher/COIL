@@ -5612,19 +5612,19 @@
       "exercise_name": "Internal Rotation",
       "filename": "internal-rotation.png",
       "anatomy": {
-        "observation": "The figure has 2 arms and 2 legs with no extra or missing limbs.",
+        "observation": "The figure has 2 arms and 2 legs.",
         "passed": true
       },
       "subject": {
-        "observation": "There is exactly one human male figure present in the image.",
+        "observation": "There is exactly one human male figure.",
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the figure, from head to toe, is visible.",
+        "observation": "The entire body from head to toe is visible.",
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
+        "observation": "The figure is wearing a light gray fitted athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
         "passed": true
       },
       "background": {
@@ -5632,19 +5632,19 @@
         "passed": true
       },
       "no_text": {
-        "observation": "The image is free of readable text, labels, or watermarks. Small brand logos are visible on the shoes but are acceptable.",
+        "observation": "There is no readable text, labels, watermarks, or annotations. Small logos on shoes are present but allowed.",
         "passed": true
       },
       "art_style": {
-        "observation": "The image features a clean digital illustration style that is photo-realistic.",
+        "observation": "The image is photo-realistic.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is standing upright on his feet, matching the 'standing' orientation.",
+        "observation": "The figure is standing upright on feet.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is standing upright, holding a resistance band with his right arm bent at 90 degrees, elbow pinned to his side, and forearm rotated inward across the body. This is an excellent match for the internal rotation exercise.",
+        "observation": "The figure is standing upright, facing the camera, with feet shoulder-width apart. The right elbow is bent at 90 degrees and tucked firmly against the right side of the ribs. The right forearm is horizontal, pointing away from the body to the right, gripping a resistance band which extends horizontally to the right. The left arm hangs at the side. All critical aspects of the pose for the start of internal rotation are met.",
         "passed": true
       },
       "pose_score": 5,
@@ -5915,11 +5915,11 @@
       "exercise_name": "Isometric Shoulder External Rotation",
       "filename": "isometric-shoulder-external-rotation.png",
       "anatomy": {
-        "observation": "The figure has exactly 2 arms and 2 legs. All limbs are correctly depicted.",
+        "observation": "The figure has exactly 2 arms and 2 legs.",
         "passed": true
       },
       "subject": {
-        "observation": "There is exactly one human male figure present in the image.",
+        "observation": "There is exactly one human male figure in the image.",
         "passed": true
       },
       "full_body": {
@@ -5927,15 +5927,15 @@
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the expected attire.",
+        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the description.",
         "passed": true
       },
       "background": {
-        "observation": "The background is clean, plain, and white, with a clear depiction of a wall.",
+        "observation": "The background is clean, plain, and light-colored, featuring a white/light grey wall.",
         "passed": true
       },
       "no_text": {
-        "observation": "The image is free of any readable text, labels, watermarks, or annotations. Small brand-style logos on the shoes are present and acceptable.",
+        "observation": "There is no readable text, labels, watermarks, or annotations present in the image.",
         "passed": true
       },
       "art_style": {
@@ -5943,11 +5943,11 @@
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is standing upright on his feet, which matches the expected 'standing' orientation.",
+        "observation": "The figure is standing upright on his feet.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is standing next to a wall with his right elbow bent at 90 degrees, pressing his forearm/hand into the wall. The torso is upright, and no visible movement is indicated, perfectly matching the description of an isometric shoulder external rotation.",
+        "observation": "The figure is standing parallel to a wall with the right arm closest. The right elbow is bent at approximately 90 degrees and pinned firmly at the side of the ribs. The right forearm is horizontal, pointing forward, with the back of the hand/wrist pressed firmly into the wall. The left arm hangs at the side. The elbow is at rib height and the back of the wrist is making contact with the wall. This is an excellent match to the exercise description.",
         "passed": true
       },
       "pose_score": 5,
@@ -6474,7 +6474,7 @@
       "exercise_name": "Lateral Side-Lying Clam Shell",
       "filename": "lateral-side-lying-clam-shell.png",
       "anatomy": {
-        "observation": "The figure has exactly 2 arms and 2 legs, and all digits appear normal.",
+        "observation": "The figure has exactly 2 arms and 2 legs.",
         "passed": true
       },
       "subject": {
@@ -6482,31 +6482,31 @@
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the figure, from head to toe, is visible within the frame.",
+        "observation": "The entire body of the figure, from head to toe, is visible.",
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, which matches the expected clothing.",
+        "observation": "The figure is wearing a light gray t-shirt, dark navy shorts, white ankle socks, and gray athletic sneakers, matching the description.",
         "passed": true
       },
       "background": {
-        "observation": "The background is a clean, plain, and white surface.",
+        "observation": "The background is clean, plain, and white.",
         "passed": true
       },
       "no_text": {
-        "observation": "The image is free of any readable text, labels, watermarks, or annotations.",
+        "observation": "The image is free of any readable text, labels, or watermarks.",
         "passed": true
       },
       "art_style": {
-        "observation": "The image is a clean digital illustration with a photo-realistic quality.",
+        "observation": "The image is a clean digital illustration.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is lying on his side, which is consistent with the 'side_lying' orientation.",
+        "observation": "The figure is lying on his side, which matches the 'side_lying' orientation.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is correctly positioned for the starting phase of a Lateral Side-Lying Clam Shell. He is lying on his side with hips bent to approximately 45 degrees and knees bent to 90 degrees, feet stacked together. The bottom arm supports the head, and the top hand rests on the hip. A resistance band is appropriately placed just above the knees.",
+        "observation": "The figure is lying on his left side with hips bent at approximately 45 degrees and knees bent at approximately 90 degrees. Both legs are bent, feet are stacked together, and the bottom arm supports the head while the top hand rests on the hip. A resistance band is correctly placed around the thighs. This pose is an excellent match to the description.",
         "passed": true
       },
       "pose_score": 5,
