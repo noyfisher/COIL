@@ -346,8 +346,12 @@ class SavedPlansViewModel: ObservableObject {
             .delete { [weak self] error in
                 if let error = error {
                     AppLogger.data.error("Error deleting plan: \(error.localizedDescription)")
-                    // Re-fetch to restore consistent state
-                    self?.fetchRehabPlans()
+                    // Re-fetch to restore consistent state.
+                    // Firestore's completion handler is nonisolated, so hop to the main
+                    // actor to call `fetchRehabPlans()` which is @MainActor-bound.
+                    Task { @MainActor [weak self] in
+                        self?.fetchRehabPlans()
+                    }
                 }
             }
     }

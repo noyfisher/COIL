@@ -42,7 +42,7 @@ class ReAssessmentViewModel: ObservableObject {
 
         guard let uid = Auth.auth().currentUser?.uid else { return }
 
-        var data: [String: Any] = [
+        let data: [String: Any] = [
             "id": snapshot.id.uuidString,
             "planId": snapshot.planId.uuidString,
             "assessmentType": snapshot.assessmentType.rawValue,
