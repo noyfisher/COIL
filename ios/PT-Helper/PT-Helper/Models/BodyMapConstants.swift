@@ -46,21 +46,26 @@ enum BodyMapConstants {
     static let proxyRadii: [String: Float] = [
         "head": 0.04,
         "knee": 0.025,
-        "ankle_foot": 0.035,
         "neck": 0.020,
     ]
 
     /// How far anterior (toward camera) proxy entities protrude past the mesh
     static let proxyForwardBias: Float = 0.02
 
-    /// Lateral offset for ankle proxies to protrude past the calf convex hull
-    static let ankleProxyLateralBias: Float = 0.015
-
     /// Fraction from bottom of knee mesh where the kneecap actually is
     static let kneeCapHeightFraction: Float = 0.2
 
-    /// Fraction of ankle zone height used for capsule height
-    static let ankleCapsuleHeightFraction: Float = 0.5
+    // MARK: - Lower-Leg Y-Banded Zones
+    //
+    // calf_shin + ankle_foot are partitioned along Z (vertical) using the same
+    // pattern as the arm chain: mesh-center midpoint transitions, auto-
+    // generated convex hulls disabled, dedicated Y-band box proxies own taps.
+    // This avoids the calf_shin convex hull bleeding down into the ankle area.
+
+    /// Ordered lower-leg region keys from top (calf_shin) to bottom (ankle_foot).
+    static let lowerLegRegionOrder: [String] = [
+        "calf_shin", "ankle_foot"
+    ]
 
     /// How far anterior each arm zone box protrudes past its region's mesh
     /// front. Ensures the zoned box is hit before any adjacent region's

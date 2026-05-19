@@ -253,6 +253,7 @@ struct BodyMap3DView: View {
                     configureCollisionShapes(for: entity, regionKeys: regionKeys)
                     createProxyEntities(for: entity, regionKeys: regionKeys)
                     createArmZoneProxies(for: entity, regionKeys: regionKeys)
+                    createLegZoneProxies(for: entity, regionKeys: regionKeys)
 
 
                     content.add(pivot)
@@ -721,17 +722,20 @@ struct BodyMap3DView: View {
     /// Configure each body-region child for tap interaction and apply region colors.
     @MainActor
     private func configureCollisionShapes(for parent: Entity, regionKeys: Set<String>) {
-        let armRegions = Set(BodyMapConstants.armRegionOrder)
+        let zoneBoxedRegions = Set(BodyMapConstants.armRegionOrder
+            + BodyMapConstants.lowerLegRegionOrder)
         for child in parent.children {
             if regionKeys.contains(child.name),
                child.components[ModelComponent.self] != nil {
                 child.components.set(InputTargetComponent(allowedInputTypes: .indirect))
 
                 let baseKey = BodyMapConstants.regionBaseKey(child.name)
-                if armRegions.contains(baseKey) {
-                    // Arm regions use Y-banded zone box proxies (see
-                    // createArmZoneProxies). Their auto-generated convex hulls
-                    // overlap each other and the shoulder, so we skip them here.
+                if zoneBoxedRegions.contains(baseKey) {
+                    // Arm regions (createArmZoneProxies) and lower-leg regions
+                    // (createLegZoneProxies) use Y-banded zone box proxies.
+                    // Their auto-generated convex hulls overlap neighbors
+                    // (calf_shin bleeds down past the ankle, etc.), so we skip
+                    // them here and let the boxes own the taps.
                 } else {
                     child.generateCollisionShapes(recursive: true)
                 }
@@ -802,11 +806,65 @@ struct BodyMap3DView: View {
         }
     }
 
+    /// Build Y-banded box proxies for the lower-leg chain (calf_shin →
+    /// ankle_foot). Mirrors `createArmZoneProxies`: midpoint transitions
+    /// between mesh centers, forward-protruding, fully owns taps because
+    /// the underlying convex hulls are disabled in `configureCollisionShapes`.
+    @MainActor
+    private func createLegZoneProxies(for entity: Entity, regionKeys: Set<String>) {
+        for side in ["left", "right"] {
+            createLegZoneProxies(for: entity, side: side, regionKeys: regionKeys)
+        }
+    }
+
+    @MainActor
+    private func createLegZoneProxies(for entity: Entity, side: String, regionKeys: Set<String>) {
+        let order = BodyMapConstants.lowerLegRegionOrder
+        let zoneKeys = order.map { "\(side)_\($0)" }
+        guard zoneKeys.allSatisfy(regionKeys.contains) else { return }
+        let ents = zoneKeys.compactMap { entity.findEntity(named: $0) }
+        guard ents.count == order.count else { return }
+        let bounds = ents.map { $0.visualBounds(relativeTo: entity) }
+
+        // Mesh-center midpoints — same logic as arms. Calf and ankle meshes
+        // overlap along Z (the calf hull extends down past the ankle), so
+        // using min.z/max.z would invert the boundary. Center midpoints stay
+        // well-ordered.
+        var transitions: [Float] = []
+        for i in 0..<(order.count - 1) {
+            transitions.append((bounds[i].center.z + bounds[i + 1].center.z) / 2)
+        }
+
+        for (i, zoneKey) in zoneKeys.enumerated() {
+            let topZ = (i == 0) ? bounds[i].max.z : transitions[i - 1]
+            let botZ = (i == order.count - 1) ? bounds[i].min.z : transitions[i]
+            let zoneExtentZ = max(0.005, topZ - botZ)
+            let zoneCenterZ = (topZ + botZ) / 2
+
+            let yFront = bounds[i].min.y - BodyMapConstants.armZoneForwardBias
+            let yBack = bounds[i].max.y
+            let zoneCenterY = (yFront + yBack) / 2
+            let zoneExtentY = max(0.005, yBack - yFront)
+
+            let zoneCenterX = bounds[i].center.x
+            let zoneExtentX = max(0.005, bounds[i].extents.x)
+
+            let proxy = Entity()
+            proxy.name = BodyMapConstants.proxyPrefix + zoneKey
+            proxy.position = SIMD3<Float>(zoneCenterX, zoneCenterY, zoneCenterZ)
+            let shape = ShapeResource.generateBox(size: SIMD3<Float>(zoneExtentX, zoneExtentY, zoneExtentZ))
+            proxy.components.set(CollisionComponent(shapes: [shape]))
+            proxy.components.set(InputTargetComponent(allowedInputTypes: .indirect))
+            entity.addChild(proxy)
+        }
+    }
+
     /// Create invisible forward-protruding proxy entities for small regions.
     @MainActor
     private func createProxyEntities(for entity: Entity, regionKeys: Set<String>) {
         for zoneKey in regionKeys {
             let baseKey = BodyMapConstants.regionBaseKey(zoneKey)
+
             guard let radius = BodyMapConstants.proxyRadii[baseKey],
                   let regionEntity = entity.findEntity(named: zoneKey) else { continue }
 
@@ -816,21 +874,12 @@ struct BodyMap3DView: View {
             var proxyZ = center.z
             if baseKey == "knee" {
                 proxyZ = bounds.min.z + bounds.extents.z * BodyMapConstants.kneeCapHeightFraction
-            } else if baseKey == "ankle_foot" {
-                proxyZ = center.z
             } else if baseKey == "head" {
                 // Push head proxy up toward the top of the skull, away from the neck
                 proxyZ = bounds.max.z - bounds.extents.z * 0.2
             }
 
-            var proxyX = center.x
-            if baseKey == "ankle_foot" {
-                if zoneKey.hasPrefix("left_") {
-                    proxyX = center.x - BodyMapConstants.ankleProxyLateralBias
-                } else if zoneKey.hasPrefix("right_") {
-                    proxyX = center.x + BodyMapConstants.ankleProxyLateralBias
-                }
-            }
+            let proxyX = center.x
 
             // Regions that need extra forward bias to sit in front of adjacent regions
             let forwardBias: Float
@@ -847,15 +896,8 @@ struct BodyMap3DView: View {
                 proxyZ
             )
 
-            if baseKey == "ankle_foot" {
-                let capsuleHeight = bounds.extents.z * BodyMapConstants.ankleCapsuleHeightFraction
-                let shape = ShapeResource.generateCapsule(height: capsuleHeight, radius: radius)
-                proxy.components.set(CollisionComponent(shapes: [shape]))
-                proxy.orientation = simd_quatf(angle: .pi / 2, axis: SIMD3<Float>(1, 0, 0))
-            } else {
-                let shape = ShapeResource.generateSphere(radius: radius)
-                proxy.components.set(CollisionComponent(shapes: [shape]))
-            }
+            let shape = ShapeResource.generateSphere(radius: radius)
+            proxy.components.set(CollisionComponent(shapes: [shape]))
 
             proxy.components.set(InputTargetComponent(allowedInputTypes: .indirect))
             entity.addChild(proxy)
