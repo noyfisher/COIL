@@ -35,10 +35,8 @@ scripts/output/_flux_backup/
 scripts/output/_best_of_three/
 scripts/output/_nb_round1_backup/
 scripts/output/_sample_pass_fail/
-scripts/output/_pre_regen_backup/
-scripts/output/_pre_end_regen_backup/
+scripts/output/_pre_*_backup/
 scripts/output/_end_flux_backup/
-scripts/output/_pre_medium_regen_backup/
 scripts/output/_regen_backup/
 scripts/output/_removed_placeholders/
 scripts/output/_nb_score5_contact_sheet.png

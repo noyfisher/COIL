@@ -263,6 +263,12 @@
     "body_position": "standing",
     "end_filename": "band-external-rotation-9090_end.png"
   },
+  "band-external-rotation_regen": {
+    "name": "Band External Rotation Regen",
+    "filename": "band-external-rotation_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "band-internal-rotation": {
     "name": "Band Shoulder Internal Rotation",
     "filename": "band-internal-rotation.png",
@@ -278,6 +284,12 @@
     "target_area": "Shoulder",
     "body_position": "standing",
     "end_filename": "band-internal-rotation-zero-degrees_end.png"
+  },
+  "band-internal-rotation_regen": {
+    "name": "Band Internal Rotation Regen",
+    "filename": "band-internal-rotation_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "band-lat-pulldown": {
     "name": "Band Lat Pulldown",
@@ -302,6 +314,12 @@
     "target_area": "Shoulder",
     "body_position": "standing",
     "end_filename": "band-pull-apart-posture_end.png"
+  },
+  "band-pull-apart_regen": {
+    "name": "Band Pull Apart Regen",
+    "filename": "band-pull-apart_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "band-pull-aparts": {
     "name": "Band Pull-Aparts",
@@ -430,6 +448,12 @@
     "body_position": "side_lying",
     "end_filename": "banded-copenhagen-adductor-exercise_end.png"
   },
+  "banded-copenhagen-adductor-exercise_regen": {
+    "name": "Banded Copenhagen Adductor Exercise Regen",
+    "filename": "banded-copenhagen-adductor-exercise_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "banded-crab-walk": {
     "name": "Banded Crab Walk",
     "filename": "banded-crab-walk.png",
@@ -445,6 +469,12 @@
     "target_area": "Shoulder",
     "body_position": "standing",
     "end_filename": "banded-external-rotation-90-90_end.png"
+  },
+  "banded-external-rotation-90-90_regen": {
+    "name": "Banded External Rotation 90 90 Regen",
+    "filename": "banded-external-rotation-90-90_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "banded-glute-bridge": {
     "name": "Banded Glute Bridge",
@@ -478,6 +508,12 @@
     "body_position": "standing",
     "end_filename": "banded-hip-abduction_end.png"
   },
+  "banded-hip-abduction_regen": {
+    "name": "Banded Hip Abduction Regen",
+    "filename": "banded-hip-abduction_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "banded-hip-bridge": {
     "name": "Banded Hip Bridge",
     "filename": "banded-hip-bridge.png",
@@ -496,6 +532,12 @@
       "banded-internal-rotation-90-90"
     ],
     "end_filename": "banded-hip-internal-rotation_end.png"
+  },
+  "banded-hip-internal-rotation_regen": {
+    "name": "Banded Hip Internal Rotation Regen",
+    "filename": "banded-hip-internal-rotation_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "banded-lateral-raises": {
     "name": "Banded Lateral Raises",
@@ -672,6 +714,12 @@
     "target_area": "Hip",
     "body_position": "standing",
     "end_filename": "banded-standing-marches_end.png"
+  },
+  "banded-standing-marches_regen": {
+    "name": "Banded Standing Marches Regen",
+    "filename": "banded-standing-marches_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "banded-superman": {
     "name": "Banded Superman",
@@ -1435,6 +1483,12 @@
     "body_position": "supine",
     "end_filename": "dead-bug-with-dumbbell_end.png"
   },
+  "dead-bug-with-dumbbell_regen": {
+    "name": "Dead Bug With Dumbbell Regen",
+    "filename": "dead-bug-with-dumbbell_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "dead-bug-with-shoulder-reach": {
     "name": "Dead Bug with Shoulder Reach",
     "filename": "dead-bug-with-shoulder-reach.png",
@@ -1442,6 +1496,12 @@
     "target_area": "Core Stability, Lower Back & Shoulder Integration",
     "body_position": "supine",
     "end_filename": "dead-bug-with-shoulder-reach_end.png"
+  },
+  "dead-bug_regen": {
+    "name": "Dead Bug Regen",
+    "filename": "dead-bug_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "dead-bugs": {
     "name": "Dead Bugs",
@@ -1565,6 +1625,12 @@
     "target_area": "Chest",
     "body_position": "standing",
     "end_filename": "doorway-pec-stretch-rotation_end.png"
+  },
+  "doorway-pec-stretch-rotation_regen": {
+    "name": "Doorway Pec Stretch Rotation Regen",
+    "filename": "doorway-pec-stretch-rotation_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "doorway-pectoral-stretch": {
     "name": "Doorway Pectoral Stretch",
@@ -1698,6 +1764,12 @@
     "body_position": "seated",
     "end_filename": "dumbbell-chest-press-seated_end.png"
   },
+  "dumbbell-chest-press_regen": {
+    "name": "Dumbbell Chest Press Regen",
+    "filename": "dumbbell-chest-press_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "dumbbell-curtsy-lunges": {
     "name": "Dumbbell Curtsy Lunges",
     "filename": "dumbbell-curtsy-lunges.png",
@@ -1793,6 +1865,12 @@
     "target_area": "Hip",
     "body_position": "supine",
     "end_filename": "dumbbell-floor-press_end.png"
+  },
+  "dumbbell-floor-press_regen": {
+    "name": "Dumbbell Floor Press Regen",
+    "filename": "dumbbell-floor-press_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "dumbbell-goblet-squat": {
     "name": "Dumbbell Goblet Squat",
@@ -1941,6 +2019,12 @@
     "body_position": "seated",
     "end_filename": "dumbbell-rows-seated_end.png"
   },
+  "dumbbell-rows_regen": {
+    "name": "Dumbbell Rows Regen",
+    "filename": "dumbbell-rows_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "dumbbell-shoulder-presses": {
     "name": "Dumbbell Shoulder Presses",
     "filename": "dumbbell-shoulder-presses.png",
@@ -2028,6 +2112,12 @@
     "target_area": "Hip",
     "body_position": "standing",
     "end_filename": "dynamic-adductor-stretch-with-hip-rotation_end.png"
+  },
+  "dynamic-adductor-stretch-with-hip-rotation_regen": {
+    "name": "Dynamic Adductor Stretch With Hip Rotation Regen",
+    "filename": "dynamic-adductor-stretch-with-hip-rotation_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "eccentric-biceps-curl-band": {
     "name": "Eccentric Biceps Curl with Band",
@@ -2155,6 +2245,12 @@
     "target_area": "Shoulder",
     "body_position": "seated",
     "end_filename": "external-rotation-resistance-band_end.png"
+  },
+  "external-rotation_regen": {
+    "name": "External Rotation Regen",
+    "filename": "external-rotation_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "eye-closure-blink": {
     "name": "Eye Closure Strengthening",
@@ -2386,6 +2482,12 @@
     ],
     "end_filename": "foam-roller-quad_end.png"
   },
+  "foam-roller-quad_regen": {
+    "name": "Foam Roller Quad Regen",
+    "filename": "foam-roller-quad_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "foam-roller-thoracic-extension": {
     "name": "Foam Roller Thoracic Extension",
     "filename": "foam-roller-thoracic-extension.png",
@@ -2492,6 +2594,12 @@
     "target_area": "Forearm",
     "body_position": "seated",
     "end_filename": "forearm-rotation-band_end.png"
+  },
+  "forearm-rotation-band_regen": {
+    "name": "Forearm Rotation Band Regen",
+    "filename": "forearm-rotation-band_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "forearm-rotation-pronation-supination": {
     "name": "Supination and Pronation",
@@ -2793,6 +2901,12 @@
     "target_area": "Hip",
     "body_position": "supine",
     "end_filename": "glute-bridge-single-leg_end.png"
+  },
+  "glute-bridge-single-leg_regen": {
+    "name": "Glute Bridge Single Leg Regen",
+    "filename": "glute-bridge-single-leg_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "glute-bridge-with-band": {
     "name": "Glute Bridge with Band",
@@ -3169,6 +3283,12 @@
     "body_position": "supine",
     "end_filename": "hamstring-stretch-with-band_end.png"
   },
+  "hamstring-stretch-with-band_regen": {
+    "name": "Hamstring Stretch With Band Regen",
+    "filename": "hamstring-stretch-with-band_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "hamstring-stretch-with-strap": {
     "name": "Hamstring Stretch with Strap",
     "filename": "hamstring-stretch-with-strap.png",
@@ -3476,6 +3596,12 @@
     "body_position": "standing",
     "end_filename": "internal-rotation_end.png"
   },
+  "internal-rotation_regen": {
+    "name": "Internal Rotation Regen",
+    "filename": "internal-rotation_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "intrinsic-finger-flexion": {
     "name": "Intrinsic Hand Strengthening - Finger Flexion",
     "filename": "intrinsic-finger-flexion.png",
@@ -3611,6 +3737,12 @@
     "body_position": "standing",
     "end_filename": "isometric-shoulder-external-rotation_end.png"
   },
+  "isometric-shoulder-external-rotation_regen": {
+    "name": "Isometric Shoulder External Rotation Regen",
+    "filename": "isometric-shoulder-external-rotation_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "isometric-shoulder-internal-rotation": {
     "name": "Isometric Shoulder Internal Rotation",
     "filename": "isometric-shoulder-internal-rotation.png",
@@ -3618,6 +3750,12 @@
     "target_area": "Shoulder",
     "body_position": "standing",
     "end_filename": "isometric-shoulder-internal-rotation_end.png"
+  },
+  "isometric-shoulder-internal-rotation_regen": {
+    "name": "Isometric Shoulder Internal Rotation Regen",
+    "filename": "isometric-shoulder-internal-rotation_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "isometric-thumb-abduction": {
     "name": "Isometric Thumb Abduction",
@@ -3903,6 +4041,12 @@
     "target_area": "Gluteus medius, hip external rotators, trochanteric bursa",
     "body_position": "side_lying",
     "end_filename": "lateral-side-lying-clam-shell_end.png"
+  },
+  "lateral-side-lying-clam-shell_regen": {
+    "name": "Lateral Side Lying Clam Shell Regen",
+    "filename": "lateral-side-lying-clam-shell_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "lateral-step-ups": {
     "name": "Lateral Step-Ups",
@@ -4383,6 +4527,12 @@
     "body_position": "seated",
     "end_filename": "neck-stretch-gentle-rotation_end.png"
   },
+  "neck-stretch-gentle-rotation_regen": {
+    "name": "Neck Stretch Gentle Rotation Regen",
+    "filename": "neck-stretch-gentle-rotation_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "neck-stretch-sternocleidomastoid": {
     "name": "Neck Stretching - Sternocleidomastoid",
     "filename": "neck-stretch-sternocleidomastoid.png",
@@ -4778,6 +4928,12 @@
     "body_position": "standing",
     "end_filename": "posterior-shoulder-stretch-band_end.png"
   },
+  "posterior-shoulder-stretch-band_regen": {
+    "name": "Posterior Shoulder Stretch Band Regen",
+    "filename": "posterior-shoulder-stretch-band_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "postural-correction-hold": {
     "name": "Postural Correction Hold",
     "filename": "postural-correction-hold.png",
@@ -4929,6 +5085,12 @@
     "target_area": "Shoulder",
     "body_position": "prone",
     "end_filename": "prone-external-rotation_end.png"
+  },
+  "prone-external-rotation_regen": {
+    "name": "Prone External Rotation Regen",
+    "filename": "prone-external-rotation_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "prone-gastrocnemius-stretch": {
     "name": "Prone Gastrocnemius Stretch",
@@ -5181,6 +5343,12 @@
     "target_area": "Back",
     "body_position": "prone",
     "end_filename": "prone-lumbar-extension-band_end.png"
+  },
+  "prone-lumbar-extension-band_regen": {
+    "name": "Prone Lumbar Extension Band Regen",
+    "filename": "prone-lumbar-extension-band_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "prone-neck-isometric-hold": {
     "name": "Prone Neck Isometric Hold",
@@ -6159,6 +6327,12 @@
     ],
     "end_filename": "resistance-band-pull-apart_end.png"
   },
+  "resistance-band-pull-apart_regen": {
+    "name": "Resistance Band Pull Apart Regen",
+    "filename": "resistance-band-pull-apart_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "resistance-band-pull-aparts": {
     "name": "Resistance Band Pull-Aparts",
     "filename": "resistance-band-pull-aparts.png",
@@ -6595,6 +6769,12 @@
     "target_area": "Hip",
     "body_position": "seated",
     "end_filename": "seated-adductor-squeeze-with-band_end.png"
+  },
+  "seated-adductor-squeeze-with-band_regen": {
+    "name": "Seated Adductor Squeeze With Band Regen",
+    "filename": "seated-adductor-squeeze-with-band_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "seated-ankle-alphabet": {
     "name": "Seated Ankle Alphabet",
@@ -7533,6 +7713,12 @@
     "body_position": "seated",
     "end_filename": "seated-shoulder-rolls-band_end.png"
   },
+  "seated-shoulder-rolls-band_regen": {
+    "name": "Seated Shoulder Rolls Band Regen",
+    "filename": "seated-shoulder-rolls-band_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "seated-shoulder-shrugs": {
     "name": "Seated Shoulder Shrugs",
     "filename": "seated-shoulder-shrugs.png",
@@ -8146,6 +8332,12 @@
     "body_position": "standing",
     "end_filename": "single-leg-balance-dumbbell-hold_end.png"
   },
+  "single-leg-balance-dumbbell-hold_regen": {
+    "name": "Single Leg Balance Dumbbell Hold Regen",
+    "filename": "single-leg-balance-dumbbell-hold_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "single-leg-balance-firm-surface": {
     "name": "Single Leg Balance on Firm Surface",
     "filename": "single-leg-balance-firm-surface.png",
@@ -8169,6 +8361,12 @@
     "target_area": "Foot",
     "body_position": "standing",
     "end_filename": "single-leg-balance-hold_end.png"
+  },
+  "single-leg-balance-hold_regen": {
+    "name": "Single Leg Balance Hold Regen",
+    "filename": "single-leg-balance-hold_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "single-leg-balance-perturbations": {
     "name": "Single Leg Balance with Perturbations",
@@ -8343,6 +8541,18 @@
     "body_position": "standing",
     "end_filename": "single-leg-stance-support_end.png"
   },
+  "single-leg-stance-support_regen": {
+    "name": "Single Leg Stance Support Regen",
+    "filename": "single-leg-stance-support_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
+  "single-leg-stance_regen": {
+    "name": "Single Leg Stance Regen",
+    "filename": "single-leg-stance_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "single-leg-stand": {
     "name": "Single Leg Stand",
     "filename": "single-leg-stand.png",
@@ -8445,6 +8655,12 @@
     "body_position": "supine",
     "end_filename": "spinal-twist_end.png"
   },
+  "spinal-twist_regen": {
+    "name": "Spinal Twist Regen",
+    "filename": "spinal-twist_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "standing-adductor-stretch-against-wall": {
     "name": "Standing Adductor Stretch Against Wall",
     "filename": "standing-adductor-stretch-against-wall.png",
@@ -8509,6 +8725,12 @@
     "body_position": "standing",
     "end_filename": "standing-balance-on-one-leg_end.png"
   },
+  "standing-balance-on-one-leg_regen": {
+    "name": "Standing Balance On One Leg Regen",
+    "filename": "standing-balance-on-one-leg_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "standing-balance-one-leg": {
     "name": "Standing Balance on One Leg",
     "filename": "standing-balance-one-leg.png",
@@ -8559,6 +8781,12 @@
     "target_area": "Back",
     "body_position": "standing",
     "end_filename": "standing-band-pull-apart_end.png"
+  },
+  "standing-band-pull-apart_regen": {
+    "name": "Standing Band Pull Apart Regen",
+    "filename": "standing-band-pull-apart_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "standing-band-row": {
     "name": "Standing Band Row",
@@ -8642,6 +8870,12 @@
     "target_area": "Chest",
     "body_position": "standing",
     "end_filename": "standing-chest-fly-with-band_end.png"
+  },
+  "standing-chest-fly-with-band_regen": {
+    "name": "Standing Chest Fly With Band Regen",
+    "filename": "standing-chest-fly-with-band_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "standing-chest-opener-breathing": {
     "name": "Standing Chest Opener with Deep Breathing",
@@ -9138,6 +9372,12 @@
     "body_position": "standing",
     "end_filename": "standing-rotation-band_end.png"
   },
+  "standing-rotation-band_regen": {
+    "name": "Standing Rotation Band Regen",
+    "filename": "standing-rotation-band_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "standing-row-with-band": {
     "name": "Standing Row with Band",
     "filename": "standing-row-with-band.png",
@@ -9186,6 +9426,12 @@
     "body_position": "standing",
     "end_filename": "standing-single-leg-balance-with-hip-stability_end.png"
   },
+  "standing-single-leg-balance_regen": {
+    "name": "Standing Single Leg Balance Regen",
+    "filename": "standing-single-leg-balance_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "standing-single-leg-calf-raises": {
     "name": "Standing Single-Leg Calf Raises",
     "filename": "standing-single-leg-calf-raises.png",
@@ -9209,6 +9455,18 @@
     "target_area": "Legs/Ankles",
     "body_position": "standing",
     "end_filename": "standing-single-leg-stance-band_end.png"
+  },
+  "standing-single-leg-stance-band_regen": {
+    "name": "Standing Single Leg Stance Band Regen",
+    "filename": "standing-single-leg-stance-band_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
+  "standing-single-leg-stance_regen": {
+    "name": "Standing Single Leg Stance Regen",
+    "filename": "standing-single-leg-stance_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "standing-single-leg-stand": {
     "name": "Standing Single Leg Stand",
@@ -9645,6 +9903,12 @@
     "body_position": "supine",
     "end_filename": "supine-external-rotation-bent-elbow_end.png"
   },
+  "supine-external-rotation-bent-elbow_regen": {
+    "name": "Supine External Rotation Bent Elbow Regen",
+    "filename": "supine-external-rotation-bent-elbow_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "supine-external-rotation-dumbbell": {
     "name": "Supine External Rotation with Dumbbell",
     "filename": "supine-external-rotation-dumbbell.png",
@@ -9652,6 +9916,12 @@
     "target_area": "Shoulder",
     "body_position": "supine",
     "end_filename": "supine-external-rotation-dumbbell_end.png"
+  },
+  "supine-external-rotation-dumbbell_regen": {
+    "name": "Supine External Rotation Dumbbell Regen",
+    "filename": "supine-external-rotation-dumbbell_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "supine-eye-movements": {
     "name": "Supine Eye Movements",
@@ -10116,6 +10386,12 @@
     "body_position": "supine",
     "end_filename": "supine-shoulder-external-rotation_end.png"
   },
+  "supine-shoulder-external-rotation_regen": {
+    "name": "Supine Shoulder External Rotation Regen",
+    "filename": "supine-shoulder-external-rotation_regen.png",
+    "category": "general",
+    "target_area": "General"
+  },
   "supine-shoulder-flexion": {
     "name": "Supine Shoulder Flexion",
     "filename": "supine-shoulder-flexion.png",
@@ -10171,6 +10447,12 @@
     "target_area": "Shoulder",
     "body_position": "supine",
     "end_filename": "supine-shoulder-rotation_end.png"
+  },
+  "supine-shoulder-rotation_regen": {
+    "name": "Supine Shoulder Rotation Regen",
+    "filename": "supine-shoulder-rotation_regen.png",
+    "category": "general",
+    "target_area": "General"
   },
   "supine-shoulder-shrugs": {
     "name": "Supine Shoulder Shrugs",
