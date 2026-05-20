@@ -18,7 +18,6 @@ final class BodyMapCollisionTests: XCTestCase {
     private let proxyPrefix = BodyMapConstants.proxyPrefix
     private let proxyRadii = BodyMapConstants.proxyRadii
     private let proxyForwardBias = BodyMapConstants.proxyForwardBias
-    private let ankleProxyLateralBias = BodyMapConstants.ankleProxyLateralBias
 
     // ── Test state ───────────────────────────────────────────────────
     private var bodyEntity: Entity!
@@ -38,6 +37,7 @@ final class BodyMapCollisionTests: XCTestCase {
         configureCollision(for: entity)
         createProxies(for: entity)
         createArmZoneProxies(for: entity)
+        createLegZoneProxies(for: entity)
 
         bodyEntity = entity
 
@@ -60,13 +60,14 @@ final class BodyMapCollisionTests: XCTestCase {
     // MARK: - Setup Helpers (replicate BodyMap3DView logic exactly)
 
     private func configureCollision(for parent: Entity) {
-        let armRegions = Set(BodyMapConstants.armRegionOrder)
+        let zoneBoxedRegions = Set(BodyMapConstants.armRegionOrder
+            + BodyMapConstants.lowerLegRegionOrder)
         for child in parent.children {
             if regionKeys.contains(child.name),
                child.components[ModelComponent.self] != nil {
                 child.components.set(InputTargetComponent(allowedInputTypes: .indirect))
                 let baseKey = BodyMapConstants.regionBaseKey(child.name)
-                if !armRegions.contains(baseKey) {
+                if !zoneBoxedRegions.contains(baseKey) {
                     child.generateCollisionShapes(recursive: true)
                 }
             }
@@ -117,9 +118,53 @@ final class BodyMapCollisionTests: XCTestCase {
         }
     }
 
+    private func createLegZoneProxies(for entity: Entity) {
+        for side in ["left", "right"] {
+            createLegZoneProxies(for: entity, side: side)
+        }
+    }
+
+    private func createLegZoneProxies(for entity: Entity, side: String) {
+        let order = BodyMapConstants.lowerLegRegionOrder
+        let zoneKeys = order.map { "\(side)_\($0)" }
+        guard zoneKeys.allSatisfy({ regionKeys.contains($0) }) else { return }
+        let ents = zoneKeys.compactMap { entity.findEntity(named: $0) }
+        guard ents.count == order.count else { return }
+        let bounds = ents.map { $0.visualBounds(relativeTo: entity) }
+
+        var transitions: [Float] = []
+        for i in 0..<(order.count - 1) {
+            transitions.append((bounds[i].center.z + bounds[i + 1].center.z) / 2)
+        }
+
+        for (i, zoneKey) in zoneKeys.enumerated() {
+            let topZ = (i == 0) ? bounds[i].max.z : transitions[i - 1]
+            let botZ = (i == order.count - 1) ? bounds[i].min.z : transitions[i]
+            let zoneExtentZ = max(0.005, topZ - botZ)
+            let zoneCenterZ = (topZ + botZ) / 2
+
+            let yFront = bounds[i].min.y - BodyMapConstants.armZoneForwardBias
+            let yBack = bounds[i].max.y
+            let zoneCenterY = (yFront + yBack) / 2
+            let zoneExtentY = max(0.005, yBack - yFront)
+
+            let zoneCenterX = bounds[i].center.x
+            let zoneExtentX = max(0.005, bounds[i].extents.x)
+
+            let proxy = Entity()
+            proxy.name = proxyPrefix + zoneKey
+            proxy.position = SIMD3<Float>(zoneCenterX, zoneCenterY, zoneCenterZ)
+            let shape = ShapeResource.generateBox(size: SIMD3<Float>(zoneExtentX, zoneExtentY, zoneExtentZ))
+            proxy.components.set(CollisionComponent(shapes: [shape]))
+            proxy.components.set(InputTargetComponent(allowedInputTypes: .indirect))
+            entity.addChild(proxy)
+        }
+    }
+
     private func createProxies(for entity: Entity) {
         for zoneKey in regionKeys {
             let baseKey = regionBaseKey(zoneKey)
+
             guard let radius = proxyRadii[baseKey],
                   let regionEntity = entity.findEntity(named: zoneKey) else { continue }
 
@@ -129,22 +174,11 @@ final class BodyMapCollisionTests: XCTestCase {
             var proxyZ = center.z
             if baseKey == "knee" {
                 proxyZ = bounds.min.z + bounds.extents.z * BodyMapConstants.kneeCapHeightFraction
-            } else if baseKey == "ankle_foot" {
-                proxyZ = center.z
             } else if baseKey == "head" {
                 proxyZ = bounds.max.z - bounds.extents.z * 0.2
             }
 
-            // Push ankle proxy laterally outward so it protrudes past
-            // the calf convex hull when viewed from the side
-            var proxyX = center.x
-            if baseKey == "ankle_foot" {
-                if zoneKey.hasPrefix("left_") {
-                    proxyX = center.x - ankleProxyLateralBias
-                } else if zoneKey.hasPrefix("right_") {
-                    proxyX = center.x + ankleProxyLateralBias
-                }
-            }
+            let proxyX = center.x
 
             let forwardBias: Float
             switch baseKey {
@@ -160,16 +194,8 @@ final class BodyMapCollisionTests: XCTestCase {
                 proxyZ
             )
 
-            if baseKey == "ankle_foot" {
-                let capsuleHeight = bounds.extents.z * BodyMapConstants.ankleCapsuleHeightFraction
-                let shape = ShapeResource.generateCapsule(height: capsuleHeight, radius: radius)
-                proxy.components.set(CollisionComponent(shapes: [shape]))
-                // Rotate capsule from Y-aligned to Z-aligned (vertical in local space)
-                proxy.orientation = simd_quatf(angle: .pi / 2, axis: SIMD3<Float>(1, 0, 0))
-            } else {
-                let shape = ShapeResource.generateSphere(radius: radius)
-                proxy.components.set(CollisionComponent(shapes: [shape]))
-            }
+            let shape = ShapeResource.generateSphere(radius: radius)
+            proxy.components.set(CollisionComponent(shapes: [shape]))
 
             proxy.components.set(InputTargetComponent(allowedInputTypes: .indirect))
 
@@ -290,11 +316,12 @@ final class BodyMapCollisionTests: XCTestCase {
     }
 
     func testNoProxiesForTorsoAndLegRegions() {
-        // Torso and leg large regions rely on mesh collision — no proxies.
-        // (Arm regions DO have proxies now: Y-band boxes from createArmZoneProxies.)
+        // Torso and upper-leg large regions rely on mesh collision — no proxies.
+        // (Arm + lower-leg regions DO have Y-band box proxies via
+        // createArmZoneProxies / createLegZoneProxies.)
         let largeBaseKeys: Set<String> = [
             "chest", "abdomen", "upper_back", "lower_back",
-            "glute", "hip", "thigh", "hamstring", "calf_shin"
+            "glute", "hip", "thigh", "hamstring"
         ]
         for key in regionKeys {
             let baseKey = regionBaseKey(key)
@@ -512,53 +539,7 @@ final class BodyMapCollisionTests: XCTestCase {
         XCTAssertEqual(hit, "left_upper_arm", "Arm-zone tap at upper_arm center should select left_upper_arm, got: \(hit ?? "nil")")
     }
 
-    // MARK: - 4c. Ankle/Foot Capsule Geometric Tests (local space, Z=height)
-
-    func testAnkleFootProxyCenteredOnZone() {
-        guard let ankleEntity = bodyEntity.findEntity(named: "left_ankle_foot"),
-              let proxy = bodyEntity.findEntity(named: proxyPrefix + "left_ankle_foot") else {
-            XCTFail("Ankle entity or proxy not found"); return
-        }
-
-        let bounds = ankleEntity.visualBounds(relativeTo: bodyEntity)
-        let proxyZ = proxy.position(relativeTo: bodyEntity).z
-
-        let tolerance = bounds.extents.z * 0.15
-        XCTAssertTrue(
-            abs(proxyZ - bounds.center.z) < tolerance,
-            "Ankle capsule center (\(proxyZ)) should be near mesh center (\(bounds.center.z))"
-        )
-    }
-
-    func testAnkleFootCapsuleCoversFootToAnkle() {
-        guard let ankleEntity = bodyEntity.findEntity(named: "left_ankle_foot"),
-              let proxy = bodyEntity.findEntity(named: proxyPrefix + "left_ankle_foot") else {
-            XCTFail("Ankle entity or proxy not found"); return
-        }
-
-        let bounds = ankleEntity.visualBounds(relativeTo: bodyEntity)
-        let proxyZ = proxy.position(relativeTo: bodyEntity).z
-        let radius = proxyRadii["ankle_foot"]!
-        let capsuleHeight = bounds.extents.z * BodyMapConstants.ankleCapsuleHeightFraction
-
-        // Capsule total coverage: center ± (capsuleHeight/2 + radius)
-        let capsuleTop = proxyZ + capsuleHeight / 2 + radius
-        let capsuleBottom = proxyZ - capsuleHeight / 2 - radius
-
-        // Should cover at least 80% up from bottom (upper ankle area)
-        let upperAnkle = bounds.min.z + bounds.extents.z * 0.8
-        XCTAssertTrue(
-            capsuleTop >= upperAnkle,
-            "Capsule top (\(capsuleTop)) should reach upper ankle (\(upperAnkle))"
-        )
-
-        // Should cover down to at least 20% from bottom (foot area)
-        let footLevel = bounds.min.z + bounds.extents.z * 0.2
-        XCTAssertTrue(
-            capsuleBottom <= footLevel,
-            "Capsule bottom (\(capsuleBottom)) should reach foot level (\(footLevel))"
-        )
-    }
+    // MARK: - 4c. Lower-Leg Y-Band Zone Tests (local space, Z=height)
 
     func testAnkleFootProxyBelowCalfShinCenter() {
         guard let calf = bodyEntity.findEntity(named: "left_calf_shin"),
@@ -575,22 +556,45 @@ final class BodyMapCollisionTests: XCTestCase {
         )
     }
 
-    func testAnkleFootProxyProtrudesLaterally() {
-        guard let ankleEntity = bodyEntity.findEntity(named: "left_ankle_foot"),
-              let proxy = bodyEntity.findEntity(named: proxyPrefix + "left_ankle_foot") else {
-            XCTFail("Ankle entity or proxy not found"); return
+    func testLowerLegRegionsHaveZoneProxies() {
+        for side in ["left", "right"] {
+            for baseKey in BodyMapConstants.lowerLegRegionOrder {
+                let key = "\(side)_\(baseKey)"
+                XCTAssertNotNil(
+                    bodyEntity.findEntity(named: proxyPrefix + key),
+                    "Lower-leg region '\(key)' should have a Y-band zone proxy"
+                )
+            }
         }
+    }
 
-        let bounds = ankleEntity.visualBounds(relativeTo: bodyEntity)
-        let proxyPos = proxy.position(relativeTo: bodyEntity)
-        let radius = proxyRadii["ankle_foot"]!
-
-        // Left ankle: proxy outer edge should extend past mesh's outer edge (min.x)
-        let proxyOuterX = proxyPos.x - radius
-        XCTAssertTrue(
-            proxyOuterX < bounds.min.x,
-            "Ankle proxy outer edge (x=\(proxyOuterX)) should protrude past mesh lateral edge (x=\(bounds.min.x))"
-        )
+    /// Verify the calf_shin / ankle_foot transition is a single shared
+    /// boundary at the mesh-center midpoint (mirrors testAdjacentArmZonesMeetAtSingleBoundary).
+    func testLegZonesMeetAtSingleBoundary() {
+        for side in ["left", "right"] {
+            let order = BodyMapConstants.lowerLegRegionOrder
+            let zoneKeys = order.map { "\(side)_\($0)" }
+            let ents = zoneKeys.compactMap { bodyEntity.findEntity(named: $0) }
+            guard ents.count == order.count else {
+                XCTFail("Missing lower-leg entities for side=\(side)"); return
+            }
+            let worldBounds = ents.map { $0.visualBounds(relativeTo: nil) }
+            for i in 0..<(order.count - 1) {
+                let upperBounds = worldBounds[i]
+                let lowerBounds = worldBounds[i + 1]
+                let midY = (upperBounds.center.y + lowerBounds.center.y) / 2
+                let hitAbove = resolveHit(frontRaycast(x: upperBounds.center.x, y: midY + 0.003))
+                let hitBelow = resolveHit(frontRaycast(x: lowerBounds.center.x, y: midY - 0.003))
+                XCTAssertEqual(
+                    hitAbove, zoneKeys[i],
+                    "Tap just above midpoint of \(zoneKeys[i])/\(zoneKeys[i+1]) on side=\(side) should select \(zoneKeys[i]), got \(hitAbove ?? "nil")"
+                )
+                XCTAssertEqual(
+                    hitBelow, zoneKeys[i + 1],
+                    "Tap just below midpoint of \(zoneKeys[i])/\(zoneKeys[i+1]) on side=\(side) should select \(zoneKeys[i+1]), got \(hitBelow ?? "nil")"
+                )
+            }
+        }
     }
 
     // MARK: - 4d. Raycast: Side-View Ankle/Foot Full Zone Tests (world space)
