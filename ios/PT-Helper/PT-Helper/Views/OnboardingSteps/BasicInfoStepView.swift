@@ -7,73 +7,66 @@ struct BasicInfoStepView: View {
     @State private var showPrivacySheet = false
     @FocusState private var isWeightFieldFocused: Bool
 
-    /// Whether to show validation errors — driven by ViewModel
     private var showErrors: Bool { viewModel.showValidationErrors }
 
     var body: some View {
         ScrollView {
-            VStack(spacing: AppSpacing.lg) {
-                CardSection(icon: "person.fill", color: AppColors.accent, title: "Full Name", required: true) {
-                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                        StyledTextField(placeholder: "First Name", text: $viewModel.userProfile.firstName)
-                        if showErrors && viewModel.userProfile.firstName.trimmingCharacters(in: .whitespaces).isEmpty {
-                            validationMessage("First name is required")
-                        }
-                        StyledTextField(placeholder: "Last Name", text: $viewModel.userProfile.lastName)
-                        if showErrors && viewModel.userProfile.lastName.trimmingCharacters(in: .whitespaces).isEmpty {
-                            validationMessage("Last name is required")
-                        }
+            VStack(spacing: AppSpacing.xl) {
+
+                // Name
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    OnboardingFieldLabel(text: "Full Name")
+                    DarkTextField(placeholder: "First Name", text: $viewModel.userProfile.firstName)
+                    if showErrors && viewModel.userProfile.firstName.trimmingCharacters(in: .whitespaces).isEmpty {
+                        validationMessage("First name is required")
+                    }
+                    DarkTextField(placeholder: "Last Name", text: $viewModel.userProfile.lastName)
+                    if showErrors && viewModel.userProfile.lastName.trimmingCharacters(in: .whitespaces).isEmpty {
+                        validationMessage("Last name is required")
                     }
                 }
 
-                CardSection(icon: "calendar", color: AppColors.warning, title: "Date of Birth") {
-                    DatePicker("", selection: $viewModel.userProfile.dateOfBirth,
-                               in: ...Date(),
-                               displayedComponents: .date)
+                // Date of Birth
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    OnboardingFieldLabel(text: "Date of Birth")
+                    DatePicker("", selection: $viewModel.userProfile.dateOfBirth, in: ...Date(), displayedComponents: .date)
                         .datePickerStyle(.compact)
                         .labelsHidden()
                         .tint(AppColors.accent)
+                        .colorScheme(.dark)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
 
-                CardSection(icon: "figure.stand", color: AppColors.accent, title: "Sex", required: true) {
-                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                        HStack(spacing: AppSpacing.sm) {
-                            ForEach(["Male", "Female", "Other"], id: \.self) { option in
-                                Button(action: { viewModel.userProfile.sex = option }) {
-                                    Text(option)
-                                        .font(.subheadline.weight(.medium))
-                                        .foregroundColor(viewModel.userProfile.sex == option ? AppColors.ctaText : AppColors.primaryText)
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, AppSpacing.md)
-                                        .background(viewModel.userProfile.sex == option ? AppColors.accent : AppColors.subtleBorder)
-                                        .cornerRadius(AppCorners.medium)
-                                }
+                // Sex
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    OnboardingFieldLabel(text: "Sex")
+                    HStack(spacing: AppSpacing.sm) {
+                        ForEach(["Male", "Female", "Other"], id: \.self) { option in
+                            DarkChipButton(label: option, isSelected: viewModel.userProfile.sex == option) {
+                                viewModel.userProfile.sex = option
                             }
                         }
-                        if showErrors && viewModel.userProfile.sex.isEmpty {
-                            validationMessage("Please select an option")
-                        }
+                    }
+                    if showErrors && viewModel.userProfile.sex.isEmpty {
+                        validationMessage("Please select an option")
                     }
                 }
 
-                CardSection(icon: "hand.raised.fill", color: AppColors.accent, title: "Dominant Side") {
+                // Dominant Side
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    OnboardingFieldLabel(text: "Dominant Side")
                     HStack(spacing: AppSpacing.sm) {
                         ForEach(["Left", "Right", "Ambidextrous"], id: \.self) { option in
-                            Button(action: { viewModel.userProfile.dominantSide = option }) {
-                                Text(option)
-                                    .font(.subheadline.weight(.medium))
-                                    .foregroundColor(viewModel.userProfile.dominantSide == option ? AppColors.ctaText : AppColors.primaryText)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, AppSpacing.md)
-                                    .background(viewModel.userProfile.dominantSide == option ? AppColors.accent : AppColors.subtleBorder)
-                                    .cornerRadius(AppCorners.medium)
+                            DarkChipButton(label: option, isSelected: viewModel.userProfile.dominantSide == option) {
+                                viewModel.userProfile.dominantSide = option
                             }
                         }
                     }
                 }
 
-                CardSection(icon: "ruler", color: AppColors.success, title: "Height") {
+                // Height
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    OnboardingFieldLabel(text: "Height")
                     HStack(spacing: AppSpacing.md) {
                         Menu {
                             ForEach(3..<8, id: \.self) { feet in
@@ -82,16 +75,17 @@ struct BasicInfoStepView: View {
                         } label: {
                             HStack {
                                 Text("\(viewModel.userProfile.heightFeet) ft")
-                                    .font(.title3.weight(.medium))
+                                    .font(Font.custom("Inter-Medium", size: 15))
+                                    .foregroundColor(.white)
+                                Spacer()
                                 Image(systemName: "chevron.up.chevron.down")
                                     .font(.caption)
-                                    .foregroundColor(AppColors.secondaryText)
+                                    .foregroundColor(OnboardingColors.muted)
                             }
-                            .foregroundColor(AppColors.primaryText)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, AppSpacing.md)
-                            .background(AppColors.inputBackground)
+                            .padding(AppSpacing.md)
+                            .background(OnboardingColors.inputBg)
                             .cornerRadius(AppCorners.medium)
+                            .overlay(RoundedRectangle(cornerRadius: AppCorners.medium).stroke(OnboardingColors.cardBorder, lineWidth: 1))
                         }
 
                         Menu {
@@ -101,48 +95,51 @@ struct BasicInfoStepView: View {
                         } label: {
                             HStack {
                                 Text("\(viewModel.userProfile.heightInches) in")
-                                    .font(.title3.weight(.medium))
+                                    .font(Font.custom("Inter-Medium", size: 15))
+                                    .foregroundColor(.white)
+                                Spacer()
                                 Image(systemName: "chevron.up.chevron.down")
                                     .font(.caption)
-                                    .foregroundColor(AppColors.secondaryText)
+                                    .foregroundColor(OnboardingColors.muted)
                             }
-                            .foregroundColor(AppColors.primaryText)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, AppSpacing.md)
-                            .background(AppColors.inputBackground)
+                            .padding(AppSpacing.md)
+                            .background(OnboardingColors.inputBg)
                             .cornerRadius(AppCorners.medium)
+                            .overlay(RoundedRectangle(cornerRadius: AppCorners.medium).stroke(OnboardingColors.cardBorder, lineWidth: 1))
                         }
                     }
                 }
 
-                CardSection(icon: "scalemass", color: AppColors.accent, title: "Weight (lbs)", required: true) {
-                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                        HStack {
-                            TextField("Enter weight", text: $weightText)
-                                .keyboardType(.decimalPad)
-                                .focused($isWeightFieldFocused)
-                                .font(.title3.weight(.medium))
-                                .foregroundColor(AppColors.primaryText)
-                                .padding(AppSpacing.md)
-                                .background(AppColors.inputBackground)
-                                .cornerRadius(AppCorners.medium)
-                                .onChange(of: weightText) { _, newValue in
-                                    if let val = Double(newValue) {
-                                        viewModel.userProfile.weight = val
-                                    } else if newValue.isEmpty {
-                                        viewModel.userProfile.weight = 0
-                                    }
+                // Weight
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    OnboardingFieldLabel(text: "Weight")
+                    HStack {
+                        TextField("Enter weight", text: $weightText)
+                            .keyboardType(.decimalPad)
+                            .focused($isWeightFieldFocused)
+                            .font(Font.custom("Inter-Regular", size: 14))
+                            .foregroundColor(.white)
+                            .padding(AppSpacing.md)
+                            .background(OnboardingColors.inputBg)
+                            .cornerRadius(AppCorners.medium)
+                            .overlay(RoundedRectangle(cornerRadius: AppCorners.medium).stroke(OnboardingColors.cardBorder, lineWidth: 1))
+                            .onChange(of: weightText) { _, newValue in
+                                if let val = Double(newValue) {
+                                    viewModel.userProfile.weight = val
+                                } else if newValue.isEmpty {
+                                    viewModel.userProfile.weight = 0
                                 }
-                            Text("lbs")
-                                .foregroundColor(AppColors.secondaryText)
-                                .font(.body.weight(.medium))
-                        }
-                        if showErrors && (viewModel.userProfile.weight < 50 || viewModel.userProfile.weight > 500) {
-                            validationMessage(viewModel.userProfile.weight == 0 ? "Weight is required" : "Please enter a weight between 50 and 500 lbs")
-                        }
+                            }
+                        Text("lbs")
+                            .foregroundColor(OnboardingColors.muted)
+                            .font(Font.custom("Inter-Medium", size: 14))
+                    }
+                    if showErrors && (viewModel.userProfile.weight < 50 || viewModel.userProfile.weight > 500) {
+                        validationMessage(viewModel.userProfile.weight == 0 ? "Weight is required" : "Please enter a weight between 50 and 500 lbs")
                     }
                 }
-                // Terms of Service acceptance
+
+                // Terms
                 VStack(alignment: .leading, spacing: AppSpacing.sm) {
                     HStack(alignment: .top, spacing: AppSpacing.md) {
                         Button {
@@ -150,25 +147,25 @@ struct BasicInfoStepView: View {
                         } label: {
                             Image(systemName: viewModel.hasAcceptedTerms ? "checkmark.square.fill" : "square")
                                 .font(.title3)
-                                .foregroundColor(viewModel.hasAcceptedTerms ? AppColors.accent : AppColors.mutedText)
+                                .foregroundColor(viewModel.hasAcceptedTerms ? AppColors.accent : OnboardingColors.muted)
                         }
                         .accessibilityIdentifier("onboarding.termsCheckbox")
 
                         VStack(alignment: .leading, spacing: 2) {
                             HStack(spacing: 0) {
                                 Text("I agree to the ")
-                                    .font(.subheadline)
-                                    .foregroundColor(AppColors.primaryText)
+                                    .font(Font.custom("Inter-Regular", size: 14))
+                                    .foregroundColor(Color.white.opacity(0.7))
                                 Button("Terms of Service") { showTermsSheet = true }
-                                    .font(.subheadline.weight(.medium))
+                                    .font(Font.custom("Inter-Medium", size: 14))
                                     .foregroundColor(AppColors.accent)
                             }
                             HStack(spacing: 0) {
                                 Text("and ")
-                                    .font(.subheadline)
-                                    .foregroundColor(AppColors.primaryText)
+                                    .font(Font.custom("Inter-Regular", size: 14))
+                                    .foregroundColor(Color.white.opacity(0.7))
                                 Button("Privacy Policy") { showPrivacySheet = true }
-                                    .font(.subheadline.weight(.medium))
+                                    .font(Font.custom("Inter-Medium", size: 14))
                                     .foregroundColor(AppColors.accent)
                             }
                         }
@@ -178,13 +175,9 @@ struct BasicInfoStepView: View {
                     }
                 }
                 .padding(AppSpacing.lg)
-                .background(AppColors.cardBackground)
-                .cornerRadius(AppCorners.large)
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppCorners.large)
-                        .stroke(AppColors.cardBorder, lineWidth: 1)
-                )
-                .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+                .background(OnboardingColors.cardBg)
+                .cornerRadius(AppCorners.card)
+                .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(OnboardingColors.cardBorder, lineWidth: 1))
             }
             .padding(.horizontal, AppSpacing.xl)
             .padding(.vertical, AppSpacing.md)
@@ -209,10 +202,8 @@ struct BasicInfoStepView: View {
 
     private func validationMessage(_ text: String) -> some View {
         HStack(spacing: 4) {
-            Image(systemName: "exclamationmark.circle.fill")
-                .font(.caption2)
-            Text(text)
-                .font(.caption)
+            Image(systemName: "exclamationmark.circle.fill").font(.caption2)
+            Text(text).font(.caption)
         }
         .foregroundColor(AppColors.danger)
         .transition(.opacity.combined(with: .move(edge: .top)))

@@ -20,6 +20,7 @@ struct ProgressTab: View {
                 savedPlansVM: savedPlansVM,
                 onSettingsTapped: { showSettings = true }
             )
+            .mvvcNavBar()
         }
         .sheet(isPresented: $showSettings) {
             SettingsView(
@@ -142,7 +143,7 @@ struct ProgressTabContent: View {
             Text("Are you sure you want to delete this workout session? This cannot be undone.")
         }
         .navigationTitle("Progress")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 HStack(spacing: AppSpacing.sm) {
@@ -190,20 +191,26 @@ struct ProgressTabContent: View {
     // MARK: - Navigation Link Row
 
     private func navLinkRow(icon: String, iconColor: Color, title: String) -> some View {
-        HStack {
+        HStack(spacing: AppSpacing.md) {
             Image(systemName: icon)
+                .font(.system(size: 16, weight: .semibold))
                 .foregroundColor(iconColor)
+                .frame(width: 36, height: 36)
+                .background(iconColor.opacity(0.12))
+                .cornerRadius(AppCorners.small)
             Text(title)
-                .font(.subheadline.weight(.medium))
+                .font(Font.custom("Inter-SemiBold", size: 14))
                 .foregroundColor(AppColors.primaryText)
             Spacer()
             Image(systemName: "chevron.right")
-                .font(.caption)
+                .font(.system(size: 13, weight: .semibold))
                 .foregroundColor(AppColors.mutedText)
         }
         .padding(AppSpacing.md)
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.card)
+        .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
+        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 
     // MARK: - Recent Workouts
@@ -215,38 +222,37 @@ struct ProgressTabContent: View {
     private var recentWorkoutsSection: some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
             HStack {
-                Image(systemName: "clock.arrow.circlepath")
-                    .foregroundColor(AppColors.accent)
-                    .font(.system(size: 16, weight: .semibold))
-                Text("Recent Workouts")
-                    .font(AppFonts.cardTitle)
-                    .foregroundColor(AppColors.primaryText)
+                MVVCDividerHeader(title: "Recent Workouts")
                 Spacer()
                 if workoutViewModel.sessions.count > 10 {
                     NavigationLink(destination: WorkoutSessionView()) {
                         Text("See All")
-                            .font(.caption.weight(.medium))
+                            .font(Font.custom("Inter-SemiBold", size: 12))
                             .foregroundColor(AppColors.accent)
                     }
                 }
             }
 
-            ForEach(recentWorkouts, id: \.id) { session in
-                workoutSessionRow(session)
-                    .contentShape(Rectangle())
-                    .contextMenu {
-                        Button(role: .destructive) {
-                            sessionToDelete = session
-                            showDeleteConfirmation = true
-                        } label: {
-                            Label("Delete", systemImage: "trash")
+            VStack(spacing: 0) {
+                ForEach(recentWorkouts, id: \.id) { session in
+                    workoutSessionRow(session)
+                        .contentShape(Rectangle())
+                        .contextMenu {
+                            Button(role: .destructive) {
+                                sessionToDelete = session
+                                showDeleteConfirmation = true
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
                         }
-                    }
+                }
             }
+            .padding(AppSpacing.lg)
+            .background(AppColors.cardBackground)
+            .cornerRadius(AppCorners.card)
+            .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
+            .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
         }
-        .padding(AppSpacing.lg)
-        .background(AppColors.cardBackground)
-        .cornerRadius(AppCorners.card)
     }
 
     private func workoutSessionRow(_ session: WorkoutSession) -> some View {
@@ -358,7 +364,14 @@ struct ProgressTabContent: View {
             ? "\(RegionPainInputView.displayName(for: selectedRegion!)) Pain"
             : "Pain Trend"
 
-        return CardSection(icon: "chart.line.uptrend.xyaxis", color: AppColors.accent, title: chartTitle) {
+        return VStack(alignment: .leading, spacing: AppSpacing.md) {
+            MVVCDividerHeader(title: chartTitle)
+            cardChartContent
+        }
+    }
+
+    private var cardChartContent: some View {
+        VStack(spacing: 0) {
             Chart(filteredChartData, id: \.id) { session in
                 let painValue = painValueForChart(session)
                 LineMark(
@@ -410,6 +423,11 @@ struct ProgressTabContent: View {
             }
             .frame(height: 220)
         }
+        .padding(AppSpacing.lg)
+        .background(AppColors.cardBackground)
+        .cornerRadius(AppCorners.card)
+        .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
+        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 
     private var filteredChartData: [WorkoutSession] {
@@ -430,26 +448,9 @@ struct ProgressTabContent: View {
 
     private var summaryStats: some View {
         HStack(spacing: AppSpacing.md) {
-            statCard(
-                icon: "number",
-                color: AppColors.accent,
-                value: "\(workoutViewModel.sessions.count)",
-                label: "Sessions"
-            )
-
-            statCard(
-                icon: "waveform.path.ecg",
-                color: averagePainColor,
-                value: String(format: "%.1f", averagePain),
-                label: "Avg Pain"
-            )
-
-            statCard(
-                icon: "clock",
-                color: AppColors.warning,
-                value: "\(totalMinutes)",
-                label: "Total Min"
-            )
+            statCard(icon: "number",            color: AppColors.accent,      value: "\(workoutViewModel.sessions.count)",     label: "Sessions")
+            statCard(icon: "waveform.path.ecg", color: averagePainColor,      value: String(format: "%.1f", averagePain),      label: "Avg Pain")
+            statCard(icon: "clock",             color: AppColors.warning,     value: "\(totalMinutes)",                        label: "Total Min")
         }
     }
 
@@ -459,21 +460,22 @@ struct ProgressTabContent: View {
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundColor(color)
                 .frame(width: 32, height: 32)
-                .background(color.opacity(0.15))
+                .background(color.opacity(0.12))
                 .cornerRadius(AppCorners.small)
 
             Text(value)
-                .font(.system(size: 22, weight: .bold, design: .rounded))
+                .font(Font.custom("BarlowCondensed-Black", size: 26))
                 .foregroundColor(AppColors.primaryText)
 
             Text(label)
-                .font(.caption2)
-                .foregroundColor(AppColors.secondaryText)
+                .font(Font.custom("Inter-Regular", size: 11))
+                .foregroundColor(AppColors.mutedText)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, AppSpacing.lg)
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.card)
+        .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
         .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 
@@ -506,31 +508,32 @@ struct ProgressTabContent: View {
                     .foregroundColor(AppColors.accent)
                     .font(.system(size: 16, weight: .semibold))
                 Text("Time for a Re-Assessment?")
-                    .font(AppFonts.cardTitle)
+                    .font(Font.custom("BarlowCondensed-Black", size: 16))
                     .foregroundColor(AppColors.primaryText)
+                Spacer()
             }
 
             Text("Check in on your progress and see how your condition has changed.")
-                .font(.caption)
+                .font(Font.custom("Inter-Regular", size: 12))
                 .foregroundColor(AppColors.secondaryText)
-                .multilineTextAlignment(.center)
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             Button {
                 tabSelection.selectedTab = 0
             } label: {
                 HStack(spacing: AppSpacing.xs) {
                     Text("Re-Assess Now")
-                        .font(.subheadline.weight(.semibold))
+                        .font(Font.custom("BarlowCondensed-Bold", size: 14))
+                        .textCase(.uppercase)
+                        .kerning(0.8)
                     Image(systemName: "arrow.right")
-                        .font(.caption.weight(.semibold))
+                        .font(.system(size: 12, weight: .semibold))
                 }
                 .foregroundColor(AppColors.accent)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, AppSpacing.sm)
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppCorners.large)
-                        .stroke(AppColors.accent, lineWidth: 1.5)
-                )
+                .padding(.vertical, 10)
+                .overlay(Capsule().stroke(AppColors.accent, lineWidth: 1.5))
             }
             .buttonStyle(.plain)
             .accessibilityIdentifier("progress.reassessButton")
@@ -538,10 +541,8 @@ struct ProgressTabContent: View {
         .padding(AppSpacing.lg)
         .background(AppColors.cardBackground)
         .cornerRadius(AppCorners.card)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppCorners.card)
-                .stroke(AppColors.accent.opacity(0.2), lineWidth: 1)
-        )
+        .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.accent.opacity(0.2), lineWidth: 1))
+        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 }
 

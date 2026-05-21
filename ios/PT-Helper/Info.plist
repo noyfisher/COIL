@@ -19,5 +19,16 @@
 	<string>PT Helper uses your camera to record exercise videos and analyze your form with AI-powered feedback.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Microphone access is required for video recording.</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Fonts/BarlowCondensed-Black.ttf</string>
+		<string>Fonts/BarlowCondensed-ExtraBold.ttf</string>
+		<string>Fonts/BarlowCondensed-Bold.ttf</string>
+		<string>Fonts/BarlowCondensed-Regular.ttf</string>
+		<string>Fonts/Inter-Regular.ttf</string>
+		<string>Fonts/Inter-Medium.ttf</string>
+		<string>Fonts/Inter-SemiBold.ttf</string>
+		<string>Fonts/Inter-Bold.ttf</string>
+	</array>
 </dict>
 </plist>

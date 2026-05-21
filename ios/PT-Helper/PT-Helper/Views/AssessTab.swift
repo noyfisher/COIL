@@ -2,20 +2,16 @@ import SwiftUI
 
 /// Tab 0: Assess — "What do you need?"
 /// Dual gateway with two hero cards: "Something Hurts" (pain path) and "Improve My Life" (wellness path).
-/// Both paths lead to AI analysis → plan generation → save to My Plan tab.
 struct AssessTab: View {
     @EnvironmentObject private var tabSelection: TabSelection
     @ObservedObject private var profileService = UserProfileService.shared
 
-    // Health check state for inactivity detection
     @State private var showQuickUpdate = false
     @State private var healthCheckDismissed = false
 
     private var needsHealthCheck: Bool {
         guard !healthCheckDismissed else { return false }
-        if let months = profileService.monthsSinceLastActivity(), months >= 3 {
-            return true
-        }
+        if let months = profileService.monthsSinceLastActivity(), months >= 3 { return true }
         return false
     }
 
@@ -25,51 +21,46 @@ struct AssessTab: View {
                 AppColors.pageBackground.ignoresSafeArea()
 
                 ScrollView {
-                    VStack(spacing: AppSpacing.lg) {
-                        // Health check banner for inactive users
-                        if needsHealthCheck {
-                            healthCheckBanner
-                        }
+                    VStack(spacing: AppSpacing.xl) {
 
-                        // Personalized greeting
-                        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                        if needsHealthCheck { healthCheckBanner }
+
+                        // Greeting
+                        VStack(alignment: .leading, spacing: 2) {
                             Text(greetingText)
-                                .font(.subheadline)
-                                .foregroundColor(AppColors.secondaryText)
+                                .font(Font.custom("Inter-Regular", size: 12))
+                                .foregroundColor(AppColors.mutedText)
                             Text(greetingName)
-                                .font(AppFonts.heroTitle)
+                                .font(Font.custom("BarlowCondensed-Black", size: 28))
+                                .textCase(.uppercase)
+                                .kerning(0.5)
                                 .foregroundColor(AppColors.primaryText)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
 
-                        // Gateway header
-                        Text("What can we help with?")
-                            .font(AppFonts.sectionTitle)
-                            .foregroundColor(AppColors.primaryText)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        // Section header
+                        MVVCDividerHeader(title: "What Can We Help With?")
 
-                        // Dual gateway cards
-                        HStack(spacing: AppSpacing.md) {
-                            // Pain pathway
+                        // Gateway cards
+                        HStack(alignment: .top, spacing: AppSpacing.md) {
                             NavigationLink(destination: BodyMap3DView()) {
-                                gatewayCard(
+                                darkGatewayCard(
                                     icon: "figure.run.circle",
+                                    badge: "Start Assessment",
                                     title: "Something Hurts",
-                                    subtitle: "Assess pain and get a recovery plan",
-                                    accentColor: AppColors.danger
+                                    subtitle: "Assess pain and get a recovery plan"
                                 )
                             }
                             .buttonStyle(.plain)
                             .accessibilityIdentifier("assess.somethingHurtsButton")
 
-                            // Wellness pathway
                             if let profile = profileService.profile {
                                 NavigationLink(destination: WellnessGoalPickerView(userProfile: profile)) {
-                                    gatewayCard(
+                                    lightGatewayCard(
                                         icon: "sparkles",
+                                        label: "Get Started",
                                         title: "Improve My Life",
-                                        subtitle: "Sleep, posture, mobility & more",
-                                        accentColor: AppColors.accent
+                                        subtitle: "Sleep, posture, mobility & more"
                                     )
                                 }
                                 .buttonStyle(.plain)
@@ -77,19 +68,55 @@ struct AssessTab: View {
                             }
                         }
 
-                        // Helpful context
                         Text("Both paths create a personalized plan with guided workouts")
-                            .font(.caption)
+                            .font(Font.custom("Inter-Regular", size: 11))
                             .foregroundColor(AppColors.mutedText)
                             .multilineTextAlignment(.center)
                             .frame(maxWidth: .infinity)
+
+                        // Quick actions
+                        MVVCDividerHeader(title: "Quick Actions")
+
+                        VStack(spacing: AppSpacing.sm) {
+                            QuickActionButton(
+                                icon: "person.crop.circle",
+                                gradientColors: [AppColors.accent],
+                                title: "Update Health Info",
+                                subtitle: "Keep your profile current",
+                                action: { showQuickUpdate = true }
+                            )
+
+                            NavigationLink(destination: NotesView()) {
+                                QuickActionCard(
+                                    icon: "note.text",
+                                    gradientColors: [AppColors.warning],
+                                    title: "Recovery Notes",
+                                    subtitle: "Log symptoms and observations",
+                                    destination: NotesView()
+                                )
+                            }
+                            .buttonStyle(.plain)
+
+                            NavigationLink(destination: WorkoutSessionView()) {
+                                QuickActionCard(
+                                    icon: "figure.strengthtraining.traditional",
+                                    gradientColors: [Color.purple],
+                                    title: "Log Workout",
+                                    subtitle: "Record a session",
+                                    destination: WorkoutSessionView()
+                                )
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
-                    .padding(.horizontal, AppSpacing.xl)
-                    .padding(.vertical, AppSpacing.lg)
+                    .padding(.horizontal, AppSpacing.lg)
+                    .padding(.top, AppSpacing.lg)
+                    .padding(.bottom, AppSpacing.xxxl)
                 }
             }
             .navigationTitle("Assess")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
+            .mvvcNavBar()
         }
         .fullScreenCover(isPresented: $showQuickUpdate) {
             QuickHealthUpdateView {
@@ -100,43 +127,100 @@ struct AssessTab: View {
         .trackScreen("AssessTab")
     }
 
-    // MARK: - Gateway Card
+    // MARK: - Dark Gateway Card ("Something Hurts")
 
-    private func gatewayCard(icon: String, title: String, subtitle: String, accentColor: Color) -> some View {
-        VStack(spacing: AppSpacing.md) {
-            Spacer(minLength: AppSpacing.md)
+    private func darkGatewayCard(icon: String, badge: String, title: String, subtitle: String) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            AppColors.accent.frame(height: 4)
 
-            Image(systemName: icon)
-                .font(.system(size: 40))
-                .foregroundColor(accentColor)
-                .frame(width: 72, height: 72)
-                .background(Circle().fill(accentColor.opacity(0.10)))
+            VStack(alignment: .leading, spacing: AppSpacing.md) {
+                Image(systemName: icon)
+                    .font(.system(size: 36))
+                    .foregroundColor(AppColors.accent)
+                    .padding(.top, AppSpacing.xs)
 
-            Text(title)
-                .font(.system(.title3, design: .serif).weight(.bold))
-                .foregroundColor(AppColors.primaryText)
+                Spacer(minLength: AppSpacing.sm)
 
-            Text(subtitle)
-                .font(.caption)
-                .foregroundColor(AppColors.secondaryText)
-                .multilineTextAlignment(.center)
-                .lineLimit(3)
-                .fixedSize(horizontal: false, vertical: true)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(Font.custom("BarlowCondensed-Black", size: 16))
+                        .textCase(.uppercase)
+                        .kerning(0.3)
+                        .foregroundColor(.white)
+                        .fixedSize(horizontal: false, vertical: true)
 
-            Spacer(minLength: AppSpacing.md)
+                    Text(subtitle)
+                        .font(Font.custom("Inter-Regular", size: 11))
+                        .foregroundColor(.white.opacity(0.6))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                HStack {
+                    MVVCRedBadge(text: badge)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(AppColors.accent)
+                }
+            }
+            .padding(AppSpacing.lg)
         }
-        .frame(maxWidth: .infinity, minHeight: 220)
-        .padding(.horizontal, AppSpacing.md)
-        .background(AppColors.cardBackground)
+        .frame(maxWidth: .infinity, minHeight: 220, alignment: .leading)
+        .background(AppColors.darkSurface)
         .cornerRadius(AppCorners.card)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppCorners.card)
-                .stroke(accentColor.opacity(0.2), lineWidth: 1)
-        )
-        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+        .shadow(color: .black.opacity(0.14), radius: 16, y: 4)
     }
 
-    // MARK: - Greeting Helpers
+    // MARK: - Light Gateway Card ("Improve My Life")
+
+    private func lightGatewayCard(icon: String, label: String, title: String, subtitle: String) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            AppColors.accent.opacity(0.10).frame(height: 4)
+
+            VStack(alignment: .leading, spacing: AppSpacing.md) {
+                Image(systemName: icon)
+                    .font(.system(size: 36))
+                    .foregroundColor(AppColors.accent)
+                    .padding(.top, AppSpacing.xs)
+
+                Spacer(minLength: AppSpacing.sm)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(Font.custom("BarlowCondensed-Black", size: 16))
+                        .textCase(.uppercase)
+                        .kerning(0.3)
+                        .foregroundColor(AppColors.primaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Text(subtitle)
+                        .font(Font.custom("Inter-Regular", size: 11))
+                        .foregroundColor(AppColors.secondaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                HStack {
+                    Text(label)
+                        .font(Font.custom("BarlowCondensed-Bold", size: 12))
+                        .textCase(.uppercase)
+                        .kerning(0.5)
+                        .foregroundColor(AppColors.accent)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(AppColors.accent)
+                }
+            }
+            .padding(AppSpacing.lg)
+        }
+        .frame(maxWidth: .infinity, minHeight: 220, alignment: .leading)
+        .background(AppColors.cardBackground)
+        .cornerRadius(AppCorners.card)
+        .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
+        .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
+    }
+
+    // MARK: - Helpers
 
     private var greetingText: String {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -166,22 +250,20 @@ struct AssessTab: View {
             }
 
             Text("It's been a while. Would you like to update your health profile before starting?")
-                .font(.caption)
+                .font(Font.custom("Inter-Regular", size: 12))
                 .foregroundColor(AppColors.secondaryText)
                 .multilineTextAlignment(.center)
 
             HStack(spacing: AppSpacing.md) {
-                Button("Update Profile") {
-                    showQuickUpdate = true
-                }
-                .font(.caption.weight(.semibold))
-                .foregroundColor(AppColors.accent)
+                Button("Update Profile") { showQuickUpdate = true }
+                    .font(Font.custom("Inter-SemiBold", size: 12))
+                    .foregroundColor(AppColors.accent)
 
                 Button("Skip") {
                     healthCheckDismissed = true
                     UserProfileService.shared.recordActivity()
                 }
-                .font(.caption)
+                .font(Font.custom("Inter-Regular", size: 12))
                 .foregroundColor(AppColors.mutedText)
             }
         }

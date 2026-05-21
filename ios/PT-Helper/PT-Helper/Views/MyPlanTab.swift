@@ -2,8 +2,7 @@ import SwiftUI
 import Combine
 
 /// Tab 1: My Plan — "What do I do?"
-/// Two sub-tabs (Injury / Wellness) filter the saved plans by `RehabPlan.PlanType`.
-/// Every plan renders as an equal-weight card with its own "Start Guided Workout" CTA.
+/// Two sub-tabs (Injury / Wellness) filter saved plans by `RehabPlan.PlanType`.
 struct MyPlanTab: View {
     @EnvironmentObject private var savedPlansViewModel: SavedPlansViewModel
     @EnvironmentObject private var tabSelection: TabSelection
@@ -30,7 +29,8 @@ struct MyPlanTab: View {
                 }
             }
             .navigationTitle("My Plan")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
+            .mvvcNavBar()
             .refreshable { savedPlansViewModel.fetchRehabPlans() }
             .alert("Delete Plan", isPresented: $showDeleteConfirmation) {
                 Button("Cancel", role: .cancel) { planToDelete = nil }
@@ -58,13 +58,15 @@ struct MyPlanTab: View {
 
     private var planContent: some View {
         VStack(spacing: 0) {
+            // Segmented picker
             Picker("Plan Type", selection: $selectedPlanType) {
                 Text("Injury").tag(RehabPlan.PlanType.rehab)
                 Text("Wellness").tag(RehabPlan.PlanType.wellness)
             }
             .pickerStyle(.segmented)
-            .padding(.horizontal, AppSpacing.xl)
-            .padding(.top, AppSpacing.sm)
+            .padding(.horizontal, AppSpacing.lg)
+            .padding(.top, AppSpacing.md)
+            .padding(.bottom, AppSpacing.sm)
             .accessibilityIdentifier("myPlan.typePicker")
 
             if filteredPlans.isEmpty {
@@ -79,27 +81,35 @@ struct MyPlanTab: View {
 
     private var plansList: some View {
         List {
-            ForEach(filteredPlans) { plan in
-                planCard(plan)
-                    .contextMenu {
-                        Button(role: .destructive) {
-                            planToDelete = plan
-                            showDeleteConfirmation = true
-                        } label: {
-                            Label("Delete", systemImage: "trash")
+            // Section header
+            Section {
+                ForEach(filteredPlans) { plan in
+                    planCard(plan)
+                        .contextMenu {
+                            Button(role: .destructive) {
+                                planToDelete = plan
+                                showDeleteConfirmation = true
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
                         }
-                    }
-                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                        Button(role: .destructive) {
-                            planToDelete = plan
-                            showDeleteConfirmation = true
-                        } label: {
-                            Label("Delete", systemImage: "trash")
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                planToDelete = plan
+                                showDeleteConfirmation = true
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
                         }
-                    }
-                    .listRowInsets(EdgeInsets(top: AppSpacing.sm, leading: AppSpacing.xl, bottom: AppSpacing.sm, trailing: AppSpacing.xl))
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(Color.clear)
+                        .listRowInsets(EdgeInsets(top: AppSpacing.sm, leading: AppSpacing.lg, bottom: AppSpacing.sm, trailing: AppSpacing.lg))
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
+                }
+            } header: {
+                MVVCDividerHeader(title: selectedPlanType == .rehab ? "Injury Plans" : "Wellness Plans")
+                    .padding(.horizontal, AppSpacing.xs)
+                    .padding(.bottom, AppSpacing.sm)
+                    .textCase(nil)
             }
         }
         .listStyle(.plain)
@@ -107,62 +117,90 @@ struct MyPlanTab: View {
         .background(AppColors.pageBackground)
     }
 
-    // MARK: - Plan Card (uniform for every plan)
+    // MARK: - Plan Card
 
     private func planCard(_ plan: RehabPlan) -> some View {
-        VStack(spacing: AppSpacing.md) {
-            NavigationLink(destination: RehabPlanView(existingPlan: plan)) {
-                VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                    Text(plan.planName)
-                        .font(AppFonts.cardTitle)
-                        .foregroundColor(AppColors.primaryText)
+        VStack(spacing: 0) {
+            // Red top stripe for active feel
+            AppColors.accent.frame(height: 3)
 
-                    if !plan.conditions.isEmpty {
-                        HStack(spacing: 6) {
-                            ForEach(plan.conditions.prefix(3), id: \.self) { condition in
-                                Text(condition)
-                                    .font(.caption2)
-                                    .padding(.horizontal, AppSpacing.sm)
-                                    .padding(.vertical, 3)
-                                    .background(AppColors.accentTint)
-                                    .foregroundColor(AppColors.accent)
-                                    .cornerRadius(AppCorners.small)
+            VStack(spacing: AppSpacing.md) {
+                // Plan info row
+                NavigationLink(destination: RehabPlanView(existingPlan: plan)) {
+                    HStack(alignment: .top) {
+                        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                            HStack(spacing: AppSpacing.sm) {
+                                MVVCRedBadge(text: "Active")
+                                Spacer()
                             }
+
+                            Text(plan.planName)
+                                .font(Font.custom("BarlowCondensed-Black", size: 18))
+                                .textCase(.uppercase)
+                                .kerning(0.3)
+                                .foregroundColor(AppColors.primaryText)
+                                .multilineTextAlignment(.leading)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            if !plan.conditions.isEmpty {
+                                Text(plan.conditions.prefix(2).joined(separator: " · "))
+                                    .font(Font.custom("Inter-Regular", size: 11))
+                                    .foregroundColor(AppColors.secondaryText)
+                            }
+
+                            HStack(spacing: AppSpacing.sm) {
+                                Text(plan.createdDate.formatted(date: .abbreviated, time: .omitted))
+                                Text("·")
+                                Text("\(plan.exercises.count) exercises")
+                            }
+                            .font(Font.custom("Inter-Regular", size: 11))
+                            .foregroundColor(AppColors.mutedText)
+                        }
+
+                        Spacer()
+
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text("\(plan.totalWeeks)")
+                                .font(Font.custom("BarlowCondensed-Black", size: 32))
+                                .foregroundColor(AppColors.primaryText)
+                            Text("weeks")
+                                .font(Font.custom("Inter-Regular", size: 10))
+                                .foregroundColor(AppColors.mutedText)
                         }
                     }
+                }
+                .buttonStyle(.plain)
 
+                // Red CTA
+                NavigationLink(destination: GuidedWorkoutView(plan: plan)) {
                     HStack(spacing: AppSpacing.sm) {
-                        Text(plan.createdDate.formatted(date: .abbreviated, time: .omitted))
-                        Text("·")
-                        Text("\(plan.exercises.count) exercises")
+                        Image(systemName: "play.fill")
+                            .font(.system(size: 12, weight: .bold))
+                        Text("Start Guided Workout")
+                            .font(Font.custom("BarlowCondensed-ExtraBold", size: 14))
+                            .textCase(.uppercase)
+                            .kerning(1.0)
                     }
-                    .font(.caption)
-                    .foregroundColor(AppColors.secondaryText)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(AppColors.ctaBackground)
+                    .clipShape(Capsule())
+                    .shadow(color: AppColors.ctaBackground.opacity(0.30), radius: 8, y: 4)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("myPlan.startWorkoutButton")
             }
-            .buttonStyle(.plain)
-
-            NavigationLink(destination: GuidedWorkoutView(plan: plan)) {
-                HStack(spacing: AppSpacing.sm) {
-                    Image(systemName: "play.fill")
-                        .font(.system(size: 14, weight: .semibold))
-                    Text("Start Guided Workout")
-                        .font(.system(.subheadline, weight: .semibold))
-                }
-                .foregroundColor(AppColors.ctaText)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, AppSpacing.md)
-                .background(AppColors.accent)
-                .cornerRadius(AppCorners.large)
-            }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier("myPlan.startWorkoutButton")
+            .padding(AppSpacing.lg)
         }
-        .cardStyle()
+        .background(AppColors.cardBackground)
+        .cornerRadius(AppCorners.card)
+        .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
+        .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
+        .clipShape(RoundedRectangle(cornerRadius: AppCorners.card))
     }
 
-    // MARK: - Empty State (per tab)
+    // MARK: - Empty State
 
     private var emptyStateForCurrentTab: some View {
         let copy: (title: String, subtitle: String, cta: String) = selectedPlanType == .rehab
@@ -182,7 +220,7 @@ struct MyPlanTab: View {
                 actionTitle: copy.cta,
                 action: { tabSelection.selectedTab = 0 }
             )
-            .padding(.horizontal, AppSpacing.xl)
+            .padding(.horizontal, AppSpacing.lg)
             Spacer()
         }
     }
@@ -196,7 +234,7 @@ struct MyPlanTab: View {
                 .font(.system(size: 40))
                 .foregroundColor(AppColors.warning)
             Text(error)
-                .font(.subheadline)
+                .font(Font.custom("Inter-Regular", size: 13))
                 .foregroundColor(AppColors.secondaryText)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, AppSpacing.xxl)

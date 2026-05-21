@@ -9,61 +9,80 @@ import GoogleSignIn
 struct LoginView: View {
     var onSignedIn: () -> Void
     @StateObject private var vm = LoginVM()
-    @Environment(\.colorScheme) private var colorScheme
     @State private var appeared = false
 
     var body: some View {
         ZStack {
-            AppColors.bgGradient.ignoresSafeArea()
+            // Black background
+            Color(red: 0.067, green: 0.067, blue: 0.067).ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                Spacer()
+            // Diagonal red accent — top-right
+            GeometryReader { geo in
+                LinearGradient(
+                    colors: [AppColors.accent.opacity(0.18), .clear],
+                    startPoint: .topTrailing, endPoint: .bottomLeading
+                )
+                .frame(width: geo.size.width * 0.7, height: geo.size.height * 0.45)
+                .offset(x: geo.size.width * 0.35, y: 0)
 
-                // Branding
-                VStack(spacing: AppSpacing.xl) {
-                    // Pill badge
-                    Text("PT Helper")
-                        .font(AppFonts.badge)
-                        .foregroundColor(AppColors.accent)
-                        .padding(.horizontal, AppSpacing.lg)
-                        .padding(.vertical, AppSpacing.xs)
-                        .background(AppColors.accentTint)
-                        .clipShape(Capsule())
+                // Bottom-left radial glow
+                RadialGradient(
+                    colors: [AppColors.accent.opacity(0.12), .clear],
+                    center: .bottomLeading, startRadius: 0, endRadius: 240
+                )
+                .frame(width: geo.size.width, height: geo.size.height * 0.5)
+                .offset(y: geo.size.height * 0.5)
+            }
+            .ignoresSafeArea()
+            .allowsHitTesting(false)
 
-                    // App icon
-                    Image(systemName: "figure.run.circle.fill")
-                        .font(.system(size: 72))
-                        .foregroundColor(AppColors.accent)
-
-                    // Motivational headline
-                    VStack(spacing: AppSpacing.sm) {
-                        (Text("Your body has ")
-                            + Text("goals").italic()
-                            + Text(",\nnot just problems."))
-                            .font(AppFonts.heroTitle)
-                            .foregroundColor(AppColors.primaryText)
-                            .multilineTextAlignment(.center)
-
-                        Text("AI-powered recovery, personalized for you")
-                            .font(.subheadline)
-                            .foregroundColor(AppColors.secondaryText)
-                    }
-                }
-
+            VStack(alignment: .leading, spacing: 0) {
                 Spacer().frame(height: AppSpacing.xxxl)
 
-                // Feature highlights
-                HStack(spacing: AppSpacing.lg) {
-                    featurePill(icon: "brain.head.profile", text: "AI Analysis")
-                    featurePill(icon: "list.clipboard", text: "Custom Plans")
-                    featurePill(icon: "chart.line.uptrend.xyaxis", text: "Track Progress")
+                // MVVC wordmark + red rule
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    Text("MVVC")
+                        .font(Font.custom("BarlowCondensed-Black", size: 32))
+                        .foregroundColor(.white)
+                        .kerning(0.5)
+
+                    Rectangle()
+                        .fill(AppColors.accent)
+                        .frame(width: 40, height: 3)
                 }
-                .padding(.horizontal, AppSpacing.xl)
+                .padding(.horizontal, AppSpacing.xxl)
 
                 Spacer()
 
-                // Sign in section
-                VStack(spacing: AppSpacing.lg) {
+                // Hero headline
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("ASSESS.")
+                        .font(Font.custom("BarlowCondensed-Black", size: 44))
+                        .foregroundColor(.white)
+                        .kerning(0.5)
+                    Text("PLAN.")
+                        .font(Font.custom("BarlowCondensed-Black", size: 44))
+                        .foregroundColor(AppColors.accent)
+                        .kerning(0.5)
+                    Text("RECOVER.")
+                        .font(Font.custom("BarlowCondensed-Black", size: 44))
+                        .foregroundColor(.white)
+                        .kerning(0.5)
+                }
+                .padding(.horizontal, AppSpacing.xxl)
+
+                Spacer().frame(height: AppSpacing.lg)
+
+                // Subhead
+                Text("AI-powered recovery, built for Mountain View athletes.")
+                    .font(Font.custom("Inter-Regular", size: 14))
+                    .foregroundColor(.white.opacity(0.5))
+                    .padding(.horizontal, AppSpacing.xxl)
+
+                Spacer()
+
+                // Sign-in buttons
+                VStack(spacing: AppSpacing.md) {
                     SignInWithAppleButton(.signIn) { req in
                         vm.prepare(req)
                     } onCompletion: { result in
@@ -74,65 +93,51 @@ struct LoginView: View {
                     .clipShape(Capsule())
                     .accessibilityIdentifier("login.appleSignInButton")
 
-                    // Google Sign-In
                     Button {
                         vm.signInWithGoogle { onSignedIn() }
                     } label: {
                         HStack(spacing: AppSpacing.md) {
-                            Image(systemName: "g.circle.fill")
-                                .font(.title2)
+                            Image(systemName: "g.circle.fill").font(.title2)
                             Text("Sign in with Google")
-                                .font(.body.weight(.medium))
+                                .font(Font.custom("Inter-SemiBold", size: 15))
                         }
-                        .foregroundColor(AppColors.primaryText)
+                        .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .frame(height: 52)
-                        .background(AppColors.cardBackground)
+                        .background(Color.white.opacity(0.09))
                         .clipShape(Capsule())
-                        .overlay(
-                            Capsule()
-                                .stroke(AppColors.cardBorder, lineWidth: 1)
-                        )
+                        .overlay(Capsule().stroke(Color.white.opacity(0.15), lineWidth: 1))
                     }
                     .accessibilityIdentifier("login.googleSignInButton")
 
                     if let msg = vm.msg {
                         Text(msg)
-                            .font(.footnote)
-                            .foregroundColor(AppColors.secondaryText)
+                            .font(Font.custom("Inter-Regular", size: 12))
+                            .foregroundColor(.white.opacity(0.5))
                             .transition(.opacity)
                     }
                 }
                 .padding(.horizontal, AppSpacing.xxl)
 
-                Spacer().frame(height: AppSpacing.xxxl)
+                Spacer().frame(height: AppSpacing.lg)
+
+                // Footer
+                Text("For authorized MVVC athletes only")
+                    .font(Font.custom("Inter-Regular", size: 11))
+                    .foregroundColor(.white.opacity(0.3))
+                    .frame(maxWidth: .infinity, alignment: .center)
+
+                Spacer().frame(height: AppSpacing.xxl)
             }
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 20)
         .onAppear {
-            withAnimation(.easeOut(duration: 0.6)) {
-                appeared = true
-            }
+            withAnimation(.easeOut(duration: 0.6)) { appeared = true }
         }
         .trackScreen("Login")
     }
 
-    private func featurePill(icon: String, text: String) -> some View {
-        VStack(spacing: AppSpacing.sm) {
-            Image(systemName: icon)
-                .font(.system(size: 20, weight: .medium))
-                .foregroundColor(AppColors.accent)
-                .frame(width: 40, height: 40)
-                .background(AppColors.accentTint)
-                .clipShape(Circle())
-
-            Text(text)
-                .font(AppFonts.badge)
-                .foregroundColor(AppColors.secondaryText)
-        }
-        .frame(maxWidth: .infinity)
-    }
 }
 
 final class LoginVM: NSObject, ObservableObject {

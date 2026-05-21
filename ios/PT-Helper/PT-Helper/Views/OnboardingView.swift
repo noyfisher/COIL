@@ -22,8 +22,8 @@ struct OnboardingView: View {
                             onSkip()
                         }) {
                             Text("Skip")
-                                .font(.subheadline.weight(.medium))
-                                .foregroundColor(AppColors.secondaryText)
+                                .font(Font.custom("Inter-Medium", size: 14))
+                                .foregroundColor(Color.white.opacity(0.40))
                         }
                         .accessibilityIdentifier("onboarding.skipButton")
                     }
@@ -32,36 +32,34 @@ struct OnboardingView: View {
                 .padding(.top, AppSpacing.md)
 
                 // Step indicator header
-                VStack(spacing: AppSpacing.lg) {
-                    Text("Step \(viewModel.currentStep) of 6")
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .foregroundColor(AppColors.ctaText)
-                        .padding(.horizontal, AppSpacing.md)
-                        .padding(.vertical, AppSpacing.xs)
-                        .background(AppColors.accent)
-                        .clipShape(Capsule())
-                        .accessibilityIdentifier("onboarding.stepIndicator")
-
-                    HStack(spacing: 6) {
-                        ForEach(1...6, id: \.self) { step in
-                            Capsule()
-                                .fill(step <= viewModel.currentStep ? AppColors.accent : AppColors.elevatedSurface)
-                                .frame(height: 5)
-                                .animation(.spring(response: 0.35), value: viewModel.currentStep)
+                VStack(spacing: AppSpacing.md) {
+                    HStack(spacing: AppSpacing.xl) {
+                        HStack(spacing: 5) {
+                            ForEach(1...6, id: \.self) { step in
+                                Capsule()
+                                    .fill(step <= viewModel.currentStep ? AppColors.accent : Color.white.opacity(0.15))
+                                    .frame(height: 3)
+                                    .animation(.spring(response: 0.35), value: viewModel.currentStep)
+                            }
                         }
+                        Text("\(viewModel.currentStep)/6")
+                            .font(Font.custom("Inter-Medium", size: 11))
+                            .foregroundColor(Color.white.opacity(0.30))
+                            .monospacedDigit()
+                            .accessibilityIdentifier("onboarding.stepIndicator")
                     }
                     .padding(.horizontal, AppSpacing.xxl)
 
-                    Text(stepTitle)
-                        .font(AppFonts.sectionTitle)
-                        .foregroundColor(AppColors.primaryText)
-
-                    Text(stepSubtitle)
-                        .font(.subheadline)
-                        .foregroundColor(AppColors.secondaryText)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, AppSpacing.xxl)
+                    VStack(spacing: AppSpacing.xs) {
+                        Text(stepTitle)
+                            .font(Font.custom("BarlowCondensed-Black", size: 26))
+                            .foregroundColor(.white)
+                        Text(stepSubtitle)
+                            .font(Font.custom("Inter-Regular", size: 13))
+                            .foregroundColor(Color.white.opacity(0.45))
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, AppSpacing.xxl)
+                    }
                 }
                 .padding(.bottom, AppSpacing.sm)
 

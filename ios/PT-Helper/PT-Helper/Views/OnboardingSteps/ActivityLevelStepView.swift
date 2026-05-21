@@ -13,53 +13,52 @@ struct ActivityLevelStepView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: AppSpacing.md) {
+            VStack(spacing: AppSpacing.sm) {
                 ForEach(levels, id: \.0) { level, icon, subtitle in
                     let isSelected = viewModel.userProfile.activityLevel == level
                     Button(action: { viewModel.userProfile.activityLevel = level }) {
                         HStack(spacing: AppSpacing.lg) {
                             Image(systemName: icon)
                                 .font(.title3)
-                                .foregroundColor(isSelected ? AppColors.ctaText : AppColors.accent)
-                                .frame(width: 44, height: 44)
-                                .background(isSelected ? AppColors.accent : AppColors.accentTint)
+                                .foregroundColor(isSelected ? .white : AppColors.accent)
+                                .frame(width: 40, height: 40)
+                                .background(isSelected ? Color.white.opacity(0.20) : Color.white.opacity(0.08))
                                 .cornerRadius(AppCorners.medium)
 
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(level)
-                                    .font(.body.weight(.semibold))
-                                    .foregroundColor(isSelected ? AppColors.ctaText : AppColors.primaryText)
+                                    .font(Font.custom("Inter-SemiBold", size: 14))
+                                    .foregroundColor(.white)
                                 Text(subtitle)
-                                    .font(.caption)
-                                    .foregroundColor(isSelected ? AppColors.ctaText.opacity(0.8) : AppColors.secondaryText)
+                                    .font(Font.custom("Inter-Regular", size: 12))
+                                    .foregroundColor(Color.white.opacity(isSelected ? 0.65 : 0.45))
                             }
 
                             Spacer()
 
-                            if isSelected {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(AppColors.ctaText)
-                                    .font(.title3)
-                            }
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.white)
+                                .font(.system(size: 18))
+                                .opacity(isSelected ? 1 : 0)
                         }
                         .padding(AppSpacing.lg)
-                        .background(isSelected ? AppColors.accent : AppColors.cardBackground)
+                        .background(isSelected ? AppColors.accent : OnboardingColors.cardBg)
                         .cornerRadius(AppCorners.card)
-                        .shadow(color: AppColors.cardShadowColor.opacity(isSelected ? 0 : 1), radius: 8, y: 2)
                         .overlay(
                             RoundedRectangle(cornerRadius: AppCorners.card)
-                                .stroke(isSelected ? AppColors.accent : Color.clear, lineWidth: 2)
+                                .stroke(isSelected ? AppColors.accent : OnboardingColors.cardBorder, lineWidth: 1.5)
                         )
                     }
                     .accessibilityIdentifier("onboarding.activityLevelOption")
                 }
 
-                CardSection(icon: "sportscourt", color: AppColors.success, title: "Primary Sport or Activity") {
-                    TextField("e.g. Basketball, Running, Yoga...", text: $viewModel.userProfile.primarySport.bound)
-                        .foregroundColor(AppColors.primaryText)
-                        .padding(AppSpacing.md)
-                        .background(AppColors.inputBackground)
-                        .cornerRadius(AppCorners.medium)
+                // Primary sport
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    OnboardingFieldLabel(text: "Primary Sport or Activity")
+                    DarkTextField(
+                        placeholder: "e.g. Basketball, Running, Yoga...",
+                        text: $viewModel.userProfile.primarySport.bound
+                    )
                 }
                 .padding(.top, AppSpacing.sm)
             }

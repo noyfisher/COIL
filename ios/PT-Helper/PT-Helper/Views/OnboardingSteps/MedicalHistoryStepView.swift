@@ -34,18 +34,19 @@ struct MedicalHistoryStepView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: AppSpacing.md) {
+            VStack(spacing: AppSpacing.lg) {
+
+                // Conditions grid
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: AppSpacing.sm) {
                     ForEach(conditions, id: \.0) { condition, icon in
                         conditionButton(condition: condition, icon: icon)
                     }
                 }
 
-                // Show More conditions
                 Button(action: { withAnimation { showMoreConditions.toggle() } }) {
                     HStack(spacing: AppSpacing.sm) {
                         Text(showMoreConditions ? "Show Less" : "Show More Conditions")
-                            .font(.subheadline.weight(.medium))
+                            .font(Font.custom("Inter-Medium", size: 13))
                         Image(systemName: showMoreConditions ? "chevron.up" : "chevron.down")
                             .font(.caption)
                     }
@@ -61,90 +62,91 @@ struct MedicalHistoryStepView: View {
                     .transition(.opacity.combined(with: .move(edge: .top)))
                 }
 
-                // Medications section
-                CardSection(icon: "pills.fill", color: AppColors.accent, title: "Current Medications") {
-                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                        Text("Select any medications you take regularly")
-                            .font(.caption)
-                            .foregroundColor(AppColors.secondaryText)
-                        FlowLayout(spacing: AppSpacing.sm) {
-                            ForEach(medications, id: \.self) { med in
-                                let isSelected = viewModel.userProfile.medications?.contains(med) ?? false
-                                Button(action: { toggleMedication(med) }) {
-                                    Text(med)
-                                        .font(.subheadline.weight(.medium))
-                                        .foregroundColor(isSelected ? AppColors.ctaText : AppColors.primaryText)
-                                        .padding(.horizontal, AppSpacing.md)
-                                        .padding(.vertical, AppSpacing.sm)
-                                        .background(isSelected ? AppColors.accent : AppColors.inputBackground)
-                                        .cornerRadius(AppCorners.small)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: AppCorners.small)
-                                                .stroke(isSelected ? Color.clear : AppColors.subtleBorder, lineWidth: 1)
-                                        )
-                                }
+                // Medications
+                VStack(alignment: .leading, spacing: AppSpacing.md) {
+                    OnboardingFieldLabel(text: "Current Medications")
+                    Text("Select any medications you take regularly")
+                        .font(Font.custom("Inter-Regular", size: 12))
+                        .foregroundColor(OnboardingColors.muted)
+
+                    FlowLayout(spacing: AppSpacing.sm) {
+                        ForEach(medications, id: \.self) { med in
+                            let isSelected = viewModel.userProfile.medications?.contains(med) ?? false
+                            Button(action: { toggleMedication(med) }) {
+                                Text(med)
+                                    .font(Font.custom("Inter-Medium", size: 13))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, AppSpacing.md)
+                                    .padding(.vertical, AppSpacing.sm)
+                                    .background(isSelected ? AppColors.accent : OnboardingColors.chipIdle)
+                                    .cornerRadius(AppCorners.small)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: AppCorners.small)
+                                            .stroke(isSelected ? Color.clear : OnboardingColors.chipBorder, lineWidth: 1)
+                                    )
                             }
                         }
+                    }
 
-                        // Custom medication input
-                        VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                            Text("Other Medications")
-                                .font(.caption.weight(.semibold))
-                                .foregroundColor(AppColors.secondaryText)
-                                .padding(.top, AppSpacing.sm)
+                    // Custom medication
+                    VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                        OnboardingFieldLabel(text: "Other Medications").padding(.top, AppSpacing.xs)
 
-                            HStack(spacing: AppSpacing.sm) {
-                                TextField("Type medication name", text: $customMedicationText)
-                                    .font(.subheadline)
-                                    .foregroundColor(AppColors.primaryText)
-                                    .padding(AppSpacing.md)
-                                    .background(AppColors.inputBackground)
-                                    .cornerRadius(AppCorners.medium)
+                        HStack(spacing: AppSpacing.sm) {
+                            TextField("Type medication name", text: $customMedicationText)
+                                .font(Font.custom("Inter-Regular", size: 14))
+                                .foregroundColor(.white)
+                                .padding(AppSpacing.md)
+                                .background(OnboardingColors.inputBg)
+                                .cornerRadius(AppCorners.medium)
+                                .overlay(RoundedRectangle(cornerRadius: AppCorners.medium).stroke(OnboardingColors.cardBorder, lineWidth: 1))
 
-                                Button(action: { addCustomMedication() }) {
-                                    Image(systemName: "plus.circle.fill")
-                                        .font(.title2)
-                                        .foregroundColor(AppColors.accent)
-                                }
-                                .disabled(customMedicationText.trimmingCharacters(in: .whitespaces).isEmpty)
+                            Button(action: { addCustomMedication() }) {
+                                Image(systemName: "plus.circle.fill")
+                                    .font(.title2)
+                                    .foregroundColor(AppColors.accent)
                             }
+                            .disabled(customMedicationText.trimmingCharacters(in: .whitespaces).isEmpty)
+                        }
 
-                            // Show custom medications as removable chips
-                            if let meds = viewModel.userProfile.medications {
-                                let customMeds = meds.filter { !medications.contains($0) }
-                                if !customMeds.isEmpty {
-                                    FlowLayout(spacing: AppSpacing.sm) {
-                                        ForEach(customMeds, id: \.self) { med in
-                                            HStack(spacing: 4) {
-                                                Text(med)
-                                                    .font(.subheadline.weight(.medium))
-                                                Button(action: { toggleMedication(med) }) {
-                                                    Image(systemName: "xmark.circle.fill")
-                                                        .font(.caption)
-                                                        .foregroundColor(AppColors.ctaText.opacity(0.8))
-                                                }
+                        if let meds = viewModel.userProfile.medications {
+                            let customMeds = meds.filter { !medications.contains($0) }
+                            if !customMeds.isEmpty {
+                                FlowLayout(spacing: AppSpacing.sm) {
+                                    ForEach(customMeds, id: \.self) { med in
+                                        HStack(spacing: 4) {
+                                            Text(med)
+                                                .font(Font.custom("Inter-Medium", size: 13))
+                                            Button(action: { toggleMedication(med) }) {
+                                                Image(systemName: "xmark.circle.fill")
+                                                    .font(.caption)
+                                                    .foregroundColor(.white.opacity(0.8))
                                             }
-                                            .foregroundColor(AppColors.ctaText)
-                                            .padding(.horizontal, AppSpacing.md)
-                                            .padding(.vertical, AppSpacing.sm)
-                                            .background(AppColors.accent)
-                                            .cornerRadius(AppCorners.small)
                                         }
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, AppSpacing.md)
+                                        .padding(.vertical, AppSpacing.sm)
+                                        .background(AppColors.accent)
+                                        .cornerRadius(AppCorners.small)
                                     }
                                 }
                             }
                         }
                     }
                 }
+                .padding(AppSpacing.lg)
+                .background(OnboardingColors.cardBg)
+                .cornerRadius(AppCorners.card)
+                .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(OnboardingColors.cardBorder, lineWidth: 1))
 
-                CardSection(icon: "plus.circle.fill", color: AppColors.warning, title: "Other Conditions") {
-                    TextField("e.g. Epilepsy, Thyroid issues...", text: $viewModel.userProfile.otherMedicalConditions.bound)
-                        .foregroundColor(AppColors.primaryText)
-                        .padding(AppSpacing.md)
-                        .background(AppColors.inputBackground)
-                        .cornerRadius(AppCorners.medium)
+                // Other conditions
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    OnboardingFieldLabel(text: "Other Conditions")
+                    DarkTextField(
+                        placeholder: "e.g. Epilepsy, Thyroid issues...",
+                        text: $viewModel.userProfile.otherMedicalConditions.bound
+                    )
                 }
-                .padding(.top, AppSpacing.sm)
             }
             .padding(.horizontal, AppSpacing.xl)
             .padding(.vertical, AppSpacing.md)
@@ -162,20 +164,20 @@ struct MedicalHistoryStepView: View {
             HStack(spacing: AppSpacing.sm) {
                 Image(systemName: icon)
                     .font(.system(size: 14))
+                    .foregroundColor(isSelected ? .white : AppColors.accent)
                 Text(condition)
-                    .font(.subheadline.weight(.medium))
+                    .font(Font.custom("Inter-Medium", size: 13))
                     .lineLimit(2)
+                    .foregroundColor(.white)
             }
-            .foregroundColor(isSelected ? AppColors.ctaText : AppColors.primaryText)
             .frame(maxWidth: .infinity)
             .padding(.vertical, AppSpacing.lg)
             .padding(.horizontal, AppSpacing.sm)
-            .background(isSelected ? AppColors.accent : AppColors.cardBackground)
+            .background(isSelected ? AppColors.accent : OnboardingColors.cardBg)
             .cornerRadius(AppCorners.medium)
-            .shadow(color: AppColors.cardShadowColor.opacity(isSelected ? 0 : 1), radius: 6, y: 2)
             .overlay(
                 RoundedRectangle(cornerRadius: AppCorners.medium)
-                    .stroke(isSelected ? AppColors.accent : Color.clear, lineWidth: 2)
+                    .stroke(isSelected ? AppColors.accent : OnboardingColors.cardBorder, lineWidth: 1.5)
             )
         }
     }
@@ -196,11 +198,7 @@ struct MedicalHistoryStepView: View {
     private func addCustomMedication() {
         let trimmed = customMedicationText.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return }
-
-        if viewModel.userProfile.medications == nil {
-            viewModel.userProfile.medications = []
-        }
-        // Don't add duplicates
+        if viewModel.userProfile.medications == nil { viewModel.userProfile.medications = [] }
         if viewModel.userProfile.medications?.contains(trimmed) != true {
             viewModel.userProfile.medications?.append(trimmed)
         }
@@ -208,14 +206,10 @@ struct MedicalHistoryStepView: View {
     }
 
     private func toggleMedication(_ med: String) {
-        if viewModel.userProfile.medications == nil {
-            viewModel.userProfile.medications = []
-        }
+        if viewModel.userProfile.medications == nil { viewModel.userProfile.medications = [] }
         if viewModel.userProfile.medications?.contains(med) == true {
             viewModel.userProfile.medications?.removeAll { $0 == med }
-            if viewModel.userProfile.medications?.isEmpty == true {
-                viewModel.userProfile.medications = nil
-            }
+            if viewModel.userProfile.medications?.isEmpty == true { viewModel.userProfile.medications = nil }
         } else {
             viewModel.userProfile.medications?.append(med)
         }
