@@ -37,6 +37,10 @@ enum TestDataSeeder {
         ProcessInfo.processInfo.arguments.contains("--prefill-weight")
     }
 
+    static var showIntroCarousel: Bool {
+        ProcessInfo.processInfo.arguments.contains("--show-intro")
+    }
+
     // MARK: - Seed All Data
 
     @MainActor

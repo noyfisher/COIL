@@ -10,6 +10,7 @@ struct RootView: View {
     @State private var errorMessage = ""
     @State private var hasLoggedSignIn = false
     @StateObject private var profileService = UserProfileService.shared
+    @AppStorage("hasSeenIntroCarousel") private var hasSeenIntroCarousel = false
 
     /// UI testing mode: bypass Firebase Auth and route based on launch arguments.
     private var isUITesting: Bool {
@@ -64,7 +65,9 @@ struct RootView: View {
 
     @ViewBuilder
     private var uiTestingContent: some View {
-        if TestDataSeeder.shouldSkipOnboarding || profileCompleted {
+        if TestDataSeeder.showIntroCarousel {
+            IntroCarouselView(onComplete: {})
+        } else if TestDataSeeder.shouldSkipOnboarding || profileCompleted {
             MainTabView()
         } else {
             OnboardingView(onComplete: {
@@ -97,6 +100,10 @@ struct RootView: View {
                 }
             } else if profileCompleted {
                 MainTabView()
+            } else if !hasSeenIntroCarousel {
+                IntroCarouselView(onComplete: {
+                    hasSeenIntroCarousel = true
+                })
             } else {
                 OnboardingView(onComplete: {
                     profileCompleted = true
