@@ -97,9 +97,27 @@ struct DeviceContext: Codable {
             deviceModel: machine,
             locale: Locale.current.identifier,
             timezone: TimeZone.current.identifier,
-            isTestFlight: Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt",
+            isTestFlight: Self.isRunningInTestFlight,
             connectionType: NetworkMonitor.shared.connectionType.description
         )
+    }
+
+    /// Detect TestFlight builds without using the iOS-18-deprecated `appStoreReceiptURL`.
+    ///
+    /// Heuristic: App Store builds have `embedded.mobileprovision` stripped at signing
+    /// time, TestFlight (and Ad-Hoc/Enterprise) builds retain it. Combined with a
+    /// `!DEBUG` guard, the presence of the provisioning profile reliably signals
+    /// TestFlight in release-channel installs.
+    ///
+    /// The proper StoreKit 2 replacement is `AppTransaction.shared`, but that API
+    /// is async — adopting it would force `DeviceContext.current()` async and
+    /// ripple through every synchronous SessionLogger call site.
+    private static var isRunningInTestFlight: Bool {
+        #if DEBUG
+        return false
+        #else
+        return Bundle.main.path(forResource: "embedded", ofType: "mobileprovision") != nil
+        #endif
     }
 }
 

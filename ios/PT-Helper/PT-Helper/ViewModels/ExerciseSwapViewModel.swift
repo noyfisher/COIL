@@ -76,9 +76,12 @@ class ExerciseSwapViewModel: ObservableObject {
     @Published var noSafeSubstituteAvailable: Bool = false
 
     /// Max retries when the AI keeps returning contraindicated substitutes.
-    static let maxSaferSubstituteRetries = 3
+    nonisolated static let maxSaferSubstituteRetries = 3
     /// Per-attempt API timeout (seconds). Total ceiling = 3 × 5s = 15s.
-    static let substituteFetchTimeoutSeconds: Double = 5.0
+    ///
+    /// `nonisolated` because this is a compile-time constant — there's no actor state
+    /// to protect, and it's accessed from `Task.sleep` inside detached task groups.
+    nonisolated static let substituteFetchTimeoutSeconds: Double = 5.0
 
     // MARK: - Input
 

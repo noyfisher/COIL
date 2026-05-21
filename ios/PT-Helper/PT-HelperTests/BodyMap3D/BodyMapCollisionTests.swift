@@ -41,12 +41,19 @@ final class BodyMapCollisionTests: XCTestCase {
 
         bodyEntity = entity
 
-        arView = ARView(frame: CGRect(x: 0, y: 0, width: 400, height: 800), cameraMode: .nonAR)
+        arView = ARView(
+            frame: CGRect(x: 0, y: 0, width: 400, height: 800),
+            cameraMode: .nonAR,
+            automaticallyConfigureSession: false
+        )
         let anchor = AnchorEntity(world: .zero)
         anchor.addChild(entity)
         arView.scene.addAnchor(anchor)
 
-        RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.3))
+        // Give RealityKit a moment to finish processing entity/collision setup.
+        // Was `RunLoop.current.run(until:)`, but that's unavailable from async
+        // contexts under Swift 6. Task.sleep is the async-native equivalent.
+        try await Task.sleep(for: .seconds(0.3))
     }
 
     override func tearDown() async throws {
