@@ -16,7 +16,7 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
 - **Exercise Substitution** — AI-powered exercise swap from plan view or mid-workout
 - **Recovery Insights** — Weekly AI-generated recovery digest via Claude Managed Agents with pain trends, adherence scoring, and recommendations
 - **Adaptive Progressions** — Rules-based difficulty scaling based on workout performance
-- **Exercise Images** — ~190 AI-generated exercise illustrations (FLUX 2 Pro) with automated Gemini QA
+- **Exercise Images** — 1364 canonical exercises with start+end frame pairs, generated with Nano Banana Pro (`gemini-3-pro-image-preview`) and validated with automated Gemini QA
 - **Progress Tracking** — Workout streaks, achievements, re-assessment comparisons, and progress charts
 - **Session Logging** — Detailed logging of analysis and workout sessions for debugging and analytics
 - **Safety Pipeline** — Analysis validation (6 steps) and rehab plan validation (9 steps) including medication-aware checks and red-flag detection
@@ -56,10 +56,10 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
 ```
 ├── ios/PT-Helper/
 │   └── PT-Helper/
-│       ├── Models/            # Data models (21 files)
-│       ├── Services/          # API, validation, logging (24 files)
+│       ├── Models/            # Data models (22 files)
+│       ├── Services/          # API, validation, logging (27 files)
 │       ├── ViewModels/        # Business logic (15 files)
-│       ├── Views/             # SwiftUI views (69 files)
+│       ├── Views/             # SwiftUI views (79 files)
 │       │   ├── Components/    # Reusable UI components
 │       │   ├── Dashboard/     # Dashboard widgets and charts
 │       │   └── OnboardingSteps/  # Onboarding flow steps
@@ -73,7 +73,7 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
 │   ├── generate_exercise_images.py
 │   ├── qa_exercise_images.py
 │   ├── exercise_list.json     # Exercise metadata
-│   └── output/                # ~190 generated images
+│   └── output/                # 1364 generated start+end frames + QA reports
 ├── docs/                      # Product brief, UX flows, safety, API, data models
 ├── firebase.json              # Firebase deployment config
 └── firestore.rules            # Security rules
@@ -168,18 +168,32 @@ The app includes multiple safety layers:
 
 ## Exercise Image Pipeline
 
-~190 exercise illustrations generated with AI:
+1364 canonical exercises with start+end frame pairs, generated with AI.
+
+> **Primary pipeline (current):** Nano Banana Pro (`gemini-3-pro-image-preview`) via
+> `scripts/generate_missing_images.py` and the auto-prompt correction loop in
+> `scripts/regen_with_auto_prompts.py`. See `project_image_provider_decision.md`.
+>
+> **Legacy pipeline:** FLUX 2 Pro via BFL API (`scripts/generate_exercise_images.py`) is
+> deprecated for new image work. Note: the on-demand `generateExerciseImage` Cloud
+> Function may still call FLUX — migration to Nano Banana Pro is an open item.
 
 ```bash
-# Generate images (requires BFL API key)
+# Generate missing images with Nano Banana Pro (Gemini API key)
 cd scripts
-python generate_exercise_images.py --api-key YOUR_BFL_KEY
+python generate_missing_images.py --api-key YOUR_GEMINI_KEY
 
-# Run automated QA (requires Gemini API key)
+# Auto-prompt correction loop (regenerate failures with targeted prompts)
+python regen_with_auto_prompts.py --api-key YOUR_GEMINI_KEY
+
+# Run automated QA (Gemini 2.5 Flash)
 python qa_exercise_images.py --api-key YOUR_GEMINI_KEY
+
+# Legacy: FLUX 2 Pro generation (requires BFL API key)
+python generate_exercise_images.py --api-key YOUR_BFL_KEY
 ```
 
-- **Generator**: FLUX 2 Pro via BFL API with structured pose descriptions
+- **Generator**: Nano Banana Pro (`gemini-3-pro-image-preview`); FLUX 2 Pro legacy
 - **QA**: Gemini 2.5 Flash vision model checking pose accuracy
 - **Style**: Clean white background, anatomical mannequin figure
 - **Image resolution**: 7-layer fuzzy matching in `ExerciseImageService`

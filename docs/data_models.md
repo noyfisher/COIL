@@ -239,6 +239,7 @@ All user data is scoped to the authenticated user. No cross-user access is possi
 | `AdaptiveProgressionAnalyzer` | `Models/AdaptiveProgressionAnalyzer.swift` | In-memory (progression logic) |
 | `ProgressionRule` | `Models/ProgressionRule.swift` | In-memory (progression rules) |
 | `Timer` | `Models/Timer.swift` | In-memory (rest timer state) |
+| `OutcomeFeedback` | `Models/OutcomeFeedback.swift` | In-memory (post-session outcome feedback) |
 
 ## Backward Compatibility
 

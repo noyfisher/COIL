@@ -3,7 +3,7 @@
 ## Navigation Structure
 3-tab layout via `ThreeTabView`:
 - **Assess** (Tab 0) — Dual gateway: pain analysis or wellness goals
-- **My Plan** (Tab 1) — Active plan hero card + saved plans list
+- **My Plan** (Tab 1) — Active plan hero card + saved plans list, with Injury / Wellness sub-tabs filtering saved plans by `RehabPlan.PlanType`
 - **Progress** (Tab 2) — Charts, recovery insights, settings, session history
 
 Note: Legacy 4-tab layout (`MainTabView`) accessible via `--use-legacy-ui` launch argument.
@@ -138,10 +138,14 @@ Note: Legacy 4-tab layout (`MainTabView`) accessible via `--use-legacy-ui` launc
 
 ### My Plan Tab
 - Active plan hero card (most recent plan)
+- Injury / Wellness sub-tabs filter saved plans by `RehabPlan.PlanType`
 - Saved plans list with tap to open
 - Recent workout sessions (last 10) with swipe-to-delete
 
-### Onboarding (6-step wizard)
+### Onboarding (preceded by 3-screen intro carousel)
+Before the wizard, first-time users see a 3-screen intro carousel that introduces the app's value proposition.
+
+Then the 6-step wizard:
 1. Basic info (name, DOB, sex, height/weight) — required
 2. Medical history — optional, subtitle explains AI accuracy impact
 3. Surgical history — optional, subtitle explains safety value

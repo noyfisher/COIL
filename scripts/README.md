@@ -1,32 +1,60 @@
 # Exercise Image Pipeline
 
-This directory contains the tools for generating, validating, and managing the ~190 AI-generated exercise illustrations used in PT Helper.
+This directory contains the tools for generating, validating, and managing the 1364 canonical exercises (start+end frame pairs, as of 2026-04-30) used in PT Helper.
+
+> **Primary pipeline (current):** Nano Banana Pro (`gemini-3-pro-image-preview`) via
+> `generate_missing_images.py` + `regen_with_auto_prompts.py`.
+> See `project_image_provider_decision.md` for rationale.
+>
+> **Legacy pipeline:** FLUX 2 Pro via BFL API (`generate_exercise_images.py`) — deprecated
+> for new image work. Still referenced by the on-demand `generateExerciseImage` Cloud
+> Function (migration is an open item).
 
 ## Overview
 
 ```
-exercise_list.json          →  generate_exercise_images.py  →  output/*.png
-(exercises + metadata)        (FLUX 2 Pro via BFL API)        (512x512 images)
-                                                                    │
-                                                                    ▼
-                                                            qa_exercise_images.py
-                                                            (Gemini 2.5 Flash QA)
-                                                                    │
-                                                                    ▼
-                                                            output/qa_report.json
-                                                            (pass/fail per image)
+all_exercises_metadata.json  →  generate_missing_images.py   →  output/*.png
+(exercises + pose descs)        (Nano Banana Pro / Gemini)
+                                          ↑                          │
+                                          │                          ▼
+                                regen_with_auto_prompts.py    qa_exercise_images.py
+                                (auto-prompt correction)       (Gemini 2.5 Flash QA)
+                                                                     │
+                                                                     ▼
+                                                             output/qa_all_starts_report.json
+                                                             (pose score 1-5 per image)
 ```
 
 ## Files
 
+### Primary pipeline (Nano Banana Pro)
+
 | File | Purpose |
 |------|---------|
-| `exercise_list.json` | Master list of exercises with metadata (name, body_position, pose_description, equipment, etc.) |
-| `generate_exercise_images.py` | Generates exercise images using FLUX 2 Pro (BFL API) |
-| `qa_exercise_images.py` | Automated QA using Gemini 2.5 Flash vision model |
-| `process_missing_images.py` | Re-processes failed or missing images |
+| `output/all_exercises_metadata.json` | Unified metadata for all 1364 exercises (name, pose_description, equipment, etc.) |
+| `generate_missing_images.py` | Generates missing start images with Nano Banana Pro + inline QA |
+| `regen_with_auto_prompts.py` | Auto-prompt correction loop: Gemini observes failure → writes anti-error prompt → regenerates |
+| `rebuild_image_mapping.py` | Reconciles `exercise_image_mapping.json` from PNGs on disk + syncs to iOS Resources |
+| `qa_exercise_images.py` | Automated QA using Gemini 2.5 Flash vision model (with no-schema fallback) |
+| `qa_sweep_robust.py` | Serial QA with per-image SIGALRM timeout + checkpointing |
+| `stockpile_exercise_images.py` | Stockpile agent that discovered the additional ~717 exercises |
+| `triage_failures.py` | Classifies failures + auto-rewrites bad pose descriptions |
+| `output/qa_all_starts_report.json` | Canonical QA report across all 1364 start images |
+
+### Legacy pipeline (FLUX 2 Pro — deprecated)
+
+| File | Purpose |
+|------|---------|
+| `exercise_list.json` | Original 190-exercise curated metadata list |
+| `generate_exercise_images.py` | Legacy FLUX 2 Pro generator (BFL API) — still used by on-demand Cloud Function |
+| `process_missing_images.py` | Legacy re-processing for FLUX pipeline |
 | `generate_reference.py` | Reference character generation (deprecated) |
-| `upload_to_firebase.sh` | Uploads images to Firebase Storage |
+
+### Shared
+
+| File | Purpose |
+|------|---------|
+| `upload_to_firebase.sh` | Uploads images to Firebase Storage (needs `gcloud auth login`) |
 | `requirements.txt` | Python dependencies |
 | `output/` | Generated PNG images and QA reports |
 | `output/exercise_image_mapping.json` | Maps exercise names to image filenames |
@@ -38,26 +66,41 @@ pip install -r requirements.txt
 ```
 
 Required API keys:
-- **BFL API key** — For FLUX 2 Pro image generation ([blackforestlabs.ai](https://blackforestlabs.ai))
-- **Gemini API key** — For automated QA ([ai.google.dev](https://ai.google.dev))
+- **Gemini API key** — For Nano Banana Pro generation and automated QA ([ai.google.dev](https://ai.google.dev))
+- **BFL API key** (legacy only) — For FLUX 2 Pro generation via the legacy script ([blackforestlabs.ai](https://blackforestlabs.ai))
 
 ## Generating Images
 
-### Generate all missing images
+### Generate all missing start images (current pipeline)
 ```bash
-python generate_exercise_images.py --api-key YOUR_BFL_KEY
+python generate_missing_images.py --api-key YOUR_GEMINI_KEY
 ```
 
-### Generate a specific exercise
+### Generate a subset
+```bash
+python generate_missing_images.py --api-key YOUR_GEMINI_KEY --only "quad-sets,glute-bridge"
+python generate_missing_images.py --api-key YOUR_GEMINI_KEY --limit 50
+```
+
+### Regenerate failures with auto-prompt correction
+```bash
+python regen_with_auto_prompts.py --api-key YOUR_GEMINI_KEY
+```
+
+### Legacy: generate with FLUX 2 Pro
 ```bash
 python generate_exercise_images.py --api-key YOUR_BFL_KEY --exercise "quad-sets"
 ```
 
 ### Key parameters
-- Images are 512x512 PNG
-- Rate limit delay: 8 seconds between API requests
 - Style: Clean white background, anatomical mannequin figure
-- 14 exercises use custom visual prompts (`_CUSTOM_VISUAL_PROMPTS`) for poses that are hard to describe by name
+- Rate limits use Gemini's per-model quotas: ~250 generations/day (`gemini-3-pro-image-preview`)
+  and ~1500 QA calls/day (`gemini-2.5-flash`). The scripts do not insert sleeps — they rely on
+  the daily quota plus per-call SIGALRM timeouts (60–90s) to catch hung requests.
+- Some exercises use custom visual prompts (`_CUSTOM_VISUAL_PROMPTS` in
+  `generate_exercise_images.py`) for poses hard to describe by name. The current Nano
+  Banana Pro pipeline uses pose descriptions from `output/all_exercises_metadata.json`
+  plus the auto-prompt correction loop instead.
 
 ## Running QA
 
@@ -71,10 +114,12 @@ The QA script:
 3. Checks: correct body position, correct pose, correct equipment, visual quality
 4. Outputs `output/qa_report.json` with pass/fail per exercise
 
-### Current Results
-- **Pass rate**: ~92%
-- **4 Gemini safety blocks**: False positives on fitness poses (glute-bridges, childs-pose, standing-quad-stretch, childs-pose-with-side-reach) — images are fine
-- **11 pose accuracy failures**: Exercises too subtle for AI vision QA (wrist curls, chin tucks, etc.)
+### Current Results (as of 2026-04-19, Nano Banana Pro pipeline)
+- **Coverage**: 1364/1364 start images generated (effectively complete)
+- **Pass rate**: ~98% at QA score 5 (806 at score 5, 25 at 4, 2 at 3, zero at ≤2)
+- **Gemini safety blocks**: Occasional false positives on fitness poses — handled by manual review
+- **Known QA limitation**: Gemini QA does NOT reliably validate variant compliance
+  (single-leg / alternating / single-arm). Visual review is mandatory for variant exercises.
 
 ## Adding a New Exercise
 
@@ -117,7 +162,14 @@ The `ExerciseImageService` in the iOS app loads images by filename from this map
 
 ## Troubleshooting
 
-- **FLUX 2 Pro can't do a pose**: Add a custom visual-only prompt to `_CUSTOM_VISUAL_PROMPTS` that describes what the camera sees without using the exercise name
-- **Gemini blocks an image**: Usually a false positive on fitness poses. Check the image manually — if it's fine, ignore the block
-- **Rate limiting**: The BFL API has rate limits. The script uses an 8-second delay between requests
-- **Prone positions**: FLUX 2 Pro handles face-down poses well (earlier Kontext Pro couldn't)
+- **Nano Banana Pro misses a pose**: Run `regen_with_auto_prompts.py` — Gemini observes the
+  failure and rewrites the prompt with anti-cues. Near-100% effective for fixable poses.
+- **Gemini blocks an image**: Usually a false positive on fitness poses. Check the image
+  manually — if it's fine, ignore the block.
+- **Gemini API hangs**: All scripts use SIGALRM (60–90s timeout) to catch hung calls.
+- **Gemini QA returns None / blank result**: Known structured-output bug. `qa_exercise_images.py`
+  has a no-schema fallback (`_normalize_qa_keys()`) — re-run failed items.
+- **Hit daily quota**: Free tier is ~250 generations/day on `gemini-3-pro-image-preview` and
+  ~1500 QA calls/day on `gemini-2.5-flash`. Resume tomorrow.
+- **Legacy FLUX 2 Pro can't do a pose**: Add a custom visual-only prompt to
+  `_CUSTOM_VISUAL_PROMPTS` in `generate_exercise_images.py`.

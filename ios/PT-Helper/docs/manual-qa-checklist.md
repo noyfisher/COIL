@@ -7,6 +7,8 @@ Run through this checklist before every release. Estimated time: 20 minutes.
 ### Login & Onboarding
 - [ ] Fresh launch: Login screen appears
 - [ ] Sign in with Apple completes successfully
+- [ ] 3-screen intro carousel appears before onboarding on first launch (and not on re-launch)
+- [ ] Intro carousel swipe + "Get Started" advance to onboarding correctly
 - [ ] Onboarding shows all 6 steps with correct titles
 - [ ] Fill basic info (name, DOB, sex, height, weight) — Continue enables
 - [ ] Skip through remaining steps — main app loads

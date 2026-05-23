@@ -6,7 +6,7 @@ ios/PT-Helper/PT-Helper/
   RootView.swift                  # Navigation root (auth check, onboarding gate)
   DesignSystem.swift              # Tokens: AppColors, AppSpacing, AppFonts, AppCorners, AppAnimations + reusable components
 
-  Models/ (21 files)
+  Models/ (22 files)
     UserProfile.swift             # User health profile (Codable)
     PainAssessment.swift          # Per-region pain data + AnalysisResult + ConditionResult
     RehabPlan.swift               # Exercise plan with weekly schedule + RehabExercise
@@ -46,7 +46,7 @@ ios/PT-Helper/PT-Helper/
     TimerViewModel.swift          # Rest timer management
     NotesViewModel.swift          # User notes CRUD
 
-  Views/ (69 files)
+  Views/ (79 files)
     ThreeTabView.swift            # 3-tab navigation container (Assess / My Plan / Progress)
     MainTabView.swift             # Legacy 4-tab wrapper (--use-legacy-ui)
     AssessTab.swift               # Dual gateway: pain analysis or wellness goals
@@ -99,7 +99,7 @@ ios/PT-Helper/PT-Helper/
     DisclaimerView.swift          # Legal disclaimer
     LegalDocumentView.swift       # Privacy policy / terms viewer
 
-    Components/ (10 files)
+    Components/ (15 files)
       ExercisePhaseStepperView.swift  # 3-phase instruction stepper (Start → Move → Return)
       ExerciseImageView.swift     # Exercise image with SF Symbol fallback
       ExerciseIllustration.swift  # Exercise illustration wrapper
@@ -132,7 +132,7 @@ ios/PT-Helper/PT-Helper/
       ActivityLevelStepView.swift # Activity level selection
       ProfileReviewStepView.swift # Profile review before submit
 
-  Services/ (24 files)
+  Services/ (27 files)
     ClaudeAPIService.swift        # Firebase proxy → Claude API (9 request types)
     APIConfig.swift               # API endpoint configuration
     ResponseValidationPipeline.swift  # Analysis (6-step) + rehab plan (9-step) validation
@@ -160,7 +160,7 @@ ios/PT-Helper/PT-Helper/
 
   Resources/
     exercise_image_mapping.json   # Exercise name → image filename mapping
-    *.png                         # ~190 AI-generated exercise illustrations
+    *.png                         # 1364 AI-generated exercise illustrations (start+end frame pairs, Nano Banana Pro)
 
 ios/PT-Helper/PT-HelperTests/
   TestFixtures.swift              # Factory methods for test data
