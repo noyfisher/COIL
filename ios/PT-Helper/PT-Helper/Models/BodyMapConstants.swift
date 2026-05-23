@@ -67,6 +67,11 @@ enum BodyMapConstants {
         "calf_shin", "ankle_foot"
     ]
 
+    /// Small Z overlap (in model units) between the calf_shin Y-band top and
+    /// the knee mesh bottom. Prevents a hairline gap where neither collision
+    /// fires. Negative values would create a gap; keep at +0.002 unless tuning.
+    static let calfShinKneeOverlap: Float = 0.002
+
     /// How far anterior each arm zone box protrudes past its region's mesh
     /// front. Ensures the zoned box is hit before any adjacent region's
     /// convex hull at the same (X, Y) position. Mirrors `proxyForwardBias`.
