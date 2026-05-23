@@ -137,8 +137,20 @@ final class BodyMapCollisionTests: XCTestCase {
             transitions.append((bounds[i].center.z + bounds[i + 1].center.z) / 2)
         }
 
+        // Mirror BodyMap3DView.createLegZoneProxies: cap calf_shin top at the
+        // knee mesh's bottom so it doesn't bleed into the kneecap area.
+        let kneeBounds = entity.findEntity(named: "\(side)_knee")
+            .map { $0.visualBounds(relativeTo: entity) }
+
         for (i, zoneKey) in zoneKeys.enumerated() {
-            let topZ = (i == 0) ? bounds[i].max.z : transitions[i - 1]
+            let topZ: Float
+            if i == 0, let kneeBounds {
+                topZ = min(bounds[i].max.z, kneeBounds.min.z + BodyMapConstants.calfShinKneeOverlap)
+            } else if i == 0 {
+                topZ = bounds[i].max.z
+            } else {
+                topZ = transitions[i - 1]
+            }
             let botZ = (i == order.count - 1) ? bounds[i].min.z : transitions[i]
             let zoneExtentZ = max(0.005, topZ - botZ)
             let zoneCenterZ = (topZ + botZ) / 2
@@ -494,6 +506,25 @@ final class BodyMapCollisionTests: XCTestCase {
         let bounds = calf.visualBounds(relativeTo: nil)
         let hit = resolveHit(frontRaycast(x: bounds.center.x, y: bounds.center.y))
         XCTAssertEqual(hit, "left_calf_shin", "Tapping calf center should select left_calf_shin, got: \(hit ?? "nil")")
+    }
+
+    /// Behavior check: a tap just inside the bottom of the knee mesh must
+    /// resolve to the knee, NOT to calf_shin. Regression test for the bug
+    /// where calf_shin's Y-band top (bounds.max.z) bled up into the kneecap
+    /// area — fixed by anchoring calf_shin's top at knee.bounds.min.z.
+    func testTapAtKneeMeshBottomSelectsKnee() {
+        for side in ["left", "right"] {
+            guard let knee = bodyEntity.findEntity(named: "\(side)_knee") else {
+                XCTFail("Knee not found for side=\(side)"); return
+            }
+            let bounds = knee.visualBounds(relativeTo: nil)
+            let tapY = bounds.min.y + bounds.extents.y * 0.02
+            let hit = resolveHit(frontRaycast(x: bounds.center.x, y: tapY))
+            XCTAssertEqual(
+                hit, "\(side)_knee",
+                "Tap near knee mesh bottom should select \(side)_knee, got \(hit ?? "nil") (regression for calf_shin top-bleed)"
+            )
+        }
     }
 
     // MARK: - 4a. Arm Zone Boundary Tests (world space)

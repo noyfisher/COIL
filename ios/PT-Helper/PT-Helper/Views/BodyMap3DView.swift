@@ -835,8 +835,24 @@ struct BodyMap3DView: View {
             transitions.append((bounds[i].center.z + bounds[i + 1].center.z) / 2)
         }
 
+        // Calf_shin's mesh max.z extends up past the kneecap, so a naive
+        // max.z top would eat the knee + lower-thigh tap area. Anchor at the
+        // knee mesh's bottom instead — knee gets a real convex hull (it's not
+        // in lowerLegRegionOrder, see configureCollisionShapes), so capping
+        // here cedes the upper band to that hull + the knee sphere proxy.
+        let kneeBounds = entity.findEntity(named: "\(side)_knee")
+            .map { $0.visualBounds(relativeTo: entity) }
+
         for (i, zoneKey) in zoneKeys.enumerated() {
-            let topZ = (i == 0) ? bounds[i].max.z : transitions[i - 1]
+            let topZ: Float
+            if i == 0, let kneeBounds {
+                topZ = min(bounds[i].max.z, kneeBounds.min.z + BodyMapConstants.calfShinKneeOverlap)
+            } else if i == 0 {
+                AppLogger.ui.warning("BodyMap3D: knee entity missing for side=\(side); calf_shin top falling back to bounds.max.z (calf_shin may bleed into kneecap)")
+                topZ = bounds[i].max.z
+            } else {
+                topZ = transitions[i - 1]
+            }
             let botZ = (i == order.count - 1) ? bounds[i].min.z : transitions[i]
             let zoneExtentZ = max(0.005, topZ - botZ)
             let zoneCenterZ = (topZ + botZ) / 2
