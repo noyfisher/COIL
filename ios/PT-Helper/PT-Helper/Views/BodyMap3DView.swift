@@ -1017,6 +1017,10 @@ struct BodyMap3DView: View {
         // Dim non-zone entities
         dimNonZoneEntities(zone: zone)
 
+        // Repaint zone regions with per-zone palette so sub-regions are
+        // instantly distinguishable. The wash returns on exit.
+        applyZonePalette(for: zone)
+
         withAnimation(.easeInOut(duration: 0.3)) {
             activeZone = zone
             viewModel.activeZone = zone
@@ -1055,6 +1059,12 @@ struct BodyMap3DView: View {
 
         // Restore all dimmed entities
         restoreAllDimmedEntities()
+
+        // Revert per-zone palette colors back to the unified wash so the
+        // overview reads as the clean neutral mannequin again.
+        if let zone = activeZone {
+            revertZonePalette(for: zone)
+        }
 
         // Animate back to overview
         accumulatedScale = 1.0
@@ -1116,9 +1126,27 @@ struct BodyMap3DView: View {
         }
     }
 
+    /// Breadth-first walk the entity tree under `root` and return the first
+    /// entity whose `name` matches AND that owns a `ModelComponent`. Works
+    /// around the `body_model.usdz` structure where every region is an
+    /// `Xform` parent with a same-named `Mesh` child — the stock
+    /// `Entity.findEntity(named:)` would return the parent (no
+    /// ModelComponent) and silently no-op every material mutation.
+    private func findRenderableEntity(named name: String, in root: Entity) -> Entity? {
+        var queue: [Entity] = [root]
+        while !queue.isEmpty {
+            let next = queue.removeFirst()
+            if next.name == name, next.components[ModelComponent.self] != nil {
+                return next
+            }
+            queue.append(contentsOf: next.children)
+        }
+        return nil
+    }
+
     private func applyHighlight(for entityName: String) {
         guard let body = bodyEntity,
-              let entity = body.findEntity(named: entityName) else { return }
+              let entity = findRenderableEntity(named: entityName, in: body) else { return }
 
         var material = SimpleMaterial()
         material.color = .init(tint: BodyMapConstants.highlightColor)
@@ -1133,7 +1161,7 @@ struct BodyMap3DView: View {
 
     private func restoreMaterial(for entityName: String) {
         guard let body = bodyEntity,
-              let entity = body.findEntity(named: entityName),
+              let entity = findRenderableEntity(named: entityName, in: body),
               let origMats = originalMaterials[entityName],
               var mc = entity.components[ModelComponent.self] else { return }
 
@@ -1221,10 +1249,129 @@ struct BodyMap3DView: View {
 
     private func regionStripColor(for region: BodyRegion) -> Color {
         let baseKey = BodyMapConstants.regionBaseKey(region.zoneKey)
+        // In drill-down, mirror the zone palette so the pill dots match the
+        // mannequin's color-coded sub-regions one-to-one.
+        if let zone = activeZone,
+           let color = BodyMapConstants.zoneColor(zone: zone, baseKey: baseKey) {
+            return Color(uiColor: color)
+        }
         if let color = BodyMapConstants.regionColors[baseKey] {
             return Color(uiColor: color)
         }
         return AppColors.mutedText
+    }
+
+    // MARK: - Zone Palette Painting
+
+    /// Paint each region in the active zone with its per-zone palette color.
+    /// Also updates `originalMaterials` for these regions so a later
+    /// selection → deselection cycle restores to the palette color rather
+    /// than the wash. Called from `drillIntoZone`.
+    ///
+    /// Currently-selected regions keep their MVVC-red highlight on screen;
+    /// only their stored `originalMaterials` entry is updated to the palette
+    /// color so a future deselect lands on the palette, not the stale wash.
+    @MainActor
+    private func applyZonePalette(for zone: BodyZone) {
+        guard let body = bodyEntity else {
+            AppLogger.ui.warning("BodyMap3D: applyZonePalette zone=\(zone.rawValue) but bodyEntity is nil")
+            return
+        }
+        let selectedKeys = Set(viewModel.selectedRegions.map(\.zoneKey))
+
+        for zoneKey in zone.regionZoneKeys {
+            let baseKey = BodyMapConstants.regionBaseKey(zoneKey)
+            guard let color = BodyMapConstants.zoneColor(zone: zone, baseKey: baseKey) else {
+                AppLogger.ui.warning("BodyMap3D: no zone color for zone=\(zone.rawValue) baseKey=\(baseKey)")
+                continue
+            }
+
+            // Bilateral pairs: paint both left_ and right_ variants if they exist.
+            for fullKey in entityKeys(forBaseKey: baseKey, zoneKey: zoneKey) {
+                if selectedKeys.contains(fullKey) {
+                    // Preserve the red highlight visually; just update the
+                    // "original" material so deselect later reverts to palette.
+                    storeOriginalMaterial(named: fullKey, with: color)
+                } else {
+                    paintEntity(named: fullKey, in: body, with: color)
+                }
+            }
+        }
+    }
+
+    /// Revert every region in the given zone back to the unified wash color
+    /// from `regionColors`. Restores `originalMaterials` to match so future
+    /// deselects after a re-drill don't flash the stale palette material.
+    /// Called from `exitDrillDown`.
+    ///
+    /// Currently-selected regions keep their MVVC-red highlight on screen;
+    /// only their stored `originalMaterials` entry is updated to the wash so
+    /// a future deselect lands on the wash, not the stale palette color.
+    @MainActor
+    private func revertZonePalette(for zone: BodyZone) {
+        guard let body = bodyEntity else { return }
+        let selectedKeys = Set(viewModel.selectedRegions.map(\.zoneKey))
+
+        for zoneKey in zone.regionZoneKeys {
+            let baseKey = BodyMapConstants.regionBaseKey(zoneKey)
+            guard let washColor = BodyMapConstants.regionColors[baseKey] else { continue }
+
+            for fullKey in entityKeys(forBaseKey: baseKey, zoneKey: zoneKey) {
+                if selectedKeys.contains(fullKey) {
+                    storeOriginalMaterial(named: fullKey, with: washColor)
+                } else {
+                    paintEntity(named: fullKey, in: body, with: washColor)
+                }
+            }
+        }
+    }
+
+    /// Enumerate the actual entity name(s) for a base key. Bilateral regions
+    /// (those whose zoneKey starts with `left_` or `right_`) live on the model
+    /// as `left_<base>` AND `right_<base>` — repaint both. Non-bilateral
+    /// regions (head, neck, chest, abdomen, upper_back, lower_back) live as
+    /// just `<base>`.
+    private func entityKeys(forBaseKey baseKey: String, zoneKey: String) -> [String] {
+        if zoneKey.hasPrefix("left_") || zoneKey.hasPrefix("right_") {
+            return ["left_\(baseKey)", "right_\(baseKey)"]
+        }
+        return [baseKey]
+    }
+
+    /// Paint a single entity with a flat material in the given color, and
+    /// update `originalMaterials` so that subsequent select→deselect
+    /// restores to this color, not the prior one.
+    @MainActor
+    private func paintEntity(named name: String, in body: Entity, with color: UIColor) {
+        guard let entity = findRenderableEntity(named: name, in: body) else { return }
+
+        let material = makeRegionMaterial(color: color)
+
+        if var mc = entity.components[ModelComponent.self] {
+            mc.materials = [material]
+            entity.components[ModelComponent.self] = mc
+            // Re-sync the "original" material so deselect after select restores
+            // to whatever we last painted (palette during drill-down, wash on exit).
+            originalMaterials[name] = [material]
+        }
+    }
+
+    /// Store the "original" material for a region without touching its
+    /// currently-rendered material. Used for regions whose highlight (red
+    /// selection material) must remain visible — we only need a future
+    /// deselect to land on the new color, not change what's drawn now.
+    @MainActor
+    private func storeOriginalMaterial(named name: String, with color: UIColor) {
+        originalMaterials[name] = [makeRegionMaterial(color: color)]
+    }
+
+    /// Build the standard region material (matte, slight specular) for a color.
+    private func makeRegionMaterial(color: UIColor) -> SimpleMaterial {
+        var material = SimpleMaterial()
+        material.color = .init(tint: color)
+        material.roughness = .float(BodyMapConstants.regionRoughness)
+        material.metallic = .float(BodyMapConstants.regionMetallic)
+        return material
     }
 
     // MARK: - Region Color Coding

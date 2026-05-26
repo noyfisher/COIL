@@ -86,6 +86,11 @@ struct ZoneSelectionPanel: View {
 
     private func regionColor(for region: BodyRegion) -> Color {
         let baseKey = BodyMapConstants.regionBaseKey(region.zoneKey)
+        // This panel only renders while a zone is drilled in, so prefer the
+        // per-zone palette so the swatch dots match the mannequin one-to-one.
+        if let color = BodyMapConstants.zoneColor(zone: zone, baseKey: baseKey) {
+            return Color(uiColor: color)
+        }
         if let color = BodyMapConstants.regionColors[baseKey] {
             return Color(uiColor: color)
         }

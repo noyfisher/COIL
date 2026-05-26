@@ -87,7 +87,7 @@ enum BodyMapConstants {
 
     // MARK: - Highlight Material
 
-    static let highlightColor = UIColor(red: 0.95, green: 0.20, blue: 0.20, alpha: 1.0)
+    static let highlightColor = UIColor(red: 0.800, green: 0.000, blue: 0.000, alpha: 1.0)
     static let highlightRoughness: Float = 0.25
     static let highlightMetallic: Float = 0.15
 
@@ -98,28 +98,115 @@ enum BodyMapConstants {
 
     // MARK: - Region Color Palette
 
-    /// Color coding for each region group. Bilateral pairs share a color.
-    /// Key = base region key (no left_/right_ prefix).
+    /// MVVC palette: every region renders with the same faint-pink wash so the
+    /// mannequin reads as a single neutral surface; the saturated MVVC-red
+    /// selection tint provides all the per-region differentiation users need.
+    /// Baked as a full-opacity color because SimpleMaterial tint alpha is
+    /// transparency, not a paint wash — a low-alpha red would make the body
+    /// see-through to the scene background.
+    static let regionWash = UIColor(red: 0.984, green: 0.920, blue: 0.920, alpha: 1)  // #FBEBEB — MVVC accent ~8% over white
+
+    /// Default color coding for each region group when the mannequin is shown
+    /// in the OVERVIEW state (no zone drilled in). Every region renders with
+    /// the unified pink wash so the mannequin reads as a single neutral surface.
+    /// During drill-down, regions in the active zone are repainted using
+    /// `zoneRegionColors` for at-a-glance differentiation; the wash returns
+    /// on exit. Bilateral pairs share a color. Key = base region key
+    /// (no left_/right_ prefix).
     static let regionColors: [String: UIColor] = [
-        "head":       UIColor(red: 0.318, green: 0.749, blue: 0.427, alpha: 1),  // #51BF6D — spring green
-        "neck":       UIColor(red: 0.624, green: 0.812, blue: 0.784, alpha: 1),  // #9FCFC8 — pale aqua
-        "chest":      UIColor(red: 0.333, green: 0.769, blue: 0.710, alpha: 1),  // #55C4B5 — teal mint
-        "abdomen":    UIColor(red: 0.549, green: 0.824, blue: 0.529, alpha: 1),  // #8CD287 — soft lime
-        "upper_back": UIColor(red: 0.231, green: 0.675, blue: 0.224, alpha: 1),  // #3BAC39 — kelly green
-        "lower_back": UIColor(red: 0.314, green: 0.588, blue: 0.545, alpha: 1),  // #50968B — deep sage teal
-        "shoulder":   UIColor(red: 0.310, green: 0.588, blue: 0.349, alpha: 1),  // #4F9659 — forest sage
-        "upper_arm":  UIColor(red: 0.435, green: 0.698, blue: 0.584, alpha: 1),  // #6FB295 — seafoam
-        "elbow":      UIColor(red: 0.490, green: 0.816, blue: 0.682, alpha: 1),  // #7DD0AE — mint cream
-        "forearm":    UIColor(red: 0.286, green: 0.733, blue: 0.569, alpha: 1),  // #49BB91 — jade
-        "wrist_hand": UIColor(red: 0.451, green: 0.710, blue: 0.443, alpha: 1),  // #73B571 — sage green
-        "glute":      UIColor(red: 0.624, green: 0.812, blue: 0.635, alpha: 1),  // #9FCFA2 — pale sage
-        "hip":        UIColor(red: 0.310, green: 0.761, blue: 0.286, alpha: 1),  // #4FC249 — vivid green
-        "thigh":      UIColor(red: 0.412, green: 0.804, blue: 0.514, alpha: 1),  // #69CD83 — emerald mint
-        "hamstring":  UIColor(red: 0.231, green: 0.671, blue: 0.427, alpha: 1),  // #3BAB6D — clover
-        "knee":       UIColor(red: 0.514, green: 0.831, blue: 0.788, alpha: 1),  // #83D4C9 — aqua mist
-        "calf_shin":  UIColor(red: 0.353, green: 0.655, blue: 0.467, alpha: 1),  // #5AA777 — eucalyptus
-        "ankle_foot": UIColor(red: 0.380, green: 0.706, blue: 0.353, alpha: 1),  // #61B45A — leaf green
+        "head":       regionWash,
+        "neck":       regionWash,
+        "chest":      regionWash,
+        "abdomen":    regionWash,
+        "upper_back": regionWash,
+        "lower_back": regionWash,
+        "shoulder":   regionWash,
+        "upper_arm":  regionWash,
+        "elbow":      regionWash,
+        "forearm":    regionWash,
+        "wrist_hand": regionWash,
+        "glute":      regionWash,
+        "hip":        regionWash,
+        "thigh":      regionWash,
+        "hamstring":  regionWash,
+        "knee":       regionWash,
+        "calf_shin":  regionWash,
+        "ankle_foot": regionWash,
     ]
+
+    // MARK: - Per-Zone Palette (drill-down only)
+    //
+    // When the user drills into a zone, every region in that zone is repainted
+    // with a distinct MVVC palette color so the sub-regions are instantly
+    // distinguishable. On exit, the wash returns. Because zones are mutually
+    // exclusive on screen, the same palette colors can be reused across zones
+    // — only one zone is ever visible at a time.
+
+    // Palette swatches (MVVC tokens reused across zones)
+    private static let paletteAccent     = UIColor(red: 0.800, green: 0,     blue: 0,     alpha: 1)  // #CC0000 accent
+    private static let paletteAccentDark = UIColor(red: 0.639, green: 0,     blue: 0,     alpha: 1)  // #A30000 accentDark
+    private static let paletteSuccess    = UIColor(red: 0.176, green: 0.478, blue: 0.227, alpha: 1)  // #2D7A3A success
+    private static let paletteWarning    = UIColor(red: 0.722, green: 0.478, blue: 0,     alpha: 1)  // #B87A00 warning
+    private static let paletteWarmEnd    = UIColor(red: 0.612, green: 0.380, blue: 0,     alpha: 1)  // #9C6100 warmGradient end
+    private static let paletteMuted      = UIColor(red: 0.533, green: 0.533, blue: 0.533, alpha: 1)  // #888888 mutedText
+    private static let paletteDark       = UIColor(red: 0.067, green: 0.067, blue: 0.067, alpha: 1)  // #111111 primaryText
+
+    /// Per-zone color assignment used during drill-down only. Outer key =
+    /// `BodyZone.rawValue`; inner key = base region key (no left_/right_ prefix).
+    /// Bilateral zones (left/right arm, left/right leg) reuse the same palette
+    /// since only one side's zone is visible at a time. Within a single zone,
+    /// every region gets a distinct hue for at-a-glance differentiation.
+    static let zoneRegionColors: [String: [String: UIColor]] = [
+        "head_neck": [
+            "head":       paletteAccent,
+            "neck":       paletteSuccess,
+        ],
+        "torso": [
+            "chest":      paletteAccent,
+            "abdomen":    paletteWarning,
+            "upper_back": paletteSuccess,
+            "lower_back": paletteDark,
+        ],
+        "left_arm": [
+            "shoulder":   paletteAccent,
+            "upper_arm":  paletteSuccess,
+            "elbow":      paletteWarning,
+            "forearm":    paletteMuted,
+            "wrist_hand": paletteDark,
+        ],
+        "right_arm": [
+            "shoulder":   paletteAccent,
+            "upper_arm":  paletteSuccess,
+            "elbow":      paletteWarning,
+            "forearm":    paletteMuted,
+            "wrist_hand": paletteDark,
+        ],
+        "left_leg": [
+            "hip":        paletteAccent,
+            "glute":      paletteAccentDark,
+            "thigh":      paletteSuccess,
+            "hamstring":  paletteWarmEnd,
+            "knee":       paletteWarning,
+            "calf_shin":  paletteMuted,
+            "ankle_foot": paletteDark,
+        ],
+        "right_leg": [
+            "hip":        paletteAccent,
+            "glute":      paletteAccentDark,
+            "thigh":      paletteSuccess,
+            "hamstring":  paletteWarmEnd,
+            "knee":       paletteWarning,
+            "calf_shin":  paletteMuted,
+            "ankle_foot": paletteDark,
+        ],
+    ]
+
+    /// Resolve the per-zone palette color for a region's base key when the
+    /// given zone is active. Returns `nil` if the zone has no entry for this
+    /// region (callers should fall back to `regionColors`).
+    static func zoneColor(zone: BodyZone, baseKey: String) -> UIColor? {
+        return zoneRegionColors[zone.rawValue]?[baseKey]
+    }
 
     // MARK: - Zone Drill-Down
 
@@ -149,8 +236,8 @@ enum BodyMapConstants {
 
     // MARK: - Background
 
-    static let sceneBackground = UIColor(red: 0.91, green: 0.94, blue: 0.91, alpha: 1.0)           // #E8F0E9
-    static let loadingOverlayBackground = UIColor(red: 0.91, green: 0.94, blue: 0.91, alpha: 0.95)  // #E8F0E9
+    static let sceneBackground = UIColor(red: 0.949, green: 0.945, blue: 0.937, alpha: 1.0)          // #F2F1EF — MVVC pageBackground
+    static let loadingOverlayBackground = UIColor(red: 0.949, green: 0.945, blue: 0.937, alpha: 0.95) // #F2F1EF — MVVC pageBackground
 
     // MARK: - Helpers
 
