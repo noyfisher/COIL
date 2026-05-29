@@ -228,7 +228,7 @@ struct PainDetailView: View {
         }
     }
 
-    private func handleContinue() {
+    func handleContinue() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         currentStep += 1
     }
@@ -330,20 +330,21 @@ struct PainDetailView: View {
             activeCustomField = field
         }) {
             HStack(spacing: AppSpacing.md) {
-                Text("Add more")
-                    .font(.body)
+                Image(systemName: "plus.circle")
+                    .font(.system(size: 18))
+                    .foregroundColor(AppColors.secondaryText)
+                    .frame(width: 28)
+                Text("Add your own")
+                    .font(Font.custom("Inter-Regular", size: 15))
                     .foregroundColor(AppColors.secondaryText)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                Image(systemName: "plus")
-                    .font(.system(size: 19, weight: .light))
-                    .foregroundColor(AppColors.secondaryText)
             }
-            .padding(.vertical, AppSpacing.lg)
-            .overlay(alignment: .bottom) {
-                Rectangle()
-                    .fill(AppColors.elevatedSurface)
-                    .frame(height: 1)
-            }
+            .padding(.horizontal, AppSpacing.lg)
+            .padding(.vertical, AppSpacing.md + 2)
+            .background(
+                RoundedRectangle(cornerRadius: AppCorners.medium)
+                    .strokeBorder(AppColors.cardBorder, style: StrokeStyle(lineWidth: 1, dash: [6]))
+            )
         }
         .buttonStyle(.plain)
     }
@@ -426,7 +427,7 @@ struct PainDetailView: View {
 
     // MARK: - Pain Duration (single-select cards)
 
-    private var painDurationOptions: [String] {
+    var painDurationOptions: [String] {
         PainAssessment.PainDuration.allCases.map { $0.displayName }
     }
 

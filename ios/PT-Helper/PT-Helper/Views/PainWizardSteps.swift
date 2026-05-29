@@ -9,7 +9,7 @@ extension PainDetailView {
     var painTypeStepView: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppSpacing.xl) {
-                questionTitle("What type of pain\nare you feeling?")
+                questionTitle("What type of pain\nare you feeling?", hint: "Select all that apply")
                 painTypeSelection
             }
             .padding(.horizontal, AppSpacing.xl)
@@ -24,7 +24,7 @@ extension PainDetailView {
     var intensityStepView: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppSpacing.xl) {
-                questionTitle("How intense\nis the pain?")
+                questionTitle("How intense\nis the pain?", hint: "Drag the slider to rate your pain")
                 painIntensitySlider
             }
             .padding(.horizontal, AppSpacing.xl)
@@ -39,8 +39,8 @@ extension PainDetailView {
     var durationStepView: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppSpacing.xl) {
-                questionTitle("How long have\nyou had this pain?")
-                painDurationPicker
+                questionTitle("How long have\nyou had this pain?", hint: "Choose one")
+                autoAdvanceDurationPicker
             }
             .padding(.horizontal, AppSpacing.xl)
             .padding(.top, AppSpacing.md)
@@ -49,12 +49,29 @@ extension PainDetailView {
         .scrollDismissesKeyboard(.interactively)
     }
 
+    private var autoAdvanceDurationPicker: some View {
+        VStack(spacing: AppSpacing.sm) {
+            ForEach(painDurationOptions, id: \.self) { duration in
+                optionCard(
+                    label: duration,
+                    isSelected: painDurations.contains(duration),
+                    action: {
+                        painDurations = [duration]
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                            handleContinue()
+                        }
+                    }
+                )
+            }
+        }
+    }
+
     // MARK: Step 3 — Frequency
 
     var frequencyStepView: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppSpacing.xl) {
-                questionTitle("How often do\nyou feel it?")
+                questionTitle("How often do\nyou feel it?", hint: "Select all that apply")
                 painFrequencyPicker
             }
             .padding(.horizontal, AppSpacing.xl)
@@ -69,7 +86,7 @@ extension PainDetailView {
     var onsetStepView: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppSpacing.xl) {
-                questionTitle("How did this\npain start?")
+                questionTitle("How did this\npain start?", hint: "Select all that apply")
                 painOnsetPicker
             }
             .padding(.horizontal, AppSpacing.xl)
@@ -84,7 +101,7 @@ extension PainDetailView {
     var aggravatingStepView: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppSpacing.xl) {
-                questionTitle("What makes\nit worse?")
+                questionTitle("What makes\nit worse?", hint: "Select all that apply")
                 aggravatingFactorsSelection
             }
             .padding(.horizontal, AppSpacing.xl)
@@ -99,7 +116,7 @@ extension PainDetailView {
     var relievingStepView: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppSpacing.xl) {
-                questionTitle("What helps\nrelieve it?")
+                questionTitle("What helps\nrelieve it?", hint: "Select all that apply")
                 relievingFactorsSelection
             }
             .padding(.horizontal, AppSpacing.xl)
@@ -116,11 +133,13 @@ extension PainDetailView {
             VStack(alignment: .leading, spacing: AppSpacing.lg) {
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text("Review Your\nAssessment")
-                        .font(.system(size: 28, weight: .bold))
+                        .font(Font.custom("BarlowCondensed-Black", size: 32))
+                        .textCase(.uppercase)
+                        .kerning(0.3)
                         .foregroundColor(AppColors.primaryText)
                     if let region = viewModel.currentRegion {
                         Text(region.name)
-                            .font(.subheadline)
+                            .font(Font.custom("Inter-Regular", size: 13))
                             .foregroundColor(AppColors.secondaryText)
                     }
                 }
@@ -201,20 +220,28 @@ extension PainDetailView {
     func optionCard(label: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack(spacing: AppSpacing.md) {
+                Image(systemName: iconForOption(label))
+                    .font(.system(size: 18))
+                    .foregroundColor(isSelected ? AppColors.accent : AppColors.secondaryText)
+                    .frame(width: 28)
                 Text(label)
-                    .font(.body.weight(isSelected ? .semibold : .regular))
+                    .font(Font.custom(isSelected ? "Inter-SemiBold" : "Inter-Regular", size: 15))
                     .foregroundColor(AppColors.primaryText)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                Image(systemName: iconForOption(label))
-                    .font(.system(size: 19, weight: .light))
-                    .foregroundColor(isSelected ? AppColors.primaryText : AppColors.secondaryText)
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 20))
+                    .foregroundColor(isSelected ? AppColors.accent : AppColors.elevatedSurface)
             }
-            .padding(.vertical, AppSpacing.lg)
-            .overlay(alignment: .bottom) {
-                Rectangle()
-                    .fill(isSelected ? AppColors.primaryText : AppColors.elevatedSurface)
-                    .frame(height: isSelected ? 2 : 1)
-            }
+            .padding(.horizontal, AppSpacing.lg)
+            .padding(.vertical, AppSpacing.md + 2)
+            .background(
+                RoundedRectangle(cornerRadius: AppCorners.medium)
+                    .fill(isSelected ? AppColors.accentTint : AppColors.cardBackground)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: AppCorners.medium)
+                    .stroke(isSelected ? AppColors.accent : AppColors.cardBorder, lineWidth: isSelected ? 1.5 : 1)
+            )
         }
         .buttonStyle(.plain)
         .animation(AppAnimations.springy, value: isSelected)
@@ -335,12 +362,20 @@ extension PainDetailView {
 
     // MARK: - Question Title
 
-    func questionTitle(_ text: String) -> some View {
-        Text(text)
-            .font(.system(size: 28, weight: .bold))
-            .foregroundColor(AppColors.primaryText)
-            .fixedSize(horizontal: false, vertical: true)
-            .lineSpacing(2)
+    func questionTitle(_ text: String, hint: String? = nil) -> some View {
+        VStack(alignment: .leading, spacing: AppSpacing.xs) {
+            Text(text)
+                .font(Font.custom("BarlowCondensed-Black", size: 32))
+                .textCase(.uppercase)
+                .kerning(0.3)
+                .foregroundColor(AppColors.primaryText)
+                .fixedSize(horizontal: false, vertical: true)
+            if let hint {
+                Text(hint)
+                    .font(Font.custom("Inter-Regular", size: 13))
+                    .foregroundColor(AppColors.secondaryText)
+            }
+        }
     }
 
     // MARK: - Summary Row Helpers
