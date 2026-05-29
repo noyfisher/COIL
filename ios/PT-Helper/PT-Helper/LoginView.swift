@@ -51,15 +51,15 @@ struct LoginView: View {
                 // Hero headline
                 VStack(alignment: .leading, spacing: 0) {
                     Text("ASSESS.")
-                        .font(Font.custom("BarlowCondensed-Black", size: 44))
+                        .font(Font.custom("Industry-Bold", size: 44))
                         .foregroundColor(AppColors.textOnDark)
                         .kerning(0.5)
                     Text("PLAN.")
-                        .font(Font.custom("BarlowCondensed-Black", size: 44))
+                        .font(Font.custom("Industry-Bold", size: 44))
                         .foregroundColor(AppColors.accent)
                         .kerning(0.5)
                     Text("RECOVER.")
-                        .font(Font.custom("BarlowCondensed-Black", size: 44))
+                        .font(Font.custom("Industry-Bold", size: 44))
                         .foregroundColor(AppColors.textOnDark)
                         .kerning(0.5)
                 }

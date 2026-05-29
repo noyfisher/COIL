@@ -37,7 +37,7 @@ struct InjuryHistoryStepView: View {
                     VStack(spacing: AppSpacing.sm) {
                         HStack {
                             Text("Injury \(index + 1)")
-                                .font(Font.custom("BarlowCondensed-Black", size: 12))
+                                .font(Font.custom("Industry-Bold", size: 12))
                                 .textCase(.uppercase)
                                 .kerning(1.0)
                                 .foregroundColor(AppColors.accent)

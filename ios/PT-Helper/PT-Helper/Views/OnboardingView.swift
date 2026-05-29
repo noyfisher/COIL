@@ -52,7 +52,7 @@ struct OnboardingView: View {
 
                     VStack(spacing: AppSpacing.xs) {
                         Text(stepTitle)
-                            .font(Font.custom("BarlowCondensed-Black", size: 26))
+                            .font(Font.custom("Industry-Bold", size: 26))
                             .foregroundColor(.white)
                         Text(stepSubtitle)
                             .font(AppFonts.small)

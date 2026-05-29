@@ -116,9 +116,9 @@ struct ThreeTabView: View {
         navBar.configureWithOpaqueBackground()
         navBar.backgroundColor = navBgColor
         navBar.shadowColor = UIColor(AppColors.navBorder)
-        let titleFont = UIFont(name: "BarlowCondensed-Black", size: 19)
+        let titleFont = UIFont(name: "Industry-Bold", size: 19)
             ?? UIFont.systemFont(ofSize: 19, weight: .black)
-        let largeTitleFont = UIFont(name: "BarlowCondensed-Black", size: 28)
+        let largeTitleFont = UIFont(name: "Industry-Bold", size: 28)
             ?? UIFont.systemFont(ofSize: 28, weight: .black)
         navBar.titleTextAttributes = [.foregroundColor: UIColor.white, .font: titleFont]
         navBar.largeTitleTextAttributes = [.foregroundColor: UIColor.white, .font: largeTitleFont]

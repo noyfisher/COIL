@@ -464,7 +464,7 @@ struct ProgressTabContent: View {
                 .cornerRadius(AppCorners.small)
 
             Text(value)
-                .font(Font.custom("BarlowCondensed-Black", size: 26))
+                .font(Font.custom("Industry-Bold", size: 26))
                 .foregroundColor(AppColors.primaryText)
 
             Text(label)
@@ -508,7 +508,7 @@ struct ProgressTabContent: View {
                     .foregroundColor(AppColors.accent)
                     .font(.system(size: 16, weight: .semibold))
                 Text("Time for a Re-Assessment?")
-                    .font(Font.custom("BarlowCondensed-Black", size: 16))
+                    .font(Font.custom("Industry-Bold", size: 16))
                     .foregroundColor(AppColors.primaryText)
                 Spacer()
             }

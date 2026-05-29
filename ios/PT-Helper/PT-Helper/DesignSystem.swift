@@ -8,7 +8,7 @@ extension Notification.Name {
 }
 
 // MARK: - Design Tokens (MVVC Rebrand)
-// Colors from mvvc-design-system.js. Add BarlowCondensed-* and Inter-* font files
+// Colors from mvvc-design-system.js. Add Industry-Bold.otf and Inter-* font files
 // to the Xcode project and register them in Info.plist under UIAppFonts to activate
 // the custom typography. SwiftUI falls back to system sans-serif until then.
 
@@ -137,19 +137,19 @@ enum AppCorners {
 }
 
 // MARK: - Typography
-// Barlow Condensed (Black/ExtraBold/Bold) for headings; Inter (Regular/Medium/SemiBold) for body.
+// Industry Bold for headings; Inter (Regular/Medium/SemiBold) for body.
 // Custom font files must be added to Xcode and registered in Info.plist under UIAppFonts.
 
 enum AppFonts {
-    // MARK: Headings — Barlow Condensed
-    static let display      = Font.custom("BarlowCondensed-Black",     size: 36) // large stat/hero number
-    static let heroTitle    = Font.custom("BarlowCondensed-Black",     size: 28)
-    static let title        = Font.custom("BarlowCondensed-Black",     size: 24)
-    static let sectionTitle = Font.custom("BarlowCondensed-Black",     size: 20)
-    static let cardTitle    = Font.custom("BarlowCondensed-Bold",      size: 14)
-    static let statNumber   = Font.custom("BarlowCondensed-Black",     size: 28)
-    static let badge        = Font.custom("BarlowCondensed-Bold",      size: 10)
-    static let fieldLabel   = Font.custom("BarlowCondensed-Black",     size: 11) // uppercase field labels
+    // MARK: Headings — Industry Bold
+    static let display      = Font.custom("Industry-Bold", size: 36) // large stat/hero number
+    static let heroTitle    = Font.custom("Industry-Bold", size: 28)
+    static let title        = Font.custom("Industry-Bold", size: 24)
+    static let sectionTitle = Font.custom("Industry-Bold", size: 20)
+    static let cardTitle    = Font.custom("Industry-Bold", size: 14)
+    static let statNumber   = Font.custom("Industry-Bold", size: 28)
+    static let badge        = Font.custom("Industry-Bold", size: 10)
+    static let fieldLabel   = Font.custom("Industry-Bold", size: 11) // uppercase field labels
 
     // MARK: Body — Inter
     static let body         = Font.custom("Inter-Regular",  size: 14)
@@ -260,7 +260,7 @@ struct PrimaryButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Font.custom("BarlowCondensed-ExtraBold", size: 15))
+            .font(Font.custom("Industry-Bold", size: 15))
             .textCase(.uppercase)
             .kerning(1.2)
             .foregroundColor(.white)
@@ -278,7 +278,7 @@ struct PrimaryButtonStyle: ButtonStyle {
 struct SecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Font.custom("BarlowCondensed-Bold", size: 14))
+            .font(Font.custom("Industry-Bold", size: 14))
             .textCase(.uppercase)
             .kerning(1.0)
             .foregroundColor(AppColors.accent)

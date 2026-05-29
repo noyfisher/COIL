@@ -243,7 +243,7 @@ private struct IntroFastTrack: View {
                     // Hero text block
                     VStack(spacing: 0) {
                         Text("FAST TRACK\nTO PERFORMANCE")
-                            .font(Font.custom("BarlowCondensed-Black", size: 38))
+                            .font(Font.custom("Industry-Bold", size: 38))
                             .italic()
                             .multilineTextAlignment(.center)
                             .foregroundColor(AppColors.accent)
@@ -322,7 +322,7 @@ private struct IntroStartJourney: View {
 
                     // Headline
                     Text("START YOUR\nJOURNEY")
-                        .font(Font.custom("BarlowCondensed-Black", size: 52))
+                        .font(Font.custom("Industry-Bold", size: 52))
                         .italic()
                         .multilineTextAlignment(.center)
                         .foregroundColor(AppColors.accent)

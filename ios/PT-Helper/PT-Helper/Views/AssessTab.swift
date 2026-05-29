@@ -143,7 +143,7 @@ struct AssessTab: View {
 
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text(title)
-                        .font(Font.custom("BarlowCondensed-Black", size: 16))
+                        .font(Font.custom("Industry-Bold", size: 16))
                         .textCase(.uppercase)
                         .kerning(0.3)
                         .foregroundColor(.white)
@@ -187,7 +187,7 @@ struct AssessTab: View {
 
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text(title)
-                        .font(Font.custom("BarlowCondensed-Black", size: 16))
+                        .font(Font.custom("Industry-Bold", size: 16))
                         .textCase(.uppercase)
                         .kerning(0.3)
                         .foregroundColor(AppColors.primaryText)
