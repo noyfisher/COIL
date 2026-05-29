@@ -28,7 +28,7 @@ struct MyPlanTab: View {
                     planContent
                 }
             }
-            .navigationTitle("My Plan")
+            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .mvvcNavBar()
             .refreshable { savedPlansViewModel.fetchRehabPlans() }

@@ -142,7 +142,7 @@ struct ProgressTabContent: View {
         } message: {
             Text("Are you sure you want to delete this workout session? This cannot be undone.")
         }
-        .navigationTitle("Progress")
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {

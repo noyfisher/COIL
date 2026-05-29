@@ -236,6 +236,16 @@ struct MVVCNavBarModifier: ViewModifier {
             .toolbarBackground(AppColors.navBackground, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Image("MVVCLogoStacked")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 56)
+                        .clipped(antialiased: false)
+                        .fixedSize()
+                }
+            }
     }
 }
 

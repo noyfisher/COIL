@@ -114,7 +114,7 @@ struct AssessTab: View {
                     .padding(.bottom, AppSpacing.xxxl)
                 }
             }
-            .navigationTitle("Assess")
+            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .mvvcNavBar()
         }
