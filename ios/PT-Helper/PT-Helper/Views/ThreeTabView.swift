@@ -27,17 +27,23 @@ struct ThreeTabView: View {
 
             TabView(selection: $tabSelection.selectedTab) {
                 AssessTab()
-                    .tabItem { Label("Assess", systemImage: "stethoscope") }
+                    .tabItem {
+                        Label { Text("Assess") } icon: { Image(systemName: "stethoscope").font(.system(size: 19)) }
+                    }
                     .tag(0)
                     .id(tabSelection.assessNavigationId)
 
                 MyPlanTab()
-                    .tabItem { Label("My Plan", systemImage: "list.clipboard.fill") }
+                    .tabItem {
+                        Label { Text("My Plan") } icon: { Image(systemName: "list.clipboard.fill").font(.system(size: 19)) }
+                    }
                     .tag(1)
                     .id(tabSelection.myPlanNavigationId)
 
                 ProgressTab()
-                    .tabItem { Label("Progress", systemImage: "chart.line.uptrend.xyaxis") }
+                    .tabItem {
+                        Label { Text("Progress") } icon: { Image(systemName: "chart.line.uptrend.xyaxis").font(.system(size: 19)) }
+                    }
                     .tag(2)
                     .id(tabSelection.progressNavigationId)
             }
