@@ -39,18 +39,12 @@ struct LoginView: View {
             VStack(alignment: .leading, spacing: 0) {
                 Spacer().frame(height: AppSpacing.xxxl)
 
-                // MVVC wordmark + red rule
-                VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                    Text("MVVC")
-                        .font(Font.custom("BarlowCondensed-Black", size: 32))
-                        .foregroundColor(AppColors.textOnDark)
-                        .kerning(0.5)
-
-                    Rectangle()
-                        .fill(AppColors.accent)
-                        .frame(width: 40, height: 3)
-                }
-                .padding(.horizontal, AppSpacing.xxl)
+                // MVVC logo
+                Image("MVVCLogo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 260)
+                    .padding(.horizontal, AppSpacing.xxl)
 
                 Spacer()
 
