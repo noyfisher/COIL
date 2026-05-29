@@ -87,7 +87,7 @@ struct ProfileReviewStepView: View {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .foregroundColor(AppColors.warning)
                             Text("Failed to save profile. Please try again.")
-                                .font(Font.custom("Inter-Regular", size: 13))
+                                .font(AppFonts.small)
                                 .foregroundColor(Color.white.opacity(0.7))
                         }
                         .padding(AppSpacing.md)
@@ -194,12 +194,12 @@ struct ReviewRow: View {
         HStack {
             if !label.isEmpty {
                 Text(label)
-                    .font(Font.custom("Inter-Regular", size: 13))
+                    .font(AppFonts.small)
                     .foregroundColor(Color.white.opacity(0.45))
             }
             Spacer()
             Text(value)
-                .font(Font.custom("Inter-Medium", size: 13))
+                .font(AppFonts.smallMedium)
                 .foregroundColor(.white)
                 .multilineTextAlignment(.trailing)
         }

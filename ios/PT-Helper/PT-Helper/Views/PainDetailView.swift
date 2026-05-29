@@ -98,7 +98,7 @@ struct PainDetailView: View {
             HStack(alignment: .center) {
                 if viewModel.hasMultipleRegions {
                     Text("Region \(viewModel.currentRegionIndex + 1) of \(viewModel.totalRegions)")
-                        .font(.caption.weight(.semibold))
+                        .font(AppFonts.captionSemiBold)
                         .foregroundColor(AppColors.ctaText)
                         .padding(.horizontal, AppSpacing.md)
                         .padding(.vertical, AppSpacing.xs)
@@ -107,7 +107,7 @@ struct PainDetailView: View {
                 }
                 Spacer()
                 Text("\(currentStep + 1) / 8")
-                    .font(.subheadline.weight(.medium))
+                    .font(AppFonts.bodyMedium)
                     .foregroundColor(AppColors.secondaryText)
                     .accessibilityIdentifier("painDetail.stepIndicator")
             }
@@ -396,7 +396,7 @@ struct PainDetailView: View {
                     .foregroundColor(AppColors.secondaryText)
                 Spacer()
                 Text(painDescription)
-                    .font(.subheadline.weight(.semibold))
+                    .font(AppFonts.bodySemiBold)
                     .foregroundColor(painColor)
                     .padding(.horizontal, AppSpacing.md)
                     .padding(.vertical, AppSpacing.sm)
@@ -408,11 +408,11 @@ struct PainDetailView: View {
                 .padding(.vertical, AppSpacing.sm)
             HStack {
                 Text("Mild")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
                 Spacer()
                 Text("Severe")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
             }
         }

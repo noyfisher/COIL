@@ -70,7 +70,7 @@ struct FormAnalysisView: View {
                         .font(.system(.title2, design: .serif).weight(.bold))
 
                     Text("Record yourself performing this exercise and get AI-powered form feedback.")
-                        .font(.subheadline)
+                        .font(AppFonts.body)
                         .foregroundColor(AppColors.secondaryText)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, AppSpacing.lg)
@@ -155,7 +155,7 @@ struct FormAnalysisView: View {
                     .font(.system(.title3, design: .serif).weight(.bold))
 
                 Text("Detecting body pose and computing joint angles...")
-                    .font(.subheadline)
+                    .font(AppFonts.body)
                     .foregroundColor(AppColors.secondaryText)
                     .multilineTextAlignment(.center)
             }
@@ -180,7 +180,7 @@ struct FormAnalysisView: View {
                     .font(.system(.title3, design: .serif).weight(.bold))
 
                 Text("Our AI is reviewing your form metrics...")
-                    .font(.subheadline)
+                    .font(AppFonts.body)
                     .foregroundColor(AppColors.secondaryText)
             }
 
@@ -208,7 +208,7 @@ struct FormAnalysisView: View {
                             .foregroundColor(AppColors.ctaText)
                         ForEach(blockingWarnings.map { $0.message }, id: \.self) { msg in
                             Text(msg)
-                                .font(.subheadline)
+                                .font(AppFonts.body)
                                 .foregroundColor(AppColors.ctaText.opacity(0.9))
                         }
                     }
@@ -225,7 +225,7 @@ struct FormAnalysisView: View {
                         Text(validation.confidenceLevel == .insufficient
                             ? "Limited data available — results may not be reliable"
                             : "Data quality is below average — some feedback may be less accurate")
-                            .font(.caption)
+                            .font(AppFonts.caption)
                             .foregroundColor(AppColors.secondaryText)
                     }
                     .padding(AppSpacing.md)
@@ -260,10 +260,10 @@ struct FormAnalysisView: View {
                         ForEach(feedback.positivePoints, id: \.self) { point in
                             HStack(alignment: .top, spacing: AppSpacing.sm) {
                                 Image(systemName: "checkmark.circle.fill")
-                                    .font(.caption)
+                                    .font(AppFonts.caption)
                                     .foregroundColor(AppColors.success)
                                 Text(point)
-                                    .font(.subheadline)
+                                    .font(AppFonts.body)
                             }
                         }
                     }
@@ -283,10 +283,10 @@ struct FormAnalysisView: View {
                         ForEach(feedback.safetyNotes, id: \.self) { note in
                             HStack(alignment: .top, spacing: AppSpacing.sm) {
                                 Image(systemName: "exclamationmark.shield.fill")
-                                    .font(.caption)
+                                    .font(AppFonts.caption)
                                     .foregroundColor(AppColors.danger)
                                 Text(note)
-                                    .font(.subheadline)
+                                    .font(AppFonts.body)
                             }
                         }
                     }
@@ -335,7 +335,7 @@ struct FormAnalysisView: View {
                     .font(.system(.title3, design: .serif).weight(.bold))
 
                 Text(message)
-                    .font(.subheadline)
+                    .font(AppFonts.body)
                     .foregroundColor(AppColors.secondaryText)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.lg)
@@ -380,7 +380,7 @@ struct FormAnalysisView: View {
                     .frame(width: 120, height: 120)
                     .rotationEffect(.degrees(-90))
 
-                VStack(spacing: 2) {
+                VStack(spacing: AppSpacing.nano) {
                     Text("\(feedback.overallScore)")
                         .font(.system(size: 36, weight: .bold, design: .rounded))
                         .foregroundColor(scoreColor(feedback.verdict))
@@ -396,7 +396,7 @@ struct FormAnalysisView: View {
                 .foregroundColor(scoreColor(feedback.verdict))
 
             Text(exercise.name)
-                .font(.subheadline)
+                .font(AppFonts.body)
                 .foregroundColor(AppColors.secondaryText)
 
             // Confidence level indicator
@@ -405,7 +405,7 @@ struct FormAnalysisView: View {
                     .fill(confidenceLevelColor(confidenceLevel))
                     .frame(width: 8, height: 8)
                 Text(confidenceLevelText(confidenceLevel))
-                    .font(.caption2.weight(.medium))
+                    .font(AppFonts.captionMedium)
                     .foregroundColor(AppColors.secondaryText)
             }
         }
@@ -420,16 +420,16 @@ struct FormAnalysisView: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             HStack {
                 Image(systemName: bodyPartIcon(correction.bodyPart))
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(severityColor(correction.severity))
 
                 Text(correction.bodyPart.capitalized)
-                    .font(.subheadline.weight(.semibold))
+                    .font(AppFonts.bodySemiBold)
 
                 Spacer()
 
                 Text(correction.severity.rawValue.capitalized)
-                    .font(.caption2.weight(.medium))
+                    .font(AppFonts.captionMedium)
                     .foregroundColor(severityColor(correction.severity))
                     .padding(.horizontal, AppSpacing.sm)
                     .padding(.vertical, 2)
@@ -438,7 +438,7 @@ struct FormAnalysisView: View {
             }
 
             Text(correction.issue)
-                .font(.subheadline)
+                .font(AppFonts.body)
                 .foregroundColor(AppColors.primaryText)
 
             HStack(alignment: .top, spacing: AppSpacing.xs) {
@@ -446,7 +446,7 @@ struct FormAnalysisView: View {
                     .font(.caption2)
                     .foregroundColor(AppColors.accent)
                 Text(correction.howToFix)
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
             }
 
@@ -470,11 +470,11 @@ struct FormAnalysisView: View {
     private func tipRow(icon: String, text: String) -> some View {
         HStack(alignment: .top, spacing: AppSpacing.sm) {
             Image(systemName: icon)
-                .font(.caption)
+                .font(AppFonts.caption)
                 .foregroundColor(AppColors.accent)
                 .frame(width: 20)
             Text(text)
-                .font(.subheadline)
+                .font(AppFonts.body)
                 .foregroundColor(AppColors.secondaryText)
         }
     }

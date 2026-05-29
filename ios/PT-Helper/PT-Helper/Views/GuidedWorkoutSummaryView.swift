@@ -28,7 +28,7 @@ struct GuidedWorkoutSummaryView: View {
                         Image(systemName: "lightbulb.fill")
                             .foregroundColor(.yellow)
                         Text(insight)
-                            .font(.caption)
+                            .font(AppFonts.caption)
                             .foregroundColor(AppColors.secondaryText)
                     }
                     .padding(AppSpacing.md)
@@ -155,7 +155,7 @@ struct GuidedWorkoutSummaryView: View {
                 .foregroundColor(AppColors.primaryText)
 
             Text(vm.plan.planName)
-                .font(.subheadline)
+                .font(AppFonts.body)
                 .foregroundColor(AppColors.secondaryText)
         }
         .frame(maxWidth: .infinity)

@@ -190,7 +190,7 @@ struct SettingsView: View {
                                     .background(AppColors.accentTint)
                                     .cornerRadius(AppCorners.small)
 
-                                VStack(alignment: .leading, spacing: 2) {
+                                VStack(alignment: .leading, spacing: AppSpacing.nano) {
                                     Text("Session Events")
                                         .font(.body)
                                     Text("\(SessionLogger.shared.eventCount) events this session")
@@ -354,7 +354,7 @@ struct SettingsView: View {
                                 .scaleEffect(1.3)
                                 .tint(AppColors.ctaText)
                             Text("Deleting account...")
-                                .font(.subheadline)
+                                .font(AppFonts.body)
                                 .foregroundColor(AppColors.primaryText)
                         }
                         .padding(AppSpacing.xxl)

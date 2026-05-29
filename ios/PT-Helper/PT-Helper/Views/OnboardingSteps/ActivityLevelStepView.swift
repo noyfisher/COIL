@@ -27,10 +27,10 @@ struct ActivityLevelStepView: View {
 
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(level)
-                                    .font(Font.custom("Inter-SemiBold", size: 14))
+                                    .font(AppFonts.bodySemiBold)
                                     .foregroundColor(.white)
                                 Text(subtitle)
-                                    .font(Font.custom("Inter-Regular", size: 12))
+                                    .font(AppFonts.caption)
                                     .foregroundColor(Color.white.opacity(isSelected ? 0.65 : 0.45))
                             }
 

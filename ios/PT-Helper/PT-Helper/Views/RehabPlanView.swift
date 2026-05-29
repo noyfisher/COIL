@@ -51,7 +51,7 @@ struct RehabPlanView: View {
                 errorView(error)
             } else if let plan = viewModel.rehabPlan {
                 ScrollView {
-                    VStack(spacing: 16) {
+                    VStack(spacing: AppSpacing.lg) {
                         // Safety warnings from validation pipeline
                         if !viewModel.rehabPlanWarnings.isEmpty {
                             rehabWarningsBanner
@@ -102,7 +102,7 @@ struct RehabPlanView: View {
                                     Image(systemName: "chart.bar.xaxis")
                                     Text("View Progress Comparison")
                                 }
-                                .font(.subheadline.weight(.medium))
+                                .font(AppFonts.bodyMedium)
                                 .foregroundColor(AppColors.accent)
                                 .padding(AppSpacing.md)
                                 .frame(maxWidth: .infinity)
@@ -357,7 +357,7 @@ struct RehabPlanView: View {
                     .font(.system(.title2, design: .serif).weight(.bold))
 
                 Text("Creating a personalized exercise program based on your conditions and fitness level...")
-                    .font(.subheadline)
+                    .font(AppFonts.body)
                     .foregroundColor(AppColors.secondaryText)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.xl)
@@ -388,7 +388,7 @@ struct RehabPlanView: View {
                     .font(.system(.title3, design: .serif).weight(.bold))
 
                 Text(message)
-                    .font(.subheadline)
+                    .font(AppFonts.body)
                     .foregroundColor(AppColors.secondaryText)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.lg)
@@ -417,16 +417,16 @@ struct RehabPlanView: View {
 
     private func planHeader(plan: RehabPlan) -> some View {
         CardSection(icon: "calendar", color: AppColors.accent, title: plan.planName) {
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 Text("Conditions: \(plan.conditions.joined(separator: ", "))")
-                    .font(.subheadline)
+                    .font(AppFonts.body)
                     .foregroundColor(AppColors.secondaryText)
                 Text("Duration: \(plan.totalWeeks) weeks")
-                    .font(.subheadline)
+                    .font(AppFonts.body)
                     .foregroundColor(AppColors.secondaryText)
                 HStack {
                     Text("Start Date:")
-                        .font(.subheadline)
+                        .font(AppFonts.body)
                         .foregroundColor(AppColors.secondaryText)
                     DatePicker("", selection: Binding(
                         get: { viewModel.rehabPlan?.createdDate ?? Date() },
@@ -476,7 +476,7 @@ struct RehabPlanView: View {
                                     .foregroundColor(AppColors.accent)
                             } else {
                                 Text("-")
-                                    .font(.caption)
+                                    .font(AppFonts.caption)
                                     .foregroundColor(Color(.systemGray4))
                             }
                         }
@@ -512,7 +512,7 @@ struct RehabPlanView: View {
     }
 
     private func exerciseList(for plan: RehabPlan) -> some View {
-        VStack(spacing: 16) {
+        VStack(spacing: AppSpacing.lg) {
             // Verification summary banner (only show if verification has been performed)
             if !viewModel.exerciseVerifications.isEmpty {
                 verificationSummaryBanner
@@ -541,7 +541,7 @@ struct RehabPlanView: View {
             ExerciseImageView(exercise: exercise, isCompact: true)
 
             // Exercise info
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: AppSpacing.tight) {
                 HStack(spacing: AppSpacing.xs) {
                     Text(exercise.name)
                         .font(.body.weight(.semibold))
@@ -557,7 +557,7 @@ struct RehabPlanView: View {
                 }
 
                 Text("Target: \(exercise.targetArea)")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
 
                 // Position preview teaser
@@ -571,7 +571,7 @@ struct RehabPlanView: View {
 
                 HStack(spacing: AppSpacing.sm) {
                     Text("\(exercise.sets) sets \u{00D7} \(exercise.reps)")
-                        .font(.caption.weight(.medium))
+                        .font(AppFonts.captionMedium)
                         .foregroundColor(AppColors.secondaryText)
 
                     Spacer()
@@ -602,7 +602,7 @@ struct RehabPlanView: View {
                         showSwapSheet = true
                     }) {
                         Image(systemName: "arrow.triangle.2.circlepath")
-                            .font(.caption)
+                            .font(AppFonts.caption)
                             .foregroundColor(AppColors.accent)
                             .frame(width: 28, height: 28)
                             .background(AppColors.accentTint)
@@ -648,7 +648,7 @@ struct RehabPlanView: View {
                 .font(.caption2.weight(.medium))
                 .foregroundColor(AppColors.mutedText)
         case .checking:
-            HStack(spacing: 4) {
+            HStack(spacing: AppSpacing.xs) {
                 ProgressView()
                     .scaleEffect(0.6)
                 Text("Checking...")
@@ -662,11 +662,11 @@ struct RehabPlanView: View {
         HStack(spacing: AppSpacing.sm) {
             Image(systemName: viewModel.isVerifyingUnknowns ? "arrow.triangle.2.circlepath" : "checkmark.shield")
                 .foregroundColor(viewModel.flaggedCount > 0 ? AppColors.warning : AppColors.success)
-                .font(.subheadline)
+                .font(AppFonts.body)
 
             if viewModel.isVerifyingUnknowns {
                 Text("Verifying exercises...")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
                 ProgressView()
                     .scaleEffect(0.7)
@@ -677,11 +677,11 @@ struct RehabPlanView: View {
 
                 if flagged > 0 {
                     Text("\(verified) of \(total) verified \u{2022} \(flagged) flagged for review")
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                 } else {
                     Text("\(verified) of \(total) exercises verified")
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                 }
             }
@@ -703,7 +703,7 @@ struct RehabPlanView: View {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundColor(AppColors.warning)
                     Text("Failed to save: \(error)")
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                         .lineLimit(2)
                 }
@@ -720,7 +720,7 @@ struct RehabPlanView: View {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(AppColors.success)
                     Text("Plan saved successfully!")
-                        .font(.subheadline.weight(.medium))
+                        .font(AppFonts.bodyMedium)
                         .foregroundColor(AppColors.success)
                 }
             } else {
@@ -746,7 +746,7 @@ struct RehabPlanView: View {
     }
 
     private var rehabWarningsBanner: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
             // High-priority (.serious, .urgent, .emergency) — rendered as the red safety notice.
             // `.emergency` is normally caught by navigation before the plan ever shows, but we
             // keep it in this filter defensively.
@@ -755,33 +755,33 @@ struct RehabPlanView: View {
             let hasHighPriority = !highPriorityWarnings.isEmpty
 
             if hasHighPriority {
-                HStack(spacing: 8) {
+                HStack(spacing: AppSpacing.sm) {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundColor(AppColors.ctaText)
                     Text("Safety Notice")
-                        .font(.subheadline.weight(.semibold))
+                        .font(AppFonts.bodySemiBold)
                         .foregroundColor(AppColors.ctaText)
                 }
                 ForEach(Array(highPriorityWarnings.enumerated()), id: \.offset) { _, warning in
                     Text("• \(warning.message)")
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.ctaText.opacity(0.95))
                 }
             }
 
             if !cautionWarnings.isEmpty {
                 if !hasHighPriority {
-                    HStack(spacing: 8) {
+                    HStack(spacing: AppSpacing.sm) {
                         Image(systemName: "exclamationmark.circle.fill")
                             .foregroundColor(AppColors.warning)
                         Text("Things to Keep in Mind")
-                            .font(.subheadline.weight(.semibold))
+                            .font(AppFonts.bodySemiBold)
                             .foregroundColor(.primary)
                     }
                 }
                 ForEach(Array(cautionWarnings.enumerated()), id: \.offset) { _, warning in
                     Text("• \(warning.message)")
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(hasHighPriority ? .white.opacity(0.9) : .secondary)
                 }
             }
@@ -849,7 +849,7 @@ struct RehabPlanView: View {
                 Spacer()
                 if let note = ProgressionRule.progressionNote(week: week, totalWeeks: totalWeeks) {
                     Text(note)
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                 }
             }
@@ -883,10 +883,10 @@ struct RehabPlanView: View {
             HStack(spacing: AppSpacing.sm) {
                 Image(systemName: "flag.fill")
                 Text("Start This Plan")
-                    .font(.subheadline.weight(.semibold))
+                    .font(AppFonts.bodySemiBold)
                 Spacer()
                 Text("Track your weekly progress")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.primaryText.opacity(0.7))
             }
             .foregroundColor(AppColors.primaryText)

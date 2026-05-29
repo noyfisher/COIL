@@ -16,7 +16,7 @@ struct AnalysisResultView: View {
         ZStack {
             AppColors.bgGradient.ignoresSafeArea()
             ScrollView {
-                VStack(spacing: 16) {
+                VStack(spacing: AppSpacing.lg) {
                     // App-detected red flags (from validation pipeline)
                     if !redFlagAlerts.isEmpty {
                         appRedFlagAlert
@@ -68,11 +68,11 @@ struct AnalysisResultView: View {
     // MARK: - Disclaimer
 
     private var disclaimerBanner: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: AppSpacing.comfortable) {
             Image(systemName: "info.circle.fill")
                 .foregroundColor(AppColors.accent)
             Text(analysisResult.disclaimerText)
-                .font(.caption)
+                .font(AppFonts.caption)
                 .foregroundColor(AppColors.secondaryText)
         }
         .padding()
@@ -83,17 +83,17 @@ struct AnalysisResultView: View {
     // MARK: - Validation Caution Banner
 
     private var validationCautionBanner: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            HStack(spacing: AppSpacing.sm) {
                 Image(systemName: "exclamationmark.circle.fill")
                     .foregroundColor(AppColors.warning)
                 Text("Things to Keep in Mind")
-                    .font(.subheadline.weight(.semibold))
+                    .font(AppFonts.bodySemiBold)
                     .foregroundColor(AppColors.primaryText)
             }
             ForEach(Array(cautionWarnings.enumerated()), id: \.offset) { _, warning in
                 Text("• \(warning.message)")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
             }
         }
@@ -140,12 +140,12 @@ struct AnalysisResultView: View {
                 }) {
                     VStack(alignment: .leading, spacing: AppSpacing.sm) {
                         HStack {
-                            VStack(alignment: .leading, spacing: 2) {
+                            VStack(alignment: .leading, spacing: AppSpacing.nano) {
                                 Text(condition.commonName)
                                     .font(AppFonts.sectionTitle)
                                     .foregroundColor(AppColors.primaryText)
                                 Text(condition.conditionName)
-                                    .font(.caption)
+                                    .font(AppFonts.caption)
                                     .foregroundColor(AppColors.secondaryText)
                             }
                             Spacer()
@@ -158,7 +158,7 @@ struct AnalysisResultView: View {
                         HStack(spacing: AppSpacing.sm) {
                             matchStrengthDots(strength)
                             Text(strength.rawValue)
-                                .font(.caption.weight(.medium))
+                                .font(AppFonts.captionMedium)
                                 .foregroundColor(matchColor(strength))
 
                             Button(action: { showConfidenceInfo = true }) {
@@ -177,11 +177,11 @@ struct AnalysisResultView: View {
 
                         // Red flag inline warning
                         if condition.isRedFlag {
-                            HStack(spacing: 6) {
+                            HStack(spacing: AppSpacing.tight) {
                                 Image(systemName: "exclamationmark.triangle.fill")
                                     .font(.caption)
                                 Text(condition.redFlagMessage ?? "Seek immediate medical attention")
-                                    .font(.caption.weight(.medium))
+                                    .font(AppFonts.captionMedium)
                             }
                             .foregroundColor(AppColors.ctaText)
                             .padding(AppSpacing.sm)
@@ -213,10 +213,10 @@ struct AnalysisResultView: View {
                         // What's happening
                         VStack(alignment: .leading, spacing: AppSpacing.sm) {
                             Label("What's happening", systemImage: "figure.stand")
-                                .font(.subheadline.weight(.semibold))
+                                .font(AppFonts.bodySemiBold)
                                 .foregroundColor(AppColors.accent)
                             Text(condition.whatItMeans)
-                                .font(.subheadline)
+                                .font(AppFonts.body)
                                 .foregroundColor(AppColors.secondaryText)
                                 .lineSpacing(3)
                         }
@@ -225,16 +225,16 @@ struct AnalysisResultView: View {
                         // Next steps
                         VStack(alignment: .leading, spacing: AppSpacing.sm) {
                             Label("Suggested next steps", systemImage: "list.number")
-                                .font(.subheadline.weight(.semibold))
+                                .font(AppFonts.bodySemiBold)
                                 .foregroundColor(AppColors.accent)
                             ForEach(Array(condition.nextSteps.enumerated()), id: \.offset) { index, step in
                                 HStack(alignment: .top, spacing: AppSpacing.sm) {
                                     Text("\(index + 1).")
-                                        .font(.subheadline.weight(.semibold))
+                                        .font(AppFonts.bodySemiBold)
                                         .foregroundColor(AppColors.accent)
                                         .frame(width: 20, alignment: .leading)
                                     Text(step)
-                                        .font(.subheadline)
+                                        .font(AppFonts.body)
                                         .foregroundColor(AppColors.secondaryText)
                                 }
                             }
@@ -252,7 +252,7 @@ struct AnalysisResultView: View {
     }
 
     private func matchStrengthDots(_ strength: MatchStrength) -> some View {
-        HStack(spacing: 4) {
+        HStack(spacing: AppSpacing.xs) {
             ForEach(0..<3, id: \.self) { index in
                 Circle()
                     .fill(dotColor(for: index, strength: strength))
@@ -282,12 +282,12 @@ struct AnalysisResultView: View {
     // MARK: - App-Detected Red Flag Alert
 
     private var appRedFlagAlert: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 10) {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            HStack(spacing: AppSpacing.comfortable) {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.title2)
                     .foregroundColor(AppColors.ctaText)
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: AppSpacing.nano) {
                     Text("Important Safety Notice")
                         .font(.headline)
                         .foregroundColor(AppColors.ctaText)
@@ -299,7 +299,7 @@ struct AnalysisResultView: View {
             }
             ForEach(Array(redFlagAlerts.enumerated()), id: \.offset) { _, alert in
                 Text(alert.message)
-                    .font(.subheadline)
+                    .font(AppFonts.body)
                     .foregroundColor(AppColors.ctaText.opacity(0.95))
             }
         }
@@ -311,12 +311,12 @@ struct AnalysisResultView: View {
     // MARK: - AI-Detected Red Flag Alert
 
     private var aiRedFlagAlert: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 10) {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            HStack(spacing: AppSpacing.comfortable) {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.title2)
                     .foregroundColor(AppColors.ctaText)
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: AppSpacing.nano) {
                     Text("Please Read This Carefully")
                         .font(.headline)
                         .foregroundColor(AppColors.ctaText)
@@ -328,7 +328,7 @@ struct AnalysisResultView: View {
             }
             ForEach(analysisResult.conditions.filter({ $0.isRedFlag })) { condition in
                 Text(condition.redFlagMessage ?? "")
-                    .font(.subheadline)
+                    .font(AppFonts.body)
                     .foregroundColor(AppColors.ctaText.opacity(0.95))
             }
         }

@@ -48,7 +48,7 @@ struct WellnessResultView: View {
             Image(systemName: "info.circle.fill")
                 .foregroundColor(AppColors.accent)
             Text(viewModel.analysisResult?.disclaimerText ?? "This is educational wellness guidance — not a medical diagnosis or treatment plan.")
-                .font(.caption)
+                .font(AppFonts.caption)
                 .foregroundColor(AppColors.secondaryText)
         }
         .padding(AppSpacing.md)
@@ -103,7 +103,7 @@ struct WellnessResultView: View {
 
                         HStack(spacing: AppSpacing.sm) {
                             Text(rec.priorityLevel.capitalized)
-                                .font(.caption.weight(.medium))
+                                .font(AppFonts.captionMedium)
                                 .foregroundColor(priorityColor)
                                 .padding(.horizontal, AppSpacing.sm)
                                 .padding(.vertical, 2)
@@ -112,7 +112,7 @@ struct WellnessResultView: View {
 
                             if let category = GoalCategory(rawValue: rec.goalCategory) {
                                 Image(systemName: category.icon)
-                                    .font(.caption)
+                                    .font(AppFonts.caption)
                                     .foregroundColor(category.color)
                             }
                         }
@@ -133,24 +133,24 @@ struct WellnessResultView: View {
                             // Current state
                             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                                 Label("Where you are now", systemImage: "location.fill")
-                                    .font(.subheadline.weight(.semibold))
+                                    .font(AppFonts.bodySemiBold)
                                     .foregroundColor(AppColors.accent)
                                 Text(rec.currentStateAssessment)
-                                    .font(.subheadline)
+                                    .font(AppFonts.body)
                             }
 
                             // Root causes
                             if !rec.rootCauses.isEmpty {
                                 VStack(alignment: .leading, spacing: AppSpacing.sm) {
                                     Label("Likely root causes", systemImage: "magnifyingglass")
-                                        .font(.subheadline.weight(.semibold))
+                                        .font(AppFonts.bodySemiBold)
                                         .foregroundColor(AppColors.warning)
                                     ForEach(rec.rootCauses, id: \.self) { cause in
                                         HStack(alignment: .top, spacing: AppSpacing.sm) {
                                             Text("•")
-                                                .font(.subheadline.weight(.semibold))
+                                                .font(AppFonts.bodySemiBold)
                                             Text(cause)
-                                                .font(.subheadline)
+                                                .font(AppFonts.body)
                                         }
                                     }
                                 }
@@ -161,7 +161,7 @@ struct WellnessResultView: View {
                                 Image(systemName: "lightbulb.fill")
                                     .foregroundColor(.yellow)
                                 Text(rec.keyInsight)
-                                    .font(.subheadline.weight(.medium))
+                                    .font(AppFonts.bodyMedium)
                             }
                             .padding(AppSpacing.md)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -173,7 +173,7 @@ struct WellnessResultView: View {
                                 Image(systemName: "calendar.badge.clock")
                                     .foregroundColor(AppColors.accent)
                                 Text(rec.expectedTimeline)
-                                    .font(.subheadline)
+                                    .font(AppFonts.body)
                                     .foregroundColor(AppColors.secondaryText)
                             }
 
@@ -181,12 +181,12 @@ struct WellnessResultView: View {
                             if !rec.relatedGoals.isEmpty {
                                 VStack(alignment: .leading, spacing: AppSpacing.sm) {
                                     Text("Related goals")
-                                        .font(.caption.weight(.medium))
+                                        .font(AppFonts.captionMedium)
                                         .foregroundColor(AppColors.secondaryText)
                                     FlowLayout(spacing: AppSpacing.sm) {
                                         ForEach(rec.relatedGoals, id: \.self) { goal in
                                             Text(goal)
-                                                .font(.caption)
+                                                .font(AppFonts.caption)
                                                 .padding(.horizontal, AppSpacing.sm)
                                                 .padding(.vertical, 4)
                                                 .background(AppColors.accentTint)

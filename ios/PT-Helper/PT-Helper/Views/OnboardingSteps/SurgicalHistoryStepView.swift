@@ -19,7 +19,7 @@ struct SurgicalHistoryStepView: View {
                             .font(Font.custom("Inter-Medium", size: 15))
                             .foregroundColor(.white)
                         Text(viewModel.userProfile.surgeries.isEmpty ? "Tap + to add" : "\(viewModel.userProfile.surgeries.count) recorded")
-                            .font(Font.custom("Inter-Regular", size: 12))
+                            .font(AppFonts.caption)
                             .foregroundColor(OnboardingColors.muted)
                     }
                     Spacer()
@@ -106,7 +106,7 @@ struct SurgicalHistoryStepView: View {
     private func yearPickerRow(index: Int) -> some View {
         HStack {
             Text("Year")
-                .font(Font.custom("Inter-Regular", size: 14))
+                .font(AppFonts.body)
                 .foregroundColor(OnboardingColors.muted)
             Spacer()
             Picker("Year", selection: Binding(
@@ -128,7 +128,7 @@ struct SurgicalHistoryStepView: View {
     private func recoveryStatusRow(index: Int) -> some View {
         VStack(alignment: .leading, spacing: AppSpacing.xs) {
             Text("Recovery Status")
-                .font(Font.custom("Inter-Regular", size: 12))
+                .font(AppFonts.caption)
                 .foregroundColor(OnboardingColors.muted)
             HStack(spacing: AppSpacing.sm) {
                 ForEach(["Fully recovered", "Still recovering", "Have restrictions"], id: \.self) { status in
@@ -172,7 +172,7 @@ struct SurgicalHistoryStepView: View {
     private func hardwareRow(index: Int) -> some View {
         VStack(alignment: .leading, spacing: AppSpacing.xs) {
             Text("Did surgery leave pins, screws, or plates?")
-                .font(Font.custom("Inter-Regular", size: 12))
+                .font(AppFonts.caption)
                 .foregroundColor(OnboardingColors.muted)
             HStack(spacing: AppSpacing.sm) {
                 ForEach(["Yes", "No", "Not Sure"], id: \.self) { option in

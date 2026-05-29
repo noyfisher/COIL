@@ -83,10 +83,10 @@ struct HomeTab: View {
                                             .font(.system(size: 14))
                                             .foregroundColor(.purple)
                                         Text("Complete \(3 - recentCount) more workout\(3 - recentCount == 1 ? "" : "s") to unlock AI Recovery Insights")
-                                            .font(.caption)
+                                            .font(AppFonts.caption)
                                             .foregroundColor(AppColors.secondaryText)
                                         Spacer()
-                                        HStack(spacing: 4) {
+                                        HStack(spacing: AppSpacing.xs) {
                                             ForEach(0..<3, id: \.self) { i in
                                                 Circle()
                                                     .fill(i < recentCount ? Color.purple : Color(.systemGray4))
@@ -179,7 +179,7 @@ struct HomeTab: View {
     private var heroGreeting: some View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text(greetingText)
-                .font(.subheadline)
+                .font(AppFonts.body)
                 .foregroundColor(AppColors.ctaText.opacity(0.8))
             Text(profileName.isEmpty ? "Welcome!" : "Hi, \(profileName)!")
                 .font(AppFonts.heroTitle)
@@ -274,7 +274,7 @@ struct HomeTab: View {
                 Button("See All") {
                     tabSelection.selectedTab = 2
                 }
-                .font(.caption.weight(.medium))
+                .font(AppFonts.captionMedium)
                 .foregroundColor(.blue)
             }
 
@@ -286,13 +286,13 @@ struct HomeTab: View {
                                 .font(AppFonts.cardTitle)
                                 .foregroundColor(AppColors.primaryText)
                             Text("\(plan.exercises.count) exercises")
-                                .font(.caption)
+                                .font(AppFonts.caption)
                                 .foregroundColor(AppColors.secondaryText)
                         }
                         Spacer()
                         Image(systemName: "chevron.right")
                             .font(.system(size: 12, weight: .semibold))
-                            .foregroundColor(.gray)
+                            .foregroundColor(AppColors.mutedText)
                     }
                     .padding(AppSpacing.lg)
                     .background(AppColors.cardBackground)
@@ -349,7 +349,7 @@ struct OnboardingEditView: View {
                         Button(action: { dismiss() }) {
                             Image(systemName: "xmark.circle.fill")
                                 .font(.title2)
-                                .foregroundColor(.gray)
+                                .foregroundColor(AppColors.mutedText)
                         }
                         Spacer()
                         Text("Update Profile")
@@ -366,7 +366,7 @@ struct OnboardingEditView: View {
                     // Step indicator
                     VStack(spacing: AppSpacing.lg) {
                         Text("Step \(viewModel.currentStep) of 6")
-                            .font(.caption)
+                            .font(AppFonts.caption)
                             .fontWeight(.semibold)
                             .foregroundColor(AppColors.ctaText)
                             .padding(.horizontal, AppSpacing.md)
@@ -374,7 +374,7 @@ struct OnboardingEditView: View {
                             .background(AppColors.accent)
                             .clipShape(Capsule())
 
-                        HStack(spacing: 6) {
+                        HStack(spacing: AppSpacing.tight) {
                             ForEach(1...6, id: \.self) { step in
                                 Capsule()
                                     .fill(step <= viewModel.currentStep ? AppColors.accent : AppColors.elevatedSurface)
@@ -389,7 +389,7 @@ struct OnboardingEditView: View {
                             .fontWeight(.bold)
 
                         Text(stepSubtitle)
-                            .font(.subheadline)
+                            .font(AppFonts.body)
                             .foregroundColor(AppColors.secondaryText)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 32)

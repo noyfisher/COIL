@@ -139,7 +139,7 @@ extension PainDetailView {
                         .foregroundColor(AppColors.primaryText)
                     if let region = viewModel.currentRegion {
                         Text(region.name)
-                            .font(Font.custom("Inter-Regular", size: 13))
+                            .font(AppFonts.small)
                             .foregroundColor(AppColors.secondaryText)
                     }
                 }
@@ -175,7 +175,7 @@ extension PainDetailView {
                 CardSection(icon: "note.text", color: AppColors.secondaryText, title: "Additional Notes") {
                     VStack(alignment: .leading, spacing: AppSpacing.sm) {
                         Text("Optional — anything else you'd like to add")
-                            .font(.caption)
+                            .font(AppFonts.caption)
                             .foregroundColor(AppColors.secondaryText)
                         TextField(
                             "",
@@ -197,7 +197,7 @@ extension PainDetailView {
                             Image(systemName: "doc.on.doc")
                             Text("Apply to All \(viewModel.totalRegions) Regions & Analyze")
                         }
-                        .font(.subheadline.weight(.semibold))
+                        .font(AppFonts.bodySemiBold)
                         .foregroundColor(AppColors.ctaText)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, AppSpacing.md)
@@ -372,7 +372,7 @@ extension PainDetailView {
                 .fixedSize(horizontal: false, vertical: true)
             if let hint {
                 Text(hint)
-                    .font(Font.custom("Inter-Regular", size: 13))
+                    .font(AppFonts.small)
                     .foregroundColor(AppColors.secondaryText)
             }
         }
@@ -383,11 +383,11 @@ extension PainDetailView {
     func summaryRow(label: String, value: String, valueColor: Color = AppColors.primaryText) -> some View {
         HStack(alignment: .top, spacing: AppSpacing.sm) {
             Text(label)
-                .font(.caption.weight(.semibold))
+                .font(AppFonts.captionSemiBold)
                 .foregroundColor(AppColors.secondaryText)
                 .frame(width: 90, alignment: .leading)
             Text(value.isEmpty ? "—" : value)
-                .font(.subheadline)
+                .font(AppFonts.body)
                 .foregroundColor(valueColor)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -396,18 +396,18 @@ extension PainDetailView {
     func summaryChipsRow(label: String, values: [String]) -> some View {
         HStack(alignment: .top, spacing: AppSpacing.sm) {
             Text(label)
-                .font(.caption.weight(.semibold))
+                .font(AppFonts.captionSemiBold)
                 .foregroundColor(AppColors.secondaryText)
                 .frame(width: 90, alignment: .leading)
             if values.isEmpty {
                 Text("—")
-                    .font(.subheadline)
+                    .font(AppFonts.body)
                     .foregroundColor(AppColors.primaryText)
             } else {
                 FlowLayout(spacing: AppSpacing.xs) {
                     ForEach(values, id: \.self) { value in
                         Text(value)
-                            .font(.caption.weight(.medium))
+                            .font(AppFonts.captionMedium)
                             .foregroundColor(AppColors.accent)
                             .padding(.horizontal, AppSpacing.sm)
                             .padding(.vertical, AppSpacing.xs)

@@ -22,7 +22,7 @@ struct OnboardingView: View {
                             onSkip()
                         }) {
                             Text("Skip")
-                                .font(Font.custom("Inter-Medium", size: 14))
+                                .font(AppFonts.bodyMedium)
                                 .foregroundColor(Color.white.opacity(0.40))
                         }
                         .accessibilityIdentifier("onboarding.skipButton")
@@ -43,7 +43,7 @@ struct OnboardingView: View {
                             }
                         }
                         Text("\(viewModel.currentStep)/6")
-                            .font(Font.custom("Inter-Medium", size: 11))
+                            .font(AppFonts.microMedium)
                             .foregroundColor(Color.white.opacity(0.30))
                             .monospacedDigit()
                             .accessibilityIdentifier("onboarding.stepIndicator")
@@ -55,7 +55,7 @@ struct OnboardingView: View {
                             .font(Font.custom("BarlowCondensed-Black", size: 26))
                             .foregroundColor(.white)
                         Text(stepSubtitle)
-                            .font(Font.custom("Inter-Regular", size: 13))
+                            .font(AppFonts.small)
                             .foregroundColor(Color.white.opacity(0.45))
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, AppSpacing.xxl)
