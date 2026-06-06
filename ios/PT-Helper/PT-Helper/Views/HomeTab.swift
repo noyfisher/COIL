@@ -60,12 +60,13 @@ struct HomeTab: View {
 private struct WeeklyDateStrip: View {
     @Binding var selectedDate: Date
 
-    private var weekDays: [Date] {
+    /// 10 days back → 10 days forward (21 total), centred on today.
+    private var scrollableDays: [Date] {
         let cal = Calendar.current
-        var comps = cal.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date())
-        comps.weekday = 2 // Monday
-        guard let monday = cal.date(from: comps) else { return [] }
-        return (0..<7).compactMap { offset -> Date? in cal.date(byAdding: .day, value: offset, to: monday) }
+        let today = cal.startOfDay(for: Date())
+        return (-10...10).compactMap { offset -> Date? in
+            cal.date(byAdding: .day, value: offset, to: today)
+        }
     }
 
     private var monthLabel: String {
@@ -75,50 +76,79 @@ private struct WeeklyDateStrip: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            // Month + "Today" button row
-            HStack {
-                Text(monthLabel)
-                    .font(Font.custom("Industry-Bold", size: 13))
-                    .kerning(0.5)
-                    .foregroundColor(Color.white.opacity(0.55))
+        ScrollViewReader { proxy in
+            VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                // Month + "Today" button row
+                HStack {
+                    Text(monthLabel)
+                        .font(Font.custom("Industry-Bold", size: 13))
+                        .kerning(0.5)
+                        .foregroundColor(Color.white.opacity(0.55))
 
-                Spacer()
+                    Spacer()
 
-                if !Calendar.current.isDateInToday(selectedDate) {
-                    Button("Today") {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
-                            selectedDate = Date()
-                        }
-                    }
-                    .font(AppFonts.captionSemiBold)
-                    .foregroundColor(AppColors.accent)
-                }
-            }
-            .padding(.horizontal, AppSpacing.lg)
-
-            // Day cells
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: AppSpacing.xs) {
-                    ForEach(weekDays, id: \.self) { day in
-                        DayCell(
-                            date: day,
-                            isSelected: Calendar.current.isDate(day, inSameDayAs: selectedDate),
-                            isToday: Calendar.current.isDateInToday(day)
-                        )
-                        .onTapGesture {
-                            withAnimation(.spring(response: 0.28, dampingFraction: 0.72)) {
-                                selectedDate = day
+                    if !Calendar.current.isDateInToday(selectedDate) {
+                        Button {
+                            let today = Calendar.current.startOfDay(for: Date())
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+                                selectedDate = Date()
+                                proxy.scrollTo(today, anchor: .center)
                             }
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "arrow.uturn.left")
+                                    .font(.system(size: 10, weight: .bold))
+                                Text("Today")
+                                    .font(AppFonts.captionSemiBold)
+                            }
+                            .foregroundColor(AppColors.accent)
                         }
+                        .transition(.opacity.combined(with: .scale(scale: 0.85)))
                     }
                 }
                 .padding(.horizontal, AppSpacing.lg)
+                .animation(.easeInOut(duration: 0.2), value: Calendar.current.isDateInToday(selectedDate))
+
+                // Day cells — scrollable ±10 days with edge fade
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: AppSpacing.xs) {
+                        ForEach(scrollableDays, id: \.self) { day in
+                            DayCell(
+                                date: day,
+                                isSelected: Calendar.current.isDate(day, inSameDayAs: selectedDate),
+                                isToday: Calendar.current.isDateInToday(day)
+                            )
+                            .id(day)
+                            .onTapGesture {
+                                withAnimation(.spring(response: 0.28, dampingFraction: 0.72)) {
+                                    selectedDate = day
+                                }
+                            }
+                        }
+                    }
+                    .padding(.horizontal, AppSpacing.lg)
+                }
+                .mask(
+                    LinearGradient(
+                        stops: [
+                            .init(color: .clear, location: 0.00),
+                            .init(color: .black, location: 0.12),
+                            .init(color: .black, location: 0.88),
+                            .init(color: .clear, location: 1.00),
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .onAppear {
+                    let today = Calendar.current.startOfDay(for: Date())
+                    proxy.scrollTo(today, anchor: .center)
+                }
             }
+            .padding(.top, AppSpacing.sm)
+            .padding(.bottom, AppSpacing.md)
+            .background(AppColors.navBackground)
         }
-        .padding(.top, AppSpacing.sm)
-        .padding(.bottom, AppSpacing.md)
-        .background(AppColors.navBackground)
     }
 }
 
