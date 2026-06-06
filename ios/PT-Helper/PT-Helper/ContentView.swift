@@ -1,7 +1,7 @@
 import SwiftUI
 import FirebaseAuth
 
-struct HomeTab: View {
+struct LegacyHomeTab: View {
     @EnvironmentObject private var savedPlansViewModel: SavedPlansViewModel
     @EnvironmentObject private var workoutViewModel: WorkoutViewModel
     @EnvironmentObject private var tabSelection: TabSelection

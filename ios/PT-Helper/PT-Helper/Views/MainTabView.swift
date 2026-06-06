@@ -155,7 +155,7 @@ struct MainTabView: View {
             }
 
             TabView(selection: $tabSelection.selectedTab) {
-                HomeTab()
+                LegacyHomeTab()
                     .tabItem {
                         Label("Home", systemImage: "house.fill")
                     }

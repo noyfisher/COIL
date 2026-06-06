@@ -9,6 +9,8 @@ struct ThreeTabView: View {
     @StateObject private var recoveryInsightsViewModel = RecoveryInsightsViewModel()
     @StateObject private var analysisStore = AnalysisResultStore.shared
 
+    @State private var showAssessment = false
+
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
@@ -27,7 +29,7 @@ struct ThreeTabView: View {
                 }
 
                 TabView(selection: $tabSelection.selectedTab) {
-                    AssessTab()
+                    HomeTab()
                         .tag(0)
                         .id(tabSelection.assessNavigationId)
                         .toolbar(.hidden, for: .tabBar)
@@ -56,6 +58,8 @@ struct ThreeTabView: View {
                     if tabSelection.selectedTab == tapped {
                         tabSelection.popToRootCurrentTab()
                     }
+                }, onAssessmentTapped: {
+                    showAssessment = true
                 })
                 .ignoresSafeArea(edges: .bottom)
             }
@@ -73,7 +77,11 @@ struct ThreeTabView: View {
             SessionLogger.shared.logNavigation(.tabSwitched, screen: name, metadata: ["tab": "\(newTab)"])
             AnalyticsService.shared.log(.tabSwitched, parameters: ["tab_index": newTab])
         }
+        .fullScreenCover(isPresented: $showAssessment) {
+            NavigationStack { BodyMap3DView() }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .popToRoot)) { _ in
+            showAssessment = false
             tabSelection.popToRootAndGoHome()
         }
         .onReceive(NotificationCenter.default.publisher(for: .deepLink)) { _ in
@@ -169,6 +177,7 @@ private let rightTabItems: [TabBarItem] = [
 struct FloatingTabBar: View {
     @Binding var selectedTab: Int
     var onTabTapped: (Int) -> Void
+    var onAssessmentTapped: () -> Void
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -194,8 +203,7 @@ struct FloatingTabBar: View {
 
             // ── Big "+" button centred, lifts above the bar ───────────────
             Button {
-                onTabTapped(0)
-                selectedTab = 0
+                onAssessmentTapped()
             } label: {
                 ZStack {
                     Circle()
