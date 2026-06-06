@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The new 3-tab navigation container (MVVC rebrand: dark tab bar, red active indicator).
+/// The 4-tab navigation container with a custom floating tab bar.
 struct ThreeTabView: View {
     @StateObject private var tabSelection = TabSelection()
     @StateObject private var networkMonitor = NetworkMonitor.shared
@@ -10,44 +10,55 @@ struct ThreeTabView: View {
     @StateObject private var analysisStore = AnalysisResultStore.shared
 
     var body: some View {
-        VStack(spacing: 0) {
-            if !networkMonitor.isConnected {
-                HStack(spacing: AppSpacing.sm) {
-                    Image(systemName: "wifi.slash")
-                        .font(.system(size: 12, weight: .semibold))
-                    Text("You're offline. Changes will sync when reconnected.")
-                        .font(.caption)
+        ZStack(alignment: .bottom) {
+            VStack(spacing: 0) {
+                if !networkMonitor.isConnected {
+                    HStack(spacing: AppSpacing.sm) {
+                        Image(systemName: "wifi.slash")
+                            .font(.system(size: 12, weight: .semibold))
+                        Text("You're offline. Changes will sync when reconnected.")
+                            .font(.caption)
+                    }
+                    .foregroundColor(AppColors.ctaText)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, AppSpacing.sm)
+                    .background(AppColors.danger)
+                    .accessibilityIdentifier("offlineBanner")
                 }
-                .foregroundColor(AppColors.ctaText)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, AppSpacing.sm)
-                .background(AppColors.danger)
-                .accessibilityIdentifier("offlineBanner")
+
+                TabView(selection: $tabSelection.selectedTab) {
+                    AssessTab()
+                        .tag(0)
+                        .id(tabSelection.assessNavigationId)
+                        .toolbar(.hidden, for: .tabBar)
+
+                    MyPlanTab()
+                        .tag(1)
+                        .id(tabSelection.myPlanNavigationId)
+                        .toolbar(.hidden, for: .tabBar)
+
+                    ProgressTab()
+                        .tag(2)
+                        .id(tabSelection.progressNavigationId)
+                        .toolbar(.hidden, for: .tabBar)
+
+                    ProfileTab()
+                        .tag(3)
+                        .id(tabSelection.profileNavigationId)
+                        .toolbar(.hidden, for: .tabBar)
+                }
             }
 
-            TabView(selection: $tabSelection.selectedTab) {
-                AssessTab()
-                    .tabItem {
-                        Label { Text("Assess") } icon: { Image(systemName: "stethoscope").font(.system(size: 19)) }
+            // Full-width tab bar pinned to bottom
+            VStack(spacing: 0) {
+                Spacer()
+                FloatingTabBar(selectedTab: $tabSelection.selectedTab, onTabTapped: { tapped in
+                    if tabSelection.selectedTab == tapped {
+                        tabSelection.popToRootCurrentTab()
                     }
-                    .tag(0)
-                    .id(tabSelection.assessNavigationId)
-
-                MyPlanTab()
-                    .tabItem {
-                        Label { Text("My Plan") } icon: { Image(systemName: "list.clipboard.fill").font(.system(size: 19)) }
-                    }
-                    .tag(1)
-                    .id(tabSelection.myPlanNavigationId)
-
-                ProgressTab()
-                    .tabItem {
-                        Label { Text("Progress") } icon: { Image(systemName: "chart.line.uptrend.xyaxis").font(.system(size: 19)) }
-                    }
-                    .tag(2)
-                    .id(tabSelection.progressNavigationId)
+                })
+                .ignoresSafeArea(edges: .bottom)
             }
-            .tint(AppColors.tabActive)
         }
         .environmentObject(tabSelection)
         .environmentObject(savedPlansViewModel)
@@ -57,7 +68,7 @@ struct ThreeTabView: View {
         .environmentObject(analysisStore)
         .onChange(of: tabSelection.selectedTab) { oldTab, newTab in
             if oldTab == newTab { tabSelection.popToRootCurrentTab() }
-            let tabNames = ["Assess", "My Plan", "Progress"]
+            let tabNames = ["Home", "My Plan", "Progress", "Profile"]
             let name = newTab < tabNames.count ? tabNames[newTab] : "Unknown"
             SessionLogger.shared.logNavigation(.tabSwitched, screen: name, metadata: ["tab": "\(newTab)"])
             AnalyticsService.shared.log(.tabSwitched, parameters: ["tab_index": newTab])
@@ -70,19 +81,21 @@ struct ThreeTabView: View {
                 switch tab {
                 case "home", "analyze": tabSelection.selectedTab = 0
                 case "plans", "rehab": tabSelection.selectedTab = 1
-                case "progress", "profile": tabSelection.selectedTab = 2
+                case "progress": tabSelection.selectedTab = 2
+                case "profile": tabSelection.selectedTab = 3
                 default: break
                 }
                 NotificationService.shared.pendingDeepLink = nil
             }
         }
         .onAppear {
-            applyMVVCAppearance()
+            applyMVVCNavBarAppearance()
             if let tab = NotificationService.shared.pendingDeepLink {
                 switch tab {
                 case "home", "analyze": tabSelection.selectedTab = 0
                 case "plans", "rehab": tabSelection.selectedTab = 1
-                case "progress", "profile": tabSelection.selectedTab = 2
+                case "progress": tabSelection.selectedTab = 2
+                case "profile": tabSelection.selectedTab = 3
                 default: break
                 }
                 NotificationService.shared.pendingDeepLink = nil
@@ -90,28 +103,11 @@ struct ThreeTabView: View {
         }
     }
 
-    // MARK: - MVVC UIKit Appearance
+    // MARK: - MVVC UIKit Appearance (nav bar only — tab bar is custom)
 
-    private func applyMVVCAppearance() {
+    private func applyMVVCNavBarAppearance() {
         let navBgColor = UIColor(AppColors.navBackground)
-        let activeColor = UIColor(AppColors.tabActive)
-        let inactiveColor = UIColor(AppColors.tabInactive)
 
-        // Tab bar — dark with red active tab
-        let tabBar = UITabBarAppearance()
-        tabBar.configureWithOpaqueBackground()
-        tabBar.backgroundColor = navBgColor
-        tabBar.shadowColor = UIColor(AppColors.navBorder)
-        for state in [tabBar.stackedLayoutAppearance, tabBar.inlineLayoutAppearance, tabBar.compactInlineLayoutAppearance] {
-            state.normal.iconColor = inactiveColor
-            state.normal.titleTextAttributes = [.foregroundColor: inactiveColor]
-            state.selected.iconColor = activeColor
-            state.selected.titleTextAttributes = [.foregroundColor: activeColor]
-        }
-        UITabBar.appearance().standardAppearance = tabBar
-        UITabBar.appearance().scrollEdgeAppearance = tabBar
-
-        // Navigation bar — dark with white title
         let navBar = UINavigationBarAppearance()
         navBar.configureWithOpaqueBackground()
         navBar.backgroundColor = navBgColor
@@ -129,5 +125,111 @@ struct ThreeTabView: View {
         UINavigationBar.appearance().compactAppearance = navBar
         UINavigationBar.appearance().scrollEdgeAppearance = navBar
         UINavigationBar.appearance().tintColor = UIColor(AppColors.accent)
+    }
+}
+
+// MARK: - Profile Tab
+
+struct ProfileTab: View {
+    @State private var showEditProfile = false
+
+    var body: some View {
+        NavigationStack {
+            SettingsView(
+                userName: UserProfileService.shared.profile?.firstName ?? "User",
+                onEditProfile: { showEditProfile = true }
+            )
+        }
+        .sheet(isPresented: $showEditProfile) {
+            // Edit profile sheet — reuse onboarding review step
+            Text("Edit Profile")
+                .padding()
+        }
+    }
+}
+
+// MARK: - Tab Bar
+
+private struct TabBarItem {
+    let tag: Int
+    let icon: String
+    let label: String
+}
+
+/// Left pair and right pair flank the centre "+" button.
+private let leftTabItems: [TabBarItem] = [
+    TabBarItem(tag: 0, icon: "house.fill",         label: "Home"),
+    TabBarItem(tag: 1, icon: "list.clipboard.fill", label: "Plan"),
+]
+private let rightTabItems: [TabBarItem] = [
+    TabBarItem(tag: 2, icon: "chart.line.uptrend.xyaxis", label: "Progress"),
+    TabBarItem(tag: 3, icon: "person.fill",               label: "Profile"),
+]
+
+struct FloatingTabBar: View {
+    @Binding var selectedTab: Int
+    var onTabTapped: (Int) -> Void
+
+    var body: some View {
+        ZStack(alignment: .top) {
+            // ── Full-width bar ─────────────────────────────────────────────
+            HStack(spacing: 0) {
+                // Left tabs
+                ForEach(leftTabItems, id: \.tag) { item in
+                    tabButton(item)
+                }
+
+                // Centre spacer — reserves room beneath the "+" button
+                Spacer()
+                    .frame(width: 72)
+
+                // Right tabs
+                ForEach(rightTabItems, id: \.tag) { item in
+                    tabButton(item)
+                }
+            }
+            .padding(.top, 10)   // push tab icons down below the "+" button
+            .frame(maxWidth: .infinity)
+            .background(AppColors.navBackground)
+
+            // ── Big "+" button centred, lifts above the bar ───────────────
+            Button {
+                onTabTapped(0)
+                selectedTab = 0
+            } label: {
+                ZStack {
+                    Circle()
+                        .fill(AppColors.accent)
+                        .frame(width: 56, height: 56)
+                        .shadow(color: AppColors.accent.opacity(0.5), radius: 10, x: 0, y: -4)
+                    Image(systemName: "plus")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(.white)
+                }
+            }
+            .accessibilityLabel("New Assessment")
+            .frame(maxWidth: .infinity, alignment: .center)
+            .offset(y: -8)   // lift slightly above the bar top edge
+        }
+    }
+
+    @ViewBuilder
+    private func tabButton(_ item: TabBarItem) -> some View {
+        Button {
+            onTabTapped(item.tag)
+            selectedTab = item.tag
+        } label: {
+            VStack(spacing: 4) {
+                Image(systemName: item.icon)
+                    .font(.system(size: 20, weight: .semibold))
+                Text(item.label)
+                    .font(.system(size: 10, weight: .medium))
+            }
+            .foregroundColor(selectedTab == item.tag ? AppColors.tabActive : AppColors.tabInactive)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+        }
+        .accessibilityLabel(item.label)
+        .accessibilityAddTraits(selectedTab == item.tag ? [.isSelected] : [])
     }
 }
