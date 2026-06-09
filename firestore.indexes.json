@@ -11,6 +11,16 @@
   ],
   "fieldOverrides": [
     {
+      "collectionGroup": "windows",
+      "fieldPath": "lastSeenAt",
+      "ttl": true,
+      "indexes": [
+        { "queryScope": "COLLECTION", "order": "ASCENDING" },
+        { "queryScope": "COLLECTION", "order": "DESCENDING" },
+        { "queryScope": "COLLECTION", "arrayConfig": "CONTAINS" }
+      ]
+    },
+    {
       "collectionGroup": "rehabPlans",
       "fieldPath": "lastModifiedDate",
       "indexes": [
