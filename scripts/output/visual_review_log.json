@@ -2271,6 +2271,2060 @@
       "status": "passed",
       "frame": "start",
       "note": "Standing with feet shoulder-width, band around legs above knees, slight forward lean and quarter-squat with bent knees \u2014 matches description."
+    },
+    "prone-iyt-raises-band": {
+      "status": "passed",
+      "frame": "both",
+      "note": "REGENERATED + visually verified + uploaded to Firebase (2026-06-04 team run). Was: failed."
+    },
+    "band-resisted-shoulder-internal-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Laterality mirrored (left side to anchor) but IR mechanics correct."
+    },
+    "quadruped-shoulder-stabilization": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "band-rows-high-to-low": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "dumbbell-deadlifts": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo-realistic style (cosmetic)."
+    },
+    "band-assisted-shoulder-external-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "No chair (hovering squat); arm mechanics correct."
+    },
+    "band-resisted-neck-flexion": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "lying-spinal-twist": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "reverse-fly-dumbbells": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo style, side view, far dumbbell occluded."
+    },
+    "resistance-band-forearm-pronation": {
+      "status": "passed",
+      "frame": "both",
+      "note": "REGENERATED + visually verified + uploaded to Firebase (2026-06-04 team run). Was: uncertain."
+    },
+    "resistance-band-forearm-supination": {
+      "status": "passed",
+      "frame": "both",
+      "note": "REGENERATED + visually verified + uploaded to Firebase (2026-06-04 team run). Was: uncertain."
+    },
+    "grip-strengthening-with-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "shoulder-shrugs-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo style."
+    },
+    "neck-rotation-active-rom": {
+      "status": "passed",
+      "frame": "start",
+      "note": "No chair (hovering)."
+    },
+    "dumbbell-rows-bilateral": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Upright pre-hinge stance per description."
+    },
+    "hamstring-curls-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Flat-illustration style variant."
+    },
+    "step-ups-dumbbell": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "scapular-stabilization-band": {
+      "status": "passed",
+      "frame": "both",
+      "note": "REGENERATED + visually verified + uploaded to Firebase (2026-06-04 team run). Was: failed."
+    },
+    "glute-bridge-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "kneeling-core-stability-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "hamstring-curl-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-spinal-rotation": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-shoulder-press-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "lying-hamstring-curl-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-chest-press-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-lateral-leg-raise-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Leg shown mid-abduction rather than neutral start; band placement correct."
+    },
+    "seated-row-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo style."
+    },
+    "seated-bicep-curl-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Appears single-arm; only right hand holds band."
+    },
+    "seated-dumbbell-shoulder-press": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-dumbbell-bicep-curl": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-dumbbell-rows": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo style."
+    },
+    "seated-dumbbell-lateral-raise": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Only right dumbbell clearly visible (3/4 view, left likely occluded)."
+    },
+    "seated-torso-rotation-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo style."
+    },
+    "standing-dumbbell-goblet-squats": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-cross-body-shoulder-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-shoulder-external-rotation-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo style."
+    },
+    "kneeling-quadruped-shoulder-reaches": {
+      "status": "passed",
+      "frame": "both",
+      "note": "REGENERATED + visually verified + uploaded to Firebase (2026-06-04 team run). Was: failed."
+    },
+    "shoulder-flexion-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "shoulder-abduction-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "elbow-flexion-band-curl": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "finger-flexion-extension-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "horizontal-adduction-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo style."
+    },
+    "supine-shoulder-internal-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "90/90 forearm-up start correct (photo)."
+    },
+    "seated-neck-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "No chair (hover), photo."
+    },
+    "walking-lunges-dumbbells": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "quadruped-bird-dogs": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-band-pull-apart": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-shoulder-flexion-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-chest-stretch-band": {
+      "status": "passed",
+      "frame": "both",
+      "note": "REGENERATED + visually verified + uploaded to Firebase (2026-06-04 team run). Was: uncertain."
+    },
+    "seated-shoulder-internal-rotation-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-hip-flexion-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "supine-lower-back-stretch-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "dumbbell-chest-press-seated": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "dumbbell-bicep-curls-standing": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "dumbbell-lateral-raises-seated": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Single dumbbell visible (3/4 view)."
+    },
+    "dumbbell-rows-seated": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Single-arm per description."
+    },
+    "resistance-band-shoulder-press": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-quad-sets-with-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-spinal-twist-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo, mild twist shown."
+    },
+    "pronation-supination-rotation": {
+      "status": "passed",
+      "frame": "both",
+      "note": "REGENERATED + visually verified + uploaded to Firebase (2026-06-04 team run). Was: uncertain."
+    },
+    "grip-strength-band-squeeze": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "wrist-flexion-stretch-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "finger-extension-towel": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "forearm-rotation": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Palm-down start correct."
+    },
+    "thumb-opposition-resistance-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "wrist-flexion-light-weight": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "wrist-extension-light-weight": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "resistance-band-toe-flexion": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "resistance-band-toe-extension": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "resistance-band-adduction-great-toe": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Feet shown close rather than spaced."
+    },
+    "hamstring-stretch-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "hallux-flexion-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "hallux-extension-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "great-toe-abduction-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "hip-abduction-band-standing": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-glute-bridge-dumbbell": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-dorsiflexion-dumbbell": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-calf-raises-dumbbell": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Only one dumbbell visible (3/4 view)."
+    },
+    "quadruped-foot-stability-taps": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-hamstring-stretch-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-hamstring-curl-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-quad-set-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-hip-ir-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "reverse-lunge-with-rotation": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "dumbbell-step-ups-deceleration": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "rotation-stretches": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "band-external-rotation-9090": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "band-internal-rotation-zero-degrees": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "band-shoulder-abduction": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "ankle-dorsiflexion-resistance": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "lateral-ankle-stability-reach": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "plantarflexion-dumbbell": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-band-ankle-inversion-stability": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-tricep-extension-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "banded-good-morning": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "banded-quadruped-reach": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "banded-superman": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-thoracic-rotation-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-torso-twist": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "resistance-band-reverse-pec-flyes": {
+      "status": "passed",
+      "frame": "both",
+      "note": "REGENERATED + visually verified + uploaded to Firebase (2026-06-04 team run). Was: failed."
+    },
+    "anti-rotation-press": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "quadruped-breathing-arm-lifts": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "quadruped-band-balance": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "dumbbell-farmers-walk": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "elbow-extension-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-elbow-flexion-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-toe-heel-taps-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "plantar-fascia-release-with-ball": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "tricep-extension-band": {
+      "status": "passed",
+      "frame": "both",
+      "note": "REGENERATED + visually verified + uploaded to Firebase (2026-06-04 team run). Was: uncertain."
+    },
+    "seated-plantar-fascia-stretch-with-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Leg lifted in front rather than crossed over opposite knee (minor)."
+    },
+    "grip-strength-with-ball": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "banded-crab-walk": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "side-lying-leg-lifts": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-standing-march-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "cervical-rotation-band": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "neck-rotation-stretch-supine": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "quadruped-pelvic-floor-hold": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "side-lying-ribcage-expansion": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "clams-resistance-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Top knee shown opened (clam action) rather than neutral start; band placement correct."
+    },
+    "knee-flexion-band": {
+      "status": "passed",
+      "frame": "start",
+      "note": "No wall shown; band around foot + knee flexion correct. Previously flagged low-scoring but looks fine."
+    },
+    "banded-shoulder-stabilization": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "banded-triceps-extension": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "dumbbell-farmers-carries": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "dumbbell-shoulder-presses": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "resistance-band-face-pulls": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-cable-external-rotation-90": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "crossbody-shoulder-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Shows stretch action rather than neutral arm-at-side start."
+    },
+    "prone-scapular-y-raises-with-band": {
+      "status": "passed",
+      "frame": "both",
+      "note": "REGENERATED + visually verified + uploaded to Firebase (2026-06-04 team run). Was: uncertain."
+    },
+    "sidelying-external-rotation-band": {
+      "status": "passed",
+      "frame": "both",
+      "note": "REGENERATED + visually verified + uploaded to Firebase (2026-06-04 team run). Was: failed."
+    },
+    "90-90-hip-flexor-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "90-90-hip-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "abdominal-bracing": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "active-rom-finger-straight": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "adductor-stretching": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "ankle-alphabet": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "ankle-alphabet-tracing": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "ankle-circles": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "ankle-inversion-eversion": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "ankle-pumps": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "anterior-tibialis-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "arch-doming-exercise": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "arch-strengthening-towel-scrunches": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "arm-circles": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "assisted-cat-cow-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "balance-walk-tandem-stance": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "arch-doming-foot-intrinsics": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "arm-circles-range-motion": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "arm-elevation-deep-breathing": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "band-external-rotation_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "band-internal-rotation_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "band-pull-apart_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "banded-copenhagen-adductor-exercise_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "banded-external-rotation-90-90_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "banded-hip-abduction_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "banded-hip-internal-rotation_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "banded-standing-marches_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "dead-bug-with-dumbbell_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "dead-bug_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "doorway-pec-stretch-rotation_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "dumbbell-chest-press_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "dumbbell-floor-press_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "dumbbell-rows_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "dynamic-adductor-stretch-with-hip-rotation_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "external-rotation_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "foam-roller-quad_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "forearm-rotation-band_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "glute-bridge-single-leg_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "hamstring-stretch-with-band_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "internal-rotation_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "isometric-shoulder-external-rotation_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "isometric-shoulder-internal-rotation_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "lateral-side-lying-clam-shell_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "neck-stretch-gentle-rotation_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "posterior-shoulder-stretch-band_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "prone-external-rotation_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "prone-lumbar-extension-band_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "resistance-band-pull-apart_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "seated-adductor-squeeze-with-band_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "seated-shoulder-rolls-band_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "single-leg-balance-dumbbell-hold_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "single-leg-balance-hold_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "single-leg-stance-support_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "single-leg-stance_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "spinal-twist_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "standing-balance-on-one-leg_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "standing-band-pull-apart_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "standing-chest-fly-with-band_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "standing-rotation-band_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "standing-single-leg-balance_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "standing-single-leg-stance-band_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "standing-single-leg-stance_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "supine-external-rotation-bent-elbow_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "supine-external-rotation-dumbbell_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "supine-shoulder-external-rotation_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "supine-shoulder-rotation_regen": {
+      "status": "skipped_duplicate",
+      "frame": "n/a",
+      "note": "Stray _regen artifact entry; canonical twin exists. Recommend removing from exercise_image_mapping.json."
+    },
+    "belly-breathing-with-leg-lifts": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "bicep-curls": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "big-arm-circles": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "big-backward-steps": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "big-head-turns": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "big-reaching-overhead": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "big-stepping-backward": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "big-stepping-forward": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "big-stepping-sideways": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "big-steps-forward": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "big-toe-flexion-strengthening": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "big-toe-joint-mobilization": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "big-trunk-rotations": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "bird-dogs": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "box-jumps": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "breathing-exercises-arm-positioning": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "bridge-hold": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "bridging-pelvic-floor": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "brisk-walking": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "bodyweight-squats": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Shows squat position rather than standing start."
+    },
+    "butterfly-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "calf-raises": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "calf-raises-on-step": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "calf-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "cat-camel-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "calf-raises-both-feet": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "calf-raises-handrail": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "calf-stretch-on-step": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "calf-stretch-wall": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "calf-stretches": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "cat-cow-mobilization": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "cervical-isometric-holds": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "cervical-isometric-neck-extension": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "cervical-isometric-neck-flexion": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "cervical-isometric-lateral-flexion": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "cervical-neck-stretches": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "cervical-retraction": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "cervical-retraction-isometric": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "cervical-retraction-resistance": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "cat-cow-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Back reads neutral/flat rather than strongly rounded cat as described."
+    },
+    "cheek-puff": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "chest-doorway-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "chest-opener-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "chest-press-machine": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "chest-stretch-corner": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "chest-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "chest-wall-mobility-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "childs-pose": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "childs-pose-with-side-reach": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "chin-tucks": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "clam-shells": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "clamshells": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "clock-reach": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "copenhagen-adduction": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "copenhagen-adductor-squeeze": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "coordinated-facial-expression": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "core-plank": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "couch-stretch-hip-flexor-lengthening": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "dead-bugs": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "deadlifts": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "diaphragmatic-breathing-supine": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "four-way-ankle-resistance": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "hamstring-curls-prone": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "lateral-lunge-with-reach": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "elbow-flexion-light-resistance": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "hip-flexor-stretch-low-lunge": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "jump-squats": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "lateral-lunges": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "lateral-step-ups": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "hip-abduction-lying": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Shows leg abducted/raised rather than neutral start; single-leg variant correct."
+    },
+    "lying-figure-four-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Photo."
+    },
+    "lying-hip-flexor-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "pigeon-pose-hip-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "pigeon-pose-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "marching-high-knees": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "marching-in-place": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "neck-rotations": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "pigeon-pose": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-back-extension": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "lying-lateral-leg-lifts": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Top leg shown raised; single-leg variant correct."
+    },
+    "prone-cobra": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-cobra-hold": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-gastrocnemius-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-hamstring-curl": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-hand-elevation-relaxation": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-cobra-breathing": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-cobras": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-glute-squeeze-holds": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-hamstring-isometric": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-head-turns": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-hip-abduction": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-hip-extension": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-hip-flexor-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-horizontal-abduction": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-hip-extension-pulse": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-i-y-t-shoulder-activation": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-hip-adduction-lifts": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Band on calves rather than above knees (minor)."
+    },
+    "prone-hip-bridges": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Image is a forearm PLANK; name+description say hip-bridges - metadata/naming mismatch, image matches its description."
+    },
+    "prone-hip-extensions": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Shows one leg raised vs both-down start."
+    },
+    "prone-i-y-t-raises": {
+      "status": "passed",
+      "frame": "start",
+      "note": "3-panel I/Y/T composite, stylistically inconsistent with single-figure format."
+    },
+    "prone-iyt-holds": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-iyt-raises": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-knee-extension": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-knee-flexion": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-reverse-fly": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-neck-isometric-hold": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-scapular-retraction": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-shoulder-blade-squeezes": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-shoulder-flexion": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-press-up": {
+      "status": "failed",
+      "frame": "start",
+      "note": "Hips lifted off floor in a plank/push-up-top position. A prone press-up (McKenzie extension) must keep hips/pelvis on the floor, arching only the upper back."
+    },
+    "prone-shoulder-flexion-lifts": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-shoulder-horizontal-abduction": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-shoulder-i-y-t-raises": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-shoulder-isometric-hold": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-shoulder-iyt": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-shoulder-iyt-raises": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-shoulder-squeeze": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-shoulder-squeeze-on-pillow": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-shoulder-stabilization": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-shoulder-ytw": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-superman-hold": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-t-raises": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-thoracic-extension": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-ytw-raises": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "scapular-retractions-resistance": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-t-y-i-holds": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "prone-y-raises": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "resisted-high-knee-march": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "scapular-squeeze-prone": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-hip-flexor-marching": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-hip-marches": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-marching-arm-circles": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-marching-arm-movements": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-torso-rotations": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-upper-extremity-reaches": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-marching": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-marching-head-turns": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-marching-in-place": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-marching-pelvic-floor": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-trunk-rotations": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "serratus-anterior-punch-prone": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-balance": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-balance-stance": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-hip-marches-wall": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "shoulder-blade-squeezes-prone": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-balance-hold": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-hip-flexor-march": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-hip-marches": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-march": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "shoulder-crossover-stretch": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Shows cross-body stretch action vs neutral arms-at-side start."
+    },
+    "standing-marching": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-supported-marching": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-torso-rotations": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "stationary-bike-resistance": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "step-ups": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-marching-head-stability": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-marching-in-place": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-wall-marching": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-wall-supported-marching": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "step-ups-low": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-achilles-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-adductor-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-arm-lifts": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-arm-slides": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-breathing-exercises": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-bridge-foot-focus": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-bridge-shoulder-engagement": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-butterfly-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-bridge": {
+      "status": "failed",
+      "frame": "start",
+      "note": "Start image shows hips lifted (bridge top); start desc = hips down on floor, knees bent."
+    },
+    "supine-bridge-hold": {
+      "status": "uncertain",
+      "frame": "start",
+      "note": "Start shows hips lifted; desc says hips down. Defensible for a hold but mismatches stated start."
+    },
+    "supine-chest-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-core-engagement-neutral-spine": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-elbow-flexion": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-eye-movements": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-figure-4-stretch-with-pelvic-mobilization": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-figure-four-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-glute-activation": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-glute-bridge": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-glute-bridges": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-figure-4-stretch": {
+      "status": "failed",
+      "frame": "start",
+      "note": "Figure-4 cross not depicted; shows plain knees-bent feet-flat, missing signature ankle-over-knee crossing."
+    },
+    "supine-glute-squeeze": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-gluteal-bridge": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-hamstring-curls": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-hamstring-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-head-turns-stabilization": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-hip-abduction": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-hip-bridges": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-hip-circles": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-hip-flexion": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-hip-bridge": {
+      "status": "failed",
+      "frame": "start",
+      "note": "Start shows bridge-top (hips lifted); should be hips-down setup with band above knees. Band correct, hip height wrong."
+    },
+    "supine-hip-flexion-knee-extension": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-hip-flexion-march": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-hip-flexor-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-hip-knee-flexion": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-hip-marching": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-iliopsoas-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-isometric-shoulder-hold": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-knee-flexion": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-knee-to-chest": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-knee-to-chest-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-leg-slides": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-marching": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-passive-rom": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-pelvic-floor-engagement": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-pelvic-floor-relaxation": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-pelvic-tilt": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-pelvic-tilts": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-piriformis-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-prone-walk": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-quad-sets": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-shoulder-abduction-slide": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-shoulder-blade-retractions": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-shoulder-blade-squeezes": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-shoulder-flexion": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-shoulder-flexion-towel": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-shoulder-shrugs": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-wrist-pronation-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "tandem-stance": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supine-shoulder-flexion-pulley": {
+      "status": "passed",
+      "frame": "start",
+      "note": "Image shows cable pulley (matches exercise name); description text says dumbbell/medicine ball - metadata mismatch, image OK."
+    },
+    "supine-shoulder-blade-retraction": {
+      "status": "uncertain",
+      "frame": "start",
+      "note": "Only one arm raised toward ceiling; desc says both arms extended up palms facing each other."
+    },
+    "tandem-stance-balance": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "tandem-stance-gaze-stabilization": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "tandem-stance-heel-to-toe": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "tandem-stance-hold": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "tandem-stance-wall": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "thumb-abduction-resistance": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "walking-lunges": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "deep-abdominal-breathing": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "doorway-shoulder-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "eccentric-hamstring-curls": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "facial-mirror-smile": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "finger-flexor-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "forearm-isometric-strengthening": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "forearm-supination-isometric": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "gaze-stabilization-vertical": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "gentle-neck-stretches": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "grip-relaxation-technique": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "hamstring-curls": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "hand-opening-closing": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "glute-bridge-pelvic": {
+      "status": "failed",
+      "frame": "start",
+      "note": "Hips lifted (bridge top); desc says knees bent feet flat (hips down). bridge_start_hips_lifted defect class."
+    },
+    "heel-to-toe-walking": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "hip-flexor-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "inversion-eversion-strengthening": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "isometric-shoulder-activation": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "knee-flexion-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "leg-swings-forward-back": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "marble-pickup": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "monster-walks": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "open-book-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "neck-lateral-flexion": {
+      "status": "uncertain",
+      "frame": "start",
+      "note": "Seated posture but no chair rendered (floating sit). Head/neck correct; missing seat is cosmetic."
+    },
+    "pendulum-shoulder-circles": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "plantar-fascia-massage": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "postural-neck-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "pursed-lip-breathing-arm-raises": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "quadriceps-sets-pelvic-floor": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "resisted-ankle-dorsiflexion": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "scapular-push-up": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-achilles-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-box-breathing": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "patellar-tendon-stretches": {
+      "status": "uncertain",
+      "frame": "start",
+      "note": "Hands-and-knees hands-forward; desc says hips over knees, toes tucked under (not clearly depicted)."
+    },
+    "seated-core-breathing": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-figure-four-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-great-toe-flexion": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-kegel-posture": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-neck-relaxation": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-shoulder-abduction": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "seated-toe-taps": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "short-arc-quads": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "shoulder-rolls": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "slow-walking-visual-focus": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-calf-raises-pelvic-floor": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-gaze-stability-with-head-movement": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-hip-adductor-squeeze": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-pelvic-tilts": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "standing-scapular-squeeze": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "stationary-bike": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "supported-deep-squat": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "tandem-walking": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "thumb-cmc-stabilization": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "thumb-opposition-isometric": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "tongue-press-lateral": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "towel-stretch": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "ulnar-nerve-glide": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "walking-metronome-pacing": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "wall-sits-knee-alignment": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "wrist-curls": {
+      "status": "passed",
+      "frame": "start"
+    },
+    "wrist-pronation-supination": {
+      "status": "passed",
+      "frame": "start"
     }
   },
   "completed_batches": [
@@ -2506,6 +4560,397 @@
       "passed": 9,
       "uncertain": 0,
       "failed": 1
+    },
+    {
+      "id": "med-26",
+      "size": 10,
+      "passed": 8,
+      "uncertain": 1,
+      "failed": 1
+    },
+    {
+      "id": "med-27",
+      "size": 10,
+      "passed": 8,
+      "uncertain": 1,
+      "failed": 1
+    },
+    {
+      "id": "med-28",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-29",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 0,
+      "failed": 1
+    },
+    {
+      "id": "med-30",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 1,
+      "failed": 0
+    },
+    {
+      "id": "med-31",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 1,
+      "failed": 0
+    },
+    {
+      "id": "med-32",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-33",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-34",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-35",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 0,
+      "failed": 1
+    },
+    {
+      "id": "med-36",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 1,
+      "failed": 0
+    },
+    {
+      "id": "med-37",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "med-38",
+      "size": 9,
+      "passed": 7,
+      "uncertain": 1,
+      "failed": 1
+    },
+    {
+      "id": "low-1",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-2",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-regen-skip",
+      "size": 47,
+      "passed": 0,
+      "uncertain": 0,
+      "failed": 0,
+      "skipped_duplicate": 47
+    },
+    {
+      "id": "low-3",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-4",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-5",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-6",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-7",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-8",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-t1",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-t2",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-t3",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-t4",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-t5",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 0,
+      "failed": 1
+    },
+    {
+      "id": "low-t6",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-t7",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-t8",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-t9",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-t10",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-t11",
+      "size": 10,
+      "passed": 8,
+      "uncertain": 1,
+      "failed": 1
+    },
+    {
+      "id": "low-t12",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 0,
+      "failed": 1
+    },
+    {
+      "id": "low-t13",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 0,
+      "failed": 1
+    },
+    {
+      "id": "low-t14",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-t15",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-t16",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 1,
+      "failed": 0
+    },
+    {
+      "id": "low-t17",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-t18",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 0,
+      "failed": 1
+    },
+    {
+      "id": "low-t19",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 1,
+      "failed": 0
+    },
+    {
+      "id": "low-t20",
+      "size": 10,
+      "passed": 9,
+      "uncertain": 1,
+      "failed": 0
+    },
+    {
+      "id": "low-t21",
+      "size": 10,
+      "passed": 10,
+      "uncertain": 0,
+      "failed": 0
+    },
+    {
+      "id": "low-t22",
+      "size": 17,
+      "passed": 17,
+      "uncertain": 0,
+      "failed": 0
     }
-  ]
+  ],
+  "cleanup_findings": {
+    "regen_duplicates": {
+      "count": 47,
+      "slugs": [
+        "band-external-rotation_regen",
+        "band-internal-rotation_regen",
+        "band-pull-apart_regen",
+        "banded-copenhagen-adductor-exercise_regen",
+        "banded-external-rotation-90-90_regen",
+        "banded-hip-abduction_regen",
+        "banded-hip-internal-rotation_regen",
+        "banded-standing-marches_regen",
+        "dead-bug-with-dumbbell_regen",
+        "dead-bug_regen",
+        "doorway-pec-stretch-rotation_regen",
+        "dumbbell-chest-press_regen",
+        "dumbbell-floor-press_regen",
+        "dumbbell-rows_regen",
+        "dynamic-adductor-stretch-with-hip-rotation_regen",
+        "external-rotation_regen",
+        "foam-roller-quad_regen",
+        "forearm-rotation-band_regen",
+        "glute-bridge-single-leg_regen",
+        "hamstring-stretch-with-band_regen",
+        "internal-rotation_regen",
+        "isometric-shoulder-external-rotation_regen",
+        "isometric-shoulder-internal-rotation_regen",
+        "lateral-side-lying-clam-shell_regen",
+        "neck-stretch-gentle-rotation_regen",
+        "posterior-shoulder-stretch-band_regen",
+        "prone-external-rotation_regen",
+        "prone-lumbar-extension-band_regen",
+        "resistance-band-pull-apart_regen",
+        "seated-adductor-squeeze-with-band_regen",
+        "seated-shoulder-rolls-band_regen",
+        "single-leg-balance-dumbbell-hold_regen",
+        "single-leg-balance-hold_regen",
+        "single-leg-stance-support_regen",
+        "single-leg-stance_regen",
+        "spinal-twist_regen",
+        "standing-balance-on-one-leg_regen",
+        "standing-band-pull-apart_regen",
+        "standing-chest-fly-with-band_regen",
+        "standing-rotation-band_regen",
+        "standing-single-leg-balance_regen",
+        "standing-single-leg-stance-band_regen",
+        "standing-single-leg-stance_regen",
+        "supine-external-rotation-bent-elbow_regen",
+        "supine-external-rotation-dumbbell_regen",
+        "supine-shoulder-external-rotation_regen",
+        "supine-shoulder-rotation_regen"
+      ],
+      "recommendation": "Remove all _regen entries from exercise_image_mapping.json (and iOS Resources copy). Canonical twins exist for all. Brings mapping 1411 -> 1364."
+    }
+  },
+  "fix_runs": [
+    {
+      "date": "2026-06-04",
+      "fixed": [
+        "prone-iyt-raises-band",
+        "scapular-stabilization-band",
+        "kneeling-quadruped-shoulder-reaches",
+        "resistance-band-reverse-pec-flyes",
+        "sidelying-external-rotation-band",
+        "resistance-band-forearm-pronation",
+        "resistance-band-forearm-supination",
+        "pronation-supination-rotation",
+        "supine-chest-stretch-band",
+        "tricep-extension-band",
+        "prone-scapular-y-raises-with-band"
+      ],
+      "note": "5 fails + 6 uncertain regenerated (start+end where needed) via auto-prompt loop, Lead-verified, 22 PNGs uploaded to Firebase Storage."
+    }
+  ],
+  "defect_classes": {
+    "bridge_start_hips_lifted": [
+      "supine-bridge",
+      "supine-bridge-hold",
+      "supine-hip-bridge",
+      "glute-bridge-pelvic"
+    ]
+  }
 }

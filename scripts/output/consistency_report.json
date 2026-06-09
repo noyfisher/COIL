@@ -16781,37 +16781,37 @@
       "exercise_name": "Kneeling Quadruped Shoulder Reaches",
       "filename": "kneeling-quadruped-shoulder-reaches",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end images.",
+        "observation": "The camera angle, distance, and framing are identical between the two images.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's identity, including facial features, hair, skin tone, and body proportions, is identical in both images.",
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The clothing (grey t-shirt, dark blue shorts, white socks, grey sneakers) is perfectly consistent in both images.",
+        "observation": "The clothing, including shirt, shorts, socks, and shoes, is identical in both images.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The art style, including line weight, shading, level of detail, and color palette, is perfectly consistent between both images.",
+        "observation": "The art style, line work, shading, and color palette are perfectly consistent across both images.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The scene setup, including the mat and background, is perfectly consistent in both images.",
+        "observation": "The plain white background is consistent, with no changes in scene setup or props.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "The non-moving body parts (supporting arm, legs, torso, head) are anchored consistently in both images. Only the intended moving arm changes position.",
+        "observation": "All body parts intended to remain stationary (left arm, both knees, torso, head) are consistently anchored.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The movement from a quadruped position to extending one arm forward is logical and clearly demonstrates the 'Kneeling Quadruped Shoulder Reaches' exercise.",
+        "observation": "The transition clearly shows one arm reaching forward from the quadruped position, accurately representing the exercise movement.",
         "score": 5,
         "passed": true
       },
@@ -22698,40 +22698,40 @@
       "critical_failures": []
     },
     "prone-iyt-raises-band": {
-      "exercise_name": "Prone Iyt Raises Band",
+      "exercise_name": "Prone I-Y-T Raises with Band",
       "filename": "prone-iyt-raises-band",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are identical between the start and end images.",
+        "observation": "The camera angle, distance, and framing are perfectly consistent between the start and end positions.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The same person is depicted in both images, with no changes in appearance, body proportions, or identity.",
+        "observation": "The same character, with identical facial features, hair, and body proportions, is present in both images.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The character is wearing the exact same outfit, including shirt, shorts, socks, and shoes, in both images.",
+        "observation": "The character is wearing the exact same outfit, including shirt, shorts, socks, and shoes, in both the start and end images.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The art style, rendering, lighting, and level of detail are perfectly consistent between the two images.",
+        "observation": "The artistic rendering, lighting, and overall style are perfectly consistent across both images, maintaining a clean fitness illustration aesthetic.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The background, exercise bench, and resistance band are all in the exact same position and appear identical in both images.",
+        "observation": "The background, the gray bench, the towel under the head, and the blue resistance band (looped around the bench leg) are all consistently set up and appear identical in both images.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "The body parts that should remain static (torso on the bench, legs, and feet anchoring the band) are consistently anchored. Only the arms and shoulders move.",
+        "observation": "The torso, chest, hips, and feet are correctly anchored to the bench and floor in the same position in both the start and end images, with only the arms moving as intended.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The transition from arms hanging down to arms extended upward and outward demonstrates a clear and logical movement for 'Prone IYT Raises Band', making the exercise easy to understand.",
+        "observation": "The transition from arms hanging down to arms raised with the resistance band stretched clearly and logically depicts the 'Prone I-Y-T Raises with Band' exercise.",
         "score": 5,
         "passed": true
       },
@@ -29231,40 +29231,40 @@
       "critical_failures": []
     },
     "scapular-stabilization-band": {
-      "exercise_name": "Scapular Stabilization Band",
+      "exercise_name": "Scapular Stabilization with Band",
       "filename": "scapular-stabilization-band",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are identical in both images.",
+        "observation": "The camera angle, distance, and framing are identical, providing a consistent viewpoint.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's face, hair, skin tone, and body proportions are perfectly consistent across both images.",
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The character's entire outfit, including the grey t-shirt, dark shorts, white socks, and grey shoes, is identical in both images.",
+        "observation": "The character's outfit, including shirt, shorts, shoes, and socks, is identical in both images.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The art style, line work, shading, and color palette are perfectly consistent between the start and end images.",
+        "observation": "The art style, line weight, shading, and color palette are perfectly consistent across both images.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The background is consistently white, and the red resistance band is present in both images, only changing its shape due to the exercise movement.",
+        "observation": "The plain white background is consistent, and the resistance band is correctly depicted in both frames.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "The lower body, hips, and torso remain perfectly still, with only the arms and shoulders performing the intended movement. This is excellent body anchoring.",
+        "observation": "The lower body, torso, and head remain anchored in the same position, while only the arms and shoulders move as intended.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The transition from extended arms to bent arms pulling the band towards the chest clearly depicts the scapular stabilization movement, making the exercise easy to understand.",
+        "observation": "The transition from the start position (arms forward holding the band) to the end position (arms spread, band pulled apart) logically and accurately depicts the scapular stabilization exercise.",
         "score": 5,
         "passed": true
       },
@@ -43412,40 +43412,40 @@
       "critical_failures": []
     },
     "supine-chest-stretch-band": {
-      "exercise_name": "Supine Chest Stretch Band",
+      "exercise_name": "Supine Chest Stretch with Band",
       "filename": "supine-chest-stretch-band",
       "camera_angle": {
-        "observation": "The camera angle, distance, and framing are identical between the start and end images.",
+        "observation": "The camera angle, distance, and framing are identical, showing the movement clearly.",
         "score": 5,
         "passed": true
       },
       "character_identity": {
-        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent across both images.",
+        "observation": "The same individual is shown in both images, with consistent physical attributes.",
         "score": 5,
         "passed": true
       },
       "clothing": {
-        "observation": "The character's clothing (t-shirt, shorts, socks, shoes) and the resistance band are identical in both images.",
+        "observation": "The character's outfit, including shirt, shorts, socks, and shoes, is identical in both images.",
         "score": 5,
         "passed": true
       },
       "art_style": {
-        "observation": "The artistic rendering, including line weight, shading, level of detail, and color palette, is perfectly consistent.",
+        "observation": "The art style, lighting, and rendering are perfectly consistent across both images.",
         "score": 5,
         "passed": true
       },
       "scene_setup": {
-        "observation": "The background and the exercise mat remain identical and in the same position in both images.",
+        "observation": "The background, mat, and resistance band are consistent in appearance and placement between the start and end images.",
         "score": 5,
         "passed": true
       },
       "body_anchoring": {
-        "observation": "The head, torso, hips, and legs (from hips to feet) remain consistently anchored in the same position relative to the mat. Only the arms and the resistance band are shown moving.",
+        "observation": "The torso, hips, legs, and head remain perfectly anchored and consistent, with only the arms moving as intended.",
         "score": 5,
         "passed": true
       },
       "movement_logic": {
-        "observation": "The movement from bent arms to slightly more extended arms holding the resistance band over the shins logically represents a chest stretch, making the exercise movement clear.",
+        "observation": "The transition from the start position (arms extended up) to the end position (arms lowered overhead) clearly and logically depicts the 'Supine Chest Stretch with Band' movement.",
         "score": 5,
         "passed": true
       },
@@ -51867,11 +51867,137 @@
       "critical_failures": [
         "MOVEMENT_LOGIC"
       ]
+    },
+    "resistance-band-reverse-pec-flyes": {
+      "exercise_name": "Resistance Band Reverse Pec Flyes",
+      "filename": "resistance-band-reverse-pec-flyes",
+      "camera_angle": {
+        "observation": "Camera angle, distance, and framing are identical between the two images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, and body proportions, is perfectly consistent across both images.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "Clothing items (shirt, shorts, socks, shoes) are identical in color and style in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, rendering, lighting, and detail level are perfectly consistent between the two images.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The background, bench, and anchored resistance band are consistent in position and appearance in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "The parts of the body not involved in the movement (head, torso, lower body) maintain consistent anchoring between the start and end positions.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The movement from arms extended forward to arms spread wide to the sides clearly and logically depicts the resistance band reverse pec flyes exercise as described.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "sidelying-external-rotation-band": {
+      "exercise_name": "Sidelying External Rotation with Band",
+      "filename": "sidelying-external-rotation-band",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The character's identity, including face, hair, skin tone, and body proportions, is perfectly consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The clothing, including color and style, is identical between the start and end positions.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, line work, shading, and color palette are consistent across both illustrations.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The scene setup, including the mat and plain background, is identical. The resistance band is present in both.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "All non-moving body parts (head, supporting arm, torso, hips, legs) remain anchored in the exact same position. The right elbow also stays correctly anchored at the ribs.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The movement from start to end position clearly and logically demonstrates the sidelying external rotation, with the elbow remaining fixed as the forearm rotates.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
+    },
+    "prone-scapular-y-raises-with-band": {
+      "exercise_name": "Prone Scapular Y-Raises with Band",
+      "filename": "prone-scapular-y-raises-with-band",
+      "camera_angle": {
+        "observation": "The camera angle, distance, and framing are identical between the two images, providing a consistent viewpoint for the exercise.",
+        "score": 5,
+        "passed": true
+      },
+      "character_identity": {
+        "observation": "The same individual is consistently depicted in both images, maintaining identical facial features, hair, skin tone, and body proportions.",
+        "score": 5,
+        "passed": true
+      },
+      "clothing": {
+        "observation": "The character's clothing, including the grey t-shirt, dark blue shorts, white socks, and grey sneakers, is identical in both the start and end positions.",
+        "score": 5,
+        "passed": true
+      },
+      "art_style": {
+        "observation": "The art style, rendering quality, shading, and color palette are perfectly consistent across both images, which appear to be photographs.",
+        "score": 5,
+        "passed": true
+      },
+      "scene_setup": {
+        "observation": "The background, yoga mat, towel/pillow, and the resistance band are all consistently placed and appear identical in both images.",
+        "score": 5,
+        "passed": true
+      },
+      "body_anchoring": {
+        "observation": "All non-moving body parts, including the head (resting on the towel), torso, and legs, remain anchored in the same position throughout the movement. The band's anchor point at the ankles is also consistent.",
+        "score": 5,
+        "passed": true
+      },
+      "movement_logic": {
+        "observation": "The transition from the arms resting down, holding the band anchored at the feet, to raising the arms overhead in a 'Y' position, stretching the band, logically and clearly demonstrates the Prone Scapular Y-Raises movement.",
+        "score": 5,
+        "passed": true
+      },
+      "overall_consistency_score": 5.0,
+      "overall_pass": true,
+      "critical_failures": []
     }
   },
   "summary": {
-    "total_pairs": 1221,
-    "consistent_pairs": 1220,
+    "total_pairs": 1224,
+    "consistent_pairs": 1223,
     "average_score": 4.87
   }
 }

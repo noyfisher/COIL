@@ -40820,23 +40820,23 @@
         "passed": true
       },
       "subject": {
-        "observation": "There is exactly one human male figure. A faint duplicate figure is present, suggesting motion, but it is not a distinct second subject.",
+        "observation": "There is exactly one human male figure in the image.",
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the main figure is visible from head to toe.",
+        "observation": "The entire body of the figure is visible from head to toe.",
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
+        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
         "passed": true
       },
       "background": {
-        "observation": "The background is clean, plain, and white, with a light-colored mat on the floor.",
+        "observation": "The background is clean, plain, and white.",
         "passed": true
       },
       "no_text": {
-        "observation": "There is no readable text, labels, watermarks, or annotations present in the image.",
+        "observation": "There is no readable text, labels, watermarks, or annotations overlaid on the image.",
         "passed": true
       },
       "art_style": {
@@ -40844,11 +40844,11 @@
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is in a quadruped position, on hands and knees on the ground.",
+        "observation": "The figure is on hands and knees, which is a quadruped position.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is in a quadruped position with shoulders over wrists and hips over knees, maintaining a neutral spine, perfectly matching the start pose description. The faded duplicate illustrates the movement of the exercise.",
+        "observation": "The figure is in a quadruped position with shoulders over wrists and hips over knees, and a neutral spine, accurately matching the expected starting pose.",
         "passed": true
       },
       "pose_score": 5,
@@ -42366,7 +42366,7 @@
       "exercise_name": "Pronation and Supination Rotation",
       "filename": "pronation-supination-rotation.png",
       "anatomy": {
-        "observation": "The figure has the correct number of limbs: 2 arms and 2 legs.",
+        "observation": "The figure has exactly 2 arms and 2 legs.",
         "passed": true
       },
       "subject": {
@@ -42374,11 +42374,11 @@
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the seated figure is visible from head to toe.",
+        "observation": "The entire body of the figure is visible from head to toe.",
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
+        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the specified attire.",
         "passed": true
       },
       "background": {
@@ -42386,7 +42386,7 @@
         "passed": true
       },
       "no_text": {
-        "observation": "No readable text, labels, watermarks, or annotations are present in the image.",
+        "observation": "The image is free of any readable text, labels, watermarks, or annotations.",
         "passed": true
       },
       "art_style": {
@@ -42394,11 +42394,11 @@
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is correctly depicted as seated.",
+        "observation": "The figure is seated, which matches the 'seated' body position requirement.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is seated with the forearm supported on a towel on a table, the elbow is bent to 90 degrees, and the hand is shown rotating from pronation to supination, matching the exercise description perfectly.",
+        "observation": "The figure is seated at a table with the elbow bent to approximately 90 degrees, forearm resting flat on the tabletop, and hand extending past the edge. The palm is clearly facing down. The elbow appears stationary, and there are no motion arcs or arrows. The pose is an excellent match to the description.",
         "passed": true
       },
       "pose_score": 5,
@@ -42761,15 +42761,15 @@
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the figure is visible from head to toe.",
+        "observation": "The entire body of the subject is visible from head to toe.",
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the description.",
+        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
         "passed": true
       },
       "background": {
-        "observation": "The background is clean, plain, and light-colored (white).",
+        "observation": "The background is clean, plain, and white.",
         "passed": true
       },
       "no_text": {
@@ -42781,11 +42781,11 @@
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is lying face-down on a bench, with chest supported, which is consistent with a prone body position.",
+        "observation": "The figure is lying face-down on a bench, which is consistent with a prone position.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is lying face-down on a bench with chest supported and feet on the ground, holding a resistance band with arms hanging down. The forehead is neutral looking toward the floor, which is an excellent match to the expected pose description.",
+        "observation": "The figure is prone on a flat bench with the torso and chest fully supported, hips on the bench, and feet on the floor. Both hands hold resistance bands hanging down. The critical elements of the chest resting on the bench, both hands holding the band, and the band not being looped elsewhere are all met. The forehead is neutral and gaze is down. This is an excellent match to the exercise description.",
         "passed": true
       },
       "pose_score": 5,
@@ -43828,7 +43828,7 @@
       "exercise_name": "Resistance Band Forearm Pronation",
       "filename": "resistance-band-forearm-pronation.png",
       "anatomy": {
-        "observation": "The figure has exactly two arms and two legs.",
+        "observation": "The figure has exactly 2 arms and 2 legs. No extra or missing limbs.",
         "passed": true
       },
       "subject": {
@@ -43836,31 +43836,31 @@
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the figure is visible from head to toe.",
+        "observation": "The entire body of the figure, from head to toe, is visible.",
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a light gray t-shirt, dark navy shorts, white ankle socks, and gray athletic sneakers, matching the specified attire.",
+        "observation": "The figure is wearing a light gray t-shirt, dark navy shorts, white ankle socks, and gray athletic sneakers, matching the expected attire.",
         "passed": true
       },
       "background": {
-        "observation": "The background is clean, plain, and white.",
+        "observation": "The background is clean, plain, and white. A light-colored bench is present as part of the exercise setup.",
         "passed": true
       },
       "no_text": {
-        "observation": "The image is free of any readable text, labels, watermarks, or annotations.",
+        "observation": "The image is free of readable text, labels, watermarks, or annotations.",
         "passed": true
       },
       "art_style": {
-        "observation": "The image is in a clean digital illustration style.",
+        "observation": "The image is a clean digital illustration with a photo-realistic quality.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is in a seated position, matching the expected body orientation.",
+        "observation": "The figure is sitting on a bench, which correctly matches the 'seated' body position.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is seated with the left elbow bent at approximately 90 degrees and held close to the side. The left hand is holding a resistance band, with the other end looped under the left foot. This is an excellent match for the setup of the Resistance Band Forearm Pronation exercise.",
+        "observation": "The figure is seated with the elbow bent at 90 degrees, upper arm close to the side, forearm horizontal, and the palm clearly facing up (supinated). A resistance band is correctly looped around the hand and anchored under the foot. This is an excellent match to the exercise description for the start position.",
         "passed": true
       },
       "pose_score": 5,
@@ -43871,42 +43871,42 @@
       "exercise_name": "Resistance Band Forearm Supination",
       "filename": "resistance-band-forearm-supination.png",
       "anatomy": {
-        "observation": "The figure has exactly two arms and two legs, and all digits are present and anatomically correct.",
+        "observation": "The figure has exactly 2 arms and 2 legs.",
         "passed": true
       },
       "subject": {
-        "observation": "The image contains a single human male figure.",
+        "observation": "There is exactly one human male figure in the image.",
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the figure, from head to feet, is visible within the frame.",
+        "observation": "The entire body of the man, from head to toe, is visible.",
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy shorts, white ankle socks, and gray athletic sneakers.",
+        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the specifications.",
         "passed": true
       },
       "background": {
-        "observation": "The background is a clean, plain, and light-colored (white) surface.",
+        "observation": "The background is clean, plain, and white.",
         "passed": true
       },
       "no_text": {
-        "observation": "There is no readable text, labels, watermarks, or annotations visible in the image.",
+        "observation": "The image is free of readable text, labels, watermarks, or annotations. Small brand logos on shoes are present but acceptable.",
         "passed": true
       },
       "art_style": {
-        "observation": "The image is a clean digital illustration.",
+        "observation": "The image is photo-realistic.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is depicted in a seated position on a bench.",
+        "observation": "The figure is seated, which matches the expected body position.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is seated with the right elbow bent at 90 degrees and close to the side. The resistance band is looped around the right hand with the palm facing down, and the other end is secured under the right foot. This pose perfectly matches the description.",
+        "observation": "The man is seated with his elbow bent and upper arm close to his side, and a resistance band looped around his hand and anchored under his foot. However, the critical detail of the hand orientation is incorrect; the expected pose is a pronated start (palm down, back of hand up), but the image shows the palm facing up (supinated).",
         "passed": true
       },
-      "pose_score": 5,
+      "pose_score": 2,
       "overall_pass": true,
       "critical_failures": []
     },
@@ -44694,7 +44694,7 @@
         "passed": true
       },
       "subject": {
-        "observation": "The image contains exactly one human male figure.",
+        "observation": "There is exactly one human male figure in the image.",
         "passed": true
       },
       "full_body": {
@@ -44702,7 +44702,7 @@
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
+        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the description.",
         "passed": true
       },
       "background": {
@@ -44710,7 +44710,7 @@
         "passed": true
       },
       "no_text": {
-        "observation": "The image is free of any readable text, labels, watermarks, or annotations.",
+        "observation": "The image is free of readable text, labels, watermarks, or annotations.",
         "passed": true
       },
       "art_style": {
@@ -44722,7 +44722,7 @@
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is standing upright with feet hip-width apart, holding a resistance band at chest height with both hands, and arms extended straight ahead, accurately matching the exercise description.",
+        "observation": "The figure is standing with feet hip-width apart, holding a resistance band at chest height with both hands. Arms are extended straight ahead in front of the chest with a slight bend in the elbows, and are close together, not spread wide. This perfectly matches the critical description for the start position.",
         "passed": true
       },
       "pose_score": 5,
@@ -50194,39 +50194,39 @@
       "exercise_name": "Supine Chest Stretch with Band",
       "filename": "supine-chest-stretch-band.png",
       "anatomy": {
-        "observation": "The figure has exactly 2 arms and 2 legs.",
+        "observation": "The figure has exactly two arms and two legs. All limbs are correctly depicted without any extra or missing parts.",
         "passed": true
       },
       "subject": {
-        "observation": "There is exactly one human male figure present in the image.",
+        "observation": "There is a single human male figure in the image.",
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the figure, from head to toe, is visible.",
+        "observation": "The entire body of the figure, from head to toe, is visible within the frame.",
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
+        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the specified attire.",
         "passed": true
       },
       "background": {
-        "observation": "The background is clean, plain, and light-colored (white/light gray).",
+        "observation": "The background is plain, clean, and white, with a gray exercise mat on the floor, meeting the background requirements.",
         "passed": true
       },
       "no_text": {
-        "observation": "The image is free of any readable text, labels, watermarks, or annotations.",
+        "observation": "There is no readable text, labels, watermarks, or annotations overlaid on the image. Small brand logos on the shoes are present but acceptable.",
         "passed": true
       },
       "art_style": {
-        "observation": "The image is a clean digital illustration.",
+        "observation": "The image is a photo-realistic photograph.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is lying on his back, face up, with his back on the ground/mat, which is a supine position.",
+        "observation": "The figure is lying on his back, face up, on a mat, which is the correct supine body position.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is lying on his back on a mat with knees bent and feet flat on the floor, holding a resistance band across his chest with both hands. This is an excellent match to the expected pose.",
+        "observation": "The figure is correctly performing the Supine Chest Stretch with Band. He is lying supine with knees bent and feet flat, holding a resistance band taut between both hands, with arms extended straight up above his chest. The band is held correctly and not routed incorrectly.",
         "passed": true
       },
       "pose_score": 5,
@@ -53853,19 +53853,19 @@
       "exercise_name": "Resistance Band Reverse Pec Flyes",
       "filename": "resistance-band-reverse-pec-flyes.png",
       "anatomy": {
-        "observation": "The figure has two arms and two legs, with no extra or missing limbs.",
+        "observation": "The figure has exactly 2 arms and 2 legs.",
         "passed": true
       },
       "subject": {
-        "observation": "The image contains a single human male figure.",
+        "observation": "There is exactly one human male figure.",
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the subject, from head to feet, is visible in the image.",
+        "observation": "The entire body of the subject is visible from head to toe.",
         "passed": true
       },
       "clothing": {
-        "observation": "The subject is wearing a light grey athletic t-shirt, dark navy compression shorts, white ankle socks, and grey athletic sneakers.",
+        "observation": "The figure is wearing a light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers, matching the description.",
         "passed": true
       },
       "background": {
@@ -53873,22 +53873,22 @@
         "passed": true
       },
       "no_text": {
-        "observation": "There is no readable text, labels, watermarks, or annotations visible in the image. Small brand logos on the shoes are present but acceptable.",
+        "observation": "There is no readable text, labels, watermarks, or annotations in the image.",
         "passed": true
       },
       "art_style": {
-        "observation": "The image is a photo-realistic photograph.",
+        "observation": "The image is photo-realistic.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is seated on a bench, which matches the expected 'seated' body position.",
+        "observation": "The figure is seated on a bench, which matches the expected 'seated' orientation.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is performing a reverse pec fly while seated, with arms extended to the sides and pulling against a resistance band anchored to a central pole. This accurately depicts the Resistance Band Reverse Pec Flyes exercise.",
+        "observation": "The figure is seated with a resistance band anchored in front. However, the arms are not extended straight forward 'together' in front of the chest as described for the critical start position. They are already slightly spread apart, indicating a mid-movement or end position rather than the specified start.",
         "passed": true
       },
-      "pose_score": 5,
+      "pose_score": 3,
       "overall_pass": true,
       "critical_failures": []
     },
@@ -54549,7 +54549,7 @@
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the figure is visible from head to toe.",
+        "observation": "The entire body of the figure, from head to toe, is visible.",
         "passed": true
       },
       "clothing": {
@@ -54557,15 +54557,15 @@
         "passed": true
       },
       "background": {
-        "observation": "The background is clean, plain, and light-colored (white).",
+        "observation": "The background is clean, plain, and white.",
         "passed": true
       },
       "no_text": {
-        "observation": "There is no readable text, labels, watermarks, or annotations overlaid on the image.",
+        "observation": "The image is free of readable text, labels, watermarks, or annotations.",
         "passed": true
       },
       "art_style": {
-        "observation": "The image is in a clean digital illustration style.",
+        "observation": "The image is a clean digital illustration with photo-realistic qualities.",
         "passed": true
       },
       "body_orientation": {
@@ -54573,10 +54573,10 @@
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is standing with feet shoulder-width apart and holding a resistance band overhead with both hands. However, the elbows are not bent 90 degrees behind the head; they are bent with the band held directly overhead, which is a variation from the specified starting position.",
+        "observation": "The figure is standing with feet shoulder-width apart, holding a resistance band overhead with elbows bent to about 90 degrees, forearms and hands behind the head, and upper arms pointing straight up close to the ears. This is an excellent match for the Tricep Extension with Band starting pose.",
         "passed": true
       },
-      "pose_score": 3,
+      "pose_score": 5,
       "overall_pass": true,
       "critical_failures": []
     },
@@ -57856,42 +57856,42 @@
       "exercise_name": "Prone Scapular Y-Raises with Band",
       "filename": "prone-scapular-y-raises-with-band.png",
       "anatomy": {
-        "observation": "The figure has two arms and two legs, and all other body parts appear anatomically correct.",
+        "observation": "The figure has exactly two arms and two legs.",
         "passed": true
       },
       "subject": {
-        "observation": "The image features exactly one human male figure.",
+        "observation": "The image features a single human male figure.",
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the figure, from head to toe, is visible within the frame.",
+        "observation": "The entire body of the subject, from head to toe, is visible in the frame.",
         "passed": true
       },
       "clothing": {
-        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy shorts, white ankle socks, and gray athletic sneakers.",
+        "observation": "The figure is wearing a fitted light gray athletic t-shirt, dark navy compression shorts, white ankle socks, and gray athletic sneakers.",
         "passed": true
       },
       "background": {
-        "observation": "The background is plain, white, and clean. There are no distracting elements or complex scenes.",
+        "observation": "The background is plain, clean, and light-colored.",
         "passed": true
       },
       "no_text": {
-        "observation": "There is no readable text, labels, watermarks, or annotations overlaid on the image.",
+        "observation": "No readable text, labels, or watermarks are present in the image, aside from small brand logos on the shoes.",
         "passed": true
       },
       "art_style": {
-        "observation": "The image is a photo-realistic photograph.",
+        "observation": "The image is photo-realistic.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is lying face down on a mat, which is the prone body position.",
+        "observation": "The figure is lying on their stomach, face down on a mat, which matches the \"prone\" orientation.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is in a prone position on a mat with a pillow, holding a resistance band and performing a 'Y' raise, which is an excellent representation of the exercise. The description mentioned 'arms at your sides' for the starting position, but the image accurately depicts the active phase of a Y-raise.",
+        "observation": "The figure is in a prone position with legs straight and forehead resting on a towel. He is holding a resistance band. However, his arms are extended forward and slightly out, resembling the peak of a Y-raise, rather than resting along his sides on the floor as described for the starting position.",
         "passed": true
       },
-      "pose_score": 5,
+      "pose_score": 3,
       "overall_pass": true,
       "critical_failures": []
     },
@@ -58028,15 +58028,15 @@
       "exercise_name": "Sidelying External Rotation with Band",
       "filename": "sidelying-external-rotation-band.png",
       "anatomy": {
-        "observation": "The main figure has 2 arms and 2 legs. An additional forearm/bicep is overlaid in the image to demonstrate the movement with the resistance band, but the primary subject's anatomy is correct.",
+        "observation": "The figure has exactly 2 arms and 2 legs, and all limbs are anatomically connected.",
         "passed": true
       },
       "subject": {
-        "observation": "There is exactly one human male figure as the primary subject. An overlaid arm is present for instructional purposes, not as a separate subject.",
+        "observation": "The image contains exactly one human male figure.",
         "passed": true
       },
       "full_body": {
-        "observation": "The entire body of the main figure is visible from head to toe.",
+        "observation": "The entire body of the figure is visible from head to toe.",
         "passed": true
       },
       "clothing": {
@@ -58044,23 +58044,23 @@
         "passed": true
       },
       "background": {
-        "observation": "The background is clean, plain, and light-colored (white).",
+        "observation": "The background is plain white with a light beige mat, which is clean, plain, and light-colored.",
         "passed": true
       },
       "no_text": {
-        "observation": "The image is free of readable text, labels, watermarks, or annotations.",
+        "observation": "The image is free of any readable text, labels, watermarks, or annotations.",
         "passed": true
       },
       "art_style": {
-        "observation": "The image is photo-realistic.",
+        "observation": "The image is a clean digital illustration.",
         "passed": true
       },
       "body_orientation": {
-        "observation": "The figure is lying on his left side, which matches the 'side_lying' body position.",
+        "observation": "The figure is lying on his side, which correctly matches 'side_lying' body position.",
         "passed": true
       },
       "pose_accuracy": {
-        "observation": "The figure is lying on his left side with his right shoulder flexed and elbow bent, holding a resistance band at chest level, accurately depicting the starting position of the Sidelying External Rotation. The overlaid arm clearly illustrates the external rotation movement.",
+        "observation": "The figure is lying on their left side, head supported, with the right shoulder flexed and the right elbow bent to about 90 degrees tucked at the ribs, the right hand holding a resistance band at chest level. Both legs are extended and resting along the floor, stacked. All critical aspects of the pose are accurately depicted.",
         "passed": true
       },
       "pose_score": 5,
