@@ -13,16 +13,20 @@ Ankle Alphabet Tracing|ankle-alphabet-tracing|Ankle
 Ankle Circles|ankle-circles|Ankle
 Ankle Circles with Single Leg Balance|ankle-circles-balance|Ankle
 Resistance Band Ankle Dorsiflexion|ankle-dorsiflexion-band|Foot
+Ankle Dorsiflexion with Resistance Band|ankle-dorsiflexion-resistance|Ankle
 Lateral Ankle Eversion with Resistance Band|ankle-eversion-band|Ankle
 Lateral Ankle Inversion with Resistance Band|ankle-inversion-band|Ankle
 Seated Ankle Inversion and Eversion|ankle-inversion-eversion|Ankle
 Seated Ankle Plantarflexion with Resistance Band|ankle-plantarflexion-band|Ankle
 Ankle Pumps|ankle-pumps|Ankle
+Seated Anterior Tibialis Stretch|anterior-tibialis-stretch|Ankle
+Anti-Rotation Press with Rotation|anti-rotation-press|Core
 Arch Doming Exercise|arch-doming-exercise|Foot
 Arch Doming and Foot Intrinsic Strengthening|arch-doming-foot-intrinsics|Ankle
 Arch Strengthening with Towel Scrunches|arch-strengthening-towel-scrunches|Foot
 Arm Circles|arm-circles|Shoulder
 Active Range of Motion Arm Circles|arm-circles-range-motion|Shoulder
+Arm Elevation with Deep Breathing|arm-elevation-deep-breathing|Shoulder
 Assisted Cat-Cow Stretch|assisted-cat-cow-stretch|Back
 Balance Ball Sitting|balance-ball-sitting|Back
 Balance Walk - Tandem Stance|balance-walk-tandem-stance|Core
@@ -52,9 +56,11 @@ Banded Bicep Curls|banded-bicep-curls|Arm
 Banded Chest Press|banded-chest-press|Chest
 Banded Clamshells|banded-clamshells|Hip
 Banded Copenhagen Adductor Exercise|banded-copenhagen-adductor-exercise|Hip
+Banded Crab Walk|banded-crab-walk|Hip
 Banded External Rotation at 90/90|banded-external-rotation-90-90|Shoulder
 Banded Glute Bridge|banded-glute-bridge|Hip
 Banded Glute Bridges|banded-glute-bridges|Hip
+Banded Good Morning|banded-good-morning|Back
 Banded Hip Abduction|banded-hip-abduction|Hip
 Banded Hip Bridge|banded-hip-bridge|Hip
 Banded Hip Internal Rotation|banded-hip-internal-rotation|Hip
@@ -65,11 +71,13 @@ Banded Overhead Press|banded-overhead-press|Shoulder
 Banded Pallof Press|banded-pallof-press|Core
 Banded Pull-Apart for Shoulder Stability|banded-pull-apart-shoulders|Shoulder
 Banded Quadriceps Sets|banded-quadriceps-sets|Hip
+Banded Quadruped Reach|banded-quadruped-reach|Back
 Banded Reverse Fly|banded-reverse-fly|Back
 Banded Row|banded-row|Back
 Banded Rows|banded-rows|Back
 Banded Shoulder Dislocations|banded-shoulder-dislocations|Shoulder
 Banded Shoulder External Rotation|banded-shoulder-external-rotation|Shoulder
+Banded Shoulder Stabilization|banded-shoulder-stabilization|Shoulder
 Banded Shoulder Stabilizer Series|banded-shoulder-stabilizer-series|Rotator cuff, scapular stabilizers, core
 Banded Side-Lying Hip Adduction|banded-side-lying-hip-adduction|Hip
 Banded Squat|banded-squat|Leg
@@ -78,6 +86,8 @@ Banded Standing Hip Abduction|banded-standing-hip-abduction|Hip
 Banded Standing Hip Extension|banded-standing-hip-extension|Hip
 Banded Standing Kickbacks|banded-standing-kickbacks|Hip
 Banded Standing Marches|banded-standing-marches|Hip
+Banded Superman|banded-superman|Back
+Banded Triceps Extension|banded-triceps-extension|Shoulder
 Banded Woodchop|banded-woodchop|Core
 Barbell Back Squats|barbell-back-squats|Hip
 Belly Breathing with Leg Lifts|belly-breathing-with-leg-lifts|Lungs
@@ -86,10 +96,16 @@ Bicep Curls with Light Dumbbell|bicep-curls-light-dumbbell|Elbow
 Big Arm Circles|big-arm-circles|Shoulder
 Big Arm Raises with Dumbbells|big-arm-raises-dumbbells|Shoulder
 Big Backward Steps|big-backward-steps|Hip
+Big Head Turns|big-head-turns|Shoulder
 Big Lateral Reaches with Dumbbells|big-lateral-reaches-dumbbells|Shoulder
+Big Reaching Overhead|big-reaching-overhead|Shoulder
 Big Sit-to-Stand with Dumbbells|big-sit-to-stand-dumbbells|Hip
+Big Stepping Backward|big-stepping-backward|Hip
+Big Stepping Forward|big-stepping-forward|Hip
+Big Stepping Sideways|big-stepping-sideways|Hip
 Big Steps Forward|big-steps-forward|Hip
 Big Toe Flexion Strengthening|big-toe-flexion-strengthening|Foot
+Big Toe Joint Mobilization|big-toe-joint-mobilization|Foot
 Big Trunk Rotations|big-trunk-rotations|Back
 Bird Dog|bird-dog|Core/Back
 Bird Dog Hold with Scapular Punch|bird-dog-hold-with-scapular-punch|Core Stability, Rotator Cuff & Scapular Control
@@ -99,7 +115,9 @@ Bird Dogs|bird-dogs|Back
 Bodyweight Squats|bodyweight-squats|Knee
 BOSU Ball Balance|bosu-ball-balance|Ankle/Knee
 Box Jumps|box-jumps|Hip
+Breathing Exercises with Arm Positioning|breathing-exercises-arm-positioning|Shoulder
 Bridge Hold|bridge-hold|Glutes
+Bridging with Pelvic Floor Engagement|bridging-pelvic-floor|Pelvic Floor
 Brisk Walking|brisk-walking|Full Body
 Bulgarian Split Squat|bulgarian-split-squat|Knee/Hip
 Butterfly Stretch|butterfly-stretch|Hip
@@ -117,18 +135,22 @@ Calf Stretches Against Wall|calf-stretch-wall|Ankle
 Calf Stretch with Band|calf-stretch-with-band|Calf
 Calf Stretches|calf-stretches|Knee
 Cat-Camel Stretch|cat-camel-stretch|Back
+Cat-Cow Mobilization|cat-cow-mobilization|Pelvic Floor
 Cat-Cow Stretch|cat-cow-stretch|Back
 Cervical Isometric Holds|cervical-isometric-holds|Neck
 Cervical Isometric Lateral Flexion|cervical-isometric-lateral-flexion|Neck
 Cervical Isometric Neck Extension|cervical-isometric-neck-extension|Neck
 Cervical Isometric Neck Flexion|cervical-isometric-neck-flexion|Neck
+Cervical Neck Stretches|cervical-neck-stretches|Neck
 Cervical Retraction|cervical-retraction|Neck
 Cervical Retraction with Isometric Hold|cervical-retraction-isometric|Neck
 Cervical Retraction with Resistance|cervical-retraction-resistance|Neck
+Cervical Rotation with Band Support|cervical-rotation-band|Neck
 Cervical Rotation Stretch|cervical-rotation-stretch|Neck
 Cheek Puff Exercise|cheek-puff|Face
 Chest Doorway Stretch|chest-doorway-stretch|Shoulder
 Chest Opener Stretch|chest-opener-stretch|Shoulder
+Chest Press Machine|chest-press-machine|Chest
 Chest Stretch|chest-stretch|Chest
 Chest Stretch Corner|chest-stretch-corner|Chest
 Chest Wall Mobility Stretch|chest-wall-mobility-stretch|Chest
@@ -138,17 +160,20 @@ Child's Pose with Side Reach|childs-pose-with-side-reach|Lower back, intercostal
 Chin Tucks|chin-tucks|Neck
 Clam Shell Exercise with Band|clam-shell-exercise-with-band|Hip
 Clam Shells|clam-shells|Hip
+Clams with Resistance Band|clams-resistance-band|Hip
 Clamshells|clamshells|Hip/Knee
 Clamshells with Resistance Band|clamshells-band|Hip
 Clamshells with Resistance Band|clamshells-resistance-band|Hip
 Clamshells with Band|clamshells-with-band|Hip
 Clock Reach|clock-reach|Ankle
+Neuromuscular Re-education - Coordinated Expressions|coordinated-facial-expression|Face
 Copenhagen Adduction|copenhagen-adduction|Hip
 Copenhagen Adductor Squeeze|copenhagen-adductor-squeeze|Hip
 Core Plank (Foot Neutral Position)|core-plank|Core
 Couch Stretch|couch-stretch-hip-flexor-lengthening|Hip
 Cross-Body Shoulder Stretch|cross-body-shoulder-stretch|Shoulder
 Cross-Body Stretch|cross-body-stretch|Shoulder
+Crossbody Shoulder Stretch|crossbody-shoulder-stretch|Shoulder
 Dead Bug|dead-bug|Core
 Dead Bug with Dumbbell|dead-bug-with-dumbbell|Back
 Dead Bug with Shoulder Reach|dead-bug-with-shoulder-reach|Core Stability, Lower Back & Shoulder Integration
@@ -158,6 +183,7 @@ Deep Abdominal Breathing|deep-abdominal-breathing|Core
 Deep Abdominal Engagement|deep-abdominal-engagement|Core
 Deep Breathing with Body Scan|deep-breathing-body-scan|Full Body
 Deep Core Activation with Band|deep-core-activation-band|Core
+Deep Squat Hold with Relaxation|deep-squat-hold|Pelvic Floor
 Diagonal Gaze Shifts|diagonal-gaze-shifts|Eyes and Neck
 Diaphragmatic Breathing|diaphragmatic-breathing|Core/Respiratory
 Diaphragmatic Breathing in Supine|diaphragmatic-breathing-supine|Lungs
@@ -169,9 +195,11 @@ Doorway Pec Stretch with Rotation|doorway-pec-stretch-rotation|Chest
 Doorway Pectoral Stretch|doorway-pectoral-stretch|Shoulder
 Doorway Shoulder Stretch|doorway-shoulder-stretch|Shoulder
 Doorway Stretch|doorway-stretch|Chest/Shoulder
+Dorsiflexion Hold Against Gravity|dorsiflexion-hold-gravity|Ankle
 Double Knee-to-Chest|double-knee-to-chest|Lower Back
 Double Leg Calf Raise|double-leg-calf-raise|Calf
 Double-Leg Glute Bridge|double-leg-glute-bridge|Hip
+Double Leg Heel Raises on Stairs|double-leg-heel-raises-stairs|Ankle
 Downward Facing Dog|downward-facing-dog|Shoulders, Back, Hamstrings
 Dumbbell Bent-Over Rows|dumbbell-bent-over-rows|Back
 Dumbbell Bicep Curls with Breathing|dumbbell-bicep-curls-breathing|Arm
@@ -186,8 +214,10 @@ Dumbbell Deadlifts (Light)|dumbbell-deadlifts-light|Back
 Dumbbell Deadlifts with Posterior Chain Focus|dumbbell-deadlifts-posterior-chain|Ankle
 Dumbbell External Rotation at 90/90|dumbbell-external-rotation-90-90|Shoulder
 Dumbbell Farmer Carry|dumbbell-farmer-carry|Shoulder
+Dumbbell Farmer's Carries|dumbbell-farmers-carries|Shoulder
 Dumbbell Farmer's Carry|dumbbell-farmers-carry|Shoulder
 Dumbbell Farmer's Carry with Head Level|dumbbell-farmers-carry-head-level|Core
+Dumbbell Farmer's Walk|dumbbell-farmers-walk|Core/Grip
 Dumbbell Floor Press|dumbbell-floor-press|Hip
 Dumbbell Goblet Squat|dumbbell-goblet-squat|Ankle
 Dumbbell Goblet Squats|dumbbell-goblet-squats|Hip
@@ -207,7 +237,9 @@ Dumbbell Row|dumbbell-row|Back
 Dumbbell Rows|dumbbell-rows|Back
 Dumbbell Rows - Bilateral|dumbbell-rows-bilateral|Back
 Dumbbell Rows - Seated|dumbbell-rows-seated|Back
+Dumbbell Shoulder Presses|dumbbell-shoulder-presses|Shoulder
 Dumbbell Shrugs|dumbbell-shrugs|Shoulder
+Dumbbell Single-Arm Row|dumbbell-single-arm-row|Back
 Dumbbell Single-Leg Deadlift|dumbbell-single-leg-deadlift|Hip
 Dumbbell Single Leg Deadlifts|dumbbell-single-leg-deadlifts|Ankle
 Dumbbell Squats with Visual Focus|dumbbell-squats-visual-focus|Hip
@@ -219,6 +251,8 @@ Dynamic Adductor Stretch with Hip Rotation|dynamic-adductor-stretch-with-hip-rot
 Eccentric Biceps Curl with Band|eccentric-biceps-curl-band|Shoulder
 Eccentric Calf Lowering|eccentric-calf-lowering|Calf
 Eccentric Hamstring Curls|eccentric-hamstring-curls|Knee
+Eccentric Wrist Flexion|eccentric-wrist-flexion|Forearm
+Elbow Extension with Resistance Band|elbow-extension-band|Elbow
 Elbow Flexion Stretch with Towel|elbow-extension-stretch|Elbow
 Elbow Flexion Curls with Resistance Band|elbow-flexion-band-curl|Elbow
 Elbow Flexion with Dumbbell|elbow-flexion-dumbbell|Forearm
@@ -226,13 +260,12 @@ Elbow Flexion and Extension|elbow-flexion-extension|Elbow
 Elbow Flexion with Light Resistance|elbow-flexion-light-resistance|Elbow
 Elbow Flexion Stretch|elbow-flexion-stretch|Elbow
 Elbow Range of Motion Pendulum|elbow-pendulum-swing|Elbow
-Exercise 1|exercise-1|Knee
-Exercise 2|exercise-2|Knee
-Exercise 3|exercise-3|Knee
 Extensor Carpi Radialis Stretch|extensor-carpi-radialis-stretch|Forearm
 External Rotation|external-rotation|Shoulder
 External Rotation with Resistance Band|external-rotation-resistance-band|Shoulder
+Eye Closure Strengthening|eye-closure-blink|Face
 Eye Closure and Blinking|eye-closure-blinking|Face
+Facial Mirror Exercises - Smile|facial-mirror-smile|Face
 Farmer's Carry|farmers-carry|Back
 Figure-4 Stretch|figure-4-stretch|Hip
 Figure-4 Stretch with Band Assist|figure-four-stretch-band|Hip
@@ -247,7 +280,9 @@ Finger Flexion and Extension|finger-flexion-extension|Hand
 Finger Flexion and Extension with Band|finger-flexion-extension-band|Hand
 Finger Flexor and Extensor Exercises|finger-flexor-extensor|Hand
 Finger Flexor Stretch|finger-flexor-stretch|Hand
+Finger Isolation Flexion|finger-isolation-flexion|Wrist
 Finger Isolation Lifts|finger-isolation-lifts|Hand
+Finger Isolation and Tapping|finger-isolation-tapping|Hand
 Finger Isometric Hold|finger-isometric-hold|Hand
 Finger Spread and Squeeze|finger-spread-squeeze|Hand
 Finger Tapping Exercise|finger-tapping-exercise|Hand
@@ -260,7 +295,9 @@ Foam Roller Thoracic Extension|foam-roller-thoracic-extension|Thoracic Spine
 Forearm Extensor Stretch with Band|forearm-extensor-stretch-band|Forearm
 Forearm Flexor Stretch with Band|forearm-flexor-stretch-band|Forearm
 Forearm Isometric Strengthening|forearm-isometric-strengthening|Forearm
+Forearm Plank with Hand Position Variation|forearm-plank-hand-variation|Forearm
 Forearm Plank on Knees|forearm-plank-knees|Forearm
+Forearm Plank with Wrist Awareness|forearm-plank-wrist|Wrist
 Forearm Pronation Isometric Hold|forearm-pronation-isometric|Elbow
 Forearm Pronation Stretch|forearm-pronation-stretch|Forearm
 Forearm Pronation and Supination|forearm-pronation-supination|Forearm
@@ -271,20 +308,26 @@ Supination and Pronation|forearm-rotation-pronation-supination|Forearm
 Forearm Self-Massage|forearm-self-massage|Forearm
 Forearm Supination Isometric Hold|forearm-supination-isometric|Forearm
 Forehead Wrinkle Exercise|forehead-wrinkle|Face
+4-7-8 Breathing Pattern|four-seven-eight-breathing|Respiratory System
+Four-Way Ankle Resistance (with towel)|four-way-ankle-resistance|Ankle
 Gait Training with Walking Pattern Focus|gait-training-walking|Full Body
 Gastrocnemius and Soleus Stretch|gastrocnemius-soleus-stretch|Ankle
 Gaze Stabilization Exercise|gaze-stabilization-exercise|Neck
 Gaze Stabilization - Head Turns (VOR Exercise)|gaze-stabilization-head-turns|Vestibular System
 Gaze Stabilization - Horizontal|gaze-stabilization-horizontal|Head
+Gaze Stabilization - Smooth Pursuits|gaze-stabilization-smooth-pursuits|Eyes
 Gaze Stabilization - Vertical|gaze-stabilization-vertical|Head
 Gaze Stabilization - X1 (Visual Fixation)|gaze-stabilization-x1|Vestibular System
 Gentle Finger Flexion Exercises|gentle-finger-flexion|Hand
 Gentle Finger Stretching|gentle-finger-stretch|Hand
 Gentle Finger Stretching|gentle-finger-stretching|Hand
+Gentle Isometric Arm Holds|gentle-isometric-arm-holds|Arm
 Gentle Jaw Opening with Tongue on Palate|gentle-jaw-opening-tongue-palate|Jaw
 Gentle Knee Flexion|gentle-knee-flexion|Knee
+Gentle Neck Rolls|gentle-neck-rolls|Neck
 Gentle Neck Stretches|gentle-neck-stretches|Neck
 Gentle Palm Pressing|gentle-palm-pressing|Hand
+Gentle Shoulder Circles|gentle-shoulder-circles|Shoulder
 Gentle Spinal Twist|gentle-spinal-twist|Back
 Gentle Stretching|gentle-stretching|Full Body
 Gentle Wrist Extension Strengthening|gentle-wrist-extension-strengthening|Forearm
@@ -305,10 +348,14 @@ Glute Bridges with Hold|glute-bridges-hold|Hip
 Glute Kickbacks with Dumbbell|glute-kickbacks-dumbbell|Hip
 Glute Squeeze with Dumbbell|glute-squeeze-with-dumbbell|Glutes
 Glute Squeezes|glute-squeezes|Hip
+Gluteal Sets|gluteal-sets|Hip
 Goblet Squat|goblet-squat|Knee
 Goblet Squats|goblet-squats|Hip
 Seated Great Toe Abduction with Band|great-toe-abduction-band|Foot
+Grip Relaxation Technique|grip-relaxation-technique|Wrist
 Grip Strengthening with Band Squeeze|grip-strength-band-squeeze|Hand
+Grip Strength Training with Adjustable Gripper|grip-strength-training|Wrist
+Grip Strength with Ball|grip-strength-with-ball|Hand
 Grip Strengthening|grip-strengthening|Hand/Forearm
 Grip Strengthening with Band|grip-strengthening-band|Hand
 Gentle Grip Strengthening with Dumbbell|grip-strengthening-dumbbell|Forearm
@@ -325,6 +372,7 @@ Half-Kneeling Pallof Press|half-kneeling-pallof-press|Core, Lower Back Stabiliza
 Half-Kneeling Shoulder Rotations with Band|half-kneeling-shoulder-rotations-with-band|Rotator Cuff, External Rotators & Shoulder Stability
 Half-Kneeling Single-Arm Dumbbell Press|half-kneeling-single-arm-dumbbell-press|Shoulder
 Half Kneeling Single-Arm Dumbbell Row|half-kneeling-single-arm-dumbbell-row|Back
+Half-Kneeling Single-Arm Row with Band|half-kneeling-single-arm-row-band|Shoulder
 Hallux Extension with Band|hallux-extension-band|Foot
 Hallux Flexion with Band Resistance|hallux-flexion-band|Foot
 Hamstring Curl with Band|hamstring-curl-band|Knee
@@ -341,6 +389,7 @@ Hamstring Stretch with Band|hamstring-stretch-with-band|Knee
 Hamstring Stretch with Strap|hamstring-stretch-with-strap|Hamstring
 Hamstring Stretches|hamstring-stretches|Knee
 Hamstring Stretching|hamstring-stretching|Hamstring
+Hand and Finger Dexterity Drills|hand-dexterity-drills|Hand
 Gentle Hand Opening and Closing|hand-opening-closing|Hand
 Gentle Hand and Wrist Circles|hand-wrist-circles|Hand
 Happy Baby Pose|happy-baby-pose|Pelvic Floor
@@ -379,13 +428,19 @@ Intrinsic Foot Muscle Strengthening|intrinsic-foot-strengthening|Foot
 Intrinsic Hand Muscle Activation|intrinsic-hand-muscle-activation|Hand
 Intrinsic Hand Strengthening|intrinsic-hand-strengthening|Hand
 Inversion/Eversion with Band|inversion-eversion-band|Ankle
+Inversion and Eversion Strengthening|inversion-eversion-strengthening|Ankle
 Isolated Finger Extension|isolated-finger-extension|Hand
+Isolated Finger Lifts|isolated-finger-lifts|Hand
+Isometric Achilles Contraction|isometric-achilles-contraction|Ankle
 Isometric Cervical Extension|isometric-cervical-extension|Neck
 Isometric Cervical Flexion|isometric-cervical-flexion|Neck
+Isometric Elbow Flexion|isometric-elbow-flexion|Elbow
+Isometric Jaw Clenching|isometric-jaw-clenching|Jaw
 Isometric Quad Contraction|isometric-quad-contraction|Knee
 Isometric Shoulder Activation|isometric-shoulder-activation|Shoulder
 Isometric Shoulder External Rotation|isometric-shoulder-external-rotation|Shoulder
 Isometric Shoulder Internal Rotation|isometric-shoulder-internal-rotation|Shoulder
+Isometric Thumb Abduction|isometric-thumb-abduction|Wrist
 Isometric Thumb Abduction Hold|isometric-thumb-hold|Thumb
 Isometric Wrist Hold|isometric-wrist-hold|Forearm
 IT Band Foam Roll Stretch|it-band-foam-roll-stretch|Hip
@@ -395,6 +450,8 @@ Jump Squats|jump-squats|Hip
 Kegel Exercise (Pelvic Floor Contraction)|kegel-exercise|Pelvic Floor
 Knee Extension and Hold|knee-extension-hold|Knee
 Knee Extension with Resistance Band|knee-extension-resistance-band|Knee
+Knee Flexion with Resistance Band|knee-flexion-band|Knee
+Knee Flexion and Extension|knee-flexion-extension|Knee
 Knee Flexion ROM|knee-flexion-rom|Knee
 Knee Flexion Stretch|knee-flexion-stretch|Knee
 Knee to Chest Hold|knee-to-chest-hold|Hip
@@ -402,22 +459,28 @@ Knee-to-Chest Stretch|knee-to-chest-stretch|Lower Back
 Kneeling Core Stability with Band|kneeling-core-stability-band|Core
 Kneeling Hip Flexor Stretch with Band|kneeling-hip-flexor-stretch-band|Hip
 Kneeling Quadruped Shoulder Reaches|kneeling-quadruped-shoulder-reaches|Shoulder
+Lat Pulldown Machine|lat-pulldown-machine|Back
 Lat Pulldown with Band|lat-pulldown-with-band|Upper Back
 Lat Stretches|lat-stretches|Upper Back, Lats
+Lateral Ankle Stability with Dumbbell Reach|lateral-ankle-stability-reach|Ankle
 Lateral Band Walk|lateral-band-walk|Hip
 Lateral Band Walks|lateral-band-walks|Hip/Glute
 Lateral Band Walks with Dumbbell|lateral-band-walks-dumbbell|Hip
 Lateral Band Walks with Dumbbells|lateral-band-walks-with-dumbbells|Hip
 Lateral Jaw Glide Exercise|lateral-jaw-glide|Jaw
+Lateral Jaw Movement|lateral-jaw-movement|Jaw
 Lateral Lunge with Dumbbell|lateral-lunge-dumbbell|Hip
 Lateral Lunge with Reach|lateral-lunge-with-reach|Hips, Inner Thigh, Core
 Lateral Lunges|lateral-lunges|Ankle
 Lateral Neck Stretch|lateral-neck-stretch|Neck
 Lateral Side-Lying Clam Shell|lateral-side-lying-clam-shell|Gluteus medius, hip external rotators, trochanteric bursa
 Lateral Step-Ups|lateral-step-ups|Knee/Hip
+Leg Press Machine|leg-press-machine|Lower Body
 Leg Swings Forward and Back|leg-swings-forward-back|Hip
 Levator Scapulae Stretch|levator-scapulae-stretch|Neck/Shoulder
 Light Dumbbell Bicep Curl|light-dumbbell-bicep-curl|Elbow
+Lightweight Lateral Raises|lightweight-lateral-raises|Shoulder
+Lip Pucker and Stretch|lip-pucker-stretch|Face
 Lip Rounding Exercise|lip-rounding|Face
 Long Arc Quads|long-arc-quads|Knee
 Lower Back Release Roll|lower-back-release-roll|Lower Back Muscles & Lumbar Fascia
@@ -427,6 +490,7 @@ Lying Figure Four Stretch|lying-figure-four-stretch|Hip
 Lying Hamstring Curl with Band|lying-hamstring-curl-band|Hip
 Lying Hip Flexor Stretch|lying-hip-flexor-stretch|Iliopsoas, Rectus Femoris
 Lying IT Band Stretch|lying-it-band-stretch|Hip
+Lying Lateral Leg Lifts|lying-lateral-leg-lifts|Hip
 Lying Affected Side Rotation with Pillow|lying-side-rotation|Shoulder
 Lying Spinal Twist|lying-spinal-twist|Back
 Lymphatic Drainage Arm Raises|lymphatic-drainage-arm-raises|Shoulder
@@ -438,12 +502,14 @@ Median Nerve Glide|median-nerve-glide|Arm/Hand
 Median Nerve Gliding|median-nerve-gliding|Wrist
 Mini Squats|mini-squats|Knee/Quadriceps
 Modified Dumbbell Chest Press|modified-dumbbell-chest-press|Chest
+Modified Plank Hold|modified-plank-hold|Back
 Modified Superman Hold|modified-superman-hold|Back
 Modified Wall Push-ups|modified-wall-push-ups|Chest
 Monster Walk|monster-walk|Hip
 Monster Walks|monster-walks|Hip/Glute
 Monster Walks with Band|monster-walks-band|Hip
 Monster Walks with Dumbbell|monster-walks-dumbbell|Hip
+Mouth Corner Lift - Alternating|mouth-corner-lift-alternate|Face
 Mouth Opening Exercise|mouth-opening|Face
 Neck Flexion and Extension|neck-flexion-extension|Neck
 Neck Flexion and Extension with Band|neck-flexion-extension-band|Neck
@@ -456,13 +522,17 @@ Neck Isometric Hold - Lateral|neck-isometric-hold-lateral|Neck
 Neck Isometric Holds|neck-isometric-holds|Neck
 Neck Lateral Flexion|neck-lateral-flexion|Neck
 Neck Lateral Flexion Stretch|neck-lateral-flexion-stretch|Neck
+Neck Retraction|neck-retraction|Neck
 Neck ROM - Gentle Turns|neck-rom-turns|Neck
 Neck Rotation - Active Range of Motion|neck-rotation-active-rom|Neck
+Neck Rotation Stretch - Supine|neck-rotation-stretch-supine|Neck
 Neck Rotations|neck-rotations|Neck
 Neck and Shoulder Relaxation|neck-shoulder-relaxation|Shoulder
 Neck and Shoulder Stretch|neck-shoulder-stretch|Neck
 Neck Side Bends|neck-side-bends|Neck
 Neck Stretching with Gentle Rotation|neck-stretch-gentle-rotation|Neck
+Neck Stretching - Sternocleidomastoid|neck-stretch-sternocleidomastoid|Neck
+Nose Wrinkle Exercise|nose-wrinkle-raise|Face
 Open Book Stretch|open-book-stretch|Thoracic Spine
 Overhead Shoulder Press|overhead-shoulder-press|Shoulder
 Overhead Tricep Stretch|overhead-tricep-stretch|Tricep/Shoulder
@@ -488,6 +558,7 @@ Peroneal Tendon Glide with Band|peroneal-tendon-glide-with-band|Ankle
 Pigeon Pose|pigeon-pose|Hip
 Pigeon Pose Hip Stretch|pigeon-pose-hip-stretch|Hip
 Pigeon Pose Stretch|pigeon-pose-stretch|Hip
+PIP Joint Extension Isometric Hold|pip-joint-extension-isometric|Finger
 PIP Joint Isolation Flexion|pip-joint-flexion|Hand
 PIP Joint Passive Range of Motion|pip-joint-passive-rom|Finger
 Piriformis Stretch|piriformis-stretch|Hip/Glute
@@ -495,15 +566,20 @@ Plank|plank|Core
 Planks with Scapular Control|planks-scapular-control|Back
 Planks with Shoulder Taps|planks-with-shoulder-taps|Shoulder
 Plantar Fascia Self-Massage|plantar-fascia-massage|Foot
+Plantar Fascia Release with Ball|plantar-fascia-release-with-ball|Foot
 Plantar Fascia Rolling|plantar-fascia-rolling|Foot
 Plantar Fascia Stretch|plantar-fascia-stretch|Foot
 Plantar Fascia Stretch with Band|plantar-fascia-stretch-band|Foot
 Plantar Fascia Stretching with Towel|plantar-fascia-stretching-towel|Foot
+Plantarflexion with Dumbbell Weight|plantarflexion-dumbbell|Ankle
+Posterior Chain Activation|posterior-chain-activation|Back
 Posterior Elbow Stretch|posterior-elbow-stretch|Elbow
 Posterior Neck Stretch with Band|posterior-neck-stretch-band|Neck
 Posterior Shoulder Doorway Stretch|posterior-shoulder-doorway-stretch|Shoulder
 Posterior Shoulder Stretch|posterior-shoulder-stretch|Shoulder
 Posterior Shoulder Stretch with Band|posterior-shoulder-stretch-band|Shoulder
+Postural Correction Hold|postural-correction-hold|Back
+Postural Neck Stretch|postural-neck-stretch|Jaw
 Postural Wall Hold|postural-wall-hold|Back
 Prayer Stretch|prayer-stretch|Lower Back
 Progressive Muscle Relaxation|progressive-muscle-relaxation|Full Body
@@ -513,6 +589,7 @@ Pronation/Supination with Light Dumbbell|pronation-supination-dumbbell|Forearm
 Pronation and Supination with Light Weight|pronation-supination-light-weight|Forearm
 Pronation and Supination Rotation|pronation-supination-rotation|Forearm
 Pronation and Supination Strengthening|pronation-supination-strengthening|Forearm
+Prone Back Extension|prone-back-extension|Back
 Prone Cobra|prone-cobra|Back
 Prone Cobra Breathing|prone-cobra-breathing|Lungs
 Prone Cobra Hold|prone-cobra-hold|Back
@@ -524,6 +601,8 @@ Prone Gastrocnemius Stretch|prone-gastrocnemius-stretch|Ankle
 Prone Glute Squeeze Holds|prone-glute-squeeze-holds|Gluteus Maximus, Lower Back Support
 Prone Hamstring Curl|prone-hamstring-curl|Hamstring
 Prone Hamstring Isometric Hold|prone-hamstring-isometric|Hamstring
+Prone Hand Elevation and Relaxation|prone-hand-elevation-relaxation|Arm
+Prone Head Turns|prone-head-turns|Neck
 Prone Hip Abduction|prone-hip-abduction|Hip
 Prone Hip Adduction Lifts|prone-hip-adduction-lifts|Hip
 Prone Hip Bridges|prone-hip-bridges|Back
@@ -549,7 +628,9 @@ Prone Knee Flexion with Band|prone-knee-flexion-with-band|Knee
 Prone Lumbar Extension with Band|prone-lumbar-extension-band|Back
 Prone Neck Isometric Hold|prone-neck-isometric-hold|Neck/Upper Back
 Prone Press-Up|prone-press-up|Lower Back
+Prone Reverse Fly|prone-reverse-fly|Shoulder
 Prone Scapular Retraction|prone-scapular-retraction|Upper Back
+Prone Scapular Y-Raises with Band|prone-scapular-y-raises-with-band|Shoulder
 Prone Shoulder Abduction (Dumbbell)|prone-shoulder-abduction-dumbbell|Shoulder
 Prone Shoulder Blade Squeezes|prone-shoulder-blade-squeezes|Shoulder
 Prone Shoulder Extension with Band|prone-shoulder-extension-band|Shoulder
@@ -571,11 +652,13 @@ Prone Superman Hold|prone-superman-hold|Back
 Prone T Raises|prone-t-raises|Shoulder/Upper Back
 Prone T-Y-I Holds|prone-t-y-i-holds|Shoulder
 Prone Thoracic Extension Hold|prone-thoracic-extension|Back
+Prone Thoracic Rotation with Band|prone-thoracic-rotation-band|Back
 Prone Y Raises|prone-y-raises|Shoulder/Upper Back
 Prone Y-T-W Raises with Band|prone-y-t-w-raises-band|Back
 Prone YTW Raises|prone-ytw-raises|Shoulder
 Proprioceptive Foot Taps on Ground|proprioceptive-foot-taps|Feet and Lower Legs
 Proprioceptive Head Tracking|proprioceptive-head-tracking|Neck
+Protective Finger Splinting Position Exercise|protective-splinting-position|Finger
 Pursed-Lip Breathing with Arm Raises|pursed-lip-breathing-arm-raises|Lungs
 Pursed-Lip Breathing during Light Exercise|pursed-lip-breathing-exercise|Respiratory System
 Pursed-Lip Breathing Walk|pursed-lip-breathing-walk|Lungs
@@ -586,7 +669,6 @@ Quad Stretches|quad-stretches|Knee
 Quadriceps Sets|quadriceps-sets|Knee
 Quadriceps Sets with Band Isometric Hold|quadriceps-sets-band|Knee
 Quadriceps Sets with Breathing Focus|quadriceps-sets-breathing-focus|Leg
-Quadriceps Sets (Isometric)|quadriceps-sets-isometric|Left Knee, Quadriceps
 Quadriceps Sets with Pelvic Floor Activation|quadriceps-sets-pelvic-floor|Quadriceps
 Quadriceps Sets with VMO Focus|quadriceps-sets-vmo|Knee
 Quadriceps Stretch|quadriceps-stretch|Knee
@@ -594,11 +676,14 @@ Quadriceps Stretch with Band|quadriceps-stretch-with-band|Knee
 Quadriceps Stretches|quadriceps-stretches|Knee
 Quadriceps Stretching|quadriceps-stretching|Quadriceps
 Quadruped Alternating Arm Raise|quadruped-alternating-arm-raise|Back
+Quadruped with Alternating Leg Lifts|quadruped-alternating-leg-lifts|Core
 Quadruped Alternating Limb Raises|quadruped-alternating-limb-raises|Core/Back
 Quadruped Arm and Leg Lifts|quadruped-arm-and-leg-lifts|Back
+Quadruped with Band-Assisted Balance|quadruped-band-balance|Core, Hip Stabilizers, Ankles
 Quadruped Band Row|quadruped-band-row|Back
 Quadruped Bird-Dog with Band|quadruped-bird-dog-band|Back
 Quadruped Bird Dogs|quadruped-bird-dogs|Core
+Quadruped Breathing with Arm Lifts|quadruped-breathing-arm-lifts|Core
 Quadruped Foot Stability Taps|quadruped-foot-stability-taps|Foot and Ankle
 Quadruped Head Turns|quadruped-head-turns|Head
 Quadruped Hip Circle|quadruped-hip-circle|Hip
@@ -609,6 +694,7 @@ Quadruped Hip Flexor March|quadruped-hip-flexor-march|Hip flexors, core stabiliz
 Quadruped Hip Flexor Stretch|quadruped-hip-flexor-stretch|Hip
 Quadruped Leg Lift|quadruped-leg-lift|Hamstring
 Quadruped Opposite Arm and Leg Raise|quadruped-opposite-arm-leg-raise|Back
+Quadruped Pelvic Floor Hold|quadruped-pelvic-floor-hold|Pelvic Floor
 Quadruped Pelvic Tilts|quadruped-pelvic-tilts|Lower Back, Core Stabilizers, Iliopsoas
 Quadruped Rock Backs|quadruped-rock-back|Back
 Quadruped Rocking|quadruped-rocking|Hip/Back
@@ -625,6 +711,7 @@ Quadruped Thoracic Rotation|quadruped-thoracic-rotation|Intercostal muscles, tho
 Radial and Ulnar Deviation|radial-ulnar-deviation|Wrist
 Radial and Ulnar Deviation with Lightweight|radial-ulnar-deviation-lightweight|Wrist
 Recumbent Figure Four|recumbent-figure-four|Hip
+Relaxation Breathing with Jaw Release|relaxation-breathing-jaw-release|Jaw
 Resistance Band Adduction|resistance-band-adduction|Groin
 Resistance Band Adduction with Great Toe|resistance-band-adduction-great-toe|Foot
 Resistance Band Ankle Eversion|resistance-band-ankle-eversion|Ankle
@@ -637,6 +724,7 @@ Resistance Band Dorsiflexion|resistance-band-dorsiflexion|Ankle
 Resistance Band Elbow Flexion|resistance-band-elbow-flexion|Arm
 Resistance Band External Rotation|resistance-band-external-rotation|Shoulder
 Resistance Band External Rotation at 90/90|resistance-band-external-rotation-at-90-90|Rotator Cuff (Infraspinatus & Teres Minor) & Shoulder Stability
+Resistance Band Face Pulls|resistance-band-face-pulls|Shoulder
 Resistance Band Finger Flexion|resistance-band-finger-flexion|Hand
 Resistance Band Forearm Pronation|resistance-band-forearm-pronation|Forearm
 Resistance Band Forearm Supination|resistance-band-forearm-supination|Forearm
@@ -655,6 +743,7 @@ Resistance Band Pull-Apart|resistance-band-pull-apart|Upper Back/Shoulder
 Resistance Band Pull-Aparts|resistance-band-pull-aparts|Shoulder
 Resistance Band Radial Deviation|resistance-band-radial-deviation|Wrist
 Resistance Band Reverse Fly|resistance-band-reverse-fly|Shoulder
+Resistance Band Reverse Pec Flyes|resistance-band-reverse-pec-flyes|Back
 Resistance Band Row|resistance-band-row|Shoulder
 Resistance Band Rows|resistance-band-rows|Back
 Resistance Band Shoulder Abduction|resistance-band-shoulder-abduction|Shoulder
@@ -677,7 +766,9 @@ Resisted Jaw Closure|resisted-jaw-closure|Jaw
 Resisted Jaw Opening with Resistance Band|resisted-jaw-opening-band|Jaw
 Reverse Fly with Dumbbells|reverse-fly-dumbbells|Shoulder
 Reverse Lunge with Rotation|reverse-lunge-with-rotation|Ankle
+Reverse Machine Fly|reverse-machine-fly|Shoulder
 Reverse Pec Deck Flyes|reverse-pec-deck-flyes|Back
+Reverse Snow Angels|reverse-snow-angels|Upper Back
 Reverse Wrist Curl with Dumbbell|reverse-wrist-curl-dumbbell|Forearm
 Reverse Wrist Curls|reverse-wrist-curls|Forearm
 Rotation Stretches|rotation-stretches|Back
@@ -700,6 +791,7 @@ Scapular Stabilization with Dumbbells|scapular-stabilization-dumbbells|Shoulder
 Scapular Wall Slides|scapular-wall-slides|Shoulder
 Scar Tissue Mobilization|scar-tissue-mobilization|Wrist
 Sciatic Nerve Glide|sciatic-nerve-glide|Leg/Back
+Seated Achilles Stretch|seated-achilles-stretch|Ankle
 Seated Adductor Squeeze with Band|seated-adductor-squeeze-with-band|Hip
 Seated Ankle Alphabet|seated-ankle-alphabet|Foot
 Seated Ankle Circles|seated-ankle-circles|Ankle
@@ -709,6 +801,8 @@ Seated Ankle Inversion with Band|seated-ankle-inversion-with-band|Ankle
 Seated Ankle Plantarflexion with Band|seated-ankle-plantarflexion-band|Ankle
 Seated Ankle Pumps|seated-ankle-pumps|Ankle
 Seated Anterior Tibialis Strengthening|seated-anterior-tibialis-strengthening|Ankle
+Seated Arm Compressions with Towel Roll|seated-arm-compressions-towel|Arm
+Seated Arm Lifts|seated-arm-lifts|Shoulder
 Seated Upper Body Band Pull-Apart|seated-band-pull-apart|Chest and Back
 Seated Bicep Curl with Band|seated-bicep-curl-band|Shoulder
 Seated Bicep Curls|seated-bicep-curls|Arm
@@ -734,6 +828,7 @@ Seated Dumbbell Lateral Raise|seated-dumbbell-lateral-raise|Shoulder
 Seated Dumbbell Press|seated-dumbbell-press|Shoulder
 Seated Dumbbell Shoulder Press|seated-dumbbell-shoulder-press|Shoulder
 Seated Elbow Flexion Active Assist|seated-elbow-flexion-assist|Shoulder
+Seated Elbow Flexion with Band|seated-elbow-flexion-band|Elbow
 Seated Eye Circles|seated-eye-circles|Eyes
 Seated Eye Tracking|seated-eye-tracking|Eye
 Seated Figure-4 Stretch|seated-figure-4-stretch|Hip
@@ -743,6 +838,7 @@ Seated Foot Alphabet|seated-foot-alphabet|Foot
 Seated Foot Flexion and Extension|seated-foot-flexion-extension|Foot
 Seated Foot Intrinsic Strengthening|seated-foot-intrinsic-strengthening|Foot
 Seated Foot Inversion with Resistance Band|seated-foot-inversion-resistance|Ankle
+Seated Foot Rolls|seated-foot-rolls|Foot
 Seated Forward Fold|seated-forward-fold|Hamstring
 Seated Forward Fold Stretch|seated-forward-fold-stretch|Back
 Seated Gastrocnemius Stretch|seated-gastrocnemius-stretch|Calf
@@ -765,9 +861,13 @@ Seated Hip Flexor Stretch|seated-hip-flexor-stretch|Hip
 Seated Hip Internal Rotation|seated-hip-internal-rotation|Hip
 Seated Hip Internal Rotation Stretch|seated-hip-internal-rotation-stretch|Hip
 Seated Hip Internal Rotation with Band|seated-hip-ir-band|Hip
+Seated Hip Marches|seated-hip-marches|Hip
 Seated Hip Internal Rotation Stretch|seated-hip-rotation-stretch|Hip
+Seated Kegel with Posture Hold|seated-kegel-posture|Pelvic Floor
 Seated Knee Extension|seated-knee-extension|Knee
 Seated Knee Extensions|seated-knee-extensions|Knee
+Seated Knee Lifts|seated-knee-lifts|Thigh
+Seated Knee to Chest|seated-knee-to-chest|Knee
 Seated Leg Extensions|seated-leg-extensions|Knee
 Seated Leg Lifts|seated-leg-lifts|Quadriceps
 Seated Long Sitting Stretch|seated-long-sitting-stretch|Hamstring/Back
@@ -778,16 +878,20 @@ Seated Marching with Head Turns|seated-marching-head-turns|Vestibular System
 Seated Marching in Place|seated-marching-in-place|Hip
 Seated Marching with Pelvic Floor Activation|seated-marching-pelvic-floor|Pelvic Floor
 Seated Neck Flexion and Extension|seated-neck-flexion-extension|Neck
+Seated Neck Relaxation|seated-neck-relaxation|Shoulder
 Seated Neck Rolls|seated-neck-rolls|Neck
 Seated Neck Rotation|seated-neck-rotation|Neck
+Seated Plantar Fascia Stretch with Band|seated-plantar-fascia-stretch-with-band|Foot
 Seated Posture Micro-Practice|seated-posture-micro-practice-throughout-day-habit|Core
 Seated Quad Sets|seated-quad-sets|Knee
 Seated Quadriceps Strengthener with Band|seated-quadriceps-strengthener-with-band|Knee
 Seated Resistance Band Rows|seated-resistance-band-rows|Back
 Seated Row with Band|seated-row-band|Back
+Seated Row Machine|seated-row-machine|Back
 Seated Row with Band|seated-row-with-band|Upper Back
 Seated Rows|seated-rows|Back
 Seated Scapular Squeezes|seated-scapular-squeezes|Shoulder
+Seated Scapular Stabilization|seated-scapular-stabilization|Shoulder
 Seated Shin Taps with Foot Flexion|seated-shin-taps|Shins and Anterior Lower Legs
 Seated Shoulder Abduction|seated-shoulder-abduction|Shoulder
 Seated Shoulder Blade Squeezes|seated-shoulder-blade-squeezes|Shoulder
@@ -810,8 +914,10 @@ Seated Spinal Stability Breathing|seated-spinal-stability-breathing|Back
 Seated Spinal Stretch with Band|seated-spinal-stretch-band|Back
 Seated Spinal Twist|seated-spinal-twist|Spine
 Seated Spinal Twist Stretch|seated-spinal-twist-stretch|Back
+Seated Standing March with Resistance Band|seated-standing-march-band|Lower Body
 Seated Thoracic Rotation|seated-thoracic-rotation|Back
 Seated Tibialis Posterior Activation with Towel|seated-tibialis-posterior-activation-towel|Ankle
+Seated Toe and Heel Taps with Band Loop|seated-toe-heel-taps-band|Feet, Ankles, Calves
 Seated Toe Taps|seated-toe-taps|Ankle/Foot
 Seated Toe Touches with Flexion/Extension|seated-toe-touches|Ankle
 Seated Torso Flexion|seated-torso-flexion|Back
@@ -821,6 +927,7 @@ Seated Torso Rotation with Band|seated-torso-rotation-with-band|Core
 Seated Torso Rotations|seated-torso-rotations|Shoulder
 Seated Torso Stretch|seated-torso-stretch|Back
 Seated Torso Twist|seated-torso-twist|Back
+Seated Tricep Extension with Band|seated-tricep-extension-band|Arm
 Seated Tricep Extensions|seated-tricep-extensions|Arm
 Seated Trunk Rotation|seated-trunk-rotation|Spine
 Seated Trunk Rotation with Dumbbell|seated-trunk-rotation-dumbbell|Core
@@ -851,6 +958,7 @@ Shoulder Mobility Band Pull-Apart|shoulder-mobility-band-pull-apart|Shoulder
 Shoulder Pendulum Swings|shoulder-pendulum-swings|Shoulder
 Shoulder Rolls|shoulder-rolls|Shoulder
 Shoulder Rolls with Band Resistance|shoulder-rolls-with-band|Shoulder
+Shoulder Shrug and Release|shoulder-shrug-release|Shoulder
 Shoulder Shrugs|shoulder-shrugs|Shoulder/Neck
 Shoulder Shrugs with Band|shoulder-shrugs-band|Shoulder
 Shoulder Shrugs with Dumbbell|shoulder-shrugs-dumbbell|Shoulder
@@ -858,10 +966,13 @@ Shoulder Shrugs and Relaxation|shoulder-shrugs-relaxation|Shoulder
 Side-Lying Clamshell with Band|side-lying-clamshell-band|Hip
 Side-Lying External Rotation|side-lying-external-rotation|Shoulder
 Side-Lying Hip Abduction|side-lying-hip-abduction|Hip
+Side-Lying Leg Lifts|side-lying-leg-lifts|Hip
+Side-Lying Ribcage Expansion|side-lying-ribcage-expansion|Ribcage
 Side-Lying Shoulder Abduction|side-lying-shoulder-abduction|Shoulder
 Side-Lying Shoulder Internal Rotation|side-lying-shoulder-internal-rotation|Shoulder
 Side Plank|side-plank|Core/Obliques
 Side Plank with Hip Drop|side-plank-hip-drop|Hip
+Sidelying External Rotation with Band|sidelying-external-rotation-band|Shoulder
 Sidelying Hip Abduction|sidelying-hip-abduction|Hip
 Sidelying Hip Abduction with Band|sidelying-hip-abduction-band|Hip
 Single-Arm Dumbbell Overhead Press|single-arm-dumbbell-overhead-press|Shoulder
@@ -889,6 +1000,7 @@ Single-Leg Glute Bridge|single-leg-glute-bridge|Hip
 Single-Leg Glute Bridges with Dumbbell|single-leg-glute-bridge-dumbbell|Hip
 Single-Leg Romanian Deadlift with Band|single-leg-rdl-band|Hamstring
 Single Leg Romanian Deadlift|single-leg-romanian-deadlift|Hip
+Single Leg Squats|single-leg-squats|Knee
 Single Leg Stance|single-leg-stance|Ankles and Core
 Single Leg Stance - Dynamic|single-leg-stance-dynamic|Hip
 Single Leg Stance with Upper Body Support|single-leg-stance-support|Lower Legs and Feet
@@ -899,6 +1011,7 @@ Sit to Stand Practice|sit-to-stand-practice|Quadriceps and Core
 Sit-to-Stand Transfer|sit-to-stand-transfer|Hip
 Sit-to-Stand with Band Assistance|sit-to-stand-with-band|Leg
 Sleeper Stretch|sleeper-stretch|Shoulder
+Slow Walking with Visual Focus|slow-walking-visual-focus|Lower Body/Vestibular
 Smile with Mouth Closed|smile-mouth-closed|Face
 Grip Strength Maintenance (Soft Object)|soft-grip-squeeze|Hand
 Soleus Stretch|soleus-stretch|Calf
@@ -914,17 +1027,21 @@ Standing Balance on One Leg|standing-balance-on-one-leg|Knee
 Standing Balance on One Leg|standing-balance-one-leg|Knee
 Standing Balance with Resistance Band|standing-balance-resistance-band|Legs/Core
 Standing Balance Stance|standing-balance-stance|Full Body
+Standing Band Ankle Inversion with Stability|standing-band-ankle-inversion-stability|Ankle
 Standing Band Pallof Press|standing-band-pallof-press|Back
 Standing Band Pull-Apart|standing-band-pull-apart|Back
 Standing Band Row|standing-band-row|Shoulder
 Standing Bicep Curl|standing-bicep-curl|Arm
 Standing Bicep Curls with Band|standing-bicep-curls-with-band|Arm
+Standing Cable External Rotation with Arm at 90 Degrees|standing-cable-external-rotation-90|Shoulder
 Standing Calf Raises|standing-calf-raises|Calf
 Standing Calf Raises with Pelvic Floor Engagement|standing-calf-raises-pelvic-floor|Legs
 Standing Calf Raises with Toe Focus|standing-calf-raises-toe-focus|Foot
 Standing Gastrocnemius and Soleus Stretch|standing-calf-stretch|Ankle
 Standing Chest Doorway Stretch|standing-chest-doorway-stretch|Shoulder
 Standing Chest Fly with Band|standing-chest-fly-with-band|Chest
+Standing Chest Opener with Deep Breathing|standing-chest-opener-breathing|Chest
+Standing Chest Squeeze|standing-chest-squeeze|Chest
 Standing Doorway Chest Stretch|standing-doorway-chest-stretch|Back
 Standing Dumbbell Goblet Squats|standing-dumbbell-goblet-squats|Leg
 Standing Dumbbell Lateral Raises|standing-dumbbell-lateral-raises|Shoulder
@@ -946,6 +1063,7 @@ Standing Hip Abduction with Band|standing-hip-abduction-with-band|Hip
 Standing Hip Abductions|standing-hip-abductions|Hip
 Standing Hip Adduction|standing-hip-adduction|Hip
 Standing Hip Adduction with Dumbbell|standing-hip-adduction-dumbbell|Hip
+Standing Hip Adductor Squeeze|standing-hip-adductor-squeeze|Hip
 Standing Hip Extension|standing-hip-extension|Hip/Glute
 Standing Hip Extension with Band|standing-hip-extension-band|Hip
 Standing Hip Flexion|standing-hip-flexion|Hip
@@ -959,6 +1077,7 @@ Standing Hip Hinge|standing-hip-hinge|Hamstring
 Standing Hip Internal Rotation|standing-hip-internal-rotation|Hip
 Standing Hip Marches|standing-hip-marches|Hip
 Standing Hip Marches with Wall Support|standing-hip-marches-wall|Hip and Core
+Standing Knee Lifts|standing-knee-lifts|Hip
 Standing Lateral Band Walk|standing-lateral-band-walk|Hip
 Standing Lateral Band Walks|standing-lateral-band-walks|Hip
 Standing Lateral Leg Raise with Band|standing-lateral-leg-raise-band|Hip
@@ -996,16 +1115,19 @@ Standing Supported Marching|standing-supported-marching|Ankle
 Standing Thoracic Extension|standing-thoracic-extension|Back
 Standing Torso Rotation with Band|standing-torso-rotation-with-band|Torso
 Standing Torso Rotations|standing-torso-rotations|Back
+Standing Torso Twist|standing-torso-twist|Back
 Standing Trunk Rotation|standing-trunk-rotation|Back
 Standing Wall Holds|standing-wall-holds|Ankle
 Standing Wall Marching|standing-wall-marching|Ankle
 Standing Wall Push-Off|standing-wall-push-off|Shoulder
 Standing Wall Push-Ups|standing-wall-push-ups|Core
 Standing Wall Slides|standing-wall-slides|Shoulder
+Standing Wall Squats with Pelvic Floor|standing-wall-squats-pelvic|Hip
 Standing Wall Supported Marching|standing-wall-supported-marching|Hip
 Standing Weight Shifts|standing-weight-shifts|Legs
 Stationary Bike|stationary-bike|Knee
 Stationary Bike with Resistance|stationary-bike-resistance|Lower Body and Cardiovascular System
+Low-Impact Cardio - Stationary Cycling|stationary-cycling|Lower Body
 Step-Up with Dumbbell|step-up-dumbbell|Knee
 Step-Ups|step-ups|Knee
 Step-Ups with Dumbbell|step-ups-dumbbell|Knee
@@ -1023,6 +1145,7 @@ Supine Achilles Stretch|supine-achilles-stretch|Ankle
 Supine Adductor Stretch|supine-adductor-stretch|Hip
 Supine Ankle Dorsiflexion with Band|supine-ankle-dorsiflexion-band|Ankle
 Seated Arm Lifts (Supine)|supine-arm-lifts|Shoulder
+Supine Arm Slides|supine-arm-slides|Shoulder
 Supine Breathing Exercises|supine-breathing-exercises|Chest
 Supine Bridge|supine-bridge|Back
 Supine Bridge with Foot Focus|supine-bridge-foot-focus|Foot
@@ -1031,12 +1154,14 @@ Supine Bridge with Shoulder Engagement|supine-bridge-shoulder-engagement|Shoulde
 Supine Butterfly Stretch|supine-butterfly-stretch|Hip
 Supine Chest Stretch|supine-chest-stretch|Shoulder
 Supine Chest Stretch with Band|supine-chest-stretch-band|Chest
+Supine Core Engagement with Neutral Spine|supine-core-engagement-neutral-spine|Core
 Supine Gentle Cross-Body Shoulder Stretch|supine-cross-body-shoulder-stretch|Shoulder
 Supine Dumbbell Chest Press|supine-dumbbell-chest-press|Chest
 Supine Elbow Extension with Light Dumbbell|supine-elbow-extension-dumbbell|Elbow
 Supine Elbow Flexion with Arm Support|supine-elbow-flexion|Shoulder
 Supine External Rotation with Bent Elbow|supine-external-rotation-bent-elbow|Shoulder
 Supine External Rotation with Dumbbell|supine-external-rotation-dumbbell|Shoulder
+Supine Eye Movements|supine-eye-movements|Eyes/Vestibular
 Supine Figure-4 Stretch|supine-figure-4-stretch|Hip
 Supine Figure-4 Stretch with Pelvic Mobilization|supine-figure-4-stretch-with-pelvic-mobilization|Piriformis, gluteal muscles, hip external rotators
 Supine Figure Four Stretch|supine-figure-four-stretch|Hip
@@ -1073,6 +1198,7 @@ Supine Isometric Shoulder Hold|supine-isometric-shoulder-hold|Shoulder
 Supine Knee Flexion|supine-knee-flexion|Knee
 Supine Knee to Chest|supine-knee-to-chest|Back
 Supine Knee to Chest Stretch|supine-knee-to-chest-stretch|Hip
+Supine Leg Slides|supine-leg-slides|Back
 Supine Lower Back Stretch with Band|supine-lower-back-stretch-band|Back
 Supine Lower Trunk Rotation|supine-lower-trunk-rotation|Lower Back
 Supine Marching|supine-marching|Core/Hip
@@ -1102,11 +1228,13 @@ Supine Shoulder Shrugs|supine-shoulder-shrugs|Shoulder
 Supine Spinal Twist|supine-spinal-twist|Back
 Supine Spinal Twist Stretch|supine-spinal-twist-stretch|Back
 Supine Thoracic Rotation|supine-thoracic-rotation|Back
+Supine Wrist Pronation Stretch|supine-wrist-pronation-stretch|Forearm
 Supported Cat-Cow Stretch|supported-cat-cow-stretch|Lower Back, Thoracic Spine & Shoulder Mobility
 Supported Child's Pose|supported-childs-pose|Back
 Supported Deep Squat|supported-deep-squat|Hip
 Supported Squats to Chair|supported-squats-to-chair|Lower Body
 Supported Wall Push-Up|supported-wall-push-up|Chest
+Sustained PIP Extension with Gravity Resistance|sustained-pip-extension-gravity|Finger
 Swimmers Exercise|swimmers-exercise|Back/Core
 Tall Kneeling Quadriceps Stretch|tall-kneeling-quad-stretch|Ankle
 Tall Kneeling Shoulder Stability|tall-kneeling-shoulder-stability|Shoulder
@@ -1134,10 +1262,16 @@ Thoracic Spine Rotation|thoracic-spine-rotation|Back
 Thread the Needle|thread-the-needle|Thoracic Spine
 Thread the Needle Stretch|thread-the-needle-stretch|Back
 Thumb Abduction with Band Resistance|thumb-abduction-band|Thumb
+Thumb Abduction Against Resistance|thumb-abduction-resistance|Thumb
+Thumb Abduction Stretch|thumb-abduction-stretch|Thumb
 Thumb Abduction with Towel Roll|thumb-abduction-towel-roll|Thumb
+Thumb Adduction Strengthening|thumb-adduction-strengthening|Thumb
+Thumb CMC Joint Stabilization|thumb-cmc-stabilization|Thumb
 Thumb-Finger Pinch and Release|thumb-finger-pinch-release|Thumb
 Thumb Flexor Stretch|thumb-flexor-stretch|Thumb
 Thumb IP Joint Flexion Hold|thumb-ip-flexion-hold|Thumb
+Thumb Isometric Stabilization|thumb-isometric-stabilization|Thumb
+Thumb MCP Joint Flexion Strengthening|thumb-mcp-flexion-strengthening|Thumb
 Isolated Thumb MCP Joint Stabilization|thumb-mcp-stability|Thumb
 Thumb Opposition Exercise|thumb-opposition|Hand
 Thumb Opposition Exercises|thumb-opposition-exercises|Hand
@@ -1152,7 +1286,9 @@ Toe Spreads|toe-spreads|Foot
 Toe Taps|toe-taps|Foot
 Toe Taps with Foot Elevated|toe-taps-elevated|Ankle
 Toe Walks on Heels|toe-walks-heels|Foot
+Tongue Press and Lateral Movement|tongue-press-lateral|Face
 Tongue Strengthening Exercise|tongue-strengthening|Jaw
+Tongue-to-Palate Exercise|tongue-to-palate|Jaw
 Towel Curl - Foot|towel-curl-foot|Foot
 Towel Curls|towel-curls|Foot/Ankle
 Towel Curls for Foot Intrinsics|towel-curls-foot-intrinsics|Foot
@@ -1167,6 +1303,7 @@ Treadmill Gait Training|treadmill-gait-training|Hip
 Treadmill Walking Progression|treadmill-walking|Knee
 Treadmill Walking with Interval Training|treadmill-walking-intervals|Cardiovascular System
 Treadmill Walking - Progressive Speed|treadmill-walking-progressive|Vestibular System
+Tricep Extension with Band|tricep-extension-band|Elbow
 Tricep Extension with Dumbbell|tricep-extension-dumbbell|Elbow
 Tricep Extensions|tricep-extensions|Arm
 Ulnar Nerve Glide|ulnar-nerve-glide|Arm/Hand
@@ -1197,6 +1334,7 @@ Wall Sits with Knee Alignment|wall-sits-knee-alignment|Knee
 Wall Sits with Sensory Focus|wall-sits-sensory|Quadriceps and Hips
 Wall Slide|wall-slide|Shoulder
 Wall Slides|wall-slides|Shoulder
+Wall Squat Hold|wall-squat-hold|Ankle
 Wall Squat with Ball|wall-squat-with-ball|Knee/Quadriceps
 Warm Compress and Rest|warm-compress-rest|Hand
 Weighted Calf Raises|weighted-calf-raises|Hip
@@ -1212,6 +1350,7 @@ Wrist Extension with Band|wrist-extension-band|Wrist
 Wrist Extension with Dumbbell|wrist-extension-dumbbell|Forearm
 Wrist Extension with Light Weight|wrist-extension-light-weight|Wrist
 Wrist Extension Stretch|wrist-extension-stretch|Wrist
+Wrist Extension with Thumb|wrist-extension-thumb|Wrist
 Wrist Extensor Stretch|wrist-extensor-stretch|Wrist/Forearm
 Wrist Flexion with Resistance Band|wrist-flexion-band|Wrist
 Wrist Flexion with Dumbbell|wrist-flexion-dumbbell|Elbow
@@ -1229,4 +1368,4 @@ Wrist Radial Deviation with Band|wrist-radial-deviation-band|Wrist
 Wrist Radial and Ulnar Deviation|wrist-radial-ulnar-deviation|Forearm
 X-Pattern Gaze Tracking|x-pattern-gaze-tracking|Eyes and Visual Coordination`;
 
-export const EXERCISE_CATALOG_ENTRY_COUNT = 1225;
+export const EXERCISE_CATALOG_ENTRY_COUNT = 1364;
