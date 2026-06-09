@@ -8,6 +8,8 @@ struct AssessTab: View {
 
     @State private var showQuickUpdate = false
     @State private var healthCheckDismissed = false
+    @State private var navigateToBodyMap = false
+    @State private var navigateToWellness = false
 
     private var needsHealthCheck: Bool {
         guard !healthCheckDismissed else { return false }
@@ -43,7 +45,14 @@ struct AssessTab: View {
 
                         // Gateway cards
                         HStack(alignment: .top, spacing: AppSpacing.md) {
-                            NavigationLink(destination: BodyMap3DView()) {
+                            Button {
+                                AnalyticsService.shared.log(.assessmentGatewayChosen,
+                                    parameters: ["path": "injury"])
+                                SessionLogger.shared.logUserAction(.buttonTapped,
+                                    action: "assessmentGatewayChosen",
+                                    metadata: ["path": "injury"])
+                                navigateToBodyMap = true
+                            } label: {
                                 darkGatewayCard(
                                     icon: "figure.run.circle",
                                     badge: "Start Assessment",
@@ -55,7 +64,14 @@ struct AssessTab: View {
                             .accessibilityIdentifier("assess.somethingHurtsButton")
 
                             if let profile = profileService.profile {
-                                NavigationLink(destination: WellnessGoalPickerView(userProfile: profile)) {
+                                Button {
+                                    AnalyticsService.shared.log(.assessmentGatewayChosen,
+                                        parameters: ["path": "wellness"])
+                                    SessionLogger.shared.logUserAction(.buttonTapped,
+                                        action: "assessmentGatewayChosen",
+                                        metadata: ["path": "wellness"])
+                                    navigateToWellness = true
+                                } label: {
                                     lightGatewayCard(
                                         icon: "sparkles",
                                         label: "Get Started",
@@ -65,6 +81,14 @@ struct AssessTab: View {
                                 }
                                 .buttonStyle(.plain)
                                 .accessibilityIdentifier("assess.improveLifeButton")
+                            }
+                        }
+                        .navigationDestination(isPresented: $navigateToBodyMap) {
+                            BodyMap3DView()
+                        }
+                        .navigationDestination(isPresented: $navigateToWellness) {
+                            if let profile = profileService.profile {
+                                WellnessGoalPickerView(userProfile: profile)
                             }
                         }
 

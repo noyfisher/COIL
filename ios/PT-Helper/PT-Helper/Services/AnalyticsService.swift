@@ -28,6 +28,13 @@ final class AnalyticsService {
         case workoutCompleted = "workout_completed"
         case workoutEndedEarly = "workout_ended_early"
         case workoutDiscarded = "workout_discarded"
+        case assessmentGatewayChosen = "assessment_gateway_chosen"
+        case accountDeleteAttempted = "account_delete_attempted"
+        case accountDeleted = "account_deleted"
+        case accountDeleteFailed = "account_delete_failed"
+        case signedOut = "signed_out"
+        case planDeleted = "plan_deleted"
+        case workoutCheckpointDiscarded = "workout_checkpoint_discarded"
     }
 
     // MARK: - Engagement Events (feature adoption & depth)
@@ -43,6 +50,11 @@ final class AnalyticsService {
         case tabSwitched = "tab_switched"
         case workoutResumed = "workout_resumed"
         case formAnalysisCompleted = "form_analysis_completed"
+        case workoutPauseToggled = "workout_pause_toggled"
+        case exerciseSwapOpened = "exercise_swap_opened"
+        case formAnalysisStarted = "form_analysis_started"
+        case settingChanged = "setting_changed"
+        case errorShown = "error_shown"
     }
 
     // MARK: - Logging

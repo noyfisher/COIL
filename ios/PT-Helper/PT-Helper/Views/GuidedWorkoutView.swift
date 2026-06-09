@@ -76,6 +76,8 @@ struct GuidedWorkoutView: View {
                 }
             }
             Button("Start Fresh", role: .destructive) {
+                AnalyticsService.shared.log(.workoutCheckpointDiscarded)
+                SessionLogger.shared.logUserAction(.buttonTapped, action: "workoutCheckpointDiscarded")
                 vm.clearCheckpoint()
             }
         } message: {
@@ -113,11 +115,23 @@ struct GuidedWorkoutView: View {
                     vm.swapCurrentExercise(with: substitute, updatedPlan: updatedPlan)
                     showSwapSheet = false
                 }
+                .onAppear {
+                    AnalyticsService.shared.log(.exerciseSwapOpened)
+                    SessionLogger.shared.log(.sheetPresented, category: .navigation,
+                                              message: "ExerciseSwapSheet shown",
+                                              metadata: ["exercise": exercise.name])
+                }
             }
         }
         .sheet(isPresented: $showFormAnalysis) {
             if let exercise = vm.currentExercise {
                 FormAnalysisView(exercise: exercise)
+                    .onAppear {
+                        AnalyticsService.shared.log(.formAnalysisStarted)
+                        SessionLogger.shared.log(.sheetPresented, category: .navigation,
+                                                  message: "FormAnalysisView shown",
+                                                  metadata: ["exercise": exercise.name])
+                    }
             }
         }
     }

@@ -176,6 +176,9 @@ class GuidedWorkoutViewModel: ObservableObject {
     /// Toggle pause state
     func togglePause() {
         isPaused.toggle()
+        AnalyticsService.shared.log(.workoutPauseToggled, parameters: ["paused": isPaused ? "true" : "false"])
+        SessionLogger.shared.logUserAction(.toggleChanged, action: "workoutPause",
+                                            metadata: ["paused": "\(isPaused)"])
         if isPaused {
             // Save elapsed time from the current active segment before pausing
             accumulatedTime += Date().timeIntervalSince(lastResumeTime)

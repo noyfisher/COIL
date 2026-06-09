@@ -108,6 +108,10 @@ struct ProfileReviewStepView: View {
                                 withAnimation(AppAnimations.bouncy) { showCelebration = true }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { onComplete?() }
                             } else {
+                                AnalyticsService.shared.log(.errorShown, parameters: [
+                                    "screen": "ProfileReviewStep",
+                                    "error_type": "profile_save_failed"
+                                ])
                                 showError = true
                             }
                         }

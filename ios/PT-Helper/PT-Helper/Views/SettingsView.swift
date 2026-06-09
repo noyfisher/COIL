@@ -73,6 +73,9 @@ struct SettingsView: View {
                                     .labelsHidden()
                                     .accessibilityIdentifier("settings.reminderToggle")
                                     .onChange(of: notificationService.isEnabled) { _, enabled in
+                                        AnalyticsService.shared.log(.settingChanged,
+                                            parameters: ["key": "reminders_enabled",
+                                                         "value": enabled ? "true" : "false"])
                                         if enabled && !notificationService.isAuthorized {
                                             Task { await notificationService.requestPermission() }
                                         }
@@ -103,6 +106,9 @@ struct SettingsView: View {
                                             let components = Calendar.current.dateComponents([.hour, .minute], from: newDate)
                                             notificationService.reminderHour = components.hour ?? 9
                                             notificationService.reminderMinute = components.minute ?? 0
+                                            let timeString = String(format: "%02d:%02d", components.hour ?? 9, components.minute ?? 0)
+                                            AnalyticsService.shared.log(.settingChanged,
+                                                parameters: ["key": "reminder_time", "value": timeString])
                                         }
                                 }
                                 .padding(.horizontal, AppSpacing.lg)
@@ -122,6 +128,11 @@ struct SettingsView: View {
                                     Spacer()
                                     Toggle("", isOn: $notificationService.workoutRemindersEnabled)
                                         .labelsHidden()
+                                        .onChange(of: notificationService.workoutRemindersEnabled) { _, enabled in
+                                            AnalyticsService.shared.log(.settingChanged,
+                                                parameters: ["key": "workout_reminders",
+                                                             "value": enabled ? "true" : "false"])
+                                        }
                                 }
                                 .padding(.horizontal, AppSpacing.lg)
                                 .padding(.vertical, AppSpacing.md)
@@ -140,6 +151,11 @@ struct SettingsView: View {
                                     Spacer()
                                     Toggle("", isOn: $notificationService.reassessmentRemindersEnabled)
                                         .labelsHidden()
+                                        .onChange(of: notificationService.reassessmentRemindersEnabled) { _, enabled in
+                                            AnalyticsService.shared.log(.settingChanged,
+                                                parameters: ["key": "reassessment_reminders",
+                                                             "value": enabled ? "true" : "false"])
+                                        }
                                 }
                                 .padding(.horizontal, AppSpacing.lg)
                                 .padding(.vertical, AppSpacing.md)
@@ -158,6 +174,11 @@ struct SettingsView: View {
                                     Spacer()
                                     Toggle("", isOn: $notificationService.inactivityNudgesEnabled)
                                         .labelsHidden()
+                                        .onChange(of: notificationService.inactivityNudgesEnabled) { _, enabled in
+                                            AnalyticsService.shared.log(.settingChanged,
+                                                parameters: ["key": "inactivity_nudges",
+                                                             "value": enabled ? "true" : "false"])
+                                        }
                                 }
                                 .padding(.horizontal, AppSpacing.lg)
                                 .padding(.vertical, AppSpacing.md)
@@ -316,9 +337,17 @@ struct SettingsView: View {
             }
             .confirmationDialog("Sign Out", isPresented: $showSignOutConfirmation, titleVisibility: .visible) {
                 Button("Sign Out", role: .destructive) {
+                    AnalyticsService.shared.log(.signedOut)
+                    SessionLogger.shared.logUserAction(.buttonTapped, action: "signOut")
                     do {
                         try Auth.auth().signOut()
                     } catch {
+                        SessionLogger.shared.logError(error, context: "Auth.signOut",
+                                                       metadata: ["screen": "SettingsView"])
+                        AnalyticsService.shared.log(.errorShown, parameters: [
+                            "screen": "SettingsView",
+                            "error_type": "sign_out_failed"
+                        ])
                         signOutErrorMessage = error.localizedDescription
                         showSignOutError = true
                     }
@@ -334,6 +363,8 @@ struct SettingsView: View {
             }
             .confirmationDialog("Delete Account", isPresented: $showDeleteConfirmation, titleVisibility: .visible) {
                 Button("Delete Everything", role: .destructive) {
+                    AnalyticsService.shared.log(.accountDeleteAttempted)
+                    SessionLogger.shared.logUserAction(.buttonTapped, action: "accountDeleteAttempted")
                     deleteAccount()
                 }
                 Button("Cancel", role: .cancel) {}
@@ -413,11 +444,23 @@ struct SettingsView: View {
                 try await user.delete()
 
                 await MainActor.run {
+                    AnalyticsService.shared.log(.accountDeleted)
+                    SessionLogger.shared.log(.stateUpdated, category: .auth,
+                                              message: "Account deleted",
+                                              metadata: ["uid": uid])
                     isDeletingAccount = false
                     dismiss()
                 }
             } catch {
                 await MainActor.run {
+                    SessionLogger.shared.logError(error, context: "deleteAccount",
+                                                   metadata: ["screen": "SettingsView"])
+                    AnalyticsService.shared.log(.accountDeleteFailed,
+                        parameters: ["reason": error.localizedDescription])
+                    AnalyticsService.shared.log(.errorShown, parameters: [
+                        "screen": "SettingsView",
+                        "error_type": "account_delete_failed"
+                    ])
                     isDeletingAccount = false
                     deleteError = error.localizedDescription
                     showDeleteError = true

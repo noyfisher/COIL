@@ -36,6 +36,10 @@ struct MyPlanTab: View {
                 Button("Cancel", role: .cancel) { planToDelete = nil }
                 Button("Delete", role: .destructive) {
                     if let plan = planToDelete {
+                        let planType = plan.planType == .rehab ? "injury" : "wellness"
+                        AnalyticsService.shared.log(.planDeleted, parameters: ["plan_type": planType])
+                        SessionLogger.shared.logUserAction(.buttonTapped, action: "planDeleted",
+                                                            metadata: ["plan_type": planType])
                         withAnimation(.easeInOut(duration: 0.25)) {
                             savedPlansViewModel.deletePlan(plan)
                         }

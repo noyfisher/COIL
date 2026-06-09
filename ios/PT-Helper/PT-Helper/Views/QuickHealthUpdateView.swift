@@ -361,6 +361,10 @@ struct QuickHealthUpdateView: View {
                 }
                 onComplete()
             } else {
+                AnalyticsService.shared.log(.errorShown, parameters: [
+                    "screen": "QuickHealthUpdateView",
+                    "error_type": "save_failed"
+                ])
                 showError = true
             }
         }
