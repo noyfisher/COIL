@@ -101,6 +101,7 @@ struct ClaudeResponse: Decodable {
 protocol ClaudeAPIServiceProtocol {
     func sendMessage(requestType: AIRequestType, userMessage: String) async throws -> String
     func requestAgentInsights() async throws -> String
+    func requestAgentFormAnalysis(exerciseName: String, userMessage: String) async throws -> String
 }
 
 // MARK: - Claude API Service
@@ -420,6 +421,123 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
             SessionLogger.shared.logAPI(.apiCallSucceeded, endpoint: "agentInsights",
                 metadata: Self.makeTelemetryMetadata(
                     requestType: "recovery_insights_agent",
+                    interfaceType: interfaceType,
+                    requestBytes: requestBytes,
+                    responseBytes: responseBytes,
+                    elapsedMs: elapsed,
+                    extras: ["responseLength": "\(textCount)"]))
+        }
+
+        return ClaudeAPIService.cleanJSONResponse(text)
+    }
+
+    /// Request cross-session form analysis from the managed agent endpoint.
+    /// Unlike `requestAgentInsights()`, the request body carries the CURRENT session's
+    /// metrics message — the just-recorded session is not in Firestore yet (iOS persists
+    /// after feedback). The server fetches prior sessions of the same exercise.
+    func requestAgentFormAnalysis(exerciseName: String, userMessage: String) async throws -> String {
+        let bgTaskID = await beginBackgroundTask(named: "agentFormAnalysis")
+        defer { endBackgroundTask(bgTaskID) }
+
+        guard let url = URL(string: APIConfig.agentFormAnalysisURL) else {
+            throw ClaudeAPIError.invalidURL
+        }
+
+        guard let currentUser = Auth.auth().currentUser else {
+            throw ClaudeAPIError.authenticationRequired
+        }
+
+        let idToken: String
+        do {
+            idToken = try await currentUser.getIDToken()
+        } catch {
+            throw ClaudeAPIError.authenticationRequired
+        }
+
+        struct AgentFormAnalysisRequest: Encodable {
+            let exerciseName: String
+            let userMessage: String
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.timeoutInterval = 180 // Agent may take longer than regular calls
+        request.setValue("Bearer \(idToken)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(
+            AgentFormAnalysisRequest(exerciseName: exerciseName, userMessage: userMessage)
+        )
+
+        let requestBytes = request.httpBody?.count ?? 0
+        let started = Date()
+        func elapsedMsInt() -> Int { Int(Date().timeIntervalSince(started) * 1000) }
+
+        await MainActor.run {
+            let interfaceType = NetworkMonitor.shared.connectionType.description
+            SessionLogger.shared.logAPI(.apiCallStarted, endpoint: "agentFormAnalysis",
+                metadata: Self.makeTelemetryMetadata(
+                    requestType: "form_analysis_agent",
+                    interfaceType: interfaceType,
+                    requestBytes: requestBytes))
+        }
+
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await URLSession.shared.data(for: request)
+        } catch {
+            let elapsed = elapsedMsInt()
+            await MainActor.run {
+                let interfaceType = NetworkMonitor.shared.connectionType.description
+                SessionLogger.shared.logAPI(.apiCallFailed, endpoint: "agentFormAnalysis",
+                    metadata: Self.makeTelemetryMetadata(
+                        requestType: "form_analysis_agent",
+                        interfaceType: interfaceType,
+                        requestBytes: requestBytes,
+                        elapsedMs: elapsed,
+                        extras: ["error": error.localizedDescription]))
+            }
+            throw ClaudeAPIError.networkError(error)
+        }
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw ClaudeAPIError.invalidResponse(0, "Invalid HTTP response")
+        }
+
+        switch httpResponse.statusCode {
+        case 200:
+            break
+        case 401:
+            throw ClaudeAPIError.authenticationRequired
+        case 429:
+            throw ClaudeAPIError.rateLimited
+        default:
+            let errorBody = String(data: data, encoding: .utf8) ?? "No error details"
+            throw ClaudeAPIError.invalidResponse(httpResponse.statusCode, errorBody)
+        }
+
+        let claudeResponse: ClaudeResponse
+        do {
+            claudeResponse = try JSONDecoder().decode(ClaudeResponse.self, from: data)
+        } catch {
+            let rawBody = String(data: data, encoding: .utf8) ?? "<non-UTF8>"
+            AppLogger.api.error("AgentFormAnalysis decode failed. Raw body (\(data.count) bytes): \(rawBody.prefix(500))")
+            throw ClaudeAPIError.decodingError(error)
+        }
+
+        guard let textBlock = claudeResponse.content.first(where: { $0.type == "text" }),
+              let text = textBlock.text, !text.isEmpty else {
+            throw ClaudeAPIError.noContent
+        }
+
+        let elapsed = elapsedMsInt()
+        let responseBytes = data.count
+        let textCount = text.count
+        await MainActor.run {
+            let interfaceType = NetworkMonitor.shared.connectionType.description
+            SessionLogger.shared.logAPI(.apiCallSucceeded, endpoint: "agentFormAnalysis",
+                metadata: Self.makeTelemetryMetadata(
+                    requestType: "form_analysis_agent",
                     interfaceType: interfaceType,
                     requestBytes: requestBytes,
                     responseBytes: responseBytes,

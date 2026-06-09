@@ -151,6 +151,35 @@ struct FormAnalysisData: Codable {
     }
 }
 
+// MARK: - Form Progress Insights (Cross-Session)
+
+/// Cross-session insights produced by the form analysis Managed Agent.
+/// Present only when the agent path ran (≥2 prior sessions of the exercise);
+/// nil on the single-call fallback path.
+struct FormProgressInsights: Codable, Equatable {
+    let progressTrends: [ProgressTrend]
+    let recurringIssues: [RecurringIssue]
+    let sessionComparison: String
+
+    struct ProgressTrend: Codable, Equatable {
+        let metric: String
+        let direction: Direction
+        let description: String
+
+        enum Direction: String, Codable {
+            case improving
+            case stable
+            case declining
+        }
+    }
+
+    struct RecurringIssue: Codable, Equatable {
+        let issue: String
+        let sessionsObserved: Int
+        let description: String
+    }
+}
+
 // MARK: - Form Feedback (AI Response)
 
 /// The structured feedback returned by Claude after analyzing form metrics.
@@ -164,10 +193,12 @@ struct FormFeedback: Codable, Identifiable {
     let safetyNotes: [String]
     let dataLimitations: [String]  // defaults to [] if not present in JSON
     let date: Date
+    /// Cross-session insights from the agent path; nil on the single-call path.
+    var progressInsights: FormProgressInsights?
 
-    // Custom decoder to handle missing dataLimitations in older JSON
+    // Custom decoder to handle missing dataLimitations / progressInsights in older JSON
     enum CodingKeys: String, CodingKey {
-        case id, exerciseName, overallScore, verdict, corrections, positivePoints, safetyNotes, dataLimitations, date
+        case id, exerciseName, overallScore, verdict, corrections, positivePoints, safetyNotes, dataLimitations, date, progressInsights
     }
 
     init(from decoder: Decoder) throws {
@@ -181,6 +212,7 @@ struct FormFeedback: Codable, Identifiable {
         safetyNotes = try container.decode([String].self, forKey: .safetyNotes)
         dataLimitations = try container.decodeIfPresent([String].self, forKey: .dataLimitations) ?? []
         date = try container.decode(Date.self, forKey: .date)
+        progressInsights = try container.decodeIfPresent(FormProgressInsights.self, forKey: .progressInsights)
     }
 
     enum Verdict: String, Codable {
@@ -212,7 +244,7 @@ struct FormFeedback: Codable, Identifiable {
         }
     }
 
-    init(id: UUID = UUID(), exerciseName: String, overallScore: Int, verdict: Verdict, corrections: [Correction], positivePoints: [String], safetyNotes: [String], dataLimitations: [String] = [], date: Date = Date()) {
+    init(id: UUID = UUID(), exerciseName: String, overallScore: Int, verdict: Verdict, corrections: [Correction], positivePoints: [String], safetyNotes: [String], dataLimitations: [String] = [], date: Date = Date(), progressInsights: FormProgressInsights? = nil) {
         self.id = id
         self.exerciseName = exerciseName
         self.overallScore = overallScore
@@ -222,6 +254,7 @@ struct FormFeedback: Codable, Identifiable {
         self.safetyNotes = safetyNotes
         self.dataLimitations = dataLimitations
         self.date = date
+        self.progressInsights = progressInsights
     }
 }
 

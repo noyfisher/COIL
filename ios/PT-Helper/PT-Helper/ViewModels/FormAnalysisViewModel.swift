@@ -3,6 +3,8 @@ import Foundation
 // MARK: - AI Response Type
 
 /// Decodable wrapper for the Claude form analysis JSON response.
+/// Cross-session fields are optional so one decoder handles both the agent
+/// payload (which includes them) and the single-call Haiku payload (which doesn't).
 private struct AIFormFeedbackResponse: Decodable {
     let overallScore: Int
     let verdict: String
@@ -10,6 +12,9 @@ private struct AIFormFeedbackResponse: Decodable {
     let positivePoints: [String]
     let safetyNotes: [String]
     let dataLimitations: [String]?
+    let progressTrends: [AIProgressTrend]?
+    let recurringIssues: [AIRecurringIssue]?
+    let sessionComparison: String?
 
     struct AICorrection: Decodable {
         let bodyPart: String
@@ -17,6 +22,18 @@ private struct AIFormFeedbackResponse: Decodable {
         let howToFix: String
         let severity: String
         let dataReference: String?
+    }
+
+    struct AIProgressTrend: Decodable {
+        let metric: String
+        let direction: String
+        let description: String
+    }
+
+    struct AIRecurringIssue: Decodable {
+        let issue: String
+        let sessionsObserved: Int
+        let description: String
     }
 }
 
@@ -37,6 +54,11 @@ class FormAnalysisViewModel: ObservableObject {
     private let analysisEngine: PoseAnalysisEngine
     private let qualityScorer: DataQualityScorer
     private let ruleEngine: BiomechanicalRuleEngine
+    private let store: FormAnalysisStoreProtocol
+
+    /// Minimum PRIOR persisted sessions of the same exercise before the agent
+    /// path is tried. Mirrors MINIMUM_FORM_HISTORY_COUNT in functions/src/firestore-queries.ts.
+    static let minimumPriorSessionsForAgent = 2
 
     /// User's medical conditions for contraindication checking.
     var userConditions: [String] = []
@@ -46,13 +68,15 @@ class FormAnalysisViewModel: ObservableObject {
         poseDetector: PoseDetectionService = .shared,
         analysisEngine: PoseAnalysisEngine = .shared,
         qualityScorer: DataQualityScorer = .shared,
-        ruleEngine: BiomechanicalRuleEngine = .shared
+        ruleEngine: BiomechanicalRuleEngine = .shared,
+        store: FormAnalysisStoreProtocol = FormAnalysisStore.shared
     ) {
         self.apiService = apiService
         self.poseDetector = poseDetector
         self.analysisEngine = analysisEngine
         self.qualityScorer = qualityScorer
         self.ruleEngine = ruleEngine
+        self.store = store
     }
 
     // MARK: - Main Pipeline
@@ -106,20 +130,20 @@ class FormAnalysisViewModel: ObservableObject {
             state = .processing(progress: 0.85)
             processingProgress = 0.85
 
-            // Step 6: Build message and send to Claude (include data quality)
+            // Step 6: Build message and get AI feedback (agent-first with fallback)
             state = .analyzing
             let userMessage = buildUserMessage(metrics: analysisData, exercise: exercise, dataQuality: dataQuality)
 
-            let response = try await apiService.sendMessage(
-                requestType: .form_analysis,
-                userMessage: userMessage
-            )
+            let (response, source) = try await fetchAIFeedback(userMessage: userMessage, exercise: exercise)
 
             // Step 7: Parse AI response
             let feedback = try parseFormFeedback(from: response, exerciseName: exercise.name)
 
-            // Step 8: Run validation pipeline (7 layers)
-            let (validatedFeedback, validationResult) = FormFeedbackValidationPipeline.validate(
+            // Step 8: Run validation pipeline (7 layers).
+            // Cross-session text (progressInsights) intentionally bypasses the
+            // 7 layers — its structure is zod-validated server-side and its
+            // claims reference PRIOR sessions the pipeline has no data for.
+            let (pipelineFeedback, validationResult) = FormFeedbackValidationPipeline.validate(
                 feedback: feedback,
                 metrics: analysisData,
                 dataQuality: dataQuality,
@@ -128,11 +152,27 @@ class FormAnalysisViewModel: ObservableObject {
                 userConditions: userConditions
             )
 
+            // Defensive re-attach: the pipeline threads progressInsights through,
+            // but cross-session insight must never be lost to a pipeline rebuild.
+            var validatedFeedback = pipelineFeedback
+            validatedFeedback.progressInsights = feedback.progressInsights
+
             let result = ValidatedFormFeedback(
                 feedback: validatedFeedback,
                 validation: validationResult,
                 dataQuality: dataQuality
             )
+
+            // Step 9: Persist a compact record for future cross-session comparison
+            // (both AI paths). Persist-after-feedback: the server history query
+            // therefore only ever sees PRIOR sessions.
+            let record = FormAnalysisRecord.makeRecord(
+                metrics: analysisData,
+                feedback: validatedFeedback,
+                dataQuality: dataQuality,
+                source: source
+            )
+            await store.save(record)
 
             state = .complete(result)
 
@@ -145,6 +185,7 @@ class FormAnalysisViewModel: ObservableObject {
                 "confidence_level": validationResult.confidenceLevel.rawValue,
                 "consistency_issues": validationResult.consistencyIssues.count,
                 "data_quality": String(format: "%.2f", dataQuality.overallScore),
+                "source": source,
             ])
 
             SessionLogger.shared.log(.stateUpdated, category: .lifecycle,
@@ -178,6 +219,43 @@ class FormAnalysisViewModel: ObservableObject {
     func reset() {
         state = .idle
         processingProgress = 0
+    }
+
+    // MARK: - AI Routing (agent-first with fallback)
+
+    /// Get AI feedback for the current session: try the cross-session managed
+    /// agent when enough prior sessions of this exercise exist, fall back to
+    /// the single-call form_analysis path on ANY failure. Mirrors
+    /// RecoveryInsightsViewModel's agent-then-fallback behavior.
+    ///
+    /// Returns the raw response text and the path that produced it
+    /// ("agent" | "single_call"). Throws only when the FALLBACK path also fails
+    /// (handled by analyzeVideo's existing catch). Internal for unit testing.
+    func fetchAIFeedback(userMessage: String, exercise: RehabExercise) async throws -> (response: String, source: String) {
+        let priorCount = await store.priorSessionCount(exerciseName: exercise.name)
+
+        if priorCount >= Self.minimumPriorSessionsForAgent {
+            do {
+                let response = try await apiService.requestAgentFormAnalysis(
+                    exerciseName: exercise.name,
+                    userMessage: userMessage
+                )
+                return (response, "agent")
+            } catch {
+                // Silent fallback — any agent failure (network, 4xx/5xx,
+                // validation) drops to the existing single-call path.
+                SessionLogger.shared.log(.errorOccurred, category: .api,
+                                          message: "Form agent failed, falling back to single-call",
+                                          metadata: ["error": error.localizedDescription,
+                                                      "exercise": exercise.name])
+            }
+        }
+
+        let response = try await apiService.sendMessage(
+            requestType: .form_analysis,
+            userMessage: userMessage
+        )
+        return (response, "single_call")
     }
 
     // MARK: - Message Construction
@@ -322,6 +400,37 @@ class FormAnalysisViewModel: ObservableObject {
             )
         }
 
+        // Cross-session fields are present only on the agent path.
+        var progressInsights: FormProgressInsights?
+        if let comparison = aiResponse.sessionComparison, !comparison.isEmpty {
+            let trends = (aiResponse.progressTrends ?? []).map { trend in
+                let direction: FormProgressInsights.ProgressTrend.Direction = {
+                    switch trend.direction.lowercased() {
+                    case "improving": return .improving
+                    case "declining": return .declining
+                    default: return .stable
+                    }
+                }()
+                return FormProgressInsights.ProgressTrend(
+                    metric: trend.metric,
+                    direction: direction,
+                    description: trend.description
+                )
+            }
+            let recurring = (aiResponse.recurringIssues ?? []).map {
+                FormProgressInsights.RecurringIssue(
+                    issue: $0.issue,
+                    sessionsObserved: $0.sessionsObserved,
+                    description: $0.description
+                )
+            }
+            progressInsights = FormProgressInsights(
+                progressTrends: trends,
+                recurringIssues: recurring,
+                sessionComparison: comparison
+            )
+        }
+
         return FormFeedback(
             exerciseName: exerciseName,
             overallScore: max(0, min(100, aiResponse.overallScore)),
@@ -329,7 +438,8 @@ class FormAnalysisViewModel: ObservableObject {
             corrections: corrections,
             positivePoints: aiResponse.positivePoints,
             safetyNotes: aiResponse.safetyNotes,
-            dataLimitations: aiResponse.dataLimitations ?? []
+            dataLimitations: aiResponse.dataLimitations ?? [],
+            progressInsights: progressInsights
         )
     }
 }

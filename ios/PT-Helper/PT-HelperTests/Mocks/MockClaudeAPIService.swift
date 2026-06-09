@@ -67,6 +67,37 @@ final class MockClaudeAPIService: ClaudeAPIServiceProtocol {
         return agentInsightsResponseToReturn ?? responseToReturn
     }
 
+    // MARK: - Agent Form Analysis Support
+
+    /// The response to return from `requestAgentFormAnalysis()`.
+    var agentFormAnalysisResponseToReturn: String?
+
+    /// If set, `requestAgentFormAnalysis()` throws this error.
+    var agentFormAnalysisErrorToThrow: Error?
+
+    /// Number of times `requestAgentFormAnalysis` was called.
+    private(set) var requestAgentFormAnalysisCallCount = 0
+
+    /// The most recent arguments passed to `requestAgentFormAnalysis`.
+    private(set) var lastAgentFormExerciseName: String?
+    private(set) var lastAgentFormUserMessage: String?
+
+    func requestAgentFormAnalysis(exerciseName: String, userMessage: String) async throws -> String {
+        requestAgentFormAnalysisCallCount += 1
+        lastAgentFormExerciseName = exerciseName
+        lastAgentFormUserMessage = userMessage
+
+        if simulatedDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(simulatedDelay * 1_000_000_000))
+        }
+
+        if let error = agentFormAnalysisErrorToThrow {
+            throw error
+        }
+
+        return agentFormAnalysisResponseToReturn ?? responseToReturn
+    }
+
     // MARK: - Send Message
 
     func sendMessage(requestType: AIRequestType, userMessage: String) async throws -> String {

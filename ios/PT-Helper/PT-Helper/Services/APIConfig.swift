@@ -7,6 +7,10 @@ enum APIConfig {
     // Managed Agent endpoint for recovery insights (server fetches data, multi-step analysis)
     static let agentInsightsURL = "https://us-central1-pt-helper-dev.cloudfunctions.net/agentInsights"
 
+    // Managed Agent endpoint for cross-session form analysis (current-session metrics in
+    // request body; server fetches prior sessions from Firestore)
+    static let agentFormAnalysisURL = "https://us-central1-pt-helper-dev.cloudfunctions.net/agentFormAnalysis"
+
     // On-demand exercise image generation (FLUX 2 Pro + Gemini QA)
     static let generateImageURL = "https://us-central1-pt-helper-dev.cloudfunctions.net/generateExerciseImage"
 

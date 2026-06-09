@@ -46,7 +46,8 @@ struct FormFeedbackValidationPipeline {
                 positivePoints: feedback.positivePoints,
                 safetyNotes: feedback.safetyNotes,
                 dataLimitations: feedback.dataLimitations,
-                date: feedback.date
+                date: feedback.date,
+                progressInsights: feedback.progressInsights
             )
         }
 

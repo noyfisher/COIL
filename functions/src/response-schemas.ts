@@ -116,6 +116,32 @@ export const formAnalysisSchema = z.object({
   dataLimitations: z.array(z.string()).optional(),
 });
 
+// Agent form analysis (cross-session) ---------------------------------------
+//
+// Output shape of the `submit_form_analysis` custom tool used by the form
+// analysis Managed Agent (see form-agent.ts / setup-form-agent.ts). Extends
+// the single-call form_analysis shape with cross-session fields. NOT in
+// RESPONSE_SCHEMAS — the agent endpoint validates via validateFormResult()
+// in form-agent.ts, same split as recovery_insights.
+
+const progressTrendSchema = z.object({
+  metric: z.string().min(1).max(100),
+  direction: lowercaseEnum(["improving", "stable", "declining"]),
+  description: z.string().min(1).max(400),
+});
+
+const recurringIssueSchema = z.object({
+  issue: z.string().min(1).max(200),
+  sessionsObserved: z.number().int().min(2),
+  description: z.string().min(1).max(400),
+});
+
+export const agentFormAnalysisSchema = formAnalysisSchema.extend({
+  progressTrends: z.array(progressTrendSchema),
+  recurringIssues: z.array(recurringIssueSchema), // may be empty — recurrence is not guaranteed
+  sessionComparison: z.string().min(1).max(1200),
+});
+
 // Wellness analysis (primary + verify) --------------------------------------
 
 const wellnessRecommendationSchema = z.object({

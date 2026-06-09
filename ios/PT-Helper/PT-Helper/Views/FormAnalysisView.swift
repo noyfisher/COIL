@@ -233,6 +233,11 @@ struct FormAnalysisView: View {
                     .cornerRadius(AppCorners.medium)
                 }
 
+                // Progress over time (cross-session agent insights)
+                if let insights = feedback.progressInsights {
+                    progressInsightsCard(insights)
+                }
+
                 // Corrections
                 if !feedback.corrections.isEmpty {
                     VStack(alignment: .leading, spacing: AppSpacing.md) {
@@ -317,6 +322,92 @@ struct FormAnalysisView: View {
             }
             .padding(.horizontal, AppSpacing.xl)
             .padding(.vertical, AppSpacing.md)
+        }
+    }
+
+    // MARK: - Progress Insights (Cross-Session)
+
+    private func progressInsightsCard(_ insights: FormProgressInsights) -> some View {
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
+            Label("Progress Over Time", systemImage: "chart.line.uptrend.xyaxis")
+                .font(.headline)
+                .foregroundColor(AppColors.accent)
+
+            // How today compares to the user's own prior sessions
+            Text(insights.sessionComparison)
+                .font(.subheadline)
+                .foregroundColor(AppColors.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+
+            // Per-metric trends
+            if !insights.progressTrends.isEmpty {
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    ForEach(Array(insights.progressTrends.enumerated()), id: \.offset) { _, trend in
+                        HStack(alignment: .top, spacing: AppSpacing.sm) {
+                            Image(systemName: trendIcon(for: trend.direction))
+                                .font(.caption)
+                                .foregroundColor(trendColor(for: trend.direction))
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(trend.metric)
+                                    .font(.subheadline.weight(.semibold))
+                                Text(trend.description)
+                                    .font(.caption)
+                                    .foregroundColor(AppColors.secondaryText)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Recurring issues
+            if !insights.recurringIssues.isEmpty {
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    Text("Recurring Patterns")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(AppColors.warning)
+
+                    ForEach(Array(insights.recurringIssues.enumerated()), id: \.offset) { _, issue in
+                        HStack(alignment: .top, spacing: AppSpacing.sm) {
+                            Image(systemName: "arrow.triangle.2.circlepath")
+                                .font(.caption)
+                                .foregroundColor(AppColors.warning)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("\(issue.issue) — \(issue.sessionsObserved) sessions")
+                                    .font(.subheadline.weight(.semibold))
+                                Text(issue.description)
+                                    .font(.caption)
+                                    .foregroundColor(AppColors.secondaryText)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                    }
+                }
+                .padding(AppSpacing.md)
+                .background(AppColors.warning.opacity(0.08))
+                .cornerRadius(AppCorners.medium)
+            }
+        }
+        .padding(AppSpacing.lg)
+        .background(AppColors.cardBackground)
+        .cornerRadius(AppCorners.card)
+        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+        .accessibilityIdentifier("formAnalysis.progressInsights")
+    }
+
+    private func trendIcon(for direction: FormProgressInsights.ProgressTrend.Direction) -> String {
+        switch direction {
+        case .improving: return "arrow.up.right.circle.fill"
+        case .stable: return "arrow.right.circle.fill"
+        case .declining: return "arrow.down.right.circle.fill"
+        }
+    }
+
+    private func trendColor(for direction: FormProgressInsights.ProgressTrend.Direction) -> Color {
+        switch direction {
+        case .improving: return AppColors.success
+        case .stable: return AppColors.secondaryText
+        case .declining: return AppColors.warning
         }
     }
 

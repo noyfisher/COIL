@@ -137,3 +137,123 @@ function formatDate(date: Date): string {
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   return `${months[date.getMonth()]} ${date.getDate()}`;
 }
+
+// ---------------------------------------------------------------------------
+// Form analysis history (cross-session form agent)
+// ---------------------------------------------------------------------------
+
+/** Minimum PRIOR sessions of the same exercise before the agent path is used. */
+export const MINIMUM_FORM_HISTORY_COUNT = 2;
+/** Most recent prior sessions included in the agent prompt. */
+export const FORM_HISTORY_LIMIT = 5;
+
+export interface FormHistoryData {
+  userMessage: string;
+  sessionCount: number;
+}
+
+/**
+ * Fetch the last few persisted form-analysis sessions for one exercise and
+ * format them as a PRIOR-HISTORY text block for the form agent. The current
+ * (just-recorded) session is NOT in Firestore yet — iOS persists after
+ * feedback — so this naturally returns prior sessions only.
+ *
+ * Document shape: see FormAnalysisRecord in iOS Services/FormAnalysisStore.swift.
+ * Requires composite index formAnalyses (exerciseName ASC, createdAt DESC).
+ */
+export async function fetchFormHistoryData(
+  uid: string,
+  exerciseName: string
+): Promise<FormHistoryData> {
+  const db = admin.firestore();
+
+  const snap = await db.collection(`users/${uid}/formAnalyses`)
+    .where("exerciseName", "==", exerciseName)
+    .orderBy("createdAt", "desc")
+    .limit(FORM_HISTORY_LIMIT)
+    .get();
+
+  // Reverse to chronological order (oldest → newest) for trend reasoning.
+  const docs = [...snap.docs].reverse();
+
+  const sessionBlocks: string[] = [];
+  for (let i = 0; i < docs.length; i++) {
+    const d = docs[i].data();
+    const date = d.createdAt instanceof admin.firestore.Timestamp
+      ? formatDate(d.createdAt.toDate())
+      : "unknown date";
+
+    const lines: string[] = [];
+    lines.push(`SESSION ${i + 1} (${date}):`);
+    lines.push(
+      `- Score: ${d.score ?? "?"}/100 (${d.verdict ?? "?"}), ` +
+      `source: ${d.source ?? "?"}, data quality: ${typeof d.dataQualityScore === "number" ? d.dataQualityScore.toFixed(2) : "?"}, ` +
+      `reps: ${d.repCount ?? "?"}`
+    );
+
+    // Per-rep ROM summary
+    const reps = d.reps as Array<{
+      repNumber?: number;
+      durationSeconds?: number;
+      angles?: Record<string, { min?: number; max?: number; rom?: number }>;
+    }> | undefined;
+    if (reps && reps.length > 0) {
+      for (const rep of reps) {
+        const angleStr = Object.entries(rep.angles ?? {})
+          .map(([joint, a]) => `${joint}: ${a.min?.toFixed(0)}–${a.max?.toFixed(0)}° (ROM ${a.rom?.toFixed(0)}°)`)
+          .join(", ");
+        lines.push(`- Rep ${rep.repNumber}: ${rep.durationSeconds?.toFixed(1)}s${angleStr ? ", " + angleStr : ""}`);
+      }
+    }
+
+    // Symmetry differences
+    const symmetry = d.symmetryDifferences as Record<string, number> | undefined;
+    if (symmetry && Object.keys(symmetry).length > 0) {
+      const symStr = Object.entries(symmetry)
+        .map(([joint, diff]) => `${joint}: ${diff.toFixed(1)}°`)
+        .join(", ");
+      lines.push(`- Left-right differences: ${symStr}`);
+    }
+
+    // Alignment issues
+    const alignment = d.alignmentIssues as string[] | undefined;
+    if (alignment && alignment.length > 0) {
+      lines.push(`- Alignment issues: ${alignment.join("; ")}`);
+    }
+
+    // Tempo
+    if (typeof d.averageTempo === "number") {
+      let tempoLine = `- Tempo: ${d.averageTempo.toFixed(1)}s/rep`;
+      if (typeof d.tempoVariability === "number") {
+        tempoLine += ` (±${d.tempoVariability.toFixed(1)}s)`;
+      }
+      lines.push(tempoLine);
+    }
+
+    // Compact corrections from that session's feedback
+    const corrections = d.corrections as Array<{
+      bodyPart?: string; issue?: string; severity?: string; dataReference?: string;
+    }> | undefined;
+    if (corrections && corrections.length > 0) {
+      for (const c of corrections) {
+        lines.push(
+          `- Correction (${c.severity ?? "?"}): ${c.bodyPart ?? "?"} — ${c.issue ?? "?"}` +
+          (c.dataReference ? ` [${c.dataReference}]` : "")
+        );
+      }
+    } else {
+      lines.push("- Corrections: none");
+    }
+
+    sessionBlocks.push(lines.join("\n"));
+  }
+
+  const userMessage = `PRIOR FORM SESSIONS for "${exerciseName}" (${snap.size} total, oldest first):
+
+${sessionBlocks.length > 0 ? sessionBlocks.join("\n\n") : "None"}`;
+
+  return {
+    userMessage,
+    sessionCount: snap.size,
+  };
+}

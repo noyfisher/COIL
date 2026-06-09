@@ -8,6 +8,7 @@
     "deploy": "npm run build && firebase deploy --only functions",
     "lint": "eslint src/**/*.ts",
     "setup-agent": "ts-node src/setup-managed-agent.ts",
+    "setup-form-agent": "ts-node src/setup-form-agent.ts",
     "test": "jest"
   },
   "engines": {

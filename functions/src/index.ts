@@ -2,8 +2,9 @@ import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import sgMail from "@sendgrid/mail";
-import { fetchRecoveryInsightsData, MINIMUM_SESSION_COUNT } from "./firestore-queries";
+import { fetchRecoveryInsightsData, MINIMUM_SESSION_COUNT, fetchFormHistoryData, MINIMUM_FORM_HISTORY_COUNT } from "./firestore-queries";
 import { runRecoveryInsightsAgent, validateInsightResult } from "./managed-agent";
+import { runFormAnalysisAgent, validateFormResult } from "./form-agent";
 import { handleGenerateExerciseImage } from "./image-generation";
 import { newRequestContext, logCompleted, logError, logWarn } from "./logger";
 import { validateClaudeResponse } from "./response-schemas";
@@ -1514,6 +1515,169 @@ export const agentInsights = functions
     }
 
     // 6. Wrap agent result in Anthropic response format for iOS compatibility
+    res.status(200).json({
+      content: [{ type: "text", text: resultJson }],
+      stop_reason: "end_turn",
+    });
+  });
+
+// ---------------------------------------------------------------------------
+// Agent-Powered Cross-Session Form Analysis
+// Uses Claude Managed Agents (Sonnet) to compare the current session's pose
+// metrics against the user's prior persisted sessions of the same exercise.
+// Falls back to the single-call form_analysis Haiku path on any agent failure.
+// ---------------------------------------------------------------------------
+const FORM_EXERCISE_NAME_MAX_LENGTH = 200;
+const FORM_USER_MESSAGE_MAX_LENGTH = 50_000;
+
+export const agentFormAnalysis = functions
+  .runWith({
+    timeoutSeconds: 300,
+    memory: "512MB",
+    secrets: ["ANTHROPIC_API_KEY", "FORM_AGENT_ID", "MANAGED_ENVIRONMENT_ID"],
+  })
+  .https.onRequest(async (req, res) => {
+    const ctx = newRequestContext("agentFormAnalysis");
+    res.on("finish", () => logCompleted(ctx, res.statusCode));
+
+    if (req.method !== "POST") {
+      res.status(405).json({ error: "Method not allowed" });
+      return;
+    }
+
+    // 1. Authenticate
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      res.status(401).json({ error: "Missing or invalid Authorization header" });
+      return;
+    }
+
+    const idToken = authHeader.split("Bearer ")[1];
+    let uid: string;
+    try {
+      const decoded = await admin.auth().verifyIdToken(idToken);
+      uid = decoded.uid;
+      ctx.uid = uid;
+    } catch {
+      res.status(401).json({ error: "Invalid Firebase ID token" });
+      return;
+    }
+
+    // 2. Rate limit
+    if (await isRateLimited(uid)) {
+      res.status(429).json({ error: "Rate limit exceeded. Please wait and try again." });
+      return;
+    }
+
+    // 3. Validate request body — the CURRENT session's metrics travel in the
+    // body (they are not in Firestore yet; iOS persists after feedback).
+    const exerciseName = req.body?.exerciseName;
+    const userMessage = req.body?.userMessage;
+    if (typeof exerciseName !== "string" || exerciseName.length === 0 ||
+        exerciseName.length > FORM_EXERCISE_NAME_MAX_LENGTH) {
+      res.status(400).json({ error: "Missing or invalid exerciseName" });
+      return;
+    }
+    if (typeof userMessage !== "string" || userMessage.length === 0 ||
+        userMessage.length > FORM_USER_MESSAGE_MAX_LENGTH) {
+      res.status(400).json({ error: "Missing or invalid userMessage" });
+      return;
+    }
+
+    // 4. Fetch prior form sessions for this exercise
+    let history;
+    try {
+      history = await fetchFormHistoryData(uid, exerciseName);
+    } catch (err) {
+      logError(ctx, err, { stage: "fetch_form_history" });
+      res.status(500).json({ error: "Failed to fetch form history" });
+      return;
+    }
+
+    ctx.metadata.sessionCount = history.sessionCount;
+
+    if (history.sessionCount < MINIMUM_FORM_HISTORY_COUNT) {
+      res.status(400).json({
+        error: `Need at least ${MINIMUM_FORM_HISTORY_COUNT} prior sessions of this exercise`,
+      });
+      return;
+    }
+
+    // 5. Try managed agent with history + current session
+    const combinedMessage = `${history.userMessage}\n\nCURRENT SESSION:\n${userMessage}`;
+    let resultJson: string;
+    try {
+      const result = await runFormAnalysisAgent(combinedMessage);
+
+      // Server-side validation before returning
+      if (!validateFormResult(result)) {
+        throw new Error("Agent returned invalid form analysis structure");
+      }
+
+      resultJson = JSON.stringify(result);
+      ctx.metadata.path = "agent";
+    } catch (agentErr) {
+      // 6. Fallback to single-call Messages API with Haiku, using the
+      // CURRENT-SESSION message only (the Haiku prompt is single-session;
+      // its JSON shape has no cross-session fields).
+      logWarn(ctx, "agent_fallback", { stage: "form_agent", fallbackReason: agentErr instanceof Error ? agentErr.message : String(agentErr) });
+      ctx.metadata.path = "fallback";
+
+      const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
+      if (!anthropicApiKey) {
+        res.status(500).json({ error: "Server configuration error" });
+        return;
+      }
+
+      try {
+        const systemPrompt = SYSTEM_PROMPTS.form_analysis;
+        const config = MODEL_CONFIG.form_analysis;
+
+        const fallbackResponse = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "x-api-key": anthropicApiKey,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            model: config.model,
+            max_tokens: config.max_tokens,
+            temperature: config.temperature,
+            system: [
+              { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } },
+            ],
+            messages: [{ role: "user", content: userMessage }],
+          }),
+        });
+
+        const fallbackData = await fallbackResponse.json();
+
+        if (!fallbackResponse.ok) {
+          res.status(fallbackResponse.status).json(fallbackData);
+          return;
+        }
+
+        // Validate fallback against the single-call schema (unlike
+        // recovery_insights, form_analysis has a zod schema).
+        const check = validateClaudeResponse("form_analysis", fallbackData);
+        if (!check.ok) {
+          logError(ctx, new Error(check.reason), { stage: "fallback_validation" });
+          res.status(502).json({ error: "ai_response_invalid" });
+          return;
+        }
+
+        // Return fallback response directly (already in Anthropic format)
+        res.status(200).json(fallbackData);
+        return;
+      } catch (fallbackErr) {
+        logError(ctx, fallbackErr, { stage: "fallback_call" });
+        res.status(502).json({ error: "Failed to generate form analysis" });
+        return;
+      }
+    }
+
+    // 7. Wrap agent result in Anthropic response format for iOS compatibility
     res.status(200).json({
       content: [{ type: "text", text: resultJson }],
       stop_reason: "end_turn",
