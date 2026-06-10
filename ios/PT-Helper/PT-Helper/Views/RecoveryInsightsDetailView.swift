@@ -60,7 +60,7 @@ struct RecoveryInsightsDetailView: View {
                 .multilineTextAlignment(.center)
 
             Text(insight.summary)
-                .font(.subheadline)
+                .font(AppFonts.body)
                 .foregroundColor(AppColors.secondaryText)
                 .multilineTextAlignment(.center)
 
@@ -89,18 +89,18 @@ struct RecoveryInsightsDetailView: View {
                         .clipShape(Circle())
 
                     Text("Pain \(analysis.trendDirection.capitalized)")
-                        .font(.subheadline.weight(.semibold))
+                        .font(AppFonts.bodySemiBold)
                         .foregroundColor(trendColor(analysis.trendDirection))
 
                     Spacer()
 
                     Text("Avg \(String(format: "%.1f", analysis.averagePain))/10")
-                        .font(.subheadline.weight(.bold))
+                        .font(AppFonts.bodySemiBold)
                         .foregroundColor(AppColors.primaryText)
                 }
 
                 Text(analysis.trendDescription)
-                    .font(.subheadline)
+                    .font(AppFonts.body)
                     .foregroundColor(AppColors.secondaryText)
 
                 // Per-region breakdown
@@ -109,14 +109,14 @@ struct RecoveryInsightsDetailView: View {
                     ForEach(regions, id: \.region) { region in
                         HStack {
                             Text(RegionPainInputView.displayName(for: region.region))
-                                .font(.caption)
+                                .font(AppFonts.caption)
                                 .foregroundColor(AppColors.primaryText)
                             Spacer()
                             Image(systemName: trendIcon(region.trend))
                                 .font(.caption2.weight(.bold))
                                 .foregroundColor(trendColor(region.trend))
                             Text(String(format: "%.1f", region.averagePain))
-                                .font(.caption.weight(.semibold))
+                                .font(AppFonts.captionSemiBold)
                                 .foregroundColor(AppColors.secondaryText)
                         }
                     }
@@ -138,9 +138,9 @@ struct RecoveryInsightsDetailView: View {
                         .font(.title3)
                         .foregroundColor(AppColors.secondaryText)
                     Spacer()
-                    VStack(alignment: .trailing, spacing: 2) {
+                    VStack(alignment: .trailing, spacing: AppSpacing.nano) {
                         Text("\(adherence.sessionsCompleted) of \(adherence.sessionsExpected)")
-                            .font(.caption.weight(.semibold))
+                            .font(AppFonts.captionSemiBold)
                         Text("sessions")
                             .font(.caption2)
                             .foregroundColor(AppColors.secondaryText)
@@ -161,7 +161,7 @@ struct RecoveryInsightsDetailView: View {
                 .frame(height: 8)
 
                 Text(adherence.description)
-                    .font(.subheadline)
+                    .font(AppFonts.body)
                     .foregroundColor(AppColors.secondaryText)
             }
         }
@@ -179,7 +179,7 @@ struct RecoveryInsightsDetailView: View {
                             .foregroundColor(AppColors.success)
                             .padding(.top, 2)
                         Text(win)
-                            .font(.subheadline)
+                            .font(AppFonts.body)
                             .foregroundColor(AppColors.primaryText)
                     }
                 }
@@ -199,7 +199,7 @@ struct RecoveryInsightsDetailView: View {
                             .foregroundColor(AppColors.warning)
                             .padding(.top, 2)
                         Text(area)
-                            .font(.subheadline)
+                            .font(AppFonts.body)
                             .foregroundColor(AppColors.primaryText)
                     }
                 }
@@ -223,10 +223,10 @@ struct RecoveryInsightsDetailView: View {
 
                         VStack(alignment: .leading, spacing: AppSpacing.xs) {
                             Text(rec.title)
-                                .font(.subheadline.weight(.semibold))
+                                .font(AppFonts.bodySemiBold)
                                 .foregroundColor(AppColors.primaryText)
                             Text(rec.description)
-                                .font(.caption)
+                                .font(AppFonts.caption)
                                 .foregroundColor(AppColors.secondaryText)
                         }
                     }
@@ -252,7 +252,7 @@ struct RecoveryInsightsDetailView: View {
                 Image(systemName: "arrow.clockwise")
                 Text("Regenerate Insights")
             }
-            .font(.subheadline.weight(.medium))
+            .font(AppFonts.bodyMedium)
             .foregroundColor(AppColors.accent)
         }
         .disabled(vm.isLoading)

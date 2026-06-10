@@ -7,7 +7,7 @@ struct ExerciseDetailView: View {
         ZStack {
             AppColors.bgGradient.ignoresSafeArea()
             ScrollView {
-                VStack(spacing: 16) {
+                VStack(spacing: AppSpacing.lg) {
                     demonstrationIcon
                     positionGuide
                     exerciseInfo
@@ -17,7 +17,7 @@ struct ExerciseDetailView: View {
                         timerView
                     }
                 }
-                .padding(20)
+                .padding(AppSpacing.xl)
             }
         }
         .trackScreen("ExerciseDetail")
@@ -43,9 +43,9 @@ struct ExerciseDetailView: View {
 
     private var exerciseInfo: some View {
         CardSection(icon: "info.circle", color: AppColors.accent, title: exercise.name) {
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 Text("Target Area: \(exercise.targetArea)")
-                    .font(.subheadline)
+                    .font(AppFonts.body)
                     .foregroundColor(AppColors.secondaryText)
                 Text(exercise.description)
                     .font(.body)
@@ -55,7 +55,7 @@ struct ExerciseDetailView: View {
                     Text("Reps: \(exercise.reps)")
                     Text("Rest: \(exercise.restSeconds) sec")
                 }
-                .font(.caption)
+                .font(AppFonts.caption)
                 .foregroundColor(AppColors.secondaryText)
             }
         }
@@ -63,10 +63,10 @@ struct ExerciseDetailView: View {
 
     private var formTips: some View {
         CardSection(icon: "lightbulb", color: AppColors.warning, title: "Form Tips") {
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 ForEach(exercise.tips, id: \.self) { tip in
                     Text("- \(tip)")
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                 }
             }
@@ -75,10 +75,10 @@ struct ExerciseDetailView: View {
 
     private var contraindications: some View {
         CardSection(icon: "exclamationmark.triangle", color: AppColors.danger, title: "Contraindications") {
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 ForEach(exercise.contraindications, id: \.self) { contraindication in
                     Text("- \(contraindication)")
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                 }
             }

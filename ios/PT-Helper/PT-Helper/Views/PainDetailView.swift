@@ -46,8 +46,19 @@ struct PainDetailView: View {
 
             wizardNavigationBar
         }
-        .navigationTitle("Pain Assessment")
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Image("MVVCLogoStacked")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 56)
+                    .clipped(antialiased: false)
+                    .fixedSize()
+            }
+        }
+        .mvvcNavBar()
         .onAppear {
             if viewModel.currentRegionIndex == 0 {
                 AnalyticsService.shared.log(.assessmentStarted)
@@ -98,7 +109,7 @@ struct PainDetailView: View {
             HStack(alignment: .center) {
                 if viewModel.hasMultipleRegions {
                     Text("Region \(viewModel.currentRegionIndex + 1) of \(viewModel.totalRegions)")
-                        .font(.caption.weight(.semibold))
+                        .font(AppFonts.captionSemiBold)
                         .foregroundColor(AppColors.ctaText)
                         .padding(.horizontal, AppSpacing.md)
                         .padding(.vertical, AppSpacing.xs)
@@ -107,7 +118,7 @@ struct PainDetailView: View {
                 }
                 Spacer()
                 Text("\(currentStep + 1) / 8")
-                    .font(.subheadline.weight(.medium))
+                    .font(AppFonts.bodyMedium)
                     .foregroundColor(AppColors.secondaryText)
                     .accessibilityIdentifier("painDetail.stepIndicator")
             }
@@ -228,7 +239,7 @@ struct PainDetailView: View {
         }
     }
 
-    private func handleContinue() {
+    func handleContinue() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         currentStep += 1
     }
@@ -330,22 +341,23 @@ struct PainDetailView: View {
             activeCustomField = field
         }) {
             HStack(spacing: AppSpacing.md) {
-                Text("Add more")
-                    .font(.body)
+                Image(systemName: "plus.circle")
+                    .font(.system(size: 18))
+                    .foregroundColor(AppColors.secondaryText)
+                    .frame(width: 28)
+                Text("Add your own")
+                    .font(Font.custom("Inter-Regular", size: 15))
                     .foregroundColor(AppColors.secondaryText)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                Image(systemName: "plus")
-                    .font(.system(size: 19, weight: .light))
-                    .foregroundColor(AppColors.secondaryText)
             }
-            .padding(.vertical, AppSpacing.lg)
-            .overlay(alignment: .bottom) {
-                Rectangle()
-                    .fill(AppColors.elevatedSurface)
-                    .frame(height: 1)
-            }
-            // .plain buttons only hit-test rendered pixels — without an explicit
-            // content shape the gap between label and trailing icon is dead.
+            .padding(.horizontal, AppSpacing.lg)
+            .padding(.vertical, AppSpacing.md + 2)
+            .background(
+                RoundedRectangle(cornerRadius: AppCorners.medium)
+                    .strokeBorder(AppColors.cardBorder, style: StrokeStyle(lineWidth: 1, dash: [6]))
+            )
+            // .plain buttons only hit-test rendered pixels — the dashed border has
+            // no fill, so without an explicit content shape the row interior is dead.
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -398,7 +410,7 @@ struct PainDetailView: View {
                     .foregroundColor(AppColors.secondaryText)
                 Spacer()
                 Text(painDescription)
-                    .font(.subheadline.weight(.semibold))
+                    .font(AppFonts.bodySemiBold)
                     .foregroundColor(painColor)
                     .padding(.horizontal, AppSpacing.md)
                     .padding(.vertical, AppSpacing.sm)
@@ -410,11 +422,11 @@ struct PainDetailView: View {
                 .padding(.vertical, AppSpacing.sm)
             HStack {
                 Text("Mild")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
                 Spacer()
                 Text("Severe")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
             }
         }
@@ -429,7 +441,7 @@ struct PainDetailView: View {
 
     // MARK: - Pain Duration (single-select cards)
 
-    private var painDurationOptions: [String] {
+    var painDurationOptions: [String] {
         PainAssessment.PainDuration.allCases.map { $0.displayName }
     }
 

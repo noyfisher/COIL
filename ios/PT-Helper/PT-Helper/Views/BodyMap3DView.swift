@@ -111,9 +111,9 @@ struct BodyMap3DView: View {
                 }
             }
         }
-        .navigationTitle("Body Map")
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarColorScheme(.light, for: .navigationBar)
+        .mvvcNavBar()
         .sheet(isPresented: $showDisclaimer) {
             DisclaimerView(onAccept: {
                 injuryAnalysisVM = InjuryAnalysisViewModel(

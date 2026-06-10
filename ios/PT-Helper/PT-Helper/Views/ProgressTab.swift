@@ -142,7 +142,7 @@ struct ProgressTabContent: View {
         } message: {
             Text("Are you sure you want to delete this workout session? This cannot be undone.")
         }
-        .navigationTitle("Progress")
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -199,7 +199,7 @@ struct ProgressTabContent: View {
                 .background(iconColor.opacity(0.12))
                 .cornerRadius(AppCorners.small)
             Text(title)
-                .font(Font.custom("Inter-SemiBold", size: 14))
+                .font(AppFonts.bodySemiBold)
                 .foregroundColor(AppColors.primaryText)
             Spacer()
             Image(systemName: "chevron.right")
@@ -227,7 +227,7 @@ struct ProgressTabContent: View {
                 if workoutViewModel.sessions.count > 10 {
                     NavigationLink(destination: WorkoutSessionView()) {
                         Text("See All")
-                            .font(Font.custom("Inter-SemiBold", size: 12))
+                            .font(AppFonts.captionSemiBold)
                             .foregroundColor(AppColors.accent)
                     }
                 }
@@ -266,12 +266,12 @@ struct ProgressTabContent: View {
                         .foregroundColor(painColor(for: session.painLevel))
                 )
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: AppSpacing.nano) {
                 Text(session.date, style: .date)
-                    .font(.subheadline.weight(.medium))
+                    .font(AppFonts.bodyMedium)
                     .foregroundColor(AppColors.primaryText)
                 Text("\(Int(session.duration / 60)) min")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
             }
 
@@ -279,7 +279,7 @@ struct ProgressTabContent: View {
 
             if !session.exercisesPerformed.isEmpty {
                 Text("\(session.exercisesPerformed.count) exercises")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
             }
 
@@ -338,7 +338,7 @@ struct ProgressTabContent: View {
     private func filterChip(label: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(label)
-                .font(.caption.weight(.medium))
+                .font(AppFonts.captionMedium)
                 .padding(.horizontal, AppSpacing.md)
                 .padding(.vertical, AppSpacing.sm)
                 .background(isSelected ? AppColors.accent : AppColors.elevatedSurface)
@@ -464,11 +464,11 @@ struct ProgressTabContent: View {
                 .cornerRadius(AppCorners.small)
 
             Text(value)
-                .font(Font.custom("BarlowCondensed-Black", size: 26))
+                .font(Font.custom("Industry-Bold", size: 26))
                 .foregroundColor(AppColors.primaryText)
 
             Text(label)
-                .font(Font.custom("Inter-Regular", size: 11))
+                .font(AppFonts.micro)
                 .foregroundColor(AppColors.mutedText)
         }
         .frame(maxWidth: .infinity)
@@ -508,13 +508,13 @@ struct ProgressTabContent: View {
                     .foregroundColor(AppColors.accent)
                     .font(.system(size: 16, weight: .semibold))
                 Text("Time for a Re-Assessment?")
-                    .font(Font.custom("BarlowCondensed-Black", size: 16))
+                    .font(Font.custom("Industry-Bold", size: 16))
                     .foregroundColor(AppColors.primaryText)
                 Spacer()
             }
 
             Text("Check in on your progress and see how your condition has changed.")
-                .font(Font.custom("Inter-Regular", size: 12))
+                .font(AppFonts.caption)
                 .foregroundColor(AppColors.secondaryText)
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -524,7 +524,7 @@ struct ProgressTabContent: View {
             } label: {
                 HStack(spacing: AppSpacing.xs) {
                     Text("Re-Assess Now")
-                        .font(Font.custom("BarlowCondensed-Bold", size: 14))
+                        .font(AppFonts.cardTitle)
                         .textCase(.uppercase)
                         .kerning(0.8)
                     Image(systemName: "arrow.right")

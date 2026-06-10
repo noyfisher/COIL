@@ -19,7 +19,7 @@ struct InjuryHistoryStepView: View {
                             .font(Font.custom("Inter-Medium", size: 15))
                             .foregroundColor(.white)
                         Text(viewModel.userProfile.injuries.isEmpty ? "Tap + to add" : "\(viewModel.userProfile.injuries.count) recorded")
-                            .font(Font.custom("Inter-Regular", size: 12))
+                            .font(AppFonts.caption)
                             .foregroundColor(OnboardingColors.muted)
                     }
                     Spacer()
@@ -37,7 +37,7 @@ struct InjuryHistoryStepView: View {
                     VStack(spacing: AppSpacing.sm) {
                         HStack {
                             Text("Injury \(index + 1)")
-                                .font(Font.custom("BarlowCondensed-Black", size: 12))
+                                .font(Font.custom("Industry-Bold", size: 12))
                                 .textCase(.uppercase)
                                 .kerning(1.0)
                                 .foregroundColor(AppColors.accent)
@@ -74,7 +74,7 @@ struct InjuryHistoryStepView: View {
                         // Year picker
                         HStack {
                             Text("Year")
-                                .font(Font.custom("Inter-Regular", size: 14))
+                                .font(AppFonts.body)
                                 .foregroundColor(OnboardingColors.muted)
                             Spacer()
                             Picker("Year", selection: Binding(
@@ -113,7 +113,7 @@ struct InjuryHistoryStepView: View {
                         if !(viewModel.userProfile.injuries[safe: index]?.isCurrent ?? true) {
                             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                                 Text("Recovery")
-                                    .font(Font.custom("Inter-Regular", size: 12))
+                                    .font(AppFonts.caption)
                                     .foregroundColor(OnboardingColors.muted)
                                 HStack(spacing: AppSpacing.sm) {
                                     ForEach(["Fully recovered", "Mostly recovered", "Still dealing with it"], id: \.self) { status in
@@ -165,7 +165,7 @@ struct InjuryHistoryStepView: View {
     private func yesNoToggle(label: String, value: Binding<Bool?>) -> some View {
         VStack(alignment: .leading, spacing: AppSpacing.xs) {
             Text(label)
-                .font(Font.custom("Inter-Regular", size: 12))
+                .font(AppFonts.caption)
                 .foregroundColor(OnboardingColors.muted)
             HStack(spacing: AppSpacing.sm) {
                 ForEach(["Yes", "No"], id: \.self) { option in

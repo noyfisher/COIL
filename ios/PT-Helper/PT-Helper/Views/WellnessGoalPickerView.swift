@@ -34,7 +34,7 @@ struct WellnessGoalPickerView: View {
 
     var body: some View {
         ZStack {
-            AppColors.bgGradient.ignoresSafeArea()
+            AppColors.pageBackground.ignoresSafeArea()
             ScrollView {
                 VStack(spacing: AppSpacing.xl) {
                     headerSection
@@ -46,8 +46,9 @@ struct WellnessGoalPickerView: View {
                 .padding(.vertical, AppSpacing.md)
             }
         }
-        .navigationTitle("What Do You Want to Improve?")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+        .mvvcNavBar()
         .navigationDestination(isPresented: $showDetailView) {
             WellnessDetailView(viewModel: createViewModel())
         }
@@ -58,6 +59,7 @@ struct WellnessGoalPickerView: View {
 
     private var headerSection: some View {
         VStack(spacing: AppSpacing.sm) {
+            MVVCDividerHeader(title: "What Do You Want to Improve?")
             Text("Select one or more goals below, or describe your own.")
                 .font(.subheadline)
                 .foregroundColor(AppColors.secondaryText)

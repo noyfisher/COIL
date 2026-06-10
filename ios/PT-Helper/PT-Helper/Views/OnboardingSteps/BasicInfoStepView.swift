@@ -79,7 +79,7 @@ struct BasicInfoStepView: View {
                                     .foregroundColor(.white)
                                 Spacer()
                                 Image(systemName: "chevron.up.chevron.down")
-                                    .font(.caption)
+                                    .font(AppFonts.caption)
                                     .foregroundColor(OnboardingColors.muted)
                             }
                             .padding(AppSpacing.md)
@@ -99,7 +99,7 @@ struct BasicInfoStepView: View {
                                     .foregroundColor(.white)
                                 Spacer()
                                 Image(systemName: "chevron.up.chevron.down")
-                                    .font(.caption)
+                                    .font(AppFonts.caption)
                                     .foregroundColor(OnboardingColors.muted)
                             }
                             .padding(AppSpacing.md)
@@ -117,7 +117,7 @@ struct BasicInfoStepView: View {
                         TextField("Enter weight", text: $weightText)
                             .keyboardType(.decimalPad)
                             .focused($isWeightFieldFocused)
-                            .font(Font.custom("Inter-Regular", size: 14))
+                            .font(AppFonts.body)
                             .foregroundColor(.white)
                             .padding(AppSpacing.md)
                             .background(OnboardingColors.inputBg)
@@ -132,7 +132,7 @@ struct BasicInfoStepView: View {
                             }
                         Text("lbs")
                             .foregroundColor(OnboardingColors.muted)
-                            .font(Font.custom("Inter-Medium", size: 14))
+                            .font(AppFonts.bodyMedium)
                     }
                     if showErrors && (viewModel.userProfile.weight < 50 || viewModel.userProfile.weight > 500) {
                         validationMessage(viewModel.userProfile.weight == 0 ? "Weight is required" : "Please enter a weight between 50 and 500 lbs")
@@ -151,21 +151,21 @@ struct BasicInfoStepView: View {
                         }
                         .accessibilityIdentifier("onboarding.termsCheckbox")
 
-                        VStack(alignment: .leading, spacing: 2) {
+                        VStack(alignment: .leading, spacing: AppSpacing.nano) {
                             HStack(spacing: 0) {
                                 Text("I agree to the ")
-                                    .font(Font.custom("Inter-Regular", size: 14))
+                                    .font(AppFonts.body)
                                     .foregroundColor(Color.white.opacity(0.7))
                                 Button("Terms of Service") { showTermsSheet = true }
-                                    .font(Font.custom("Inter-Medium", size: 14))
+                                    .font(AppFonts.bodyMedium)
                                     .foregroundColor(AppColors.accent)
                             }
                             HStack(spacing: 0) {
                                 Text("and ")
-                                    .font(Font.custom("Inter-Regular", size: 14))
+                                    .font(AppFonts.body)
                                     .foregroundColor(Color.white.opacity(0.7))
                                 Button("Privacy Policy") { showPrivacySheet = true }
-                                    .font(Font.custom("Inter-Medium", size: 14))
+                                    .font(AppFonts.bodyMedium)
                                     .foregroundColor(AppColors.accent)
                             }
                         }
@@ -201,9 +201,9 @@ struct BasicInfoStepView: View {
     }
 
     private func validationMessage(_ text: String) -> some View {
-        HStack(spacing: 4) {
+        HStack(spacing: AppSpacing.xs) {
             Image(systemName: "exclamationmark.circle.fill").font(.caption2)
-            Text(text).font(.caption)
+            Text(text).font(AppFonts.caption)
         }
         .foregroundColor(AppColors.danger)
         .transition(.opacity.combined(with: .move(edge: .top)))

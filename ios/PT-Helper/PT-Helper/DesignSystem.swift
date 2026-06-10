@@ -8,7 +8,7 @@ extension Notification.Name {
 }
 
 // MARK: - Design Tokens (MVVC Rebrand)
-// Colors from mvvc-design-system.js. Add BarlowCondensed-* and Inter-* font files
+// Colors from mvvc-design-system.js. Add Industry-Bold.otf and Inter-* font files
 // to the Xcode project and register them in Info.plist under UIAppFonts to activate
 // the custom typography. SwiftUI falls back to system sans-serif until then.
 
@@ -108,6 +108,7 @@ enum AppColors {
 // MARK: - Spacing
 
 enum AppSpacing {
+    static let nano: CGFloat = 2
     static let xs:   CGFloat = 4
     static let sm:   CGFloat = 8
     static let md:   CGFloat = 12
@@ -115,6 +116,12 @@ enum AppSpacing {
     static let xl:   CGFloat = 20
     static let xxl:  CGFloat = 28
     static let xxxl: CGFloat = 40
+
+    // Aliases for commonly needed in-between values
+    static let tight:       CGFloat = 6
+    static let comfortable: CGFloat = 10
+    static let wide:        CGFloat = 24
+    static let huge:        CGFloat = 32
 }
 
 // MARK: - Corner Radii
@@ -130,23 +137,40 @@ enum AppCorners {
 }
 
 // MARK: - Typography
-// Barlow Condensed (Black/ExtraBold/Bold) for headings; Inter (Regular/Medium/SemiBold) for body.
+// Industry Bold for headings; Inter (Regular/Medium/SemiBold) for body.
 // Custom font files must be added to Xcode and registered in Info.plist under UIAppFonts.
 
 enum AppFonts {
-    // Headings — Barlow Condensed Black
-    static let heroTitle    = Font.custom("BarlowCondensed-Black",     size: 28)
-    static let sectionTitle = Font.custom("BarlowCondensed-Black",     size: 20)
-    static let cardTitle    = Font.custom("BarlowCondensed-Bold",      size: 14)
-    static let statNumber   = Font.custom("BarlowCondensed-Black",     size: 28)
-    static let badge        = Font.custom("BarlowCondensed-Bold",      size: 10)
+    // MARK: Headings — Industry Bold
+    static let display      = Font.custom("Industry-Bold", size: 36) // large stat/hero number
+    static let heroTitle    = Font.custom("Industry-Bold", size: 28)
+    static let title        = Font.custom("Industry-Bold", size: 24)
+    static let sectionTitle = Font.custom("Industry-Bold", size: 20)
+    static let cardTitle    = Font.custom("Industry-Bold", size: 14)
+    static let statNumber   = Font.custom("Industry-Bold", size: 28)
+    static let badge        = Font.custom("Industry-Bold", size: 10)
+    static let fieldLabel   = Font.custom("Industry-Bold", size: 11) // uppercase field labels
 
-    // Body — Inter
+    // MARK: Body — Inter
     static let body         = Font.custom("Inter-Regular",  size: 14)
     static let bodyMedium   = Font.custom("Inter-Medium",   size: 14)
     static let bodySemiBold = Font.custom("Inter-SemiBold", size: 14)
 
-    // Dashboard data (monospaced for number alignment)
+    // MARK: Small — Inter 13pt
+    static let small         = Font.custom("Inter-Regular",  size: 13)
+    static let smallMedium   = Font.custom("Inter-Medium",   size: 13)
+    static let smallSemiBold = Font.custom("Inter-SemiBold", size: 13)
+
+    // MARK: Caption — Inter 12pt
+    static let caption         = Font.custom("Inter-Regular",  size: 12)
+    static let captionMedium   = Font.custom("Inter-Medium",   size: 12)
+    static let captionSemiBold = Font.custom("Inter-SemiBold", size: 12)
+
+    // MARK: Micro — Inter 11pt
+    static let micro       = Font.custom("Inter-Regular",  size: 11)
+    static let microMedium = Font.custom("Inter-Medium",   size: 11)
+
+    // MARK: Dashboard data (monospaced for number alignment)
     static let dataLarge  = Font.system(.title,    design: .monospaced).weight(.bold)
     static let dataMedium = Font.system(.body,     design: .monospaced).weight(.semibold)
     static let dataSmall  = Font.system(.footnote, design: .monospaced).weight(.medium)
@@ -212,6 +236,16 @@ struct MVVCNavBarModifier: ViewModifier {
             .toolbarBackground(AppColors.navBackground, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Image("MVVCLogoStacked")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 56)
+                        .clipped(antialiased: false)
+                        .fixedSize()
+                }
+            }
     }
 }
 
@@ -226,7 +260,7 @@ struct PrimaryButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Font.custom("BarlowCondensed-ExtraBold", size: 15))
+            .font(Font.custom("Industry-Bold", size: 15))
             .textCase(.uppercase)
             .kerning(1.2)
             .foregroundColor(.white)
@@ -244,7 +278,7 @@ struct PrimaryButtonStyle: ButtonStyle {
 struct SecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Font.custom("BarlowCondensed-Bold", size: 14))
+            .font(Font.custom("Industry-Bold", size: 14))
             .textCase(.uppercase)
             .kerning(1.0)
             .foregroundColor(AppColors.accent)
@@ -261,7 +295,7 @@ struct SecondaryButtonStyle: ButtonStyle {
 struct DestructiveButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.subheadline.weight(.medium))
+            .font(AppFonts.bodyMedium)
             .foregroundColor(AppColors.danger)
             .padding(.vertical, AppSpacing.md)
             .padding(.horizontal, AppSpacing.xl)
@@ -279,9 +313,9 @@ struct MVVCDividerHeader: View {
     let title: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: AppSpacing.tight) {
             Text(title)
-                .font(Font.custom("BarlowCondensed-Black", size: 20))
+                .font(AppFonts.sectionTitle)
                 .textCase(.uppercase)
                 .kerning(1.0)
                 .foregroundColor(AppColors.primaryText)
@@ -301,12 +335,12 @@ struct MVVCRedBadge: View {
 
     var body: some View {
         Text(text)
-            .font(Font.custom("BarlowCondensed-Bold", size: 10))
+            .font(AppFonts.badge)
             .textCase(.uppercase)
             .kerning(1.0)
-            .foregroundColor(.white)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 3)
+            .foregroundColor(AppColors.ctaText)
+            .padding(.horizontal, AppSpacing.comfortable)
+            .padding(.vertical, AppSpacing.nano + 1)
             .background(AppColors.accent)
             .clipShape(Capsule())
     }
@@ -325,17 +359,17 @@ struct CardSection<Content: View>: View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
             HStack(spacing: AppSpacing.sm) {
                 Image(systemName: icon)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(AppFonts.bodySemiBold)
                     .foregroundColor(color)
                     .frame(width: 28, height: 28)
                     .background(color.opacity(0.12))
-                    .cornerRadius(7)
+                    .cornerRadius(AppCorners.small - 1)
                 Text(title)
-                    .font(Font.custom("BarlowCondensed-Bold", size: 14))
+                    .font(AppFonts.cardTitle)
                     .foregroundColor(AppColors.secondaryText)
                 if required {
                     Text("Required")
-                        .font(.caption2.weight(.medium))
+                        .font(AppFonts.captionMedium)
                         .foregroundColor(AppColors.danger.opacity(0.8))
                 }
             }
@@ -351,7 +385,7 @@ struct StyledTextField: View {
 
     var body: some View {
         TextField(placeholder, text: $text)
-            .font(Font.custom("Inter-Regular", size: 14))
+            .font(AppFonts.body)
             .foregroundColor(AppColors.primaryText)
             .padding(AppSpacing.md)
             .background(AppColors.inputBackground)
@@ -377,7 +411,7 @@ struct EmptyStateView: View {
                     .font(AppFonts.cardTitle)
                     .foregroundColor(AppColors.primaryText)
                 Text(subtitle)
-                    .font(Font.custom("Inter-Regular", size: 13))
+                    .font(AppFonts.small)
                     .foregroundColor(AppColors.secondaryText)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.lg)
@@ -406,7 +440,7 @@ struct LoadingStateView: View {
                 .tint(AppColors.accent)
                 .scaleEffect(1.2)
             Text(message)
-                .font(Font.custom("Inter-Regular", size: 13))
+                .font(AppFonts.small)
                 .foregroundColor(AppColors.secondaryText)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -422,31 +456,31 @@ struct QuickActionCard<Destination: View>: View {
 
     var body: some View {
         NavigationLink(destination: destination) {
-            HStack(spacing: 14) {
+            HStack(spacing: AppSpacing.md) {
                 Image(systemName: icon)
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(AppFonts.bodyMedium)
                     .foregroundColor(gradientColors.first ?? AppColors.accent)
                     .frame(width: 40, height: 40)
                     .background((gradientColors.first ?? AppColors.accent).opacity(0.12))
                     .cornerRadius(AppCorners.small)
 
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: AppSpacing.nano) {
                     Text(title)
-                        .font(Font.custom("Inter-SemiBold", size: 14))
+                        .font(AppFonts.bodySemiBold)
                         .foregroundColor(AppColors.primaryText)
                     Text(subtitle)
-                        .font(Font.custom("Inter-Regular", size: 12))
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(AppFonts.smallSemiBold)
                     .foregroundColor(AppColors.mutedText)
             }
             .padding(.horizontal, AppSpacing.lg)
-            .padding(.vertical, 14)
+            .padding(.vertical, AppSpacing.md + 2)
             .background(AppColors.cardBackground)
             .cornerRadius(AppCorners.card)
             .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
@@ -464,31 +498,31 @@ struct QuickActionButton: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 14) {
+            HStack(spacing: AppSpacing.md) {
                 Image(systemName: icon)
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(AppFonts.bodyMedium)
                     .foregroundColor(gradientColors.first ?? AppColors.accent)
                     .frame(width: 40, height: 40)
                     .background((gradientColors.first ?? AppColors.accent).opacity(0.12))
                     .cornerRadius(AppCorners.small)
 
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: AppSpacing.nano) {
                     Text(title)
-                        .font(Font.custom("Inter-SemiBold", size: 14))
+                        .font(AppFonts.bodySemiBold)
                         .foregroundColor(AppColors.primaryText)
                     Text(subtitle)
-                        .font(Font.custom("Inter-Regular", size: 12))
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(AppFonts.smallSemiBold)
                     .foregroundColor(AppColors.mutedText)
             }
             .padding(.horizontal, AppSpacing.lg)
-            .padding(.vertical, 14)
+            .padding(.vertical, AppSpacing.md + 2)
             .background(AppColors.cardBackground)
             .cornerRadius(AppCorners.card)
             .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
@@ -506,9 +540,9 @@ struct SectionHeader: View {
         HStack(spacing: AppSpacing.sm) {
             Image(systemName: icon)
                 .foregroundColor(color)
-                .font(.system(size: 14, weight: .semibold))
+                .font(AppFonts.bodySemiBold)
             Text(title)
-                .font(Font.custom("BarlowCondensed-Bold", size: 14))
+                .font(AppFonts.cardTitle)
                 .foregroundColor(AppColors.secondaryText)
             Spacer()
         }
@@ -525,10 +559,10 @@ struct ChipButton: View {
     var body: some View {
         Button(action: action) {
             Text(label)
-                .font(Font.custom("Inter-SemiBold", size: 13))
-                .foregroundColor(isSelected ? .white : AppColors.primaryText)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 7)
+                .font(AppFonts.smallSemiBold)
+                .foregroundColor(isSelected ? AppColors.ctaText : AppColors.primaryText)
+                .padding(.horizontal, AppSpacing.md + 2)
+                .padding(.vertical, AppSpacing.tight + 1)
                 .background(isSelected ? AppColors.chipSelectedBg : Color.clear)
                 .clipShape(Capsule())
                 .overlay(
@@ -667,7 +701,7 @@ struct DarkTextField: View {
     var body: some View {
         TextField(placeholder, text: $text)
             .keyboardType(keyboardType)
-            .font(Font.custom("Inter-Regular", size: 14))
+            .font(AppFonts.body)
             .foregroundColor(.white)
             .padding(AppSpacing.md)
             .background(OnboardingColors.inputBg)
@@ -683,7 +717,7 @@ struct OnboardingFieldLabel: View {
     let text: String
     var body: some View {
         Text(text)
-            .font(Font.custom("BarlowCondensed-Black", size: 11))
+            .font(AppFonts.fieldLabel)
             .textCase(.uppercase)
             .kerning(1.2)
             .foregroundColor(OnboardingColors.subLabel)
@@ -700,7 +734,7 @@ struct DarkChipButton: View {
     var body: some View {
         Button(action: action) {
             Text(label)
-                .font(Font.custom("Inter-Medium", size: compact ? 13 : 14))
+                .font(compact ? AppFonts.smallMedium : AppFonts.bodyMedium)
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, compact ? AppSpacing.xs + 2 : AppSpacing.md)

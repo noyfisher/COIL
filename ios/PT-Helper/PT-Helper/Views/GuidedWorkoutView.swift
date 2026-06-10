@@ -157,11 +157,11 @@ struct GuidedWorkoutView: View {
                                     Text("Mastered")
                                         .font(.caption2.weight(.bold))
                                         .foregroundColor(.white)
-                                        .padding(.horizontal, 8)
+                                        .padding(.horizontal, AppSpacing.sm)
                                         .padding(.vertical, 4)
                                         .background(AppColors.accent.opacity(0.9))
                                         .cornerRadius(100)
-                                        .padding(8)
+                                        .padding(AppSpacing.sm)
                                 }
                             }
 
@@ -180,11 +180,11 @@ struct GuidedWorkoutView: View {
                                         showInstructions.toggle()
                                     }
                                 } label: {
-                                    HStack(spacing: 4) {
+                                    HStack(spacing: AppSpacing.xs) {
                                         Image(systemName: "book.fill")
                                             .font(.caption2)
                                         Text(showInstructions ? "Hide" : "How to")
-                                            .font(.caption.weight(.semibold))
+                                            .font(AppFonts.captionSemiBold)
                                     }
                                     .foregroundColor(AppColors.accent)
                                     .padding(.horizontal, 10)
@@ -216,7 +216,7 @@ struct GuidedWorkoutView: View {
                         if showInstructions && !exercise.tips.isEmpty {
                             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                                 Text("Tips")
-                                    .font(.caption.weight(.semibold))
+                                    .font(AppFonts.captionSemiBold)
                                     .foregroundColor(AppColors.secondaryText)
                                 ForEach(exercise.tips, id: \.self) { tip in
                                     HStack(alignment: .top, spacing: AppSpacing.xs) {
@@ -224,7 +224,7 @@ struct GuidedWorkoutView: View {
                                             .font(.caption2)
                                             .foregroundColor(.yellow)
                                         Text(tip)
-                                            .font(.caption)
+                                            .font(AppFonts.caption)
                                             .foregroundColor(AppColors.secondaryText)
                                     }
                                 }
@@ -340,7 +340,7 @@ struct GuidedWorkoutView: View {
 
     private func compactActionButton(icon: String, label: String, identifier: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            VStack(spacing: 4) {
+            VStack(spacing: AppSpacing.xs) {
                 Image(systemName: icon)
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(AppColors.secondaryText)
@@ -351,7 +351,7 @@ struct GuidedWorkoutView: View {
                     .shadow(color: AppColors.cardShadowColor, radius: 4, y: 1)
 
                 Text(label)
-                    .font(.caption2.weight(.medium))
+                    .font(AppFonts.captionMedium)
                     .foregroundColor(AppColors.mutedText)
             }
         }
@@ -384,14 +384,14 @@ struct GuidedWorkoutView: View {
                         .contentTransition(.numericText())
 
                     Text("Rest")
-                        .font(.subheadline)
+                        .font(AppFonts.body)
                         .foregroundColor(AppColors.secondaryText)
                 }
             }
             .animation(.easeInOut(duration: 0.5), value: timerColor)
 
             // +/- 15s adjustment buttons
-            HStack(spacing: 24) {
+            HStack(spacing: AppSpacing.wide) {
                 Button { vm.adjustRestTime(by: -15) } label: {
                     Text("\u{2212}15")
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
@@ -445,16 +445,16 @@ struct GuidedWorkoutView: View {
         HStack(spacing: AppSpacing.lg) {
             ExerciseImageView(exercise: exercise, isCompact: true)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: AppSpacing.nano) {
                 Text("Up Next")
-                    .font(.caption2.weight(.semibold))
+                    .font(AppFonts.captionSemiBold)
                     .foregroundColor(AppColors.mutedText)
                     .textCase(.uppercase)
                 Text(exercise.name)
                     .font(.system(.headline, design: .serif))
                     .foregroundColor(AppColors.primaryText)
                 Text(subtitle)
-                    .font(.subheadline)
+                    .font(AppFonts.body)
                     .foregroundColor(AppColors.secondaryText)
             }
 
@@ -491,7 +491,7 @@ struct GuidedWorkoutView: View {
                     .foregroundColor(AppColors.primaryText)
 
                 Text("This plan doesn't have any exercises yet. Please go back and regenerate the plan.")
-                    .font(.subheadline)
+                    .font(AppFonts.body)
                     .foregroundColor(AppColors.secondaryText)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.lg)
@@ -518,15 +518,15 @@ struct GuidedWorkoutView: View {
         VStack(spacing: AppSpacing.sm) {
             HStack {
                 Text("Exercise \(vm.exerciseProgress)")
-                    .font(.caption.weight(.semibold))
+                    .font(AppFonts.captionSemiBold)
                     .foregroundColor(AppColors.accent)
                 Spacer()
                 Text(vm.formattedElapsedTime)
-                    .font(.caption.weight(.medium))
+                    .font(AppFonts.captionMedium)
                     .foregroundColor(AppColors.secondaryText)
             }
 
-            HStack(spacing: 4) {
+            HStack(spacing: AppSpacing.xs) {
                 ForEach(0..<vm.totalExercises, id: \.self) { index in
                     RoundedRectangle(cornerRadius: 3)
                         .fill(segmentColor(for: index))
@@ -549,11 +549,11 @@ struct GuidedWorkoutView: View {
     }
 
     private func infoBadge(icon: String, text: String) -> some View {
-        HStack(spacing: 4) {
+        HStack(spacing: AppSpacing.xs) {
             Image(systemName: icon)
                 .font(.caption2)
             Text(text)
-                .font(.caption.weight(.medium))
+                .font(AppFonts.captionMedium)
         }
         .foregroundColor(AppColors.accent)
         .padding(.horizontal, AppSpacing.sm)
@@ -568,7 +568,7 @@ struct GuidedWorkoutView: View {
                 .font(.caption)
                 .foregroundColor(AppColors.accent)
             Text(text)
-                .font(.subheadline)
+                .font(AppFonts.body)
                 .foregroundColor(AppColors.secondaryText)
         }
     }
@@ -596,15 +596,15 @@ struct GuidedWorkoutView: View {
                         .cornerRadius(7)
 
                     Text("Last time: ")
-                        .font(.caption.weight(.medium))
+                        .font(AppFonts.captionMedium)
                         .foregroundColor(AppColors.secondaryText)
                     +
                     Text("Completed \(lastSession.exercisesPerformed.count) exercises")
-                        .font(.caption.weight(.semibold))
+                        .font(AppFonts.captionSemiBold)
                         .foregroundColor(AppColors.primaryText)
                     +
                     Text(" · Pain \(Int(lastSession.painLevel))/10")
-                        .font(.caption.weight(.medium))
+                        .font(AppFonts.captionMedium)
                         .foregroundColor(AppColors.secondaryText)
                 }
                 .padding(AppSpacing.md)

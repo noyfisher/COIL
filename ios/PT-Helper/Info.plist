@@ -21,10 +21,7 @@
 	<string>Microphone access is required for video recording.</string>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Fonts/BarlowCondensed-Black.ttf</string>
-		<string>Fonts/BarlowCondensed-ExtraBold.ttf</string>
-		<string>Fonts/BarlowCondensed-Bold.ttf</string>
-		<string>Fonts/BarlowCondensed-Regular.ttf</string>
+		<string>Fonts/Industry-Bold.otf</string>
 		<string>Fonts/Inter-Regular.ttf</string>
 		<string>Fonts/Inter-Medium.ttf</string>
 		<string>Fonts/Inter-SemiBold.ttf</string>

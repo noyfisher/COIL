@@ -28,7 +28,7 @@ struct MyPlanTab: View {
                     planContent
                 }
             }
-            .navigationTitle("My Plan")
+            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .mvvcNavBar()
             .refreshable { savedPlansViewModel.fetchRehabPlans() }
@@ -139,7 +139,7 @@ struct MyPlanTab: View {
                             }
 
                             Text(plan.planName)
-                                .font(Font.custom("BarlowCondensed-Black", size: 18))
+                                .font(Font.custom("Industry-Bold", size: 18))
                                 .textCase(.uppercase)
                                 .kerning(0.3)
                                 .foregroundColor(AppColors.primaryText)
@@ -148,7 +148,7 @@ struct MyPlanTab: View {
 
                             if !plan.conditions.isEmpty {
                                 Text(plan.conditions.prefix(2).joined(separator: " · "))
-                                    .font(Font.custom("Inter-Regular", size: 11))
+                                    .font(AppFonts.micro)
                                     .foregroundColor(AppColors.secondaryText)
                             }
 
@@ -157,15 +157,15 @@ struct MyPlanTab: View {
                                 Text("·")
                                 Text("\(plan.exercises.count) exercises")
                             }
-                            .font(Font.custom("Inter-Regular", size: 11))
+                            .font(AppFonts.micro)
                             .foregroundColor(AppColors.mutedText)
                         }
 
                         Spacer()
 
-                        VStack(alignment: .trailing, spacing: 2) {
+                        VStack(alignment: .trailing, spacing: AppSpacing.nano) {
                             Text("\(plan.totalWeeks)")
-                                .font(Font.custom("BarlowCondensed-Black", size: 32))
+                                .font(Font.custom("Industry-Bold", size: 32))
                                 .foregroundColor(AppColors.primaryText)
                             Text("weeks")
                                 .font(Font.custom("Inter-Regular", size: 10))
@@ -181,13 +181,13 @@ struct MyPlanTab: View {
                         Image(systemName: "play.fill")
                             .font(.system(size: 12, weight: .bold))
                         Text("Start Guided Workout")
-                            .font(Font.custom("BarlowCondensed-ExtraBold", size: 14))
+                            .font(AppFonts.cardTitle)
                             .textCase(.uppercase)
                             .kerning(1.0)
                     }
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
+                    .padding(.vertical, AppSpacing.md)
                     .background(AppColors.ctaBackground)
                     .clipShape(Capsule())
                     .shadow(color: AppColors.ctaBackground.opacity(0.30), radius: 8, y: 4)
@@ -238,7 +238,7 @@ struct MyPlanTab: View {
                 .font(.system(size: 40))
                 .foregroundColor(AppColors.warning)
             Text(error)
-                .font(Font.custom("Inter-Regular", size: 13))
+                .font(AppFonts.small)
                 .foregroundColor(AppColors.secondaryText)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, AppSpacing.xxl)

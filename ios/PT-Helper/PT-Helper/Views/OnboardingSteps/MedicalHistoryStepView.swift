@@ -46,7 +46,7 @@ struct MedicalHistoryStepView: View {
                 Button(action: { withAnimation { showMoreConditions.toggle() } }) {
                     HStack(spacing: AppSpacing.sm) {
                         Text(showMoreConditions ? "Show Less" : "Show More Conditions")
-                            .font(Font.custom("Inter-Medium", size: 13))
+                            .font(AppFonts.smallMedium)
                         Image(systemName: showMoreConditions ? "chevron.up" : "chevron.down")
                             .font(.caption)
                     }
@@ -66,7 +66,7 @@ struct MedicalHistoryStepView: View {
                 VStack(alignment: .leading, spacing: AppSpacing.md) {
                     OnboardingFieldLabel(text: "Current Medications")
                     Text("Select any medications you take regularly")
-                        .font(Font.custom("Inter-Regular", size: 12))
+                        .font(AppFonts.caption)
                         .foregroundColor(OnboardingColors.muted)
 
                     FlowLayout(spacing: AppSpacing.sm) {
@@ -74,7 +74,7 @@ struct MedicalHistoryStepView: View {
                             let isSelected = viewModel.userProfile.medications?.contains(med) ?? false
                             Button(action: { toggleMedication(med) }) {
                                 Text(med)
-                                    .font(Font.custom("Inter-Medium", size: 13))
+                                    .font(AppFonts.smallMedium)
                                     .foregroundColor(.white)
                                     .padding(.horizontal, AppSpacing.md)
                                     .padding(.vertical, AppSpacing.sm)
@@ -94,7 +94,7 @@ struct MedicalHistoryStepView: View {
 
                         HStack(spacing: AppSpacing.sm) {
                             TextField("Type medication name", text: $customMedicationText)
-                                .font(Font.custom("Inter-Regular", size: 14))
+                                .font(AppFonts.body)
                                 .foregroundColor(.white)
                                 .padding(AppSpacing.md)
                                 .background(OnboardingColors.inputBg)
@@ -116,7 +116,7 @@ struct MedicalHistoryStepView: View {
                                     ForEach(customMeds, id: \.self) { med in
                                         HStack(spacing: 4) {
                                             Text(med)
-                                                .font(Font.custom("Inter-Medium", size: 13))
+                                                .font(AppFonts.smallMedium)
                                             Button(action: { toggleMedication(med) }) {
                                                 Image(systemName: "xmark.circle.fill")
                                                     .font(.caption)
@@ -166,7 +166,7 @@ struct MedicalHistoryStepView: View {
                     .font(.system(size: 14))
                     .foregroundColor(isSelected ? .white : AppColors.accent)
                 Text(condition)
-                    .font(Font.custom("Inter-Medium", size: 13))
+                    .font(AppFonts.smallMedium)
                     .lineLimit(2)
                     .foregroundColor(.white)
             }

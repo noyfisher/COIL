@@ -30,12 +30,12 @@ struct AssessTab: View {
                         if needsHealthCheck { healthCheckBanner }
 
                         // Greeting
-                        VStack(alignment: .leading, spacing: 2) {
+                        VStack(alignment: .leading, spacing: AppSpacing.nano) {
                             Text(greetingText)
-                                .font(Font.custom("Inter-Regular", size: 12))
+                                .font(AppFonts.caption)
                                 .foregroundColor(AppColors.mutedText)
                             Text(greetingName)
-                                .font(Font.custom("BarlowCondensed-Black", size: 28))
+                                .font(AppFonts.heroTitle)
                                 .textCase(.uppercase)
                                 .kerning(0.5)
                                 .foregroundColor(AppColors.primaryText)
@@ -95,7 +95,7 @@ struct AssessTab: View {
                         }
 
                         Text("Both paths create a personalized plan with guided workouts")
-                            .font(Font.custom("Inter-Regular", size: 11))
+                            .font(AppFonts.micro)
                             .foregroundColor(AppColors.mutedText)
                             .multilineTextAlignment(.center)
                             .frame(maxWidth: .infinity)
@@ -160,7 +160,7 @@ struct AssessTab: View {
                     .padding(.bottom, AppSpacing.xxxl)
                 }
             }
-            .navigationTitle("Assess")
+            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .mvvcNavBar()
         }
@@ -187,16 +187,16 @@ struct AssessTab: View {
 
                 Spacer(minLength: AppSpacing.sm)
 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text(title)
-                        .font(Font.custom("BarlowCondensed-Black", size: 16))
+                        .font(Font.custom("Industry-Bold", size: 16))
                         .textCase(.uppercase)
                         .kerning(0.3)
                         .foregroundColor(.white)
                         .fixedSize(horizontal: false, vertical: true)
 
                     Text(subtitle)
-                        .font(Font.custom("Inter-Regular", size: 11))
+                        .font(AppFonts.micro)
                         .foregroundColor(.white.opacity(0.6))
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -231,23 +231,23 @@ struct AssessTab: View {
 
                 Spacer(minLength: AppSpacing.sm)
 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text(title)
-                        .font(Font.custom("BarlowCondensed-Black", size: 16))
+                        .font(Font.custom("Industry-Bold", size: 16))
                         .textCase(.uppercase)
                         .kerning(0.3)
                         .foregroundColor(AppColors.primaryText)
                         .fixedSize(horizontal: false, vertical: true)
 
                     Text(subtitle)
-                        .font(Font.custom("Inter-Regular", size: 11))
+                        .font(AppFonts.micro)
                         .foregroundColor(AppColors.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
                 HStack {
                     Text(label)
-                        .font(Font.custom("BarlowCondensed-Bold", size: 12))
+                        .font(AppFonts.caption)
                         .textCase(.uppercase)
                         .kerning(0.5)
                         .foregroundColor(AppColors.accent)
@@ -356,20 +356,20 @@ struct AssessTab: View {
             }
 
             Text("It's been a while. Would you like to update your health profile before starting?")
-                .font(Font.custom("Inter-Regular", size: 12))
+                .font(AppFonts.caption)
                 .foregroundColor(AppColors.secondaryText)
                 .multilineTextAlignment(.center)
 
             HStack(spacing: AppSpacing.md) {
                 Button("Update Profile") { showQuickUpdate = true }
-                    .font(Font.custom("Inter-SemiBold", size: 12))
+                    .font(AppFonts.captionSemiBold)
                     .foregroundColor(AppColors.accent)
 
                 Button("Skip") {
                     healthCheckDismissed = true
                     UserProfileService.shared.recordActivity()
                 }
-                .font(Font.custom("Inter-Regular", size: 12))
+                .font(AppFonts.caption)
                 .foregroundColor(AppColors.mutedText)
             }
         }

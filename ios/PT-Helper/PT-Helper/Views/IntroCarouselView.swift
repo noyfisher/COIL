@@ -34,7 +34,7 @@ private struct IntroNavBar: View {
         VStack(spacing: 0) {
             HStack(alignment: .center) {
                 Text("MVVC")
-                    .font(Font.custom("BarlowCondensed-Black", size: 24))
+                    .font(AppFonts.title)
                     .italic()
                     .foregroundColor(AppColors.accent)
                 Spacer()
@@ -50,12 +50,12 @@ private struct IntroNavBar: View {
                 } else {
                     Button(action: onSkip) {
                         Text("SKIP")
-                            .font(.system(size: 14, weight: .semibold))
+                            .font(AppFonts.bodySemiBold)
                             .foregroundColor(.white.opacity(0.6))
                     }
                 }
             }
-            .padding(.horizontal, 24)
+            .padding(.horizontal, AppSpacing.wide)
             .frame(height: 52)
 
             Rectangle()
@@ -71,7 +71,7 @@ private struct SwipeIndicator: View {
     @State private var offset: CGFloat = 0
 
     var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: AppSpacing.tight) {
             Text("SWIPE")
                 .font(.system(size: 10, weight: .medium, design: .monospaced))
                 .foregroundColor(.white.opacity(0.28))
@@ -147,20 +147,20 @@ private struct IntroPrecisionRecovery: View {
                                 .kerning(0.8)
                         }
                         .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
+                        .padding(.vertical, AppSpacing.sm)
                         .background(Color.white.opacity(0.08))
                         .clipShape(Capsule())
                         .overlay(Capsule().strokeBorder(Color.white.opacity(0.12), lineWidth: 0.5))
                         .padding(.top, 20)
 
                         // Headline
-                        VStack(alignment: .leading, spacing: 2) {
+                        VStack(alignment: .leading, spacing: AppSpacing.nano) {
                             Text("PRECISION")
-                                .font(Font.custom("BarlowCondensed-Black", size: 28))
+                                .font(AppFonts.heroTitle)
                                 .italic()
-                                .foregroundColor(.white)
+                                .foregroundColor(AppColors.textOnDark)
                             Text("RECOVERY")
-                                .font(Font.custom("BarlowCondensed-Black", size: 28))
+                                .font(AppFonts.heroTitle)
                                 .italic()
                                 .foregroundColor(AppColors.accent)
                         }
@@ -168,13 +168,13 @@ private struct IntroPrecisionRecovery: View {
 
                         // Body text
                         Text("Our AI analyzes your form in real-time to prevent injury and optimize recovery. Professional-grade physical therapy in the palm of your hand.")
-                            .font(Font.custom("Inter-Regular", size: 14))
+                            .font(AppFonts.body)
                             .foregroundColor(.white.opacity(0.6))
                             .lineSpacing(5)
                             .fixedSize(horizontal: false, vertical: true)
                             .padding(.top, 12)
                     }
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, AppSpacing.wide)
 
                     Spacer(minLength: 0)
 
@@ -199,7 +199,7 @@ private struct IntroPrecisionRecovery: View {
                                 .foregroundColor(.white.opacity(0.4))
                                 .kerning(0.5)
                         }
-                        .padding(.horizontal, 24)
+                        .padding(.horizontal, AppSpacing.wide)
                         .padding(.top, 18)
 
                         SwipeIndicator()
@@ -247,7 +247,7 @@ private struct IntroFastTrack: View {
                     // Hero text block
                     VStack(spacing: 0) {
                         Text("FAST TRACK\nTO PERFORMANCE")
-                            .font(Font.custom("BarlowCondensed-Black", size: 38))
+                            .font(Font.custom("Industry-Bold", size: 38))
                             .italic()
                             .multilineTextAlignment(.center)
                             .foregroundColor(AppColors.accent)
@@ -261,7 +261,7 @@ private struct IntroFastTrack: View {
                             .padding(.top, 16)
 
                         Text("MVVC uses professional-grade protocols to accelerate your body's natural healing process. We help you stay active, prevent injury, and return to performance faster.")
-                            .font(Font.custom("Inter-Regular", size: 15))
+                            .font(AppFonts.body)
                             .foregroundColor(.white.opacity(0.6))
                             .multilineTextAlignment(.center)
                             .lineSpacing(5)
@@ -309,7 +309,7 @@ private struct IntroStartJourney: View {
                         .frame(height: geo.size.height * 0.33)
 
                     // Progress dashes
-                    HStack(spacing: 10) {
+                    HStack(spacing: AppSpacing.comfortable) {
                         ForEach(0..<3) { i in
                             RoundedRectangle(cornerRadius: 3)
                                 .fill(i == 2 ? AppColors.accent : Color.white.opacity(0.22))
@@ -326,7 +326,7 @@ private struct IntroStartJourney: View {
 
                     // Headline
                     Text("START YOUR\nJOURNEY")
-                        .font(Font.custom("BarlowCondensed-Black", size: 52))
+                        .font(Font.custom("Industry-Bold", size: 52))
                         .italic()
                         .multilineTextAlignment(.center)
                         .foregroundColor(AppColors.accent)
@@ -336,7 +336,7 @@ private struct IntroStartJourney: View {
 
                     // Body text
                     Text("Set your goals and let MVVC handle the rest. Your path to peak performance starts here.")
-                        .font(Font.custom("Inter-Regular", size: 15))
+                        .font(AppFonts.body)
                         .foregroundColor(.white.opacity(0.6))
                         .multilineTextAlignment(.center)
                         .lineSpacing(5)
@@ -353,18 +353,18 @@ private struct IntroStartJourney: View {
 
                         Button(action: onStart) {
                             Text("LET'S GO")
-                                .font(Font.custom("BarlowCondensed-Black", size: 20))
+                                .font(AppFonts.sectionTitle)
                                 .italic()
-                                .foregroundColor(.white)
+                                .foregroundColor(AppColors.textOnDark)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 18)
                                 .background(AppColors.accent)
                                 .cornerRadius(14)
                         }
-                        .padding(.horizontal, 24)
-                        .padding(.top, 20)
+                        .padding(.horizontal, AppSpacing.wide)
+                        .padding(.top, AppSpacing.xl)
 
-                        HStack(spacing: 8) {
+                        HStack(spacing: AppSpacing.sm) {
                             Text("PHASE 03")
                                 .font(.system(size: 11, weight: .medium, design: .monospaced))
                                 .foregroundColor(.white.opacity(0.35))

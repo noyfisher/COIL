@@ -32,7 +32,7 @@ struct WorkoutSessionView: View {
                                     .foregroundColor(AppColors.secondaryText)
                                 Spacer()
                                 Text(painDescription)
-                                    .font(.subheadline.weight(.medium))
+                                    .font(AppFonts.bodyMedium)
                                     .foregroundColor(painColor)
                                     .padding(.horizontal, AppSpacing.md)
                                     .padding(.vertical, AppSpacing.xs)
@@ -98,7 +98,7 @@ struct WorkoutSessionView: View {
                         VStack(alignment: .leading, spacing: AppSpacing.sm) {
                             if !availableExercises.isEmpty {
                                 Text("From your rehab plans:")
-                                    .font(.caption)
+                                    .font(AppFonts.caption)
                                     .foregroundColor(AppColors.secondaryText)
                                 ForEach(availableExercises, id: \.self) { name in
                                     Button(action: {
@@ -112,7 +112,7 @@ struct WorkoutSessionView: View {
                                             Image(systemName: selectedExercises.contains(name) ? "checkmark.circle.fill" : "circle")
                                                 .foregroundColor(selectedExercises.contains(name) ? AppColors.success : AppColors.secondaryText)
                                             Text(name)
-                                                .font(.subheadline)
+                                                .font(AppFonts.body)
                                                 .foregroundColor(AppColors.primaryText)
                                             Spacer()
                                         }
@@ -124,7 +124,7 @@ struct WorkoutSessionView: View {
                             // Custom exercise input
                             HStack(spacing: AppSpacing.sm) {
                                 TextField("Add other exercise...", text: $customExercise)
-                                    .font(.subheadline)
+                                    .font(AppFonts.body)
                                     .padding(.horizontal, AppSpacing.md)
                                     .padding(.vertical, AppSpacing.sm)
                                     .background(AppColors.inputBackground)
@@ -141,7 +141,7 @@ struct WorkoutSessionView: View {
 
                             if !selectedExercises.isEmpty {
                                 Text("\(selectedExercises.count) exercise(s) selected")
-                                    .font(.caption)
+                                    .font(AppFonts.caption)
                                     .foregroundColor(AppColors.success)
                             }
                         }
@@ -310,10 +310,10 @@ struct WorkoutSessionView: View {
 
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(session.date, style: .date)
-                    .font(.subheadline.weight(.medium))
+                    .font(AppFonts.bodyMedium)
                     .foregroundColor(AppColors.primaryText)
                 Text("\(Int(session.duration / 60)) minutes")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
                 if !session.exercisesPerformed.isEmpty {
                     Text(session.exercisesPerformed.joined(separator: ", "))

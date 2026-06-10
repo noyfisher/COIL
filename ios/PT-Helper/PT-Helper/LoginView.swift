@@ -39,34 +39,28 @@ struct LoginView: View {
             VStack(alignment: .leading, spacing: 0) {
                 Spacer().frame(height: AppSpacing.xxxl)
 
-                // MVVC wordmark + red rule
-                VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                    Text("MVVC")
-                        .font(Font.custom("BarlowCondensed-Black", size: 32))
-                        .foregroundColor(.white)
-                        .kerning(0.5)
-
-                    Rectangle()
-                        .fill(AppColors.accent)
-                        .frame(width: 40, height: 3)
-                }
-                .padding(.horizontal, AppSpacing.xxl)
+                // MVVC logo
+                Image("MVVCLogo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 260)
+                    .padding(.horizontal, AppSpacing.xxl)
 
                 Spacer()
 
                 // Hero headline
                 VStack(alignment: .leading, spacing: 0) {
                     Text("ASSESS.")
-                        .font(Font.custom("BarlowCondensed-Black", size: 44))
-                        .foregroundColor(.white)
+                        .font(Font.custom("Industry-Bold", size: 44))
+                        .foregroundColor(AppColors.textOnDark)
                         .kerning(0.5)
                     Text("PLAN.")
-                        .font(Font.custom("BarlowCondensed-Black", size: 44))
+                        .font(Font.custom("Industry-Bold", size: 44))
                         .foregroundColor(AppColors.accent)
                         .kerning(0.5)
                     Text("RECOVER.")
-                        .font(Font.custom("BarlowCondensed-Black", size: 44))
-                        .foregroundColor(.white)
+                        .font(Font.custom("Industry-Bold", size: 44))
+                        .foregroundColor(AppColors.textOnDark)
                         .kerning(0.5)
                 }
                 .padding(.horizontal, AppSpacing.xxl)
@@ -75,7 +69,7 @@ struct LoginView: View {
 
                 // Subhead
                 Text("AI-powered recovery, built for Mountain View athletes.")
-                    .font(Font.custom("Inter-Regular", size: 14))
+                    .font(AppFonts.body)
                     .foregroundColor(.white.opacity(0.5))
                     .padding(.horizontal, AppSpacing.xxl)
 
@@ -101,7 +95,7 @@ struct LoginView: View {
                             Text("Sign in with Google")
                                 .font(Font.custom("Inter-SemiBold", size: 15))
                         }
-                        .foregroundColor(.white)
+                        .foregroundColor(AppColors.textOnDark)
                         .frame(maxWidth: .infinity)
                         .frame(height: 52)
                         .background(Color.white.opacity(0.09))
@@ -112,7 +106,7 @@ struct LoginView: View {
 
                     if let msg = vm.msg {
                         Text(msg)
-                            .font(Font.custom("Inter-Regular", size: 12))
+                            .font(AppFonts.caption)
                             .foregroundColor(.white.opacity(0.5))
                             .transition(.opacity)
                     }
@@ -123,7 +117,7 @@ struct LoginView: View {
 
                 // Footer
                 Text("For authorized MVVC athletes only")
-                    .font(Font.custom("Inter-Regular", size: 11))
+                    .font(AppFonts.micro)
                     .foregroundColor(.white.opacity(0.3))
                     .frame(maxWidth: .infinity, alignment: .center)
 

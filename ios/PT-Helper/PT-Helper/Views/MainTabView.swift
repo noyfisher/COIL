@@ -51,6 +51,7 @@ class TabSelection: ObservableObject {
             switch selectedTab {
             case 1: myPlanNavigationId = UUID()
             case 2: progressNavigationId = UUID()
+            case 3: profileNavigationId = UUID()
             default: break
             }
         } else if useDashboardUI {
@@ -81,6 +82,7 @@ class TabSelection: ObservableObject {
             case 0: assessNavigationId = UUID()
             case 1: myPlanNavigationId = UUID()
             case 2: progressNavigationId = UUID()
+            case 3: profileNavigationId = UUID()
             default: break
             }
         } else if useDashboardUI {
@@ -153,7 +155,7 @@ struct MainTabView: View {
             }
 
             TabView(selection: $tabSelection.selectedTab) {
-                HomeTab()
+                LegacyHomeTab()
                     .tabItem {
                         Label("Home", systemImage: "house.fill")
                     }
