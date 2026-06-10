@@ -26,6 +26,15 @@ class SessionLogger: ObservableObject {
     private var lastUploadAt: Date?
     private var lastUploadedEventCount: Int = 0
 
+    /// True when running inside a unit-test host. Tests drive ViewModels
+    /// through this singleton, which leaves a deterministic orphaned session
+    /// file behind; the next real launch then uploads that test trail via
+    /// crash recovery under whichever user is signed in (the 170-event
+    /// "Login-only" trail misdiagnosed as F4 in virtual-users/results/2026-06-09).
+    /// In-memory logging stays on; disk persistence and uploads are disabled.
+    private static let isTestHost =
+        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+
     private let fileManager = FileManager.default
     private let encoder: JSONEncoder = {
         let enc = JSONEncoder()
@@ -183,6 +192,7 @@ class SessionLogger: ObservableObject {
 
     private func persistToDisk() {
         eventsSinceLastPersist = 0
+        guard !Self.isTestHost else { return }
         guard let data = try? encoder.encode(currentLog) else { return }
         try? data.write(to: currentLogURL, options: .atomic)
     }
@@ -212,6 +222,7 @@ class SessionLogger: ObservableObject {
     ///   dedup). Used when the app is backgrounding — the last chance to
     ///   upload this session's trail before suspension.
     func uploadToFirestore(force: Bool = false) async {
+        guard !Self.isTestHost else { return }
         guard let userId = Auth.auth().currentUser?.uid else { return }
 
         // Dedup: skip if no new events since the last upload.
@@ -266,6 +277,7 @@ class SessionLogger: ObservableObject {
     }
 
     private func uploadPreviousSessionLog() async {
+        guard !Self.isTestHost else { return }
         guard let userId = Auth.auth().currentUser?.uid else { return }
         guard let data = try? Data(contentsOf: previousLogURL),
               let previousLog = try? decoder.decode(SessionLog.self, from: data) else { return }
