@@ -282,6 +282,109 @@ final class GuidedWorkoutViewModelTests: XCTestCase {
         XCTAssertEqual(vm.phase, .exercise)
     }
 
+    // MARK: - Inter-Set Rest (F7 regression)
+
+    func testCompleteSet_interSetRest_skipRest_staysOnSameExercise() {
+        let exercises = [
+            makeExercise(name: "Ex1", sets: 3, restSeconds: 30),
+            makeExercise(name: "Ex2", sets: 1, restSeconds: 30)
+        ]
+        let vm = GuidedWorkoutViewModel(plan: makePlan(exercises: exercises))
+
+        vm.completeSet()
+        XCTAssertEqual(vm.phase, .rest)
+        XCTAssertEqual(vm.restKind, .interSet)
+        XCTAssertEqual(vm.currentSet, 2)
+
+        vm.skipRest()
+
+        // Must return to the SAME exercise for set 2, not advance
+        XCTAssertEqual(vm.phase, .exercise)
+        XCTAssertEqual(vm.currentExerciseIndex, 0)
+        XCTAssertEqual(vm.currentExercise?.name, "Ex1")
+        XCTAssertEqual(vm.currentSet, 2)
+        XCTAssertTrue(vm.completedExercises.isEmpty)
+    }
+
+    func testThreeSetExercise_fullProgression_appendsToCompleted() {
+        let exercises = [
+            makeExercise(name: "Ex1", sets: 3, restSeconds: 30),
+            makeExercise(name: "Ex2", sets: 1, restSeconds: 30)
+        ]
+        let vm = GuidedWorkoutViewModel(plan: makePlan(exercises: exercises))
+
+        // Set 1 → inter-set rest → set 2
+        vm.completeSet()
+        XCTAssertEqual(vm.restKind, .interSet)
+        vm.skipRest()
+        XCTAssertEqual(vm.currentSet, 2)
+        XCTAssertEqual(vm.currentExerciseIndex, 0)
+
+        // Set 2 → inter-set rest → set 3
+        vm.completeSet()
+        XCTAssertEqual(vm.restKind, .interSet)
+        vm.skipRest()
+        XCTAssertEqual(vm.currentSet, 3)
+        XCTAssertEqual(vm.currentExerciseIndex, 0)
+        XCTAssertTrue(vm.completedExercises.isEmpty)
+
+        // Set 3 (final) → exercise completed, inter-exercise rest
+        vm.completeSet()
+        XCTAssertEqual(vm.completedExercises, ["Ex1"])
+        XCTAssertEqual(vm.phase, .rest)
+        XCTAssertEqual(vm.restKind, .interExercise)
+
+        // Rest ends → next exercise, set counter reset
+        vm.skipRest()
+        XCTAssertEqual(vm.currentExerciseIndex, 1)
+        XCTAssertEqual(vm.currentExercise?.name, "Ex2")
+        XCTAssertEqual(vm.currentSet, 1)
+        XCTAssertEqual(vm.phase, .exercise)
+
+        // Final exercise, sole set → workout complete
+        vm.completeSet()
+        XCTAssertEqual(vm.phase, .complete)
+        XCTAssertEqual(vm.completedExercises, ["Ex1", "Ex2"])
+        XCTAssertTrue(vm.skippedExercises.isEmpty)
+    }
+
+    func testRestKind_afterFinalSet_isInterExercise() {
+        let exercises = [
+            makeExercise(name: "Ex1", sets: 1, restSeconds: 10),
+            makeExercise(name: "Ex2", sets: 1, restSeconds: 10)
+        ]
+        let vm = GuidedWorkoutViewModel(plan: makePlan(exercises: exercises))
+
+        vm.completeSet()
+
+        XCTAssertEqual(vm.phase, .rest)
+        XCTAssertEqual(vm.restKind, .interExercise)
+    }
+
+    func testCheckpoint_duringInterSetRest_restoresToSameExerciseAndSet() {
+        let exercises = [makeExercise(name: "Ex1", sets: 3, restSeconds: 30)]
+        let plan = makePlan(exercises: exercises)
+        let vm = GuidedWorkoutViewModel(plan: plan)
+
+        // Complete set 1 → inter-set rest; checkpoint was saved with currentSet = 2
+        vm.completeSet()
+
+        guard let checkpoint = GuidedWorkoutViewModel.savedCheckpoint(forPlanId: plan.id.uuidString) else {
+            XCTFail("Expected checkpoint after completeSet")
+            return
+        }
+        XCTAssertEqual(checkpoint.currentExerciseIndex, 0)
+        XCTAssertEqual(checkpoint.currentSet, 2)
+
+        let restored = GuidedWorkoutViewModel(plan: plan)
+        restored.restoreFromCheckpoint(checkpoint)
+
+        XCTAssertEqual(restored.currentExerciseIndex, 0)
+        XCTAssertEqual(restored.currentSet, 2)
+        XCTAssertEqual(restored.phase, .exercise)
+        XCTAssertTrue(restored.completedExercises.isEmpty)
+    }
+
     // MARK: - Full Workout Flow
 
     func testFullWorkout_twoExercises() {

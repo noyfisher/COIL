@@ -415,32 +415,13 @@ struct GuidedWorkoutView: View {
                 }
             }
 
-            // Next exercise preview with image
-            if vm.currentExerciseIndex + 1 < vm.totalExercises {
+            // Preview of what comes after the rest: next set of the same
+            // exercise (inter-set rest) or the next exercise.
+            if vm.restKind == .interSet, let current = vm.currentExercise {
+                upNextCard(exercise: current, subtitle: "Set \(vm.currentSet) of \(current.sets)")
+            } else if vm.currentExerciseIndex + 1 < vm.totalExercises {
                 let next = vm.plan.exercises[vm.currentExerciseIndex + 1]
-                HStack(spacing: AppSpacing.lg) {
-                    ExerciseImageView(exercise: next, isCompact: true)
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Up Next")
-                            .font(.caption2.weight(.semibold))
-                            .foregroundColor(AppColors.mutedText)
-                            .textCase(.uppercase)
-                        Text(next.name)
-                            .font(.system(.headline, design: .serif))
-                            .foregroundColor(AppColors.primaryText)
-                        Text("\(next.sets) sets \u{00D7} \(next.reps)")
-                            .font(.subheadline)
-                            .foregroundColor(AppColors.secondaryText)
-                    }
-
-                    Spacer()
-                }
-                .padding(AppSpacing.lg)
-                .background(AppColors.cardBackground)
-                .cornerRadius(AppCorners.card)
-                .shadow(color: AppColors.cardShadowColor, radius: 4, y: 1)
-                .padding(.horizontal, AppSpacing.xl)
+                upNextCard(exercise: next, subtitle: "\(next.sets) sets \u{00D7} \(next.reps)")
             }
 
             Spacer()
@@ -458,6 +439,32 @@ struct GuidedWorkoutView: View {
             .padding(.horizontal, AppSpacing.xl)
             .padding(.bottom, AppSpacing.xxl)
         }
+    }
+
+    private func upNextCard(exercise: RehabExercise, subtitle: String) -> some View {
+        HStack(spacing: AppSpacing.lg) {
+            ExerciseImageView(exercise: exercise, isCompact: true)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Up Next")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundColor(AppColors.mutedText)
+                    .textCase(.uppercase)
+                Text(exercise.name)
+                    .font(.system(.headline, design: .serif))
+                    .foregroundColor(AppColors.primaryText)
+                Text(subtitle)
+                    .font(.subheadline)
+                    .foregroundColor(AppColors.secondaryText)
+            }
+
+            Spacer()
+        }
+        .padding(AppSpacing.lg)
+        .background(AppColors.cardBackground)
+        .cornerRadius(AppCorners.card)
+        .shadow(color: AppColors.cardShadowColor, radius: 4, y: 1)
+        .padding(.horizontal, AppSpacing.xl)
     }
 
     private var timerColor: Color {
@@ -610,8 +617,7 @@ struct GuidedWorkoutView: View {
     }
 
     private var restProgress: CGFloat {
-        guard let exercise = vm.currentExercise, exercise.restSeconds > 0 else { return 0 }
-        let total = Double(exercise.restSeconds)
-        return CGFloat(Double(vm.timeRemaining) / total)
+        guard vm.restDuration > 0 else { return 0 }
+        return CGFloat(Double(vm.timeRemaining) / Double(vm.restDuration))
     }
 }

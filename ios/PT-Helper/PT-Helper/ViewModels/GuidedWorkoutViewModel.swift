@@ -42,6 +42,17 @@ class GuidedWorkoutViewModel: ObservableObject {
         case complete
     }
 
+    /// What the current rest phase leads into. Inter-set rest returns to the
+    /// same exercise; inter-exercise rest advances to the next exercise.
+    enum RestKind: Equatable {
+        case interSet
+        case interExercise
+    }
+
+    @Published private(set) var restKind: RestKind = .interExercise
+    /// Total duration of the current rest, used for progress ring rendering.
+    @Published private(set) var restDuration: Int = 0
+
     // MARK: - Exercise Familiarity
 
     enum ExerciseFamiliarity: Int, Comparable {
@@ -135,7 +146,7 @@ class GuidedWorkoutViewModel: ObservableObject {
 
             if currentExerciseIndex < totalExercises - 1 {
                 // Start rest before next exercise
-                startRestTimer(seconds: exercise.restSeconds)
+                startRestTimer(seconds: exercise.restSeconds, kind: .interExercise)
             } else {
                 // Last exercise — workout complete
                 finishWorkout()
@@ -145,7 +156,7 @@ class GuidedWorkoutViewModel: ObservableObject {
             currentSet += 1
             saveCheckpoint()
             let interSetRest = min(exercise.restSeconds, 60)
-            startRestTimer(seconds: interSetRest)
+            startRestTimer(seconds: interSetRest, kind: .interSet)
         }
     }
 
@@ -160,17 +171,19 @@ class GuidedWorkoutViewModel: ObservableObject {
         moveToNextExercise()
     }
 
-    /// Skip the remaining rest time and go to next exercise
+    /// Skip the remaining rest time and continue (next set or next exercise,
+    /// depending on the kind of rest in progress).
     func skipRest() {
         stopTimer()
         if phase == .rest {
-            moveToNextExercise()
+            endRest()
         }
     }
 
     /// Adjust rest timer by a number of seconds (positive or negative)
     func adjustRestTime(by seconds: Int) {
         timeRemaining = max(5, timeRemaining + seconds)
+        restDuration = max(restDuration, timeRemaining)
     }
 
     /// Toggle pause state
@@ -316,6 +329,19 @@ class GuidedWorkoutViewModel: ObservableObject {
         }
     }
 
+    /// End the current rest phase, routing to the next set or next exercise
+    /// based on the kind of rest that was running.
+    private func endRest() {
+        stopTimer()
+        switch restKind {
+        case .interSet:
+            // Stay on the same exercise; currentSet was already advanced in completeSet()
+            phase = .exercise
+        case .interExercise:
+            moveToNextExercise()
+        }
+    }
+
     private func finishWorkout() {
         // Capture final elapsed time before stopping timers
         if !isPaused {
@@ -339,9 +365,11 @@ class GuidedWorkoutViewModel: ObservableObject {
                                               "elapsed": formattedElapsedTime])
     }
 
-    private func startRestTimer(seconds: Int) {
+    private func startRestTimer(seconds: Int, kind: RestKind) {
         phase = .rest
+        restKind = kind
         timeRemaining = max(seconds, 5)
+        restDuration = timeRemaining
         isTimerRunning = true
 
         timerSubscription = Foundation.Timer.publish(every: 1, on: .main, in: .common)
@@ -356,8 +384,7 @@ class GuidedWorkoutViewModel: ObservableObject {
                         UINotificationFeedbackGenerator().notificationOccurred(.success)
                     }
                 } else {
-                    self.stopTimer()
-                    self.moveToNextExercise()
+                    self.endRest()
                 }
             }
     }
@@ -372,8 +399,7 @@ class GuidedWorkoutViewModel: ObservableObject {
                 if self.timeRemaining > 0 {
                     self.timeRemaining -= 1
                 } else {
-                    self.stopTimer()
-                    self.moveToNextExercise()
+                    self.endRest()
                 }
             }
     }
