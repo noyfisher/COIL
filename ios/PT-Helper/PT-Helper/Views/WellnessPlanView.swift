@@ -3,7 +3,9 @@ import SwiftUI
 struct WellnessPlanView: View {
     @ObservedObject var viewModel: WellnessPlanViewModel
     let wellnessResult: WellnessAnalysisResult
-    @Environment(\.dismiss) private var dismiss
+    // NOTE: no @Environment(\.dismiss) here — this view is pushed as a navigation
+    // destination; the back button uses DismissButton (leaf-scoped dismiss read)
+    // to avoid the infinite-render freeze documented in Components/DismissButton.swift.
 
     var body: some View {
         ZStack {
@@ -96,7 +98,7 @@ struct WellnessPlanView: View {
                 saveButton
 
                 // Back button
-                Button(action: { dismiss() }) {
+                DismissButton {
                     HStack(spacing: AppSpacing.sm) {
                         Image(systemName: "chevron.left")
                         Text("Back to Recommendations")

@@ -5,8 +5,15 @@ struct WellnessResultView: View {
     @State private var expandedRecommendations: Set<String> = []
     @State private var showPreferencesSheet = false
     @State private var showWellnessPlan = false
+    /// Set when the user taps Generate/Skip in the preferences sheet. Generation and the
+    /// navigation push are deferred to the sheet's onDismiss — mutating the navigation
+    /// destination (or publishing from planVM) in the same transaction as the sheet
+    /// dismissal sends SwiftUI into an infinite layout loop that freezes the app.
+    @State private var pendingPlanGeneration = false
     @StateObject private var planVM = WellnessPlanViewModel()
-    @Environment(\.dismiss) private var dismiss
+    // NOTE: no @Environment(\.dismiss) here — this view registers a
+    // navigationDestination, and reading dismiss alongside it causes the
+    // infinite-render freeze documented in Components/DismissButton.swift.
 
     var body: some View {
         ZStack {
@@ -35,7 +42,14 @@ struct WellnessResultView: View {
                 WellnessPlanView(viewModel: planVM, wellnessResult: result)
             }
         }
-        .sheet(isPresented: $showPreferencesSheet) {
+        .sheet(isPresented: $showPreferencesSheet, onDismiss: {
+            guard pendingPlanGeneration else { return }
+            pendingPlanGeneration = false
+            if let result = viewModel.analysisResult {
+                planVM.generateWellnessPlan(from: result)
+            }
+            showWellnessPlan = true
+        }) {
             preferencesSheet
         }
         .trackScreen("WellnessResult")
@@ -274,11 +288,8 @@ struct WellnessResultView: View {
                     }
 
                     Button(action: {
+                        pendingPlanGeneration = true
                         showPreferencesSheet = false
-                        if let result = viewModel.analysisResult {
-                            planVM.generateWellnessPlan(from: result)
-                        }
-                        showWellnessPlan = true
                     }) {
                         HStack(spacing: AppSpacing.sm) {
                             Image(systemName: "sparkles")
@@ -295,11 +306,8 @@ struct WellnessResultView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Skip") {
+                        pendingPlanGeneration = true
                         showPreferencesSheet = false
-                        if let result = viewModel.analysisResult {
-                            planVM.generateWellnessPlan(from: result)
-                        }
-                        showWellnessPlan = true
                     }
                 }
             }
@@ -310,7 +318,7 @@ struct WellnessResultView: View {
 
     private var navigationButtons: some View {
         VStack(spacing: AppSpacing.md) {
-            Button(action: { dismiss() }) {
+            DismissButton {
                 HStack(spacing: AppSpacing.sm) {
                     Image(systemName: "chevron.left")
                     Text("Back to Assessment")

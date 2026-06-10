@@ -6,7 +6,9 @@ struct RehabPlanView: View {
     @ObservedObject var viewModel: RehabPlanViewModel
     @EnvironmentObject private var savedPlansVM: SavedPlansViewModel
     @EnvironmentObject private var workoutViewModel: WorkoutViewModel
-    @Environment(\.dismiss) private var dismiss
+    // NOTE: no @Environment(\.dismiss) here — this view is pushed as a navigation
+    // destination, and reading dismiss in it participates in the infinite-render
+    // freeze documented in Components/DismissButton.swift. (It was unused anyway.)
     @State private var showEditSheet = false
     @State private var showSwapSheet = false
     @State private var exerciseToSwap: RehabExercise?

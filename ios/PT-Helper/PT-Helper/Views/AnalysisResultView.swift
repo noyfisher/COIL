@@ -8,7 +8,14 @@ struct AnalysisResultView: View {
     @State private var expandedConditions: Set<String> = []
     @State private var showConfidenceInfo = false
     @State private var showPreferencesSheet = false
-    @Environment(\.dismiss) private var dismiss
+    /// Set when the user taps Generate/Skip in the preferences sheet. Generation and the
+    /// navigation push are deferred to the sheet's onDismiss — mutating the navigation
+    /// destination (or publishing from rehabVM) in the same transaction as the sheet
+    /// dismissal sends SwiftUI into an infinite layout loop that freezes the app.
+    @State private var pendingPlanGeneration = false
+    // NOTE: no @Environment(\.dismiss) here — this view registers a
+    // navigationDestination, and reading dismiss alongside it causes the
+    // infinite-render freeze documented in Components/DismissButton.swift.
     /// Prefetched rehab plan VM — generation starts as soon as this view appears
     @StateObject private var rehabVM = RehabPlanViewModel()
 
@@ -44,7 +51,12 @@ struct AnalysisResultView: View {
         .navigationDestination(isPresented: $showRehabPlan) {
             RehabPlanView(viewModel: rehabVM, analysisResult: analysisResult)
         }
-        .sheet(isPresented: $showPreferencesSheet) {
+        .sheet(isPresented: $showPreferencesSheet, onDismiss: {
+            guard pendingPlanGeneration else { return }
+            pendingPlanGeneration = false
+            rehabVM.generateRehabPlan(from: analysisResult)
+            showRehabPlan = true
+        }) {
             rehabPreferencesSheet
         }
         .alert("About Match Strength", isPresented: $showConfidenceInfo) {
@@ -397,9 +409,8 @@ struct AnalysisResultView: View {
                     }
 
                     Button(action: {
+                        pendingPlanGeneration = true
                         showPreferencesSheet = false
-                        rehabVM.generateRehabPlan(from: analysisResult)
-                        showRehabPlan = true
                     }) {
                         HStack(spacing: AppSpacing.sm) {
                             Image(systemName: "sparkles")
@@ -416,9 +427,8 @@ struct AnalysisResultView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Skip") {
+                        pendingPlanGeneration = true
                         showPreferencesSheet = false
-                        rehabVM.generateRehabPlan(from: analysisResult)
-                        showRehabPlan = true
                     }
                 }
             }
@@ -427,9 +437,7 @@ struct AnalysisResultView: View {
 
     private var navigationButtons: some View {
         VStack(spacing: AppSpacing.md) {
-            Button(action: {
-                dismiss()
-            }) {
+            DismissButton {
                 HStack(spacing: AppSpacing.sm) {
                     Image(systemName: "chevron.left")
                     Text("Back to Assessment")
