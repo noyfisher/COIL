@@ -17,6 +17,7 @@ struct IntroCarouselView: View {
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
         .ignoresSafeArea()
+        .trackScreen("IntroCarousel")
     }
 }
 

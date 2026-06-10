@@ -344,6 +344,9 @@ struct PainDetailView: View {
                     .fill(AppColors.elevatedSurface)
                     .frame(height: 1)
             }
+            // .plain buttons only hit-test rendered pixels — without an explicit
+            // content shape the gap between label and trailing icon is dead.
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }

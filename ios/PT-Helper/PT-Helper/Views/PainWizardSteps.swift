@@ -215,6 +215,9 @@ extension PainDetailView {
                     .fill(isSelected ? AppColors.primaryText : AppColors.elevatedSurface)
                     .frame(height: isSelected ? 2 : 1)
             }
+            // .plain buttons only hit-test rendered pixels — without an explicit
+            // content shape the gap between label and trailing icon is dead.
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .animation(AppAnimations.springy, value: isSelected)
