@@ -16,7 +16,10 @@ struct IntroCarouselView: View {
                 .tag(2)
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
-        .ignoresSafeArea()
+        // No .ignoresSafeArea() here: it zeroes geo.safeAreaInsets inside the
+        // pages, collapsing their status-bar spacers and pushing the nav bar
+        // (incl. the xmark close button) under the status bar (F6). Page
+        // backgrounds ignore the safe area themselves, so the bleed is kept.
         .trackScreen("IntroCarousel")
     }
 }
