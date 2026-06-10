@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import FirebaseCore
 import FirebaseCrashlytics
 import FirebaseFirestore
@@ -33,10 +34,21 @@ struct PainPointApp: App {
                 .onChange(of: scenePhase) { _, newPhase in
                     switch newPhase {
                     case .active:
-                        SessionLogger.shared.log(.appForegrounded, category: .lifecycle, message: "App foregrounded")
+                        SessionLogger.shared.resumeSession()
                         AnalyticsService.shared.log(.appOpened)
                     case .background:
-                        SessionLogger.shared.log(.appBackgrounded, category: .lifecycle, message: "App backgrounded")
+                        // End the session and force-upload the trail now —
+                        // for sessions without an AI analysis this is the only
+                        // upload trigger. The background task keeps iOS from
+                        // suspending us before the upload finishes.
+                        SessionLogger.shared.endSession()
+                        let taskId = UIApplication.shared.beginBackgroundTask(withName: "SessionLogUpload")
+                        Task {
+                            await SessionLogger.shared.uploadToFirestore(force: true)
+                            if taskId != .invalid {
+                                UIApplication.shared.endBackgroundTask(taskId)
+                            }
+                        }
                     default:
                         break
                     }

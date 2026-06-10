@@ -72,10 +72,16 @@ class SessionLogger: ObservableObject {
                 crashDetected = true
                 // Save previous log for crash recovery upload
                 try? previousData.write(to: previousLogURL, options: .atomic)
-                Task { await uploadPreviousSessionLog() }
             }
             // Clean up
             try? fileManager.removeItem(at: currentLogURL)
+        }
+
+        // Upload any pending previous-session log — covers both a crash just
+        // detected above and an orphaned file from an earlier attempt that
+        // raced an auth transition (sign-out before the upload task ran).
+        if fileManager.fileExists(atPath: previousLogURL.path) {
+            Task { await uploadPreviousSessionLog() }
         }
 
         currentLog = SessionLog(
@@ -99,6 +105,20 @@ class SessionLogger: ObservableObject {
         currentLog.endedAt = Date()
         log(.appBackgrounded, category: .lifecycle, message: "Session ended")
         persistToDisk()
+    }
+
+    /// Reopens the current session after a return to foreground. Clears
+    /// `endedAt` so the crash detector in `startSession` can still flag a
+    /// genuine crash that happens after the app was backgrounded once.
+    /// Only persists when an ended session is actually being reopened —
+    /// at cold launch `.active` fires before `startSession`, and persisting
+    /// here would clobber the previous session's file before crash detection
+    /// reads it.
+    func resumeSession() {
+        let wasEnded = currentLog.endedAt != nil
+        currentLog.endedAt = nil
+        log(.appForegrounded, category: .lifecycle, message: "App foregrounded")
+        if wasEnded { persistToDisk() }
     }
 
     // MARK: - Logging API
@@ -188,7 +208,10 @@ class SessionLogger: ObservableObject {
 
     // MARK: - Auto-Upload
 
-    func uploadToFirestore() async {
+    /// - Parameter force: bypasses the time throttle (not the no-new-events
+    ///   dedup). Used when the app is backgrounding — the last chance to
+    ///   upload this session's trail before suspension.
+    func uploadToFirestore(force: Bool = false) async {
         guard let userId = Auth.auth().currentUser?.uid else { return }
 
         // Dedup: skip if no new events since the last upload.
@@ -196,7 +219,7 @@ class SessionLogger: ObservableObject {
 
         // Throttle: skip if we uploaded within the last minUploadInterval.
         // Next caller after the window will carry the accumulated events.
-        if let last = lastUploadAt,
+        if !force, let last = lastUploadAt,
            Date().timeIntervalSince(last) < Self.minUploadInterval {
             return
         }
@@ -220,7 +243,7 @@ class SessionLogger: ObservableObject {
             _ = try await storageRef.putDataAsync(jsonData, metadata: metadata)
 
             // Write index document to Firestore
-            let indexData: [String: Any] = [
+            var indexData: [String: Any] = [
                 "sessionId": sessionId,
                 "userId": userId,
                 "startedAt": Timestamp(date: currentLog.startedAt),
@@ -232,6 +255,9 @@ class SessionLogger: ObservableObject {
                 "osVersion": currentLog.deviceContext.osVersion,
                 "uploadedAt": FieldValue.serverTimestamp()
             ]
+            if let endedAt = currentLog.endedAt {
+                indexData["endedAt"] = Timestamp(date: endedAt)
+            }
             try await db.collection("sessionLogs").document(sessionId).setData(indexData)
             AppLogger.data.info("Session log uploaded: \(sessionId)")
         } catch {
