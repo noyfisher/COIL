@@ -83,6 +83,11 @@ class FormAnalysisViewModel: ObservableObject {
 
     /// Run the full form analysis pipeline: video → pose detection → metrics → AI feedback.
     func analyzeVideo(url: URL, exercise: RehabExercise) async {
+        // The recorded video is only consumed on-device by pose detection below.
+        // Delete it once analysis finishes so user exercise footage does not
+        // accumulate in the app container indefinitely.
+        defer { try? FileManager.default.removeItem(at: url) }
+
         state = .processing(progress: 0)
         processingProgress = 0
 

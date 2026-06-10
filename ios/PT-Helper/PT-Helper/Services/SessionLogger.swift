@@ -80,7 +80,7 @@ class SessionLogger: ObservableObject {
             if previousLog.endedAt == nil {
                 crashDetected = true
                 // Save previous log for crash recovery upload
-                try? previousData.write(to: previousLogURL, options: .atomic)
+                try? previousData.write(to: previousLogURL, options: [.atomic, .completeFileProtection])
             }
             // Clean up
             try? fileManager.removeItem(at: currentLogURL)
@@ -194,7 +194,7 @@ class SessionLogger: ObservableObject {
         eventsSinceLastPersist = 0
         guard !Self.isTestHost else { return }
         guard let data = try? encoder.encode(currentLog) else { return }
-        try? data.write(to: currentLogURL, options: .atomic)
+        try? data.write(to: currentLogURL, options: [.atomic, .completeFileProtection])
     }
 
     // MARK: - Export
@@ -208,7 +208,7 @@ class SessionLogger: ObservableObject {
         let fileName = "pt-helper-session-\(sessionPrefix)-\(dateString).json"
         let tempURL = fileManager.temporaryDirectory.appendingPathComponent(fileName)
         do {
-            try data.write(to: tempURL, options: .atomic)
+            try data.write(to: tempURL, options: [.atomic, .completeFileProtection])
             return tempURL
         } catch {
             AppLogger.data.error("Failed to export session log: \(error.localizedDescription)")

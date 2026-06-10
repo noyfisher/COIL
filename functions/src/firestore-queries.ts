@@ -8,6 +8,29 @@ import * as admin from "firebase-admin";
 const LOOKBACK_DAYS = 14;
 const MINIMUM_SESSION_COUNT = 3;
 
+/**
+ * Light sanitization for free-text fields (exercise/plan names, conditions,
+ * alignment issues, correction text) that are interpolated into managed-agent
+ * prompts. Much of this text originates from EARLIER AI output and re-enters a
+ * more capable agent — a second-order prompt-injection vector. This is
+ * defense-in-depth alongside the `<prior_data>` delimiters + the agent's
+ * system-prompt instruction to treat delimited content as data.
+ *
+ * Deliberately NOT a phrase denylist: tokens like "system:" appear in
+ * legitimate exercise/clinical text ("Hip Assist:", "Over-assistance:"), so
+ * denylisting would corrupt the agent's real input. It only strips control
+ * characters, Unicode-normalizes (collapsing homoglyph tricks), caps length,
+ * and neutralizes attempts to forge/close the `<prior_data>` delimiter.
+ */
+function sanitizeForPrompt(value: unknown, maxLen = 300): string {
+  let s = String(value ?? "");
+  s = Array.from(s).map((ch) => { const c = ch.codePointAt(0)!; return (c < 32 || c === 127) ? " " : ch; }).join(""); // drop control chars
+  s = s.normalize("NFKC");
+  s = s.replace(/<\/?prior_data>/gi, "[tag]");  // neutralize delimiter breakout
+  if (s.length > maxLen) s = s.slice(0, maxLen);
+  return s;
+}
+
 export interface RecoveryInsightsData {
   userMessage: string;
   sessionCount: number;
@@ -56,7 +79,7 @@ export async function fetchRecoveryInsightsData(uid: string): Promise<RecoveryIn
     if (s.planId) {
       const linkedPlan = plansSnap.docs.find((p) => p.id === s.planId);
       if (linkedPlan) {
-        line += ` (plan: ${linkedPlan.data().planName})`;
+        line += ` (plan: ${sanitizeForPrompt(linkedPlan.data().planName)})`;
       }
     }
 
@@ -69,14 +92,14 @@ export async function fetchRecoveryInsightsData(uid: string): Promise<RecoveryIn
   for (const doc of plansSnap.docs) {
     const p = doc.data();
     const exercises = (p.exercises as Array<{ name: string }>) || [];
-    const exerciseNames = exercises.map((e) => e.name).join(", ");
+    const exerciseNames = exercises.map((e) => sanitizeForPrompt(e.name)).join(", ");
     // weeklySchedule is stored as a map { "0": [...], "2": [...] } with only non-empty days
     const weeklySchedule = (p.weeklySchedule as Record<string, string[]> | undefined) || {};
     const scheduledDays = Object.values(weeklySchedule).filter((day) => day.length > 0).length;
     expectedPerWeek += scheduledDays;
     const conditions = (p.conditions as string[]) || [];
     planLines.push(
-      `- ${p.planName}: ${exercises.length} exercises (${exerciseNames}), ${scheduledDays} days/week scheduled, conditions: ${conditions.join(", ")}`
+      `- ${sanitizeForPrompt(p.planName)}: ${exercises.length} exercises (${exerciseNames}), ${scheduledDays} days/week scheduled, conditions: ${conditions.map((c) => sanitizeForPrompt(c)).join(", ")}`
     );
   }
 
@@ -98,12 +121,12 @@ export async function fetchRecoveryInsightsData(uid: string): Promise<RecoveryIn
 
     const conditions = p.medicalConditions as string[] | undefined;
     if (conditions && conditions.length > 0) {
-      parts.push(`conditions: ${conditions.join(", ")}`);
+      parts.push(`conditions: ${conditions.map((c) => sanitizeForPrompt(c)).join(", ")}`);
     }
 
     const medications = p.medications as string[] | undefined;
     if (medications && medications.length > 0) {
-      parts.push(`medications: ${medications.join(", ")}`);
+      parts.push(`medications: ${medications.map((m) => sanitizeForPrompt(m)).join(", ")}`);
     }
 
     if (parts.length > 0) {
@@ -113,6 +136,7 @@ export async function fetchRecoveryInsightsData(uid: string): Promise<RecoveryIn
 
   const userMessage = `RECOVERY DATA (past ${LOOKBACK_DAYS} days):
 
+<prior_data>
 WORKOUT SESSIONS (${sessionsSnap.size} total):
 ${sessionLines.length > 0 ? sessionLines.join("\n") : "None"}
 
@@ -122,6 +146,7 @@ ${planLines.length > 0 ? planLines.join("\n") : "None"}
 EXPECTED SESSIONS PER WEEK: ${expectedPerWeek > 0 ? expectedPerWeek.toString() : "Not scheduled"}
 
 USER PROFILE: ${profileContext}
+</prior_data>
 
 Please analyze this data and provide a weekly recovery digest.`;
 
@@ -183,12 +208,16 @@ export async function fetchFormHistoryData(
       ? formatDate(d.createdAt.toDate())
       : "unknown date";
 
+    // Defense-in-depth: formAnalyses is client-written, so ignore an
+    // out-of-range/forged score rather than feeding it to the agent as truth.
+    const safeScore = (typeof d.score === "number" && d.score >= 0 && d.score <= 100)
+      ? d.score : "?";
     const lines: string[] = [];
     lines.push(`SESSION ${i + 1} (${date}):`);
     lines.push(
-      `- Score: ${d.score ?? "?"}/100 (${d.verdict ?? "?"}), ` +
-      `source: ${d.source ?? "?"}, data quality: ${typeof d.dataQualityScore === "number" ? d.dataQualityScore.toFixed(2) : "?"}, ` +
-      `reps: ${d.repCount ?? "?"}`
+      `- Score: ${safeScore}/100 (${sanitizeForPrompt(d.verdict ?? "?", 40)}), ` +
+      `source: ${sanitizeForPrompt(d.source ?? "?", 40)}, data quality: ${typeof d.dataQualityScore === "number" ? d.dataQualityScore.toFixed(2) : "?"}, ` +
+      `reps: ${typeof d.repCount === "number" ? d.repCount : "?"}`
     );
 
     // Per-rep ROM summary
@@ -218,7 +247,7 @@ export async function fetchFormHistoryData(
     // Alignment issues
     const alignment = d.alignmentIssues as string[] | undefined;
     if (alignment && alignment.length > 0) {
-      lines.push(`- Alignment issues: ${alignment.join("; ")}`);
+      lines.push(`- Alignment issues: ${alignment.map((a) => sanitizeForPrompt(a)).join("; ")}`);
     }
 
     // Tempo
@@ -237,8 +266,8 @@ export async function fetchFormHistoryData(
     if (corrections && corrections.length > 0) {
       for (const c of corrections) {
         lines.push(
-          `- Correction (${c.severity ?? "?"}): ${c.bodyPart ?? "?"} — ${c.issue ?? "?"}` +
-          (c.dataReference ? ` [${c.dataReference}]` : "")
+          `- Correction (${sanitizeForPrompt(c.severity ?? "?", 40)}): ${sanitizeForPrompt(c.bodyPart ?? "?", 60)} — ${sanitizeForPrompt(c.issue ?? "?")}` +
+          (c.dataReference ? ` [${sanitizeForPrompt(c.dataReference, 80)}]` : "")
         );
       }
     } else {
@@ -248,9 +277,11 @@ export async function fetchFormHistoryData(
     sessionBlocks.push(lines.join("\n"));
   }
 
-  const userMessage = `PRIOR FORM SESSIONS for "${exerciseName}" (${snap.size} total, oldest first):
+  const userMessage = `PRIOR FORM SESSIONS for "${sanitizeForPrompt(exerciseName)}" (${snap.size} total, oldest first):
 
-${sessionBlocks.length > 0 ? sessionBlocks.join("\n\n") : "None"}`;
+<prior_data>
+${sessionBlocks.length > 0 ? sessionBlocks.join("\n\n") : "None"}
+</prior_data>`;
 
   return {
     userMessage,

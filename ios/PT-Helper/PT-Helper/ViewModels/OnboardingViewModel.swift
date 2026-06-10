@@ -263,12 +263,46 @@ class OnboardingViewModel: ObservableObject {
     /// Maximum draft age before it's considered stale and discarded (7 days).
     private static let maxDraftAgeSeconds: TimeInterval = 7 * 24 * 60 * 60
 
-    /// Saves the current onboarding state to UserDefaults for crash/interruption recovery.
+    /// File-protected location for the PHI-bearing draft profile blob. The draft
+    /// holds medical conditions, surgeries, and injuries, so it is stored as a
+    /// file with `.completeFileProtection` (encrypted at rest while the device is
+    /// locked, excluded from unencrypted backups) rather than in UserDefaults.
+    /// The non-PHI scalars (step / accepted-terms / savedAt) remain in UserDefaults.
+    private static var draftProfileFileURL: URL {
+        let dir = (try? FileManager.default.url(
+            for: .applicationSupportDirectory, in: .userDomainMask,
+            appropriateFor: nil, create: true)) ?? FileManager.default.temporaryDirectory
+        return dir.appendingPathComponent("onboarding_draft_profile.json")
+    }
+
+    private static func writeDraftProfile(_ data: Data) {
+        let url = draftProfileFileURL
+        try? data.write(to: url, options: [.atomic, .completeFileProtection])
+        var values = URLResourceValues()
+        values.isExcludedFromBackup = true
+        var mutableURL = url
+        try? mutableURL.setResourceValues(values)
+    }
+
+    /// Reads the draft profile blob, migrating once from the legacy UserDefaults key.
+    private static func readDraftProfile() -> Data? {
+        if let data = try? Data(contentsOf: draftProfileFileURL) {
+            return data
+        }
+        if let legacy = UserDefaults.standard.data(forKey: DraftKeys.profile) {
+            writeDraftProfile(legacy)
+            UserDefaults.standard.removeObject(forKey: DraftKeys.profile)
+            return legacy
+        }
+        return nil
+    }
+
+    /// Saves the current onboarding state for crash/interruption recovery.
     func saveDraft() {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         if let data = try? encoder.encode(userProfile) {
-            UserDefaults.standard.set(data, forKey: DraftKeys.profile)
+            Self.writeDraftProfile(data)
         }
         UserDefaults.standard.set(currentStep, forKey: DraftKeys.step)
         UserDefaults.standard.set(hasAcceptedTerms, forKey: DraftKeys.acceptedTerms)
@@ -277,8 +311,10 @@ class OnboardingViewModel: ObservableObject {
 
     /// Loads a previously saved draft. Returns true if a valid draft was restored.
     func loadDraft() -> Bool {
-        // Don't load drafts during UI testing
+        // Don't load drafts during UI testing (DEBUG-only flag).
+        #if DEBUG
         guard !ProcessInfo.processInfo.arguments.contains("--uitesting") else { return false }
+        #endif
 
         // Check draft age — discard if stale
         let savedAt = UserDefaults.standard.double(forKey: DraftKeys.savedAt)
@@ -290,7 +326,7 @@ class OnboardingViewModel: ObservableObject {
             }
         }
 
-        guard let data = UserDefaults.standard.data(forKey: DraftKeys.profile) else {
+        guard let data = Self.readDraftProfile() else {
             return false
         }
         let decoder = JSONDecoder()
@@ -305,9 +341,10 @@ class OnboardingViewModel: ObservableObject {
         return true
     }
 
-    /// Removes any saved draft from UserDefaults.
+    /// Removes any saved draft (file-protected profile blob + UserDefaults scalars).
     static func clearDraft() {
-        UserDefaults.standard.removeObject(forKey: DraftKeys.profile)
+        try? FileManager.default.removeItem(at: draftProfileFileURL)
+        UserDefaults.standard.removeObject(forKey: DraftKeys.profile) // clear any legacy remnant
         UserDefaults.standard.removeObject(forKey: DraftKeys.step)
         UserDefaults.standard.removeObject(forKey: DraftKeys.acceptedTerms)
         UserDefaults.standard.removeObject(forKey: DraftKeys.savedAt)

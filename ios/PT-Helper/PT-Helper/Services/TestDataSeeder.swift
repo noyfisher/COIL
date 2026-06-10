@@ -5,40 +5,81 @@ import Foundation
 /// Writes to UserDefaults / in-memory stores — never touches Firestore.
 enum TestDataSeeder {
 
+    // Test/UI-automation launch flags. Gated to DEBUG builds so the
+    // `--uitesting` auth bypass (and the rest of the test affordances) cannot
+    // be activated in a shipped release binary via re-signed/jailbroken launch
+    // arguments. In release these all read `false`, so the production auth and
+    // onboarding paths always run. Mirrors the existing `virtualUserToken` gate.
     static var isUITesting: Bool {
+        #if DEBUG
         ProcessInfo.processInfo.arguments.contains("--uitesting")
+        #else
+        false
+        #endif
     }
 
     static var shouldSeedMockData: Bool {
+        #if DEBUG
         ProcessInfo.processInfo.arguments.contains("--seed-mock-data")
+        #else
+        false
+        #endif
     }
 
     static var shouldSkipOnboarding: Bool {
+        #if DEBUG
         ProcessInfo.processInfo.arguments.contains("--skip-onboarding")
+        #else
+        false
+        #endif
     }
 
     static var shouldSimulateOffline: Bool {
+        #if DEBUG
         ProcessInfo.processInfo.arguments.contains("--simulate-offline")
+        #else
+        false
+        #endif
     }
 
     static var shouldClearCoachMark: Bool {
+        #if DEBUG
         ProcessInfo.processInfo.arguments.contains("--clear-coach-mark")
+        #else
+        false
+        #endif
     }
 
     static var shouldUseLegacyUI: Bool {
+        #if DEBUG
         ProcessInfo.processInfo.arguments.contains("--use-legacy-ui")
+        #else
+        false
+        #endif
     }
 
     static var shouldClearWorkoutCheckpoint: Bool {
+        #if DEBUG
         ProcessInfo.processInfo.arguments.contains("--clear-workout-checkpoint")
+        #else
+        false
+        #endif
     }
 
     static var shouldPrefillWeight: Bool {
+        #if DEBUG
         ProcessInfo.processInfo.arguments.contains("--prefill-weight")
+        #else
+        false
+        #endif
     }
 
     static var showIntroCarousel: Bool {
+        #if DEBUG
         ProcessInfo.processInfo.arguments.contains("--show-intro")
+        #else
+        false
+        #endif
     }
 
     /// Virtual user mode: `--virtual-user-token <token>` signs into Firebase Auth

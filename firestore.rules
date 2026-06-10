@@ -3,21 +3,92 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // User profile and sub-collections (assessments, rehabPlans, workoutSessions, notes)
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // ----------------------------------------------------------------------
+    // User health data.
+    //
+    // NOTE on Firestore rule semantics: grants are ADDITIVE (OR) across every
+    // matching `match` block, and the recursive `{document=**}` matches nested
+    // paths too. So this broad rule grants READ ONLY — if it also granted
+    // `write`, the schema-bounded per-collection write rules below would be
+    // bypassed (the broad grant would OR to true). Writes are therefore
+    // enumerated per-subcollection. Any user subcollection NOT listed below is
+    // read-only to clients (Admin-SDK/Cloud-Function writes still bypass rules).
+    // ----------------------------------------------------------------------
     match /users/{userId}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if isOwner(userId);
     }
 
-    // Missing exercise images — any authenticated user can log missing images
+    // Schema-bounded: formAnalyses is consumed by the cross-session form agent
+    // as ground truth, so a forged score/name would poison AI feedback.
+    match /users/{userId}/formAnalyses/{doc} {
+      allow create, update: if isOwner(userId)
+        && request.resource.data.score is number
+        && request.resource.data.score >= 0
+        && request.resource.data.score <= 100
+        && request.resource.data.exerciseName is string
+        && request.resource.data.exerciseName.size() <= 200
+        && request.resource.data.createdAt is timestamp;
+      allow delete: if isOwner(userId);
+    }
+
+    // Schema-bounded: streakData feeds achievements/analytics.
+    match /users/{userId}/streakData/{doc} {
+      allow create, update: if isOwner(userId)
+        && request.resource.data.currentStreak is int
+        && request.resource.data.currentStreak >= 0
+        && request.resource.data.currentStreak <= 100000
+        && request.resource.data.longestStreak is int
+        && request.resource.data.longestStreak >= 0
+        && request.resource.data.longestStreak <= 100000;
+      allow delete: if isOwner(userId);
+    }
+
+    // Remaining client-written user subcollections (no schema bound today;
+    // owner-scoped write preserves existing behavior). Keep this list in sync
+    // with the iOS write paths.
+    match /users/{userId}/profile/{doc}          { allow write: if isOwner(userId); }
+    match /users/{userId}/rehabPlans/{doc}        { allow write: if isOwner(userId); }
+    match /users/{userId}/workoutSessions/{doc}   { allow write: if isOwner(userId); }
+    match /users/{userId}/assessments/{doc}       { allow write: if isOwner(userId); }
+    match /users/{userId}/notes/{doc}             { allow write: if isOwner(userId); }
+    match /users/{userId}/wellnessPlans/{doc}     { allow write: if isOwner(userId); }
+    match /users/{userId}/analysisOutcomes/{doc}  { allow write: if isOwner(userId); }
+
+    // Missing exercise images — telemetry of unmatched exercise images. No PII.
+    // Authenticated read is preserved (the in-app debug view reads it); writes
+    // are constrained so any user cannot rewrite arbitrary fields or jump the
+    // shared counter (client increments by exactly 1 via FieldValue.increment).
     match /missingExerciseImages/{docId} {
-      allow read, write: if request.auth != null;
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.exerciseName is string;
+      allow update: if request.auth != null
+        && request.resource.data.count == resource.data.count + 1;
     }
 
-    // Session logs — authenticated users can write their own crash/session logs
+    // Session logs — append-only crash/session telemetry. Owner-scoped read;
+    // create only (no client update/delete — let TTL/admin handle cleanup).
     match /sessionLogs/{logId} {
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
     }
+
+    // Remote config (e.g. config/exerciseImageAliases) — readable by any signed-in
+    // client (production hot-fix lever); only Admin SDK writes.
+    match /config/{doc} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Validation-shadow telemetry (low-value debug counters written by the
+    // iOS validation pipeline). Constrained to authenticated writes so the
+    // existing writes succeed without opening arbitrary cross-user reads.
+    match /comorbidityAliasMisses/{doc}   { allow create, update: if request.auth != null; }
+    match /unknownRepSpecs/{doc}          { allow create, update: if request.auth != null; }
+    match /strictParseWouldReject/{doc}   { allow create, update: if request.auth != null; }
 
     // Rate-limit counters (Tier 2 PR B). Only the Cloud Function Admin SDK
     // touches these — clients must NEVER be able to decrement or delete them
