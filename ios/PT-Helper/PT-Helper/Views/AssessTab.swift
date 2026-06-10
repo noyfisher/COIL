@@ -4,12 +4,14 @@ import SwiftUI
 /// Dual gateway with two hero cards: "Something Hurts" (pain path) and "Improve My Life" (wellness path).
 struct AssessTab: View {
     @EnvironmentObject private var tabSelection: TabSelection
+    @EnvironmentObject private var analysisStore: AnalysisResultStore
     @ObservedObject private var profileService = UserProfileService.shared
 
     @State private var showQuickUpdate = false
     @State private var healthCheckDismissed = false
     @State private var navigateToBodyMap = false
     @State private var navigateToWellness = false
+    @State private var navigateToLastAnalysis = false
 
     private var needsHealthCheck: Bool {
         guard !healthCheckDismissed else { return false }
@@ -97,6 +99,26 @@ struct AssessTab: View {
                             .foregroundColor(AppColors.mutedText)
                             .multilineTextAlignment(.center)
                             .frame(maxWidth: .infinity)
+
+                        // Last analysis re-entry point — a completed analysis persists
+                        // across relaunches and must stay reachable (F2).
+                        if let lastResult = analysisStore.lastResult {
+                            MVVCDividerHeader(title: "Your Last Analysis")
+
+                            Button {
+                                SessionLogger.shared.logUserAction(.buttonTapped,
+                                    action: "lastAnalysisOpened",
+                                    metadata: ["topCondition": lastResult.conditions.first?.commonName ?? "none"])
+                                navigateToLastAnalysis = true
+                            } label: {
+                                lastAnalysisCard(for: lastResult)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityIdentifier("assess.lastAnalysisCard")
+                            .navigationDestination(isPresented: $navigateToLastAnalysis) {
+                                AnalysisResultView(analysisResult: lastResult)
+                            }
+                        }
 
                         // Quick actions
                         MVVCDividerHeader(title: "Quick Actions")
@@ -242,6 +264,66 @@ struct AssessTab: View {
         .cornerRadius(AppCorners.card)
         .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
         .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
+    }
+
+    // MARK: - Last Analysis Card
+
+    private func lastAnalysisCard(for result: AnalysisResult) -> some View {
+        let topCondition = result.conditions.first
+        let strength = topCondition.map { ConfidenceCalibrator.matchStrength(for: $0.confidence) }
+
+        return HStack(spacing: 14) {
+            Image(systemName: "stethoscope")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(AppColors.accent)
+                .frame(width: 40, height: 40)
+                .background(AppColors.accent.opacity(0.12))
+                .cornerRadius(AppCorners.small)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(topCondition?.commonName ?? "Analysis Results")
+                    .font(Font.custom("Inter-SemiBold", size: 14))
+                    .foregroundColor(AppColors.primaryText)
+
+                HStack(spacing: AppSpacing.xs) {
+                    if let strength {
+                        Text(strength.rawValue)
+                            .font(Font.custom("Inter-SemiBold", size: 12))
+                            .foregroundColor(matchColor(strength))
+                        Text("•")
+                            .font(Font.custom("Inter-Regular", size: 12))
+                            .foregroundColor(AppColors.mutedText)
+                    }
+                    Text(result.generatedDate.formatted(.relative(presentation: .named)))
+                        .font(Font.custom("Inter-Regular", size: 12))
+                        .foregroundColor(AppColors.secondaryText)
+                }
+
+                Text("View results & build a rehab plan")
+                    .font(Font.custom("Inter-Regular", size: 11))
+                    .foregroundColor(AppColors.mutedText)
+            }
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(AppColors.accent)
+        }
+        .padding(.horizontal, AppSpacing.lg)
+        .padding(.vertical, 14)
+        .background(AppColors.cardBackground)
+        .cornerRadius(AppCorners.card)
+        .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
+        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+    }
+
+    private func matchColor(_ strength: MatchStrength) -> Color {
+        switch strength {
+        case .strong: return AppColors.success
+        case .moderate: return AppColors.warning
+        case .weak: return AppColors.mutedText
+        }
     }
 
     // MARK: - Helpers
