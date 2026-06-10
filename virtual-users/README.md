@@ -20,6 +20,15 @@ chart rendering against seeded ground truth.
 6. Cleanup: `node virtual-users/seed_vuser_data.js --cleanup` — deletes ALL `vuser-*`
    Firestore trees, sessionLogs, Storage trails, rateLimits, and Auth records so
    `aggregateDailyMetrics` / the nightly report stay clean.
+   **Then neutralize the simulator too**, or later launches (e.g. test hosts) will
+   re-upload leftover trails and re-create Auth records (observed 2026-06-09):
+   ```
+   xcrun simctl terminate <udid> com.noyfisher.pthelper
+   find "$(xcrun simctl get_app_container <udid> com.noyfisher.pthelper data)" \
+     -name "session_log_*.json" -delete
+   xcrun simctl uninstall <udid> com.noyfisher.pthelper   # clears keychain vuser session
+   ```
+   Re-run `--verify` afterwards to confirm zero vuser docs.
 
 ## Bug classification rule
 

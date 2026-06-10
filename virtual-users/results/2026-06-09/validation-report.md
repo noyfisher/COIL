@@ -51,10 +51,13 @@ Consequences, all observed live:
     multiple relaunches.
   - `endedAt` is never set, so the crash detector flags **every** prior session as
     a crash → nightly-report crash counts inflated, session-log counts undercounted.
-  - The crash-recovery upload path (`uploadPreviousSessionLog`) produced no
-    documents in 3 opportunities — needs investigation (suspect Storage/Firestore
-    rules vs. auth-user mismatch during sign-in transitions, rules require
-    `userId == request.auth.uid`).
+  - The crash-recovery upload path (`uploadPreviousSessionLog`) is unreliable and
+    LATE rather than fully broken: it produced nothing during the run itself
+    (3 opportunities), but leftover local session files were uploaded much later
+    when the SmokePlan test-host launched the app — vuser sessionLogs docs
+    re-appeared AFTER cleanup had run. Late uploads also mean test/QA data can
+    resurrect post-cleanup; the harness now purges local `session_log_*.json`
+    files and uninstalls the app from the simulator at cleanup time.
 Fix sketch: call `endSession()` + `uploadToFirestore()` on `scenePhase == .background`
 in PT_HelperApp, and re-test crash recovery.
 
