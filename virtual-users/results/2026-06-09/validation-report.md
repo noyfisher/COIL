@@ -142,3 +142,10 @@ All `vuser-*` Firestore/Auth/Storage data deleted post-validation via
 `node virtual-users/seed_vuser_data.js --cleanup` (results in this directory are
 the durable record). Note: vuser activity from today may still appear in tomorrow's
 `aggregateDailyMetrics` totals if the 01:00 UTC job ran mid-test — one-day blip only.
+
+## Addendum — 2026-06-10 follow-up
+
+- **F1** fixed in `b4885aa`; **F3** fixed in `42c4c6f`; **F5** fixed in `a959b61`; **F6** fixed in `282da75` (TabView-level `.ignoresSafeArea()` zeroed the pages' safe-area insets; nav bar now renders below the status bar, verified on sim).
+- **F4 RESOLVED AS MISDIAGNOSIS.** `.trackScreen` exists on 51/80 view files and predates the run build. The analyzed 170-event trail was the **unit-test host's session log**: the suite drives ViewModels through the SessionLogger singleton, leaves an orphaned `session_log_current.json` (deterministically 170 events, one "Login" screenAppeared, ~24 errorOccurred from error-path tests), and the next real launch uploads it via crash recovery **under whichever user is signed in**. Reproduced exactly on 2026-06-10 with a `vuser-f4-debug` session: the recovered test-host trail (170 events, embedded userId `vuser-veteran-001`) appeared beside the genuine live trail, which correctly contained `appLaunched` + `screenAppeared` (Onboarding, OnboardingBasicInfo) + `appBackgrounded`. Screen tracking works; the 24 errorOccurred were test artifacts. Fix: SessionLogger is now inert in test hosts (`b4f8e24`).
+- **GA4 BigQuery check still blocked**: as of 2026-06-10 ~02:30 PT the newest export table is `events_20260522`; no daily/intraday table for the run window yet. Re-run the query above once `events_20260609`/`events_20260610` materialize.
+- All `vuser-*` data (including the F4 debug session) cleaned post-verification.
