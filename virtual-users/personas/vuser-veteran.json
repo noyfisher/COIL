@@ -1,0 +1,31 @@
+{
+  "virtualUserId": "vuser-veteran-001",
+  "description": "Established user with 14 days of history (pre-seeded via seed_vuser_data.js). Validates that every chart renders seeded activity correctly, then completes one live workout.",
+  "preSeed": "seed_vuser_data.js — MUST run and be verified before launching the app",
+  "seededGroundTruth": {
+    "sessions": 10,
+    "avgPain": 4.8,
+    "totalMinutes": 250,
+    "painTrend": "declining 7.0 -> 3.0 over 14 days",
+    "regions": ["right_knee", "left_hip"],
+    "plan": "Knee Recovery Plan, week 4 of 6, 3 exercises (Wall Sits, Straight Leg Raises, Clamshells)",
+    "currentStreak": 3,
+    "longestStreak": 5,
+    "achievements": ["first_workout", "streak_3", "sessions_10"],
+    "exerciseFrequency": { "Wall Sits": 7, "Straight Leg Raises": 7, "Clamshells": 7 }
+  },
+  "journey": [
+    { "step": "launch", "expect": "profile exists -> straight to main tabs (no onboarding)", "analyticsEvents": ["app_opened", "sign_in_completed"] },
+    { "step": "my_plan", "action": "view My Plan tab, open Knee Recovery Plan", "analyticsEvents": ["tab_switched", "plan_viewed"] },
+    { "step": "chart_review_progress", "action": "Progress tab: screenshot pain trend (overall + right_knee filter), summary stats, recent workouts", "analyticsEvents": ["tab_switched"] },
+    { "step": "chart_review_metrics", "action": "screenshot RehabMetricsView (adherence, avg pain, streak, plan progress, exercise history, session list) and AchievementsView", "analyticsEvents": [] },
+    { "step": "live_workout", "action": "complete one guided workout (all 3 exercises)", "analyticsEvents": ["workout_started", "workout_completed"] },
+    { "step": "chart_recheck", "action": "verify Progress tab reflects the new session (count 11, updated trend point)", "analyticsEvents": ["tab_switched"] }
+  ],
+  "expectedFirestore": {
+    "workoutSessions": "10 seeded + 1 live = 11",
+    "streakData/current": "currentStreak stays 3 or increments per StreakService logic (last workout already today)",
+    "sessionLogs": ">=1 index doc"
+  },
+  "aiCalls": "none (plan pre-seeded)"
+}

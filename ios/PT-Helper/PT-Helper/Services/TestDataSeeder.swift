@@ -41,6 +41,22 @@ enum TestDataSeeder {
         ProcessInfo.processInfo.arguments.contains("--show-intro")
     }
 
+    /// Virtual user mode: `--virtual-user-token <token>` signs into Firebase Auth
+    /// with a custom token and follows the real production path (real Firestore
+    /// writes, SessionLogger, Analytics). DEBUG builds only. Mutually exclusive
+    /// with `--uitesting` — virtual user mode takes precedence.
+    static var virtualUserToken: String? {
+        #if DEBUG
+        let args = ProcessInfo.processInfo.arguments
+        guard let idx = args.firstIndex(of: "--virtual-user-token"), idx + 1 < args.count else {
+            return nil
+        }
+        return args[idx + 1]
+        #else
+        return nil
+        #endif
+    }
+
     // MARK: - Seed All Data
 
     @MainActor

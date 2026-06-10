@@ -1,0 +1,35 @@
+{
+  "virtualUserId": "vuser-veteran-001",
+  "runDate": "2026-06-09",
+  "seededGroundTruth": {
+    "sessions": 10,
+    "avgPain": 4.8,
+    "totalMinutes": 250,
+    "painTrendOverall": [7.0, 6.5, 6.0, 5.5, 5.0, 4.5, 4.0, 3.5, 3.0, 3.0],
+    "painTrendRightKnee": [7.0, 6.5, 6.0, 5.5, 5.0, 4.5, 4.0, 3.5, 3.0, 3.0],
+    "painTrendLeftHip": [4.0, 3.5, 3.0, 2.5, 2.0],
+    "plan": "Knee Recovery Plan, started 21d ago (May 19), week 4 of 6, 3 exercises",
+    "currentStreak": 3, "longestStreak": 5,
+    "achievements": ["first_workout (May 27)", "streak_3 (Jun 9)", "sessions_10 (Jun 9)"]
+  },
+  "chartVerification": {
+    "progress.summaryStats.before": { "expected": "10 / 4.8 / 250", "displayed": "10 Sessions / 4.8 Avg Pain / 250 Total Min", "verdict": "PASS (exact)" },
+    "progress.summaryStats.afterLiveWorkout": { "expected": "11 / 4.64 / 250", "displayed": "11 / 4.6 / 250", "verdict": "PASS (exact, (48+3)/11=4.64 -> 4.6)" },
+    "progress.painTrend.overall": { "expected": "decline 7.0 -> 3.0, 10 points, flat 3.0 tail", "displayed": "matches incl. flat tail", "verdict": "PASS" },
+    "progress.regionFilter.chips": { "expected": "Overall + Left Hip + Right Knee discovered from regionPainLevels", "displayed": "all 3 chips", "verdict": "PASS" },
+    "progress.painTrend.rightKnee": { "expected": "10 points 7.0 -> 3.0, title RIGHT KNEE PAIN", "displayed": "matches", "verdict": "PASS" },
+    "progress.painTrend.leftHip": { "expected": "5 points 4.0 -> 2.0", "displayed": "matches", "verdict": "PASS" },
+    "progress.recentWorkouts": { "expected": "10 sessions May 27 - Jun 9 with pain circles, durations 20-30 min, 2-3 exercises", "displayed": "all rows correct incl. color coding (3=green, 4-5=yellow, 6-7=warm)", "verdict": "PASS" },
+    "progress.streakBadge": { "expected": "3", "displayed": "3 with flame", "verdict": "PASS" },
+    "myPlan.planCard": { "expected": "KNEE RECOVERY PLAN, Active, PFPS, 3 exercises, 6 weeks, May 19 2026", "displayed": "all correct", "verdict": "PASS" },
+    "achievements": { "expected": "current 3 / longest 5 / earned 3 (First Steps May 27, Getting Going Jun 9, Dedicated Jun 9), others locked", "displayed": "all correct", "verdict": "PASS" },
+    "outcomeRatingPrompt": { "expected": "shown (plan >= 7 days old)", "displayed": "shown", "verdict": "PASS" },
+    "recoveryInsightTeaser": { "displayed": "'recent pain trending down (avg 3.2/10)' on workout completion - used seeded data", "verdict": "PASS" }
+  },
+  "liveWorkout": {
+    "actions": "started guided workout, completed 3 sets of Wall Sits (skip rest x2), workout completed, pain 3/10, saved",
+    "firestoreResult": "workoutSessions count 10 -> 11 (verified via Admin SDK)",
+    "expectedFunnelEvents": ["workout_started", "workout_completed"],
+    "anomaly": "completion summary displayed '0 Completed / 0 Skipped' exercises after completing 3 sets of exercise 1 — workout also ended after first exercise instead of advancing to exercise 2 of 3. Needs investigation (rapid set completion + Skip Rest race?)"
+  }
+}

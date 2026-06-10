@@ -1,0 +1,24 @@
+{
+  "virtualUserId": "vuser-happy-path-001",
+  "description": "Full funnel: fresh user signs in, completes onboarding, runs an injury assessment through AI analysis, generates a rehab plan, completes a guided workout, then reviews Progress.",
+  "preSeed": "none — everything generated live so all funnel events fire organically",
+  "journey": [
+    { "step": "launch", "expect": "[VirtualUser] signed in as vuser-happy-path-001 in logs", "analyticsEvents": ["app_opened", "sign_in_completed"] },
+    { "step": "intro_carousel", "action": "tap through IntroCarouselView to completion (part of real funnel — no skip arg exists in production path)", "analyticsEvents": [] },
+    { "step": "onboarding", "action": "complete all onboarding steps: basic info (name, DOB, sex, height, weight), injury history (none), surgical history (none), medical history (none), activity level (Moderate), review & submit", "analyticsEvents": ["onboarding_started", "onboarding_step_completed (xN)", "onboarding_completed"] },
+    { "step": "assess_gateway", "action": "Assess tab → choose 'Something Hurts' (injury path)", "analyticsEvents": ["assessment_gateway_chosen {path: injury}"] },
+    { "step": "body_map", "action": "open body map, select right knee region", "analyticsEvents": ["body_map_opened", "regions_selected {region_count: 1}"] },
+    { "step": "pain_assessment", "action": "fill essential pain fields (aching, intensity 6, 2 weeks, intermittent, gradual onset, aggravated by stairs, relieved by rest) and run analysis", "analyticsEvents": ["assessment_started", "assessment_completed", "analysis_completed"] },
+    { "step": "rehab_plan", "action": "from analysis result, open preferences sheet (no equipment, 30 min, moderate) and generate plan", "analyticsEvents": ["rehab_plan_generated"] },
+    { "step": "guided_workout", "action": "start workout from plan, complete 2 sets of first exercise, skip second exercise, finish workout", "analyticsEvents": ["workout_started", "exercise_skipped", "workout_completed"] },
+    { "step": "progress_tab", "action": "switch to Progress tab, view charts", "analyticsEvents": ["tab_switched"] }
+  ],
+  "expectedFirestore": {
+    "profile/health": 1,
+    "rehabPlans": 1,
+    "workoutSessions": 1,
+    "streakData/current": "currentStreak=1, achievements include first_workout",
+    "sessionLogs": ">=1 index doc with userId=vuser-happy-path-001"
+  },
+  "aiCalls": "analysis + analysis_verify + rehab_plan (one full pipeline run — budgeted)"
+}

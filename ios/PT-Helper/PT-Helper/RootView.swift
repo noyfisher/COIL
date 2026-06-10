@@ -13,9 +13,13 @@ struct RootView: View {
     @AppStorage("hasSeenIntroCarousel") private var hasSeenIntroCarousel = false
 
     /// UI testing mode: bypass Firebase Auth and route based on launch arguments.
+    /// Virtual user mode (`--virtual-user-token`) takes precedence: it must use
+    /// the real production auth path, so the uitesting bypass is disabled.
     private var isUITesting: Bool {
-        TestDataSeeder.isUITesting
+        TestDataSeeder.isUITesting && TestDataSeeder.virtualUserToken == nil
     }
+
+    @State private var hasAttemptedVirtualSignIn = false
 
     var body: some View {
         Group {
@@ -57,6 +61,27 @@ struct RootView: View {
                     isCheckingProfile = true
                     profileService.clear()
                 }
+            }
+            attemptVirtualUserSignInIfNeeded()
+        }
+    }
+
+    /// Signs in with a custom token when launched in virtual user mode.
+    /// Runs after the auth state listener is registered so the resulting
+    /// state change is observed like any real sign-in. Signs out any
+    /// previously persisted user so the token's vuser always wins.
+    private func attemptVirtualUserSignInIfNeeded() {
+        guard let token = TestDataSeeder.virtualUserToken, !hasAttemptedVirtualSignIn else { return }
+        hasAttemptedVirtualSignIn = true
+        Task {
+            do {
+                if Auth.auth().currentUser != nil {
+                    try Auth.auth().signOut()
+                }
+                let result = try await Auth.auth().signIn(withCustomToken: token)
+                print("[VirtualUser] signed in as \(result.user.uid)")
+            } catch {
+                print("[VirtualUser] sign-in failed: \(error.localizedDescription)")
             }
         }
     }

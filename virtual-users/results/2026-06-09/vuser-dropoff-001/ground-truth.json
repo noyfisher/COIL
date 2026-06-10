@@ -1,0 +1,19 @@
+{
+  "virtualUserId": "vuser-dropoff-001",
+  "runDate": "2026-06-09",
+  "actions": [
+    { "step": "launch (fresh install)", "expectedFunnelEvents": ["app_opened", "sign_in_completed"] },
+    { "step": "intro_carousel", "action": "swiped to page 3, tapped LET'S GO" },
+    { "step": "onboarding", "action": "Dana Drop off, Female, 130 lbs, no conditions, Lightly Active, submitted", "expectedFunnelEvents": ["onboarding_started", "onboarding_step_completed x5", "onboarding_completed"] },
+    { "step": "body_map", "action": "Something Hurts -> body map -> zoomed Left Leg -> selected Left Knee via chip -> backed out (ABANDON)", "expectedFunnelEvents": ["assessment_gateway_chosen {injury}", "body_map_opened", "regions_selected {1}"] },
+    { "step": "empty_states", "action": "My Plan + Progress tabs viewed", "verified": "My Plan: 'No Injury Plans Yet' + Start Assessment CTA; Progress: 'No Data Yet' + streak 0. Both render correctly." },
+    { "step": "abandon", "action": "home button" }
+  ],
+  "expectedFirestore": {
+    "profile/health": "exists (firstName Dana)",
+    "rehabPlans": 0,
+    "workoutSessions": 0,
+    "streakData": "absent",
+    "sessionLogs": "see SessionLogger upload-trigger finding — trail only uploads via next-launch crash recovery"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "virtualUserId": "vuser-happy-path-001",
+  "runDate": "2026-06-09",
+  "appLaunchUTC": "2026-06-10T02:11:00Z",
+  "driver": "claude-code XcodeBuildMCP/axe session",
+  "notes": [
+    "Intensity left at default 5/10 (persona spec said 6) — SwiftUI slider rejected synthetic drags.",
+    "Intro carousel completed via swipe x2 + LET'S GO button (xmark in status-bar region not reliably tappable).",
+    "UX BUG FOUND: pain wizard optionCard rows only hit-test on label/icon, not full row width (missing .contentShape). Taps at row center are dead.",
+    "UX BUG FOUND (minor): intro carousel xmark close button sits inside status-bar region (.ignoresSafeArea) — taps unreliable."
+  ],
+  "actions": [
+    { "step": "launch", "expectedFunnelEvents": ["app_opened", "sign_in_completed"], "expectedScreens": [], "verified": "[VirtualUser] signed in as vuser-happy-path-001 in runtime log" },
+    { "step": "intro_carousel", "action": "swiped pages 1->2->3, tapped LET'S GO", "expectedFunnelEvents": [], "expectedScreens": ["IntroCarousel"] },
+    { "step": "onboarding", "action": "6 steps: Harper Pathfinder, DOB Jun 9 1996, Male, 5'7\", 165 lbs, Right dominant, no conditions (None), no surgeries, no injuries, Moderately Active, terms accepted, submitted", "expectedFunnelEvents": ["onboarding_started", "onboarding_step_completed x5", "onboarding_completed"], "expectedScreens": ["Onboarding"] },
+    { "step": "assess_gateway", "action": "tapped Something Hurts", "expectedFunnelEvents": ["assessment_gateway_chosen {path: injury}"], "expectedScreens": ["AssessTab"] },
+    { "step": "body_map", "action": "zoomed Left Leg (mis-tap, backed out), zoomed Right Leg, selected Right Knee, Continue", "expectedFunnelEvents": ["body_map_opened", "regions_selected {region_count: 1}"], "expectedScreens": ["BodyMap3D"] },
+    { "step": "pain_wizard", "action": "Aching, intensity 5/10, 1-2 Weeks, Intermittent, Gradual onset, worsened by Climbing stairs, relieved by Rest, no notes, Review & Analyze", "expectedFunnelEvents": ["assessment_started", "assessment_completed"], "expectedScreens": ["PainAssessment"] },
+    { "step": "analysis", "action": "two-call AI pipeline ran (analysis + analysis_verify)", "expectedFunnelEvents": ["analysis_completed"], "expectedScreens": ["AnalysisResult"] }
+  ],
+  "expectedFirestore": {
+    "profile/health": "exists, firstName=Harper",
+    "rehabPlans": "0 — generation blocked by freeze bug",
+    "workoutSessions": "0 — journey ended at analysis",
+    "sessionLogs": ">=1 index doc userId=vuser-happy-path-001 (first session uploaded via crash recovery with crashMarker=true, 170 events)"
+  },
+  "outcome": [
+    "Journey completed through analysis_completed TWICE (second run after freeze recovery). AI returned clinically sensible top-3 (PFPS strong match) both times.",
+    "P1 BUG: tapping GENERATE PLAN on the Plan Preferences sheet hangs the app in a SwiftUI render loop (main thread 100% in ViewRendererHost.render; AX tree goes empty; taps dead). Reproduced 2/2. Evidence: bugs/generate-plan-freeze-sample.txt + generate-plan-freeze-screen.png.",
+    "UX GAP: after relaunch, the stored analysis result has no re-entry point in the 3-tab UI — no way to build a plan from a completed analysis without redoing the assessment (and paying for AI calls again).",
+    "rehab_plan_generated, workout_started/completed funnel events NOT exercised for this persona due to the bug."
+  ]
+}

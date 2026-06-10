@@ -1,0 +1,20 @@
+{
+  "virtualUserId": "vuser-dropoff-001",
+  "description": "Funnel drop-off: signs in, completes onboarding, opens body map, then abandons. Re-validates the persona that failed validation in the 2026-03-24 run. Also used to verify chart EMPTY states (user has zero workout data).",
+  "preSeed": "none",
+  "journey": [
+    { "step": "launch", "expect": "[VirtualUser] signed in as vuser-dropoff-001", "analyticsEvents": ["app_opened", "sign_in_completed"] },
+    { "step": "intro_carousel", "action": "tap through IntroCarouselView", "analyticsEvents": [] },
+    { "step": "onboarding", "action": "complete onboarding (minimal valid inputs)", "analyticsEvents": ["onboarding_started", "onboarding_completed"] },
+    { "step": "body_map", "action": "Assess tab -> injury path -> open body map, select a region, then back out", "analyticsEvents": ["assessment_gateway_chosen", "body_map_opened", "regions_selected"] },
+    { "step": "empty_state_check", "action": "visit My Plan tab and Progress tab — verify empty states render ('No Data Yet', 'No plans yet') instead of blank/broken charts", "analyticsEvents": ["tab_switched"] },
+    { "step": "abandon", "action": "background the app (home button)", "analyticsEvents": [] }
+  ],
+  "expectedFirestore": {
+    "profile/health": 1,
+    "rehabPlans": 0,
+    "workoutSessions": 0,
+    "sessionLogs": ">=1 index doc"
+  },
+  "aiCalls": "none"
+}
