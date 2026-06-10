@@ -34,10 +34,13 @@ The user loses the analysis they just paid for (see F2). Happy-path could never
 generate a plan; funnel events `rehab_plan_generated` → `workout_*` unreachable on
 this path. Evidence: `bugs/generate-plan-freeze-sample.txt`, `bugs/generate-plan-freeze-screen.png`.
 
-### F2 — UX GAP: stored analysis has no re-entry point
-After relaunch, the persisted analysis result (AnalysisResultStore/UserDefaults) is
+### F2 — ANOMALY (unconfirmed, 1/2 repros): stored analysis has no re-entry point
+After relaunch, the persisted analysis result (AnalysisResultStore/UserDefaults) was
 not reachable anywhere in the 3-tab UI — no way to build a plan from a completed
-analysis without redoing the assessment (and re-paying for 2 AI calls).
+analysis without redoing the assessment (and re-paying for 2 AI calls). Observed
+once; per the two-reproduction rule (virtual-users/README.md) this stays an anomaly
+until the next run reproduces it: sign in with a stored analysis, relaunch, and
+search all three tabs for a path back to the result.
 
 ### F3 — LOGGING GAP: session trails only upload when an AI analysis runs
 `SessionLogger.uploadToFirestore()` has exactly one call site
