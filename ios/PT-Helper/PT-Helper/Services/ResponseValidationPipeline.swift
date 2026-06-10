@@ -1075,6 +1075,7 @@ struct ImageAvailabilityValidator {
                 }
                 rewrittenExercise.name = substitute.name
                 rewrittenExercise.imageFileName = substitute.key
+                rewritten.append(rewrittenExercise)
                 warnings.append(ValidationWarning(
                     severity: .info,
                     message: "Showing illustration for similar exercise: \(substitute.name) (instead of \(original.name))."
