@@ -78,7 +78,24 @@ struct ThreeTabView: View {
             AnalyticsService.shared.log(.tabSwitched, parameters: ["tab_index": newTab])
         }
         .fullScreenCover(isPresented: $showAssessment) {
-            NavigationStack { BodyMap3DView() }
+            NavigationStack {
+                BodyMap3DView()
+                    .toolbar {
+                        // BodyMap3DView registers a navigationDestination, so the
+                        // close affordance lives out here and toggles state directly
+                        // instead of reading @Environment(\.dismiss) (P1 freeze class).
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button {
+                                showAssessment = false
+                            } label: {
+                                Image(systemName: "xmark")
+                                    .font(.system(size: 16, weight: .semibold))
+                            }
+                            .accessibilityLabel("Close")
+                            .accessibilityIdentifier("bodyMap.closeButton")
+                        }
+                    }
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: .popToRoot)) { _ in
             showAssessment = false
