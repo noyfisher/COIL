@@ -185,7 +185,10 @@ async function decrementQuota(uid: string): Promise<void> {
 // Increment-on-admit: over-budget calls are rejected (never admitted); admitted
 // calls count — a hard ceiling, not precise per-call accounting.
 // ---------------------------------------------------------------------------
-const AI_DAILY_BUDGET = 2000;
+// Global daily ceiling across ALL AI request types and ALL users. Conservative
+// dev value — denial-of-wallet is a prod concern, and dev has no public account
+// minting. Bump if virtual-user batches / heavy manual QA trip the 429 ceiling.
+const AI_DAILY_BUDGET = 50;
 
 async function checkGlobalDailyBudget(): Promise<boolean> {
   const today = new Date().toISOString().slice(0, 10);
