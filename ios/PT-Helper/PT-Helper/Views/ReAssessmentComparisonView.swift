@@ -81,7 +81,7 @@ struct ReAssessmentComparisonView: View {
                 Button("Done") { dismiss() }
                     .buttonStyle(PrimaryButtonStyle())
 
-                Spacer(minLength: 40)
+                Spacer(minLength: FloatingTabBarMetrics.clearance)
             }
             .padding(.horizontal, AppSpacing.xl)
             .padding(.vertical, AppSpacing.md)

@@ -294,7 +294,7 @@ struct GuidedWorkoutView: View {
         }
         .padding(.horizontal, AppSpacing.xl)
         .padding(.top, AppSpacing.md)
-        .padding(.bottom, 34)
+        .padding(.bottom, FloatingTabBarMetrics.clearance)
         .background(
             AppColors.cardBackground
                 .shadow(color: AppColors.cardShadowColor, radius: 12, y: -4)
@@ -437,7 +437,7 @@ struct GuidedWorkoutView: View {
             .buttonStyle(SecondaryButtonStyle())
             .accessibilityIdentifier("workout.skipRestButton")
             .padding(.horizontal, AppSpacing.xl)
-            .padding(.bottom, AppSpacing.xxl)
+            .padding(.bottom, FloatingTabBarMetrics.clearance)
         }
     }
 

@@ -175,6 +175,26 @@ struct ProfileTab: View {
 
 // MARK: - Tab Bar
 
+/// Layout metrics for the custom `FloatingTabBar`.
+enum FloatingTabBarMetrics {
+    /// Bottom clearance needed so on-screen content/footers sit above the
+    /// floating tab bar. The bar overlays the bottom of every view rendered
+    /// inside the tab navigation (it lives in `ThreeTabView`'s ZStack, outside
+    /// the NavigationStacks, and uses `.ignoresSafeArea(edges: .bottom)`), so
+    /// this covers the full bar footprint including the home-indicator area and
+    /// the lifted centre "+" button.
+    static let clearance: CGFloat = 100
+}
+
+extension View {
+    /// Adds bottom padding so content/footers clear the custom `FloatingTabBar`
+    /// overlay. Apply to a pinned footer's bottom or to a ScrollView's inner
+    /// content container.
+    func floatingTabBarClearance() -> some View {
+        padding(.bottom, FloatingTabBarMetrics.clearance)
+    }
+}
+
 private struct TabBarItem {
     let tag: Int
     let icon: String

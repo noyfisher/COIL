@@ -18,6 +18,7 @@ struct ExerciseDetailView: View {
                     }
                 }
                 .padding(AppSpacing.xl)
+                .floatingTabBarClearance()
             }
         }
         .trackScreen("ExerciseDetail")

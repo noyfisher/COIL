@@ -47,6 +47,7 @@ struct AchievementsView: View {
                 }
                 .padding(.horizontal, AppSpacing.xl)
                 .padding(.vertical, AppSpacing.md)
+                .floatingTabBarClearance()
             }
         }
         .navigationTitle("Achievements")

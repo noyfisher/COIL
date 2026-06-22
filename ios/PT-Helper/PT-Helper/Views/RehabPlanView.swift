@@ -140,6 +140,7 @@ struct RehabPlanView: View {
                         }
                     }
                     .padding(AppSpacing.xl)
+                    .floatingTabBarClearance()
                 }
             } else {
                 emptyState

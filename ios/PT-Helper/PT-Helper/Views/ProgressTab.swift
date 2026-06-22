@@ -125,6 +125,7 @@ struct ProgressTabContent: View {
             }
             .padding(.horizontal, AppSpacing.xl)
             .padding(.vertical, AppSpacing.md)
+            .floatingTabBarClearance()
         }
         .background(AppColors.pageBackground)
         .alert("Delete Session", isPresented: $showDeleteConfirmation) {

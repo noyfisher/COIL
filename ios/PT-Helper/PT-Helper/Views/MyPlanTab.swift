@@ -119,6 +119,9 @@ struct MyPlanTab: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .background(AppColors.pageBackground)
+        .safeAreaInset(edge: .bottom) {
+            Color.clear.frame(height: FloatingTabBarMetrics.clearance)
+        }
     }
 
     // MARK: - Plan Card

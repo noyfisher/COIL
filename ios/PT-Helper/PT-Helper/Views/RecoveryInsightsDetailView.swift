@@ -22,7 +22,7 @@ struct RecoveryInsightsDetailView: View {
                         recommendationsSection(insight.recommendations)
                         regenerateButton
                         disclaimerText
-                        Spacer(minLength: 40)
+                        Spacer(minLength: FloatingTabBarMetrics.clearance)
                     }
                     .padding(.horizontal, AppSpacing.xl)
                     .padding(.vertical, AppSpacing.md)

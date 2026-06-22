@@ -199,6 +199,8 @@ struct WorkoutSessionView: View {
                     .listStyle(.plain)
                     .frame(minHeight: CGFloat(viewModel.sessions.count) * 90)
                 }
+
+                Color.clear.frame(height: FloatingTabBarMetrics.clearance)
             }
             .scrollDismissesKeyboard(.interactively)
         }

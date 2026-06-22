@@ -71,6 +71,7 @@ struct NotesView: View {
                 }
                 .padding(.horizontal, AppSpacing.xl)
                 .padding(.vertical, AppSpacing.md)
+                .floatingTabBarClearance()
             }
             .scrollDismissesKeyboard(.interactively)
         }

@@ -326,6 +326,7 @@ struct SettingsView: View {
                     }
                     .padding(.horizontal, AppSpacing.xl)
                     .padding(.vertical, AppSpacing.md)
+                    .floatingTabBarClearance()
                 }
             }
             .navigationTitle("Settings")

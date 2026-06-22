@@ -43,7 +43,7 @@ struct HomeTab: View {
                         }
                         .padding(.horizontal, AppSpacing.lg)
                         .padding(.top, AppSpacing.xs)
-                        .padding(.bottom, AppSpacing.xxxl)
+                        .floatingTabBarClearance()
                     }
                 }
             }
