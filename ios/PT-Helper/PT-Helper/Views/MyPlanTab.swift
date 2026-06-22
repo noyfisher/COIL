@@ -10,6 +10,14 @@ struct MyPlanTab: View {
     @State private var showDeleteConfirmation = false
     @State private var selectedPlanType: RehabPlan.PlanType = .rehab
     @State private var hasInitializedTab = false
+    @State private var route: PlanRoute? = nil
+
+    /// Programmatic navigation target. Keyed by `RehabPlan.id` (a `UUID`) so the
+    /// shared `RehabPlan` model doesn't need to be `Hashable`.
+    private enum PlanRoute: Hashable {
+        case detail(UUID)
+        case workout(UUID)
+    }
 
     private var filteredPlans: [RehabPlan] {
         savedPlansViewModel.rehabPlans.filter { $0.planType == selectedPlanType }
@@ -31,6 +39,18 @@ struct MyPlanTab: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .mvvcNavBar()
+            .navigationDestination(item: $route) { route in
+                switch route {
+                case .detail(let id):
+                    if let plan = savedPlansViewModel.rehabPlans.first(where: { $0.id == id }) {
+                        RehabPlanView(existingPlan: plan)
+                    }
+                case .workout(let id):
+                    if let plan = savedPlansViewModel.rehabPlans.first(where: { $0.id == id }) {
+                        GuidedWorkoutView(plan: plan)
+                    }
+                }
+            }
             .refreshable { savedPlansViewModel.fetchRehabPlans() }
             .alert("Delete Plan", isPresented: $showDeleteConfirmation) {
                 Button("Cancel", role: .cancel) { planToDelete = nil }
@@ -132,54 +152,54 @@ struct MyPlanTab: View {
             AppColors.accent.frame(height: 3)
 
             VStack(spacing: AppSpacing.md) {
-                // Plan info row
-                NavigationLink(destination: RehabPlanView(existingPlan: plan)) {
-                    HStack(alignment: .top) {
-                        VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                            HStack(spacing: AppSpacing.sm) {
-                                MVVCRedBadge(text: "Active")
-                                Spacer()
-                            }
+                // Plan info row — tapping anywhere on the card (handled by the
+                // card's onTapGesture below) opens the plan home page.
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                        HStack(spacing: AppSpacing.sm) {
+                            MVVCRedBadge(text: "Active")
+                            Spacer()
+                        }
 
-                            Text(plan.planName)
-                                .font(Font.custom("Industry-Bold", size: 18))
-                                .textCase(.uppercase)
-                                .kerning(0.3)
-                                .foregroundColor(AppColors.primaryText)
-                                .multilineTextAlignment(.leading)
-                                .fixedSize(horizontal: false, vertical: true)
+                        Text(plan.planName)
+                            .font(Font.custom("Industry-Bold", size: 18))
+                            .textCase(.uppercase)
+                            .kerning(0.3)
+                            .foregroundColor(AppColors.primaryText)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
 
-                            if !plan.conditions.isEmpty {
-                                Text(plan.conditions.prefix(2).joined(separator: " · "))
-                                    .font(AppFonts.micro)
-                                    .foregroundColor(AppColors.secondaryText)
-                            }
+                        if !plan.conditions.isEmpty {
+                            Text(plan.conditions.prefix(2).joined(separator: " · "))
+                                .font(AppFonts.micro)
+                                .foregroundColor(AppColors.secondaryText)
+                        }
 
-                            HStack(spacing: AppSpacing.sm) {
-                                Text(plan.createdDate.formatted(date: .abbreviated, time: .omitted))
-                                Text("·")
-                                Text("\(plan.exercises.count) exercises")
-                            }
-                            .font(AppFonts.micro)
+                        HStack(spacing: AppSpacing.sm) {
+                            Text(plan.createdDate.formatted(date: .abbreviated, time: .omitted))
+                            Text("·")
+                            Text("\(plan.exercises.count) exercises")
+                        }
+                        .font(AppFonts.micro)
+                        .foregroundColor(AppColors.mutedText)
+                    }
+
+                    Spacer()
+
+                    VStack(alignment: .trailing, spacing: AppSpacing.nano) {
+                        Text("\(plan.totalWeeks)")
+                            .font(Font.custom("Industry-Bold", size: 32))
+                            .foregroundColor(AppColors.primaryText)
+                        Text("weeks")
+                            .font(Font.custom("Inter-Regular", size: 10))
                             .foregroundColor(AppColors.mutedText)
-                        }
-
-                        Spacer()
-
-                        VStack(alignment: .trailing, spacing: AppSpacing.nano) {
-                            Text("\(plan.totalWeeks)")
-                                .font(Font.custom("Industry-Bold", size: 32))
-                                .foregroundColor(AppColors.primaryText)
-                            Text("weeks")
-                                .font(Font.custom("Inter-Regular", size: 10))
-                                .foregroundColor(AppColors.mutedText)
-                        }
                     }
                 }
-                .buttonStyle(.plain)
 
-                // Red CTA
-                NavigationLink(destination: GuidedWorkoutView(plan: plan)) {
+                // Red CTA — explicit button so only this region starts the workout.
+                Button {
+                    route = .workout(plan.id)
+                } label: {
                     HStack(spacing: AppSpacing.sm) {
                         Image(systemName: "play.fill")
                             .font(.system(size: 12, weight: .bold))
@@ -205,6 +225,8 @@ struct MyPlanTab: View {
         .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
         .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
         .clipShape(RoundedRectangle(cornerRadius: AppCorners.card))
+        .contentShape(Rectangle())
+        .onTapGesture { route = .detail(plan.id) }
     }
 
     // MARK: - Empty State
