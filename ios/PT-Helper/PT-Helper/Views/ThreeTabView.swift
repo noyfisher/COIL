@@ -279,6 +279,8 @@ struct FloatingTabBar: View {
 
             // ── Big "+" button centred, lifts above the bar ───────────────
             Button {
+                // Tactile feedback on the app's primary action (audit #77).
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 onAssessmentTapped()
             } label: {
                 VStack(spacing: 3) {
@@ -307,6 +309,8 @@ struct FloatingTabBar: View {
     @ViewBuilder
     private func tabButton(_ item: TabBarItem) -> some View {
         Button {
+            // Light selection haptic + animated active-color change (audit #77).
+            UISelectionFeedbackGenerator().selectionChanged()
             onTabTapped(item.tag)
             selectedTab = item.tag
         } label: {
@@ -317,6 +321,7 @@ struct FloatingTabBar: View {
                     .font(.system(size: 10, weight: .medium))
             }
             .foregroundColor(selectedTab == item.tag ? AppColors.tabActive : AppColors.tabInactive)
+            .animation(AppAnimations.smooth, value: selectedTab)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 10)
         }
