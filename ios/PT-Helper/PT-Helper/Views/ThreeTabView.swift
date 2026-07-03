@@ -10,6 +10,10 @@ struct ThreeTabView: View {
     @StateObject private var analysisStore = AnalysisResultStore.shared
 
     @State private var showAssessment = false
+    /// Set by RootView when the user finishes onboarding, so completing their
+    /// profile hands them straight into their first assessment (the "aha" moment)
+    /// rather than dropping them cold on the Home tab. Consumed once on appear.
+    @AppStorage("pendingFirstAssessment") private var pendingFirstAssessment = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -124,6 +128,11 @@ struct ThreeTabView: View {
                 default: break
                 }
                 NotificationService.shared.pendingDeepLink = nil
+            }
+            // Post-onboarding hand-off: route straight into the first assessment.
+            if pendingFirstAssessment {
+                pendingFirstAssessment = false
+                showAssessment = true
             }
         }
     }

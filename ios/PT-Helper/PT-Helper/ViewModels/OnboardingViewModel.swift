@@ -208,22 +208,26 @@ class OnboardingViewModel: ObservableObject {
         }
     }
 
-    /// Whether the current step has all required fields filled in
+    /// Whether the current step has all required fields filled in.
+    ///
+    /// Step order (2026 reorder): 1 Basic · 2 Activity · 3 Medical · 4 Surgical
+    /// · 5 Injury · 6 Review. Activity moved up to step 2 so a single, momentum-
+    /// building tap comes before the heavier optional medical/surgical/injury steps.
     var canProceedFromCurrentStep: Bool {
         switch currentStep {
         case 1:
-            // Basic info: need first name, last name, sex, reasonable height/weight
+            // Basic info: need first name, sex, reasonable height/weight, terms.
+            // Last name is optional — nothing user-facing ever shows a surname.
             let hasName = !userProfile.firstName.trimmingCharacters(in: .whitespaces).isEmpty
-                && !userProfile.lastName.trimmingCharacters(in: .whitespaces).isEmpty
             let hasSex = !userProfile.sex.isEmpty
             let hasHeight = userProfile.heightFeet >= 3 && userProfile.heightFeet <= 7
             let hasWeight = userProfile.weight >= 50 && userProfile.weight <= 500
             return hasName && hasSex && hasHeight && hasWeight && hasAcceptedTerms
-        case 5:
+        case 2:
             // Activity level must be selected
             return !userProfile.activityLevel.isEmpty
         default:
-            // Steps 2, 3, 4 (medical, surgical, injury history) are optional
+            // Steps 3, 4, 5 (medical, surgical, injury history) are optional
             // Step 6 is the review/submit step
             return true
         }

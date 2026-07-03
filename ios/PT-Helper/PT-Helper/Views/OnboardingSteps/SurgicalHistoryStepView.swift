@@ -86,10 +86,10 @@ struct SurgicalHistoryStepView: View {
                 set: { if index < viewModel.userProfile.surgeries.count { viewModel.userProfile.surgeries[index].name = $0 } }
             ))
 
-            DarkTextField(placeholder: "Body area (e.g. Left Knee)", text: Binding(
+            BodyAreaChipPicker(bodyArea: Binding(
                 get: { viewModel.userProfile.surgeries[safe: index]?.bodyArea ?? "" },
                 set: { if index < viewModel.userProfile.surgeries.count { viewModel.userProfile.surgeries[index].bodyArea = $0.isEmpty ? nil : $0 } }
-            ))
+            ), accent: AppColors.warning)
 
             yearPickerRow(index: index)
             recoveryStatusRow(index: index)

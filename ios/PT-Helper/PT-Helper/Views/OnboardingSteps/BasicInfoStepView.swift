@@ -20,10 +20,7 @@ struct BasicInfoStepView: View {
                     if showErrors && viewModel.userProfile.firstName.trimmingCharacters(in: .whitespaces).isEmpty {
                         validationMessage("First name is required")
                     }
-                    DarkTextField(placeholder: "Last Name", text: $viewModel.userProfile.lastName)
-                    if showErrors && viewModel.userProfile.lastName.trimmingCharacters(in: .whitespaces).isEmpty {
-                        validationMessage("Last name is required")
-                    }
+                    DarkTextField(placeholder: "Last Name (optional)", text: $viewModel.userProfile.lastName)
                 }
 
                 // Date of Birth
@@ -137,6 +134,12 @@ struct BasicInfoStepView: View {
                     if showErrors && (viewModel.userProfile.weight < 50 || viewModel.userProfile.weight > 500) {
                         validationMessage(viewModel.userProfile.weight == 0 ? "Weight is required" : "Please enter a weight between 50 and 500 lbs")
                     }
+                    HStack(spacing: AppSpacing.xs) {
+                        Image(systemName: "lock.fill").font(.caption2)
+                        Text("Height and weight tailor your exercise intensity and keep dosing safe — your details stay private.")
+                            .font(AppFonts.caption)
+                    }
+                    .foregroundColor(OnboardingColors.muted)
                 }
 
                 // Terms

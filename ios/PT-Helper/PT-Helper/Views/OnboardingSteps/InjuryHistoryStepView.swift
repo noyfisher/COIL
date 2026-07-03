@@ -48,7 +48,7 @@ struct InjuryHistoryStepView: View {
                             }
                         }
 
-                        DarkTextField(placeholder: "Body area (e.g. Left Knee)", text: Binding(
+                        BodyAreaChipPicker(bodyArea: Binding(
                             get: { viewModel.userProfile.injuries[safe: index]?.bodyArea ?? "" },
                             set: { if index < viewModel.userProfile.injuries.count { viewModel.userProfile.injuries[index].bodyArea = $0 } }
                         ))

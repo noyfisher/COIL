@@ -59,6 +59,16 @@ struct OnboardingView: View {
                             .foregroundColor(Color.white.opacity(0.45))
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, AppSpacing.xxl)
+                        // Set expectations up front so the 6-step intake feels
+                        // quick and low-stakes rather than a daunting medical form.
+                        if viewModel.currentStep == 1 {
+                            Text("About 2 minutes · skip anything that doesn't apply · progress saves automatically")
+                                .font(AppFonts.microMedium)
+                                .foregroundColor(Color.white.opacity(0.30))
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, AppSpacing.xxl)
+                                .padding(.top, AppSpacing.nano)
+                        }
                     }
                 }
                 .padding(.bottom, AppSpacing.sm)
@@ -66,10 +76,10 @@ struct OnboardingView: View {
                 // Step content
                 TabView(selection: $viewModel.currentStep) {
                     BasicInfoStepView(viewModel: viewModel).tag(1)
-                    MedicalHistoryStepView(viewModel: viewModel).tag(2)
-                    SurgicalHistoryStepView(viewModel: viewModel).tag(3)
-                    InjuryHistoryStepView(viewModel: viewModel).tag(4)
-                    ActivityLevelStepView(viewModel: viewModel).tag(5)
+                    ActivityLevelStepView(viewModel: viewModel).tag(2)
+                    MedicalHistoryStepView(viewModel: viewModel).tag(3)
+                    SurgicalHistoryStepView(viewModel: viewModel).tag(4)
+                    InjuryHistoryStepView(viewModel: viewModel).tag(5)
                     ProfileReviewStepView(viewModel: viewModel, onComplete: onComplete).tag(6)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
@@ -126,10 +136,10 @@ struct OnboardingView: View {
     private var stepTitle: String {
         switch viewModel.currentStep {
         case 1: return "About You"
-        case 2: return "Medical History"
-        case 3: return "Past Surgeries"
-        case 4: return "Injuries"
-        case 5: return "Activity Level"
+        case 2: return "Activity Level"
+        case 3: return "Medical History"
+        case 4: return "Past Surgeries"
+        case 5: return "Injuries"
         case 6: return "Review & Submit"
         default: return ""
         }
@@ -138,10 +148,12 @@ struct OnboardingView: View {
     private var stepSubtitle: String {
         switch viewModel.currentStep {
         case 1: return "Let's start with some basic information"
-        case 2: return "Select any conditions that apply to you"
-        case 3: return "Tell us about any past surgical procedures"
-        case 4: return "Any current or previous injuries?"
-        case 5: return "How active are you day to day?"
+        case 2: return "How active are you day to day?"
+        // Value-bridge copy: explain why a "performance" app asks for medical
+        // history right after selling recovery, at the most fragile moment.
+        case 3: return "We use this to keep every exercise safe for your body — never to diagnose you"
+        case 4: return "Past procedures help us protect the area — optional, but useful"
+        case 5: return "Current or past injuries help us tailor safely — optional"
         case 6: return "Make sure everything looks correct"
         default: return ""
         }
