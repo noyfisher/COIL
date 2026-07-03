@@ -123,6 +123,17 @@ struct PainDetailView: View {
                     .accessibilityIdentifier("painDetail.stepIndicator")
             }
 
+            if viewModel.hasMultipleRegions && viewModel.currentRegionIndex == 0 {
+                // Surface the "apply to all regions" shortcut up front so symmetrical
+                // multi-region users know they won't have to re-answer every area —
+                // the actionable "Apply to All" button lives on the summary step (audit #15).
+                Label("Similar pain in all \(viewModel.totalRegions) areas? You can apply these answers to all of them at the summary.", systemImage: "square.on.square")
+                    .font(.caption2)
+                    .foregroundColor(AppColors.secondaryText)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     Capsule()
