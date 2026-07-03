@@ -1,6 +1,7 @@
 import SwiftUI
 import FirebaseAuth
 import FirebaseFirestore
+import StoreKit
 
 struct SettingsView: View {
     let userName: String
@@ -109,6 +110,16 @@ struct SettingsView: View {
                                             let timeString = String(format: "%02d:%02d", components.hour ?? 9, components.minute ?? 0)
                                             AnalyticsService.shared.log(.settingChanged,
                                                 parameters: ["key": "reminder_time", "value": timeString])
+                                        }
+                                        .onAppear {
+                                            // Seed the picker from the SAVED time so a glance or an
+                                            // accidental tap can't silently overwrite it (audit #81).
+                                            var comps = DateComponents()
+                                            comps.hour = notificationService.reminderHour
+                                            comps.minute = notificationService.reminderMinute
+                                            if let seeded = Calendar.current.date(from: comps) {
+                                                reminderDate = seeded
+                                            }
                                         }
                                 }
                                 .padding(.horizontal, AppSpacing.lg)
@@ -223,6 +234,28 @@ struct SettingsView: View {
                             }
                             .padding(.horizontal, AppSpacing.lg)
                             .padding(.vertical, AppSpacing.md)
+                        }
+                        .background(AppColors.cardBackground)
+                        .cornerRadius(AppCorners.large)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: AppCorners.large)
+                                .stroke(AppColors.cardBorder, lineWidth: 1)
+                        )
+                        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+
+                        // Help & Support (audit #84)
+                        VStack(spacing: 0) {
+                            settingsRow(icon: "envelope", color: AppColors.accent, title: "Contact Support") {
+                                contactSupport()
+                            }
+                            .accessibilityIdentifier("settings.contactSupportButton")
+
+                            Divider().padding(.leading, 52)
+
+                            settingsRow(icon: "star", color: AppColors.accent, title: "Rate PT Helper") {
+                                requestAppReview()
+                            }
+                            .accessibilityIdentifier("settings.rateAppButton")
                         }
                         .background(AppColors.cardBackground)
                         .cornerRadius(AppCorners.large)
@@ -478,6 +511,24 @@ struct SettingsView: View {
             return String(parts[0].prefix(1) + parts[1].prefix(1)).uppercased()
         }
         return String(userName.prefix(2)).uppercased()
+    }
+
+    /// Opens the mail composer prefilled with the app version for faster debugging (audit #84).
+    private func contactSupport() {
+        let subject = "PT Helper Support"
+        let body = "\n\n———\n\(appVersionText)"
+        let encodedSubject = subject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let encodedBody = body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        if let url = URL(string: "mailto:noyfisher2003@gmail.com?subject=\(encodedSubject)&body=\(encodedBody)") {
+            UIApplication.shared.open(url)
+        }
+    }
+
+    /// Requests an App Store review via the system prompt (audit #84).
+    private func requestAppReview() {
+        guard let scene = UIApplication.shared.connectedScenes
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene else { return }
+        SKStoreReviewController.requestReview(in: scene)
     }
 
     private var appVersionText: String {
