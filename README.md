@@ -16,7 +16,7 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
 - **Exercise Substitution** — AI-powered exercise swap from plan view or mid-workout
 - **Recovery Insights** — Weekly AI-generated recovery digest via Claude Managed Agents with pain trends, adherence scoring, and recommendations
 - **Adaptive Progressions** — Rules-based difficulty scaling based on workout performance
-- **Exercise Images** — ~190 AI-generated exercise illustrations (FLUX 2 Pro) with automated Gemini QA
+- **Exercise Images** — 1,364 AI-generated exercise illustrations (start + end frames) via Nano Banana Pro (`gemini-3-pro-image-preview`) with automated Gemini QA, served on demand from Firebase Storage
 - **Progress Tracking** — Workout streaks, achievements, re-assessment comparisons, and progress charts
 - **Session Logging** — Detailed logging of analysis and workout sessions for debugging and analytics
 - **Safety Pipeline** — Analysis validation (6 steps) and rehab plan validation (9 steps) including medication-aware checks and red-flag detection
@@ -34,7 +34,7 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
            │ HTTPS
 ┌──────────▼───────────┐
 │  Firebase Cloud Fns   │
-│  (Node.js 20)        │
+│  (Node.js 22)        │
 │  • Rate limiting      │
 │  • System prompts     │
 │  • Prompt assembly    │
@@ -56,25 +56,32 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
 ```
 ├── ios/PT-Helper/
 │   └── PT-Helper/
-│       ├── Models/            # Data models (21 files)
-│       ├── Services/          # API, validation, logging (24 files)
+│       ├── Models/            # Data models (22 files)
+│       ├── Services/          # API, validation, logging (28 files)
 │       ├── ViewModels/        # Business logic (15 files)
-│       ├── Views/             # SwiftUI views (69 files)
+│       ├── Views/             # SwiftUI views (81 files)
 │       │   ├── Components/    # Reusable UI components
 │       │   ├── Dashboard/     # Dashboard widgets and charts
 │       │   └── OnboardingSteps/  # Onboarding flow steps
-│       ├── Resources/         # Exercise images, mappings
+│       ├── Resources/         # exercise_image_mapping.json (images live in Firebase Storage)
 │       └── DesignSystem.swift # Colors, spacing, typography
 │   └── PT-HelperTests/        # Unit + UI tests
 ├── functions/src/             # Firebase Cloud Functions
-│   ├── index.ts               # Rate limiting, system prompts, endpoints
-│   └── managed-agent.ts       # Managed Agents API client
-├── scripts/                   # Exercise image pipeline
-│   ├── generate_exercise_images.py
+│   ├── index.ts               # Rate limiting, system prompts, AI proxy endpoints
+│   ├── managed-agent.ts       # Managed Agents API client (recovery insights)
+│   ├── form-agent.ts          # Cross-session form analysis agent
+│   ├── image-generation.ts    # On-demand exercise image generation
+│   ├── billing-shutoff.ts     # Daily AI budget enforcement
+│   ├── firestore-queries.ts   # Recovery data queries
+│   └── nightly-report-validator.ts
+├── scripts/                   # Exercise image pipeline (Nano Banana Pro)
+│   ├── generate_missing_images.py
+│   ├── regen_with_auto_prompts.py  # Auto-prompt correction loop
 │   ├── qa_exercise_images.py
-│   ├── exercise_list.json     # Exercise metadata
-│   └── output/                # ~190 generated images
-├── docs/                      # Product brief, UX flows, safety, API, data models
+│   ├── upload_to_firebase.sh
+│   ├── exercise_list.json          # Curated exercise metadata
+│   └── output/                     # Generated images + QA reports
+├── docs/                      # Brief, UX flows, safety, API, data models, privacy/terms
 ├── firebase.json              # Firebase deployment config
 └── firestore.rules            # Security rules
 ```
@@ -84,8 +91,8 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
 ### Prerequisites
 
 - Xcode 16+
-- iOS 17+ deployment target
-- Node.js 20 (for Cloud Functions)
+- iOS 18.2+ deployment target
+- Node.js 22 (for Cloud Functions)
 - Firebase CLI (`npm install -g firebase-tools`)
 - A Firebase project with Firestore and Authentication enabled
 
@@ -160,7 +167,7 @@ The app includes multiple safety layers:
 1. **Red-flag detection** — Flags symptoms requiring emergency care (numbness, bowel/bladder changes, etc.)
 2. **Input sanitization** — Strips prompt injection attempts from user text
 3. **Analysis validation** — 6-step pipeline: content validation, symptom/condition red flags, anatomical relevance, confidence calibration (85% cap), deduplication
-4. **Rehab plan validation** — 9-step pipeline: contraindications, knowledge graph verification, parameter ranges, exercise count, duration, age safety, medical conditions, medication-aware checks, post-surgical restrictions
+4. **Rehab plan validation** — 9-step pipeline: image-availability + auto-substitution, contraindications, knowledge graph verification, parameter ranges, exercise count, duration, age safety, medical conditions, medication-aware + post-surgical checks
 5. **Form feedback validation** — `FormFeedbackValidationPipeline` + `BiomechanicalRuleEngine` for exercise form analysis safety
 6. **Rate limiting** — 20 requests/minute per user (server-side)
 7. **Firestore rules** — Users can only read/write their own data
@@ -168,21 +175,31 @@ The app includes multiple safety layers:
 
 ## Exercise Image Pipeline
 
-~190 exercise illustrations generated with AI:
+1,364 exercise illustrations (start + end frames) generated with AI and uploaded to Firebase Storage:
 
 ```bash
-# Generate images (requires BFL API key)
+# Generate missing images (requires Gemini API key)
 cd scripts
-python generate_exercise_images.py --api-key YOUR_BFL_KEY
+python generate_missing_images.py --api-key YOUR_GEMINI_KEY
 
-# Run automated QA (requires Gemini API key)
+# Auto-prompt correction loop: re-prompt failures with anti-error cues
+python regen_with_auto_prompts.py --api-key YOUR_GEMINI_KEY
+
+# Run automated QA
 python qa_exercise_images.py --api-key YOUR_GEMINI_KEY
+
+# Upload PNGs + mapping to Firebase Storage (needs `gcloud auth login`)
+./upload_to_firebase.sh
 ```
 
-- **Generator**: FLUX 2 Pro via BFL API with structured pose descriptions
-- **QA**: Gemini 2.5 Flash vision model checking pose accuracy
+- **Generator**: Nano Banana Pro (`gemini-3-pro-image-preview`) with structured pose descriptions — far better prompt adherence than the legacy FLUX pipeline
+- **QA**: Gemini 2.5 Flash vision model (9 checks + 1–5 pose-accuracy score)
+- **Auto-prompt correction**: feed Gemini its own QA failure → it writes a targeted regen prompt with anti-cues → near-100% success
 - **Style**: Clean white background, anatomical mannequin figure
+- **Delivery**: images served on demand from Firebase Storage; the iOS bundle ships only `exercise_image_mapping.json`
 - **Image resolution**: 7-layer fuzzy matching in `ExerciseImageService`
+
+> The original FLUX 2 Pro pipeline (`generate_exercise_images.py`, BFL API) is retained for the on-demand image Cloud Function but is no longer used for batch generation.
 
 ## Key Files
 
