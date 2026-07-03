@@ -55,7 +55,7 @@ struct ExerciseSwapSheet: View {
                         .foregroundColor(AppColors.primaryText)
 
                     Text(vm.exercise.name)
-                        .font(.subheadline)
+                        .font(AppFonts.small)
                         .foregroundColor(AppColors.secondaryText)
                 }
                 .padding(.top, AppSpacing.xl)
@@ -66,7 +66,7 @@ struct ExerciseSwapSheet: View {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .foregroundColor(AppColors.warning)
                         Text(error)
-                            .font(.caption)
+                            .font(AppFonts.caption)
                             .foregroundColor(AppColors.secondaryText)
                     }
                     .padding(AppSpacing.md)
@@ -89,7 +89,7 @@ struct ExerciseSwapSheet: View {
                                 .cornerRadius(AppCorners.small)
 
                             Text(reason.displayName)
-                                .font(.body.weight(.medium))
+                                .font(AppFonts.bodyMedium)
                                 .foregroundColor(AppColors.primaryText)
 
                             Spacer()
@@ -134,7 +134,7 @@ struct ExerciseSwapSheet: View {
                     .foregroundColor(AppColors.primaryText)
 
                 Text("Looking for exercises that work for you...")
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(AppColors.secondaryText)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.xl)
@@ -170,7 +170,7 @@ struct ExerciseSwapSheet: View {
                     .multilineTextAlignment(.center)
 
                 Text("We couldn't find a safe alternative for \(vm.exercise.name) given your conditions. Please contact your physical therapist for a tailored swap.")
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(AppColors.secondaryText)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.xl)
@@ -181,7 +181,7 @@ struct ExerciseSwapSheet: View {
                 vm.selectedReason = nil
             }) {
                 Text("Try a different reason")
-                    .font(.subheadline.weight(.semibold))
+                    .font(AppFonts.smallSemiBold)
                     .foregroundColor(.white)
                     .padding(.horizontal, AppSpacing.xxl)
                     .padding(.vertical, AppSpacing.md)
@@ -208,7 +208,7 @@ struct ExerciseSwapSheet: View {
                         .foregroundColor(AppColors.primaryText)
 
                     Text("Replacing: \(vm.exercise.name)")
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                 }
                 .padding(.top, AppSpacing.md)
@@ -219,13 +219,13 @@ struct ExerciseSwapSheet: View {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .foregroundColor(AppColors.warning)
                         Text(error)
-                            .font(.caption)
+                            .font(AppFonts.caption)
                             .foregroundColor(AppColors.secondaryText)
                         Spacer()
                         Button("Retry") {
                             Task { await vm.fetchSubstitutes() }
                         }
-                        .font(.caption.weight(.semibold))
+                        .font(AppFonts.captionSemiBold)
                         .foregroundColor(AppColors.accent)
                     }
                     .padding(AppSpacing.md)
@@ -252,7 +252,7 @@ struct ExerciseSwapSheet: View {
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     HStack {
                         Text(substitute.name)
-                            .font(.body.weight(.semibold))
+                            .font(AppFonts.bodySemiBold)
                             .lineLimit(2)
 
                         Spacer()
@@ -264,7 +264,7 @@ struct ExerciseSwapSheet: View {
 
                     HStack(spacing: AppSpacing.sm) {
                         Text("\(substitute.sets) sets \u{00D7} \(substitute.reps)")
-                            .font(.caption.weight(.medium))
+                            .font(AppFonts.captionMedium)
                             .foregroundColor(AppColors.secondaryText)
 
                         DifficultyBadge(difficulty: substitute.difficulty)
@@ -276,10 +276,10 @@ struct ExerciseSwapSheet: View {
             if let reason = vm.substituteReasons[substitute.id] {
                 HStack(alignment: .top, spacing: AppSpacing.sm) {
                     Image(systemName: "lightbulb.fill")
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.warning)
                     Text(reason)
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                 }
             }
@@ -289,10 +289,10 @@ struct ExerciseSwapSheet: View {
                case .contraindicated(let reason) = status {
                 HStack(spacing: AppSpacing.sm) {
                     Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.caption2)
+                        .font(AppFonts.micro)
                         .foregroundColor(AppColors.danger)
                     Text(reason)
-                        .font(.caption2)
+                        .font(AppFonts.micro)
                         .foregroundColor(AppColors.danger)
                 }
                 .padding(AppSpacing.sm)
@@ -312,7 +312,7 @@ struct ExerciseSwapSheet: View {
                     Image(systemName: "checkmark.circle.fill")
                     Text("Select This Exercise")
                 }
-                .font(.subheadline.weight(.medium))
+                .font(AppFonts.smallMedium)
                 .frame(maxWidth: .infinity)
             }
             .buttonStyle(SecondaryButtonStyle())
@@ -331,23 +331,23 @@ struct ExerciseSwapSheet: View {
         switch status {
         case .verified:
             Label("Verified", systemImage: "checkmark.seal.fill")
-                .font(.caption2.weight(.medium))
+                .font(AppFonts.microMedium)
                 .foregroundColor(AppColors.success)
         case .contraindicated:
             Label("Warning", systemImage: "xmark.octagon.fill")
-                .font(.caption2.weight(.medium))
+                .font(AppFonts.microMedium)
                 .foregroundColor(AppColors.danger)
         case .crossModelVerified:
             Label("Checked", systemImage: "checkmark.seal")
-                .font(.caption2.weight(.medium))
+                .font(AppFonts.microMedium)
                 .foregroundColor(AppColors.accent)
         case .crossModelFlagged:
             Label("Review", systemImage: "exclamationmark.triangle.fill")
-                .font(.caption2.weight(.medium))
+                .font(AppFonts.microMedium)
                 .foregroundColor(AppColors.warning)
         default:
             Label("Unreviewed", systemImage: "questionmark.circle")
-                .font(.caption2.weight(.medium))
+                .font(AppFonts.microMedium)
                 .foregroundColor(AppColors.mutedText)
         }
     }

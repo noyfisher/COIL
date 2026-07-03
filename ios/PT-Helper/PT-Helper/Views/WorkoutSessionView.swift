@@ -47,11 +47,11 @@ struct WorkoutSessionView: View {
 
                             HStack {
                                 Text("No pain")
-                                    .font(.caption2)
+                                    .font(AppFonts.micro)
                                     .foregroundColor(AppColors.secondaryText)
                                 Spacer()
                                 Text("Severe")
-                                    .font(.caption2)
+                                    .font(AppFonts.micro)
                                     .foregroundColor(AppColors.secondaryText)
                             }
                         }
@@ -83,11 +83,11 @@ struct WorkoutSessionView: View {
 
                             HStack {
                                 Text("5 min")
-                                    .font(.caption2)
+                                    .font(AppFonts.micro)
                                     .foregroundColor(AppColors.secondaryText)
                                 Spacer()
                                 Text("2 hours")
-                                    .font(.caption2)
+                                    .font(AppFonts.micro)
                                     .foregroundColor(AppColors.secondaryText)
                             }
                         }
@@ -320,7 +320,7 @@ struct WorkoutSessionView: View {
                     .foregroundColor(AppColors.secondaryText)
                 if !session.exercisesPerformed.isEmpty {
                     Text(session.exercisesPerformed.joined(separator: ", "))
-                        .font(.caption2)
+                        .font(AppFonts.micro)
                         .foregroundColor(AppColors.secondaryText)
                         .lineLimit(1)
                 }
