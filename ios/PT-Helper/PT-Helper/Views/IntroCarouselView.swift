@@ -167,7 +167,7 @@ private struct IntroPrecisionRecovery: View {
                         .padding(.top, 14)
 
                         // Body text
-                        Text("Our AI analyzes your form in real-time to prevent injury and optimize recovery. Professional-grade physical therapy in the palm of your hand.")
+                        Text("Our AI reviews your recorded form to help you move safely and recover well — rehab guidance built on clinical protocols, right in your pocket.")
                             .font(AppFonts.body)
                             .foregroundColor(.white.opacity(0.6))
                             .lineSpacing(5)
@@ -260,7 +260,7 @@ private struct IntroFastTrack: View {
                             .frame(width: 80, height: 3)
                             .padding(.top, 16)
 
-                        Text("MVVC uses professional-grade protocols to accelerate your body's natural healing process. We help you stay active, prevent injury, and return to performance faster.")
+                        Text("MVVC uses clinically-informed protocols to support your body's natural healing process. We help you stay active, prevent injury, and return to performance faster.")
                             .font(AppFonts.body)
                             .foregroundColor(.white.opacity(0.6))
                             .multilineTextAlignment(.center)

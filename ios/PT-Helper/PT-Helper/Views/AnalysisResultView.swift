@@ -7,6 +7,7 @@ struct AnalysisResultView: View {
     @State private var showRehabPlan = false
     @State private var expandedConditions: Set<String> = []
     @State private var showConfidenceInfo = false
+    @State private var showVerificationInfo = false
     @State private var showPreferencesSheet = false
     /// Set when the user taps Generate/Skip in the preferences sheet. Generation and the
     /// navigation push are deferred to the sheet's onDismiss — mutating the navigation
@@ -24,23 +25,24 @@ struct AnalysisResultView: View {
             AppColors.bgGradient.ignoresSafeArea()
             ScrollView {
                 VStack(spacing: AppSpacing.lg) {
-                    // App-detected red flags (from validation pipeline)
+                    // Emergency / red-flag alerts stay pinned at the very top.
                     if !redFlagAlerts.isEmpty {
                         appRedFlagAlert
                     }
-                    // AI-detected red flags
                     if analysisResult.conditions.contains(where: { $0.isRedFlag }) {
                         aiRedFlagAlert
                     }
-                    disclaimerBanner
-                    // Validation cautions (if any)
-                    if !cautionWarnings.isEmpty {
-                        validationCautionBanner
-                    }
+                    // Lead with the answer the user waited for (audit #25).
                     overallSummaryCard
+                    verificationBadge
                     ForEach(Array(analysisResult.conditions.prefix(3))) { condition in
                         conditionCard(for: condition)
                     }
+                    // Standing disclaimer + validation cautions moved below the result.
+                    if !cautionWarnings.isEmpty {
+                        validationCautionBanner
+                    }
+                    disclaimerBanner
                     buildRehabPlanButton
                     navigationButtons
                 }
@@ -63,6 +65,11 @@ struct AnalysisResultView: View {
             Button("OK", role: .cancel) { }
         } message: {
             Text("Match strength is capped at 85% because AI analysis should always be verified by a healthcare professional. A \"Strong\" match means your symptoms closely align with this condition.")
+        }
+        .alert("How we checked this", isPresented: $showVerificationInfo) {
+            Button("Got it", role: .cancel) { }
+        } message: {
+            Text("Your results ran through a second AI pass that argues against the first answer to refine the top conditions, plus a multi-step safety screen (red-flag detection, anatomical relevance, and confidence calibration). It's a coaching aid, not a diagnosis — always verify with a clinician.")
         }
         .trackScreen("AnalysisResult")
         .onAppear {
@@ -126,6 +133,38 @@ struct AnalysisResultView: View {
         )
     }
 
+    // MARK: - Verification Trust Badge
+
+    /// Surfaces the (otherwise invisible) two-call devil's-advocate verification +
+    /// safety-validation pipeline so results don't look like one quick AI guess (audit #27).
+    private var verificationBadge: some View {
+        Button(action: { showVerificationInfo = true }) {
+            HStack(spacing: AppSpacing.sm) {
+                Image(systemName: "checkmark.shield.fill")
+                    .foregroundColor(AppColors.success)
+                Text("Reviewed by a second AI pass + safety checks")
+                    .font(AppFonts.caption)
+                    .foregroundColor(AppColors.secondaryText)
+                    .multilineTextAlignment(.leading)
+                Spacer()
+                Image(systemName: "info.circle")
+                    .font(.caption)
+                    .foregroundColor(AppColors.secondaryText)
+            }
+            .padding(AppSpacing.md)
+            .frame(maxWidth: .infinity)
+            .background(AppColors.success.opacity(0.08))
+            .cornerRadius(AppCorners.card)
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("analysisResult.verificationBadge")
+    }
+
+    /// Whether any red flag (app- or AI-detected) is present — gates the plan CTA.
+    private var hasAnyRedFlag: Bool {
+        !redFlagAlerts.isEmpty || analysisResult.conditions.contains(where: { $0.isRedFlag })
+    }
+
     // MARK: - Condition Card
 
     private func conditionCard(for condition: ConditionResult) -> some View {
@@ -156,7 +195,9 @@ struct AnalysisResultView: View {
                                 Text(condition.commonName)
                                     .font(AppFonts.sectionTitle)
                                     .foregroundColor(AppColors.primaryText)
-                                Text(condition.conditionName)
+                                // Label the clinical term so it reads as context,
+                                // not a scary standalone diagnosis (audit #30).
+                                Text("Medical term: \(condition.conditionName)")
                                     .font(AppFonts.caption)
                                     .foregroundColor(AppColors.secondaryText)
                             }
@@ -252,6 +293,21 @@ struct AnalysisResultView: View {
                             }
                         }
                         .padding(.horizontal, AppSpacing.lg)
+
+                        // How to manage this — the AI already generates this per
+                        // condition; surface it here instead of discarding it (audit #29).
+                        if !condition.howToManage.isEmpty {
+                            VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                                Label("How to manage this", systemImage: "cross.case")
+                                    .font(AppFonts.bodySemiBold)
+                                    .foregroundColor(AppColors.accent)
+                                Text(condition.howToManage)
+                                    .font(AppFonts.body)
+                                    .foregroundColor(AppColors.secondaryText)
+                                    .lineSpacing(3)
+                            }
+                            .padding(.horizontal, AppSpacing.lg)
+                        }
                     }
                     .padding(.bottom, AppSpacing.lg)
                     .transition(.opacity.combined(with: .move(edge: .top)))
@@ -352,15 +408,43 @@ struct AnalysisResultView: View {
     // MARK: - Buttons
 
     private var buildRehabPlanButton: some View {
-        Button(action: { showPreferencesSheet = true }) {
-            HStack(spacing: AppSpacing.sm) {
-                Image(systemName: "figure.run")
-                Text("Build Rehab Plan")
+        VStack(spacing: AppSpacing.sm) {
+            // When a red flag is present, don't offer a self-guided plan as the
+            // headline action — add a clinician nudge and demote to secondary (audit #24).
+            if hasAnyRedFlag {
+                Label("We recommend seeing a clinician before starting a self-guided plan.",
+                      systemImage: "stethoscope")
+                    .font(AppFonts.caption)
+                    .foregroundColor(AppColors.secondaryText)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
             }
+            planCTAButton
         }
-        .buttonStyle(PrimaryButtonStyle())
         .padding(.top, AppSpacing.lg)
-        .accessibilityIdentifier("analysisResult.buildRehabPlanButton")
+    }
+
+    @ViewBuilder
+    private var planCTAButton: some View {
+        if hasAnyRedFlag {
+            Button(action: { showPreferencesSheet = true }) {
+                HStack(spacing: AppSpacing.sm) {
+                    Image(systemName: "figure.run")
+                    Text("Build Rehab Plan Anyway")
+                }
+            }
+            .buttonStyle(SecondaryButtonStyle())
+            .accessibilityIdentifier("analysisResult.buildRehabPlanButton")
+        } else {
+            Button(action: { showPreferencesSheet = true }) {
+                HStack(spacing: AppSpacing.sm) {
+                    Image(systemName: "figure.run")
+                    Text("Build Rehab Plan")
+                }
+            }
+            .buttonStyle(PrimaryButtonStyle())
+            .accessibilityIdentifier("analysisResult.buildRehabPlanButton")
+        }
     }
 
     // MARK: - Preferences Sheet
