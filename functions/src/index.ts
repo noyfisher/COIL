@@ -337,6 +337,13 @@ USING PATIENT HISTORY:
 - For patients with Diabetes: include warm-up, monitor for foot issues, avoid exercises that cause excessive foot pressure if neuropathy is present.
 - If relevant injury history shows the patient did NOT see a doctor for a significant issue, note this in the plan notes.
 
+EQUIPMENT CONSTRAINTS (from PATIENT PREFERENCES — enforce strictly):
+- "No equipment": ONLY bodyweight exercises. No weights, resistance bands, cables, machines, or benches required. Floor mat and wall are acceptable.
+- "Resistance bands": Bodyweight OR resistance band exercises only. No free weights, cables, or machines.
+- "Dumbbells": Bodyweight, resistance band, OR dumbbell exercises. No barbells, cables, or machines.
+- "Full gym": Any exercise from the catalog is permitted.
+NEVER prescribe an exercise that requires equipment the patient does not have.
+
 RULES:
 - Create 4-8 exercises with clear instructions, sets, reps, rest periods
 - Match difficulty to activity level: sedentary→beginner, moderate→beginner+intermediate, active→intermediate+advanced

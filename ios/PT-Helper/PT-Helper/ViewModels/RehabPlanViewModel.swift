@@ -513,8 +513,8 @@ class RehabPlanViewModel: ObservableObject {
         }
 
         // User preferences
-        message += "\nPATIENT PREFERENCES:"
-        message += "\n- Available Equipment: \(preferences.equipment.rawValue)"
+        message += "\n\nPATIENT PREFERENCES (STRICT CONSTRAINTS — must be honoured):"
+        message += "\n- Available Equipment: \(preferences.equipment.rawValue) — select ONLY exercises that require this equipment level or less"
         message += "\n- Preferred Session Length: \(preferences.sessionLength.rawValue)"
         message += "\n- Difficulty Preference: \(preferences.difficulty.rawValue)"
 

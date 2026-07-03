@@ -150,6 +150,27 @@ final class RehabPlanViewModelTests: XCTestCase {
         XCTAssertTrue(message.contains("create a personalized rehabilitation exercise plan"))
     }
 
+    func testBuildRehabUserMessage_equipmentConstraintHeader_present() {
+        let vm = RehabPlanViewModel()
+        let result = TestFixtures.makeAnalysisResult()
+
+        let message = vm.buildRehabUserMessage(from: result)
+
+        XCTAssertTrue(message.contains("STRICT CONSTRAINTS"), "Equipment preference header must use strict constraint language")
+        XCTAssertTrue(message.contains("select ONLY exercises that require this equipment level or less"), "Equipment line must include enforcement directive")
+    }
+
+    func testBuildRehabUserMessage_equipmentConstraint_reflectsSelection() {
+        let vm = RehabPlanViewModel()
+        vm.preferences.equipment = .fullGym
+        let result = TestFixtures.makeAnalysisResult()
+
+        let message = vm.buildRehabUserMessage(from: result)
+
+        XCTAssertTrue(message.contains("Full gym"), "Message must reflect selected equipment tier")
+        XCTAssertFalse(message.contains("No equipment"), "Message must not contain default equipment when overridden")
+    }
+
     // MARK: - Async Generation Tests (with MockClaudeAPIService)
 
     func testGenerateRehabPlan_setsIsGenerating() {
