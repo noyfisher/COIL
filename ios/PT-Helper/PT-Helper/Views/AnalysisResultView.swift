@@ -69,7 +69,7 @@ struct AnalysisResultView: View {
             rehabPreferencesSheet
         }
         .alert("About Match Strength", isPresented: $showConfidenceInfo) {
-            Button("OK", role: .cancel) { }
+            Button("Got it", role: .cancel) { }
         } message: {
             Text("Match strength is capped at 85% because AI analysis should always be verified by a healthcare professional. A \"Strong\" match means your symptoms closely align with this condition.")
         }

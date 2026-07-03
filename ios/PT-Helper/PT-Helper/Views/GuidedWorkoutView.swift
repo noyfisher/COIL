@@ -83,7 +83,7 @@ struct GuidedWorkoutView: View {
             }
         } message: {
             if let checkpoint = savedCheckpoint {
-                Text("You have an incomplete workout with \(checkpoint.completedExercises.count) exercise(s) completed. Would you like to continue where you left off?")
+                Text("You have an incomplete workout with \(checkpoint.completedExercises.count) \(checkpoint.completedExercises.count == 1 ? "exercise" : "exercises") completed. Would you like to continue where you left off?")
             }
         }
         .alert("End Workout?", isPresented: $showEndConfirmation) {

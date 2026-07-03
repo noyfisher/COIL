@@ -140,7 +140,7 @@ struct WorkoutSessionView: View {
                             }
 
                             if !selectedExercises.isEmpty {
-                                Text("\(selectedExercises.count) exercise(s) selected")
+                                Text("\(selectedExercises.count) \(selectedExercises.count == 1 ? "exercise" : "exercises") selected")
                                     .font(AppFonts.caption)
                                     .foregroundColor(AppColors.success)
                             }

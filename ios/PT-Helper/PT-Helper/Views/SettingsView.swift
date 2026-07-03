@@ -390,7 +390,7 @@ struct SettingsView: View {
             } message: {
                 Text("Are you sure you want to sign out?")
             }
-            .alert("Sign Out Failed", isPresented: $showSignOutError) {
+            .alert("Couldn't sign you out", isPresented: $showSignOutError) {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(signOutErrorMessage)
@@ -405,7 +405,7 @@ struct SettingsView: View {
             } message: {
                 Text("This will permanently delete your account, all health data, rehab plans, and workout history. This cannot be undone.")
             }
-            .alert("Delete Failed", isPresented: $showDeleteError) {
+            .alert("Couldn't delete your account", isPresented: $showDeleteError) {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(deleteError ?? "An unknown error occurred.")
