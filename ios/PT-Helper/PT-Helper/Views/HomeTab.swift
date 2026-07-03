@@ -310,7 +310,7 @@ struct ProgramDayView: View {
                 title: "No Active Program",
                 subtitle: "Complete an assessment to get a personalized rehab program",
                 actionTitle: "Start Assessment",
-                action: { tabSelection.selectedTab = 0 }
+                action: { tabSelection.assessmentRequest = .gateway }
             )
             Spacer(minLength: AppSpacing.xl)
         }

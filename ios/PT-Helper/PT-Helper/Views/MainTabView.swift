@@ -20,9 +20,24 @@ var useDashboardUI: Bool {
     return false // Dashboard UI disabled in favor of 3-tab layout
 }
 
+/// Which assessment entry to present from the floating "+" or a CTA button.
+enum AssessmentRoute: Int, Identifiable {
+    case gateway   // dual choice: "Something hurts" vs "Improve my life"
+    case pain      // straight into the body-map pain assessment
+    case wellness  // straight into the wellness goal picker
+    var id: Int { rawValue }
+}
+
 /// Observable class to allow any child view to switch tabs or pop to root
 class TabSelection: ObservableObject {
     @Published var selectedTab: Int = 0
+
+    /// Set by any child tab / CTA to request an assessment entry point.
+    /// `ThreeTabView` observes this and presents the matching full-screen cover,
+    /// so buttons no longer dead-end on `selectedTab = 0` (the Home tab, which has
+    /// no assessment launcher).
+    @Published var assessmentRequest: AssessmentRoute?
+
     @Published var homeNavigationId = UUID()
     @Published var analyzeNavigationId = UUID()
     @Published var plansNavigationId = UUID()

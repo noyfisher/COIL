@@ -521,7 +521,7 @@ struct ProgressTabContent: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             Button {
-                tabSelection.selectedTab = 0
+                tabSelection.assessmentRequest = .gateway
             } label: {
                 HStack(spacing: AppSpacing.xs) {
                     Text("Re-Assess Now")
