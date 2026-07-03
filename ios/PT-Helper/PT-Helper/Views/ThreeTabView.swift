@@ -1,6 +1,8 @@
 import SwiftUI
 
-/// The 4-tab navigation container with a custom floating tab bar.
+/// The primary navigation container: 4 tabs (Home · My Plan · Progress · Profile)
+/// plus a floating "+" that opens the assessment gateway. Named `ThreeTabView`
+/// for historical reasons (an earlier 3-tab IA); the shipped bar has four tabs.
 struct ThreeTabView: View {
     @StateObject private var tabSelection = TabSelection()
     @StateObject private var networkMonitor = NetworkMonitor.shared
@@ -9,7 +11,6 @@ struct ThreeTabView: View {
     @StateObject private var recoveryInsightsViewModel = RecoveryInsightsViewModel()
     @StateObject private var analysisStore = AnalysisResultStore.shared
 
-    @State private var showAssessment = false
     /// Set by RootView when the user finishes onboarding, so completing their
     /// profile hands them straight into their first assessment (the "aha" moment)
     /// rather than dropping them cold on the Home tab. Consumed once on appear.
@@ -63,7 +64,7 @@ struct ThreeTabView: View {
                         tabSelection.popToRootCurrentTab()
                     }
                 }, onAssessmentTapped: {
-                    showAssessment = true
+                    tabSelection.assessmentRequest = .gateway
                 })
                 .ignoresSafeArea(edges: .bottom)
             }
@@ -81,16 +82,16 @@ struct ThreeTabView: View {
             SessionLogger.shared.logNavigation(.tabSwitched, screen: name, metadata: ["tab": "\(newTab)"])
             AnalyticsService.shared.log(.tabSwitched, parameters: ["tab_index": newTab])
         }
-        .fullScreenCover(isPresented: $showAssessment) {
+        .fullScreenCover(item: $tabSelection.assessmentRequest) { route in
             NavigationStack {
-                BodyMap3DView()
+                assessmentDestination(for: route)
                     .toolbar {
-                        // BodyMap3DView registers a navigationDestination, so the
+                        // The destinations register navigationDestinations, so the
                         // close affordance lives out here and toggles state directly
                         // instead of reading @Environment(\.dismiss) (P1 freeze class).
                         ToolbarItem(placement: .topBarLeading) {
                             Button {
-                                showAssessment = false
+                                tabSelection.assessmentRequest = nil
                             } label: {
                                 Image(systemName: "xmark")
                                     .font(.system(size: 16, weight: .semibold))
@@ -102,39 +103,58 @@ struct ThreeTabView: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .popToRoot)) { _ in
-            showAssessment = false
+            tabSelection.assessmentRequest = nil
             tabSelection.popToRootAndGoHome()
         }
         .onReceive(NotificationCenter.default.publisher(for: .deepLink)) { _ in
-            if let tab = NotificationService.shared.pendingDeepLink {
-                switch tab {
-                case "home", "analyze": tabSelection.selectedTab = 0
-                case "plans", "rehab": tabSelection.selectedTab = 1
-                case "progress": tabSelection.selectedTab = 2
-                case "profile": tabSelection.selectedTab = 3
-                default: break
-                }
-                NotificationService.shared.pendingDeepLink = nil
-            }
+            handleDeepLink()
         }
         .onAppear {
             applyMVVCNavBarAppearance()
-            if let tab = NotificationService.shared.pendingDeepLink {
-                switch tab {
-                case "home", "analyze": tabSelection.selectedTab = 0
-                case "plans", "rehab": tabSelection.selectedTab = 1
-                case "progress": tabSelection.selectedTab = 2
-                case "profile": tabSelection.selectedTab = 3
-                default: break
-                }
-                NotificationService.shared.pendingDeepLink = nil
-            }
+            handleDeepLink()
             // Post-onboarding hand-off: route straight into the first assessment.
             if pendingFirstAssessment {
                 pendingFirstAssessment = false
-                showAssessment = true
+                tabSelection.assessmentRequest = .gateway
             }
         }
+    }
+
+    // MARK: - Assessment presentation
+
+    /// The screen shown inside the assessment `fullScreenCover` for a given route.
+    @ViewBuilder
+    private func assessmentDestination(for route: AssessmentRoute) -> some View {
+        switch route {
+        case .gateway:
+            AssessmentGatewayView()
+        case .pain:
+            BodyMap3DView()
+        case .wellness:
+            if let profile = UserProfileService.shared.profile {
+                WellnessGoalPickerView(userProfile: profile)
+            } else {
+                // No profile (skipped onboarding) — fall back to the chooser.
+                AssessmentGatewayView()
+            }
+        }
+    }
+
+    /// Routes a pending notification deep link. "analyze"/"wellness" now open the
+    /// assessment gateway/wellness picker (previously "analyze" dead-ended on the
+    /// Home tab), keeping the routing table aligned with real tab contents.
+    private func handleDeepLink() {
+        guard let tab = NotificationService.shared.pendingDeepLink else { return }
+        switch tab {
+        case "home": tabSelection.selectedTab = 0
+        case "analyze": tabSelection.assessmentRequest = .gateway
+        case "wellness": tabSelection.assessmentRequest = .wellness
+        case "plans", "rehab": tabSelection.selectedTab = 1
+        case "progress": tabSelection.selectedTab = 2
+        case "profile": tabSelection.selectedTab = 3
+        default: break
+        }
+        NotificationService.shared.pendingDeepLink = nil
     }
 
     // MARK: - MVVC UIKit Appearance (nav bar only — tab bar is custom)
@@ -175,9 +195,8 @@ struct ProfileTab: View {
             )
         }
         .sheet(isPresented: $showEditProfile) {
-            // Edit profile sheet — reuse onboarding review step
-            Text("Edit Profile")
-                .padding()
+            // Real editor (matches the ProgressTab path) — was a placeholder stub.
+            OnboardingEditView()
         }
     }
 }
@@ -251,14 +270,21 @@ struct FloatingTabBar: View {
             Button {
                 onAssessmentTapped()
             } label: {
-                ZStack {
-                    Circle()
-                        .fill(AppColors.accent)
-                        .frame(width: 56, height: 56)
-                        .shadow(color: AppColors.accent.opacity(0.5), radius: 10, x: 0, y: -4)
-                    Image(systemName: "plus")
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(.white)
+                VStack(spacing: 3) {
+                    ZStack {
+                        Circle()
+                            .fill(AppColors.accent)
+                            .frame(width: 56, height: 56)
+                            .shadow(color: AppColors.accent.opacity(0.5), radius: 10, x: 0, y: -4)
+                        Image(systemName: "plus")
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundColor(.white)
+                    }
+                    // Visible caption so the app's most important action reads as
+                    // "start a pain/wellness assessment", not a generic "add item".
+                    Text("Assess")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(AppColors.accent)
                 }
             }
             .accessibilityLabel("New Assessment")

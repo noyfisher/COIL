@@ -247,7 +247,12 @@ struct MyPlanTab: View {
                 title: copy.title,
                 subtitle: copy.subtitle,
                 actionTitle: copy.cta,
-                action: { tabSelection.selectedTab = 0 }
+                action: {
+                    // Injury empty state → dual gateway; wellness empty state →
+                    // straight into the wellness goal picker (previously both
+                    // dead-ended on the Home tab).
+                    tabSelection.assessmentRequest = selectedPlanType == .rehab ? .gateway : .wellness
+                }
             )
             .padding(.horizontal, AppSpacing.lg)
             Spacer()
