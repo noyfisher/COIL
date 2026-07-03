@@ -82,6 +82,35 @@ class StreakService: ObservableObject {
         }
     }
 
+    /// Awards the "pain_improved" achievement when the trailing 7-day average
+    /// post-workout pain is meaningfully lower than the prior 7 days (audit #37 —
+    /// previously impossible to earn: checkAchievements had no case for it).
+    /// Requires ≥2 sessions in each half so it isn't awarded on noise.
+    func evaluatePainImprovement(sessions: [WorkoutSession]) {
+        guard let i = achievements.firstIndex(where: { $0.id == "pain_improved" }),
+              !achievements[i].isEarned else { return }
+
+        let calendar = Calendar.current
+        let now = Date()
+        guard let sevenDaysAgo = calendar.date(byAdding: .day, value: -7, to: now),
+              let fourteenDaysAgo = calendar.date(byAdding: .day, value: -14, to: now) else { return }
+
+        let recent = sessions.filter { $0.date > sevenDaysAgo }
+        let prior = sessions.filter { $0.date > fourteenDaysAgo && $0.date <= sevenDaysAgo }
+        guard recent.count >= 2, prior.count >= 2 else { return }
+
+        let recentAvg = recent.map(\.painLevel).reduce(0, +) / Double(recent.count)
+        let priorAvg = prior.map(\.painLevel).reduce(0, +) / Double(prior.count)
+
+        // Require a meaningful decrease (≥0.5 on the 0–10 scale).
+        if recentAvg <= priorAvg - 0.5 {
+            achievements[i].dateEarned = Date()
+            newlyEarned = achievements[i]
+            AnalyticsService.shared.log(.achievementEarned, parameters: ["achievement_id": "pain_improved"])
+            Task { await saveToFirestore() }
+        }
+    }
+
     // MARK: - Firestore
 
     func loadFromFirestore() async {

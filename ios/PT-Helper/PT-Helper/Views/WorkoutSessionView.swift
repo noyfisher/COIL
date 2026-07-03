@@ -226,6 +226,7 @@ struct WorkoutSessionView: View {
         } message: {
             Text("Are you sure you want to delete this workout session? This cannot be undone.")
         }
+        .achievementCelebration()
         .trackScreen("WorkoutSession")
     }
 

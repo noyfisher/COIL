@@ -94,8 +94,17 @@ class NotificationService: ObservableObject {
             let weekday = dayIndex + 1
 
             let content = UNMutableNotificationContent()
-            content.title = "Time for your exercises!"
-            content.body = "\(plan.planName) — \(exercises.count) exercise(s) scheduled today"
+            let streak = StreakService.shared.streakData.currentStreak
+            let exerciseText = exercises.count == 1 ? "1 exercise" : "\(exercises.count) exercises"
+            // Personalize with streak stakes so reminders read as a personal nudge,
+            // not a robotic alarm (audit #35 — also fixes the "(s)" pluralization).
+            if streak >= 2 {
+                content.title = "Keep your \(streak)-day streak alive 🔥"
+                content.body = "\(plan.planName) — \(exerciseText) today keeps the chain going."
+            } else {
+                content.title = "Time for your exercises!"
+                content.body = "\(plan.planName) — \(exerciseText) scheduled today."
+            }
             content.sound = .default
             content.badge = 1
 
@@ -126,6 +135,39 @@ class NotificationService: ObservableObject {
     func cancelAllReminders() {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
         UNUserNotificationCenter.current().setBadgeCount(0)
+    }
+
+    // MARK: - Inactivity Nudge (audit #33)
+
+    private let inactivityNudgeId = "inactivity-nudge"
+    /// Days of no workout before the "come back" nudge fires.
+    private let inactivityNudgeDays = 3
+
+    /// (Re)schedules a "come back" nudge `inactivityNudgeDays` out, gated by the
+    /// `inactivityNudgesEnabled` toggle (which previously did nothing). Call after
+    /// each workout so the clock resets to the last active day; if the user keeps
+    /// working out it never fires, and it lands only after a real lapse.
+    func scheduleInactivityNudge() {
+        cancelInactivityNudge()
+        guard isEnabled, isAuthorized, inactivityNudgesEnabled else { return }
+
+        let content = UNMutableNotificationContent()
+        content.title = "Your recovery misses you"
+        content.body = "It's been a few days — a short session keeps your progress moving."
+        content.sound = .default
+
+        let seconds = TimeInterval(inactivityNudgeDays * 24 * 60 * 60)
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: seconds, repeats: false)
+        let request = UNNotificationRequest(identifier: inactivityNudgeId, content: content, trigger: trigger)
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                AppLogger.data.error("Failed to schedule inactivity nudge: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    func cancelInactivityNudge() {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [inactivityNudgeId])
     }
 
     /// Update reminder time and reschedule all active plans
