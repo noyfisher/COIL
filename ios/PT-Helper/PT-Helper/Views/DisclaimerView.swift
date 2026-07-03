@@ -81,8 +81,11 @@ struct DisclaimerView: View {
             .interactiveDismissDisabled()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                        .accessibilityLabel("Cancel and close disclaimer")
+                    // "Back" reads as a normal return to the body map (selections
+                    // intact) rather than a broken "Cancel" that silently aborts the
+                    // flow at the moment they're most excited for results (audit #85).
+                    Button("Back") { dismiss() }
+                        .accessibilityLabel("Go back to the body map")
                 }
             }
         }

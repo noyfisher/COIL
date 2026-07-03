@@ -58,6 +58,18 @@ struct EmergencyRedirectView: View {
                 Spacer()
 
                 VStack(spacing: AppSpacing.md) {
+                    // Always display the number as large selectable text so a user
+                    // in a crisis is never left staring at a dead button (audit #80).
+                    Text(emergencyNumber)
+                        .font(.system(size: 44, weight: .bold, design: .rounded))
+                        .foregroundColor(AppColors.danger)
+                        .textSelection(.enabled)
+                        .accessibilityLabel("Emergency number \(emergencyNumber)")
+                    Text("Call \(emergencyNumber) from a phone, or dial your local emergency number.")
+                        .font(.caption)
+                        .foregroundColor(AppColors.secondaryText)
+                        .multilineTextAlignment(.center)
+
                     Button(action: callEmergencyServices) {
                         Label("Call Emergency Services", systemImage: "phone.fill")
                             .font(.body.weight(.semibold))
@@ -84,12 +96,15 @@ struct EmergencyRedirectView: View {
         .navigationBarBackButtonHidden(true)
     }
 
+    /// US-default for v1. Future: honor locale. The number is ALSO shown on screen
+    /// as large selectable text, so it's usable even when the device can't dial.
+    private let emergencyNumber = "911"
+
     private func callEmergencyServices() {
-        // US-default for v1. Future: honor locale. 911 is overwhelmingly the safest
-        // single-number fallback for US users; non-US users will see the screen guide
-        // them to their local services.
-        if let url = URL(string: "tel://911"), UIApplication.shared.canOpenURL(url) {
+        if let url = URL(string: "tel://\(emergencyNumber)"), UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
         }
+        // If canOpenURL is false (iPad / non-cellular), the on-screen number above
+        // is the fallback — no silent dead button in a crisis (audit #80).
     }
 }
