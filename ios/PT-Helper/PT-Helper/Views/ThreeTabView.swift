@@ -16,22 +16,30 @@ struct ThreeTabView: View {
     /// rather than dropping them cold on the Home tab. Consumed once on appear.
     @AppStorage("pendingFirstAssessment") private var pendingFirstAssessment = false
 
+    /// Reusable offline banner — shown in the tab container AND inside the
+    /// assessment cover, since the cover overlays the container and hides the
+    /// container's banner during the one flow most dependent on connectivity (#59).
+    @ViewBuilder
+    private var offlineBanner: some View {
+        if !networkMonitor.isConnected {
+            HStack(spacing: AppSpacing.sm) {
+                Image(systemName: "wifi.slash")
+                    .font(.system(size: 12, weight: .semibold))
+                Text("You're offline. Changes will sync when reconnected.")
+                    .font(.caption)
+            }
+            .foregroundColor(AppColors.ctaText)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, AppSpacing.sm)
+            .background(AppColors.danger)
+            .accessibilityIdentifier("offlineBanner")
+        }
+    }
+
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
-                if !networkMonitor.isConnected {
-                    HStack(spacing: AppSpacing.sm) {
-                        Image(systemName: "wifi.slash")
-                            .font(.system(size: 12, weight: .semibold))
-                        Text("You're offline. Changes will sync when reconnected.")
-                            .font(.caption)
-                    }
-                    .foregroundColor(AppColors.ctaText)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, AppSpacing.sm)
-                    .background(AppColors.danger)
-                    .accessibilityIdentifier("offlineBanner")
-                }
+                offlineBanner
 
                 TabView(selection: $tabSelection.selectedTab) {
                     HomeTab()
@@ -83,8 +91,10 @@ struct ThreeTabView: View {
             AnalyticsService.shared.log(.tabSwitched, parameters: ["tab_index": newTab])
         }
         .fullScreenCover(item: $tabSelection.assessmentRequest) { route in
-            NavigationStack {
-                assessmentDestination(for: route)
+            VStack(spacing: 0) {
+                offlineBanner
+                NavigationStack {
+                    assessmentDestination(for: route)
                     .toolbar {
                         // The destinations register navigationDestinations, so the
                         // close affordance lives out here and toggles state directly
@@ -100,6 +110,7 @@ struct ThreeTabView: View {
                             .accessibilityIdentifier("bodyMap.closeButton")
                         }
                     }
+                }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .popToRoot)) { _ in

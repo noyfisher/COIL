@@ -431,6 +431,47 @@ struct EmptyStateView: View {
     }
 }
 
+/// Standard error state (icon + title + message + Retry) used across screens
+/// instead of ad-hoc error UI. The icon is intentionally generic so a
+/// non-connectivity failure (e.g. a Firestore permission error) isn't mislabeled
+/// as a wifi problem (audit #63).
+struct ErrorStateView: View {
+    var title: String = "Something went wrong"
+    let message: String
+    var systemImage: String = "exclamationmark.triangle"
+    var retryTitle: String = "Try Again"
+    let onRetry: () -> Void
+
+    var body: some View {
+        VStack(spacing: AppSpacing.lg) {
+            Image(systemName: systemImage)
+                .font(.system(size: 48))
+                .foregroundColor(AppColors.warning)
+
+            VStack(spacing: AppSpacing.sm) {
+                Text(title)
+                    .font(AppFonts.cardTitle)
+                    .foregroundColor(AppColors.primaryText)
+                Text(message)
+                    .font(AppFonts.small)
+                    .foregroundColor(AppColors.secondaryText)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, AppSpacing.lg)
+            }
+
+            Button(action: onRetry) {
+                Text(retryTitle)
+            }
+            .buttonStyle(SecondaryButtonStyle())
+            .padding(.horizontal, AppSpacing.xxl)
+            .accessibilityIdentifier("errorState.retryButton")
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, AppSpacing.xxl)
+        .cardStyle()
+    }
+}
+
 struct LoadingStateView: View {
     var message: String = "Loading..."
 
