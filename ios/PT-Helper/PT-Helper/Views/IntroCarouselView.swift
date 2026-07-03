@@ -102,7 +102,7 @@ private struct IntroPrecisionRecovery: View {
             let heroH = geo.size.height * 0.50
 
             ZStack(alignment: .top) {
-                Color(red: 0.067, green: 0.067, blue: 0.067).ignoresSafeArea()
+                AppColors.darkSurface.ignoresSafeArea()
 
                 VStack(spacing: 0) {
                     // Safe area spacer
@@ -117,7 +117,7 @@ private struct IntroPrecisionRecovery: View {
                             colors: [
                                 Color(red: 0.35, green: 0.02, blue: 0.02),
                                 Color(red: 0.13, green: 0.02, blue: 0.02),
-                                Color(red: 0.067, green: 0.067, blue: 0.067)
+                                AppColors.darkSurface
                             ],
                             center: .center,
                             startRadius: 10,
@@ -221,7 +221,7 @@ private struct IntroFastTrack: View {
     var body: some View {
         GeometryReader { geo in
             ZStack(alignment: .top) {
-                Color(red: 0.067, green: 0.067, blue: 0.067).ignoresSafeArea()
+                AppColors.darkSurface.ignoresSafeArea()
 
                 // Corner red glows
                 RadialGradient(
@@ -289,7 +289,7 @@ private struct IntroStartJourney: View {
     var body: some View {
         GeometryReader { geo in
             ZStack(alignment: .top) {
-                Color(red: 0.067, green: 0.067, blue: 0.067).ignoresSafeArea()
+                AppColors.darkSurface.ignoresSafeArea()
 
                 // Ambient corner glows
                 RadialGradient(

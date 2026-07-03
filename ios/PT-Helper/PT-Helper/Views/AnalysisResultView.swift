@@ -8,6 +8,8 @@ struct AnalysisResultView: View {
     @State private var expandedConditions: Set<String> = []
     @State private var showConfidenceInfo = false
     @State private var showVerificationInfo = false
+    /// Drives the staggered condition-card entrance (audit #78).
+    @State private var cardsAppeared = false
     @State private var showPreferencesSheet = false
     /// Set when the user taps Generate/Skip in the preferences sheet. Generation and the
     /// navigation push are deferred to the sheet's onDismiss — mutating the navigation
@@ -35,8 +37,13 @@ struct AnalysisResultView: View {
                     // Lead with the answer the user waited for (audit #25).
                     overallSummaryCard
                     verificationBadge
-                    ForEach(Array(analysisResult.conditions.prefix(3))) { condition in
+                    ForEach(Array(analysisResult.conditions.prefix(3).enumerated()), id: \.element.id) { index, condition in
                         conditionCard(for: condition)
+                            // Reveal one at a time so the diagnosis feels considered,
+                            // not dumped on the user (audit #78).
+                            .opacity(cardsAppeared ? 1 : 0)
+                            .offset(y: cardsAppeared ? 0 : 14)
+                            .animation(AppAnimations.smooth.delay(Double(index) * 0.12), value: cardsAppeared)
                     }
                     // Standing disclaimer + validation cautions moved below the result.
                     if !cautionWarnings.isEmpty {
@@ -74,6 +81,7 @@ struct AnalysisResultView: View {
         .trackScreen("AnalysisResult")
         .onAppear {
             AnalysisResultStore.shared.save(analysisResult)
+            cardsAppeared = true
         }
     }
 
