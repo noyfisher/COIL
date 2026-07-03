@@ -113,6 +113,15 @@ class InjuryAnalysisViewModel: ObservableObject {
             return
         }
 
+        // Fail fast when offline instead of making the user watch a doomed
+        // 15–30s spinner before a generic network error (audit #58).
+        guard NetworkMonitor.shared.isConnected else {
+            analysisError = "You're offline. Connect to the internet to run your assessment, then tap Try Again."
+            isAnalyzing = false
+            showAnalyzingScreen = true
+            return
+        }
+
         // Pre-flight validation logging
         let regionNames = completed.map { $0.selectedRegion.name }
         let missingFields = completed.enumerated().compactMap { (i, a) -> String? in

@@ -141,6 +141,15 @@ class RehabPlanViewModel: ObservableObject {
     /// Generate a rehab plan using AI, with fallback to hardcoded database
     func generateRehabPlan(from analysisResult: AnalysisResult) {
         guard !isGenerating else { return }
+
+        // Fail fast when offline instead of showing the plan-building spinner for a
+        // request that can't succeed (audit #58).
+        guard NetworkMonitor.shared.isConnected else {
+            generationError = "You're offline. Connect to the internet to build your plan, then try again."
+            isGenerating = false
+            return
+        }
+
         let conditions = analysisResult.conditions.map { $0.conditionName }
 
         // Cache original result for potential safer-plan retries.

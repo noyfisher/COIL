@@ -63,12 +63,25 @@ struct ProgressTabContent: View {
     var body: some View {
         ScrollView {
             VStack(spacing: AppSpacing.lg) {
-                if workoutViewModel.sessions.isEmpty {
+                if let loadError = workoutViewModel.loadError {
+                    // A fetch failure must not masquerade as "No Data Yet" — that's
+                    // the brand-new-user message and makes a longtime user fear their
+                    // data vanished (audit #62).
+                    Spacer(minLength: 100)
+                    ErrorStateView(
+                        title: "Couldn't load your progress",
+                        message: loadError,
+                        onRetry: { workoutViewModel.fetchSessions() }
+                    )
+                    Spacer(minLength: 100)
+                } else if workoutViewModel.sessions.isEmpty {
                     Spacer(minLength: 100)
                     EmptyStateView(
                         icon: "chart.line.uptrend.xyaxis",
                         title: "No Data Yet",
-                        subtitle: "Complete workout sessions to see your progress over time"
+                        subtitle: "Complete workout sessions to see your progress over time",
+                        actionTitle: "Start an Assessment",
+                        action: { tabSelection.assessmentRequest = .gateway }
                     )
                     Spacer(minLength: 100)
                 } else {

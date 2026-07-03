@@ -262,19 +262,16 @@ struct MyPlanTab: View {
     // MARK: - Error State
 
     private func errorState(_ error: String) -> some View {
-        VStack(spacing: AppSpacing.lg) {
+        // Standardized error UI — no hardcoded wifi icon (a Firestore permission
+        // error is not a connectivity problem) (audit #63).
+        VStack {
             Spacer()
-            Image(systemName: "wifi.exclamationmark")
-                .font(.system(size: 40))
-                .foregroundColor(AppColors.warning)
-            Text(error)
-                .font(AppFonts.small)
-                .foregroundColor(AppColors.secondaryText)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, AppSpacing.xxl)
-            Button("Retry") { savedPlansViewModel.fetchRehabPlans() }
-                .buttonStyle(SecondaryButtonStyle())
-                .padding(.horizontal, AppSpacing.xxxl)
+            ErrorStateView(
+                title: "Couldn't load your plans",
+                message: error,
+                onRetry: { savedPlansViewModel.fetchRehabPlans() }
+            )
+            .padding(.horizontal, AppSpacing.lg)
             Spacer()
         }
     }
