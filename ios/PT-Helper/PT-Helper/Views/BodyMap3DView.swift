@@ -180,6 +180,13 @@ struct BodyMap3DView: View {
                     .font(.caption)
                     .foregroundColor(AppColors.mutedText)
                     .multilineTextAlignment(.center)
+                // Always-visible rotate cue (not just the one-time coach mark) so
+                // returning users know the model turns — that's where the back,
+                // glutes & hamstrings live (audit #18).
+                Label("Drag to rotate — reach the back, glutes & hamstrings", systemImage: "arrow.triangle.2.circlepath")
+                    .font(.caption2)
+                    .foregroundColor(AppColors.accent)
+                    .multilineTextAlignment(.center)
             }
         }
         .padding(.top, AppSpacing.lg)
@@ -665,10 +672,21 @@ struct BodyMap3DView: View {
 
     // MARK: - Bottom Actions
 
+    /// Self-explaining status line: a nudge when nothing's picked, otherwise a
+    /// correctly-pluralized count (audit #21 — fixes "0 area(s) selected").
+    private var selectionSummary: String {
+        let n = viewModel.selectedRegions.count
+        switch n {
+        case 0: return "No areas selected yet"
+        case 1: return "1 area selected"
+        default: return "\(n) areas selected"
+        }
+    }
+
     private var bottomActions: some View {
         VStack(spacing: AppSpacing.md) {
             HStack {
-                Text("\(viewModel.selectedRegions.count) area(s) selected")
+                Text(selectionSummary)
                     .font(.subheadline.weight(.medium))
                     .foregroundColor(AppColors.primaryText)
                 Spacer()
@@ -694,9 +712,11 @@ struct BodyMap3DView: View {
                 }
             }) {
                 HStack(spacing: AppSpacing.sm) {
-                    Text("Continue")
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 13, weight: .bold))
+                    Text(viewModel.selectedRegions.isEmpty ? "Select where it hurts" : "Continue")
+                    if !viewModel.selectedRegions.isEmpty {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 13, weight: .bold))
+                    }
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, AppSpacing.lg)
@@ -983,7 +1003,7 @@ struct BodyMap3DView: View {
         }
     }
 
-    /// Toggle a region from the ZoneSelectionPanel (same logic, called via panel callback).
+    /// Toggle a region's selection from the inline zone drill-down region strip.
     private func toggleRegionInDrillDown(_ region: BodyRegion) {
         selectRegion(named: region.zoneKey)
     }

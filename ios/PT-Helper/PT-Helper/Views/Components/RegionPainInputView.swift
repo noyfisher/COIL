@@ -8,22 +8,13 @@ struct RegionPainInputView: View {
 
     @State private var showRegionPicker = false
 
-    /// All available body regions (matching 3D body map zone keys)
-    static let allRegions: [String] = [
-        "head", "neck",
-        "left_shoulder", "right_shoulder",
-        "chest", "upper_back",
-        "left_upper_arm", "right_upper_arm",
-        "left_elbow", "right_elbow",
-        "left_forearm", "right_forearm",
-        "left_wrist_hand", "right_wrist_hand",
-        "core", "lower_back",
-        "left_hip", "right_hip",
-        "left_upper_thigh", "right_upper_thigh",
-        "left_knee", "right_knee",
-        "left_lower_leg", "right_lower_leg",
-        "left_ankle_foot", "right_ankle_foot"
-    ]
+    /// All available body regions, sourced from the SAME canonical `BodyZone`
+    /// definitions the 3D body map uses, so post-workout region pain lines up with
+    /// what the body map / analysis records (audit #19). Previously this list had
+    /// drifted (e.g. "core" vs "abdomen", "left_upper_thigh" vs "left_thigh",
+    /// "left_lower_leg" vs "left_calf_shin") and omitted glutes/hamstrings, leaving
+    /// gaps in progress charts and recovery insights.
+    static let allRegions: [String] = BodyZone.allCases.flatMap { $0.regionZoneKeys }
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
