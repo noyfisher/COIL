@@ -448,11 +448,45 @@ struct ProgressTabContent: View {
     // MARK: - Summary Stats
 
     private var summaryStats: some View {
-        HStack(spacing: AppSpacing.md) {
-            statCard(icon: "number",            color: AppColors.accent,      value: "\(workoutViewModel.sessions.count)",     label: "Sessions")
-            statCard(icon: "waveform.path.ecg", color: averagePainColor,      value: String(format: "%.1f", averagePain),      label: "Avg Pain")
-            statCard(icon: "clock",             color: AppColors.warning,     value: "\(totalMinutes)",                        label: "Total Min")
+        VStack(spacing: AppSpacing.md) {
+            HStack(spacing: AppSpacing.md) {
+                statCard(icon: "number",            color: AppColors.accent,      value: "\(workoutViewModel.sessions.count)",     label: "Sessions")
+                statCard(icon: "waveform.path.ecg", color: averagePainColor,      value: String(format: "%.1f", averagePain),      label: "Avg Pain")
+                // Promote the day streak — the number users actually build toward —
+                // over "Total Min", which nobody opens the app to check (audit #38).
+                statCard(icon: streakService.streakData.isActive ? "flame.fill" : "flame",
+                         color: .orange,
+                         value: "\(streakService.streakData.currentStreak)",
+                         label: "Day Streak")
+            }
+            if let personalBest = personalBestText {
+                HStack(spacing: AppSpacing.xs) {
+                    Image(systemName: "rosette")
+                        .foregroundColor(.orange)
+                    Text(personalBest)
+                        .font(AppFonts.captionMedium)
+                        .foregroundColor(AppColors.secondaryText)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, AppSpacing.sm)
+                .background(Color.orange.opacity(0.08))
+                .cornerRadius(AppCorners.medium)
+            }
         }
+    }
+
+    /// Surfaces the personal-best (longest) streak as a callout when the current
+    /// streak matches or nears the record (audit #38).
+    private var personalBestText: String? {
+        let cur = streakService.streakData.currentStreak
+        let best = streakService.streakData.longestStreak
+        guard best >= 2 else { return nil }
+        if cur >= best {
+            return "Personal best streak — \(best) days! Keep it going."
+        } else if cur >= best - 1 {
+            return "1 day from your personal best of \(best) days."
+        }
+        return "Personal best streak: \(best) days."
     }
 
     private func statCard(icon: String, color: Color, value: String, label: String) -> some View {

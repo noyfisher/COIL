@@ -4,6 +4,7 @@ import SwiftUI
 struct GuidedWorkoutSummaryView: View {
     @ObservedObject var vm: GuidedWorkoutViewModel
     @EnvironmentObject private var workoutViewModel: WorkoutViewModel
+    @ObservedObject private var streakService = StreakService.shared
     @Environment(\.dismiss) private var dismiss
 
     @State private var overallPain: Double = 3
@@ -105,7 +106,9 @@ struct GuidedWorkoutSummaryView: View {
             .padding(.vertical, AppSpacing.md)
         }
         .overlay {
-            if showSavedConfirmation {
+            // Suppress the generic "Saved!" flash when a badge celebration is
+            // showing instead (the achievement overlay takes precedence).
+            if showSavedConfirmation && streakService.newlyEarned == nil {
                 CelebrationOverlay(
                     icon: "checkmark.circle.fill",
                     message: "Workout Saved!",
@@ -113,6 +116,7 @@ struct GuidedWorkoutSummaryView: View {
                 )
             }
         }
+        .achievementCelebration()
         .trackScreen("GuidedWorkoutSummary")
         .onAppear {
             // Compute trajectory insight from previous sessions for this plan
@@ -157,9 +161,33 @@ struct GuidedWorkoutSummaryView: View {
             Text(vm.plan.planName)
                 .font(AppFonts.body)
                 .foregroundColor(AppColors.secondaryText)
+
+            // Surface the streak the workout just advanced, at peak motivation (audit #32).
+            if streakService.streakData.currentStreak >= 1 {
+                HStack(spacing: AppSpacing.xs) {
+                    Image(systemName: "flame.fill")
+                        .foregroundColor(.orange)
+                    Text(streakChipText)
+                        .font(AppFonts.captionSemiBold)
+                        .foregroundColor(AppColors.primaryText)
+                }
+                .padding(.horizontal, AppSpacing.md)
+                .padding(.vertical, AppSpacing.xs)
+                .background(Color.orange.opacity(0.12))
+                .clipShape(Capsule())
+                .accessibilityIdentifier("workoutSummary.streakChip")
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, AppSpacing.xl)
+    }
+
+    private var streakChipText: String {
+        let n = streakService.streakData.currentStreak
+        if n >= 2 && n == streakService.streakData.longestStreak {
+            return "Personal best — \(n) days in a row!"
+        }
+        return n == 1 ? "Day 1 — you're on the board!" : "\(n) days in a row — don't break the chain!"
     }
 
     // MARK: - Stats Grid

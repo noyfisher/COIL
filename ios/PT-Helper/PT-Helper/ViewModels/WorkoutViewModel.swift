@@ -95,6 +95,9 @@ class WorkoutViewModel: ObservableObject {
         // Update streak and achievements
         StreakService.shared.updateStreak(after: session)
         StreakService.shared.checkAchievements(totalSessions: sessions.count)
+        StreakService.shared.evaluatePainImprovement(sessions: sessions)
+        // Reset the inactivity-nudge clock — the user is active today (audit #33).
+        NotificationService.shared.scheduleInactivityNudge()
 
         // Persist to Firestore
         guard let uid = Auth.auth().currentUser?.uid else { return }
