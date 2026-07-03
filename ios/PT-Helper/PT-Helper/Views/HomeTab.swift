@@ -324,15 +324,7 @@ private struct ExerciseProgramRow: View {
 
     var body: some View {
         HStack(spacing: AppSpacing.md) {
-            // Icon / image placeholder
-            ZStack {
-                RoundedRectangle(cornerRadius: AppCorners.small)
-                    .fill(AppColors.darkSurface)
-                    .frame(width: 52, height: 52)
-                Image(systemName: exercise.demonstrationIcon.isEmpty ? "figure.strengthtraining.traditional" : exercise.demonstrationIcon)
-                    .font(.system(size: 22))
-                    .foregroundColor(AppColors.accent)
-            }
+            ExerciseImageView(exercise: exercise, isCompact: true)
 
             VStack(alignment: .leading, spacing: AppSpacing.nano) {
                 Text(exercise.name)
