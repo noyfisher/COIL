@@ -197,6 +197,33 @@ struct FormAnalysisView: View {
                 // Score badge with confidence indicator
                 scoreHeader(feedback, confidenceLevel: validation.confidenceLevel)
 
+                // Honest framing of what the score is — a coaching aid, not a
+                // diagnosis — so users don't over-read a big number (audit #91).
+                Text("This score estimates your technique from on-device pose tracking — a coaching aid, not a medical assessment.")
+                    .font(AppFonts.caption)
+                    .foregroundColor(AppColors.secondaryText)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+
+                // Surface the AI-returned data limitations we already parse but
+                // previously discarded (audit #91).
+                if !feedback.dataLimitations.isEmpty {
+                    VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                        Label("What this couldn't fully assess", systemImage: "eye.trianglebadge.exclamationmark")
+                            .font(AppFonts.captionSemiBold)
+                            .foregroundColor(AppColors.secondaryText)
+                        ForEach(Array(feedback.dataLimitations.enumerated()), id: \.offset) { _, limitation in
+                            Text("• \(limitation)")
+                                .font(AppFonts.caption)
+                                .foregroundColor(AppColors.secondaryText)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(AppSpacing.md)
+                    .background(AppColors.cardBackground)
+                    .cornerRadius(AppCorners.medium)
+                }
+
                 // Contraindication / serious+ warnings (red banner). Covers .serious, .urgent,
                 // and .emergency — all are high-priority and get the same strong banner here,
                 // since form analysis doesn't navigate to an emergency redirect.
@@ -217,17 +244,34 @@ struct FormAnalysisView: View {
                     .cornerRadius(AppCorners.card)
                 }
 
-                // Data quality note (if low)
+                // Data quality note (if low) — surface the concrete, fixable
+                // warnings the scorer already computed (too short / poor lighting /
+                // joints out of frame) instead of one vague line (audit #88).
                 if validation.confidenceLevel == .low || validation.confidenceLevel == .insufficient {
-                    HStack(spacing: AppSpacing.sm) {
-                        Image(systemName: "info.circle.fill")
+                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                        Label(validation.confidenceLevel == .insufficient
+                              ? "Limited data — results may not be reliable"
+                              : "Some feedback may be less accurate",
+                              systemImage: "info.circle.fill")
+                            .font(AppFonts.captionSemiBold)
                             .foregroundColor(AppColors.warning)
-                        Text(validation.confidenceLevel == .insufficient
-                            ? "Limited data available — results may not be reliable"
-                            : "Data quality is below average — some feedback may be less accurate")
-                            .font(AppFonts.caption)
-                            .foregroundColor(AppColors.secondaryText)
+
+                        if dataQuality.warnings.isEmpty {
+                            Text("Record again with better lighting and your whole body in frame.")
+                                .font(AppFonts.caption)
+                                .foregroundColor(AppColors.secondaryText)
+                        } else {
+                            Text("How to get a better result:")
+                                .font(AppFonts.caption)
+                                .foregroundColor(AppColors.secondaryText)
+                            ForEach(Array(dataQuality.warnings.enumerated()), id: \.offset) { _, warning in
+                                Text("• \(warning)")
+                                    .font(AppFonts.caption)
+                                    .foregroundColor(AppColors.secondaryText)
+                            }
+                        }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(AppSpacing.md)
                     .background(AppColors.warning.opacity(0.1))
                     .cornerRadius(AppCorners.medium)
@@ -431,6 +475,29 @@ struct FormAnalysisView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.lg)
             }
+
+            // A short actionable checklist so a cryptic failure becomes a clear
+            // "do this and record again" instead of a dead end (audit #92).
+            VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                Text("Before you try again:")
+                    .font(AppFonts.captionSemiBold)
+                    .foregroundColor(AppColors.primaryText)
+                ForEach([
+                    "Record in a well-lit space",
+                    "Stand back so your whole body fits in frame",
+                    "Keep the camera steady",
+                    "Check your internet connection"
+                ], id: \.self) { tip in
+                    Label(tip, systemImage: "checkmark.circle")
+                        .font(AppFonts.caption)
+                        .foregroundColor(AppColors.secondaryText)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(AppSpacing.md)
+            .background(AppColors.cardBackground)
+            .cornerRadius(AppCorners.medium)
+            .padding(.horizontal, AppSpacing.lg)
 
             VStack(spacing: AppSpacing.md) {
                 Button(action: {
