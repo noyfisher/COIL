@@ -142,33 +142,36 @@ enum AppCorners {
 
 enum AppFonts {
     // MARK: Headings — Industry Bold
-    static let display      = Font.custom("Industry-Bold", size: 36) // large stat/hero number
-    static let heroTitle    = Font.custom("Industry-Bold", size: 28)
-    static let title        = Font.custom("Industry-Bold", size: 24)
-    static let sectionTitle = Font.custom("Industry-Bold", size: 20)
-    static let cardTitle    = Font.custom("Industry-Bold", size: 14)
-    static let statNumber   = Font.custom("Industry-Bold", size: 28)
-    static let badge        = Font.custom("Industry-Bold", size: 10)
-    static let fieldLabel   = Font.custom("Industry-Bold", size: 11) // uppercase field labels
+    // `relativeTo:` makes every custom token scale with the iOS "Larger Text"
+    // setting (audit #65). The point sizes are unchanged at the default Dynamic
+    // Type size; they now grow/shrink proportionally to the mapped text style.
+    static let display      = Font.custom("Industry-Bold", size: 36, relativeTo: .largeTitle) // large stat/hero number
+    static let heroTitle    = Font.custom("Industry-Bold", size: 28, relativeTo: .title)
+    static let title        = Font.custom("Industry-Bold", size: 24, relativeTo: .title2)
+    static let sectionTitle = Font.custom("Industry-Bold", size: 20, relativeTo: .title3)
+    static let cardTitle    = Font.custom("Industry-Bold", size: 14, relativeTo: .headline)
+    static let statNumber   = Font.custom("Industry-Bold", size: 28, relativeTo: .title)
+    static let badge        = Font.custom("Industry-Bold", size: 10, relativeTo: .caption2)
+    static let fieldLabel   = Font.custom("Industry-Bold", size: 11, relativeTo: .caption2) // uppercase field labels
 
     // MARK: Body — Inter
-    static let body         = Font.custom("Inter-Regular",  size: 14)
-    static let bodyMedium   = Font.custom("Inter-Medium",   size: 14)
-    static let bodySemiBold = Font.custom("Inter-SemiBold", size: 14)
+    static let body         = Font.custom("Inter-Regular",  size: 14, relativeTo: .body)
+    static let bodyMedium   = Font.custom("Inter-Medium",   size: 14, relativeTo: .body)
+    static let bodySemiBold = Font.custom("Inter-SemiBold", size: 14, relativeTo: .body)
 
     // MARK: Small — Inter 13pt
-    static let small         = Font.custom("Inter-Regular",  size: 13)
-    static let smallMedium   = Font.custom("Inter-Medium",   size: 13)
-    static let smallSemiBold = Font.custom("Inter-SemiBold", size: 13)
+    static let small         = Font.custom("Inter-Regular",  size: 13, relativeTo: .subheadline)
+    static let smallMedium   = Font.custom("Inter-Medium",   size: 13, relativeTo: .subheadline)
+    static let smallSemiBold = Font.custom("Inter-SemiBold", size: 13, relativeTo: .subheadline)
 
     // MARK: Caption — Inter 12pt
-    static let caption         = Font.custom("Inter-Regular",  size: 12)
-    static let captionMedium   = Font.custom("Inter-Medium",   size: 12)
-    static let captionSemiBold = Font.custom("Inter-SemiBold", size: 12)
+    static let caption         = Font.custom("Inter-Regular",  size: 12, relativeTo: .caption)
+    static let captionMedium   = Font.custom("Inter-Medium",   size: 12, relativeTo: .caption)
+    static let captionSemiBold = Font.custom("Inter-SemiBold", size: 12, relativeTo: .caption)
 
     // MARK: Micro — Inter 11pt
-    static let micro       = Font.custom("Inter-Regular",  size: 11)
-    static let microMedium = Font.custom("Inter-Medium",   size: 11)
+    static let micro       = Font.custom("Inter-Regular",  size: 11, relativeTo: .caption2)
+    static let microMedium = Font.custom("Inter-Medium",   size: 11, relativeTo: .caption2)
 
     // MARK: Dashboard data (monospaced for number alignment)
     static let dataLarge  = Font.system(.title,    design: .monospaced).weight(.bold)
