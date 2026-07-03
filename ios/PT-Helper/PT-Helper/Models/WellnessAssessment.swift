@@ -36,6 +36,26 @@ enum GoalCategory: String, Codable, CaseIterable {
         }
     }
 
+    /// One-line plain-English description shown under each goal card so users can
+    /// choose with confidence instead of guessing from a two-word title (audit #45).
+    var subtitle: String {
+        switch self {
+        case .improveSleep: return "Wind-down routines & gentle evening mobility"
+        case .improvePosture: return "Undo desk slouch and stand tall"
+        case .standLonger: return "Build tolerance for time on your feet"
+        case .sitWithoutPain: return "Ease discomfort from long sitting"
+        case .workWithEquipment: return "Use bands, weights or a gym you have"
+        case .driveWithoutPain: return "Comfort for commutes and long drives"
+        case .reduceMorningStiffness: return "Loosen up and move easier at the start of the day"
+        case .coreAndBalance: return "Steadier, stronger trunk and balance"
+        case .flexibilityAndMobility: return "Move through a fuller range of motion"
+        case .manageStress: return "Breathing & mobility to unwind"
+        case .stayActiveAsYouAge: return "Keep strong, mobile and independent"
+        case .fasterWorkoutRecovery: return "Bounce back quicker between sessions"
+        case .custom: return "Describe your own goal"
+        }
+    }
+
     var icon: String {
         switch self {
         case .improveSleep: return "moon.zzz.fill"

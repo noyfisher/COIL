@@ -111,18 +111,23 @@ struct WellnessAnalyzingView: View {
     // MARK: - Error View
 
     private func errorView(_ message: String) -> some View {
-        VStack(spacing: AppSpacing.xl) {
+        // Distinguish a dropped connection from a server error so users retry the
+        // right thing instead of seeing an opaque technical string (audit #43).
+        let isOffline = !NetworkMonitor.shared.isConnected
+        return VStack(spacing: AppSpacing.xl) {
             Spacer()
 
-            Image(systemName: "exclamationmark.triangle.fill")
+            Image(systemName: isOffline ? "wifi.slash" : "exclamationmark.triangle.fill")
                 .font(.system(size: 60))
                 .foregroundColor(AppColors.warning)
 
             VStack(spacing: AppSpacing.sm) {
-                Text("Analysis Failed")
+                Text(isOffline ? "You're Offline" : "Analysis Failed")
                     .font(.system(.title2, design: .serif).weight(.bold))
                     .foregroundColor(AppColors.primaryText)
-                Text(message)
+                Text(isOffline
+                     ? "You appear to be offline. Reconnect and try again."
+                     : message)
                     .font(.subheadline)
                     .foregroundColor(AppColors.secondaryText)
                     .multilineTextAlignment(.center)

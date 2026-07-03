@@ -5,14 +5,6 @@ struct WellnessGoalPickerView: View {
     @State private var selectedCategories: Set<GoalCategory> = []
     @State private var customGoalText: String = ""
     @State private var showDetailView = false
-    @StateObject private var viewModel: WellnessAnalysisViewModel = {
-        // Placeholder — will be replaced when navigating
-        WellnessAnalysisViewModel(userProfile: UserProfile(
-            userId: "", firstName: "", lastName: "", dateOfBirth: Date(), sex: "",
-            heightFeet: 0, heightInches: 0, weight: 0, medicalConditions: [],
-            surgeries: [], injuries: [], activityLevel: ""
-        ), selectedGoals: [])
-    }()
 
     private let columns = [
         GridItem(.flexible(), spacing: AppSpacing.md),
@@ -105,6 +97,13 @@ struct WellnessGoalPickerView: View {
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
+
+                Text(category.subtitle)
+                    .font(.caption2)
+                    .foregroundColor(AppColors.mutedText)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, AppSpacing.lg)
@@ -167,8 +166,12 @@ struct WellnessGoalPickerView: View {
             showDetailView = true
         }) {
             HStack(spacing: AppSpacing.sm) {
-                Image(systemName: "arrow.right")
-                Text("Continue with \(selectedGoals.count) \(selectedGoals.count == 1 ? "Goal" : "Goals")")
+                if !selectedGoals.isEmpty {
+                    Image(systemName: "arrow.right")
+                }
+                Text(selectedGoals.isEmpty
+                     ? "Select a goal to continue"
+                     : "Continue with \(selectedGoals.count) \(selectedGoals.count == 1 ? "Goal" : "Goals")")
             }
         }
         .buttonStyle(PrimaryButtonStyle())
