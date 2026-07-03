@@ -236,8 +236,10 @@ struct AnalyzingView: View {
 
                 let validate = status(for: .validating)
                 AnalysisStepRow(
-                    icon: "list.bullet.clipboard.fill",
-                    text: "Generating recommendations",
+                    // This stage is the 6-step safety/validation pipeline, not
+                    // recommendation generation — name it for the trust signal (audit #28).
+                    icon: "checkmark.shield.fill",
+                    text: "Running safety checks",
                     isCompleted: validate.isCompleted,
                     isActive: validate.isActive
                 )
@@ -259,7 +261,7 @@ struct AnalyzingView: View {
         if elapsedSeconds < 5 {
             return ""
         } else if elapsedSeconds < 20 {
-            return "\(elapsedSeconds)s — this usually takes 10–20 seconds"
+            return "\(elapsedSeconds)s — hang tight, this usually takes a few moments"
         } else {
             return "\(elapsedSeconds)s — almost there..."
         }
