@@ -271,31 +271,38 @@ struct ProgressTabContent: View {
 
     private func workoutSessionRow(_ session: WorkoutSession) -> some View {
         HStack(spacing: AppSpacing.md) {
-            Circle()
-                .fill(painColor(for: session.painLevel).opacity(0.15))
-                .frame(width: 40, height: 40)
-                .overlay(
-                    Text("\(Int(session.painLevel))")
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
-                        .foregroundColor(painColor(for: session.painLevel))
-                )
+            // Combine the pieces into one spoken element so VoiceOver reads a
+            // contextualized "June 12, pain 4 of 10 (moderate), 30 minutes,
+            // 5 exercises" instead of a floating color-coded "4" (audit #69).
+            HStack(spacing: AppSpacing.md) {
+                Circle()
+                    .fill(painColor(for: session.painLevel).opacity(0.15))
+                    .frame(width: 40, height: 40)
+                    .overlay(
+                        Text("\(Int(session.painLevel))")
+                            .font(.system(size: 14, weight: .bold, design: .rounded))
+                            .foregroundColor(painColor(for: session.painLevel))
+                    )
 
-            VStack(alignment: .leading, spacing: AppSpacing.nano) {
-                Text(session.date, style: .date)
-                    .font(AppFonts.bodyMedium)
-                    .foregroundColor(AppColors.primaryText)
-                Text("\(Int(session.duration / 60)) min")
-                    .font(AppFonts.caption)
-                    .foregroundColor(AppColors.secondaryText)
+                VStack(alignment: .leading, spacing: AppSpacing.nano) {
+                    Text(session.date, style: .date)
+                        .font(AppFonts.bodyMedium)
+                        .foregroundColor(AppColors.primaryText)
+                    Text("\(Int(session.duration / 60)) min")
+                        .font(AppFonts.caption)
+                        .foregroundColor(AppColors.secondaryText)
+                }
+
+                Spacer()
+
+                if !session.exercisesPerformed.isEmpty {
+                    Text("\(session.exercisesPerformed.count) exercises")
+                        .font(AppFonts.caption)
+                        .foregroundColor(AppColors.secondaryText)
+                }
             }
-
-            Spacer()
-
-            if !session.exercisesPerformed.isEmpty {
-                Text("\(session.exercisesPerformed.count) exercises")
-                    .font(AppFonts.caption)
-                    .foregroundColor(AppColors.secondaryText)
-            }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(sessionAccessibilityLabel(session))
 
             Button {
                 sessionToDelete = session
@@ -312,6 +319,32 @@ struct ProgressTabContent: View {
             .accessibilityIdentifier("progress.deleteSession")
         }
         .padding(.vertical, AppSpacing.xs)
+    }
+
+    private var painTrendAccessibilityValue: String {
+        let data = filteredChartData
+        guard data.count >= 2, let first = data.first, let last = data.last else {
+            return "Not enough data yet to show a trend."
+        }
+        let firstPain = Int(painValueForChart(first))
+        let lastPain = Int(painValueForChart(last))
+        let direction = lastPain < firstPain ? "down" : (lastPain > firstPain ? "up" : "steady")
+        return "Pain trended \(direction), from \(firstPain) to \(lastPain) out of 10 over the last \(data.count) sessions."
+    }
+
+    private func sessionAccessibilityLabel(_ session: WorkoutSession) -> String {
+        let dateStr = session.date.formatted(date: .abbreviated, time: .omitted)
+        let pain = Int(session.painLevel)
+        let severity: String
+        switch pain {
+        case 0...3: severity = "mild"
+        case 4...6: severity = "moderate"
+        default: severity = "severe"
+        }
+        let mins = Int(session.duration / 60)
+        let count = session.exercisesPerformed.count
+        let exercises = count == 1 ? "1 exercise" : "\(count) exercises"
+        return "\(dateStr), pain \(pain) of 10 (\(severity)), \(mins) minutes, \(exercises)"
     }
 
     private func painColor(for level: Double) -> Color {
@@ -436,6 +469,11 @@ struct ProgressTabContent: View {
                 }
             }
             .frame(height: 220)
+            // The pain-over-time story was conveyed only by pixels — give VoiceOver
+            // a spoken summary of the trend (audit #66).
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Pain trend chart")
+            .accessibilityValue(painTrendAccessibilityValue)
         }
         .padding(AppSpacing.lg)
         .background(AppColors.cardBackground)

@@ -611,6 +611,9 @@ struct ChipButton: View {
                         .stroke(isSelected ? AppColors.chipSelectedBorder : Color.black.opacity(0.15), lineWidth: 1.5)
                 )
         }
+        // Selection was conveyed by color alone — announce it to VoiceOver and
+        // colorblind users everywhere ChipButton is used (audit #68).
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 }
 
