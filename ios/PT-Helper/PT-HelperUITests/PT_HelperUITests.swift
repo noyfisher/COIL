@@ -29,8 +29,8 @@ final class OnboardingUITests: UITestBase {
             firstNameField.typeText("Test")
         }
 
-        // Last Name — tap directly (keyboard already up from first field)
-        let lastNameField = app.textFields["Last Name"]
+        // Last Name (now optional) — tap directly (keyboard already up from first field)
+        let lastNameField = app.textFields["Last Name (optional)"]
         if lastNameField.waitForExistence(timeout: 3) {
             lastNameField.tap()
             lastNameField.typeText("User")
@@ -81,32 +81,33 @@ final class OnboardingUITests: UITestBase {
 
         continueButton.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
 
-        // Step 2: Medical History (optional step)
+        // Step 2: Activity Level (moved up in the 2026 reorder) — select a level
+        // so Continue enables (this step is now required).
         XCTAssertTrue(staticText("Step 2 of 6").waitForExistence(timeout: 5))
-        if continueButton.exists, continueButton.isEnabled {
-            continueButton.tap()
-        }
-
-        // Step 3: Surgical History (optional step)
-        XCTAssertTrue(staticText("Step 3 of 6").waitForExistence(timeout: 5))
-        if continueButton.exists, continueButton.isEnabled {
-            continueButton.tap()
-        }
-
-        // Step 4: Injuries (optional step)
-        XCTAssertTrue(staticText("Step 4 of 6").waitForExistence(timeout: 5))
-        if continueButton.exists, continueButton.isEnabled {
-            continueButton.tap()
-        }
-
-        // Step 5: Activity Level — select a level
-        XCTAssertTrue(staticText("Step 5 of 6").waitForExistence(timeout: 5))
         let moderateButton = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Moderately'")).firstMatch
         if moderateButton.waitForExistence(timeout: 3) {
             moderateButton.tap()
         }
         if continueButton.exists, continueButton.isEnabled {
             continueButton.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        }
+
+        // Step 3: Medical History (optional step)
+        XCTAssertTrue(staticText("Step 3 of 6").waitForExistence(timeout: 5))
+        if continueButton.exists, continueButton.isEnabled {
+            continueButton.tap()
+        }
+
+        // Step 4: Surgical History (optional step)
+        XCTAssertTrue(staticText("Step 4 of 6").waitForExistence(timeout: 5))
+        if continueButton.exists, continueButton.isEnabled {
+            continueButton.tap()
+        }
+
+        // Step 5: Injuries (optional step)
+        XCTAssertTrue(staticText("Step 5 of 6").waitForExistence(timeout: 5))
+        if continueButton.exists, continueButton.isEnabled {
+            continueButton.tap()
         }
 
         // Step 6: Review & Submit
@@ -142,10 +143,12 @@ final class OnboardingUITests: UITestBase {
         _ = XCTWaiter.wait(for: [expectation], timeout: 5)
 
         if continueButton.isEnabled {
-            // Step 1 → 2
+            // Step 1 → 2 (Activity Level, moved up in the 2026 reorder)
             continueButton.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
             _ = staticText("Step 2 of 6").waitForExistence(timeout: 5)
-            // Step 2 → 3
+            // Select an activity level so Continue enables, then Step 2 → 3
+            let moderateButton = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Moderately'")).firstMatch
+            if moderateButton.waitForExistence(timeout: 3) { moderateButton.tap() }
             if continueButton.isEnabled { continueButton.tap() }
             _ = staticText("Step 3 of 6").waitForExistence(timeout: 5)
         }

@@ -11,6 +11,12 @@ struct RootView: View {
     @State private var hasLoggedSignIn = false
     @StateObject private var profileService = UserProfileService.shared
     @AppStorage("hasSeenIntroCarousel") private var hasSeenIntroCarousel = false
+    /// Set when the user taps Skip on onboarding, so the choice survives a
+    /// relaunch instead of re-trapping them in the questionnaire every launch.
+    @AppStorage("skippedOnboarding") private var skippedOnboarding = false
+    /// Set when the user *completes* onboarding, so the app hands them straight
+    /// into their first assessment (consumed + cleared by ThreeTabView).
+    @AppStorage("pendingFirstAssessment") private var pendingFirstAssessment = false
 
     /// UI testing mode: bypass Firebase Auth and route based on launch arguments.
     /// Virtual user mode (`--virtual-user-token`) takes precedence: it must use
@@ -58,6 +64,9 @@ struct RootView: View {
                     NotificationService.shared.clearFCMToken()
                     OnboardingViewModel.clearDraft()
                     profileCompleted = false
+                    // Reset the skip flag so a different account on this device
+                    // isn't silently auto-skipped past onboarding.
+                    skippedOnboarding = false
                     isCheckingProfile = true
                     profileService.clear()
                 }
@@ -123,7 +132,7 @@ struct RootView: View {
                             .foregroundColor(AppColors.secondaryText)
                     }
                 }
-            } else if profileCompleted {
+            } else if profileCompleted || skippedOnboarding {
                 MainTabView()
             } else if !hasSeenIntroCarousel {
                 IntroCarouselView(onComplete: {
@@ -131,8 +140,10 @@ struct RootView: View {
                 })
             } else {
                 OnboardingView(onComplete: {
+                    pendingFirstAssessment = true
                     profileCompleted = true
                 }, onSkip: {
+                    skippedOnboarding = true
                     profileCompleted = true
                 })
             }

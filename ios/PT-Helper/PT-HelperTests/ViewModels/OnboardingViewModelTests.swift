@@ -16,7 +16,7 @@ final class OnboardingViewModelTests: XCTestCase {
         vm.hasAcceptedTerms = true
     }
 
-    /// Helper to fill valid step 5 data
+    /// Helper to fill valid activity-level data (step 2 after the 2026 reorder)
     private func fillValidActivityLevel(_ vm: OnboardingViewModel) {
         vm.userProfile.activityLevel = "Active"
     }
@@ -38,6 +38,7 @@ final class OnboardingViewModelTests: XCTestCase {
     func testNextStep_AdvancesWithValidData() {
         let vm = OnboardingViewModel()
         fillValidBasicInfo(vm)
+        fillValidActivityLevel(vm) // step 2 (activity) now requires a selection
 
         vm.nextStep()
         XCTAssertEqual(vm.currentStep, 2)
@@ -65,6 +66,7 @@ final class OnboardingViewModelTests: XCTestCase {
     func testPreviousStep_DecreasesStep() {
         let vm = OnboardingViewModel()
         fillValidBasicInfo(vm)
+        fillValidActivityLevel(vm) // step 2 (activity) now requires a selection
         vm.nextStep()
         vm.nextStep()
         XCTAssertEqual(vm.currentStep, 3)
@@ -99,19 +101,19 @@ final class OnboardingViewModelTests: XCTestCase {
         }
     }
 
-    func testCanProceedFromStep1_RequiresAllFields() {
+    func testCanProceedFromStep1_requiresCoreFields_lastNameOptional() {
         let vm = OnboardingViewModel()
         XCTAssertFalse(vm.canProceedFromCurrentStep, "Empty profile should not pass validation")
 
         vm.userProfile.firstName = "Test"
-        XCTAssertFalse(vm.canProceedFromCurrentStep, "Missing last name, sex, weight")
+        XCTAssertFalse(vm.canProceedFromCurrentStep, "Still missing sex, weight, terms")
 
-        vm.userProfile.lastName = "User"
+        // Last name is intentionally NOT set — it is optional (2026 change).
         vm.userProfile.sex = "Male"
         vm.userProfile.heightFeet = 5
         vm.userProfile.weight = 175
         vm.hasAcceptedTerms = true
-        XCTAssertTrue(vm.canProceedFromCurrentStep, "All required fields filled")
+        XCTAssertTrue(vm.canProceedFromCurrentStep, "Core fields filled; last name is optional")
     }
 
     func testUserProfileModification() {
@@ -188,26 +190,27 @@ final class OnboardingViewModelTests: XCTestCase {
         XCTAssertFalse(vm.canProceedFromCurrentStep)
     }
 
-    func testCanProceed_step5_emptyActivityLevel_returnsFalse() {
+    func testCanProceed_step2_emptyActivityLevel_returnsFalse() {
         let vm = OnboardingViewModel()
         fillValidBasicInfo(vm)
-        // Advance to step 5
-        for _ in 1..<5 { vm.nextStep() }
-        XCTAssertEqual(vm.currentStep, 5)
+        vm.nextStep() // → step 2 (activity level, moved up in the 2026 reorder)
+        XCTAssertEqual(vm.currentStep, 2)
 
         vm.userProfile.activityLevel = ""
         XCTAssertFalse(vm.canProceedFromCurrentStep)
     }
 
-    func testCanProceed_steps2Through4_alwaysTrue() {
+    func testCanProceed_steps3Through5_alwaysTrue() {
         let vm = OnboardingViewModel()
         fillValidBasicInfo(vm)
-        vm.nextStep() // → step 2
-        XCTAssertTrue(vm.canProceedFromCurrentStep, "Step 2 should always allow proceed")
-        vm.nextStep() // → step 3
-        XCTAssertTrue(vm.canProceedFromCurrentStep, "Step 3 should always allow proceed")
-        vm.nextStep() // → step 4
-        XCTAssertTrue(vm.canProceedFromCurrentStep, "Step 4 should always allow proceed")
+        fillValidActivityLevel(vm)
+        vm.nextStep() // → step 2 (activity)
+        vm.nextStep() // → step 3 (medical — optional)
+        XCTAssertTrue(vm.canProceedFromCurrentStep, "Step 3 (medical) should always allow proceed")
+        vm.nextStep() // → step 4 (surgical — optional)
+        XCTAssertTrue(vm.canProceedFromCurrentStep, "Step 4 (surgical) should always allow proceed")
+        vm.nextStep() // → step 5 (injury — optional)
+        XCTAssertTrue(vm.canProceedFromCurrentStep, "Step 5 (injury) should always allow proceed")
     }
 
     func testNextStep_failedValidation_showsValidationErrors() {
