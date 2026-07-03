@@ -12,6 +12,7 @@ struct BodyMap3DView: View {
     // MARK: - Navigation State
 
     @State private var navigateToPainDetail = false
+    @State private var showRegionList = false
     @State private var showDisclaimer = false
     /// Stable ViewModel for injury analysis — created before navigation flag is set,
     /// cleaned up via onChange when navigation pops back.
@@ -123,6 +124,9 @@ struct BodyMap3DView: View {
                 navigateToPainDetail = true
             })
         }
+        .sheet(isPresented: $showRegionList) {
+            regionListSheet
+        }
         .onChange(of: navigateToPainDetail) { _, navigating in
             if !navigating {
                 injuryAnalysisVM = nil
@@ -187,11 +191,65 @@ struct BodyMap3DView: View {
                     .font(.caption2)
                     .foregroundColor(AppColors.accent)
                     .multilineTextAlignment(.center)
+
+                // Non-visual path: a VoiceOver user can't tap the 3D RealityKit
+                // model, so give them a list to select regions from — otherwise the
+                // whole assessment funnel dead-ends at step one (audit #64).
+                Button {
+                    showRegionList = true
+                } label: {
+                    Label("Choose from a list", systemImage: "list.bullet")
+                        .font(.caption.weight(.medium))
+                }
+                .padding(.top, AppSpacing.xs)
+                .accessibilityIdentifier("bodyMap.chooseFromListButton")
             }
         }
         .padding(.top, AppSpacing.lg)
         .padding(.horizontal, AppSpacing.xl)
         .animation(.easeInOut(duration: 0.25), value: activeZone)
+    }
+
+    // MARK: - Accessible Region List (audit #64)
+
+    /// VoiceOver-reachable list of body regions (grouped by zone) that toggles the
+    /// same selection the 3D model does — driven by the same `BodyZone` data.
+    private var regionListSheet: some View {
+        NavigationStack {
+            List {
+                ForEach(BodyZone.allCases) { zone in
+                    let zoneRegions = viewModel.regions.filter { zone.regionZoneKeys.contains($0.zoneKey) }
+                    if !zoneRegions.isEmpty {
+                        Section(zone.displayName) {
+                            ForEach(zoneRegions, id: \.zoneKey) { region in
+                                let isSelected = viewModel.selectedRegions.contains { $0.zoneKey == region.zoneKey }
+                                Button {
+                                    selectRegion(named: region.zoneKey)
+                                } label: {
+                                    HStack {
+                                        Text(region.name)
+                                            .foregroundColor(AppColors.primaryText)
+                                        Spacer()
+                                        if isSelected {
+                                            Image(systemName: "checkmark")
+                                                .foregroundColor(AppColors.accent)
+                                        }
+                                    }
+                                }
+                                .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Select Areas")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { showRegionList = false }
+                }
+            }
+        }
     }
 
     // MARK: - Selected Regions Pills

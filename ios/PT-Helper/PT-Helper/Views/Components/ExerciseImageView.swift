@@ -92,6 +92,9 @@ struct ExerciseImageView: View {
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .stroke(difficultyColor.opacity(0.3), lineWidth: 1.5)
             )
+            // Decorative thumbnail — the exercise name is announced right next to
+            // it in list rows, so don't double-announce a bare image (audit #67).
+            .accessibilityHidden(true)
     }
 
     private func fullImageView(_ image: UIImage) -> some View {
@@ -117,6 +120,12 @@ struct ExerciseImageView: View {
                     .stroke(difficultyColor.opacity(0.15), lineWidth: 2)
             )
             .shadow(color: .black.opacity(0.08), radius: 12, y: 4)
+            // Announce the pose so VoiceOver users can follow the movement in an
+            // app where doing an exercise wrong risks re-injury (audit #67).
+            .accessibilityElement()
+            .accessibilityLabel(showingEnd && endImage != nil
+                                 ? "End position for \(exercise.name)"
+                                 : "Start position for \(exercise.name)")
 
             // Difficulty badge
             DifficultyBadge(difficulty: exercise.difficulty)
