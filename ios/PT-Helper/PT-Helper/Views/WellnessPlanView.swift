@@ -45,7 +45,10 @@ struct WellnessPlanView: View {
             VStack(spacing: AppSpacing.sm) {
                 Text("Building Your Plan")
                     .font(.system(.title2, design: .serif).weight(.bold))
-                Text("Creating personalized exercises and habits...")
+                // Honest copy: the plan renders exercises (habit guidance lands in
+                // Notes); a structured "Daily Habits" section is a deploy-gated
+                // follow-up (audit #39), so don't promise a habits section here.
+                Text("Building your personalized wellness plan...")
                     .font(.subheadline)
                     .foregroundColor(AppColors.secondaryText)
             }
