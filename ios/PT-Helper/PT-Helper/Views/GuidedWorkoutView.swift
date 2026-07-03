@@ -8,6 +8,7 @@ struct GuidedWorkoutView: View {
     @EnvironmentObject private var savedPlansVM: SavedPlansViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var showSwapSheet = false
+    @State private var showSkipConfirmation = false
     @State private var showFormAnalysis = false
     @State private var showEndConfirmation = false
     @State private var showResumePrompt = false
@@ -86,16 +87,25 @@ struct GuidedWorkoutView: View {
             }
         }
         .alert("End Workout?", isPresented: $showEndConfirmation) {
-            Button("End & Save", role: .destructive) {
+            // The destructive (red) role belongs on the irreversible action —
+            // discarding — not on saving your progress (audit #47).
+            Button("Save & Finish") {
                 vm.endWorkoutEarly()
             }
-            Button("Discard Workout") {
+            Button("Discard Without Saving", role: .destructive) {
                 vm.discardWorkout()
                 dismiss()
             }
             Button("Cancel", role: .cancel) { }
         } message: {
             Text("Save your progress, or discard if you started by mistake.")
+        }
+        .confirmationDialog("Skip this exercise?", isPresented: $showSkipConfirmation, titleVisibility: .visible) {
+            Button("Skip Exercise", role: .destructive) { vm.skipExercise() }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            // Also clarifies what Swap does — the safer alternative to Skip (audit #54).
+            Text("It'll be dropped from today's workout. Try “Swap” to trade it for a safe alternative that works the same area instead.")
         }
         .onChange(of: vm.currentExerciseIndex) {
             // Auto-expand instructions for new exercises, collapse for familiar
@@ -268,14 +278,21 @@ struct GuidedWorkoutView: View {
                         )
                         .scaleEffect(justCompletedSet == index ? 1.4 : 1.0)
                         .animation(AppAnimations.bouncy, value: justCompletedSet)
+                        // Fade the fill in with color instead of snapping (audit #57).
+                        .animation(AppAnimations.smooth, value: vm.currentSet)
                         .accessibilityIdentifier("workout.setDot.\(index)")
                 }
             }
 
             // Primary action button
             Button(action: {
-                let impact = UIImpactFeedbackGenerator(style: .medium)
-                impact.impactOccurred()
+                // Finishing the exercise (last set) gets a distinct success buzz,
+                // not the same tap as every other set (audit #57).
+                if vm.currentSet >= exercise.sets {
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                } else {
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                }
                 let completedIndex = vm.currentSet - 1
                 vm.completeSet()
                 // Bounce the just-completed set dot
@@ -332,7 +349,7 @@ struct GuidedWorkoutView: View {
                 label: "Skip",
                 identifier: "workout.skipButton"
             ) {
-                vm.skipExercise()
+                showSkipConfirmation = true
             }
         }
         .padding(.vertical, AppSpacing.sm)

@@ -62,25 +62,34 @@ struct ExerciseDetailView: View {
         }
     }
 
+    // Empty for many AI-generated / swapped exercises — don't render a bare
+    // labeled box (a blank "Contraindications" card reads as "no safety
+    // concerns") when there's nothing to show (audit #55).
+    @ViewBuilder
     private var formTips: some View {
-        CardSection(icon: "lightbulb", color: AppColors.warning, title: "Form Tips") {
-            VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                ForEach(exercise.tips, id: \.self) { tip in
-                    Text("- \(tip)")
-                        .font(AppFonts.caption)
-                        .foregroundColor(AppColors.secondaryText)
+        if !exercise.tips.isEmpty {
+            CardSection(icon: "lightbulb", color: AppColors.warning, title: "Form Tips") {
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    ForEach(exercise.tips, id: \.self) { tip in
+                        Text("- \(tip)")
+                            .font(AppFonts.caption)
+                            .foregroundColor(AppColors.secondaryText)
+                    }
                 }
             }
         }
     }
 
+    @ViewBuilder
     private var contraindications: some View {
-        CardSection(icon: "exclamationmark.triangle", color: AppColors.danger, title: "Contraindications") {
-            VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                ForEach(exercise.contraindications, id: \.self) { contraindication in
-                    Text("- \(contraindication)")
-                        .font(AppFonts.caption)
-                        .foregroundColor(AppColors.secondaryText)
+        if !exercise.contraindications.isEmpty {
+            CardSection(icon: "exclamationmark.triangle", color: AppColors.danger, title: "Contraindications") {
+                VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                    ForEach(exercise.contraindications, id: \.self) { contraindication in
+                        Text("- \(contraindication)")
+                            .font(AppFonts.caption)
+                            .foregroundColor(AppColors.secondaryText)
+                    }
                 }
             }
         }

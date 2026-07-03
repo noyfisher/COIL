@@ -22,6 +22,8 @@ struct RehabPlanView: View {
     /// Adaptive progression recommendation
     @State private var adaptiveRecommendation: ProgressionRecommendation?
     @State private var showProgressionBanner = true
+    /// Brief "Your Plan Is Ready!" flash when generation completes (audit #49).
+    @State private var showPlanReadyCelebration = false
 
     // Tier 1 — serious-warning modal gating.
     @AppStorage("strictValidationV1Enabled") private var strictValidationV1Enabled: Bool = true
@@ -144,6 +146,28 @@ struct RehabPlanView: View {
                 }
             } else {
                 emptyState
+            }
+        }
+        // Ease the plan in instead of snapping (audit #49).
+        .animation(AppAnimations.smooth, value: viewModel.isGenerating)
+        .overlay {
+            if showPlanReadyCelebration {
+                CelebrationOverlay(
+                    icon: "checkmark.circle.fill",
+                    message: "Your Plan Is Ready!",
+                    iconColor: AppColors.success
+                )
+            }
+        }
+        .onChange(of: viewModel.isGenerating) { _, generating in
+            // Mirror AnalyzingView's payoff: success haptic + a brief celebration
+            // when the (longest) generation call finishes (audit #49).
+            if !generating && viewModel.rehabPlan != nil {
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                withAnimation(AppAnimations.bouncy) { showPlanReadyCelebration = true }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
+                    withAnimation { showPlanReadyCelebration = false }
+                }
             }
         }
         .navigationTitle("Rehab Plan")
@@ -362,6 +386,14 @@ struct RehabPlanView: View {
                 Text("Creating a personalized exercise program based on your conditions and fitness level...")
                     .font(AppFonts.body)
                     .foregroundColor(AppColors.secondaryText)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, AppSpacing.xl)
+
+                // Set expectations for the app's longest wait so people don't
+                // force-quit seconds before the plan appears (audit #48).
+                Text("This can take a little longer than the analysis — we're also running safety checks on every exercise.")
+                    .font(AppFonts.caption)
+                    .foregroundColor(AppColors.mutedText)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.xl)
             }

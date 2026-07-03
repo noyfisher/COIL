@@ -13,6 +13,7 @@ struct GuidedWorkoutSummaryView: View {
     @State private var showSavedConfirmation = false
     @State private var isSaved = false
     @State private var insightText: String?
+    @State private var trophyBounce = false
 
     var body: some View {
         ScrollView {
@@ -41,6 +42,12 @@ struct GuidedWorkoutSummaryView: View {
                 // Pain input
                 CardSection(icon: "waveform.path.ecg", color: painColor, title: "How do you feel?") {
                     VStack(spacing: AppSpacing.md) {
+                        // Reframe the slider as collaborative tuning, not a graded
+                        // test, so people report honestly (audit #56).
+                        Text("Be honest — this helps us tune your next sessions. Some soreness is normal.")
+                            .font(AppFonts.caption)
+                            .foregroundColor(AppColors.secondaryText)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         HStack {
                             Text("\(Int(overallPain))")
                                 .font(.system(size: 36, weight: .bold, design: .rounded))
@@ -119,6 +126,11 @@ struct GuidedWorkoutSummaryView: View {
         .achievementCelebration()
         .trackScreen("GuidedWorkoutSummary")
         .onAppear {
+            // Greet the finish with a success buzz + a trophy bounce the moment the
+            // summary appears — not only later on Save (audit #53).
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            trophyBounce.toggle()
+
             // Compute trajectory insight from previous sessions for this plan
             let planSessions = workoutViewModel.sessions
                 .filter { $0.planId == vm.plan.id }
@@ -152,7 +164,7 @@ struct GuidedWorkoutSummaryView: View {
                         endPoint: .bottom
                     )
                 )
-                .symbolEffect(.bounce, value: true)
+                .symbolEffect(.bounce, value: trophyBounce)
 
             Text("Workout Complete!")
                 .font(.system(.title2, design: .serif).weight(.bold))
