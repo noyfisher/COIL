@@ -363,6 +363,34 @@ enum TestFixtures {
         )
     }
 
+    // MARK: - Wellness Analysis Response
+
+    /// Returns a valid JSON string matching the AI wellness analysis response format
+    /// (`AIWellnessResponse`). Benign by default so validation produces no red flags.
+    static func makeWellnessAnalysisResponseJSON(
+        goalCategory: String = "improve_posture",
+        title: String = "Posture Improvement Plan"
+    ) -> String {
+        """
+        {
+            "recommendations": [
+                {
+                    "goalCategory": "\(goalCategory)",
+                    "title": "\(title)",
+                    "currentStateAssessment": "You have mild postural fatigue from desk work.",
+                    "rootCauses": ["Prolonged sitting", "Weak core"],
+                    "expectedTimeline": "4-6 weeks",
+                    "keyInsight": "Frequent movement breaks help more than any single stretch.",
+                    "priorityLevel": "high",
+                    "relatedGoals": []
+                }
+            ],
+            "overallSummary": "Small daily habits will steadily improve your posture over the next several weeks.",
+            "disclaimerText": "This is educational wellness guidance, not medical advice."
+        }
+        """
+    }
+
     // MARK: - Exercise Substitute Response
 
     /// Returns a valid JSON string matching the expected AI exercise substitute response format.

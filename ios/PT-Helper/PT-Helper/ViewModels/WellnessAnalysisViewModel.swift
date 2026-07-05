@@ -14,6 +14,7 @@ class WellnessAnalysisViewModel: ObservableObject {
     /// Validation warnings from `WellnessAnalysisValidator`. Published so views can
     /// route on `worstSeverity` (same pattern as `InjuryAnalysisViewModel.redFlagAlerts`).
     @Published var validationWarnings: [ValidationWarning] = []
+    @Published var emergencyMessages: [String]? = nil
     /// Convenience: highest severity across `validationWarnings`, or `.info` if none.
     var worstSeverity: ValidationSeverity {
         validationWarnings.map(\.severity).max() ?? .info
@@ -72,6 +73,8 @@ class WellnessAnalysisViewModel: ObservableObject {
         isAnalyzing = false
         analysisError = nil
         showAnalyzingScreen = false
+        emergencyMessages = nil
+        validationWarnings = []
     }
 
     /// Reset all analysis state.
@@ -82,6 +85,8 @@ class WellnessAnalysisViewModel: ObservableObject {
         analysisError = nil
         analysisResult = nil
         showAnalyzingScreen = false
+        emergencyMessages = nil
+        validationWarnings = []
     }
 
     private func startAnalysis() {
@@ -121,8 +126,13 @@ class WellnessAnalysisViewModel: ObservableObject {
                     AppLogger.rehab.info("Wellness analysis task was cancelled after completion")
                     return
                 }
-                self.analysisResult = validated.result
                 self.validationWarnings = validated.warnings
+                if validated.worstSeverity == .emergency {
+                    self.emergencyMessages = validated.warnings
+                        .filter { $0.severity == .emergency }.map(\.message)
+                } else {
+                    self.analysisResult = validated.result
+                }
                 self.isAnalyzing = false
 
                 AnalyticsService.shared.log(.analysisCompleted, parameters: [
