@@ -10,6 +10,9 @@ struct RootView: View {
     @State private var errorMessage = ""
     @State private var hasLoggedSignIn = false
     @StateObject private var profileService = UserProfileService.shared
+    @StateObject private var consentService = ConsentService.shared
+    /// Drives the launch-time ToS re-acceptance gate (production branch only).
+    @State private var showLegalGate = false
     @AppStorage("hasSeenIntroCarousel") private var hasSeenIntroCarousel = false
     /// Set when the user taps Skip on onboarding, so the choice survives a
     /// relaunch instead of re-trapping them in the questionnaire every launch.
@@ -56,6 +59,7 @@ struct RootView: View {
                         hasLoggedSignIn = true
                         AnalyticsService.shared.log(.signInCompleted)
                     }
+                    Task { await ConsentService.shared.load() }
                     checkProfileCompletion()
                 } else {
                     SessionLogger.shared.log(.signedOut, category: .auth, message: "User signed out")
@@ -135,6 +139,15 @@ struct RootView: View {
                 }
             } else if profileCompleted || skippedOnboarding {
                 MainTabView()
+                    .fullScreenCover(isPresented: $showLegalGate) {
+                        LegalAcceptanceGateView(mode: .reacceptance) { _ in showLegalGate = false }
+                    }
+                    .onChange(of: consentService.isLoaded) { _, loaded in
+                        if loaded && consentService.needsLegalReacceptance { showLegalGate = true }
+                    }
+                    .onAppear {
+                        if consentService.isLoaded && consentService.needsLegalReacceptance { showLegalGate = true }
+                    }
             } else if !hasSeenIntroCarousel {
                 IntroCarouselView(onComplete: {
                     hasSeenIntroCarousel = true
