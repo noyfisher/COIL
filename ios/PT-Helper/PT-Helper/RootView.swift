@@ -15,8 +15,12 @@ struct RootView: View {
     @State private var showLegalGate = false
     /// Drives the skip-onboarding legal + age gate (production branch only).
     @State private var showSkipGate = false
-    /// Set by the skip gate when a 13–17 DOB is entered; consumed in WP-5.5.
+    /// Set by the skip gate when a 13–17 DOB is entered, or by
+    /// checkProfileCompletion for a minor who completed onboarding; drives the
+    /// one-time minor-safety interstitial (production branch only).
     @AppStorage("pendingMinorSafetyScreen") private var pendingMinorSafetyScreen = false
+    /// True once the minor-safety interstitial has been shown (so it appears once).
+    @AppStorage("hasSeenMinorSafetyScreen") private var hasSeenMinorSafetyScreen = false
     @AppStorage("hasSeenIntroCarousel") private var hasSeenIntroCarousel = false
     /// Set when the user taps Skip on onboarding, so the choice survives a
     /// relaunch instead of re-trapping them in the questionnaire every launch.
@@ -146,6 +150,12 @@ struct RootView: View {
                     .fullScreenCover(isPresented: $showLegalGate) {
                         LegalAcceptanceGateView(mode: .reacceptance) { _ in showLegalGate = false }
                     }
+                    .fullScreenCover(isPresented: $pendingMinorSafetyScreen) {
+                        MinorSafetyResourcesView {
+                            pendingMinorSafetyScreen = false
+                            hasSeenMinorSafetyScreen = true
+                        }
+                    }
                     .onChange(of: consentService.isLoaded) { _, loaded in
                         if loaded && consentService.needsLegalReacceptance { showLegalGate = true }
                     }
@@ -193,6 +203,10 @@ struct RootView: View {
                     activityLevel: profile.activityLevel,
                     hasProfile: true
                 )
+                // Minors see the safety interstitial once after landing in the app.
+                if AgePolicy.isMinor(dateOfBirth: profile.dateOfBirth), !hasSeenMinorSafetyScreen {
+                    pendingMinorSafetyScreen = true
+                }
             }
         }
     }

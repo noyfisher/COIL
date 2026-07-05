@@ -22,6 +22,7 @@ struct SettingsView: View {
     @State private var showTermsOfService = false
     @State private var showConsumerHealthDataPolicy = false
     @State private var showReportConcern = false
+    @State private var showSafetyResources = false
 
     var body: some View {
         NavigationStack {
@@ -261,6 +262,13 @@ struct SettingsView: View {
 
                             Divider().padding(.leading, 52)
 
+                            settingsRow(icon: "shield.checkered", color: AppColors.accent, title: "Safety Resources") {
+                                showSafetyResources = true
+                            }
+                            .accessibilityIdentifier("settings.safetyResourcesButton")
+
+                            Divider().padding(.leading, 52)
+
                             settingsRow(icon: "star", color: AppColors.accent, title: "Rate PT Helper") {
                                 requestAppReview()
                             }
@@ -462,6 +470,9 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showReportConcern) {
             ReportConcernView()
+        }
+        .sheet(isPresented: $showSafetyResources) {
+            MinorSafetyResourcesView { showSafetyResources = false }
         }
     }
 
