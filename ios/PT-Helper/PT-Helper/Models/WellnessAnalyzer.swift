@@ -111,7 +111,7 @@ class WellnessAnalyzer {
 
     static func buildUserMessage(assessments: [WellnessAssessment], profile: UserProfile) -> String {
         var message = """
-        PATIENT PROFILE:
+        USER PROFILE:
         - Age: \(profile.age) years old
         - Sex: \(profile.sex)
         - Height: \(profile.heightFeet)'\(profile.heightInches)"

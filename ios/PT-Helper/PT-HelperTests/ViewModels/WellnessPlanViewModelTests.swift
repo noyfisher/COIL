@@ -57,7 +57,7 @@ final class WellnessPlanViewModelTests: XCTestCase {
         let vm = WellnessPlanViewModel(apiService: mockAPI)
         let result = TestFixtures.makeWellnessAnalysisResult()
         let message = vm.buildWellnessPlanUserMessage(from: result)
-        XCTAssertTrue(message.contains("PATIENT PREFERENCES"), "Message should include preferences section")
+        XCTAssertTrue(message.contains("USER PREFERENCES"), "Message should include preferences section")
         XCTAssertTrue(message.contains("Equipment"), "Message should include equipment preference")
         XCTAssertTrue(message.contains("Session Length"), "Message should include session length")
     }

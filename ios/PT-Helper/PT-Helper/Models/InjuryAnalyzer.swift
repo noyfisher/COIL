@@ -129,7 +129,7 @@ class InjuryAnalyzer {
         let assessedRegions = assessments.map { $0.selectedRegion }
 
         var message = """
-        PATIENT PROFILE:
+        USER PROFILE:
         - Age: \(profile.age) years old
         - Sex: \(profile.sex)
         - Height: \(profile.heightFeet)'\(profile.heightInches)"
