@@ -6,13 +6,17 @@ struct DashDifferentialsTable: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
-            DashSectionHeader(title: "Differential Analysis")
+            DashSectionHeader(title: "Possible Explanations")
 
             VStack(spacing: AppSpacing.sm) {
                 ForEach(Array(conditions.enumerated()), id: \.element.id) { index, condition in
                     differentialRow(rank: index + 1, condition: condition)
                 }
             }
+
+            Text("Match strength reflects how well each explanation fits the symptoms you reported — it's capped below certainty, because AI analysis should always be verified by a healthcare professional. These are possible explanations, not a diagnosis.")
+                .font(.caption2)
+                .foregroundColor(AppColors.dashTextSecondary)
         }
         .dashWidget()
     }
@@ -51,14 +55,12 @@ struct DashDifferentialsTable: View {
 
                     Spacer()
 
-                    // Confidence bar + %
-                    HStack(spacing: AppSpacing.sm) {
-                        confidenceBar(condition.confidence)
-                        Text("\(Int(condition.confidence))%")
-                            .font(AppFonts.dataSmall)
-                            .foregroundColor(AppColors.dashTextPrimary)
-                            .frame(width: 36, alignment: .trailing)
-                    }
+                    // Qualitative match strength
+                    let strength = ConfidenceCalibrator.matchStrength(for: condition.confidence)
+                    Text(strength.rawValue)
+                        .font(AppFonts.dataSmall)
+                        .foregroundColor(strength == .strong ? AppColors.success
+                            : strength == .moderate ? AppColors.warning : AppColors.dashTextSecondary)
 
                     Image(systemName: "chevron.right")
                         .font(.caption2)
@@ -80,19 +82,5 @@ struct DashDifferentialsTable: View {
                     .background(AppColors.dashBorder)
             }
         }
-    }
-
-    private func confidenceBar(_ value: Double) -> some View {
-        GeometryReader { geo in
-            ZStack(alignment: .leading) {
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(AppColors.dashBorder)
-                    .frame(height: 4)
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(AppColors.dashAccentGradient)
-                    .frame(width: geo.size.width * value / 100, height: 4)
-            }
-        }
-        .frame(width: 60, height: 4)
     }
 }

@@ -66,10 +66,6 @@ struct AnalysisDashboardView: View {
                 widgetGrid(result: result)
                     .entranceAnimation(animateEntrance, delay: 0.1)
 
-                // Confidence Chart
-                DashConfidenceChart(conditions: result.conditions)
-                    .entranceAnimation(animateEntrance, delay: 0.2)
-
                 // Differentials Table
                 DashDifferentialsTable(conditions: result.conditions)
                     .entranceAnimation(animateEntrance, delay: 0.3)
