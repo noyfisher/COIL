@@ -66,10 +66,6 @@ struct AnalysisDashboardView: View {
                 widgetGrid(result: result)
                     .entranceAnimation(animateEntrance, delay: 0.1)
 
-                // Confidence Chart
-                DashConfidenceChart(conditions: result.conditions)
-                    .entranceAnimation(animateEntrance, delay: 0.2)
-
                 // Differentials Table
                 DashDifferentialsTable(conditions: result.conditions)
                     .entranceAnimation(animateEntrance, delay: 0.3)
@@ -119,8 +115,8 @@ struct AnalysisDashboardView: View {
             DashStatWidget(
                 icon: "chart.bar.fill",
                 iconColor: AppColors.dashAccent,
-                value: topCondition.map { "\(Int($0.confidence))%" } ?? "—",
-                label: "Confidence"
+                value: topCondition.map { ConfidenceCalibrator.matchStrength(for: $0.confidence).rawValue } ?? "—",
+                label: "Match Strength"
             )
 
             DashStatWidget(
