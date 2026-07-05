@@ -115,8 +115,8 @@ struct AnalysisDashboardView: View {
             DashStatWidget(
                 icon: "chart.bar.fill",
                 iconColor: AppColors.dashAccent,
-                value: topCondition.map { "\(Int($0.confidence))%" } ?? "—",
-                label: "Confidence"
+                value: topCondition.map { ConfidenceCalibrator.matchStrength(for: $0.confidence).rawValue } ?? "—",
+                label: "Match Strength"
             )
 
             DashStatWidget(
