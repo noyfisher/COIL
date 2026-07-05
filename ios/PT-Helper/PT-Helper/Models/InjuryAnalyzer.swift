@@ -294,7 +294,7 @@ class InjuryAnalyzer {
     /// with the primary analysis JSON for the verifier to review.
     static func buildVerificationMessage(originalUserMessage: String, primaryResponseJSON: String) -> String {
         return """
-        ORIGINAL PATIENT DATA:
+        ORIGINAL USER DATA:
         \(originalUserMessage)
 
         PRIMARY ANALYSIS (from initial review):

@@ -162,7 +162,7 @@ const SUBMIT_TOOL_SCHEMA = {
     },
     sessionComparison: {
       type: "string",
-      description: "2-4 sentence comparison of today vs the patient's own prior sessions, citing at least one number, max 1200 chars",
+      description: "2-4 sentence comparison of today vs the person's own prior sessions, citing at least one number, max 1200 chars",
     },
   },
   required: [

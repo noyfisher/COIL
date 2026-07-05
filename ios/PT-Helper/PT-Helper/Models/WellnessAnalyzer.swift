@@ -230,7 +230,7 @@ class WellnessAnalyzer {
 
     static func buildVerificationMessage(originalUserMessage: String, primaryResponseJSON: String) -> String {
         return """
-        ORIGINAL PATIENT DATA:
+        ORIGINAL USER DATA:
         \(originalUserMessage)
 
         PRIMARY WELLNESS ANALYSIS (from initial review):

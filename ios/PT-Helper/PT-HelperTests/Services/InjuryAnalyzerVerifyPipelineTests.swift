@@ -43,8 +43,8 @@ final class InjuryAnalyzerVerifyPipelineTests: XCTestCase {
             primaryResponseJSON: "{}"
         )
 
-        XCTAssertTrue(verifyMsg.contains("ORIGINAL PATIENT DATA:"))
-        XCTAssertTrue(verifyMsg.contains("PATIENT PROFILE:"))
+        XCTAssertTrue(verifyMsg.contains("ORIGINAL USER DATA:"))
+        XCTAssertTrue(verifyMsg.contains("USER PROFILE:"))
         XCTAssertTrue(verifyMsg.contains("PAIN ASSESSMENTS:"))
     }
 
