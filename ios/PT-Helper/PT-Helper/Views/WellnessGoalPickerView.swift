@@ -5,6 +5,7 @@ struct WellnessGoalPickerView: View {
     @State private var selectedCategories: Set<GoalCategory> = []
     @State private var customGoalText: String = ""
     @State private var showDetailView = false
+    @State private var showWellnessDisclaimer = false
 
     private let columns = [
         GridItem(.flexible(), spacing: AppSpacing.md),
@@ -43,6 +44,9 @@ struct WellnessGoalPickerView: View {
         .mvvcNavBar()
         .navigationDestination(isPresented: $showDetailView) {
             WellnessDetailView(viewModel: createViewModel())
+        }
+        .sheet(isPresented: $showWellnessDisclaimer) {
+            DisclaimerView(onAccept: { showDetailView = true })
         }
         .trackScreen("WellnessGoalPicker")
     }
@@ -163,7 +167,11 @@ struct WellnessGoalPickerView: View {
 
     private var continueButton: some View {
         Button(action: {
-            showDetailView = true
+            if DisclaimerManager.hasAccepted {
+                showDetailView = true
+            } else {
+                showWellnessDisclaimer = true
+            }
         }) {
             HStack(spacing: AppSpacing.sm) {
                 if !selectedGoals.isEmpty {
