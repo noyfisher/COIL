@@ -423,7 +423,7 @@ struct AnalysisResultView: View {
                 Label("We recommend seeing a clinician before starting a self-guided plan.",
                       systemImage: "stethoscope")
                     .font(AppFonts.caption)
-                    .foregroundColor(AppColors.secondaryText)
+                    .foregroundColor(Color.white.opacity(0.7))
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
             }

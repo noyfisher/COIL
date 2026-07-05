@@ -19,11 +19,11 @@ struct HealthCheckPromptView: View {
             VStack(spacing: AppSpacing.sm) {
                 Text("Welcome Back!")
                     .font(.system(.title, design: .serif).weight(.bold))
-                    .foregroundColor(AppColors.primaryText)
+                    .foregroundColor(.white)
 
                 Text("It's been a while since your last visit. Have there been any changes to your health?")
                     .font(.body)
-                    .foregroundColor(AppColors.secondaryText)
+                    .foregroundColor(Color.white.opacity(0.7))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.xl)
             }

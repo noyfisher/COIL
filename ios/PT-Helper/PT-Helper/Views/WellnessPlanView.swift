@@ -45,12 +45,13 @@ struct WellnessPlanView: View {
             VStack(spacing: AppSpacing.sm) {
                 Text("Building Your Plan")
                     .font(.system(.title2, design: .serif).weight(.bold))
+                    .foregroundColor(.white)
                 // Honest copy: the plan renders exercises (habit guidance lands in
                 // Notes); a structured "Daily Habits" section is a deploy-gated
                 // follow-up (audit #39), so don't promise a habits section here.
                 Text("Building your personalized wellness plan...")
                     .font(.subheadline)
-                    .foregroundColor(AppColors.secondaryText)
+                    .foregroundColor(Color.white.opacity(0.7))
             }
 
             ProgressView()
@@ -70,9 +71,10 @@ struct WellnessPlanView: View {
                 VStack(spacing: AppSpacing.sm) {
                     Text(plan.planName)
                         .font(.system(.title3, design: .serif).weight(.bold))
+                        .foregroundColor(.white)
                     Text("\(plan.exercises.count) exercises · \(plan.totalWeeks) weeks")
                         .font(.subheadline)
-                        .foregroundColor(AppColors.secondaryText)
+                        .foregroundColor(Color.white.opacity(0.7))
                 }
                 .padding(.top, AppSpacing.md)
 
@@ -258,9 +260,10 @@ struct WellnessPlanView: View {
                 .foregroundColor(AppColors.warning)
             Text("Plan Generation Failed")
                 .font(.system(.title2, design: .serif).weight(.bold))
+                .foregroundColor(.white)
             Text(message)
                 .font(.subheadline)
-                .foregroundColor(AppColors.secondaryText)
+                .foregroundColor(Color.white.opacity(0.7))
             Button(action: {
                 viewModel.generateWellnessPlan(from: wellnessResult)
             }) {

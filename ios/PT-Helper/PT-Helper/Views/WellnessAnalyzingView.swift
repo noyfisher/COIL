@@ -76,10 +76,10 @@ struct WellnessAnalyzingView: View {
             VStack(spacing: AppSpacing.sm) {
                 Text("Analyzing Your Goals")
                     .font(.system(.title2, design: .serif).weight(.bold))
-                    .foregroundColor(AppColors.primaryText)
+                    .foregroundColor(.white)
                 Text("Our AI is building your personalized wellness plan...")
                     .font(.subheadline)
-                    .foregroundColor(AppColors.secondaryText)
+                    .foregroundColor(Color.white.opacity(0.7))
                     .multilineTextAlignment(.center)
             }
 
@@ -90,7 +90,7 @@ struct WellnessAnalyzingView: View {
                 Text(elapsedTimeText)
                     .font(.caption)
                     .monospacedDigit()
-                    .foregroundColor(AppColors.secondaryText)
+                    .foregroundColor(Color.white.opacity(0.7))
             }
 
             VStack(alignment: .leading, spacing: AppSpacing.lg) {
@@ -124,12 +124,12 @@ struct WellnessAnalyzingView: View {
             VStack(spacing: AppSpacing.sm) {
                 Text(isOffline ? "You're Offline" : "Analysis Failed")
                     .font(.system(.title2, design: .serif).weight(.bold))
-                    .foregroundColor(AppColors.primaryText)
+                    .foregroundColor(.white)
                 Text(isOffline
                      ? "You appear to be offline. Reconnect and try again."
                      : message)
                     .font(.subheadline)
-                    .foregroundColor(AppColors.secondaryText)
+                    .foregroundColor(Color.white.opacity(0.7))
                     .multilineTextAlignment(.center)
             }
 

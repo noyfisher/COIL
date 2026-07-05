@@ -337,11 +337,19 @@ struct OnboardingEditView: View {
 
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground)
+            AppColors.bgGradient
                 .ignoresSafeArea()
 
             if isLoading {
-                LoadingStateView(message: "Loading your profile...")
+                VStack(spacing: AppSpacing.md) {
+                    ProgressView()
+                        .tint(.white)
+                        .scaleEffect(1.2)
+                    Text("Loading your profile...")
+                        .font(AppFonts.small)
+                        .foregroundColor(Color.white.opacity(0.7))
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 VStack(spacing: 0) {
                     // Top bar with close button
@@ -349,11 +357,12 @@ struct OnboardingEditView: View {
                         Button(action: { dismiss() }) {
                             Image(systemName: "xmark.circle.fill")
                                 .font(.title2)
-                                .foregroundColor(AppColors.mutedText)
+                                .foregroundColor(Color.white.opacity(0.6))
                         }
                         Spacer()
                         Text("Update Profile")
                             .font(.headline)
+                            .foregroundColor(.white)
                         Spacer()
                         Image(systemName: "xmark.circle.fill")
                             .font(.title2)
@@ -377,7 +386,7 @@ struct OnboardingEditView: View {
                         HStack(spacing: AppSpacing.tight) {
                             ForEach(1...6, id: \.self) { step in
                                 Capsule()
-                                    .fill(step <= viewModel.currentStep ? AppColors.accent : AppColors.elevatedSurface)
+                                    .fill(step <= viewModel.currentStep ? AppColors.accent : Color.white.opacity(0.15))
                                     .frame(height: 5)
                                     .animation(.spring(response: 0.35), value: viewModel.currentStep)
                             }
@@ -387,10 +396,11 @@ struct OnboardingEditView: View {
                         Text(stepTitle)
                             .font(.title2)
                             .fontWeight(.bold)
+                            .foregroundColor(.white)
 
                         Text(stepSubtitle)
                             .font(AppFonts.body)
-                            .foregroundColor(AppColors.secondaryText)
+                            .foregroundColor(Color.white.opacity(0.7))
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 32)
                     }

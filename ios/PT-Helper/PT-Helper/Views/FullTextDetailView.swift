@@ -12,7 +12,7 @@ struct FullTextDetailView: View {
             ScrollView {
                 Text(bodyText)
                     .font(.body)
-                    .foregroundColor(AppColors.primaryText)
+                    .foregroundColor(.white)
                     .lineSpacing(4)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(AppSpacing.xl)

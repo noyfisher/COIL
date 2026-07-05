@@ -36,7 +36,7 @@ struct FormCheckTab: View {
                 VStack(alignment: .leading, spacing: AppSpacing.sm) {
                     Text("Select an exercise to check your form")
                         .font(.subheadline)
-                        .foregroundColor(AppColors.secondaryText)
+                        .foregroundColor(Color.white.opacity(0.7))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -45,7 +45,7 @@ struct FormCheckTab: View {
                     VStack(alignment: .leading, spacing: AppSpacing.md) {
                         Text(plan.planName)
                             .font(.caption.weight(.semibold))
-                            .foregroundColor(AppColors.secondaryText)
+                            .foregroundColor(Color.white.opacity(0.7))
                             .textCase(.uppercase)
 
                         ForEach(plan.exercises) { exercise in
@@ -107,16 +107,16 @@ struct FormCheckTab: View {
 
             Image(systemName: "video.badge.checkmark")
                 .font(.system(size: 50))
-                .foregroundColor(AppColors.mutedText)
+                .foregroundColor(Color.white.opacity(0.5))
 
             VStack(spacing: AppSpacing.sm) {
                 Text("No Exercises Available")
                     .font(.system(.title3, design: .serif).weight(.bold))
-                    .foregroundColor(AppColors.primaryText)
+                    .foregroundColor(.white)
 
                 Text("Create a rehab plan first, then you can check your form on any exercise.")
                     .font(.subheadline)
-                    .foregroundColor(AppColors.secondaryText)
+                    .foregroundColor(Color.white.opacity(0.7))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.lg)
             }
