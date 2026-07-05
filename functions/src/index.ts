@@ -1132,6 +1132,72 @@ Return results in the same order as the exercises listed above.`;
   });
 
 // ---------------------------------------------------------------------------
+// Cloud Function: deleteAccount
+// Deletes ALL server-side data for the authenticated user, then the Auth user.
+// Order matters: the Auth user is deleted LAST so any mid-way failure leaves
+// the account able to re-authenticate and retry. Every step is idempotent.
+// ---------------------------------------------------------------------------
+export const deleteAccount = functions
+  .runWith({ timeoutSeconds: 300, memory: "512MB" })
+  .https.onRequest(async (req, res) => {
+    const ctx = newRequestContext("deleteAccount");
+    res.on("finish", () => logCompleted(ctx, res.statusCode));
+
+    if (req.method !== "POST") {
+      res.status(405).json({ error: "Method not allowed" });
+      return;
+    }
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      res.status(401).json({ error: "Missing or invalid Authorization header" });
+      return;
+    }
+    let uid: string;
+    try {
+      const decoded = await admin.auth().verifyIdToken(authHeader.split("Bearer ")[1]);
+      uid = decoded.uid;
+      ctx.uid = uid;
+    } catch {
+      res.status(401).json({ error: "Invalid Firebase ID token" });
+      return;
+    }
+
+    const db = admin.firestore();
+    try {
+      // 1. Entire user tree (recursiveDelete covers every subcollection:
+      //    profile, rehabPlans, workoutSessions, notes, wellnessPlans,
+      //    assessments, formAnalyses, streakData, analysisOutcomes, quotas,
+      //    consents, riskAcknowledgements).
+      await db.recursiveDelete(db.collection("users").doc(uid));
+
+      // 2. Top-level sessionLogs index docs (rules grant clients create/read only).
+      for (;;) {
+        const snap = await db.collection("sessionLogs")
+          .where("userId", "==", uid).limit(300).get();
+        if (snap.empty) break;
+        const batch = db.batch();
+        snap.docs.forEach((d) => batch.delete(d.ref));
+        await batch.commit();
+        if (snap.size < 300) break;
+      }
+
+      // 3. Storage session-log JSON blobs.
+      await admin.storage().bucket().deleteFiles({ prefix: `sessionLogs/${uid}/` });
+
+      // 4. Rate-limit counters (admin-only path).
+      await db.recursiveDelete(db.collection("rateLimits").doc(uid));
+
+      // 5. Auth user — LAST.
+      await admin.auth().deleteUser(uid);
+
+      res.status(200).json({ ok: true });
+    } catch (error) {
+      logError(ctx, error, { stage: "delete_account" });
+      res.status(500).json({ error: "deletion_failed" });
+    }
+  });
+
+// ---------------------------------------------------------------------------
 // Virtual User Auth — mint Firebase Custom Tokens for virtual test users
 // Only works for UIDs prefixed with "vuser-" and requires a shared secret.
 // ---------------------------------------------------------------------------
