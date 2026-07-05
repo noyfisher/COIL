@@ -82,6 +82,16 @@ class GuidedWorkoutViewModel: ObservableObject {
         UserDefaults.standard.set(current + 1, forKey: key)
     }
 
+    /// Clears the workout checkpoint and all per-exercise completion counters
+    /// (account deletion).
+    static func clearAllLocalWorkoutState() {
+        UserDefaults.standard.removeObject(forKey: checkpointKey)
+        for key in UserDefaults.standard.dictionaryRepresentation().keys
+        where key.hasPrefix("exerciseCompletions_") {
+            UserDefaults.standard.removeObject(forKey: key)
+        }
+    }
+
     // MARK: - Timer
 
     private var timerSubscription: AnyCancellable?

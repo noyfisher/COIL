@@ -216,6 +216,16 @@ class SessionLogger: ObservableObject {
         }
     }
 
+    /// Removes all locally persisted session-log data (account deletion).
+    func clearAllLocalData() {
+        currentLog.events.removeAll()
+        eventCount = 0
+        eventsSinceLastPersist = 0
+        lastUploadedEventCount = 0
+        try? fileManager.removeItem(at: currentLogURL)
+        try? fileManager.removeItem(at: previousLogURL)
+    }
+
     // MARK: - Auto-Upload
 
     /// - Parameter force: bypasses the time throttle (not the no-new-events

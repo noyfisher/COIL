@@ -447,60 +447,57 @@ struct SettingsView: View {
 
     private func deleteAccount() {
         guard let user = Auth.auth().currentUser else { return }
-        let uid = user.uid
-        let db = Firestore.firestore()
-
         isDeletingAccount = true
-
         Task {
             do {
-                // 1. Delete Firestore user data (subcollections)
-                let subcollections = ["profile", "rehabPlans", "workoutSessions", "notes", "wellnessPlans"]
-                for subcollection in subcollections {
-                    let snapshot = try await db.collection("users").document(uid)
-                        .collection(subcollection).getDocuments()
-                    for doc in snapshot.documents {
-                        try await doc.reference.delete()
-                    }
+                let idToken = try await user.getIDToken()
+                var request = URLRequest(url: URL(string: APIConfig.deleteAccountURL)!)
+                request.httpMethod = "POST"
+                request.timeoutInterval = 120
+                request.setValue("Bearer \(idToken)", forHTTPHeaderField: "Authorization")
+                let (_, response) = try await URLSession.shared.data(for: request)
+                let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+                // 200 = deleted. 401 = token already invalid — a previous attempt
+                // finished server-side (auth user gone); treat as success.
+                guard status == 200 || status == 401 else {
+                    throw NSError(domain: "DeleteAccount", code: status,
+                        userInfo: [NSLocalizedDescriptionKey:
+                            "The server couldn't complete the deletion (code \(status)). Your account was NOT deleted — please try again."])
                 }
-
-                // 2. Delete the user document itself
-                try await db.collection("users").document(uid).delete()
-
-                // 3. Clear local caches
-                await MainActor.run {
-                    UserProfileService.shared.clear()
-                    DisclaimerManager.reset()
-                    OnboardingViewModel.clearDraft()
-                }
-
-                // 4. Delete the Firebase Auth account
-                try await user.delete()
-
+                await MainActor.run { clearAllLocalUserData() }
+                try? Auth.auth().signOut()
                 await MainActor.run {
                     AnalyticsService.shared.log(.accountDeleted)
-                    SessionLogger.shared.log(.stateUpdated, category: .auth,
-                                              message: "Account deleted",
-                                              metadata: ["uid": uid])
                     isDeletingAccount = false
                     dismiss()
                 }
             } catch {
                 await MainActor.run {
-                    SessionLogger.shared.logError(error, context: "deleteAccount",
-                                                   metadata: ["screen": "SettingsView"])
                     AnalyticsService.shared.log(.accountDeleteFailed,
                         parameters: ["reason": error.localizedDescription])
-                    AnalyticsService.shared.log(.errorShown, parameters: [
-                        "screen": "SettingsView",
-                        "error_type": "account_delete_failed"
-                    ])
                     isDeletingAccount = false
                     deleteError = error.localizedDescription
                     showDeleteError = true
                 }
             }
         }
+    }
+
+    @MainActor
+    private func clearAllLocalUserData() {
+        UserProfileService.shared.clear()
+        DisclaimerManager.reset()
+        OnboardingViewModel.clearDraft()
+        AnalysisResultStore.shared.clear()
+        SeriousWarningAcknowledgements.clearAll()
+        SessionLogger.shared.clearAllLocalData()
+        GuidedWorkoutViewModel.clearAllLocalWorkoutState()
+        UserDefaults.standard.removeObject(forKey: "hasAcceptedTermsOfService")
+        UserDefaults.standard.removeObject(forKey: "tosAcceptedDate")
+        // ⚠️ COMPILE-ORDER: ConsentService does not exist until PR-4. Ship this
+        // line COMMENTED OUT in PR-3; WP-4.2 step 6 uncomments it.
+        // ConsentService.clearLocalMirrors()
+        UserDefaults.standard.removeObject(forKey: "hasSeenMinorSafetyScreen")  // plain string key — compiles fine before PR-5
     }
 
     // MARK: - Helpers

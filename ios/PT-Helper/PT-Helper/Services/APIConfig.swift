@@ -14,6 +14,9 @@ enum APIConfig {
     // On-demand exercise image generation (FLUX 2 Pro + Gemini QA)
     static let generateImageURL = "https://us-central1-pt-helper-dev.cloudfunctions.net/generateExerciseImage"
 
+    // Complete server-side account deletion (deletes all Firestore/Storage data + Auth user)
+    static let deleteAccountURL = "https://us-central1-pt-helper-dev.cloudfunctions.net/deleteAccount"
+
     /// Tier 3 PR E: client-side mirror of the server's `MODEL_CONFIG.analysis.model`
     /// (see `functions/src/index.ts`). Used by `ValidationRegressionRunner`
     /// to decide whether committed golden responses are still valid for the
