@@ -1,7 +1,8 @@
+<!-- GENERATED MIRROR — canonical text lives in ios/PT-Helper/PT-Helper/Models/LegalContent.swift. Edit there, then re-sync this file. -->
 # Terms of Service
 
 **PT Helper**
-**Last Updated: March 2025**
+**Last Updated: July 2026**
 
 ## 1. Acceptance of Terms
 
@@ -44,6 +45,8 @@ You agree to:
 ## 5. Account and Data
 
 - You must be at least 13 years old to use the App
+- If you are 13–17, you should review these terms with a parent or guardian
+- Your acceptance of these terms is recorded with a timestamp and version when you accept them in the app
 - You are responsible for all activity under your account
 - You may delete your account and data at any time
 - We may suspend accounts that violate these terms
