@@ -20,6 +20,7 @@ struct SettingsView: View {
     @State private var showShareSheet = false
     @State private var showPrivacyPolicy = false
     @State private var showTermsOfService = false
+    @State private var showConsumerHealthDataPolicy = false
 
     var body: some View {
         NavigationStack {
@@ -278,6 +279,13 @@ struct SettingsView: View {
                                 showTermsOfService = true
                             }
                             .accessibilityIdentifier("settings.termsOfServiceButton")
+
+                            Divider().padding(.leading, 52)
+
+                            settingsRow(icon: "heart.text.square", color: AppColors.accent, title: "Consumer Health Data Policy") {
+                                showConsumerHealthDataPolicy = true
+                            }
+                            .accessibilityIdentifier("settings.consumerHealthDataPolicyButton")
                         }
                         .background(AppColors.cardBackground)
                         .cornerRadius(AppCorners.large)
@@ -440,6 +448,9 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showTermsOfService) {
             LegalDocumentView(title: "Terms of Service", markdownContent: LegalContent.termsOfService)
+        }
+        .sheet(isPresented: $showConsumerHealthDataPolicy) {
+            LegalDocumentView(title: "Consumer Health Data Policy", markdownContent: LegalContent.consumerHealthDataPolicy)
         }
     }
 
