@@ -710,6 +710,41 @@ interface ProxyRequestBody {
 }
 
 // ---------------------------------------------------------------------------
+// Minor-user safeguards (Anthropic minors policy). Age derived server-side
+// from stored DOB (profile, falling back to the skip-gate consent record).
+// ---------------------------------------------------------------------------
+const MINOR_SAFETY_PROMPT = `MINOR USER SAFEGUARDS (this user is under 18):
+- Use age-appropriate, encouraging language suitable for a teenager.
+- Be extra conservative: prefer lower-intensity exercise options and slower progressions.
+- Never provide guidance on weight loss, supplements, medication, or body-image topics; if asked, recommend speaking with a parent, guardian, or doctor.
+- If any input suggests self-harm, abuse, disordered eating, or a personal crisis, do not analyze it — say that this app cannot help with that, and that they should talk to a trusted adult right away or call or text 988 (Suicide & Crisis Lifeline, US).
+- Encourage the user to involve a parent, guardian, coach, or athletic trainer in their plan.
+- Persistent or severe pain in a growing body should always be checked by a doctor — growth plates make some injuries different for teens.`;
+
+const ageCache = new Map<string, { age: number | null; fetchedAt: number }>();
+const AGE_CACHE_TTL_MS = 15 * 60_000;
+
+export function computeAgeFromDob(dobMs: number, nowMs: number): number {
+  return Math.floor((nowMs - dobMs) / (365.25 * 24 * 3600 * 1000));
+}
+
+async function getUserAge(uid: string): Promise<number | null> {
+  const cached = ageCache.get(uid);
+  if (cached && Date.now() - cached.fetchedAt < AGE_CACHE_TTL_MS) return cached.age;
+  let age: number | null = null;
+  try {
+    const db = admin.firestore();
+    let dob = (await db.doc(`users/${uid}/profile/health`).get()).get("dateOfBirth");
+    if (!dob) dob = (await db.doc(`users/${uid}/consents/legal`).get()).get("dateOfBirth");
+    if (dob && typeof dob.toDate === "function") {
+      age = computeAgeFromDob(dob.toDate().getTime(), Date.now());
+    }
+  } catch { /* fail open (adult); the client gate is primary */ }
+  ageCache.set(uid, { age, fetchedAt: Date.now() });
+  return age;
+}
+
+// ---------------------------------------------------------------------------
 // Cloud Function: claudeProxy
 // ---------------------------------------------------------------------------
 export const claudeProxy = functions
@@ -829,6 +864,18 @@ export const claudeProxy = functions
     }
 
     // -----------------------------------------------------------------------
+    // 4c. Minor-user safeguards. Under-13 is a hard block; 13–17 receives an
+    // extra system block. Age is derived server-side (tamper-resistant) and
+    // fails open to adult if unavailable (the client gate is primary).
+    // -----------------------------------------------------------------------
+    const userAge = await getUserAge(uid);
+    if (userAge !== null && userAge < 13) {
+      res.status(403).json({ error: "age_policy" });
+      return;
+    }
+    const isMinor = userAge !== null && userAge < 18;
+
+    // -----------------------------------------------------------------------
     // 5. Build request with SERVER-SIDE prompt and model config
     // -----------------------------------------------------------------------
     const systemPrompt = SYSTEM_PROMPTS[body.requestType];
@@ -848,6 +895,12 @@ export const claudeProxy = functions
       : [
           { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } },
         ];
+
+    // Minors get an extra, cacheable safety block appended last (catalog +
+    // prompt + minors = at most 3 of the 4 cache breakpoints — safe).
+    if (isMinor) {
+      systemBlocks.push({ type: "text", text: MINOR_SAFETY_PROMPT, cache_control: { type: "ephemeral" } });
+    }
 
     try {
       const anthropicResponse = await fetch("https://api.anthropic.com/v1/messages", {
