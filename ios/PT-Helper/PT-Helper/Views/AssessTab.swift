@@ -108,7 +108,7 @@ struct AssessTab: View {
                             Button {
                                 SessionLogger.shared.logUserAction(.buttonTapped,
                                     action: "lastAnalysisOpened",
-                                    metadata: ["topCondition": lastResult.conditions.first?.commonName ?? "none"])
+                                    metadata: [:])
                                 navigateToLastAnalysis = true
                             } label: {
                                 lastAnalysisCard(for: lastResult)

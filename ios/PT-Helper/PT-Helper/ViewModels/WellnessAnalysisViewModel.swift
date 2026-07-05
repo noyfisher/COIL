@@ -14,6 +14,7 @@ class WellnessAnalysisViewModel: ObservableObject {
     /// Validation warnings from `WellnessAnalysisValidator`. Published so views can
     /// route on `worstSeverity` (same pattern as `InjuryAnalysisViewModel.redFlagAlerts`).
     @Published var validationWarnings: [ValidationWarning] = []
+    @Published var emergencyMessages: [String]? = nil
     /// Convenience: highest severity across `validationWarnings`, or `.info` if none.
     var worstSeverity: ValidationSeverity {
         validationWarnings.map(\.severity).max() ?? .info
@@ -72,6 +73,8 @@ class WellnessAnalysisViewModel: ObservableObject {
         isAnalyzing = false
         analysisError = nil
         showAnalyzingScreen = false
+        emergencyMessages = nil
+        validationWarnings = []
     }
 
     /// Reset all analysis state.
@@ -82,6 +85,8 @@ class WellnessAnalysisViewModel: ObservableObject {
         analysisError = nil
         analysisResult = nil
         showAnalyzingScreen = false
+        emergencyMessages = nil
+        validationWarnings = []
     }
 
     private func startAnalysis() {
@@ -96,6 +101,19 @@ class WellnessAnalysisViewModel: ObservableObject {
             return
         }
 
+        let screeningStrings = completed.flatMap { $0.redFlagScreeningStrings }
+        let preScreen = MedicalRedFlagDetector.check(symptomStrings: screeningStrings)
+        let emergencyAlerts = preScreen.alerts.filter { $0.severity == .emergency }
+        if !emergencyAlerts.isEmpty {
+            validationWarnings = preScreen.alerts
+            emergencyMessages = emergencyAlerts.map(\.message)
+            isAnalyzing = false
+            SessionLogger.shared.log(.stateUpdated, category: .stateChange,
+                message: "Wellness emergency pre-screen triggered — analysis blocked",
+                metadata: ["alertCount": "\(emergencyAlerts.count)"])
+            return
+        }
+
         let goalNames = completed.map { $0.goalCategory.displayName }
 
         isAnalyzing = true
@@ -106,8 +124,7 @@ class WellnessAnalysisViewModel: ObservableObject {
         AppLogger.rehab.info("Starting wellness analysis: \(completed.count) goal(s) — \(goalNames.joined(separator: ", "))")
         SessionLogger.shared.log(.loadingStarted, category: .stateChange, message: "Wellness analysis started",
                                   metadata: [
-                                    "goalCount": "\(completed.count)",
-                                    "goals": goalNames.joined(separator: ", ")
+                                    "goalCount": "\(completed.count)"
                                   ])
 
         analysisTask = Task {
@@ -121,8 +138,13 @@ class WellnessAnalysisViewModel: ObservableObject {
                     AppLogger.rehab.info("Wellness analysis task was cancelled after completion")
                     return
                 }
-                self.analysisResult = validated.result
                 self.validationWarnings = validated.warnings
+                if validated.worstSeverity == .emergency {
+                    self.emergencyMessages = validated.warnings
+                        .filter { $0.severity == .emergency }.map(\.message)
+                } else {
+                    self.analysisResult = validated.result
+                }
                 self.isAnalyzing = false
 
                 AnalyticsService.shared.log(.analysisCompleted, parameters: [
@@ -130,12 +152,10 @@ class WellnessAnalysisViewModel: ObservableObject {
                     "type": "wellness",
                     "worst_severity": validated.worstSeverity.rawValue
                 ])
-                let recTitles = validated.result.recommendations.map { $0.title }
-                AppLogger.rehab.info("Wellness analysis completed: \(recTitles.joined(separator: ", "))")
+                AppLogger.rehab.info("Wellness analysis completed: \(validated.result.recommendations.count) recommendations")
                 SessionLogger.shared.log(.loadingFinished, category: .stateChange, message: "Wellness analysis completed",
                                           metadata: [
-                                            "recommendationCount": "\(validated.result.recommendations.count)",
-                                            "recommendations": recTitles.joined(separator: ", ")
+                                            "recommendationCount": "\(validated.result.recommendations.count)"
                                           ])
             } catch is CancellationError {
                 AppLogger.rehab.info("Wellness analysis task cancelled by user")

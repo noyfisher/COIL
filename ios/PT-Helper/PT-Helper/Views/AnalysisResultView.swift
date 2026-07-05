@@ -11,6 +11,7 @@ struct AnalysisResultView: View {
     /// Drives the staggered condition-card entrance (audit #78).
     @State private var cardsAppeared = false
     @State private var showPreferencesSheet = false
+    @State private var showRiskAcknowledgement = false
     /// Set when the user taps Generate/Skip in the preferences sheet. Generation and the
     /// navigation push are deferred to the sheet's onDismiss — mutating the navigation
     /// destination (or publishing from rehabVM) in the same transaction as the sheet
@@ -67,6 +68,23 @@ struct AnalysisResultView: View {
             showRehabPlan = true
         }) {
             rehabPreferencesSheet
+        }
+        .sheet(isPresented: $showRiskAcknowledgement) {
+            RedFlagAcknowledgementSheet(
+                analysisId: analysisResult.id.uuidString,
+                warningMessages: redFlagAlerts.map(\.message)
+                    + analysisResult.conditions.filter(\.isRedFlag).compactMap(\.redFlagMessage),
+                onAcknowledge: {
+                    SeriousWarningAcknowledgements.acknowledge(planId: analysisResult.id.uuidString)
+                    RiskAcknowledgementRecorder.record(analysisId: analysisResult.id.uuidString,
+                                                       warnings: redFlagAlerts.map(\.message))
+                    showRiskAcknowledgement = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                        showPreferencesSheet = true
+                    }
+                },
+                onDismiss: { showRiskAcknowledgement = false }
+            )
         }
         .alert("About Match Strength", isPresented: $showConfidenceInfo) {
             Button("Got it", role: .cancel) { }
@@ -435,7 +453,13 @@ struct AnalysisResultView: View {
     @ViewBuilder
     private var planCTAButton: some View {
         if hasAnyRedFlag {
-            Button(action: { showPreferencesSheet = true }) {
+            Button(action: {
+                if SeriousWarningAcknowledgements.isAcknowledged(planId: analysisResult.id.uuidString) {
+                    showPreferencesSheet = true
+                } else {
+                    showRiskAcknowledgement = true
+                }
+            }) {
                 HStack(spacing: AppSpacing.sm) {
                     Image(systemName: "figure.run")
                     Text("Build Rehab Plan Anyway")

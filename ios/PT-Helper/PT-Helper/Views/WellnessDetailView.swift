@@ -1,5 +1,10 @@
 import SwiftUI
 
+enum WellnessDestination: Hashable {
+    case result
+    case emergency(warnings: [String])
+}
+
 struct WellnessDetailView: View {
     @ObservedObject var viewModel: WellnessAnalysisViewModel
 
@@ -18,7 +23,7 @@ struct WellnessDetailView: View {
     @State private var specificContext: String = ""
     @State private var additionalNotes: String = ""
 
-    @State private var showAnalyzingScreen = false
+    @State private var destination: WellnessDestination?
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -60,14 +65,23 @@ struct WellnessDetailView: View {
         }
         .navigationTitle(viewModel.currentGoal?.category.displayName ?? "Goal Details")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(isPresented: $showAnalyzingScreen) {
-            WellnessResultView(viewModel: viewModel)
+        .navigationDestination(item: $destination) { dest in
+            switch dest {
+            case .result:
+                WellnessResultView(viewModel: viewModel)
+            case .emergency(let warnings):
+                EmergencyRedirectView(warningMessages: warnings) {
+                    destination = nil
+                    viewModel.resetAnalysisState()
+                }
+            }
         }
         .onAppear { restoreFormState() }
         .onChange(of: viewModel.analysisResult?.id) { _, newValue in
-            if newValue != nil {
-                showAnalyzingScreen = true
-            }
+            if newValue != nil { destination = .result }
+        }
+        .onChange(of: viewModel.emergencyMessages) { _, newValue in
+            if let warnings = newValue { destination = .emergency(warnings: warnings) }
         }
         .trackScreen("WellnessDetail")
     }

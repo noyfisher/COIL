@@ -113,6 +113,21 @@ class InjuryAnalysisViewModel: ObservableObject {
             return
         }
 
+        // Emergency pre-screen: never send 911-pattern data to the API.
+        let preScreen = MedicalRedFlagDetector.check(assessments: completed)
+        let emergencyAlerts = preScreen.alerts.filter { $0.severity == .emergency }
+        if !emergencyAlerts.isEmpty {
+            redFlagAlerts = emergencyAlerts
+            analysisResult = nil
+            analysisError = nil
+            isAnalyzing = false
+            showAnalyzingScreen = true
+            SessionLogger.shared.log(.stateUpdated, category: .stateChange,
+                message: "Emergency pre-screen triggered — analysis blocked",
+                metadata: ["alertCount": "\(emergencyAlerts.count)"])
+            return
+        }
+
         // Fail fast when offline instead of making the user watch a doomed
         // 15–30s spinner before a generic network error (audit #58).
         guard NetworkMonitor.shared.isConnected else {
@@ -143,7 +158,6 @@ class InjuryAnalysisViewModel: ObservableObject {
         SessionLogger.shared.log(.loadingStarted, category: .stateChange, message: "Analysis started",
                                   metadata: [
                                     "regionCount": "\(completed.count)",
-                                    "regions": regionNames.joined(separator: ", "),
                                     "missingFields": missingFields.isEmpty ? "none" : missingFields.joined(separator: "; ")
                                   ])
 
@@ -176,12 +190,10 @@ class InjuryAnalysisViewModel: ObservableObject {
                     "condition_count": validated.result.conditions.count,
                     "has_red_flags": !validated.redFlagAlerts.isEmpty
                 ])
-                let conditionNames = validated.result.conditions.map { "\($0.commonName)(\(Int($0.confidence))%)" }
-                AppLogger.rehab.info("Analysis completed: \(conditionNames.joined(separator: ", "))")
+                AppLogger.rehab.info("Analysis completed: \(validated.result.conditions.count) conditions")
                 SessionLogger.shared.log(.loadingFinished, category: .stateChange, message: "Analysis completed",
                                           metadata: [
                                             "conditionCount": "\(validated.result.conditions.count)",
-                                            "conditions": conditionNames.joined(separator: ", "),
                                             "hasRedFlags": "\(!validated.redFlagAlerts.isEmpty)",
                                             "warningCount": "\(validated.validation.warnings.count)",
                                             "appliedFixes": validated.validation.appliedFixes.joined(separator: "; ")

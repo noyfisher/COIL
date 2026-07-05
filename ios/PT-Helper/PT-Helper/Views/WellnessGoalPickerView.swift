@@ -7,6 +7,7 @@ struct WellnessGoalPickerView: View {
     @State private var showDetailView = false
     /// MHMDA health-data consent gate (shown before the wellness detail flow).
     @State private var showHealthConsent = false
+    @State private var showWellnessDisclaimer = false
 
     private let columns = [
         GridItem(.flexible(), spacing: AppSpacing.md),
@@ -47,13 +48,18 @@ struct WellnessGoalPickerView: View {
             WellnessDetailView(viewModel: createViewModel())
         }
         .sheet(isPresented: $showHealthConsent, onDismiss: {
-            // Proceed into the wellness flow once consent is granted (never in the
-            // same transaction as the dismissal — Gotcha #2).
-            if ConsentService.shared.hasHealthDataConsent {
+            // After consent, continue the gate chain: disclaimer next, then detail
+            // (never in the same transaction as the dismissal — Gotcha #2).
+            if ConsentService.shared.hasHealthDataConsent && !DisclaimerManager.hasAccepted {
+                showWellnessDisclaimer = true
+            } else if ConsentService.shared.hasHealthDataConsent {
                 showDetailView = true
             }
         }) {
             HealthDataConsentView { showHealthConsent = false }
+        }
+        .sheet(isPresented: $showWellnessDisclaimer) {
+            DisclaimerView(onAccept: { showDetailView = true })
         }
         .trackScreen("WellnessGoalPicker")
     }
@@ -174,8 +180,11 @@ struct WellnessGoalPickerView: View {
 
     private var continueButton: some View {
         Button(action: {
+            // Gate chain: MHMDA health-data consent → disclaimer → detail.
             if !ConsentService.shared.hasHealthDataConsent {
                 showHealthConsent = true
+            } else if !DisclaimerManager.hasAccepted {
+                showWellnessDisclaimer = true
             } else {
                 showDetailView = true
             }

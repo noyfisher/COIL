@@ -57,7 +57,8 @@ service cloud.firestore {
     match /users/{userId}/notes/{doc}             { allow write: if isOwner(userId); }
     match /users/{userId}/wellnessPlans/{doc}     { allow write: if isOwner(userId); }
     match /users/{userId}/analysisOutcomes/{doc}  { allow write: if isOwner(userId); }
-    match /users/{userId}/consents/{doc}          { allow write: if isOwner(userId); }
+    match /users/{userId}/consents/{doc}             { allow write: if isOwner(userId); }
+    match /users/{userId}/riskAcknowledgements/{doc} { allow write: if isOwner(userId); }
 
     // Missing exercise images — telemetry of unmatched exercise images. No PII.
     // Authenticated read is preserved (the in-app debug view reads it); writes

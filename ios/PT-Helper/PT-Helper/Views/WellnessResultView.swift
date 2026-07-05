@@ -20,6 +20,9 @@ struct WellnessResultView: View {
             AppColors.bgGradient.ignoresSafeArea()
             ScrollView {
                 VStack(spacing: AppSpacing.lg) {
+                    if viewModel.validationWarnings.contains(where: { $0.severity >= .serious }) {
+                        urgentWarningBanner
+                    }
                     disclaimerBanner
                     overallSummaryCard
 
@@ -53,6 +56,25 @@ struct WellnessResultView: View {
             preferencesSheet
         }
         .trackScreen("WellnessResult")
+    }
+
+    // MARK: - Urgent Warning Banner
+
+    private var urgentWarningBanner: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            HStack(spacing: AppSpacing.comfortable) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.title2).foregroundColor(AppColors.ctaText)
+                Text("Important Safety Notice")
+                    .font(.headline).foregroundColor(AppColors.ctaText)
+                Spacer()
+            }
+            ForEach(viewModel.validationWarnings.filter { $0.severity >= .serious }, id: \.message) { w in
+                Text(w.message).font(AppFonts.body)
+                    .foregroundColor(AppColors.ctaText.opacity(0.95))
+            }
+        }
+        .padding().background(AppColors.danger).cornerRadius(AppCorners.card)
     }
 
     // MARK: - Disclaimer
