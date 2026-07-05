@@ -33,6 +33,15 @@ final class ConsentService: ObservableObject {
         ConsentPolicy.needsLegalReacceptance(recordedVersion: recordedTosVersion)
     }
 
+    // MARK: - Health data consent (Washington MHMDA)
+
+    /// True when the mirrored health-data policy version matches the current one
+    /// (the user has given standalone opt-in consent for the current policy).
+    var hasHealthDataConsent: Bool {
+        UserDefaults.standard.string(forKey: MirrorKeys.healthDataPolicyVersion)
+            == LegalContent.healthDataPolicyVersion
+    }
+
     // MARK: - Load
 
     /// Hydrates from the offline mirror first (so the gate can decide immediately),
@@ -54,9 +63,15 @@ final class ConsentService: ObservableObject {
                 recordedTosVersion = version
                 UserDefaults.standard.set(version, forKey: MirrorKeys.tosVersion)
             }
+
+            let healthSnapshot = try await db.collection("users").document(uid)
+                .collection("consents").document("healthData").getDocument()
+            if let data = healthSnapshot.data(), let version = data["policyVersion"] as? String {
+                UserDefaults.standard.set(version, forKey: MirrorKeys.healthDataPolicyVersion)
+            }
         } catch {
             AppLogger.data.error("Error loading consent record: \(error.localizedDescription)")
-            // Fall back to the already-hydrated mirror value.
+            // Fall back to the already-hydrated mirror values.
         }
         isLoaded = true
     }
@@ -86,6 +101,28 @@ final class ConsentService: ObservableObject {
 
         recordedTosVersion = LegalContent.tosVersion
         UserDefaults.standard.set(LegalContent.tosVersion, forKey: MirrorKeys.tosVersion)
+    }
+
+    /// Writes (merge) the standalone MHMDA health-data consent — collection AND
+    /// sharing recorded as separate timestamps — to `users/{uid}/consents/healthData`
+    /// and updates the mirror. Called only after BOTH consent checkboxes are ticked.
+    func recordHealthDataConsent() {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+
+        let data: [String: Any] = [
+            "policyVersion": LegalContent.healthDataPolicyVersion,
+            "collectionConsentAt": FieldValue.serverTimestamp(),
+            "sharingConsentAt": FieldValue.serverTimestamp(),
+            "appVersion": appVersion
+        ]
+
+        db.collection("users").document(uid)
+            .collection("consents").document("healthData")
+            .setData(data, merge: true)
+
+        UserDefaults.standard.set(LegalContent.healthDataPolicyVersion,
+                                  forKey: MirrorKeys.healthDataPolicyVersion)
+        objectWillChange.send()
     }
 
     // MARK: - Local mirror lifecycle

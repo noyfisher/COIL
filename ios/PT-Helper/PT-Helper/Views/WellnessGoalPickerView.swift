@@ -5,6 +5,8 @@ struct WellnessGoalPickerView: View {
     @State private var selectedCategories: Set<GoalCategory> = []
     @State private var customGoalText: String = ""
     @State private var showDetailView = false
+    /// MHMDA health-data consent gate (shown before the wellness detail flow).
+    @State private var showHealthConsent = false
 
     private let columns = [
         GridItem(.flexible(), spacing: AppSpacing.md),
@@ -43,6 +45,15 @@ struct WellnessGoalPickerView: View {
         .mvvcNavBar()
         .navigationDestination(isPresented: $showDetailView) {
             WellnessDetailView(viewModel: createViewModel())
+        }
+        .sheet(isPresented: $showHealthConsent, onDismiss: {
+            // Proceed into the wellness flow once consent is granted (never in the
+            // same transaction as the dismissal — Gotcha #2).
+            if ConsentService.shared.hasHealthDataConsent {
+                showDetailView = true
+            }
+        }) {
+            HealthDataConsentView { showHealthConsent = false }
         }
         .trackScreen("WellnessGoalPicker")
     }
@@ -163,7 +174,11 @@ struct WellnessGoalPickerView: View {
 
     private var continueButton: some View {
         Button(action: {
-            showDetailView = true
+            if !ConsentService.shared.hasHealthDataConsent {
+                showHealthConsent = true
+            } else {
+                showDetailView = true
+            }
         }) {
             HStack(spacing: AppSpacing.sm) {
                 if !selectedGoals.isEmpty {

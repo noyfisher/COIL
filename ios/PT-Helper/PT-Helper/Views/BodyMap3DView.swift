@@ -14,6 +14,8 @@ struct BodyMap3DView: View {
     @State private var navigateToPainDetail = false
     @State private var showRegionList = false
     @State private var showDisclaimer = false
+    /// MHMDA health-data consent gate (shown before the disclaimer on first use).
+    @State private var showHealthConsent = false
     /// Stable ViewModel for injury analysis — created before navigation flag is set,
     /// cleaned up via onChange when navigation pops back.
     @State private var injuryAnalysisVM: InjuryAnalysisViewModel?
@@ -115,6 +117,15 @@ struct BodyMap3DView: View {
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .mvvcNavBar()
+        .sheet(isPresented: $showHealthConsent, onDismiss: {
+            // Chain into the disclaimer once consent is granted (never in the same
+            // transaction as the dismissal — Gotcha #2).
+            if ConsentService.shared.hasHealthDataConsent && !DisclaimerManager.hasAccepted {
+                showDisclaimer = true
+            }
+        }) {
+            HealthDataConsentView { showHealthConsent = false }
+        }
         .sheet(isPresented: $showDisclaimer) {
             DisclaimerView(onAccept: {
                 injuryAnalysisVM = InjuryAnalysisViewModel(
@@ -759,7 +770,9 @@ struct BodyMap3DView: View {
             }
 
             Button(action: {
-                if DisclaimerManager.hasAccepted {
+                if !ConsentService.shared.hasHealthDataConsent {
+                    showHealthConsent = true
+                } else if DisclaimerManager.hasAccepted {
                     injuryAnalysisVM = InjuryAnalysisViewModel(
                         userProfile: viewModel.userProfile,
                         selectedRegions: viewModel.selectedRegions

@@ -5,6 +5,8 @@ struct OnboardingView: View {
     var onSkip: (() -> Void)? = nil
     @StateObject private var viewModel = OnboardingViewModel()
     @Environment(\.scenePhase) private var scenePhase
+    /// MHMDA health-data consent must be granted before any health data is entered.
+    @State private var showHealthConsent = false
 
     var body: some View {
         ZStack {
@@ -124,6 +126,12 @@ struct OnboardingView: View {
             if viewModel.loadDraft() {
                 AppLogger.data.info("Resumed onboarding draft at step \(viewModel.currentStep)")
             }
+            if !ConsentService.shared.hasHealthDataConsent {
+                showHealthConsent = true
+            }
+        }
+        .fullScreenCover(isPresented: $showHealthConsent) {
+            HealthDataConsentView { showHealthConsent = false }
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .background {
