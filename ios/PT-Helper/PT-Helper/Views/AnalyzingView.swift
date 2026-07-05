@@ -96,6 +96,11 @@ struct AnalyzingView: View {
             timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
                 elapsedSeconds += 1
             }
+            if !viewModel.isAnalyzing,
+               viewModel.analysisResult == nil,
+               viewModel.redFlagAlerts.map(\.severity).max() == .emergency {
+                destination = routingDestination()
+            }
         }
         .onDisappear {
             timer?.invalidate()

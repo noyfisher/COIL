@@ -101,6 +101,19 @@ class WellnessAnalysisViewModel: ObservableObject {
             return
         }
 
+        let screeningStrings = completed.flatMap { $0.redFlagScreeningStrings }
+        let preScreen = MedicalRedFlagDetector.check(symptomStrings: screeningStrings)
+        let emergencyAlerts = preScreen.alerts.filter { $0.severity == .emergency }
+        if !emergencyAlerts.isEmpty {
+            validationWarnings = preScreen.alerts
+            emergencyMessages = emergencyAlerts.map(\.message)
+            isAnalyzing = false
+            SessionLogger.shared.log(.stateUpdated, category: .stateChange,
+                message: "Wellness emergency pre-screen triggered — analysis blocked",
+                metadata: ["alertCount": "\(emergencyAlerts.count)"])
+            return
+        }
+
         let goalNames = completed.map { $0.goalCategory.displayName }
 
         isAnalyzing = true

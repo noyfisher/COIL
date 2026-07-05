@@ -193,4 +193,14 @@ struct WellnessAssessment: Codable, Identifiable {
     let commitmentLevel: CommitmentLevel
     let specificContext: String?
     let additionalNotes: String?
+
+    /// Free-text and list inputs screened client-side for emergency red-flag
+    /// patterns before any data leaves the device.
+    var redFlagScreeningStrings: [String] {
+        var out: [String] = dailyActivitiesAffected + currentHabits
+        if let t = customGoalText, !t.isEmpty { out.append(t) }
+        if let s = specificContext, !s.isEmpty { out.append(s) }
+        if let n = additionalNotes, !n.isEmpty { out.append(n) }
+        return out
+    }
 }

@@ -113,6 +113,21 @@ class InjuryAnalysisViewModel: ObservableObject {
             return
         }
 
+        // Emergency pre-screen: never send 911-pattern data to the API.
+        let preScreen = MedicalRedFlagDetector.check(assessments: completed)
+        let emergencyAlerts = preScreen.alerts.filter { $0.severity == .emergency }
+        if !emergencyAlerts.isEmpty {
+            redFlagAlerts = emergencyAlerts
+            analysisResult = nil
+            analysisError = nil
+            isAnalyzing = false
+            showAnalyzingScreen = true
+            SessionLogger.shared.log(.stateUpdated, category: .stateChange,
+                message: "Emergency pre-screen triggered — analysis blocked",
+                metadata: ["alertCount": "\(emergencyAlerts.count)"])
+            return
+        }
+
         // Fail fast when offline instead of making the user watch a doomed
         // 15–30s spinner before a generic network error (audit #58).
         guard NetworkMonitor.shared.isConnected else {

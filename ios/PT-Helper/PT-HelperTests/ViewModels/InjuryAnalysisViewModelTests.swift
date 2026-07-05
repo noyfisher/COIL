@@ -420,6 +420,44 @@ final class InjuryAnalysisViewModelTests: XCTestCase {
         XCTAssertEqual(mock.sendMessageCallCount, 3)
     }
 
+    // MARK: - WP-2.2 — Emergency pre-screen (no API call for 911-pattern data)
+
+    func testStartAnalysis_EmergencySymptoms_MakesNoAPICall() {
+        let mock = MockClaudeAPIService()
+        mock.responseToReturn = TestFixtures.makeAnalysisResponseJSON()
+        // Cardiac 911 pattern requires "chest pain" + "shortness of breath" in free text
+        // AND a chest region key. Put it in the free-text notes field.
+        let chestRegion = TestFixtures.makeRegion(name: "Chest", zoneKey: "chest")
+        let emergencyAssessment = PainAssessment(
+            id: UUID(),
+            selectedRegion: chestRegion,
+            painTypes: ["Aching"],
+            customPainDescription: nil,
+            painIntensity: 5,
+            painDurations: ["Over a Month"],
+            painFrequencies: ["Intermittent"],
+            painOnsets: ["Gradual"],
+            aggravatingFactors: [],
+            relievingFactors: [],
+            additionalNotes: "chest pain and shortness of breath",
+            currentTreatment: nil
+        )
+        let vm = InjuryAnalysisViewModel(
+            userProfile: TestFixtures.makeProfile(),
+            selectedRegions: [chestRegion],
+            apiService: mock
+        )
+
+        vm.saveAndAnalyze(emergencyAssessment)
+
+        XCTAssertEqual(mock.sendMessageCallCount, 0, "911-pattern data must never leave the device")
+        XCTAssertFalse(vm.redFlagAlerts.isEmpty, "Emergency red-flag alerts should be populated")
+        XCTAssertEqual(vm.redFlagAlerts.map(\.severity).max(), .emergency)
+        XCTAssertNil(vm.analysisResult)
+        XCTAssertFalse(vm.isAnalyzing)
+        XCTAssertTrue(vm.showAnalyzingScreen, "Analyzing screen shows so AnalyzingView can route to the emergency redirect")
+    }
+
     func testStartAnalysis_noCompletedAssessments_doesNotCallAPI() {
         let mock = MockClaudeAPIService()
         let region = TestFixtures.makeRegion(name: "Knee")
