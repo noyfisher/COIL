@@ -101,6 +101,7 @@ struct WellnessDetailView: View {
                         .foregroundColor(goal.category.color)
                     Text("Tell us more about: \(goal.category.displayName)")
                         .font(.subheadline.weight(.medium))
+                        .foregroundColor(.white)
                 }
                 .padding(AppSpacing.md)
                 .frame(maxWidth: .infinity)
