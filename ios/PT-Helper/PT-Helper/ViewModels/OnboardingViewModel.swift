@@ -225,7 +225,8 @@ class OnboardingViewModel: ObservableObject {
             let hasSex = !userProfile.sex.isEmpty
             let hasHeight = userProfile.heightFeet >= 3 && userProfile.heightFeet <= 7
             let hasWeight = userProfile.weight >= 50 && userProfile.weight <= 500
-            return hasName && hasSex && hasHeight && hasWeight && hasAcceptedTerms
+            let isOldEnough = !AgePolicy.isBlocked(dateOfBirth: userProfile.dateOfBirth)
+            return hasName && hasSex && hasHeight && hasWeight && hasAcceptedTerms && isOldEnough
         case 2:
             // Activity level must be selected
             return !userProfile.activityLevel.isEmpty

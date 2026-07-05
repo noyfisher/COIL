@@ -32,6 +32,9 @@ struct BasicInfoStepView: View {
                         .tint(AppColors.accent)
                         .colorScheme(.dark)
                         .frame(maxWidth: .infinity, alignment: .leading)
+                    if AgePolicy.isBlocked(dateOfBirth: viewModel.userProfile.dateOfBirth) {
+                        validationMessage("You must be at least 13 years old to use this app")
+                    }
                 }
 
                 // Sex

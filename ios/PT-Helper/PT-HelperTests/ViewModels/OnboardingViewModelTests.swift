@@ -190,6 +190,22 @@ final class OnboardingViewModelTests: XCTestCase {
         XCTAssertFalse(vm.canProceedFromCurrentStep)
     }
 
+    func testCanProceedStep1_UnderThirteenDOB_False() {
+        let vm = OnboardingViewModel()
+        fillValidBasicInfo(vm)
+        // Ten years old — under the 13+ minimum.
+        vm.userProfile.dateOfBirth = Calendar.current.date(byAdding: .year, value: -10, to: Date())!
+        XCTAssertFalse(vm.canProceedFromCurrentStep, "Under-13 DOB must block step 1")
+    }
+
+    func testCanProceedStep1_ExactlyThirteenDOB_True() {
+        let vm = OnboardingViewModel()
+        fillValidBasicInfo(vm)
+        // Exactly 13 years old today — the boundary is allowed.
+        vm.userProfile.dateOfBirth = Calendar.current.date(byAdding: .year, value: -13, to: Date())!
+        XCTAssertTrue(vm.canProceedFromCurrentStep, "Exactly-13 DOB must pass step 1")
+    }
+
     func testCanProceed_step2_emptyActivityLevel_returnsFalse() {
         let vm = OnboardingViewModel()
         fillValidBasicInfo(vm)
