@@ -21,6 +21,7 @@ struct SettingsView: View {
     @State private var showPrivacyPolicy = false
     @State private var showTermsOfService = false
     @State private var showConsumerHealthDataPolicy = false
+    @State private var showReportConcern = false
 
     var body: some View {
         NavigationStack {
@@ -253,6 +254,13 @@ struct SettingsView: View {
 
                             Divider().padding(.leading, 52)
 
+                            settingsRow(icon: "flag", color: AppColors.warning, title: "Report a Concern") {
+                                showReportConcern = true
+                            }
+                            .accessibilityIdentifier("settings.reportConcernButton")
+
+                            Divider().padding(.leading, 52)
+
                             settingsRow(icon: "star", color: AppColors.accent, title: "Rate PT Helper") {
                                 requestAppReview()
                             }
@@ -451,6 +459,9 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showConsumerHealthDataPolicy) {
             LegalDocumentView(title: "Consumer Health Data Policy", markdownContent: LegalContent.consumerHealthDataPolicy)
+        }
+        .sheet(isPresented: $showReportConcern) {
+            ReportConcernView()
         }
     }
 

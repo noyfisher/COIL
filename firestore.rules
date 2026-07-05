@@ -77,6 +77,12 @@ service cloud.firestore {
       allow read: if request.auth != null && request.auth.uid == resource.data.userId;
     }
 
+    // Concern reports — user-submitted safety/moderation reports. Create-only;
+    // only the Admin SDK reads these.
+    match /concernReports/{doc} {
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+    }
+
     // Remote config (e.g. config/exerciseImageAliases) — readable by any signed-in
     // client (production hot-fix lever); only Admin SDK writes.
     match /config/{doc} {
