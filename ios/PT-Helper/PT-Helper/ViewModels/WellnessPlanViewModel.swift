@@ -207,7 +207,7 @@ class WellnessPlanViewModel: ObservableObject {
         let profile = wellnessResult.userProfileSnapshot
 
         var message = """
-        PATIENT PROFILE:
+        USER PROFILE:
         - Age: \(profile.age) years old
         - Sex: \(profile.sex)
         - Height: \(profile.heightFeet)'\(profile.heightInches)"
@@ -264,7 +264,7 @@ class WellnessPlanViewModel: ObservableObject {
             message += "\n  Key Insight: \(rec.keyInsight)"
         }
 
-        message += "\n\nPATIENT PREFERENCES:"
+        message += "\n\nUSER PREFERENCES:"
         message += "\n- Available Equipment: \(preferences.equipment.rawValue)"
         message += "\n- Preferred Session Length: \(preferences.sessionLength.rawValue)"
         message += "\n- Difficulty Preference: \(preferences.difficulty.rawValue)"

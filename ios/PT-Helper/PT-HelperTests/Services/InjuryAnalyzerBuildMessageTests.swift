@@ -75,7 +75,7 @@ final class InjuryAnalyzerBuildMessageTests: XCTestCase {
 
         let message = InjuryAnalyzer.buildUserMessage(assessments: [assessment], profile: profile)
 
-        XCTAssertTrue(message.contains("PATIENT PROFILE:"))
+        XCTAssertTrue(message.contains("USER PROFILE:"))
         XCTAssertTrue(message.contains("Age: 30"))
         XCTAssertTrue(message.contains("Sex: Female"))
         XCTAssertTrue(message.contains("Height: 5'10\""))

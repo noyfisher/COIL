@@ -419,7 +419,7 @@ class RehabPlanViewModel: ObservableObject {
         let assessedRegions = analysisResult.assessments.map { $0.selectedRegion }
 
         var message = """
-        PATIENT PROFILE:
+        USER PROFILE:
         - Age: \(profile.age) years old
         - Sex: \(profile.sex)
         - Height: \(profile.heightFeet)'\(profile.heightInches)"
@@ -522,7 +522,7 @@ class RehabPlanViewModel: ObservableObject {
         }
 
         // User preferences
-        message += "\n\nPATIENT PREFERENCES (STRICT CONSTRAINTS — must be honoured):"
+        message += "\n\nUSER PREFERENCES (STRICT CONSTRAINTS — must be honoured):"
         message += "\n- Available Equipment: \(preferences.equipment.rawValue) — select ONLY exercises that require this equipment level or less"
         message += "\n- Preferred Session Length: \(preferences.sessionLength.rawValue)"
         message += "\n- Difficulty Preference: \(preferences.difficulty.rawValue)"
