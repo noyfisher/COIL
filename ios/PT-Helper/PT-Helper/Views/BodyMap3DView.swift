@@ -1041,7 +1041,7 @@ struct BodyMap3DView: View {
 
         SessionLogger.shared.logUserAction(wasSelected ? .regionDeselected : .regionSelected,
                                             action: wasSelected ? "deselect" : "select",
-                                            metadata: ["region": region.name, "zoneKey": region.zoneKey])
+                                            metadata: ["selectedCount": "\(viewModel.selectedRegions.count)"])
 
         if wasSelected {
             restoreMaterial(for: name)
@@ -1120,7 +1120,7 @@ struct BodyMap3DView: View {
 
         SessionLogger.shared.logUserAction(.regionSelected,
                                             action: "zone_drill_in",
-                                            metadata: ["zone": zone.rawValue])
+                                            metadata: [:])
     }
 
     private func exitDrillDown() {

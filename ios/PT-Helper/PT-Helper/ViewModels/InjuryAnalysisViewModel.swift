@@ -158,7 +158,6 @@ class InjuryAnalysisViewModel: ObservableObject {
         SessionLogger.shared.log(.loadingStarted, category: .stateChange, message: "Analysis started",
                                   metadata: [
                                     "regionCount": "\(completed.count)",
-                                    "regions": regionNames.joined(separator: ", "),
                                     "missingFields": missingFields.isEmpty ? "none" : missingFields.joined(separator: "; ")
                                   ])
 
@@ -191,12 +190,10 @@ class InjuryAnalysisViewModel: ObservableObject {
                     "condition_count": validated.result.conditions.count,
                     "has_red_flags": !validated.redFlagAlerts.isEmpty
                 ])
-                let conditionNames = validated.result.conditions.map { "\($0.commonName)(\(Int($0.confidence))%)" }
-                AppLogger.rehab.info("Analysis completed: \(conditionNames.joined(separator: ", "))")
+                AppLogger.rehab.info("Analysis completed: \(validated.result.conditions.count) conditions")
                 SessionLogger.shared.log(.loadingFinished, category: .stateChange, message: "Analysis completed",
                                           metadata: [
                                             "conditionCount": "\(validated.result.conditions.count)",
-                                            "conditions": conditionNames.joined(separator: ", "),
                                             "hasRedFlags": "\(!validated.redFlagAlerts.isEmpty)",
                                             "warningCount": "\(validated.validation.warnings.count)",
                                             "appliedFixes": validated.validation.appliedFixes.joined(separator: "; ")

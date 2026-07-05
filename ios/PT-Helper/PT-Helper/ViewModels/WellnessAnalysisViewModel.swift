@@ -124,8 +124,7 @@ class WellnessAnalysisViewModel: ObservableObject {
         AppLogger.rehab.info("Starting wellness analysis: \(completed.count) goal(s) — \(goalNames.joined(separator: ", "))")
         SessionLogger.shared.log(.loadingStarted, category: .stateChange, message: "Wellness analysis started",
                                   metadata: [
-                                    "goalCount": "\(completed.count)",
-                                    "goals": goalNames.joined(separator: ", ")
+                                    "goalCount": "\(completed.count)"
                                   ])
 
         analysisTask = Task {
@@ -153,12 +152,10 @@ class WellnessAnalysisViewModel: ObservableObject {
                     "type": "wellness",
                     "worst_severity": validated.worstSeverity.rawValue
                 ])
-                let recTitles = validated.result.recommendations.map { $0.title }
-                AppLogger.rehab.info("Wellness analysis completed: \(recTitles.joined(separator: ", "))")
+                AppLogger.rehab.info("Wellness analysis completed: \(validated.result.recommendations.count) recommendations")
                 SessionLogger.shared.log(.loadingFinished, category: .stateChange, message: "Wellness analysis completed",
                                           metadata: [
-                                            "recommendationCount": "\(validated.result.recommendations.count)",
-                                            "recommendations": recTitles.joined(separator: ", ")
+                                            "recommendationCount": "\(validated.result.recommendations.count)"
                                           ])
             } catch is CancellationError {
                 AppLogger.rehab.info("Wellness analysis task cancelled by user")
