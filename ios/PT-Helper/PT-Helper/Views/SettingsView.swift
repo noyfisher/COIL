@@ -354,7 +354,7 @@ struct SettingsView: View {
                         // App version
                         Text(appVersionText)
                             .font(.caption2)
-                            .foregroundColor(AppColors.mutedText)
+                            .foregroundColor(Color.white.opacity(0.5))
                             .padding(.top, AppSpacing.lg)
                     }
                     .padding(.horizontal, AppSpacing.xl)

@@ -79,7 +79,7 @@ struct WellnessDetailView: View {
             if viewModel.hasMultipleGoals {
                 Text("Goal \(viewModel.currentGoalIndex + 1) of \(viewModel.totalGoals)")
                     .font(.caption.weight(.medium))
-                    .foregroundColor(AppColors.secondaryText)
+                    .foregroundColor(Color.white.opacity(0.7))
 
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {

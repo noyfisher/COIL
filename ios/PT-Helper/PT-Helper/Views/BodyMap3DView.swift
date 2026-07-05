@@ -273,7 +273,7 @@ struct BodyMap3DView: View {
                                 .frame(width: 8, height: 8)
                             Text(region.name)
                                 .font(.caption.weight(.medium))
-                                .foregroundColor(AppColors.primaryText)
+                                .foregroundColor(.white)
                             Button(action: {
                                 withAnimation(AppAnimations.springy) {
                                     viewModel.toggleSelection(for: region)
@@ -282,7 +282,7 @@ struct BodyMap3DView: View {
                             }) {
                                 Image(systemName: "xmark.circle.fill")
                                     .font(.system(size: 12))
-                                    .foregroundColor(AppColors.primaryText.opacity(0.7))
+                                    .foregroundColor(Color.white.opacity(0.85))
                             }
                         }
                         .padding(.horizontal, AppSpacing.md)

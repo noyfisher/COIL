@@ -382,10 +382,11 @@ struct RehabPlanView: View {
             VStack(spacing: AppSpacing.sm) {
                 Text("Building Your Plan")
                     .font(.system(.title2, design: .serif).weight(.bold))
+                    .foregroundColor(.white)
 
                 Text("Creating a personalized exercise program based on your conditions and fitness level...")
                     .font(AppFonts.body)
-                    .foregroundColor(AppColors.secondaryText)
+                    .foregroundColor(Color.white.opacity(0.7))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.xl)
 
@@ -393,7 +394,7 @@ struct RehabPlanView: View {
                 // force-quit seconds before the plan appears (audit #48).
                 Text("This can take a little longer than the analysis — we're also running safety checks on every exercise.")
                     .font(AppFonts.caption)
-                    .foregroundColor(AppColors.mutedText)
+                    .foregroundColor(Color.white.opacity(0.5))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.xl)
             }
@@ -421,10 +422,11 @@ struct RehabPlanView: View {
             VStack(spacing: AppSpacing.sm) {
                 Text("Plan Generation Failed")
                     .font(.system(.title3, design: .serif).weight(.bold))
+                    .foregroundColor(.white)
 
                 Text(message)
                     .font(AppFonts.body)
-                    .foregroundColor(AppColors.secondaryText)
+                    .foregroundColor(Color.white.opacity(0.7))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.lg)
             }
