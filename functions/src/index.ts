@@ -1187,8 +1187,14 @@ export const deleteAccount = functions
       // 4. Rate-limit counters (admin-only path).
       await db.recursiveDelete(db.collection("rateLimits").doc(uid));
 
-      // 5. Auth user — LAST.
-      await admin.auth().deleteUser(uid);
+      // 5. Auth user — LAST. A retry after a lost success response may arrive
+      //    with a still-valid token for an already-deleted user; user-not-found
+      //    here means the desired end state is already reached.
+      try {
+        await admin.auth().deleteUser(uid);
+      } catch (error) {
+        if ((error as { code?: string })?.code !== "auth/user-not-found") throw error;
+      }
 
       res.status(200).json({ ok: true });
     } catch (error) {
