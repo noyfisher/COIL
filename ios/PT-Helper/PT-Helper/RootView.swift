@@ -13,6 +13,10 @@ struct RootView: View {
     @StateObject private var consentService = ConsentService.shared
     /// Drives the launch-time ToS re-acceptance gate (production branch only).
     @State private var showLegalGate = false
+    /// Drives the skip-onboarding legal + age gate (production branch only).
+    @State private var showSkipGate = false
+    /// Set by the skip gate when a 13–17 DOB is entered; consumed in WP-5.5.
+    @AppStorage("pendingMinorSafetyScreen") private var pendingMinorSafetyScreen = false
     @AppStorage("hasSeenIntroCarousel") private var hasSeenIntroCarousel = false
     /// Set when the user taps Skip on onboarding, so the choice survives a
     /// relaunch instead of re-trapping them in the questionnaire every launch.
@@ -157,9 +161,18 @@ struct RootView: View {
                     pendingFirstAssessment = true
                     profileCompleted = true
                 }, onSkip: {
-                    skippedOnboarding = true
-                    profileCompleted = true
+                    showSkipGate = true
                 })
+                .fullScreenCover(isPresented: $showSkipGate) {
+                    LegalAcceptanceGateView(mode: .skipOnboarding) { dob in
+                        if let dob, AgePolicy.isMinor(dateOfBirth: dob) {
+                            pendingMinorSafetyScreen = true
+                        }
+                        showSkipGate = false
+                        skippedOnboarding = true
+                        profileCompleted = true
+                    }
+                }
             }
         } else {
             LoginView(onSignedIn: { signedIn = true })
