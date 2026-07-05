@@ -494,9 +494,7 @@ struct SettingsView: View {
         GuidedWorkoutViewModel.clearAllLocalWorkoutState()
         UserDefaults.standard.removeObject(forKey: "hasAcceptedTermsOfService")
         UserDefaults.standard.removeObject(forKey: "tosAcceptedDate")
-        // ⚠️ COMPILE-ORDER: ConsentService does not exist until PR-4. Ship this
-        // line COMMENTED OUT in PR-3; WP-4.2 step 6 uncomments it.
-        // ConsentService.clearLocalMirrors()
+        ConsentService.clearLocalMirrors()
         UserDefaults.standard.removeObject(forKey: "hasSeenMinorSafetyScreen")  // plain string key — compiles fine before PR-5
     }
 

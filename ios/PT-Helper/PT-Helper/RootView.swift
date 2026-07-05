@@ -69,6 +69,7 @@ struct RootView: View {
                     skippedOnboarding = false
                     isCheckingProfile = true
                     profileService.clear()
+                    ConsentService.clearLocalMirrors()
                 }
             }
             attemptVirtualUserSignInIfNeeded()
