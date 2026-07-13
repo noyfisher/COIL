@@ -20,7 +20,7 @@ struct ProgressTab: View {
                 savedPlansVM: savedPlansVM,
                 onSettingsTapped: { showSettings = true }
             )
-            .mvvcNavBar()
+            .coilNavBar()
         }
         .sheet(isPresented: $showSettings) {
             SettingsView(
@@ -236,7 +236,7 @@ struct ProgressTabContent: View {
     private var recentWorkoutsSection: some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
             HStack {
-                MVVCDividerHeader(title: "Recent Workouts")
+                CoilDividerHeader(title: "Recent Workouts")
                 Spacer()
                 if workoutViewModel.sessions.count > 10 {
                     NavigationLink(destination: WorkoutSessionView()) {
@@ -412,7 +412,7 @@ struct ProgressTabContent: View {
             : "Pain Trend"
 
         return VStack(alignment: .leading, spacing: AppSpacing.md) {
-            MVVCDividerHeader(title: chartTitle)
+            CoilDividerHeader(title: chartTitle)
             cardChartContent
         }
     }

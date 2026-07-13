@@ -53,7 +53,7 @@ struct PainDetailView: View {
                 CoilWordmark()
             }
         }
-        .mvvcNavBar()
+        .coilNavBar()
         .onAppear {
             if viewModel.currentRegionIndex == 0 {
                 AnalyticsService.shared.log(.assessmentStarted)

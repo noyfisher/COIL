@@ -29,7 +29,7 @@ struct DisclaimerView: View {
                                 icon: "info.circle.fill",
                                 color: AppColors.accent,
                                 title: "Educational Tool Only",
-                                text: "PT Helper provides general health information for educational purposes. It is not a medical device and does not provide medical diagnoses."
+                                text: "COIL provides general health information for educational purposes. It is not a medical device and does not provide medical diagnoses."
                             )
 
                             disclaimerSection(

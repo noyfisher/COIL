@@ -98,8 +98,8 @@ enum BodyMapConstants {
 
     // MARK: - Region Color Palette
 
-    /// MVVC palette: every region renders with the same faint-pink wash so the
-    /// mannequin reads as a single neutral surface; the saturated MVVC-red
+    /// COIL palette: every region renders with the same faint-pink wash so the
+    /// mannequin reads as a single neutral surface; the saturated teal
     /// selection tint provides all the per-region differentiation users need.
     /// Baked as a full-opacity color because SimpleMaterial tint alpha is
     /// transparency, not a paint wash — a low-alpha red would make the body
@@ -137,7 +137,7 @@ enum BodyMapConstants {
     // MARK: - Per-Zone Palette (drill-down only)
     //
     // When the user drills into a zone, every region in that zone is repainted
-    // with a distinct MVVC palette color so the sub-regions are instantly
+    // with a distinct COIL palette color so the sub-regions are instantly
     // distinguishable. On exit, the wash returns. Because zones are mutually
     // exclusive on screen, the same palette colors can be reused across zones
     // — only one zone is ever visible at a time.

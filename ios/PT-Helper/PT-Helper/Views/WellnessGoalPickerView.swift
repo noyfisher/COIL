@@ -43,7 +43,7 @@ struct WellnessGoalPickerView: View {
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
-        .mvvcNavBar()
+        .coilNavBar()
         .navigationDestination(isPresented: $showDetailView) {
             WellnessDetailView(viewModel: createViewModel())
         }
@@ -68,7 +68,7 @@ struct WellnessGoalPickerView: View {
 
     private var headerSection: some View {
         VStack(spacing: AppSpacing.sm) {
-            MVVCDividerHeader(title: "What Do You Want to Improve?")
+            CoilDividerHeader(title: "What Do You Want to Improve?")
             Text("Select one or more goals below, or describe your own.")
                 .font(.subheadline)
                 .foregroundColor(AppColors.secondaryText)

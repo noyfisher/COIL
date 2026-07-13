@@ -38,7 +38,7 @@ struct MyPlanTab: View {
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
-            .mvvcNavBar()
+            .coilNavBar()
             .navigationDestination(item: $route) { route in
                 switch route {
                 case .detail(let id):
@@ -130,7 +130,7 @@ struct MyPlanTab: View {
                         .listRowBackground(Color.clear)
                 }
             } header: {
-                MVVCDividerHeader(title: selectedPlanType == .rehab ? "Injury Plans" : "Wellness Plans")
+                CoilDividerHeader(title: selectedPlanType == .rehab ? "Injury Plans" : "Wellness Plans")
                     .padding(.horizontal, AppSpacing.xs)
                     .padding(.bottom, AppSpacing.sm)
                     .textCase(nil)
@@ -157,7 +157,7 @@ struct MyPlanTab: View {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: AppSpacing.sm) {
                         HStack(spacing: AppSpacing.sm) {
-                            MVVCRedBadge(text: "Active")
+                            CoilBadge(text: "Active")
                             Spacer()
                         }
 

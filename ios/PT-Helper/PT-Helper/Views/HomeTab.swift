@@ -49,7 +49,7 @@ struct HomeTab: View {
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
-            .mvvcNavBar()
+            .coilNavBar()
         }
         .trackScreen("HomeTab")
     }
@@ -249,11 +249,11 @@ struct ProgramDayView: View {
     var body: some View {
         if let plan = plan {
             VStack(alignment: .leading, spacing: AppSpacing.md) {
-                MVVCDividerHeader(title: "\(dayLabel)'s Program")
+                CoilDividerHeader(title: "\(dayLabel)'s Program")
 
                 // Plan name badge
                 HStack(spacing: AppSpacing.sm) {
-                    MVVCRedBadge(text: "Active Plan")
+                    CoilBadge(text: "Active Plan")
                     Text(plan.planName)
                         .font(AppFonts.smallSemiBold)
                         .foregroundColor(AppColors.secondaryText)
@@ -386,7 +386,7 @@ struct PreventativeTasksView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
-            MVVCDividerHeader(title: "Daily Preventative Care")
+            CoilDividerHeader(title: "Daily Preventative Care")
 
             // Progress summary
             HStack(spacing: AppSpacing.sm) {

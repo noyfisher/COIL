@@ -307,7 +307,7 @@ struct SettingsView: View {
 
                             Divider().padding(.leading, 52)
 
-                            settingsRow(icon: "star", color: AppColors.accent, title: "Rate PT Helper") {
+                            settingsRow(icon: "star", color: AppColors.accent, title: "Rate COIL") {
                                 requestAppReview()
                             }
                             .accessibilityIdentifier("settings.rateAppButton")
@@ -581,7 +581,7 @@ struct SettingsView: View {
 
     /// Opens the mail composer prefilled with the app version for faster debugging (audit #84).
     private func contactSupport() {
-        let subject = "PT Helper Support"
+        let subject = "COIL Support"
         let body = "\n\n———\n\(appVersionText)"
         let encodedSubject = subject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let encodedBody = body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
@@ -600,7 +600,7 @@ struct SettingsView: View {
     private var appVersionText: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
-        return "PT Helper v\(version) (\(build))"
+        return "COIL v\(version) (\(build))"
     }
 
     private func settingsRow(icon: String, color: Color, title: String, action: @escaping () -> Void) -> some View {

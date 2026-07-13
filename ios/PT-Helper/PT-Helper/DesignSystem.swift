@@ -347,10 +347,10 @@ extension View {
     }
 }
 
-// MARK: - MVVC Nav Bar Modifier
+// MARK: - COIL Nav Bar Modifier
 // Apply to the root content view inside each NavigationStack.
 
-struct MVVCNavBarModifier: ViewModifier {
+struct CoilNavBarModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .toolbarBackground(AppColors.navBackground, for: .navigationBar)
@@ -365,7 +365,7 @@ struct MVVCNavBarModifier: ViewModifier {
 }
 
 extension View {
-    func mvvcNavBar() -> some View { modifier(MVVCNavBarModifier()) }
+    func coilNavBar() -> some View { modifier(CoilNavBarModifier()) }
 }
 
 // MARK: - Button Styles
@@ -421,10 +421,10 @@ struct DestructiveButtonStyle: ButtonStyle {
     }
 }
 
-// MARK: - MVVC Shared Components
+// MARK: - COIL Shared Components
 
 /// Red gradient rule with uppercase Barlow Condensed title — use for all content section breaks.
-struct MVVCDividerHeader: View {
+struct CoilDividerHeader: View {
     let title: String
 
     var body: some View {
@@ -445,7 +445,7 @@ struct MVVCDividerHeader: View {
 }
 
 /// Small red pill badge — "ACTIVE", "ON FIRE", count indicators, etc.
-struct MVVCRedBadge: View {
+struct CoilBadge: View {
     let text: String
 
     var body: some View {

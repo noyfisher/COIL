@@ -121,7 +121,7 @@ struct ThreeTabView: View {
             handleDeepLink()
         }
         .onAppear {
-            applyMVVCNavBarAppearance()
+            applyCoilNavBarAppearance()
             handleDeepLink()
             // Post-onboarding hand-off: route straight into the first assessment.
             if pendingFirstAssessment {
@@ -168,9 +168,9 @@ struct ThreeTabView: View {
         NotificationService.shared.pendingDeepLink = nil
     }
 
-    // MARK: - MVVC UIKit Appearance (nav bar only — tab bar is custom)
+    // MARK: - COIL UIKit Appearance (nav bar only — tab bar is custom)
 
-    private func applyMVVCNavBarAppearance() {
+    private func applyCoilNavBarAppearance() {
         // Nav bar is fixed dark brand chrome in both appearances. Source colors from
         // the Tier-0 CoilPalette primitives directly (dynamic UIColor) rather than
         // round-tripping a SwiftUI Color, which would flatten to a launch-time snapshot.

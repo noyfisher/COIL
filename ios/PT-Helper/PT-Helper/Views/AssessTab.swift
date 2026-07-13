@@ -43,7 +43,7 @@ struct AssessTab: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                         // Section header
-                        MVVCDividerHeader(title: "What Can We Help With?")
+                        CoilDividerHeader(title: "What Can We Help With?")
 
                         // Gateway cards
                         HStack(alignment: .top, spacing: AppSpacing.md) {
@@ -103,7 +103,7 @@ struct AssessTab: View {
                         // Last analysis re-entry point — a completed analysis persists
                         // across relaunches and must stay reachable (F2).
                         if let lastResult = analysisStore.lastResult {
-                            MVVCDividerHeader(title: "Your Last Analysis")
+                            CoilDividerHeader(title: "Your Last Analysis")
 
                             Button {
                                 SessionLogger.shared.logUserAction(.buttonTapped,
@@ -121,7 +121,7 @@ struct AssessTab: View {
                         }
 
                         // Quick actions
-                        MVVCDividerHeader(title: "Quick Actions")
+                        CoilDividerHeader(title: "Quick Actions")
 
                         VStack(spacing: AppSpacing.sm) {
                             QuickActionButton(
@@ -162,7 +162,7 @@ struct AssessTab: View {
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
-            .mvvcNavBar()
+            .coilNavBar()
         }
         .fullScreenCover(isPresented: $showQuickUpdate) {
             QuickHealthUpdateView {
@@ -202,7 +202,7 @@ struct AssessTab: View {
                 }
 
                 HStack {
-                    MVVCRedBadge(text: badge)
+                    CoilBadge(text: badge)
                     Spacer()
                     Image(systemName: "chevron.right")
                         .font(.system(size: 12, weight: .semibold))

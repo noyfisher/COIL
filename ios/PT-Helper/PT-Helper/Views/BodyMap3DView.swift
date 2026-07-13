@@ -116,7 +116,7 @@ struct BodyMap3DView: View {
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
-        .mvvcNavBar()
+        .coilNavBar()
         .sheet(isPresented: $showHealthConsent, onDismiss: {
             // Chain into the disclaimer once consent is granted (never in the same
             // transaction as the dismissal — Gotcha #2).
@@ -1359,7 +1359,7 @@ struct BodyMap3DView: View {
     /// selection → deselection cycle restores to the palette color rather
     /// than the wash. Called from `drillIntoZone`.
     ///
-    /// Currently-selected regions keep their MVVC-red highlight on screen;
+    /// Currently-selected regions keep their teal highlight on screen;
     /// only their stored `originalMaterials` entry is updated to the palette
     /// color so a future deselect lands on the palette, not the stale wash.
     @MainActor
@@ -1395,7 +1395,7 @@ struct BodyMap3DView: View {
     /// deselects after a re-drill don't flash the stale palette material.
     /// Called from `exitDrillDown`.
     ///
-    /// Currently-selected regions keep their MVVC-red highlight on screen;
+    /// Currently-selected regions keep their teal highlight on screen;
     /// only their stored `originalMaterials` entry is updated to the wash so
     /// a future deselect lands on the wash, not the stale palette color.
     @MainActor

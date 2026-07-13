@@ -16,7 +16,7 @@
 		</dict>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>PT Helper uses your camera to record exercise videos and analyze your form with AI-powered feedback.</string>
+	<string>COIL uses your camera to record exercise videos and analyze your form with AI-powered feedback.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Microphone access is required for video recording.</string>
 	<key>UIAppFonts</key>
