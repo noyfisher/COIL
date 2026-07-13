@@ -23,6 +23,7 @@ struct PainPointApp: App {
     }
 
     @Environment(\.scenePhase) private var scenePhase
+    @AppStorage(AppAppearance.storageKey) private var appearanceRaw = AppAppearance.system.rawValue
 
     var body: some Scene {
         WindowGroup {
@@ -33,7 +34,7 @@ struct PainPointApp: App {
                     RootView()
                 }
             }
-                .preferredColorScheme(.light)
+                .preferredColorScheme((AppAppearance(rawValue: appearanceRaw) ?? .system).colorScheme)
                 .onOpenURL { url in
                     GIDSignIn.sharedInstance.handle(url)
                 }

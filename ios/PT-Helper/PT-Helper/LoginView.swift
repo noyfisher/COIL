@@ -13,8 +13,8 @@ struct LoginView: View {
 
     var body: some View {
         ZStack {
-            // Black background
-            Color(red: 0.067, green: 0.067, blue: 0.067).ignoresSafeArea()
+            // Ink background (fixed dark)
+            AppColors.darkSurface.ignoresSafeArea()
 
             // Diagonal red accent — top-right
             GeometryReader { geo in
@@ -130,6 +130,7 @@ struct LoginView: View {
             withAnimation(.easeOut(duration: 0.6)) { appeared = true }
         }
         .trackScreen("Login")
+        .preferredColorScheme(.dark) // hero screen is intentionally dark in both app modes
     }
 
 }

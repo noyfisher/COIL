@@ -139,6 +139,7 @@ struct OnboardingView: View {
             }
         }
         .trackScreen("Onboarding")
+        .preferredColorScheme(.dark) // hero screen is intentionally dark in both app modes
     }
 
     private var stepTitle: String {

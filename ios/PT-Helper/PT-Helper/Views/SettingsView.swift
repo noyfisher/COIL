@@ -23,6 +23,7 @@ struct SettingsView: View {
     @State private var showConsumerHealthDataPolicy = false
     @State private var showReportConcern = false
     @State private var showSafetyResources = false
+    @AppStorage(AppAppearance.storageKey) private var appearanceRaw = AppAppearance.system.rawValue
 
     var body: some View {
         NavigationStack {
@@ -50,6 +51,43 @@ struct SettingsView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, AppSpacing.xl)
+                        .background(AppColors.cardBackground)
+                        .cornerRadius(AppCorners.xl)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: AppCorners.xl)
+                                .stroke(AppColors.cardBorder, lineWidth: 1)
+                        )
+                        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+
+                        // Appearance
+                        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                            HStack(spacing: AppSpacing.md) {
+                                Image(systemName: "circle.lefthalf.filled")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(AppColors.accent)
+                                    .frame(width: 32, height: 32)
+                                    .background(AppColors.accentTint)
+                                    .cornerRadius(AppCorners.small)
+
+                                Text("Appearance")
+                                    .font(.body)
+
+                                Spacer()
+                            }
+
+                            Picker("Appearance", selection: $appearanceRaw) {
+                                ForEach(AppAppearance.allCases) { mode in
+                                    Text(mode.label).tag(mode.rawValue)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                            .accessibilityIdentifier("settings.appearancePicker")
+                            .onChange(of: appearanceRaw) { _, newValue in
+                                AnalyticsService.shared.log(.settingChanged,
+                                    parameters: ["key": "appearance", "value": newValue])
+                            }
+                        }
+                        .padding(AppSpacing.lg)
                         .background(AppColors.cardBackground)
                         .cornerRadius(AppCorners.xl)
                         .overlay(

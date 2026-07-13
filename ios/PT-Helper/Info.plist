@@ -4,8 +4,6 @@
 <dict>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
-	<key>UIUserInterfaceStyle</key>
-	<string>Light</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

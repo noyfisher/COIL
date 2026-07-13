@@ -171,7 +171,10 @@ struct ThreeTabView: View {
     // MARK: - MVVC UIKit Appearance (nav bar only — tab bar is custom)
 
     private func applyMVVCNavBarAppearance() {
-        let navBgColor = UIColor(AppColors.navBackground)
+        // Nav bar is fixed dark brand chrome in both appearances. Source colors from
+        // the Tier-0 CoilPalette primitives directly (dynamic UIColor) rather than
+        // round-tripping a SwiftUI Color, which would flatten to a launch-time snapshot.
+        let navBgColor = CoilPalette.ink
 
         let navBar = UINavigationBarAppearance()
         navBar.configureWithOpaqueBackground()
@@ -184,12 +187,12 @@ struct ThreeTabView: View {
         navBar.titleTextAttributes = [.foregroundColor: UIColor.white, .font: titleFont]
         navBar.largeTitleTextAttributes = [.foregroundColor: UIColor.white, .font: largeTitleFont]
         let backImage = UIImage(systemName: "chevron.left")?
-            .withTintColor(UIColor(AppColors.accent), renderingMode: .alwaysOriginal)
+            .withTintColor(CoilPalette.accent, renderingMode: .alwaysOriginal)
         navBar.setBackIndicatorImage(backImage, transitionMaskImage: backImage)
         UINavigationBar.appearance().standardAppearance = navBar
         UINavigationBar.appearance().compactAppearance = navBar
         UINavigationBar.appearance().scrollEdgeAppearance = navBar
-        UINavigationBar.appearance().tintColor = UIColor(AppColors.accent)
+        UINavigationBar.appearance().tintColor = CoilPalette.accent
     }
 }
 
