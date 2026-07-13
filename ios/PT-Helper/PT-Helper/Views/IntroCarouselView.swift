@@ -33,10 +33,7 @@ private struct IntroNavBar: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(alignment: .center) {
-                Text("MVVC")
-                    .font(AppFonts.title)
-                    .italic()
-                    .foregroundColor(AppColors.accent)
+                CoilWordmark(fontSize: 20, glyph: 24)
                 Spacer()
                 if showX {
                     Button(action: onSkip) {
@@ -260,7 +257,7 @@ private struct IntroFastTrack: View {
                             .frame(width: 80, height: 3)
                             .padding(.top, 16)
 
-                        Text("MVVC uses evidence-informed exercise guidance to support your body's natural healing process. We help you stay active, protect against setbacks, and get back to what you love.")
+                        Text("COIL uses evidence-informed exercise guidance to support your body's natural healing process. We help you stay active, protect against setbacks, and get back to what you love.")
                             .font(AppFonts.body)
                             .foregroundColor(.white.opacity(0.6))
                             .multilineTextAlignment(.center)
@@ -335,7 +332,7 @@ private struct IntroStartJourney: View {
                         .padding(.top, 24)
 
                     // Body text
-                    Text("Set your goals and let MVVC handle the rest. Your path to peak performance starts here.")
+                    Text("Set your goals and let COIL handle the rest. Your path to peak performance starts here.")
                         .font(AppFonts.body)
                         .foregroundColor(.white.opacity(0.6))
                         .multilineTextAlignment(.center)

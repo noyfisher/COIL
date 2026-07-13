@@ -174,6 +174,54 @@ enum AppAppearance: String, CaseIterable, Identifiable {
     static let storageKey = "coil.appearance"
 }
 
+// MARK: - COIL Brandmark
+
+/// The COIL coil/spring glyph — a clean Archimedean spiral in the brand teal.
+struct CoilGlyph: View {
+    var color: Color = AppColors.accent
+    var lineWidth: CGFloat = 2.2
+
+    var body: some View {
+        GeometryReader { geo in
+            let w = geo.size.width, h = geo.size.height
+            let cx = w / 2, cy = h / 2
+            let maxR = min(w, h) * 0.46
+            let turns: CGFloat = 2.6
+            let steps = 140
+            Path { p in
+                for i in 0...steps {
+                    let t = CGFloat(i) / CGFloat(steps)
+                    let angle = t * turns * 2 * .pi - .pi / 2
+                    let r = maxR * t
+                    let pt = CGPoint(x: cx + r * cos(angle), y: cy + r * sin(angle))
+                    if i == 0 { p.move(to: pt) } else { p.addLine(to: pt) }
+                }
+            }
+            .stroke(color, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round))
+        }
+    }
+}
+
+/// COIL wordmark — spiral glyph + letter-spaced wordmark. Used in nav bars and hero screens.
+struct CoilWordmark: View {
+    var fontSize: CGFloat = 18
+    var glyph: CGFloat = 22
+    var textColor: Color = .white
+
+    var body: some View {
+        HStack(spacing: 7) {
+            CoilGlyph(lineWidth: max(2, glyph * 0.11))
+                .frame(width: glyph, height: glyph)
+            Text("COIL")
+                .font(Font.custom("Industry-Bold", size: fontSize))
+                .tracking(fontSize * 0.22)
+                .foregroundColor(textColor)
+        }
+        .accessibilityElement()
+        .accessibilityLabel("COIL")
+    }
+}
+
 // MARK: - Spacing
 
 enum AppSpacing {
@@ -310,12 +358,7 @@ struct MVVCNavBarModifier: ViewModifier {
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Image("MVVCLogoStacked")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 56)
-                        .clipped(antialiased: false)
-                        .fixedSize()
+                    CoilWordmark()
                 }
             }
     }

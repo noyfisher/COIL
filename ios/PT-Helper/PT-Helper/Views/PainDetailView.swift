@@ -50,12 +50,7 @@ struct PainDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Image("MVVCLogoStacked")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 56)
-                    .clipped(antialiased: false)
-                    .fixedSize()
+                CoilWordmark()
             }
         }
         .mvvcNavBar()

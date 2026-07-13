@@ -39,11 +39,8 @@ struct LoginView: View {
             VStack(alignment: .leading, spacing: 0) {
                 Spacer().frame(height: AppSpacing.xxxl)
 
-                // MVVC logo
-                Image("MVVCLogo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 260)
+                // COIL wordmark
+                CoilWordmark(fontSize: 40, glyph: 46)
                     .padding(.horizontal, AppSpacing.xxl)
 
                 Spacer()
@@ -68,7 +65,7 @@ struct LoginView: View {
                 Spacer().frame(height: AppSpacing.lg)
 
                 // Subhead
-                Text("AI-powered recovery, built for Mountain View athletes.")
+                Text("AI-powered recovery, built for COIL athletes.")
                     .font(AppFonts.body)
                     .foregroundColor(.white.opacity(0.5))
                     .padding(.horizontal, AppSpacing.xxl)
@@ -116,7 +113,7 @@ struct LoginView: View {
                 Spacer().frame(height: AppSpacing.lg)
 
                 // Footer
-                Text("For authorized MVVC athletes only")
+                Text("For authorized COIL athletes only")
                     .font(AppFonts.micro)
                     .foregroundColor(.white.opacity(0.3))
                     .frame(maxWidth: .infinity, alignment: .center)
