@@ -128,7 +128,7 @@ struct WellnessDetailView: View {
     // MARK: - Impact Level
 
     private var impactLevelSection: some View {
-        CardSection(icon: "gauge.medium", color: .orange, title: "How much does this affect your daily life?") {
+        CardSection(icon: "gauge.medium", color: AppColors.warning, title: "How much does this affect your daily life?") {
             FlowLayout(spacing: AppSpacing.sm) {
                 ForEach(WellnessAssessment.ImpactLevel.allCases, id: \.self) { level in
                     ChipButton(
@@ -144,7 +144,7 @@ struct WellnessDetailView: View {
     // MARK: - Motivation Slider
 
     private var motivationSection: some View {
-        CardSection(icon: "flame.fill", color: .red, title: "How motivated are you to improve this?") {
+        CardSection(icon: "flame.fill", color: Color(CoilPalette.pop), title: "How motivated are you to improve this?") {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 HStack {
                     Text("\(Int(motivationLevel))")
@@ -246,7 +246,7 @@ struct WellnessDetailView: View {
     // MARK: - Activities Affected (Goal-specific + custom)
 
     private var activitiesAffectedSection: some View {
-        CardSection(icon: "figure.walk", color: .indigo, title: "Daily activities affected") {
+        CardSection(icon: "figure.walk", color: AppColors.accent, title: "Daily activities affected") {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 FlowLayout(spacing: AppSpacing.sm) {
                     ForEach(dailyActivitiesOptions, id: \.self) { activity in
@@ -292,7 +292,7 @@ struct WellnessDetailView: View {
     // MARK: - Current Habits (Goal-specific + custom)
 
     private var currentHabitsSection: some View {
-        CardSection(icon: "heart.fill", color: .green, title: "What do you currently do that helps?") {
+        CardSection(icon: "heart.fill", color: AppColors.success, title: "What do you currently do that helps?") {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 FlowLayout(spacing: AppSpacing.sm) {
                     ForEach(currentHabitsOptions, id: \.self) { habit in
@@ -359,7 +359,7 @@ struct WellnessDetailView: View {
     // MARK: - Context (Free text)
 
     private var contextSection: some View {
-        CardSection(icon: "text.alignleft", color: .mint, title: "Tell us more about your situation") {
+        CardSection(icon: "text.alignleft", color: AppColors.accent, title: "Tell us more about your situation") {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 HStack(spacing: AppSpacing.xs) {
                     Image(systemName: "sparkles")

@@ -15,7 +15,7 @@ struct ExerciseIllustrationView: View {
     private var gradientColors: [Color] {
         switch difficulty {
         case .beginner:
-            return [Color.green.opacity(0.7), Color.green]
+            return [AppColors.success.opacity(0.7), AppColors.success]
         case .intermediate:
             return [AppColors.accent.opacity(0.7), AppColors.accent]
         case .advanced:
@@ -33,7 +33,7 @@ struct ExerciseIllustrationView: View {
 
     private var difficultyColor: Color {
         switch difficulty {
-        case .beginner: return .green
+        case .beginner: return AppColors.success
         case .intermediate: return AppColors.accent
         case .advanced: return AppColors.accent
         }
@@ -172,7 +172,7 @@ struct ExercisePositionGuideView: View {
         if startPosition != nil || movement != nil || endPosition != nil {
             VStack(alignment: .leading, spacing: 16) {
                 if let start = startPosition {
-                    positionStep(number: 1, label: "Starting Position", text: start, color: .green)
+                    positionStep(number: 1, label: "Starting Position", text: start, color: AppColors.success)
                 }
                 if let move = movement {
                     positionStep(number: 2, label: "Movement", text: move, color: AppColors.accent)
@@ -226,9 +226,9 @@ struct DifficultyBadge: View {
 
     private var color: Color {
         switch difficulty {
-        case .beginner: return .green
-        case .intermediate: return AppColors.accent
-        case .advanced: return AppColors.accent
+        case .beginner: return AppColors.success
+        case .intermediate: return AppColors.warning
+        case .advanced: return AppColors.danger
         }
     }
 

@@ -120,7 +120,7 @@ struct ProgressTabContent: View {
                 // Log Workout card
                 NavigationLink(destination: WorkoutSessionView()) {
                     navLinkRow(icon: "figure.strengthtraining.traditional",
-                               iconColor: .purple,
+                               iconColor: AppColors.accent,
                                title: "Log Workout")
                 }
                 .buttonStyle(.plain)
@@ -506,21 +506,21 @@ struct ProgressTabContent: View {
                 // Promote the day streak — the number users actually build toward —
                 // over "Total Min", which nobody opens the app to check (audit #38).
                 statCard(icon: streakService.streakData.isActive ? "flame.fill" : "flame",
-                         color: .orange,
+                         color: Color(CoilPalette.pop),
                          value: "\(streakService.streakData.currentStreak)",
                          label: "Day Streak")
             }
             if let personalBest = personalBestText {
                 HStack(spacing: AppSpacing.xs) {
                     Image(systemName: "rosette")
-                        .foregroundColor(.orange)
+                        .foregroundColor(Color(CoilPalette.pop))
                     Text(personalBest)
                         .font(AppFonts.captionMedium)
                         .foregroundColor(AppColors.secondaryText)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, AppSpacing.sm)
-                .background(Color.orange.opacity(0.08))
+                .background(Color(CoilPalette.pop).opacity(0.08))
                 .cornerRadius(AppCorners.medium)
             }
         }

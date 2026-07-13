@@ -28,13 +28,13 @@ struct GuidedWorkoutSummaryView: View {
                 if let insight = insightText {
                     HStack(spacing: AppSpacing.sm) {
                         Image(systemName: "lightbulb.fill")
-                            .foregroundColor(.yellow)
+                            .foregroundColor(Color(CoilPalette.pop))
                         Text(insight)
                             .font(AppFonts.caption)
                             .foregroundColor(AppColors.secondaryText)
                     }
                     .padding(AppSpacing.md)
-                    .background(Color.yellow.opacity(0.08))
+                    .background(Color(CoilPalette.pop).opacity(0.08))
                     .cornerRadius(AppCorners.medium)
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
                 }
@@ -159,7 +159,7 @@ struct GuidedWorkoutSummaryView: View {
                 .font(.system(size: 50))
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [.yellow, .orange],
+                        colors: [Color(CoilPalette.pop), AppColors.warning],
                         startPoint: .top,
                         endPoint: .bottom
                     )
@@ -178,14 +178,14 @@ struct GuidedWorkoutSummaryView: View {
             if streakService.streakData.currentStreak >= 1 {
                 HStack(spacing: AppSpacing.xs) {
                     Image(systemName: "flame.fill")
-                        .foregroundColor(.orange)
+                        .foregroundColor(Color(CoilPalette.pop))
                     Text(streakChipText)
                         .font(AppFonts.captionSemiBold)
                         .foregroundColor(AppColors.primaryText)
                 }
                 .padding(.horizontal, AppSpacing.md)
                 .padding(.vertical, AppSpacing.xs)
-                .background(Color.orange.opacity(0.12))
+                .background(Color(CoilPalette.pop).opacity(0.12))
                 .clipShape(Capsule())
                 .accessibilityIdentifier("workoutSummary.streakChip")
             }

@@ -195,13 +195,13 @@ struct WellnessResultView: View {
                             // Key insight
                             HStack(alignment: .top, spacing: AppSpacing.sm) {
                                 Image(systemName: "lightbulb.fill")
-                                    .foregroundColor(.yellow)
+                                    .foregroundColor(Color(CoilPalette.pop))
                                 Text(rec.keyInsight)
                                     .font(AppFonts.bodyMedium)
                             }
                             .padding(AppSpacing.md)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color.yellow.opacity(0.1))
+                            .background(Color(CoilPalette.pop).opacity(0.1))
                             .cornerRadius(AppCorners.small)
 
                             // Timeline
@@ -297,7 +297,7 @@ struct WellnessResultView: View {
                         }
                     }
 
-                    CardSection(icon: "speedometer", color: .orange, title: "Difficulty Level") {
+                    CardSection(icon: "speedometer", color: AppColors.warning, title: "Difficulty Level") {
                         FlowLayout(spacing: AppSpacing.sm) {
                             ForEach(RehabPlanPreferences.DifficultyPreference.allCases, id: \.self) { option in
                                 ChipButton(

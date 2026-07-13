@@ -232,7 +232,7 @@ struct GuidedWorkoutView: View {
                                     HStack(alignment: .top, spacing: AppSpacing.xs) {
                                         Image(systemName: "lightbulb.fill")
                                             .font(.caption2)
-                                            .foregroundColor(.yellow)
+                                            .foregroundColor(Color(CoilPalette.pop))
                                         Text(tip)
                                             .font(AppFonts.caption)
                                             .foregroundColor(AppColors.secondaryText)

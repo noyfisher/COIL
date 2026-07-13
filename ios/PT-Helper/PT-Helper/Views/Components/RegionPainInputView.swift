@@ -147,9 +147,9 @@ struct RegionPainInputView: View {
 
     private func painColor(for level: Double) -> Color {
         switch Int(level) {
-        case 0...3: return .green
-        case 4...6: return .orange
-        default: return .red
+        case 0...3: return AppColors.success
+        case 4...6: return AppColors.warning
+        default: return AppColors.danger
         }
     }
 
