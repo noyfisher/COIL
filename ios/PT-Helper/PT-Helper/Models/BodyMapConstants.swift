@@ -87,7 +87,7 @@ enum BodyMapConstants {
 
     // MARK: - Highlight Material
 
-    static let highlightColor = UIColor(red: 0.800, green: 0.000, blue: 0.000, alpha: 1.0)
+    static let highlightColor = CoilPalette.hex(0x0FB5B0) // COIL teal selection tint
     static let highlightRoughness: Float = 0.25
     static let highlightMetallic: Float = 0.15
 
@@ -104,7 +104,7 @@ enum BodyMapConstants {
     /// Baked as a full-opacity color because SimpleMaterial tint alpha is
     /// transparency, not a paint wash — a low-alpha red would make the body
     /// see-through to the scene background.
-    static let regionWash = UIColor(red: 0.984, green: 0.920, blue: 0.920, alpha: 1)  // #FBEBEB — MVVC accent ~8% over white
+    static let regionWash = CoilPalette.hex(0xEDF3F2)  // faint COIL teal wash over white
 
     /// Default color coding for each region group when the mannequin is shown
     /// in the OVERVIEW state (no zone drilled in). Every region renders with
@@ -142,14 +142,14 @@ enum BodyMapConstants {
     // exclusive on screen, the same palette colors can be reused across zones
     // — only one zone is ever visible at a time.
 
-    // Palette swatches (MVVC tokens reused across zones)
-    private static let paletteAccent     = UIColor(red: 0.800, green: 0,     blue: 0,     alpha: 1)  // #CC0000 accent
-    private static let paletteAccentDark = UIColor(red: 0.639, green: 0,     blue: 0,     alpha: 1)  // #A30000 accentDark
-    private static let paletteSuccess    = UIColor(red: 0.176, green: 0.478, blue: 0.227, alpha: 1)  // #2D7A3A success
-    private static let paletteWarning    = UIColor(red: 0.722, green: 0.478, blue: 0,     alpha: 1)  // #B87A00 warning
-    private static let paletteWarmEnd    = UIColor(red: 0.612, green: 0.380, blue: 0,     alpha: 1)  // #9C6100 warmGradient end
-    private static let paletteMuted      = UIColor(red: 0.533, green: 0.533, blue: 0.533, alpha: 1)  // #888888 mutedText
-    private static let paletteDark       = UIColor(red: 0.067, green: 0.067, blue: 0.067, alpha: 1)  // #111111 primaryText
+    // Palette swatches (COIL tokens reused across zones)
+    private static let paletteAccent     = CoilPalette.hex(0x0FB5B0)  // teal accent
+    private static let paletteAccentDark = CoilPalette.hex(0x0B7A78)  // deep teal
+    private static let paletteSuccess    = CoilPalette.hex(0x1E874B)  // success green
+    private static let paletteWarning    = CoilPalette.hex(0xC67A00)  // warning amber
+    private static let paletteWarmEnd    = CoilPalette.hex(0xF5A623)  // pop amber
+    private static let paletteMuted      = CoilPalette.hex(0x7A8A8D)  // teal-grey muted
+    private static let paletteDark       = CoilPalette.hex(0x0E1C22)  // ink
 
     /// Per-zone color assignment used during drill-down only. Outer key =
     /// `BodyZone.rawValue`; inner key = base region key (no left_/right_ prefix).
@@ -236,8 +236,9 @@ enum BodyMapConstants {
 
     // MARK: - Background
 
-    static let sceneBackground = UIColor(red: 0.949, green: 0.945, blue: 0.937, alpha: 1.0)          // #F2F1EF — MVVC pageBackground
-    static let loadingOverlayBackground = UIColor(red: 0.949, green: 0.945, blue: 0.937, alpha: 0.95) // #F2F1EF — MVVC pageBackground
+    static let sceneBackground = CoilPalette.dyn(CoilPalette.hex(0xF3F5F4), CoilPalette.hex(0x0E1518))          // COIL page (adaptive)
+    static let loadingOverlayBackground = CoilPalette.dyn(CoilPalette.hex(0xF3F5F4).withAlphaComponent(0.95),
+                                                          CoilPalette.hex(0x0E1518).withAlphaComponent(0.95))    // COIL page (adaptive)
 
     // MARK: - Helpers
 
