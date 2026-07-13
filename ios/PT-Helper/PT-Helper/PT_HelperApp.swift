@@ -26,7 +26,13 @@ struct PainPointApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootView()
+            Group {
+                if ProcessInfo.processInfo.arguments.contains("--showcase") {
+                    ShowcaseHostView()
+                } else {
+                    RootView()
+                }
+            }
                 .preferredColorScheme(.light)
                 .onOpenURL { url in
                     GIDSignIn.sharedInstance.handle(url)
