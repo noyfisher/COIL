@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // MARK: - Notifications
 
@@ -7,87 +8,131 @@ extension Notification.Name {
     static let deepLink = Notification.Name("deepLink")
 }
 
-// MARK: - Design Tokens (MVVC Rebrand)
-// Colors from mvvc-design-system.js. Add Industry-Bold.otf and Inter-* font files
-// to the Xcode project and register them in Info.plist under UIAppFonts to activate
-// the custom typography. SwiftUI falls back to system sans-serif until then.
+// MARK: - COIL Design Tokens
+// Two-tier adaptive color system (light + dark).
+// Tier 0 `CoilPalette` holds the raw hues — the ONLY place RGB lives — and is shared by
+// both AppColors (SwiftUI) and Models/BodyMapConstants (UIKit/RealityKit).
+// Tier 1 `AppColors` maps semantic roles onto Tier 0; token names are preserved so
+// component/screen code needs no changes. Headings use Industry-Bold; body uses Inter
+// (registered in Info.plist under UIAppFonts).
+
+enum CoilPalette {
+    /// Build a light/dark adaptive UIColor from two fixed hues.
+    static func dyn(_ light: UIColor, _ dark: UIColor) -> UIColor {
+        UIColor { $0.userInterfaceStyle == .dark ? dark : light }
+    }
+    /// 0xRRGGBB → opaque UIColor.
+    static func hex(_ v: Int) -> UIColor {
+        UIColor(red: CGFloat((v >> 16) & 0xFF) / 255.0,
+                green: CGFloat((v >> 8) & 0xFF) / 255.0,
+                blue: CGFloat(v & 0xFF) / 255.0, alpha: 1.0)
+    }
+
+    // Brand — teal ("Coiled energy")
+    static let accent       = dyn(hex(0x0FB5B0), hex(0x2CC7C2))
+    static let accentDeep   = dyn(hex(0x0B7A78), hex(0x17A6A2)) // CTA / text on white
+    static let accentBright = dyn(hex(0x3FD0CB), hex(0x5FE0DB))
+    static let accentDeeper = dyn(hex(0x075E5C), hex(0x0B7A78))
+
+    // Ink / chrome — fixed dark in BOTH modes (nav bar, tab bar, hero surfaces)
+    static let ink         = hex(0x0E1C22)
+    static let inkElevated = hex(0x16303A)
+    static let inkDeep     = hex(0x0B1418)
+
+    // Neutral surfaces
+    static let page     = dyn(hex(0xF3F5F4), hex(0x0E1518))
+    static let card     = dyn(hex(0xFFFFFF), hex(0x16232A))
+    static let elevated = dyn(hex(0xF5F7F6), hex(0x1C2A31))
+    static let inputBg  = dyn(hex(0xF8FAF9), hex(0x111D22))
+
+    // Text
+    static let textPrimary   = dyn(hex(0x111A1D), hex(0xEAF2F1))
+    static let textSecondary = dyn(hex(0x4B5A5E), hex(0x9DB2B3))
+    static let textMuted     = dyn(hex(0x7A8A8D), hex(0x6E8285))
+
+    // Semantics — decoupled from the brand hue
+    static let errorRed = dyn(hex(0xD64541), hex(0xF0736E))
+    static let success  = dyn(hex(0x1E874B), hex(0x3FBE77))
+    static let warning  = dyn(hex(0xC67A00), hex(0xE8A73B))
+    static let infoBlue = dyn(hex(0x2E74C7), hex(0x5DA0E8))
+    static let pop      = dyn(hex(0xF5A623), hex(0xFBC15A)) // streaks / achievements
+
+    // Hairline (adaptive black/white alpha)
+    static let hairline = dyn(UIColor.black.withAlphaComponent(0.08),
+                              UIColor.white.withAlphaComponent(0.10))
+}
 
 enum AppColors {
     // MARK: Brand
-    static let accent       = Color(red: 0.800, green: 0,     blue: 0)     // #CC0000 — MVVC red
-    static let success      = Color(red: 0.176, green: 0.478, blue: 0.227) // #2D7A3A
-    static let warning      = Color(red: 0.722, green: 0.478, blue: 0)     // #B87A00
-    static let danger       = Color(red: 0.800, green: 0,     blue: 0)     // #CC0000 — same as brand red
-    static let info         = Color(red: 0.800, green: 0,     blue: 0)     // #CC0000
+    static let accent  = Color(CoilPalette.accent)
+    static let success = Color(CoilPalette.success)
+    static let warning = Color(CoilPalette.warning)
+    static let danger  = Color(CoilPalette.errorRed)   // decoupled from brand
+    static let info    = Color(CoilPalette.infoBlue)   // decoupled from brand
 
-    // MARK: Text (light surfaces)
-    static let primaryText    = Color(red: 0.067, green: 0.067, blue: 0.067) // #111111
-    static let secondaryText  = Color(red: 0.333, green: 0.333, blue: 0.333) // #555555
-    static let mutedText      = Color(red: 0.533, green: 0.533, blue: 0.533) // #888888
-
-    // MARK: Text (dark surfaces)
+    // MARK: Text
+    static let primaryText    = Color(CoilPalette.textPrimary)
+    static let secondaryText  = Color(CoilPalette.textSecondary)
+    static let mutedText      = Color(CoilPalette.textMuted)
     static let textOnDark      = Color.white
     static let textOnDarkMuted = Color.white.opacity(0.6)
 
     // MARK: Surfaces
-    static let cardBackground = Color.white                                         // #FFFFFF
-    static let pageBackground = Color(red: 0.949, green: 0.945, blue: 0.937)       // #F2F1EF
-    static let elevatedSurface = Color(red: 0.961, green: 0.957, blue: 0.949)      // #F5F4F2
-    static let inputBackground = Color(red: 0.973, green: 0.969, blue: 0.965)      // #F8F7F6
-    static let subtleBorder    = Color.black.opacity(0.08)
+    static let cardBackground  = Color(CoilPalette.card)
+    static let pageBackground  = Color(CoilPalette.page)
+    static let elevatedSurface = Color(CoilPalette.elevated)
+    static let inputBackground = Color(CoilPalette.inputBg)
+    static let subtleBorder    = Color(CoilPalette.hairline)
 
-    // MARK: Dark surfaces (nav bar, hero cards, workout screen)
-    static let darkSurface        = Color(red: 0.067, green: 0.067, blue: 0.067) // #111111
-    static let darkSurfaceElevated = Color(red: 0.102, green: 0.102, blue: 0.102) // #1A1A1A
-    static let navBackground      = Color(red: 0.067, green: 0.067, blue: 0.067) // #111111
-    static let navBorder          = Color.white.opacity(0.08)
+    // MARK: Dark surfaces (nav bar, hero cards, workout screen — fixed dark both modes)
+    static let darkSurface         = Color(CoilPalette.ink)
+    static let darkSurfaceElevated = Color(CoilPalette.inkElevated)
+    static let navBackground       = Color(CoilPalette.ink)
+    static let navBorder           = Color.white.opacity(0.08)
 
     // MARK: Tab bar
-    static let tabActive   = Color(red: 0.800, green: 0, blue: 0)   // #CC0000
+    static let tabActive   = Color(CoilPalette.accent)
     static let tabInactive = Color.white.opacity(0.45)
 
     // MARK: CTA
-    static let ctaBackground = Color(red: 0.800, green: 0, blue: 0) // #CC0000
+    static let ctaBackground = Color(CoilPalette.accentDeep)
     static let ctaText       = Color.white
 
     // MARK: Accent variants
-    static let accentLight = Color(red: 0.910, green: 0,     blue: 0.051) // #E8000D
-    static let accentDark  = Color(red: 0.639, green: 0,     blue: 0)     // #A30000
-    static let accentTint  = Color(red: 0.800, green: 0,     blue: 0).opacity(0.10)
+    static let accentLight = Color(CoilPalette.accentBright)
+    static let accentDark  = Color(CoilPalette.accentDeeper)
+    static let accentTint  = Color(CoilPalette.accent).opacity(0.10)
 
     // MARK: Chip
-    static let chipSelectedBg     = Color(red: 0.800, green: 0, blue: 0) // #CC0000
-    static let chipSelectedBorder = Color(red: 0.800, green: 0, blue: 0)
+    static let chipSelectedBg     = Color(CoilPalette.accent)
+    static let chipSelectedBorder = Color(CoilPalette.accent)
     static let chipSelectedText   = Color.white
 
     // MARK: Card styling
-    static let cardBorder      = Color.black.opacity(0.08)
+    static let cardBorder      = Color(CoilPalette.hairline)
     static let cardShadowColor = Color.black.opacity(0.06)
-    static let inputFocusBorder = Color(red: 0.800, green: 0, blue: 0)
+    static let inputFocusBorder = Color(CoilPalette.accent)
 
     // MARK: Gradients
     static let primaryGradient = LinearGradient(
-        colors: [Color(red: 0.800, green: 0, blue: 0), Color(red: 0.639, green: 0, blue: 0)],
+        colors: [Color(CoilPalette.accent), Color(CoilPalette.accentDeep)],
         startPoint: .topLeading, endPoint: .bottomTrailing
     )
     static let warmGradient = LinearGradient(
-        colors: [Color(red: 0.722, green: 0.478, blue: 0), Color(red: 0.612, green: 0.380, blue: 0)],
+        colors: [Color(CoilPalette.pop), Color(CoilPalette.warning)],
         startPoint: .topLeading, endPoint: .bottomTrailing
     )
     static let coolGradient = LinearGradient(
-        colors: [Color(red: 0.800, green: 0, blue: 0), Color(red: 0.910, green: 0, blue: 0.051)],
+        colors: [Color(CoilPalette.accent), Color(CoilPalette.accentBright)],
         startPoint: .topLeading, endPoint: .bottomTrailing
     )
     static let healingGradient = LinearGradient(
-        colors: [Color(red: 0.800, green: 0, blue: 0), Color(red: 0.639, green: 0, blue: 0)],
+        colors: [Color(CoilPalette.accent), Color(CoilPalette.accentDeep)],
         startPoint: .topLeading, endPoint: .bottomTrailing
     )
-    // Login / launch screen background
+    // Login / launch / hero background — fixed dark in both modes
     static let bgGradient = LinearGradient(
-        colors: [
-            Color(red: 0.067, green: 0.067, blue: 0.067),
-            Color(red: 0.102, green: 0.102, blue: 0.102)
-        ],
+        colors: [Color(CoilPalette.inkDeep), Color(CoilPalette.ink)],
         startPoint: .top, endPoint: .bottom
     )
 
