@@ -13,10 +13,10 @@ struct LoginView: View {
 
     var body: some View {
         ZStack {
-            // Black background
-            Color(red: 0.067, green: 0.067, blue: 0.067).ignoresSafeArea()
+            // Dark slate background
+            AppColors.darkSurface.ignoresSafeArea()
 
-            // Diagonal red accent — top-right
+            // Diagonal accent — top-right
             GeometryReader { geo in
                 LinearGradient(
                     colors: [AppColors.accent.opacity(0.18), .clear],
@@ -39,27 +39,31 @@ struct LoginView: View {
             VStack(alignment: .leading, spacing: 0) {
                 Spacer().frame(height: AppSpacing.xxxl)
 
-                // MVVC logo
-                Image("MVVCLogo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 260)
-                    .padding(.horizontal, AppSpacing.xxl)
+                // Wordmark
+                HStack(spacing: AppSpacing.md) {
+                    Image(systemName: "figure.run.circle.fill")
+                        .font(.system(size: 40))
+                        .foregroundColor(AppColors.accentLight)
+                    Text("PT Helper")
+                        .font(Font.custom("Inter-Bold", size: 34))
+                        .foregroundColor(AppColors.textOnDark)
+                }
+                .padding(.horizontal, AppSpacing.xxl)
 
                 Spacer()
 
                 // Hero headline
                 VStack(alignment: .leading, spacing: 0) {
                     Text("ASSESS.")
-                        .font(Font.custom("Industry-Bold", size: 44))
+                        .font(Font.custom("Inter-Bold", size: 44))
                         .foregroundColor(AppColors.textOnDark)
                         .kerning(0.5)
                     Text("PLAN.")
-                        .font(Font.custom("Industry-Bold", size: 44))
+                        .font(Font.custom("Inter-Bold", size: 44))
                         .foregroundColor(AppColors.accent)
                         .kerning(0.5)
                     Text("RECOVER.")
-                        .font(Font.custom("Industry-Bold", size: 44))
+                        .font(Font.custom("Inter-Bold", size: 44))
                         .foregroundColor(AppColors.textOnDark)
                         .kerning(0.5)
                 }
@@ -68,7 +72,7 @@ struct LoginView: View {
                 Spacer().frame(height: AppSpacing.lg)
 
                 // Subhead
-                Text("AI-powered recovery, built for Mountain View athletes.")
+                Text("AI-powered recovery, personalized for you.")
                     .font(AppFonts.body)
                     .foregroundColor(.white.opacity(0.5))
                     .padding(.horizontal, AppSpacing.xxl)
@@ -112,14 +116,6 @@ struct LoginView: View {
                     }
                 }
                 .padding(.horizontal, AppSpacing.xxl)
-
-                Spacer().frame(height: AppSpacing.lg)
-
-                // Footer
-                Text("For authorized MVVC athletes only")
-                    .font(AppFonts.micro)
-                    .foregroundColor(.white.opacity(0.3))
-                    .frame(maxWidth: .infinity, alignment: .center)
 
                 Spacer().frame(height: AppSpacing.xxl)
             }

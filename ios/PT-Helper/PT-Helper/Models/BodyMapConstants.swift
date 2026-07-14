@@ -87,7 +87,7 @@ enum BodyMapConstants {
 
     // MARK: - Highlight Material
 
-    static let highlightColor = UIColor(red: 0.800, green: 0.000, blue: 0.000, alpha: 1.0)
+    static let highlightColor = UIColor(red: 0.106, green: 0.424, blue: 0.659, alpha: 1.0) // #1B6CA8 Recover Blue
     static let highlightRoughness: Float = 0.25
     static let highlightMetallic: Float = 0.15
 
@@ -98,17 +98,17 @@ enum BodyMapConstants {
 
     // MARK: - Region Color Palette
 
-    /// MVVC palette: every region renders with the same faint-pink wash so the
-    /// mannequin reads as a single neutral surface; the saturated MVVC-red
-    /// selection tint provides all the per-region differentiation users need.
+    /// Recovery palette: every region renders with the same faint-blue wash so
+    /// the mannequin reads as a single neutral surface; the saturated Recover
+    /// Blue selection tint provides all the per-region differentiation users need.
     /// Baked as a full-opacity color because SimpleMaterial tint alpha is
-    /// transparency, not a paint wash — a low-alpha red would make the body
+    /// transparency, not a paint wash — a low-alpha blue would make the body
     /// see-through to the scene background.
-    static let regionWash = UIColor(red: 0.984, green: 0.920, blue: 0.920, alpha: 1)  // #FBEBEB — MVVC accent ~8% over white
+    static let regionWash = UIColor(red: 0.929, green: 0.953, blue: 0.973, alpha: 1)  // #EDF3F8 — accent ~8% over white
 
     /// Default color coding for each region group when the mannequin is shown
     /// in the OVERVIEW state (no zone drilled in). Every region renders with
-    /// the unified pink wash so the mannequin reads as a single neutral surface.
+    /// the unified blue wash so the mannequin reads as a single neutral surface.
     /// During drill-down, regions in the active zone are repainted using
     /// `zoneRegionColors` for at-a-glance differentiation; the wash returns
     /// on exit. Bilateral pairs share a color. Key = base region key
@@ -137,19 +137,19 @@ enum BodyMapConstants {
     // MARK: - Per-Zone Palette (drill-down only)
     //
     // When the user drills into a zone, every region in that zone is repainted
-    // with a distinct MVVC palette color so the sub-regions are instantly
+    // with a distinct recovery-palette color so the sub-regions are instantly
     // distinguishable. On exit, the wash returns. Because zones are mutually
     // exclusive on screen, the same palette colors can be reused across zones
     // — only one zone is ever visible at a time.
 
-    // Palette swatches (MVVC tokens reused across zones)
-    private static let paletteAccent     = UIColor(red: 0.800, green: 0,     blue: 0,     alpha: 1)  // #CC0000 accent
-    private static let paletteAccentDark = UIColor(red: 0.639, green: 0,     blue: 0,     alpha: 1)  // #A30000 accentDark
-    private static let paletteSuccess    = UIColor(red: 0.176, green: 0.478, blue: 0.227, alpha: 1)  // #2D7A3A success
-    private static let paletteWarning    = UIColor(red: 0.722, green: 0.478, blue: 0,     alpha: 1)  // #B87A00 warning
-    private static let paletteWarmEnd    = UIColor(red: 0.612, green: 0.380, blue: 0,     alpha: 1)  // #9C6100 warmGradient end
-    private static let paletteMuted      = UIColor(red: 0.533, green: 0.533, blue: 0.533, alpha: 1)  // #888888 mutedText
-    private static let paletteDark       = UIColor(red: 0.067, green: 0.067, blue: 0.067, alpha: 1)  // #111111 primaryText
+    // Palette swatches (design tokens reused across zones)
+    private static let paletteAccent     = UIColor(red: 0.106, green: 0.424, blue: 0.659, alpha: 1)  // #1B6CA8 accent
+    private static let paletteAccentDark = UIColor(red: 0.082, green: 0.353, blue: 0.557, alpha: 1)  // #155A8E accentDark
+    private static let paletteSuccess    = UIColor(red: 0.165, green: 0.682, blue: 0.510, alpha: 1)  // #2AAE82 success
+    private static let paletteWarning    = UIColor(red: 0.941, green: 0.761, blue: 0.227, alpha: 1)  // #F0C23A warning
+    private static let paletteWarmEnd    = UIColor(red: 0.941, green: 0.482, blue: 0.227, alpha: 1)  // #F07B3A warmAccent
+    private static let paletteMuted      = UIColor(red: 0.490, green: 0.576, blue: 0.651, alpha: 1)  // #7D93A6 mutedText
+    private static let paletteDark       = UIColor(red: 0.110, green: 0.169, blue: 0.227, alpha: 1)  // #1C2B3A primaryText
 
     /// Per-zone color assignment used during drill-down only. Outer key =
     /// `BodyZone.rawValue`; inner key = base region key (no left_/right_ prefix).
@@ -236,8 +236,8 @@ enum BodyMapConstants {
 
     // MARK: - Background
 
-    static let sceneBackground = UIColor(red: 0.949, green: 0.945, blue: 0.937, alpha: 1.0)          // #F2F1EF — MVVC pageBackground
-    static let loadingOverlayBackground = UIColor(red: 0.949, green: 0.945, blue: 0.937, alpha: 0.95) // #F2F1EF — MVVC pageBackground
+    static let sceneBackground = UIColor(red: 0.918, green: 0.941, blue: 0.961, alpha: 1.0)          // #EAF0F5 — Cloud Base pageBackground
+    static let loadingOverlayBackground = UIColor(red: 0.918, green: 0.941, blue: 0.961, alpha: 0.95) // #EAF0F5 — Cloud Base pageBackground
 
     // MARK: - Helpers
 

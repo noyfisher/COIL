@@ -114,7 +114,7 @@ struct ThreeTabView: View {
             }
         }
         .onAppear {
-            applyMVVCNavBarAppearance()
+            applyAppNavBarAppearance()
             if let tab = NotificationService.shared.pendingDeepLink {
                 switch tab {
                 case "home", "analyze": tabSelection.selectedTab = 0
@@ -128,28 +128,28 @@ struct ThreeTabView: View {
         }
     }
 
-    // MARK: - MVVC UIKit Appearance (nav bar only — tab bar is custom)
+    // MARK: - UIKit Appearance (nav bar only — tab bar is custom)
 
-    private func applyMVVCNavBarAppearance() {
+    private func applyAppNavBarAppearance() {
         let navBgColor = UIColor(AppColors.navBackground)
 
         let navBar = UINavigationBarAppearance()
         navBar.configureWithOpaqueBackground()
         navBar.backgroundColor = navBgColor
         navBar.shadowColor = UIColor(AppColors.navBorder)
-        let titleFont = UIFont(name: "Industry-Bold", size: 19)
-            ?? UIFont.systemFont(ofSize: 19, weight: .black)
-        let largeTitleFont = UIFont(name: "Industry-Bold", size: 28)
-            ?? UIFont.systemFont(ofSize: 28, weight: .black)
+        let titleFont = UIFont(name: "Inter-Bold", size: 19)
+            ?? UIFont.systemFont(ofSize: 19, weight: .bold)
+        let largeTitleFont = UIFont(name: "Inter-Bold", size: 28)
+            ?? UIFont.systemFont(ofSize: 28, weight: .bold)
         navBar.titleTextAttributes = [.foregroundColor: UIColor.white, .font: titleFont]
         navBar.largeTitleTextAttributes = [.foregroundColor: UIColor.white, .font: largeTitleFont]
         let backImage = UIImage(systemName: "chevron.left")?
-            .withTintColor(UIColor(AppColors.accent), renderingMode: .alwaysOriginal)
+            .withTintColor(.white, renderingMode: .alwaysOriginal)
         navBar.setBackIndicatorImage(backImage, transitionMaskImage: backImage)
         UINavigationBar.appearance().standardAppearance = navBar
         UINavigationBar.appearance().compactAppearance = navBar
         UINavigationBar.appearance().scrollEdgeAppearance = navBar
-        UINavigationBar.appearance().tintColor = UIColor(AppColors.accent)
+        UINavigationBar.appearance().tintColor = .white
     }
 }
 
@@ -244,12 +244,12 @@ struct FloatingTabBar: View {
             } label: {
                 ZStack {
                     Circle()
-                        .fill(AppColors.accent)
+                        .fill(Color.white)
                         .frame(width: 56, height: 56)
-                        .shadow(color: AppColors.accent.opacity(0.5), radius: 10, x: 0, y: -4)
+                        .shadow(color: Color.black.opacity(0.25), radius: 10, x: 0, y: -4)
                     Image(systemName: "plus")
                         .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(AppColors.accent)
                 }
             }
             .accessibilityLabel("New Assessment")

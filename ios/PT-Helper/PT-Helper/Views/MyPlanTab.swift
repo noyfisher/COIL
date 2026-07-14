@@ -28,9 +28,8 @@ struct MyPlanTab: View {
                     planContent
                 }
             }
-            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
-            .mvvcNavBar()
+            .appNavBar("My Plan")
             .refreshable { savedPlansViewModel.fetchRehabPlans() }
             .alert("Delete Plan", isPresented: $showDeleteConfirmation) {
                 Button("Cancel", role: .cancel) { planToDelete = nil }
@@ -110,7 +109,7 @@ struct MyPlanTab: View {
                         .listRowBackground(Color.clear)
                 }
             } header: {
-                MVVCDividerHeader(title: selectedPlanType == .rehab ? "Injury Plans" : "Wellness Plans")
+                SectionDividerHeader(title: selectedPlanType == .rehab ? "Injury Plans" : "Wellness Plans")
                     .padding(.horizontal, AppSpacing.xs)
                     .padding(.bottom, AppSpacing.sm)
                     .textCase(nil)
@@ -137,12 +136,12 @@ struct MyPlanTab: View {
                     HStack(alignment: .top) {
                         VStack(alignment: .leading, spacing: AppSpacing.sm) {
                             HStack(spacing: AppSpacing.sm) {
-                                MVVCRedBadge(text: "Active")
+                                AccentBadge(text: "Active")
                                 Spacer()
                             }
 
                             Text(plan.planName)
-                                .font(Font.custom("Industry-Bold", size: 18))
+                                .font(Font.custom("Inter-Bold", size: 18))
                                 .textCase(.uppercase)
                                 .kerning(0.3)
                                 .foregroundColor(AppColors.primaryText)
@@ -168,7 +167,7 @@ struct MyPlanTab: View {
 
                         VStack(alignment: .trailing, spacing: AppSpacing.nano) {
                             Text("\(plan.totalWeeks)")
-                                .font(Font.custom("Industry-Bold", size: 32))
+                                .font(Font.custom("Inter-Bold", size: 32))
                                 .foregroundColor(AppColors.primaryText)
                             Text("weeks")
                                 .font(Font.custom("Inter-Regular", size: 10))

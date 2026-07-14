@@ -47,9 +47,8 @@ struct HomeTab: View {
                     }
                 }
             }
-            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
-            .mvvcNavBar()
+            .appNavBar("PT Helper")
         }
         .trackScreen("HomeTab")
     }
@@ -81,7 +80,7 @@ private struct WeeklyDateStrip: View {
                 // Month + "Today" button row
                 HStack {
                     Text(monthLabel)
-                        .font(Font.custom("Industry-Bold", size: 13))
+                        .font(Font.custom("Inter-Bold", size: 13))
                         .kerning(0.5)
                         .foregroundColor(Color.white.opacity(0.55))
 
@@ -173,7 +172,7 @@ private struct DayCell: View {
                 .foregroundColor(isSelected ? .white : Color.white.opacity(0.40))
 
             Text(Self.numFmt.string(from: date))
-                .font(Font.custom("Industry-Bold", size: 20))
+                .font(Font.custom("Inter-Bold", size: 20))
                 .foregroundColor(
                     isSelected ? .white
                     : isToday  ? AppColors.accent
@@ -218,7 +217,7 @@ private struct HomeTabPicker: View {
             withAnimation(.easeInOut(duration: 0.2)) { selected = tab }
         } label: {
             Text(label)
-                .font(Font.custom("Industry-Bold", size: 13))
+                .font(Font.custom("Inter-Bold", size: 13))
                 .textCase(.uppercase)
                 .kerning(0.5)
                 .foregroundColor(active ? .white : AppColors.secondaryText)
@@ -249,11 +248,11 @@ struct ProgramDayView: View {
     var body: some View {
         if let plan = plan {
             VStack(alignment: .leading, spacing: AppSpacing.md) {
-                MVVCDividerHeader(title: "\(dayLabel)'s Program")
+                SectionDividerHeader(title: "\(dayLabel)'s Program")
 
                 // Plan name badge
                 HStack(spacing: AppSpacing.sm) {
-                    MVVCRedBadge(text: "Active Plan")
+                    AccentBadge(text: "Active Plan")
                     Text(plan.planName)
                         .font(AppFonts.smallSemiBold)
                         .foregroundColor(AppColors.secondaryText)
@@ -394,7 +393,7 @@ struct PreventativeTasksView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
-            MVVCDividerHeader(title: "Daily Preventative Care")
+            SectionDividerHeader(title: "Daily Preventative Care")
 
             // Progress summary
             HStack(spacing: AppSpacing.sm) {

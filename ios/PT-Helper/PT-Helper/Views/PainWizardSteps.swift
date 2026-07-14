@@ -133,7 +133,7 @@ extension PainDetailView {
             VStack(alignment: .leading, spacing: AppSpacing.lg) {
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text("Review Your\nAssessment")
-                        .font(Font.custom("Industry-Bold", size: 32))
+                        .font(Font.custom("Inter-Bold", size: 32))
                         .textCase(.uppercase)
                         .kerning(0.3)
                         .foregroundColor(AppColors.primaryText)
@@ -368,7 +368,7 @@ extension PainDetailView {
     func questionTitle(_ text: String, hint: String? = nil) -> some View {
         VStack(alignment: .leading, spacing: AppSpacing.xs) {
             Text(text)
-                .font(Font.custom("Industry-Bold", size: 32))
+                .font(Font.custom("Inter-Bold", size: 32))
                 .textCase(.uppercase)
                 .kerning(0.3)
                 .foregroundColor(AppColors.primaryText)

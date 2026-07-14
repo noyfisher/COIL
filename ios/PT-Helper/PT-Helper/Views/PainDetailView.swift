@@ -46,19 +46,7 @@ struct PainDetailView: View {
 
             wizardNavigationBar
         }
-        .navigationTitle("")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Image("MVVCLogoStacked")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 56)
-                    .clipped(antialiased: false)
-                    .fixedSize()
-            }
-        }
-        .mvvcNavBar()
+        .appNavBar("Pain Assessment")
         .onAppear {
             if viewModel.currentRegionIndex == 0 {
                 AnalyticsService.shared.log(.assessmentStarted)

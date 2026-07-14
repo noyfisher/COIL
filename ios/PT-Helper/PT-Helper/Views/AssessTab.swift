@@ -43,7 +43,7 @@ struct AssessTab: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                         // Section header
-                        MVVCDividerHeader(title: "What Can We Help With?")
+                        SectionDividerHeader(title: "What Can We Help With?")
 
                         // Gateway cards
                         HStack(alignment: .top, spacing: AppSpacing.md) {
@@ -103,7 +103,7 @@ struct AssessTab: View {
                         // Last analysis re-entry point — a completed analysis persists
                         // across relaunches and must stay reachable (F2).
                         if let lastResult = analysisStore.lastResult {
-                            MVVCDividerHeader(title: "Your Last Analysis")
+                            SectionDividerHeader(title: "Your Last Analysis")
 
                             Button {
                                 SessionLogger.shared.logUserAction(.buttonTapped,
@@ -121,7 +121,7 @@ struct AssessTab: View {
                         }
 
                         // Quick actions
-                        MVVCDividerHeader(title: "Quick Actions")
+                        SectionDividerHeader(title: "Quick Actions")
 
                         VStack(spacing: AppSpacing.sm) {
                             QuickActionButton(
@@ -160,9 +160,8 @@ struct AssessTab: View {
                     .padding(.bottom, AppSpacing.xxxl)
                 }
             }
-            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
-            .mvvcNavBar()
+            .appNavBar("Assess")
         }
         .fullScreenCover(isPresented: $showQuickUpdate) {
             QuickHealthUpdateView {
@@ -189,7 +188,7 @@ struct AssessTab: View {
 
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text(title)
-                        .font(Font.custom("Industry-Bold", size: 16))
+                        .font(Font.custom("Inter-Bold", size: 16))
                         .textCase(.uppercase)
                         .kerning(0.3)
                         .foregroundColor(.white)
@@ -202,7 +201,7 @@ struct AssessTab: View {
                 }
 
                 HStack {
-                    MVVCRedBadge(text: badge)
+                    AccentBadge(text: badge)
                     Spacer()
                     Image(systemName: "chevron.right")
                         .font(.system(size: 12, weight: .semibold))
@@ -233,7 +232,7 @@ struct AssessTab: View {
 
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text(title)
-                        .font(Font.custom("Industry-Bold", size: 16))
+                        .font(Font.custom("Inter-Bold", size: 16))
                         .textCase(.uppercase)
                         .kerning(0.3)
                         .foregroundColor(AppColors.primaryText)

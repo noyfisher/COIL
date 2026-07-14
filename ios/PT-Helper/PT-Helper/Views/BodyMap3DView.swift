@@ -111,9 +111,8 @@ struct BodyMap3DView: View {
                 }
             }
         }
-        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
-        .mvvcNavBar()
+        .appNavBar("Body Map")
         .sheet(isPresented: $showDisclaimer) {
             DisclaimerView(onAccept: {
                 injuryAnalysisVM = InjuryAnalysisViewModel(
@@ -1268,7 +1267,7 @@ struct BodyMap3DView: View {
     /// selection → deselection cycle restores to the palette color rather
     /// than the wash. Called from `drillIntoZone`.
     ///
-    /// Currently-selected regions keep their MVVC-red highlight on screen;
+    /// Currently-selected regions keep their Recover Blue highlight on screen;
     /// only their stored `originalMaterials` entry is updated to the palette
     /// color so a future deselect lands on the palette, not the stale wash.
     @MainActor
@@ -1304,7 +1303,7 @@ struct BodyMap3DView: View {
     /// deselects after a re-drill don't flash the stale palette material.
     /// Called from `exitDrillDown`.
     ///
-    /// Currently-selected regions keep their MVVC-red highlight on screen;
+    /// Currently-selected regions keep their Recover Blue highlight on screen;
     /// only their stored `originalMaterials` entry is updated to the wash so
     /// a future deselect lands on the wash, not the stale palette color.
     @MainActor

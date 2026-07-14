@@ -70,7 +70,7 @@ struct SurgicalHistoryStepView: View {
         VStack(spacing: AppSpacing.sm) {
             HStack {
                 Text("Surgery \(index + 1)")
-                    .font(Font.custom("Industry-Bold", size: 12))
+                    .font(Font.custom("Inter-Bold", size: 12))
                     .textCase(.uppercase)
                     .kerning(1.0)
                     .foregroundColor(AppColors.warning)

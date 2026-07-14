@@ -7,23 +7,32 @@ extension Notification.Name {
     static let deepLink = Notification.Name("deepLink")
 }
 
-// MARK: - Design Tokens (MVVC Rebrand)
-// Colors from mvvc-design-system.js. Add Industry-Bold.otf and Inter-* font files
-// to the Xcode project and register them in Info.plist under UIAppFonts to activate
-// the custom typography. SwiftUI falls back to system sans-serif until then.
+// MARK: - Design Tokens (Recovery Palette)
+// Research-driven palette for rehab/prehab UX (July 2026 design research):
+// blue = trust & clinical credibility, green = growth & progress, a single
+// warm ember accent for motivational moments, and red reserved strictly for
+// pain/errors. Inter is the app typeface (registered in Info.plist UIAppFonts).
 
 enum AppColors {
     // MARK: Brand
-    static let accent       = Color(red: 0.800, green: 0,     blue: 0)     // #CC0000 — MVVC red
-    static let success      = Color(red: 0.176, green: 0.478, blue: 0.227) // #2D7A3A
-    static let warning      = Color(red: 0.722, green: 0.478, blue: 0)     // #B87A00
-    static let danger       = Color(red: 0.800, green: 0,     blue: 0)     // #CC0000 — same as brand red
-    static let info         = Color(red: 0.800, green: 0,     blue: 0)     // #CC0000
+    static let accent       = Color(red: 0.106, green: 0.424, blue: 0.659) // #1B6CA8 — Recover Blue
+    static let success      = Color(red: 0.165, green: 0.682, blue: 0.510) // #2AAE82 — Vitality Green
+    static let warning      = Color(red: 0.941, green: 0.761, blue: 0.227) // #F0C23A — Warning Yellow
+    static let danger       = Color(red: 0.851, green: 0.310, blue: 0.239) // #D94F3D — Pain Signal (pain/errors only)
+    static let info         = Color(red: 0.106, green: 0.424, blue: 0.659) // #1B6CA8
+
+    // MARK: Growth & progress variants
+    static let successDark = Color(red: 0.118, green: 0.549, blue: 0.408) // #1E8C68 — Strength Forest
+    static let successTint = Color(red: 0.816, green: 0.961, blue: 0.918) // #D0F5EA — Healing Mint
+
+    // MARK: Warm accent (streaks, challenges — one pop per screen max)
+    static let warmAccent = Color(red: 0.941, green: 0.482, blue: 0.227) // #F07B3A — Active Ember
+    static let warmTint   = Color(red: 0.992, green: 0.910, blue: 0.847) // #FDE8D8 — Warm Glow
 
     // MARK: Text (light surfaces)
-    static let primaryText    = Color(red: 0.067, green: 0.067, blue: 0.067) // #111111
-    static let secondaryText  = Color(red: 0.333, green: 0.333, blue: 0.333) // #555555
-    static let mutedText      = Color(red: 0.533, green: 0.533, blue: 0.533) // #888888
+    static let primaryText    = Color(red: 0.110, green: 0.169, blue: 0.227) // #1C2B3A — Midnight Slate
+    static let secondaryText  = Color(red: 0.290, green: 0.388, blue: 0.471) // #4A6378 — Steel Mist
+    static let mutedText      = Color(red: 0.490, green: 0.576, blue: 0.651) // #7D93A6
 
     // MARK: Text (dark surfaces)
     static let textOnDark      = Color.white
@@ -31,62 +40,62 @@ enum AppColors {
 
     // MARK: Surfaces
     static let cardBackground = Color.white                                         // #FFFFFF
-    static let pageBackground = Color(red: 0.949, green: 0.945, blue: 0.937)       // #F2F1EF
-    static let elevatedSurface = Color(red: 0.961, green: 0.957, blue: 0.949)      // #F5F4F2
-    static let inputBackground = Color(red: 0.973, green: 0.969, blue: 0.965)      // #F8F7F6
+    static let pageBackground = Color(red: 0.918, green: 0.941, blue: 0.961)       // #EAF0F5 — Cloud Base
+    static let elevatedSurface = Color(red: 0.949, green: 0.965, blue: 0.980)      // #F2F6FA
+    static let inputBackground = Color(red: 0.961, green: 0.973, blue: 0.984)      // #F5F8FB
     static let subtleBorder    = Color.black.opacity(0.08)
 
     // MARK: Dark surfaces (nav bar, hero cards, workout screen)
-    static let darkSurface        = Color(red: 0.067, green: 0.067, blue: 0.067) // #111111
-    static let darkSurfaceElevated = Color(red: 0.102, green: 0.102, blue: 0.102) // #1A1A1A
-    static let navBackground      = Color(red: 0.067, green: 0.067, blue: 0.067) // #111111
+    static let darkSurface        = Color(red: 0.110, green: 0.169, blue: 0.227) // #1C2B3A — Midnight Slate
+    static let darkSurfaceElevated = Color(red: 0.149, green: 0.227, blue: 0.306) // #263A4E
+    static let navBackground      = Color(red: 0.106, green: 0.424, blue: 0.659) // #1B6CA8 — Recover Blue
     static let navBorder          = Color.white.opacity(0.08)
 
     // MARK: Tab bar
-    static let tabActive   = Color(red: 0.800, green: 0, blue: 0)   // #CC0000
-    static let tabInactive = Color.white.opacity(0.45)
+    static let tabActive   = Color.white
+    static let tabInactive = Color.white.opacity(0.55)
 
     // MARK: CTA
-    static let ctaBackground = Color(red: 0.800, green: 0, blue: 0) // #CC0000
+    static let ctaBackground = Color(red: 0.106, green: 0.424, blue: 0.659) // #1B6CA8
     static let ctaText       = Color.white
 
     // MARK: Accent variants
-    static let accentLight = Color(red: 0.910, green: 0,     blue: 0.051) // #E8000D
-    static let accentDark  = Color(red: 0.639, green: 0,     blue: 0)     // #A30000
-    static let accentTint  = Color(red: 0.800, green: 0,     blue: 0).opacity(0.10)
+    static let accentLight = Color(red: 0.290, green: 0.580, blue: 0.796) // #4A94CB
+    static let accentDark  = Color(red: 0.082, green: 0.353, blue: 0.557) // #155A8E — Deep Recovery
+    static let accentTint  = Color(red: 0.839, green: 0.918, blue: 0.973) // #D6EAF8 — Recovery Mist
 
     // MARK: Chip
-    static let chipSelectedBg     = Color(red: 0.800, green: 0, blue: 0) // #CC0000
-    static let chipSelectedBorder = Color(red: 0.800, green: 0, blue: 0)
+    static let chipSelectedBg     = Color(red: 0.106, green: 0.424, blue: 0.659) // #1B6CA8
+    static let chipSelectedBorder = Color(red: 0.106, green: 0.424, blue: 0.659)
     static let chipSelectedText   = Color.white
 
     // MARK: Card styling
     static let cardBorder      = Color.black.opacity(0.08)
     static let cardShadowColor = Color.black.opacity(0.06)
-    static let inputFocusBorder = Color(red: 0.800, green: 0, blue: 0)
+    static let inputFocusBorder = Color(red: 0.106, green: 0.424, blue: 0.659)
 
     // MARK: Gradients
     static let primaryGradient = LinearGradient(
-        colors: [Color(red: 0.800, green: 0, blue: 0), Color(red: 0.639, green: 0, blue: 0)],
+        colors: [Color(red: 0.106, green: 0.424, blue: 0.659), Color(red: 0.082, green: 0.353, blue: 0.557)],
         startPoint: .topLeading, endPoint: .bottomTrailing
     )
     static let warmGradient = LinearGradient(
-        colors: [Color(red: 0.722, green: 0.478, blue: 0), Color(red: 0.612, green: 0.380, blue: 0)],
+        colors: [Color(red: 0.941, green: 0.482, blue: 0.227), Color(red: 0.851, green: 0.396, blue: 0.141)],
         startPoint: .topLeading, endPoint: .bottomTrailing
     )
     static let coolGradient = LinearGradient(
-        colors: [Color(red: 0.800, green: 0, blue: 0), Color(red: 0.910, green: 0, blue: 0.051)],
+        colors: [Color(red: 0.106, green: 0.424, blue: 0.659), Color(red: 0.290, green: 0.580, blue: 0.796)],
         startPoint: .topLeading, endPoint: .bottomTrailing
     )
     static let healingGradient = LinearGradient(
-        colors: [Color(red: 0.800, green: 0, blue: 0), Color(red: 0.639, green: 0, blue: 0)],
+        colors: [Color(red: 0.165, green: 0.682, blue: 0.510), Color(red: 0.118, green: 0.549, blue: 0.408)],
         startPoint: .topLeading, endPoint: .bottomTrailing
     )
     // Login / launch screen background
     static let bgGradient = LinearGradient(
         colors: [
-            Color(red: 0.067, green: 0.067, blue: 0.067),
-            Color(red: 0.102, green: 0.102, blue: 0.102)
+            Color(red: 0.110, green: 0.169, blue: 0.227),
+            Color(red: 0.149, green: 0.227, blue: 0.306)
         ],
         startPoint: .top, endPoint: .bottom
     )
@@ -137,19 +146,19 @@ enum AppCorners {
 }
 
 // MARK: - Typography
-// Industry Bold for headings; Inter (Regular/Medium/SemiBold) for body.
+// Inter for both headings (Bold) and body (Regular/Medium/SemiBold).
 // Custom font files must be added to Xcode and registered in Info.plist under UIAppFonts.
 
 enum AppFonts {
-    // MARK: Headings — Industry Bold
-    static let display      = Font.custom("Industry-Bold", size: 36) // large stat/hero number
-    static let heroTitle    = Font.custom("Industry-Bold", size: 28)
-    static let title        = Font.custom("Industry-Bold", size: 24)
-    static let sectionTitle = Font.custom("Industry-Bold", size: 20)
-    static let cardTitle    = Font.custom("Industry-Bold", size: 14)
-    static let statNumber   = Font.custom("Industry-Bold", size: 28)
-    static let badge        = Font.custom("Industry-Bold", size: 10)
-    static let fieldLabel   = Font.custom("Industry-Bold", size: 11) // uppercase field labels
+    // MARK: Headings — Inter Bold
+    static let display      = Font.custom("Inter-Bold", size: 36) // large stat/hero number
+    static let heroTitle    = Font.custom("Inter-Bold", size: 28)
+    static let title        = Font.custom("Inter-Bold", size: 24)
+    static let sectionTitle = Font.custom("Inter-Bold", size: 20)
+    static let cardTitle    = Font.custom("Inter-Bold", size: 14)
+    static let statNumber   = Font.custom("Inter-Bold", size: 28)
+    static let badge        = Font.custom("Inter-Bold", size: 10)
+    static let fieldLabel   = Font.custom("Inter-Bold", size: 11) // uppercase field labels
 
     // MARK: Body — Inter
     static let body         = Font.custom("Inter-Regular",  size: 14)
@@ -227,30 +236,24 @@ extension View {
     }
 }
 
-// MARK: - MVVC Nav Bar Modifier
+// MARK: - App Nav Bar Modifier
 // Apply to the root content view inside each NavigationStack.
 
-struct MVVCNavBarModifier: ViewModifier {
+struct AppNavBarModifier: ViewModifier {
+    let title: String
+
     func body(content: Content) -> some View {
         content
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(AppColors.navBackground, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Image("MVVCLogoStacked")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 56)
-                        .clipped(antialiased: false)
-                        .fixedSize()
-                }
-            }
     }
 }
 
 extension View {
-    func mvvcNavBar() -> some View { modifier(MVVCNavBarModifier()) }
+    func appNavBar(_ title: String) -> some View { modifier(AppNavBarModifier(title: title)) }
 }
 
 // MARK: - Button Styles
@@ -260,9 +263,7 @@ struct PrimaryButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Font.custom("Industry-Bold", size: 15))
-            .textCase(.uppercase)
-            .kerning(1.2)
+            .font(Font.custom("Inter-SemiBold", size: 15))
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 13)
@@ -278,9 +279,7 @@ struct PrimaryButtonStyle: ButtonStyle {
 struct SecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Font.custom("Industry-Bold", size: 14))
-            .textCase(.uppercase)
-            .kerning(1.0)
+            .font(Font.custom("Inter-SemiBold", size: 14))
             .foregroundColor(AppColors.accent)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 13)
@@ -306,18 +305,16 @@ struct DestructiveButtonStyle: ButtonStyle {
     }
 }
 
-// MARK: - MVVC Shared Components
+// MARK: - Section Components
 
-/// Red gradient rule with uppercase Barlow Condensed title — use for all content section breaks.
-struct MVVCDividerHeader: View {
+/// Accent gradient rule beneath a section title — use for all content section breaks.
+struct SectionDividerHeader: View {
     let title: String
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.tight) {
             Text(title)
                 .font(AppFonts.sectionTitle)
-                .textCase(.uppercase)
-                .kerning(1.0)
                 .foregroundColor(AppColors.primaryText)
 
             LinearGradient(
@@ -329,9 +326,10 @@ struct MVVCDividerHeader: View {
     }
 }
 
-/// Small red pill badge — "ACTIVE", "ON FIRE", count indicators, etc.
-struct MVVCRedBadge: View {
+/// Small accent pill badge — "ACTIVE", "ON FIRE", count indicators, etc.
+struct AccentBadge: View {
     let text: String
+    var color: Color = AppColors.accent
 
     var body: some View {
         Text(text)
@@ -341,7 +339,7 @@ struct MVVCRedBadge: View {
             .foregroundColor(AppColors.ctaText)
             .padding(.horizontal, AppSpacing.comfortable)
             .padding(.vertical, AppSpacing.nano + 1)
-            .background(AppColors.accent)
+            .background(color)
             .clipShape(Capsule())
     }
 }

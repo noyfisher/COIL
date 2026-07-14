@@ -33,7 +33,7 @@ private struct IntroNavBar: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(alignment: .center) {
-                Text("MVVC")
+                Text("PT HELPER")
                     .font(AppFonts.title)
                     .italic()
                     .foregroundColor(AppColors.accent)
@@ -102,7 +102,7 @@ private struct IntroPrecisionRecovery: View {
             let heroH = geo.size.height * 0.50
 
             ZStack(alignment: .top) {
-                Color(red: 0.067, green: 0.067, blue: 0.067).ignoresSafeArea()
+                AppColors.darkSurface.ignoresSafeArea()
 
                 VStack(spacing: 0) {
                     // Safe area spacer
@@ -117,7 +117,7 @@ private struct IntroPrecisionRecovery: View {
                             colors: [
                                 Color(red: 0.35, green: 0.02, blue: 0.02),
                                 Color(red: 0.13, green: 0.02, blue: 0.02),
-                                Color(red: 0.067, green: 0.067, blue: 0.067)
+                                AppColors.darkSurface
                             ],
                             center: .center,
                             startRadius: 10,
@@ -221,7 +221,7 @@ private struct IntroFastTrack: View {
     var body: some View {
         GeometryReader { geo in
             ZStack(alignment: .top) {
-                Color(red: 0.067, green: 0.067, blue: 0.067).ignoresSafeArea()
+                AppColors.darkSurface.ignoresSafeArea()
 
                 // Corner red glows
                 RadialGradient(
@@ -247,7 +247,7 @@ private struct IntroFastTrack: View {
                     // Hero text block
                     VStack(spacing: 0) {
                         Text("FAST TRACK\nTO PERFORMANCE")
-                            .font(Font.custom("Industry-Bold", size: 38))
+                            .font(Font.custom("Inter-Bold", size: 38))
                             .italic()
                             .multilineTextAlignment(.center)
                             .foregroundColor(AppColors.accent)
@@ -260,7 +260,7 @@ private struct IntroFastTrack: View {
                             .frame(width: 80, height: 3)
                             .padding(.top, 16)
 
-                        Text("MVVC uses professional-grade protocols to accelerate your body's natural healing process. We help you stay active, prevent injury, and return to performance faster.")
+                        Text("PT Helper uses professional-grade protocols to accelerate your body's natural healing process. We help you stay active, prevent injury, and return to performance faster.")
                             .font(AppFonts.body)
                             .foregroundColor(.white.opacity(0.6))
                             .multilineTextAlignment(.center)
@@ -289,7 +289,7 @@ private struct IntroStartJourney: View {
     var body: some View {
         GeometryReader { geo in
             ZStack(alignment: .top) {
-                Color(red: 0.067, green: 0.067, blue: 0.067).ignoresSafeArea()
+                AppColors.darkSurface.ignoresSafeArea()
 
                 // Ambient corner glows
                 RadialGradient(
@@ -326,7 +326,7 @@ private struct IntroStartJourney: View {
 
                     // Headline
                     Text("START YOUR\nJOURNEY")
-                        .font(Font.custom("Industry-Bold", size: 52))
+                        .font(Font.custom("Inter-Bold", size: 52))
                         .italic()
                         .multilineTextAlignment(.center)
                         .foregroundColor(AppColors.accent)
@@ -335,7 +335,7 @@ private struct IntroStartJourney: View {
                         .padding(.top, 24)
 
                     // Body text
-                    Text("Set your goals and let MVVC handle the rest. Your path to peak performance starts here.")
+                    Text("Set your goals and let PT Helper handle the rest. Your path to peak performance starts here.")
                         .font(AppFonts.body)
                         .foregroundColor(.white.opacity(0.6))
                         .multilineTextAlignment(.center)

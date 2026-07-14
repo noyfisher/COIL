@@ -20,7 +20,7 @@ struct ProgressTab: View {
                 savedPlansVM: savedPlansVM,
                 onSettingsTapped: { showSettings = true }
             )
-            .mvvcNavBar()
+            .appNavBar("Progress")
         }
         .sheet(isPresented: $showSettings) {
             SettingsView(
@@ -223,7 +223,7 @@ struct ProgressTabContent: View {
     private var recentWorkoutsSection: some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
             HStack {
-                MVVCDividerHeader(title: "Recent Workouts")
+                SectionDividerHeader(title: "Recent Workouts")
                 Spacer()
                 if workoutViewModel.sessions.count > 10 {
                     NavigationLink(destination: WorkoutSessionView()) {
@@ -366,7 +366,7 @@ struct ProgressTabContent: View {
             : "Pain Trend"
 
         return VStack(alignment: .leading, spacing: AppSpacing.md) {
-            MVVCDividerHeader(title: chartTitle)
+            SectionDividerHeader(title: chartTitle)
             cardChartContent
         }
     }
@@ -465,7 +465,7 @@ struct ProgressTabContent: View {
                 .cornerRadius(AppCorners.small)
 
             Text(value)
-                .font(Font.custom("Industry-Bold", size: 26))
+                .font(Font.custom("Inter-Bold", size: 26))
                 .foregroundColor(AppColors.primaryText)
 
             Text(label)
@@ -509,7 +509,7 @@ struct ProgressTabContent: View {
                     .foregroundColor(AppColors.accent)
                     .font(.system(size: 16, weight: .semibold))
                 Text("Time for a Re-Assessment?")
-                    .font(Font.custom("Industry-Bold", size: 16))
+                    .font(Font.custom("Inter-Bold", size: 16))
                     .foregroundColor(AppColors.primaryText)
                 Spacer()
             }

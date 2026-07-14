@@ -126,7 +126,7 @@ struct ProfileReviewStepView: View {
                                 Text("Submit Profile")
                             }
                         }
-                        .font(Font.custom("Industry-Bold", size: 16))
+                        .font(Font.custom("Inter-Bold", size: 16))
                         .textCase(.uppercase)
                         .kerning(1.0)
                         .foregroundColor(.white)
@@ -175,7 +175,7 @@ struct ReviewCard<Content: View>: View {
                     .background(color.opacity(0.15))
                     .cornerRadius(7)
                 Text(title)
-                    .font(Font.custom("Industry-Bold", size: 13))
+                    .font(Font.custom("Inter-Bold", size: 13))
                     .textCase(.uppercase)
                     .kerning(0.8)
                     .foregroundColor(Color.white.opacity(0.5))
