@@ -24,6 +24,15 @@ class UITestBase: XCTestCase {
         args.append(contentsOf: additionalLaunchArguments)
 
         app.launchArguments = args
+
+        // Workaround for a simulator/XCTest launch crash: the app's custom UIAppFonts
+        // (Industry-Bold / Inter) emit an os_log fault during font registration that
+        // XCTAutomationSupport's runtime-issue handler mishandles, segfaulting the app
+        // on launch (EXC_BAD_ACCESS in libGSFont `AddFontsFromURLOrPath`). Disabling
+        // os_activity in the launched process suppresses the fault so the app launches
+        // cleanly under UI automation. Pre-existing; unrelated to app logic.
+        app.launchEnvironment["OS_ACTIVITY_MODE"] = "disable"
+
         app.launch()
     }
 
@@ -49,8 +58,16 @@ class UITestBase: XCTestCase {
     }
 
     /// Tap a tab bar item by label text.
+    /// The app's live shell uses a custom SwiftUI `FloatingTabBar` (whose items are plain
+    /// accessibility buttons via `accessibilityLabel`), not a system `UITabBar`, so query
+    /// `app.buttons` first and fall back to `tabBars.buttons` for any legacy system bar.
     func tapTab(_ label: String) {
-        app.tabBars.buttons[label].tap()
+        let floatingItem = app.buttons[label]
+        if floatingItem.waitForExistence(timeout: 5) {
+            floatingItem.tap()
+        } else {
+            app.tabBars.buttons[label].tap()
+        }
     }
 
     /// Capture a screenshot with a descriptive name.
