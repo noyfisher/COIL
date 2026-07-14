@@ -176,42 +176,44 @@ enum AppAppearance: String, CaseIterable, Identifiable {
 
 // MARK: - COIL Brandmark
 
-/// The COIL coil/spring glyph — a clean Archimedean spiral in the brand teal.
+/// The COIL brandmark glyph — a spring seen side-on (overlapping rings) in the brand teal.
+/// The whole ring group is sized from the frame HEIGHT and centered, so it reads
+/// consistently whether the frame is square or wide.
 struct CoilGlyph: View {
     var color: Color = AppColors.accent
-    var lineWidth: CGFloat = 2.2
+    var rings: Int = 4
 
     var body: some View {
         GeometryReader { geo in
             let w = geo.size.width, h = geo.size.height
-            let cx = w / 2, cy = h / 2
-            let maxR = min(w, h) * 0.46
-            let turns: CGFloat = 2.6
-            let steps = 140
+            let lw = max(1.6, h * 0.12)
+            let ry = h * 0.38
+            let rx = h * 0.15
+            let spacing = rx * 1.5
+            let groupW = rx * 2 + spacing * CGFloat(max(rings - 1, 0))
+            let startCX = (w - groupW) / 2 + rx
             Path { p in
-                for i in 0...steps {
-                    let t = CGFloat(i) / CGFloat(steps)
-                    let angle = t * turns * 2 * .pi - .pi / 2
-                    let r = maxR * t
-                    let pt = CGPoint(x: cx + r * cos(angle), y: cy + r * sin(angle))
-                    if i == 0 { p.move(to: pt) } else { p.addLine(to: pt) }
+                for i in 0..<rings {
+                    let cx = startCX + spacing * CGFloat(i)
+                    p.addEllipse(in: CGRect(x: cx - rx, y: h / 2 - ry, width: rx * 2, height: ry * 2))
                 }
             }
-            .stroke(color, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round))
+            .stroke(color, style: StrokeStyle(lineWidth: lw, lineCap: .round))
         }
+        .accessibilityHidden(true)
     }
 }
 
-/// COIL wordmark — spiral glyph + letter-spaced wordmark. Used in nav bars and hero screens.
+/// COIL wordmark — spring-rings glyph + letter-spaced wordmark. Used in nav bars and hero screens.
 struct CoilWordmark: View {
     var fontSize: CGFloat = 18
     var glyph: CGFloat = 22
     var textColor: Color = .white
 
     var body: some View {
-        HStack(spacing: 7) {
-            CoilGlyph(lineWidth: max(2, glyph * 0.11))
-                .frame(width: glyph, height: glyph)
+        HStack(spacing: 8) {
+            CoilGlyph()
+                .frame(width: glyph * 1.45, height: glyph)
             Text("COIL")
                 .font(Font.custom("Industry-Bold", size: fontSize))
                 .tracking(fontSize * 0.22)
