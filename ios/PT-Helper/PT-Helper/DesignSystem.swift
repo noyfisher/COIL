@@ -38,18 +38,20 @@ enum AppColors {
     static let textOnDark      = Color.white
     static let textOnDarkMuted = Color.white.opacity(0.6)
 
-    // MARK: Surfaces
+    // MARK: Surfaces (warm neutral base — airy, minimal identity)
     static let cardBackground = Color.white                                         // #FFFFFF
-    static let pageBackground = Color(red: 0.918, green: 0.941, blue: 0.961)       // #EAF0F5 — Cloud Base
-    static let elevatedSurface = Color(red: 0.949, green: 0.965, blue: 0.980)      // #F2F6FA
-    static let inputBackground = Color(red: 0.961, green: 0.973, blue: 0.984)      // #F5F8FB
+    static let pageBackground = Color(red: 0.965, green: 0.957, blue: 0.937)       // #F6F4EF — Warm Canvas
+    static let elevatedSurface = Color(red: 0.984, green: 0.980, blue: 0.969)      // #FBFAF7
+    static let inputBackground = Color(red: 0.953, green: 0.945, blue: 0.922)      // #F3F1EB
     static let subtleBorder    = Color.black.opacity(0.08)
 
-    // MARK: Dark surfaces (nav bar, hero cards, workout screen)
+    // MARK: Dark surfaces (hero cards, workout screen)
     static let darkSurface        = Color(red: 0.110, green: 0.169, blue: 0.227) // #1C2B3A — Midnight Slate
     static let darkSurfaceElevated = Color(red: 0.149, green: 0.227, blue: 0.306) // #263A4E
-    static let navBackground      = Color(red: 0.106, green: 0.424, blue: 0.659) // #1B6CA8 — Recover Blue
-    static let navBorder          = Color.white.opacity(0.08)
+
+    // MARK: Nav bar (light — blends into the page)
+    static let navBackground      = Color(red: 0.965, green: 0.957, blue: 0.937) // #F6F4EF — Warm Canvas
+    static let navBorder          = Color.black.opacity(0.06)
 
     // MARK: Tab bar
     static let tabActive   = Color.white
@@ -248,7 +250,7 @@ struct AppNavBarModifier: ViewModifier {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(AppColors.navBackground, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbarColorScheme(.light, for: .navigationBar)
     }
 }
 

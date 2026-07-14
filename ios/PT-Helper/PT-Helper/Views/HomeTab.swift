@@ -22,7 +22,7 @@ struct HomeTab: View {
                 AppColors.pageBackground.ignoresSafeArea()
 
                 VStack(spacing: 0) {
-                    // Weekly strip — dark, visually extends the nav bar
+                    // Weekly strip — sits directly on the page background
                     WeeklyDateStrip(selectedDate: $selectedDate)
 
                     // Program / Preventative picker
@@ -47,8 +47,7 @@ struct HomeTab: View {
                     }
                 }
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .appNavBar("PT Helper")
+            .toolbar(.hidden, for: .navigationBar)
         }
         .trackScreen("HomeTab")
     }
@@ -82,7 +81,7 @@ private struct WeeklyDateStrip: View {
                     Text(monthLabel)
                         .font(Font.custom("Inter-Bold", size: 13))
                         .kerning(0.5)
-                        .foregroundColor(Color.white.opacity(0.55))
+                        .foregroundColor(AppColors.mutedText)
 
                     Spacer()
 
@@ -144,9 +143,8 @@ private struct WeeklyDateStrip: View {
                     proxy.scrollTo(today, anchor: .center)
                 }
             }
-            .padding(.top, AppSpacing.sm)
-            .padding(.bottom, AppSpacing.md)
-            .background(AppColors.navBackground)
+            .padding(.top, AppSpacing.md)
+            .padding(.bottom, AppSpacing.sm)
         }
     }
 }
@@ -169,25 +167,29 @@ private struct DayCell: View {
         VStack(spacing: 3) {
             Text(Self.dayFmt.string(from: date).uppercased())
                 .font(AppFonts.micro)
-                .foregroundColor(isSelected ? .white : Color.white.opacity(0.40))
+                .foregroundColor(isSelected ? Color.white.opacity(0.75) : AppColors.mutedText)
 
             Text(Self.numFmt.string(from: date))
                 .font(Font.custom("Inter-Bold", size: 20))
                 .foregroundColor(
                     isSelected ? .white
                     : isToday  ? AppColors.accent
-                    : Color.white.opacity(0.55)
+                    : AppColors.primaryText
                 )
         }
         .frame(width: 44, height: 60)
-        .background(isSelected ? AppColors.accent : Color.clear)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .background(isSelected ? AppColors.primaryText : Color.clear)
+        .clipShape(RoundedRectangle(cornerRadius: AppCorners.medium))
         .overlay(
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: AppCorners.medium)
                 .stroke(
                     isToday && !isSelected ? AppColors.accent.opacity(0.55) : Color.clear,
                     lineWidth: 1.5
                 )
+        )
+        .shadow(
+            color: isSelected ? AppColors.primaryText.opacity(0.25) : .clear,
+            radius: 6, y: 3
         )
     }
 }
@@ -198,16 +200,13 @@ private struct HomeTabPicker: View {
     @Binding var selected: HomeTab.HomeContentTab
 
     var body: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: AppSpacing.xs) {
             pickerButton("Program", tab: .program)
             pickerButton("Preventative", tab: .preventative)
         }
-        .background(AppColors.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: AppCorners.card))
-        .overlay(
-            RoundedRectangle(cornerRadius: AppCorners.card)
-                .stroke(AppColors.cardBorder, lineWidth: 1)
-        )
+        .padding(AppSpacing.xs)
+        .background(Color.black.opacity(0.05))
+        .clipShape(RoundedRectangle(cornerRadius: AppCorners.pill))
     }
 
     @ViewBuilder
@@ -217,14 +216,13 @@ private struct HomeTabPicker: View {
             withAnimation(.easeInOut(duration: 0.2)) { selected = tab }
         } label: {
             Text(label)
-                .font(Font.custom("Inter-Bold", size: 13))
-                .textCase(.uppercase)
-                .kerning(0.5)
-                .foregroundColor(active ? .white : AppColors.secondaryText)
+                .font(Font.custom("Inter-SemiBold", size: 14))
+                .foregroundColor(active ? AppColors.primaryText : AppColors.secondaryText)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, AppSpacing.sm + 2)
-                .background(active ? AppColors.accent : Color.clear)
-                .clipShape(RoundedRectangle(cornerRadius: AppCorners.card - 1))
+                .background(active ? AppColors.cardBackground : Color.clear)
+                .clipShape(Capsule())
+                .shadow(color: active ? Color.black.opacity(0.08) : .clear, radius: 4, y: 2)
         }
         .buttonStyle(.plain)
     }
@@ -248,7 +246,9 @@ struct ProgramDayView: View {
     var body: some View {
         if let plan = plan {
             VStack(alignment: .leading, spacing: AppSpacing.md) {
-                SectionDividerHeader(title: "\(dayLabel)'s Program")
+                Text("\(dayLabel)'s Program")
+                    .font(AppFonts.sectionTitle)
+                    .foregroundColor(AppColors.primaryText)
 
                 // Plan name badge
                 HStack(spacing: AppSpacing.sm) {
@@ -281,9 +281,7 @@ struct ProgramDayView: View {
                         Image(systemName: "play.fill")
                             .font(.system(size: 12, weight: .bold))
                         Text("Start Guided Workout")
-                            .font(AppFonts.cardTitle)
-                            .textCase(.uppercase)
-                            .kerning(1.0)
+                            .font(Font.custom("Inter-SemiBold", size: 15))
                     }
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
@@ -325,12 +323,12 @@ private struct ExerciseProgramRow: View {
         HStack(spacing: AppSpacing.md) {
             // Icon / image placeholder
             ZStack {
-                RoundedRectangle(cornerRadius: AppCorners.small)
-                    .fill(AppColors.darkSurface)
+                RoundedRectangle(cornerRadius: AppCorners.medium)
+                    .fill(AppColors.accentTint)
                     .frame(width: 52, height: 52)
                 Image(systemName: exercise.demonstrationIcon.isEmpty ? "figure.strengthtraining.traditional" : exercise.demonstrationIcon)
                     .font(.system(size: 22))
-                    .foregroundColor(AppColors.accent)
+                    .foregroundColor(AppColors.accentDark)
             }
 
             VStack(alignment: .leading, spacing: AppSpacing.nano) {
@@ -393,7 +391,9 @@ struct PreventativeTasksView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
-            SectionDividerHeader(title: "Daily Preventative Care")
+            Text("Daily Preventative Care")
+                .font(AppFonts.sectionTitle)
+                .foregroundColor(AppColors.primaryText)
 
             // Progress summary
             HStack(spacing: AppSpacing.sm) {

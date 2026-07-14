@@ -140,6 +140,7 @@ struct ThreeTabView: View {
 
     private func applyAppNavBarAppearance() {
         let navBgColor = UIColor(AppColors.navBackground)
+        let titleColor = UIColor(AppColors.primaryText)
 
         let navBar = UINavigationBarAppearance()
         navBar.configureWithOpaqueBackground()
@@ -149,15 +150,15 @@ struct ThreeTabView: View {
             ?? UIFont.systemFont(ofSize: 19, weight: .bold)
         let largeTitleFont = UIFont(name: "Inter-Bold", size: 28)
             ?? UIFont.systemFont(ofSize: 28, weight: .bold)
-        navBar.titleTextAttributes = [.foregroundColor: UIColor.white, .font: titleFont]
-        navBar.largeTitleTextAttributes = [.foregroundColor: UIColor.white, .font: largeTitleFont]
+        navBar.titleTextAttributes = [.foregroundColor: titleColor, .font: titleFont]
+        navBar.largeTitleTextAttributes = [.foregroundColor: titleColor, .font: largeTitleFont]
         let backImage = UIImage(systemName: "chevron.left")?
-            .withTintColor(.white, renderingMode: .alwaysOriginal)
+            .withTintColor(titleColor, renderingMode: .alwaysOriginal)
         navBar.setBackIndicatorImage(backImage, transitionMaskImage: backImage)
         UINavigationBar.appearance().standardAppearance = navBar
         UINavigationBar.appearance().compactAppearance = navBar
         UINavigationBar.appearance().scrollEdgeAppearance = navBar
-        UINavigationBar.appearance().tintColor = .white
+        UINavigationBar.appearance().tintColor = titleColor
     }
 }
 
