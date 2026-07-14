@@ -186,10 +186,10 @@ struct CoilGlyph: View {
     var body: some View {
         GeometryReader { geo in
             let w = geo.size.width, h = geo.size.height
-            let lw = max(1.6, h * 0.12)
-            let ry = h * 0.38
-            let rx = h * 0.15
-            let spacing = rx * 1.5
+            let lw = max(1.4, h * 0.10)
+            let ry = h * 0.45
+            let rx = h * 0.13
+            let spacing = rx * 1.55
             let groupW = rx * 2 + spacing * CGFloat(max(rings - 1, 0))
             let startCX = (w - groupW) / 2 + rx
             Path { p in
@@ -213,7 +213,7 @@ struct CoilWordmark: View {
     var body: some View {
         HStack(spacing: 8) {
             CoilGlyph()
-                .frame(width: glyph * 1.45, height: glyph)
+                .frame(width: glyph * 1.2, height: glyph)
             Text("COIL")
                 .font(Font.custom("Industry-Bold", size: fontSize))
                 .tracking(fontSize * 0.22)
