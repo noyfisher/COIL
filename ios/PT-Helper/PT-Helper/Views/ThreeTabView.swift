@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// The 4-tab navigation container with a custom floating tab bar.
+/// The 4-tab navigation container using the native iOS tab bar
+/// (floating Liquid Glass style on iOS 26).
 struct ThreeTabView: View {
     @StateObject private var tabSelection = TabSelection()
     @StateObject private var networkMonitor = NetworkMonitor.shared
@@ -11,58 +12,57 @@ struct ThreeTabView: View {
 
     @State private var showAssessment = false
 
+    /// Sentinel tab value for the "New Assessment" action tab. Selecting it
+    /// presents the body map cover and reverts to the previous tab.
+    private static let assessActionTab = 4
+
     var body: some View {
-        ZStack(alignment: .bottom) {
-            VStack(spacing: 0) {
-                if !networkMonitor.isConnected {
-                    HStack(spacing: AppSpacing.sm) {
-                        Image(systemName: "wifi.slash")
-                            .font(.system(size: 12, weight: .semibold))
-                        Text("You're offline. Changes will sync when reconnected.")
-                            .font(.caption)
-                    }
-                    .foregroundColor(AppColors.ctaText)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, AppSpacing.sm)
-                    .background(AppColors.danger)
-                    .accessibilityIdentifier("offlineBanner")
+        VStack(spacing: 0) {
+            if !networkMonitor.isConnected {
+                HStack(spacing: AppSpacing.sm) {
+                    Image(systemName: "wifi.slash")
+                        .font(.system(size: 12, weight: .semibold))
+                    Text("You're offline. Changes will sync when reconnected.")
+                        .font(.caption)
                 }
+                .foregroundColor(AppColors.ctaText)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, AppSpacing.sm)
+                .background(AppColors.danger)
+                .accessibilityIdentifier("offlineBanner")
+            }
 
-                TabView(selection: $tabSelection.selectedTab) {
+            TabView(selection: $tabSelection.selectedTab) {
+                Tab("Home", systemImage: "house.fill", value: 0) {
                     HomeTab()
-                        .tag(0)
                         .id(tabSelection.assessNavigationId)
-                        .toolbar(.hidden, for: .tabBar)
+                }
 
+                Tab("Plan", systemImage: "list.clipboard.fill", value: 1) {
                     MyPlanTab()
-                        .tag(1)
                         .id(tabSelection.myPlanNavigationId)
-                        .toolbar(.hidden, for: .tabBar)
+                }
 
+                Tab("Progress", systemImage: "chart.line.uptrend.xyaxis", value: 2) {
                     ProgressTab()
-                        .tag(2)
                         .id(tabSelection.progressNavigationId)
-                        .toolbar(.hidden, for: .tabBar)
+                }
 
+                Tab("Profile", systemImage: "person.fill", value: 3) {
                     ProfileTab()
-                        .tag(3)
                         .id(tabSelection.profileNavigationId)
-                        .toolbar(.hidden, for: .tabBar)
+                }
+
+                // Action tab: on iOS 26 the search role renders as the
+                // separated circular button on the floating bar. Selection is
+                // intercepted in onChange and never lands here.
+                Tab("Assess", systemImage: "plus", value: Self.assessActionTab, role: .search) {
+                    Color.clear
                 }
             }
-
-            // Full-width tab bar pinned to bottom
-            VStack(spacing: 0) {
-                Spacer()
-                FloatingTabBar(selectedTab: $tabSelection.selectedTab, onTabTapped: { tapped in
-                    if tabSelection.selectedTab == tapped {
-                        tabSelection.popToRootCurrentTab()
-                    }
-                }, onAssessmentTapped: {
-                    showAssessment = true
-                })
-                .ignoresSafeArea(edges: .bottom)
-            }
+            // The system glass bar is light — white (the old tabActive) would
+            // wash out, so tint with the brand accent instead.
+            .tint(AppColors.accent)
         }
         .environmentObject(tabSelection)
         .environmentObject(savedPlansViewModel)
@@ -71,6 +71,14 @@ struct ThreeTabView: View {
         .environmentObject(recoveryInsightsViewModel)
         .environmentObject(analysisStore)
         .onChange(of: tabSelection.selectedTab) { oldTab, newTab in
+            // Intercept the Assess action tab: present the body map and
+            // bounce selection back to the tab the user was on.
+            if newTab == Self.assessActionTab {
+                showAssessment = true
+                tabSelection.selectedTab = oldTab
+                return
+            }
+            if oldTab == Self.assessActionTab { return }  // bounce-back, not a real switch
             if oldTab == newTab { tabSelection.popToRootCurrentTab() }
             let tabNames = ["Home", "My Plan", "Progress", "Profile"]
             let name = newTab < tabNames.count ? tabNames[newTab] : "Unknown"
@@ -128,7 +136,7 @@ struct ThreeTabView: View {
         }
     }
 
-    // MARK: - UIKit Appearance (nav bar only — tab bar is custom)
+    // MARK: - UIKit Appearance (nav bar only — tab bar is the native system bar)
 
     private func applyAppNavBarAppearance() {
         let navBgColor = UIColor(AppColors.navBackground)
@@ -175,106 +183,17 @@ struct ProfileTab: View {
 
 // MARK: - Tab Bar
 
-/// Layout metrics for the custom `FloatingTabBar`.
+/// Layout metrics kept for the call sites that padded content above the old
+/// custom overlay bar. The native tab bar participates in the safe area, so
+/// no extra clearance is needed.
 enum FloatingTabBarMetrics {
-    /// Bottom clearance needed so on-screen content/footers sit above the
-    /// floating tab bar. The bar overlays the bottom of every view rendered
-    /// inside the tab navigation (it lives in `ThreeTabView`'s ZStack, outside
-    /// the NavigationStacks, and uses `.ignoresSafeArea(edges: .bottom)`), so
-    /// this covers the full bar footprint including the home-indicator area and
-    /// the lifted centre "+" button.
-    static let clearance: CGFloat = 100
+    static let clearance: CGFloat = 0
 }
 
 extension View {
-    /// Adds bottom padding so content/footers clear the custom `FloatingTabBar`
-    /// overlay. Apply to a pinned footer's bottom or to a ScrollView's inner
-    /// content container.
+    /// No-op retained for source compatibility: the native tab bar insets
+    /// content automatically, so no manual clearance padding is required.
     func floatingTabBarClearance() -> some View {
         padding(.bottom, FloatingTabBarMetrics.clearance)
-    }
-}
-
-private struct TabBarItem {
-    let tag: Int
-    let icon: String
-    let label: String
-}
-
-/// Left pair and right pair flank the centre "+" button.
-private let leftTabItems: [TabBarItem] = [
-    TabBarItem(tag: 0, icon: "house.fill",         label: "Home"),
-    TabBarItem(tag: 1, icon: "list.clipboard.fill", label: "Plan"),
-]
-private let rightTabItems: [TabBarItem] = [
-    TabBarItem(tag: 2, icon: "chart.line.uptrend.xyaxis", label: "Progress"),
-    TabBarItem(tag: 3, icon: "person.fill",               label: "Profile"),
-]
-
-struct FloatingTabBar: View {
-    @Binding var selectedTab: Int
-    var onTabTapped: (Int) -> Void
-    var onAssessmentTapped: () -> Void
-
-    var body: some View {
-        ZStack(alignment: .top) {
-            // ── Full-width bar ─────────────────────────────────────────────
-            HStack(spacing: 0) {
-                // Left tabs
-                ForEach(leftTabItems, id: \.tag) { item in
-                    tabButton(item)
-                }
-
-                // Centre spacer — reserves room beneath the "+" button
-                Spacer()
-                    .frame(width: 72)
-
-                // Right tabs
-                ForEach(rightTabItems, id: \.tag) { item in
-                    tabButton(item)
-                }
-            }
-            .padding(.top, 10)   // push tab icons down below the "+" button
-            .frame(maxWidth: .infinity)
-            .background(AppColors.navBackground)
-
-            // ── Big "+" button centred, lifts above the bar ───────────────
-            Button {
-                onAssessmentTapped()
-            } label: {
-                ZStack {
-                    Circle()
-                        .fill(Color.white)
-                        .frame(width: 56, height: 56)
-                        .shadow(color: Color.black.opacity(0.25), radius: 10, x: 0, y: -4)
-                    Image(systemName: "plus")
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(AppColors.accent)
-                }
-            }
-            .accessibilityLabel("New Assessment")
-            .frame(maxWidth: .infinity, alignment: .center)
-            .offset(y: -8)   // lift slightly above the bar top edge
-        }
-    }
-
-    @ViewBuilder
-    private func tabButton(_ item: TabBarItem) -> some View {
-        Button {
-            onTabTapped(item.tag)
-            selectedTab = item.tag
-        } label: {
-            VStack(spacing: 4) {
-                Image(systemName: item.icon)
-                    .font(.system(size: 20, weight: .semibold))
-                Text(item.label)
-                    .font(.system(size: 10, weight: .medium))
-            }
-            .foregroundColor(selectedTab == item.tag ? AppColors.tabActive : AppColors.tabInactive)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 10)
-        }
-        .accessibilityLabel(item.label)
-        .accessibilityAddTraits(selectedTab == item.tag ? [.isSelected] : [])
     }
 }
