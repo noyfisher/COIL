@@ -52,96 +52,7 @@ struct RehabPlanView: View {
             } else if let error = viewModel.generationError {
                 errorView(error)
             } else if let plan = viewModel.rehabPlan {
-                ScrollView {
-                    VStack(spacing: AppSpacing.lg) {
-                        // Safety warnings from validation pipeline
-                        if !viewModel.rehabPlanWarnings.isEmpty {
-                            rehabWarningsBanner
-                        }
-
-                        // Week progress banner (for saved plans with startDate)
-                        if analysisResult == nil, let week = plan.currentWeek {
-                            weekProgressBanner(week: week, totalWeeks: plan.totalWeeks)
-                        }
-
-                        // Adaptive progression recommendation
-                        if analysisResult == nil,
-                           plan.startDate != nil,
-                           showProgressionBanner,
-                           let recommendation = adaptiveRecommendation,
-                           recommendation.action != .insufficientData {
-                            AdaptiveProgressionBannerView(
-                                recommendation: recommendation,
-                                onApply: { applyProgression() },
-                                onDismiss: { withAnimation { showProgressionBanner = false } }
-                            )
-                        }
-
-                        // Start Plan button (for saved plans not yet started)
-                        if analysisResult == nil && plan.startDate == nil {
-                            startPlanBanner
-                        }
-
-                        // Re-assessment prompt
-                        if analysisResult == nil,
-                           reAssessmentVM.shouldShowReAssessment(for: plan),
-                           let assessmentType = reAssessmentVM.assessmentType(for: plan) {
-                            ReAssessmentPromptView(
-                                plan: plan,
-                                assessmentType: assessmentType,
-                                onStartAssessment: { showReAssessment = true }
-                            )
-                        }
-
-                        // Show comparison if available
-                        if analysisResult == nil,
-                           let comparison = reAssessmentVM.comparison(for: plan.id) {
-                            NavigationLink(destination: ReAssessmentComparisonView(
-                                initial: comparison.initial,
-                                latest: comparison.latest
-                            )) {
-                                HStack(spacing: AppSpacing.sm) {
-                                    Image(systemName: "chart.bar.xaxis")
-                                    Text("View Progress Comparison")
-                                }
-                                .font(AppFonts.bodyMedium)
-                                .foregroundColor(AppColors.accent)
-                                .padding(AppSpacing.md)
-                                .frame(maxWidth: .infinity)
-                                .background(AppColors.accentTint)
-                                .cornerRadius(AppCorners.medium)
-                            }
-                        }
-
-                        planHeader(plan: plan)
-                        weeklyCalendar(plan: plan)
-                        exerciseList(for: plan)
-
-                        // Guided workout button (only for saved plans, not during generation)
-                        if analysisResult == nil {
-                            NavigationLink(destination: GuidedWorkoutView(plan: plan)) {
-                                HStack(spacing: AppSpacing.sm) {
-                                    Image(systemName: "play.fill")
-                                    Text("Start Guided Workout")
-                                }
-                                .font(.headline)
-                                .foregroundColor(AppColors.primaryText)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
-                                .background(AppColors.coolGradient)
-                                .cornerRadius(AppCorners.large)
-                                .shadow(color: AppColors.cardShadowColor, radius: 8, y: 4)
-                            }
-                        }
-
-                        if analysisResult != nil {
-                            savePlanButton
-                            homeButton
-                        }
-                    }
-                    .padding(AppSpacing.xl)
-                    .floatingTabBarClearance()
-                }
+                planContent(plan: plan)
             } else {
                 emptyState
             }
@@ -252,6 +163,112 @@ struct RehabPlanView: View {
             }
         }
         .trackScreen("RehabPlan")
+    }
+
+    // MARK: - Plan Content
+
+    /// Scrollable plan display: banners → header → calendar → exercises → actions.
+    /// `analysisResult == nil` means a saved plan; non-nil means a freshly
+    /// generated plan being previewed before save.
+    private func planContent(plan: RehabPlan) -> some View {
+        ScrollView {
+            VStack(spacing: AppSpacing.lg) {
+                // Safety warnings from validation pipeline
+                if !viewModel.rehabPlanWarnings.isEmpty {
+                    rehabWarningsBanner
+                }
+
+                // Week progress banner (for saved plans with startDate)
+                if analysisResult == nil, let week = plan.currentWeek {
+                    weekProgressBanner(week: week, totalWeeks: plan.totalWeeks)
+                }
+
+                // Adaptive progression recommendation
+                if analysisResult == nil,
+                   plan.startDate != nil,
+                   showProgressionBanner,
+                   let recommendation = adaptiveRecommendation,
+                   recommendation.action != .insufficientData {
+                    AdaptiveProgressionBannerView(
+                        recommendation: recommendation,
+                        onApply: { applyProgression() },
+                        onDismiss: { withAnimation { showProgressionBanner = false } }
+                    )
+                }
+
+                // Start Plan button (for saved plans not yet started)
+                if analysisResult == nil && plan.startDate == nil {
+                    startPlanBanner
+                }
+
+                // Re-assessment prompt
+                if analysisResult == nil,
+                   reAssessmentVM.shouldShowReAssessment(for: plan),
+                   let assessmentType = reAssessmentVM.assessmentType(for: plan) {
+                    ReAssessmentPromptView(
+                        plan: plan,
+                        assessmentType: assessmentType,
+                        onStartAssessment: { showReAssessment = true }
+                    )
+                }
+
+                // Show comparison if available
+                if analysisResult == nil,
+                   let comparison = reAssessmentVM.comparison(for: plan.id) {
+                    progressComparisonLink(comparison: comparison)
+                }
+
+                planHeader(plan: plan)
+                weeklyCalendar(plan: plan)
+                exerciseList(for: plan)
+
+                // Guided workout button (only for saved plans, not during generation)
+                if analysisResult == nil {
+                    guidedWorkoutButton(plan: plan)
+                }
+
+                if analysisResult != nil {
+                    savePlanButton
+                    homeButton
+                }
+            }
+            .padding(AppSpacing.xl)
+            .floatingTabBarClearance()
+        }
+    }
+
+    private func progressComparisonLink(comparison: (initial: AssessmentSnapshot, latest: AssessmentSnapshot)) -> some View {
+        NavigationLink(destination: ReAssessmentComparisonView(
+            initial: comparison.initial,
+            latest: comparison.latest
+        )) {
+            HStack(spacing: AppSpacing.sm) {
+                Image(systemName: "chart.bar.xaxis")
+                Text("View Progress Comparison")
+            }
+            .font(AppFonts.bodyMedium)
+            .foregroundColor(AppColors.accent)
+            .padding(AppSpacing.md)
+            .frame(maxWidth: .infinity)
+            .background(AppColors.accentTint)
+            .cornerRadius(AppCorners.medium)
+        }
+    }
+
+    private func guidedWorkoutButton(plan: RehabPlan) -> some View {
+        NavigationLink(destination: GuidedWorkoutView(plan: plan)) {
+            HStack(spacing: AppSpacing.sm) {
+                Image(systemName: "play.fill")
+                Text("Start Guided Workout")
+            }
+            .font(.headline)
+            .foregroundColor(AppColors.primaryText)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .background(AppColors.coolGradient)
+            .cornerRadius(AppCorners.large)
+            .shadow(color: AppColors.cardShadowColor, radius: 8, y: 4)
+        }
     }
 
     // MARK: - Re-Assessment Sheet

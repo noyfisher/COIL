@@ -28,295 +28,12 @@ struct SettingsView: View {
 
                 ScrollView {
                     VStack(spacing: AppSpacing.lg) {
-                        // Profile card
-                        VStack(spacing: AppSpacing.lg) {
-                            // Avatar
-                            Text(initials)
-                                .font(.system(size: 28, weight: .bold, design: .rounded))
-                                .foregroundColor(AppColors.ctaText)
-                                .frame(width: 72, height: 72)
-                                .background(
-                                    Circle()
-                                        .fill(AppColors.primaryGradient)
-                                )
-
-                            Text(userName.isEmpty ? "User" : userName)
-                                .font(.system(.title3, design: .serif).weight(.bold))
-                                .foregroundColor(AppColors.primaryText)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, AppSpacing.xl)
-                        .background(AppColors.cardBackground)
-                        .cornerRadius(AppCorners.xl)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: AppCorners.xl)
-                                .stroke(AppColors.cardBorder, lineWidth: 1)
-                        )
-                        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
-
-                        // Notifications
-                        VStack(spacing: 0) {
-                            HStack(spacing: AppSpacing.md) {
-                                Image(systemName: "bell.badge")
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(AppColors.warning)
-                                    .frame(width: 32, height: 32)
-                                    .background(AppColors.warning.opacity(0.12))
-                                    .cornerRadius(AppCorners.small)
-
-                                Text("Reminders")
-                                    .font(.body)
-
-                                Spacer()
-
-                                Toggle("", isOn: $notificationService.isEnabled)
-                                    .labelsHidden()
-                                    .accessibilityIdentifier("settings.reminderToggle")
-                                    .onChange(of: notificationService.isEnabled) { _, enabled in
-                                        AnalyticsService.shared.log(.settingChanged,
-                                            parameters: ["key": "reminders_enabled",
-                                                         "value": enabled ? "true" : "false"])
-                                        if enabled && !notificationService.isAuthorized {
-                                            Task { await notificationService.requestPermission() }
-                                        }
-                                    }
-                            }
-                            .padding(.horizontal, AppSpacing.lg)
-                            .padding(.vertical, AppSpacing.md)
-
-                            if notificationService.isEnabled {
-                                Divider().padding(.leading, 52)
-
-                                HStack(spacing: AppSpacing.md) {
-                                    Image(systemName: "clock")
-                                        .font(.system(size: 14, weight: .semibold))
-                                        .foregroundColor(AppColors.accent)
-                                        .frame(width: 32, height: 32)
-                                        .background(AppColors.accentTint)
-                                        .cornerRadius(AppCorners.small)
-
-                                    Text("Reminder Time")
-                                        .font(.body)
-
-                                    Spacer()
-
-                                    DatePicker("", selection: $reminderDate, displayedComponents: .hourAndMinute)
-                                        .labelsHidden()
-                                        .onChange(of: reminderDate) { _, newDate in
-                                            let components = Calendar.current.dateComponents([.hour, .minute], from: newDate)
-                                            notificationService.reminderHour = components.hour ?? 9
-                                            notificationService.reminderMinute = components.minute ?? 0
-                                            let timeString = String(format: "%02d:%02d", components.hour ?? 9, components.minute ?? 0)
-                                            AnalyticsService.shared.log(.settingChanged,
-                                                parameters: ["key": "reminder_time", "value": timeString])
-                                        }
-                                }
-                                .padding(.horizontal, AppSpacing.lg)
-                                .padding(.vertical, AppSpacing.md)
-
-                                Divider().padding(.leading, 52)
-
-                                HStack(spacing: AppSpacing.md) {
-                                    Image(systemName: "dumbbell")
-                                        .font(.system(size: 14, weight: .semibold))
-                                        .foregroundColor(AppColors.success)
-                                        .frame(width: 32, height: 32)
-                                        .background(AppColors.success.opacity(0.12))
-                                        .cornerRadius(AppCorners.small)
-                                    Text("Workout Reminders")
-                                        .font(.body)
-                                    Spacer()
-                                    Toggle("", isOn: $notificationService.workoutRemindersEnabled)
-                                        .labelsHidden()
-                                        .onChange(of: notificationService.workoutRemindersEnabled) { _, enabled in
-                                            AnalyticsService.shared.log(.settingChanged,
-                                                parameters: ["key": "workout_reminders",
-                                                             "value": enabled ? "true" : "false"])
-                                        }
-                                }
-                                .padding(.horizontal, AppSpacing.lg)
-                                .padding(.vertical, AppSpacing.md)
-
-                                Divider().padding(.leading, 52)
-
-                                HStack(spacing: AppSpacing.md) {
-                                    Image(systemName: "arrow.triangle.2.circlepath")
-                                        .font(.system(size: 14, weight: .semibold))
-                                        .foregroundColor(AppColors.accent)
-                                        .frame(width: 32, height: 32)
-                                        .background(AppColors.accentTint)
-                                        .cornerRadius(AppCorners.small)
-                                    Text("Re-Assessment Prompts")
-                                        .font(.body)
-                                    Spacer()
-                                    Toggle("", isOn: $notificationService.reassessmentRemindersEnabled)
-                                        .labelsHidden()
-                                        .onChange(of: notificationService.reassessmentRemindersEnabled) { _, enabled in
-                                            AnalyticsService.shared.log(.settingChanged,
-                                                parameters: ["key": "reassessment_reminders",
-                                                             "value": enabled ? "true" : "false"])
-                                        }
-                                }
-                                .padding(.horizontal, AppSpacing.lg)
-                                .padding(.vertical, AppSpacing.md)
-
-                                Divider().padding(.leading, 52)
-
-                                HStack(spacing: AppSpacing.md) {
-                                    Image(systemName: "bell.badge.waveform")
-                                        .font(.system(size: 14, weight: .semibold))
-                                        .foregroundColor(AppColors.warning)
-                                        .frame(width: 32, height: 32)
-                                        .background(AppColors.warning.opacity(0.12))
-                                        .cornerRadius(AppCorners.small)
-                                    Text("Inactivity Nudges")
-                                        .font(.body)
-                                    Spacer()
-                                    Toggle("", isOn: $notificationService.inactivityNudgesEnabled)
-                                        .labelsHidden()
-                                        .onChange(of: notificationService.inactivityNudgesEnabled) { _, enabled in
-                                            AnalyticsService.shared.log(.settingChanged,
-                                                parameters: ["key": "inactivity_nudges",
-                                                             "value": enabled ? "true" : "false"])
-                                        }
-                                }
-                                .padding(.horizontal, AppSpacing.lg)
-                                .padding(.vertical, AppSpacing.md)
-                            }
-                        }
-                        .background(AppColors.cardBackground)
-                        .cornerRadius(AppCorners.large)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: AppCorners.large)
-                                .stroke(AppColors.cardBorder, lineWidth: 1)
-                        )
-                        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
-
-                        // Debug & Feedback
-                        VStack(spacing: 0) {
-                            settingsRow(icon: "ladybug", color: AppColors.accent, title: "Export Debug Log") {
-                                if let url = SessionLogger.shared.exportAsShareableFile() {
-                                    shareURL = url
-                                    showShareSheet = true
-                                }
-                            }
-
-                            Divider().padding(.leading, 52)
-
-                            HStack(spacing: AppSpacing.md) {
-                                Image(systemName: "doc.text.magnifyingglass")
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(AppColors.accentLight)
-                                    .frame(width: 32, height: 32)
-                                    .background(AppColors.accentTint)
-                                    .cornerRadius(AppCorners.small)
-
-                                VStack(alignment: .leading, spacing: AppSpacing.nano) {
-                                    Text("Session Events")
-                                        .font(.body)
-                                    Text("\(SessionLogger.shared.eventCount) events this session")
-                                        .font(.caption2)
-                                        .foregroundColor(AppColors.secondaryText)
-                                }
-
-                                Spacer()
-                            }
-                            .padding(.horizontal, AppSpacing.lg)
-                            .padding(.vertical, AppSpacing.md)
-                        }
-                        .background(AppColors.cardBackground)
-                        .cornerRadius(AppCorners.large)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: AppCorners.large)
-                                .stroke(AppColors.cardBorder, lineWidth: 1)
-                        )
-                        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
-
-                        // Legal
-                        VStack(spacing: 0) {
-                            settingsRow(icon: "hand.raised", color: AppColors.accent, title: "Privacy Policy") {
-                                showPrivacyPolicy = true
-                            }
-                            .accessibilityIdentifier("settings.privacyPolicyButton")
-
-                            Divider().padding(.leading, 52)
-
-                            settingsRow(icon: "doc.text", color: AppColors.accent, title: "Terms of Service") {
-                                showTermsOfService = true
-                            }
-                            .accessibilityIdentifier("settings.termsOfServiceButton")
-                        }
-                        .background(AppColors.cardBackground)
-                        .cornerRadius(AppCorners.large)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: AppCorners.large)
-                                .stroke(AppColors.cardBorder, lineWidth: 1)
-                        )
-                        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
-
-                        // Actions
-                        VStack(spacing: 0) {
-                            settingsRow(icon: "heart.text.clipboard", color: AppColors.accent, title: "Update Health Info") {
-                                dismiss()
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                    onEditProfile()
-                                }
-                            }
-                            .accessibilityIdentifier("settings.editProfileButton")
-
-                            #if DEBUG
-                            Divider().padding(.leading, 52)
-
-                            NavigationLink(destination: MissingImagesDebugView()) {
-                                HStack(spacing: AppSpacing.md) {
-                                    Image(systemName: "photo.badge.exclamationmark")
-                                        .font(.system(size: 14, weight: .semibold))
-                                        .foregroundColor(AppColors.warning)
-                                        .frame(width: 32, height: 32)
-                                        .background(AppColors.warning.opacity(0.12))
-                                        .cornerRadius(AppCorners.small)
-                                    Text("Image Diagnostics (DEBUG)")
-                                        .font(.body)
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .font(.system(size: 12, weight: .semibold))
-                                        .foregroundColor(AppColors.secondaryText)
-                                }
-                                .padding(.horizontal, AppSpacing.lg)
-                                .padding(.vertical, AppSpacing.md)
-                            }
-                            .accessibilityIdentifier("settings.imageDiagnosticsButton")
-                            #endif
-
-                            Divider().padding(.leading, 52)
-
-                            settingsRow(icon: "rectangle.portrait.and.arrow.right", color: AppColors.danger, title: "Sign Out") {
-                                showSignOutConfirmation = true
-                            }
-                            .accessibilityIdentifier("settings.signOutButton")
-                        }
-                        .background(AppColors.cardBackground)
-                        .cornerRadius(AppCorners.large)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: AppCorners.large)
-                                .stroke(AppColors.cardBorder, lineWidth: 1)
-                        )
-                        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
-
-                        // Danger zone
-                        VStack(spacing: 0) {
-                            settingsRow(icon: "trash", color: AppColors.danger, title: "Delete Account") {
-                                showDeleteConfirmation = true
-                            }
-                            .accessibilityIdentifier("settings.deleteAccountButton")
-                        }
-                        .background(AppColors.cardBackground)
-                        .cornerRadius(AppCorners.large)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: AppCorners.large)
-                                .stroke(AppColors.cardBorder, lineWidth: 1)
-                        )
-                        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+                        profileCard
+                        notificationsCard
+                        debugAndFeedbackCard
+                        legalCard
+                        actionsCard
+                        dangerZoneCard
 
                         // App version
                         Text(appVersionText)
@@ -337,22 +54,7 @@ struct SettingsView: View {
                 }
             }
             .confirmationDialog("Sign Out", isPresented: $showSignOutConfirmation, titleVisibility: .visible) {
-                Button("Sign Out", role: .destructive) {
-                    AnalyticsService.shared.log(.signedOut)
-                    SessionLogger.shared.logUserAction(.buttonTapped, action: "signOut")
-                    do {
-                        try Auth.auth().signOut()
-                    } catch {
-                        SessionLogger.shared.logError(error, context: "Auth.signOut",
-                                                       metadata: ["screen": "SettingsView"])
-                        AnalyticsService.shared.log(.errorShown, parameters: [
-                            "screen": "SettingsView",
-                            "error_type": "sign_out_failed"
-                        ])
-                        signOutErrorMessage = error.localizedDescription
-                        showSignOutError = true
-                    }
-                }
+                Button("Sign Out", role: .destructive) { signOut() }
                 Button("Cancel", role: .cancel) {}
             } message: {
                 Text("Are you sure you want to sign out?")
@@ -379,20 +81,7 @@ struct SettingsView: View {
             }
             .overlay {
                 if isDeletingAccount {
-                    ZStack {
-                        AppColors.primaryText.opacity(0.4).ignoresSafeArea()
-                        VStack(spacing: AppSpacing.md) {
-                            ProgressView()
-                                .scaleEffect(1.3)
-                                .tint(AppColors.ctaText)
-                            Text("Deleting account...")
-                                .font(AppFonts.body)
-                                .foregroundColor(AppColors.primaryText)
-                        }
-                        .padding(AppSpacing.xxl)
-                        .background(.ultraThinMaterial)
-                        .cornerRadius(AppCorners.large)
-                    }
+                    deletingAccountOverlay
                 }
             }
         }
@@ -407,6 +96,252 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showTermsOfService) {
             LegalDocumentView(title: "Terms of Service", markdownContent: LegalContent.termsOfService)
+        }
+    }
+
+    // MARK: - Profile Card
+
+    private var profileCard: some View {
+        VStack(spacing: AppSpacing.lg) {
+            // Avatar
+            Text(initials)
+                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .foregroundColor(AppColors.ctaText)
+                .frame(width: 72, height: 72)
+                .background(
+                    Circle()
+                        .fill(AppColors.primaryGradient)
+                )
+
+            Text(userName.isEmpty ? "User" : userName)
+                .font(.system(.title3, design: .serif).weight(.bold))
+                .foregroundColor(AppColors.primaryText)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, AppSpacing.xl)
+        .settingsCard(cornerRadius: AppCorners.xl)
+    }
+
+    // MARK: - Notifications Card
+
+    private var notificationsCard: some View {
+        VStack(spacing: 0) {
+            toggleRow(
+                icon: "bell.badge",
+                iconColor: AppColors.warning,
+                iconBackground: AppColors.warning.opacity(0.12),
+                title: "Reminders",
+                isOn: $notificationService.isEnabled,
+                toggleIdentifier: "settings.reminderToggle",
+                analyticsKey: "reminders_enabled"
+            ) { enabled in
+                if enabled && !notificationService.isAuthorized {
+                    Task { await notificationService.requestPermission() }
+                }
+            }
+
+            if notificationService.isEnabled {
+                rowDivider
+
+                reminderTimeRow
+
+                rowDivider
+
+                toggleRow(
+                    icon: "dumbbell",
+                    iconColor: AppColors.success,
+                    iconBackground: AppColors.success.opacity(0.12),
+                    title: "Workout Reminders",
+                    isOn: $notificationService.workoutRemindersEnabled,
+                    analyticsKey: "workout_reminders"
+                )
+
+                rowDivider
+
+                toggleRow(
+                    icon: "arrow.triangle.2.circlepath",
+                    iconColor: AppColors.accent,
+                    iconBackground: AppColors.accentTint,
+                    title: "Re-Assessment Prompts",
+                    isOn: $notificationService.reassessmentRemindersEnabled,
+                    analyticsKey: "reassessment_reminders"
+                )
+
+                rowDivider
+
+                toggleRow(
+                    icon: "bell.badge.waveform",
+                    iconColor: AppColors.warning,
+                    iconBackground: AppColors.warning.opacity(0.12),
+                    title: "Inactivity Nudges",
+                    isOn: $notificationService.inactivityNudgesEnabled,
+                    analyticsKey: "inactivity_nudges"
+                )
+            }
+        }
+        .settingsCard()
+    }
+
+    private var reminderTimeRow: some View {
+        HStack(spacing: AppSpacing.md) {
+            iconBadge("clock", color: AppColors.accent, background: AppColors.accentTint)
+
+            Text("Reminder Time")
+                .font(.body)
+
+            Spacer()
+
+            DatePicker("", selection: $reminderDate, displayedComponents: .hourAndMinute)
+                .labelsHidden()
+                .onChange(of: reminderDate) { _, newDate in
+                    let components = Calendar.current.dateComponents([.hour, .minute], from: newDate)
+                    notificationService.reminderHour = components.hour ?? 9
+                    notificationService.reminderMinute = components.minute ?? 0
+                    let timeString = String(format: "%02d:%02d", components.hour ?? 9, components.minute ?? 0)
+                    AnalyticsService.shared.log(.settingChanged,
+                        parameters: ["key": "reminder_time", "value": timeString])
+                }
+        }
+        .settingsRowPadding()
+    }
+
+    // MARK: - Debug & Feedback Card
+
+    private var debugAndFeedbackCard: some View {
+        VStack(spacing: 0) {
+            settingsRow(icon: "ladybug", color: AppColors.accent, title: "Export Debug Log") {
+                if let url = SessionLogger.shared.exportAsShareableFile() {
+                    shareURL = url
+                    showShareSheet = true
+                }
+            }
+
+            rowDivider
+
+            HStack(spacing: AppSpacing.md) {
+                iconBadge("doc.text.magnifyingglass", color: AppColors.accentLight, background: AppColors.accentTint)
+
+                VStack(alignment: .leading, spacing: AppSpacing.nano) {
+                    Text("Session Events")
+                        .font(.body)
+                    Text("\(SessionLogger.shared.eventCount) events this session")
+                        .font(.caption2)
+                        .foregroundColor(AppColors.secondaryText)
+                }
+
+                Spacer()
+            }
+            .settingsRowPadding()
+        }
+        .settingsCard()
+    }
+
+    // MARK: - Legal Card
+
+    private var legalCard: some View {
+        VStack(spacing: 0) {
+            settingsRow(icon: "hand.raised", color: AppColors.accent, title: "Privacy Policy") {
+                showPrivacyPolicy = true
+            }
+            .accessibilityIdentifier("settings.privacyPolicyButton")
+
+            rowDivider
+
+            settingsRow(icon: "doc.text", color: AppColors.accent, title: "Terms of Service") {
+                showTermsOfService = true
+            }
+            .accessibilityIdentifier("settings.termsOfServiceButton")
+        }
+        .settingsCard()
+    }
+
+    // MARK: - Actions Card
+
+    private var actionsCard: some View {
+        VStack(spacing: 0) {
+            settingsRow(icon: "heart.text.clipboard", color: AppColors.accent, title: "Update Health Info") {
+                dismiss()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    onEditProfile()
+                }
+            }
+            .accessibilityIdentifier("settings.editProfileButton")
+
+            #if DEBUG
+            rowDivider
+
+            NavigationLink(destination: MissingImagesDebugView()) {
+                HStack(spacing: AppSpacing.md) {
+                    iconBadge("photo.badge.exclamationmark", color: AppColors.warning, background: AppColors.warning.opacity(0.12))
+                    Text("Image Diagnostics (DEBUG)")
+                        .font(.body)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(AppColors.secondaryText)
+                }
+                .settingsRowPadding()
+            }
+            .accessibilityIdentifier("settings.imageDiagnosticsButton")
+            #endif
+
+            rowDivider
+
+            settingsRow(icon: "rectangle.portrait.and.arrow.right", color: AppColors.danger, title: "Sign Out") {
+                showSignOutConfirmation = true
+            }
+            .accessibilityIdentifier("settings.signOutButton")
+        }
+        .settingsCard()
+    }
+
+    // MARK: - Danger Zone Card
+
+    private var dangerZoneCard: some View {
+        VStack(spacing: 0) {
+            settingsRow(icon: "trash", color: AppColors.danger, title: "Delete Account") {
+                showDeleteConfirmation = true
+            }
+            .accessibilityIdentifier("settings.deleteAccountButton")
+        }
+        .settingsCard()
+    }
+
+    // MARK: - Deleting Overlay
+
+    private var deletingAccountOverlay: some View {
+        ZStack {
+            AppColors.primaryText.opacity(0.4).ignoresSafeArea()
+            VStack(spacing: AppSpacing.md) {
+                ProgressView()
+                    .scaleEffect(1.3)
+                    .tint(AppColors.ctaText)
+                Text("Deleting account...")
+                    .font(AppFonts.body)
+                    .foregroundColor(AppColors.primaryText)
+            }
+            .padding(AppSpacing.xxl)
+            .background(.ultraThinMaterial)
+            .cornerRadius(AppCorners.large)
+        }
+    }
+
+    // MARK: - Sign Out
+
+    private func signOut() {
+        AnalyticsService.shared.log(.signedOut)
+        SessionLogger.shared.logUserAction(.buttonTapped, action: "signOut")
+        do {
+            try Auth.auth().signOut()
+        } catch {
+            SessionLogger.shared.logError(error, context: "Auth.signOut",
+                                           metadata: ["screen": "SettingsView"])
+            AnalyticsService.shared.log(.errorShown, parameters: [
+                "screen": "SettingsView",
+                "error_type": "sign_out_failed"
+            ])
+            signOutErrorMessage = error.localizedDescription
+            showSignOutError = true
         }
     }
 
@@ -486,15 +421,57 @@ struct SettingsView: View {
         return "PT Helper v\(version) (\(build))"
     }
 
+    private var rowDivider: some View {
+        Divider().padding(.leading, 52)
+    }
+
+    /// Rounded icon square shown at the leading edge of every settings row.
+    private func iconBadge(_ icon: String, color: Color, background: Color) -> some View {
+        Image(systemName: icon)
+            .font(.system(size: 14, weight: .semibold))
+            .foregroundColor(color)
+            .frame(width: 32, height: 32)
+            .background(background)
+            .cornerRadius(AppCorners.small)
+    }
+
+    /// Row with a trailing toggle that logs the change to analytics.
+    /// `onToggle` runs after logging for any extra side effects.
+    private func toggleRow(
+        icon: String,
+        iconColor: Color,
+        iconBackground: Color,
+        title: String,
+        isOn: Binding<Bool>,
+        toggleIdentifier: String? = nil,
+        analyticsKey: String,
+        onToggle: ((Bool) -> Void)? = nil
+    ) -> some View {
+        HStack(spacing: AppSpacing.md) {
+            iconBadge(icon, color: iconColor, background: iconBackground)
+
+            Text(title)
+                .font(.body)
+
+            Spacer()
+
+            Toggle("", isOn: isOn)
+                .labelsHidden()
+                .accessibilityIdentifier(toggleIdentifier ?? "")
+                .onChange(of: isOn.wrappedValue) { _, enabled in
+                    AnalyticsService.shared.log(.settingChanged,
+                        parameters: ["key": analyticsKey,
+                                     "value": enabled ? "true" : "false"])
+                    onToggle?(enabled)
+                }
+        }
+        .settingsRowPadding()
+    }
+
     private func settingsRow(icon: String, color: Color, title: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack(spacing: AppSpacing.md) {
-                Image(systemName: icon)
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(color)
-                    .frame(width: 32, height: 32)
-                    .background(color.opacity(0.12))
-                    .cornerRadius(AppCorners.small)
+                iconBadge(icon, color: color, background: color.opacity(0.12))
 
                 Text(title)
                     .font(.body)
@@ -506,8 +483,30 @@ struct SettingsView: View {
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundColor(AppColors.mutedText)
             }
+            .settingsRowPadding()
+        }
+    }
+}
+
+// MARK: - Settings Styling Helpers
+
+private extension View {
+    /// Shared card chrome for every settings section.
+    func settingsCard(cornerRadius: CGFloat = AppCorners.large) -> some View {
+        self
+            .background(AppColors.cardBackground)
+            .cornerRadius(cornerRadius)
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .stroke(AppColors.cardBorder, lineWidth: 1)
+            )
+            .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+    }
+
+    /// Standard inner padding for a settings row.
+    func settingsRowPadding() -> some View {
+        self
             .padding(.horizontal, AppSpacing.lg)
             .padding(.vertical, AppSpacing.md)
-        }
     }
 }

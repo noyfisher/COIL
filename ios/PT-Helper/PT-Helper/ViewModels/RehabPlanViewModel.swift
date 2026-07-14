@@ -161,130 +161,141 @@ class RehabPlanViewModel: ObservableObject {
 
         Task {
             do {
-                AppLogger.rehab.info("Calling AI for rehab plan...")
-                let plan = try await generateAIRehabPlan(from: analysisResult)
-                AppLogger.rehab.info("AI returned plan '\(plan.planName)' with \(plan.exercises.count) exercises, \(plan.totalWeeks) weeks")
-
-                // Validate the plan (includes knowledge graph check)
-                AppLogger.rehab.info("Validating AI rehab plan...")
-                let painRegions = analysisResult.assessments.map { $0.selectedRegion.name }
-                let (validatedPlan, warnings, graphVerification) = ResponseValidationPipeline.validateRehabPlan(
-                    plan,
-                    conditions: conditions,
-                    userProfile: analysisResult.userProfileSnapshot,
-                    userPainRegions: painRegions
-                )
-                self.rehabPlan = validatedPlan
-                self.rehabPlanWarnings = warnings
-                self.isGenerating = false
-
-                // Set initial verification statuses from knowledge graph
-                if let graphResult = graphVerification {
-                    applyGraphVerification(graphResult)
-                }
-
-                let exerciseNames = plan.exercises.map { $0.name }
-                AppLogger.rehab.info("Rehab plan finalized: \(exerciseNames.joined(separator: ", "))")
-                SessionLogger.shared.log(.loadingFinished, category: .stateChange, message: "Rehab plan generated (AI)",
-                                          metadata: [
-                                            "exerciseCount": "\(plan.exercises.count)",
-                                            "exercises": exerciseNames.prefix(5).joined(separator: ", "),
-                                            "totalWeeks": "\(plan.totalWeeks)",
-                                            "warningCount": "\(warnings.count)",
-                                            "source": "ai"
-                                          ])
-
-                // Trigger cross-model verification for unverified exercises (async, background)
-                if let graphResult = graphVerification, !graphResult.unverifiedExercises.isEmpty {
-                    await performCrossModelVerification(
-                        unverified: graphResult.unverifiedExercises,
-                        conditions: conditions,
-                        profile: analysisResult.userProfileSnapshot
-                    )
-                } else {
-                    verificationComplete = true
-                }
-
-                // Preload exercise images in background
-                ExerciseImageService.shared.preloadImages(for: plan.exercises)
-                // Log exercises that don't have images yet
-                logMissingImages(exercises: plan.exercises, source: "ai")
+                try await generateAndPublishAIPlan(from: analysisResult, conditions: conditions)
             } catch {
-                // Fallback to hardcoded database
-                AppLogger.rehab.warning("AI rehab generation failed, using fallback: \(error.localizedDescription)")
-                // Tier 1 breadcrumb: distinguish schema failures (ai_response_invalid)
-                // from network/quota errors in telemetry.
-                if let apiError = error as? ClaudeAPIError, apiError.isResponseInvalid {
-                    SessionLogger.shared.log(.errorOccurred, category: .api,
-                        message: "Rehab plan rejected by server schema (ai_response_invalid)",
-                        metadata: ["error_kind": "ai_response_invalid"])
-                }
-                SessionLogger.shared.log(.stateUpdated, category: .stateChange, message: "Rehab plan using fallback",
-                                          metadata: ["source": "fallback", "reason": error.localizedDescription])
-
-                let exercises = conditions.flatMap { exerciseDatabase[$0] ?? [] }
-                let matchedConditions = conditions.filter { exerciseDatabase[$0] != nil }
-                let unmatchedConditions = conditions.filter { exerciseDatabase[$0] == nil }
-
-                if !unmatchedConditions.isEmpty {
-                    AppLogger.rehab.info("No fallback exercises for: \(unmatchedConditions.joined(separator: ", "))")
-                }
-
-                let finalExercises: [RehabExercise]
-                if exercises.isEmpty {
-                    AppLogger.rehab.info("No condition-specific exercises found, using region-aware fallback")
-                    finalExercises = getRegionAwareExercises(conditions: conditions)
-                } else {
-                    finalExercises = exercises
-                }
-
-                AppLogger.rehab.info("Fallback plan: \(finalExercises.count) exercises from \(matchedConditions.count) matched condition(s)")
-
-                let weeklySchedule = createWeeklySchedule(
-                    for: finalExercises,
-                    activityLevel: analysisResult.userProfileSnapshot.activityLevel
-                )
-
-                let fallbackPlan = RehabPlan(
-                    id: UUID(),
-                    planName: "Personalized Rehab Plan",
-                    conditions: conditions,
-                    exercises: finalExercises,
-                    weeklySchedule: weeklySchedule,
-                    totalWeeks: 4,
-                    createdDate: Date(),
-                    notes: nil
-                )
-                // Validate fallback plan too
-                let (validatedFallback, warnings, _) = ResponseValidationPipeline.validateRehabPlan(
-                    fallbackPlan,
-                    conditions: conditions,
-                    userProfile: analysisResult.userProfileSnapshot,
-                    userPainRegions: analysisResult.assessments.map { $0.selectedRegion.name }
-                )
-                self.rehabPlan = validatedFallback
-                self.rehabPlanWarnings = warnings
-                self.isGenerating = false
-                // Fallback exercises are curated — mark all as verified, skip cross-model
-                for exercise in validatedFallback.exercises {
-                    exerciseVerifications[exercise.name] = .verified
-                }
-                verificationComplete = true
-
-                SessionLogger.shared.log(.loadingFinished, category: .stateChange, message: "Rehab plan generated (fallback)",
-                                          metadata: [
-                                            "exerciseCount": "\(finalExercises.count)",
-                                            "source": "fallback",
-                                            "matchedConditions": matchedConditions.joined(separator: ", "),
-                                            "unmatchedConditions": unmatchedConditions.joined(separator: ", ")
-                                          ])
-
-                // Preload exercise images in background
-                ExerciseImageService.shared.preloadImages(for: finalExercises)
-                // Log exercises that don't have images yet
-                logMissingImages(exercises: finalExercises, source: "fallback")
+                publishFallbackPlan(from: analysisResult, conditions: conditions, aiError: error)
             }
         }
+    }
+
+    /// Success path: call the AI, validate the plan, publish it, then kick off
+    /// verification and image preloading.
+    private func generateAndPublishAIPlan(from analysisResult: AnalysisResult, conditions: [String]) async throws {
+        AppLogger.rehab.info("Calling AI for rehab plan...")
+        let plan = try await generateAIRehabPlan(from: analysisResult)
+        AppLogger.rehab.info("AI returned plan '\(plan.planName)' with \(plan.exercises.count) exercises, \(plan.totalWeeks) weeks")
+
+        // Validate the plan (includes knowledge graph check)
+        AppLogger.rehab.info("Validating AI rehab plan...")
+        let painRegions = analysisResult.assessments.map { $0.selectedRegion.name }
+        let (validatedPlan, warnings, graphVerification) = ResponseValidationPipeline.validateRehabPlan(
+            plan,
+            conditions: conditions,
+            userProfile: analysisResult.userProfileSnapshot,
+            userPainRegions: painRegions
+        )
+        self.rehabPlan = validatedPlan
+        self.rehabPlanWarnings = warnings
+        self.isGenerating = false
+
+        // Set initial verification statuses from knowledge graph
+        if let graphResult = graphVerification {
+            applyGraphVerification(graphResult)
+        }
+
+        let exerciseNames = plan.exercises.map { $0.name }
+        AppLogger.rehab.info("Rehab plan finalized: \(exerciseNames.joined(separator: ", "))")
+        SessionLogger.shared.log(.loadingFinished, category: .stateChange, message: "Rehab plan generated (AI)",
+                                  metadata: [
+                                    "exerciseCount": "\(plan.exercises.count)",
+                                    "exercises": exerciseNames.prefix(5).joined(separator: ", "),
+                                    "totalWeeks": "\(plan.totalWeeks)",
+                                    "warningCount": "\(warnings.count)",
+                                    "source": "ai"
+                                  ])
+
+        // Trigger cross-model verification for unverified exercises (async, background)
+        if let graphResult = graphVerification, !graphResult.unverifiedExercises.isEmpty {
+            await performCrossModelVerification(
+                unverified: graphResult.unverifiedExercises,
+                conditions: conditions,
+                profile: analysisResult.userProfileSnapshot
+            )
+        } else {
+            verificationComplete = true
+        }
+
+        // Preload exercise images in background
+        ExerciseImageService.shared.preloadImages(for: plan.exercises)
+        // Log exercises that don't have images yet
+        logMissingImages(exercises: plan.exercises, source: "ai")
+    }
+
+    /// Fallback path when AI generation fails: build a plan from the hardcoded
+    /// exercise database (or region-aware defaults), validate, and publish it.
+    private func publishFallbackPlan(from analysisResult: AnalysisResult, conditions: [String], aiError: Error) {
+        AppLogger.rehab.warning("AI rehab generation failed, using fallback: \(aiError.localizedDescription)")
+        // Tier 1 breadcrumb: distinguish schema failures (ai_response_invalid)
+        // from network/quota errors in telemetry.
+        if let apiError = aiError as? ClaudeAPIError, apiError.isResponseInvalid {
+            SessionLogger.shared.log(.errorOccurred, category: .api,
+                message: "Rehab plan rejected by server schema (ai_response_invalid)",
+                metadata: ["error_kind": "ai_response_invalid"])
+        }
+        SessionLogger.shared.log(.stateUpdated, category: .stateChange, message: "Rehab plan using fallback",
+                                  metadata: ["source": "fallback", "reason": aiError.localizedDescription])
+
+        let exercises = conditions.flatMap { exerciseDatabase[$0] ?? [] }
+        let matchedConditions = conditions.filter { exerciseDatabase[$0] != nil }
+        let unmatchedConditions = conditions.filter { exerciseDatabase[$0] == nil }
+
+        if !unmatchedConditions.isEmpty {
+            AppLogger.rehab.info("No fallback exercises for: \(unmatchedConditions.joined(separator: ", "))")
+        }
+
+        let finalExercises: [RehabExercise]
+        if exercises.isEmpty {
+            AppLogger.rehab.info("No condition-specific exercises found, using region-aware fallback")
+            finalExercises = getRegionAwareExercises(conditions: conditions)
+        } else {
+            finalExercises = exercises
+        }
+
+        AppLogger.rehab.info("Fallback plan: \(finalExercises.count) exercises from \(matchedConditions.count) matched condition(s)")
+
+        let weeklySchedule = createWeeklySchedule(
+            for: finalExercises,
+            activityLevel: analysisResult.userProfileSnapshot.activityLevel
+        )
+
+        let fallbackPlan = RehabPlan(
+            id: UUID(),
+            planName: "Personalized Rehab Plan",
+            conditions: conditions,
+            exercises: finalExercises,
+            weeklySchedule: weeklySchedule,
+            totalWeeks: 4,
+            createdDate: Date(),
+            notes: nil
+        )
+        // Validate fallback plan too
+        let (validatedFallback, warnings, _) = ResponseValidationPipeline.validateRehabPlan(
+            fallbackPlan,
+            conditions: conditions,
+            userProfile: analysisResult.userProfileSnapshot,
+            userPainRegions: analysisResult.assessments.map { $0.selectedRegion.name }
+        )
+        self.rehabPlan = validatedFallback
+        self.rehabPlanWarnings = warnings
+        self.isGenerating = false
+        // Fallback exercises are curated — mark all as verified, skip cross-model
+        for exercise in validatedFallback.exercises {
+            exerciseVerifications[exercise.name] = .verified
+        }
+        verificationComplete = true
+
+        SessionLogger.shared.log(.loadingFinished, category: .stateChange, message: "Rehab plan generated (fallback)",
+                                  metadata: [
+                                    "exerciseCount": "\(finalExercises.count)",
+                                    "source": "fallback",
+                                    "matchedConditions": matchedConditions.joined(separator: ", "),
+                                    "unmatchedConditions": unmatchedConditions.joined(separator: ", ")
+                                  ])
+
+        // Preload exercise images in background
+        ExerciseImageService.shared.preloadImages(for: finalExercises)
+        // Log exercises that don't have images yet
+        logMissingImages(exercises: finalExercises, source: "fallback")
     }
 
     // MARK: - Knowledge Graph & Cross-Model Verification
