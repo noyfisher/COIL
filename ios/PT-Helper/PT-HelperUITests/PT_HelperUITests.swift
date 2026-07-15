@@ -8,14 +8,61 @@ final class OnboardingUITests: UITestBase {
     override var seedMockData: Bool { false }
     override var additionalLaunchArguments: [String] { ["--prefill-weight"] }
 
-    /// Dismiss the software keyboard if it's showing.
+    /// The MHMDA health-data consent cover is presented on top of onboarding the
+    /// first time it's shown (before any health data is collected). Dismiss it if
+    /// present so the onboarding flow is reachable regardless of persisted consent
+    /// state (a freshly erased simulator shows it; a reused one may not).
+    @MainActor
+    private func dismissHealthConsentIfPresent() {
+        let collection = app.buttons["healthConsent.collectionCheckbox"]
+        guard collection.waitForExistence(timeout: 2) else { return }
+        collection.tap()
+        app.buttons["healthConsent.sharingCheckbox"].tap()
+        let cont = app.buttons["healthConsent.continueButton"]
+        if cont.waitForExistence(timeout: 2) { cont.tap() }
+    }
+
+    /// Wait until the step indicator reads "N/6" (the header shows a compact
+    /// "\(currentStep)/6", not "Step N of 6").
+    @MainActor
+    @discardableResult
+    private func waitForStep(_ step: Int, timeout: TimeInterval = 5) -> Bool {
+        let indicator = app.descendants(matching: .any)["onboarding.stepIndicator"]
+        let predicate = NSPredicate(format: "label == %@", "\(step)/6")
+        let expectation = XCTNSPredicateExpectation(predicate: predicate, object: indicator)
+        return XCTWaiter.wait(for: [expectation], timeout: timeout) == .completed
+    }
+
+    /// Dismiss the software keyboard. BasicInfoStepView resigns the first responder
+    /// on a tap of its ScrollView content, so tap the non-editable "Full Name" label
+    /// (matched case-insensitively — it renders uppercased). Tapping the header step
+    /// indicator does NOT resign, which would leave the keyboard covering the Sex
+    /// chips, Terms checkbox, and the bottom Continue button.
     @MainActor
     private func dismissKeyboard() {
-        // Tap on the step indicator area at the top, which is always visible and non-interactive
-        let stepIndicator = app.descendants(matching: .any)["onboarding.stepIndicator"]
-        if stepIndicator.exists {
-            stepIndicator.tap()
+        guard app.keyboards.firstMatch.exists else { return }
+        let nameLabel = app.staticTexts
+            .matching(NSPredicate(format: "label ==[c] %@", "Full Name")).firstMatch
+        if nameLabel.exists { nameLabel.tap() }
+        // Fallback: BasicInfoStepView also uses .scrollDismissesKeyboard(.interactively).
+        var attempts = 0
+        while app.keyboards.firstMatch.exists && attempts < 3 {
+            app.swipeDown()
+            attempts += 1
         }
+    }
+
+    /// Swipe up until `element` is hittable (used to reveal fields lower in the
+    /// onboarding form). Returns whether it ended up hittable.
+    @MainActor
+    @discardableResult
+    private func scrollUpToHittable(_ element: XCUIElement, maxSwipes: Int = 6) -> Bool {
+        var swipes = 0
+        while !(element.exists && element.isHittable) && swipes < maxSwipes {
+            app.swipeUp()
+            swipes += 1
+        }
+        return element.exists && element.isHittable
     }
 
     /// Fill all required Step 1 fields so the Continue button becomes enabled.
@@ -36,40 +83,39 @@ final class OnboardingUITests: UITestBase {
             lastNameField.typeText("User")
         }
 
-        // Dismiss keyboard by tapping the step indicator
+        // Dismiss the keyboard so the fields below it become reachable.
         dismissKeyboard()
 
-        // Sex — tap "Male" chip
+        // Sex — tap the "Male" chip (scroll into view if needed).
         let maleButton = button("Male")
-        if maleButton.waitForExistence(timeout: 3) {
+        if scrollUpToHittable(maleButton) {
             maleButton.tap()
         }
 
         // Height uses default 5ft 7in which passes validation.
         // Weight is pre-filled to 170 via --prefill-weight launch argument.
 
-        // Accept Terms of Service checkbox (required for Continue)
-        app.swipeUp()
+        // Accept Terms of Service checkbox (required for Continue) — it sits near the
+        // bottom of the form, so scroll it into view first.
         let termsCheckbox = app.descendants(matching: .any)["onboarding.termsCheckbox"]
-        if termsCheckbox.waitForExistence(timeout: 3) {
+        if scrollUpToHittable(termsCheckbox) {
             termsCheckbox.tap()
         }
     }
 
     @MainActor
     func testFullFlow_CompletesAllSixSteps() throws {
+        dismissHealthConsentIfPresent()
+
         // Step 1: Basic Info
         assertExists("onboarding.stepIndicator")
-        XCTAssertTrue(staticText("Step 1 of 6").exists)
+        XCTAssertTrue(waitForStep(1), "Should start on step 1")
 
-        // Fill all required fields
+        // Fill all required fields (this also dismisses the keyboard).
         fillStep1RequiredFields()
 
-        // Dismiss keyboard and scroll to reveal Continue button
-        dismissKeyboard()
-        app.swipeUp()
-
-        // Wait for validation to enable Continue, then tap
+        // Continue lives in the fixed bottom nav bar — visible once the keyboard is
+        // dismissed.
         let continueButton = app.descendants(matching: .any)["onboarding.continueButton"]
         XCTAssertTrue(continueButton.waitForExistence(timeout: 5))
 
@@ -83,7 +129,7 @@ final class OnboardingUITests: UITestBase {
 
         // Step 2: Activity Level (moved up in the 2026 reorder) — select a level
         // so Continue enables (this step is now required).
-        XCTAssertTrue(staticText("Step 2 of 6").waitForExistence(timeout: 5))
+        XCTAssertTrue(waitForStep(2), "Should advance to step 2 (Activity Level)")
         let moderateButton = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Moderately'")).firstMatch
         if moderateButton.waitForExistence(timeout: 3) {
             moderateButton.tap()
@@ -93,46 +139,52 @@ final class OnboardingUITests: UITestBase {
         }
 
         // Step 3: Medical History (optional step)
-        XCTAssertTrue(staticText("Step 3 of 6").waitForExistence(timeout: 5))
+        XCTAssertTrue(waitForStep(3), "Should advance to step 3 (Medical History)")
         if continueButton.exists, continueButton.isEnabled {
             continueButton.tap()
         }
 
         // Step 4: Surgical History (optional step)
-        XCTAssertTrue(staticText("Step 4 of 6").waitForExistence(timeout: 5))
+        XCTAssertTrue(waitForStep(4), "Should advance to step 4 (Surgical History)")
         if continueButton.exists, continueButton.isEnabled {
             continueButton.tap()
         }
 
         // Step 5: Injuries (optional step)
-        XCTAssertTrue(staticText("Step 5 of 6").waitForExistence(timeout: 5))
+        XCTAssertTrue(waitForStep(5), "Should advance to step 5 (Injuries)")
         if continueButton.exists, continueButton.isEnabled {
             continueButton.tap()
         }
 
         // Step 6: Review & Submit
-        XCTAssertTrue(staticText("Step 6 of 6").waitForExistence(timeout: 5))
+        XCTAssertTrue(waitForStep(6), "Should advance to step 6 (Review)")
 
         captureScreenshot(name: "Onboarding-Step6-Review")
     }
 
     @MainActor
     func testSkipButton_GoesToMainView() throws {
+        dismissHealthConsentIfPresent()
+
         let skipButton = app.descendants(matching: .any)["onboarding.skipButton"]
         XCTAssertTrue(skipButton.waitForExistence(timeout: 3))
         skipButton.tap()
 
-        // Should land on the main tab view (Dashboard or legacy tabs)
-        let tabBar = app.tabBars.firstMatch
-        XCTAssertTrue(tabBar.waitForExistence(timeout: 10), "Tab bar should appear after skipping onboarding")
+        // The live shell has no system tab bar — assert the custom FloatingTabBar's
+        // Home tab (a plain accessibility button) appears after skipping.
+        XCTAssertTrue(
+            app.buttons["Home"].waitForExistence(timeout: 10) ||
+            app.buttons["New Assessment"].waitForExistence(timeout: 3),
+            "The main shell's floating tab bar should appear after skipping onboarding"
+        )
     }
 
     @MainActor
     func testBackButton_NavigatesToPreviousStep() throws {
-        // Fill step 1 required fields and advance
+        dismissHealthConsentIfPresent()
+
+        // Fill step 1 required fields and advance (fill dismisses the keyboard).
         fillStep1RequiredFields()
-        dismissKeyboard()
-        app.swipeUp()
 
         let continueButton = app.descendants(matching: .any)["onboarding.continueButton"]
         XCTAssertTrue(continueButton.waitForExistence(timeout: 5))
@@ -145,25 +197,27 @@ final class OnboardingUITests: UITestBase {
         if continueButton.isEnabled {
             // Step 1 → 2 (Activity Level, moved up in the 2026 reorder)
             continueButton.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
-            _ = staticText("Step 2 of 6").waitForExistence(timeout: 5)
+            _ = waitForStep(2)
             // Select an activity level so Continue enables, then Step 2 → 3
             let moderateButton = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Moderately'")).firstMatch
             if moderateButton.waitForExistence(timeout: 3) { moderateButton.tap() }
             if continueButton.isEnabled { continueButton.tap() }
-            _ = staticText("Step 3 of 6").waitForExistence(timeout: 5)
+            _ = waitForStep(3)
         }
 
         // Go back twice
         let backButton = app.descendants(matching: .any)["onboarding.backButton"]
-        XCTAssertTrue(backButton.exists)
+        XCTAssertTrue(backButton.waitForExistence(timeout: 3))
         backButton.tap()
-        XCTAssertTrue(staticText("Step 2 of 6").waitForExistence(timeout: 3))
+        XCTAssertTrue(waitForStep(2), "Back should return to step 2")
         backButton.tap()
-        XCTAssertTrue(staticText("Step 1 of 6").waitForExistence(timeout: 3))
+        XCTAssertTrue(waitForStep(1), "Back should return to step 1")
     }
 
     @MainActor
     func testContinueDisabled_WhenRequiredFieldsMissing() throws {
+        dismissHealthConsentIfPresent()
+
         // On step 1 with no fields filled, Continue should be disabled
         let continueButton = app.descendants(matching: .any)["onboarding.continueButton"]
         XCTAssertTrue(continueButton.waitForExistence(timeout: 3))

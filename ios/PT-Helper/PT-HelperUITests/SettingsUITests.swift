@@ -2,47 +2,52 @@ import XCTest
 
 final class SettingsUITests: UITestBase {
 
+    /// Open the Settings sheet from the Progress tab's toolbar gear.
     @MainActor
     private func navigateToSettings() {
         tapTab("Progress")
 
-        // Wait for Progress tab to load
-        _ = app.navigationBars["Progress"].waitForExistence(timeout: 5)
+        // Settings lives behind the gear button in the Progress toolbar.
+        let gearButton = app.buttons["progress.settingsButton"]
+        XCTAssertTrue(gearButton.waitForExistence(timeout: 10),
+                      "Settings gear should appear in the Progress toolbar")
+        gearButton.tap()
 
-        // In the 3-tab UI, Settings is accessed via the gear icon in the Progress toolbar
-        let gearButton = app.buttons.matching(NSPredicate(format: "label CONTAINS[cd] 'gear' OR label CONTAINS[cd] 'settings'")).firstMatch
-        let gearImage = app.images.matching(NSPredicate(format: "label CONTAINS[cd] 'gearshape'")).firstMatch
+        // The sheet has fully presented once a known settings control exists.
+        XCTAssertTrue(app.buttons["settings.appearancePicker"].waitForExistence(timeout: 5) ||
+                      app.otherElements["settings.appearancePicker"].waitForExistence(timeout: 2) ||
+                      app.buttons["settings.signOutButton"].waitForExistence(timeout: 5),
+                      "Settings sheet should present")
+    }
 
-        if gearButton.waitForExistence(timeout: 5) {
-            gearButton.tap()
-        } else if gearImage.waitForExistence(timeout: 3) {
-            gearImage.tap()
-        } else {
-            // Fallback: tap the rightmost toolbar button area
-            let navBar = app.navigationBars["Progress"]
-            let buttons = navBar.buttons
-            if buttons.count > 0 {
-                buttons.element(boundBy: buttons.count - 1).tap()
-            }
+    /// Scroll the settings ScrollView up until `element` is hittable (it exists in
+    /// the tree from the start but may sit below the fold).
+    @MainActor
+    @discardableResult
+    private func scrollToHittable(_ element: XCUIElement, maxSwipes: Int = 8) -> Bool {
+        guard element.waitForExistence(timeout: 5) else { return false }
+        var swipes = 0
+        while !element.isHittable && swipes < maxSwipes {
+            app.swipeUp()
+            swipes += 1
         }
-
-        // Wait for the settings sheet to appear
-        _ = app.descendants(matching: .any)["settings.signOutButton"].waitForExistence(timeout: 5) ||
-            staticText("Sign Out").waitForExistence(timeout: 5)
+        return element.isHittable
     }
 
     @MainActor
     func testSettings_AllOptions_Displayed() throws {
         navigateToSettings()
 
-        // Verify key settings elements exist
-        let signOut = app.descendants(matching: .any)["settings.signOutButton"]
-
-        // At least the sign out should be visible
+        // Appearance picker is new in the COIL rebrand — assert it's present.
         XCTAssertTrue(
-            signOut.waitForExistence(timeout: 5) ||
-            staticText("Sign Out").waitForExistence(timeout: 5),
-            "Sign Out option should be visible"
+            app.descendants(matching: .any)["settings.appearancePicker"].waitForExistence(timeout: 5),
+            "Appearance picker should be visible in Settings"
+        )
+
+        // Sign Out lives further down the sheet but is in the tree from the start.
+        XCTAssertTrue(
+            app.descendants(matching: .any)["settings.signOutButton"].waitForExistence(timeout: 5),
+            "Sign Out option should be present"
         )
 
         captureScreenshot(name: "Settings-AllOptions")
@@ -53,17 +58,10 @@ final class SettingsUITests: UITestBase {
         navigateToSettings()
 
         let signOut = app.descendants(matching: .any)["settings.signOutButton"]
-        if signOut.waitForExistence(timeout: 5) {
-            signOut.tap()
-        } else {
-            // Fallback: find by text
-            let signOutText = staticText("Sign Out")
-            if signOutText.waitForExistence(timeout: 3) {
-                signOutText.tap()
-            }
-        }
+        XCTAssertTrue(scrollToHittable(signOut), "Sign Out button should scroll into view")
+        signOut.tap()
 
-        // Confirmation dialog should appear
+        // Confirmation dialog should appear.
         XCTAssertTrue(
             staticText("Are you sure you want to sign out?").waitForExistence(timeout: 3),
             "Sign out confirmation should appear"
@@ -76,31 +74,14 @@ final class SettingsUITests: UITestBase {
     func testSettings_DeleteAccount_ShowsConfirmation() throws {
         navigateToSettings()
 
-        // Scroll down within the settings sheet to reveal the delete account button
-        app.swipeUp()
-        app.swipeUp()
-        app.swipeUp()
-
+        // The delete button sits in the "Danger zone" at the very bottom of the sheet.
         let deleteAccount = app.descendants(matching: .any)["settings.deleteAccountButton"]
-        if deleteAccount.waitForExistence(timeout: 5) {
-            deleteAccount.tap()
-        } else {
-            let deleteText = staticText("Delete Account")
-            if deleteText.waitForExistence(timeout: 3) {
-                deleteText.tap()
-            } else {
-                // Last resort: find any element containing "Delete"
-                let deleteBtn = app.buttons.matching(NSPredicate(format: "label CONTAINS[cd] 'delete'")).firstMatch
-                if deleteBtn.waitForExistence(timeout: 3) {
-                    deleteBtn.tap()
-                }
-            }
-        }
+        XCTAssertTrue(scrollToHittable(deleteAccount), "Delete Account button should scroll into view")
+        deleteAccount.tap()
 
-        // Destructive confirmation dialog (action sheet) should appear
+        // Destructive confirmation dialog should appear with the "Delete Everything" action.
         XCTAssertTrue(
-            app.buttons["Delete Everything"].waitForExistence(timeout: 5) ||
-            staticText("Delete Account").waitForExistence(timeout: 3),
+            app.buttons["Delete Everything"].waitForExistence(timeout: 5),
             "Delete account confirmation should appear"
         )
 

@@ -91,6 +91,7 @@ struct HealthDataConsentView: View {
                                 .cornerRadius(AppCorners.large)
                         }
                         .disabled(!canContinue)
+                        .accessibilityIdentifier("healthConsent.continueButton")
                         .padding(.horizontal, AppSpacing.xl)
                         .padding(.top, AppSpacing.lg)
 

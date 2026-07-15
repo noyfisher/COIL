@@ -321,7 +321,11 @@ struct GuidedWorkoutView: View {
                 .fill(AppColors.subtleBorder)
                 .frame(height: 1)
         }
-        .accessibilityIdentifier("workout.bottomBar")
+        // NOTE: intentionally no accessibilityIdentifier on this container. Putting
+        // one here made SwiftUI flatten the whole bar into a single element, which
+        // shadowed the inner "workout.completeSetButton" identifier (the button was
+        // still tappable but only queryable as the container id). The bar identifier
+        // was unused, so it's dropped to keep the button individually addressable.
     }
 
     // MARK: - Compact Secondary Actions

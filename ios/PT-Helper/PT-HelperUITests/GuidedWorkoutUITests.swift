@@ -22,26 +22,26 @@ final class GuidedWorkoutUITests: UITestBase {
     /// Navigate to a rehab plan and start a guided workout.
     @MainActor
     private func navigateToWorkout() {
-        tapTab("My Plan")
+        // The live shell labels the "My Plan" tab "Plan" in the FloatingTabBar.
+        tapTab("Plan")
 
-        // Wait for My Plan tab to fully load
-        _ = app.navigationBars["My Plan"].waitForExistence(timeout: 5)
+        // The seeded data has two rehab plans (Knee + Shoulder), so MyPlanTab opens
+        // on the Injury sub-tab showing a hero card per plan — hence `.firstMatch`
+        // (both cards carry the same "myPlan.startWorkoutButton" identifier). There
+        // is no "My Plan" nav-bar title to wait on anymore (the title is the empty
+        // COIL wordmark), so wait directly on the start-workout CTA.
+        let startButton = app.descendants(matching: .any)["myPlan.startWorkoutButton"].firstMatch
+        XCTAssertTrue(startButton.waitForExistence(timeout: 10),
+                      "Start Guided Workout button should appear on the Plan tab")
 
-        // In the 3-tab layout, the "Start Guided Workout" CTA is directly visible
-        // on the hero card — no need to scroll through metrics
-        let startButton = app.descendants(matching: .any)["myPlan.startWorkoutButton"]
-        if startButton.waitForExistence(timeout: 5) {
-            startButton.tap()
-        } else {
-            // Fallback: find by label text
-            let startByLabel = button("Start Guided Workout")
-            if startByLabel.waitForExistence(timeout: 3) {
-                startByLabel.tap()
-            }
-        }
+        // The CTA is a `.plain` button inside a `List` row, which XCUI reports as
+        // existing but not hittable, so a plain `.tap()` throws. A coordinate tap
+        // bypasses the hittability check (the same pattern the onboarding tests use
+        // for buttons nested in scrolling containers).
+        startButton.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
 
         // Trigger the interruption monitor by interacting with the app
-        // (XCUI only fires interruption monitors on next interaction)
+        // (XCUI only fires interruption monitors on next interaction).
         app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
     }
 
@@ -113,9 +113,10 @@ final class GuidedWorkoutUITests: UITestBase {
         XCTAssertTrue(staticText("End Workout?").waitForExistence(timeout: 3),
                       "End workout confirmation should appear")
 
-        // Verify both save and discard options exist
-        XCTAssertTrue(button("End & Save").exists, "End & Save button should exist")
-        XCTAssertTrue(button("Discard Workout").exists, "Discard Workout button should exist")
+        // Verify both save and discard options exist (current copy: the destructive
+        // role sits on "Discard", the safe action reads "Save & Finish").
+        XCTAssertTrue(button("Save & Finish").exists, "Save & Finish button should exist")
+        XCTAssertTrue(button("Discard Without Saving").exists, "Discard Without Saving button should exist")
 
         captureScreenshot(name: "Workout-EndConfirmation")
     }
@@ -129,15 +130,16 @@ final class GuidedWorkoutUITests: UITestBase {
         endButton.tap()
 
         // Tap Discard
-        let discardButton = button("Discard Workout")
+        let discardButton = button("Discard Without Saving")
         XCTAssertTrue(discardButton.waitForExistence(timeout: 3))
         discardButton.tap()
 
-        // Should dismiss back to My Plan tab
+        // Discarding dismisses the pushed workout, returning to the plan list —
+        // the hero card's start button reappears (it's removed from the tree while
+        // the workout is pushed on top).
         XCTAssertTrue(
-            app.navigationBars["My Plan"].waitForExistence(timeout: 5) ||
-            staticText("Knee Rehab Plan").waitForExistence(timeout: 5),
-            "Should return to My Plan after discarding"
+            app.descendants(matching: .any)["myPlan.startWorkoutButton"].firstMatch.waitForExistence(timeout: 5),
+            "Should return to the Plan tab after discarding"
         )
 
         captureScreenshot(name: "Workout-DiscardedBackToPlan")
