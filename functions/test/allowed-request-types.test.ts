@@ -6,7 +6,8 @@
  * the allow-list's exact shape so a future edit can't silently widen it.
  */
 
-import { ALLOWED_REQUEST_TYPES, SYSTEM_PROMPTS } from "../src/index";
+import { ALLOWED_REQUEST_TYPES } from "../src/index";
+import { SYSTEM_PROMPTS } from "../src/prompts";
 
 describe("ALLOWED_REQUEST_TYPES", () => {
   it("has exactly 9 members", () => {
