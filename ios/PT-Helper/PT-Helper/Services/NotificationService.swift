@@ -38,7 +38,7 @@ class NotificationService: ObservableObject {
 
     // MARK: - Deep Link Queue (for cold-launch)
 
-    /// Stores the target tab from a notification tap, consumed by MainTabView/DashboardMainTabView on appear.
+    /// Stores the target tab from a notification tap, consumed by ThreeTabView on appear.
     @Published var pendingDeepLink: String?
 
     private init() {

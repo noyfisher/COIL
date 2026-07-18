@@ -22,9 +22,6 @@ class TabSelection: ObservableObject {
     @Published var plansNavigationId = UUID()
     @Published var progressNavigationId = UUID()
 
-    /// Navigation IDs for the 3-tab dashboard layout.
-    @Published var dashboardNavigationId = UUID()
-    @Published var rehabNavigationId = UUID()
     @Published var profileNavigationId = UUID()
 
     /// Navigation IDs for the new 3-tab layout (Assess / My Plan / Progress).
