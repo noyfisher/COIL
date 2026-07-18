@@ -85,11 +85,13 @@ struct ProgressTabContent: View {
                     )
                     Spacer(minLength: 100)
                 } else {
+                    let chartData = filteredChartData
+
                     // Region filter picker
                     regionFilterPicker
 
                     // Pain trend chart
-                    painTrendChart
+                    painTrendChart(chartData)
 
                     // Summary stats + streak
                     summaryStats
@@ -321,8 +323,7 @@ struct ProgressTabContent: View {
         .padding(.vertical, AppSpacing.xs)
     }
 
-    private var painTrendAccessibilityValue: String {
-        let data = filteredChartData
+    private func painTrendAccessibilityValue(for data: [WorkoutSession]) -> String {
         guard data.count >= 2, let first = data.first, let last = data.last else {
             return "Not enough data yet to show a trend."
         }
@@ -406,20 +407,20 @@ struct ProgressTabContent: View {
 
     // MARK: - Pain Trend Chart
 
-    private var painTrendChart: some View {
+    private func painTrendChart(_ data: [WorkoutSession]) -> some View {
         let chartTitle = selectedRegion != nil
             ? "\(RegionPainInputView.displayName(for: selectedRegion!)) Pain"
             : "Pain Trend"
 
         return VStack(alignment: .leading, spacing: AppSpacing.md) {
             CoilDividerHeader(title: chartTitle)
-            cardChartContent
+            cardChartContent(data)
         }
     }
 
-    private var cardChartContent: some View {
+    private func cardChartContent(_ data: [WorkoutSession]) -> some View {
         VStack(spacing: 0) {
-            Chart(filteredChartData, id: \.id) { session in
+            Chart(data, id: \.id) { session in
                 let painValue = painValueForChart(session)
                 LineMark(
                     x: .value("Date", session.date),
@@ -473,7 +474,7 @@ struct ProgressTabContent: View {
             // a spoken summary of the trend (audit #66).
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("Pain trend chart")
-            .accessibilityValue(painTrendAccessibilityValue)
+            .accessibilityValue(painTrendAccessibilityValue(for: data))
         }
         .padding(AppSpacing.lg)
         .background(AppColors.cardBackground)
@@ -502,7 +503,7 @@ struct ProgressTabContent: View {
         VStack(spacing: AppSpacing.md) {
             HStack(spacing: AppSpacing.md) {
                 statCard(icon: "number",            color: AppColors.accent,      value: "\(workoutViewModel.sessions.count)",     label: "Sessions")
-                statCard(icon: "waveform.path.ecg", color: averagePainColor,      value: String(format: "%.1f", averagePain),      label: "Avg Pain")
+                statCard(icon: "waveform.path.ecg", color: averagePainColor,      value: String(format: "%.1f", workoutViewModel.averagePain),      label: "Avg Pain")
                 // Promote the day streak — the number users actually build toward —
                 // over "Total Min", which nobody opens the app to check (audit #38).
                 statCard(icon: streakService.streakData.isActive ? "flame.fill" : "flame",
@@ -567,22 +568,12 @@ struct ProgressTabContent: View {
 
     // MARK: - Computed Properties
 
-    private var averagePain: Double {
-        guard !workoutViewModel.sessions.isEmpty else { return 0 }
-        let total = workoutViewModel.sessions.reduce(0.0) { $0 + $1.painLevel }
-        return total / Double(workoutViewModel.sessions.count)
-    }
-
     private var averagePainColor: Color {
-        switch Int(averagePain) {
+        switch Int(workoutViewModel.averagePain) {
         case 0...3: return AppColors.success
         case 4...6: return AppColors.warning
         default: return AppColors.danger
         }
-    }
-
-    private var totalMinutes: Int {
-        Int(workoutViewModel.sessions.reduce(0.0) { $0 + $1.duration } / 60)
     }
 
     // MARK: - Re-Assessment Card

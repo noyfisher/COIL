@@ -4,9 +4,12 @@ import FirebaseAuth
 
 @MainActor
 class WorkoutViewModel: ObservableObject {
-    @Published var sessions: [WorkoutSession] = []
+    @Published var sessions: [WorkoutSession] = [] {
+        didSet { recomputeDerivedStats() }
+    }
     @Published var loadError: String?
     @Published var isLoading: Bool = false
+    @Published private(set) var averagePain: Double = 0
 
     private let db = Firestore.firestore()
 
@@ -18,6 +21,10 @@ class WorkoutViewModel: ObservableObject {
         } else {
             fetchSessions()
         }
+    }
+
+    private func recomputeDerivedStats() {
+        averagePain = sessions.isEmpty ? 0 : sessions.reduce(0.0) { $0 + $1.painLevel } / Double(sessions.count)
     }
 
     func fetchSessions() {
