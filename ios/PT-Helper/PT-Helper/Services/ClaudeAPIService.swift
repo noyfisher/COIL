@@ -155,6 +155,30 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
         }
     }
 
+    // MARK: - Retry Policy (WS8-03)
+
+    static let maxAttempts = 2                       // 1 initial + 1 retry
+    static let retryDelaySeconds: TimeInterval = 2   // fixed first backoff step
+
+    /// Idempotent-cost eligibility: exercise_substitute owns its own VM-level
+    /// retry/timeout race (ExerciseSwapViewModel.swift) — a service-level sleep
+    /// would starve that budget and stack retries. All other proxy request
+    /// types are pure generate-and-return with no user-data writes.
+    static func isServiceRetryEligible(_ requestType: AIRequestType) -> Bool {
+        requestType != .exercise_substitute
+    }
+
+    static func isRetryableStatus(_ statusCode: Int) -> Bool {
+        (500...599).contains(statusCode)
+    }
+
+    /// Waits the fixed retry backoff. Returns false if the task was cancelled
+    /// during the wait — callers must not retry in that case.
+    private func waitBeforeRetry() async -> Bool {
+        try? await Task.sleep(for: .seconds(Self.retryDelaySeconds))
+        return !Task.isCancelled
+    }
+
     // MARK: - Shared Proxy Call
 
     /// Per-endpoint configuration for `performProxyRequest`. Values mirror what
@@ -165,11 +189,12 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
         let telemetryRequestType: String
         let timeout: TimeInterval
         let bgTaskName: String
+        let retryEligible: Bool
     }
 
     /// Single choke point for all Claude/agent HTTP traffic: auth, request build,
-    /// telemetry, status mapping, decode, and text extraction. Each public method
-    /// below is a thin wrapper supplying its own URL/timeout/telemetry identity.
+    /// telemetry, retry, status mapping, decode, and text extraction. Each public
+    /// method below is a thin wrapper supplying its own URL/timeout/telemetry identity.
     private func performProxyRequest(_ call: ProxyCall, body: Data) async throws -> String {
         let bgTaskID = await beginBackgroundTask(named: call.bgTaskName)
         defer { endBackgroundTask(bgTaskID) }
@@ -209,80 +234,105 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
                     requestBytes: requestBytes))
         }
 
-        let data: Data
-        let response: URLResponse
-        do {
-            (data, response) = try await URLSession.shared.data(for: request)
-        } catch {
-            let elapsed = elapsedMsInt()
-            await MainActor.run {
-                let interfaceType = NetworkMonitor.shared.connectionType.description
-                SessionLogger.shared.logAPI(.apiCallFailed, endpoint: call.endpointName,
-                    metadata: Self.makeTelemetryMetadata(
-                        requestType: call.telemetryRequestType,
-                        interfaceType: interfaceType,
-                        requestBytes: requestBytes,
-                        elapsedMs: elapsed,
-                        extras: ["error": error.localizedDescription]))
-            }
-            throw ClaudeAPIError.networkError(error)
-        }
+        var data = Data()
+        var statusCode = 0
+        var succeededAttempt = 1
 
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw ClaudeAPIError.invalidResponse(0, "Invalid HTTP response")
-        }
+        for attempt in 1...Self.maxAttempts {
+            succeededAttempt = attempt
+            let transportResult: Result<(Data, URLResponse), Error>
+            do {
+                transportResult = .success(try await URLSession.shared.data(for: request))
+            } catch {
+                transportResult = .failure(error)
+            }
 
-        let statusCode = httpResponse.statusCode
-        switch statusCode {
-        case 200:
-            break // Success
-        case 401:
-            let elapsed = elapsedMsInt()
-            let responseBytes = data.count
-            await MainActor.run {
-                let interfaceType = NetworkMonitor.shared.connectionType.description
-                SessionLogger.shared.logAPI(.apiCallFailed, endpoint: call.endpointName,
-                    metadata: Self.makeTelemetryMetadata(
-                        requestType: call.telemetryRequestType,
-                        interfaceType: interfaceType,
-                        requestBytes: requestBytes,
-                        responseBytes: responseBytes,
-                        elapsedMs: elapsed,
-                        extras: ["statusCode": "401", "error": "authRequired"]))
+            switch transportResult {
+            case .failure(let error):
+                let elapsed = elapsedMsInt()
+                let retrying = call.retryEligible && attempt < Self.maxAttempts
+                await MainActor.run {
+                    let interfaceType = NetworkMonitor.shared.connectionType.description
+                    var extras = ["error": error.localizedDescription]
+                    if retrying { extras["attempt"] = "\(attempt)" }
+                    SessionLogger.shared.logAPI(.apiCallFailed, endpoint: call.endpointName,
+                        metadata: Self.makeTelemetryMetadata(
+                            requestType: call.telemetryRequestType,
+                            interfaceType: interfaceType,
+                            requestBytes: requestBytes,
+                            elapsedMs: elapsed,
+                            extras: extras))
+                }
+                guard retrying, await waitBeforeRetry() else { throw ClaudeAPIError.networkError(error) }
+                continue
+
+            case .success(let pair):
+                guard let httpResponse = pair.1 as? HTTPURLResponse else {
+                    throw ClaudeAPIError.invalidResponse(0, "Invalid HTTP response")
+                }
+                data = pair.0
+                statusCode = httpResponse.statusCode
             }
-            throw ClaudeAPIError.authenticationRequired
-        case 429:
-            let elapsed = elapsedMsInt()
-            let responseBytes = data.count
-            await MainActor.run {
-                let interfaceType = NetworkMonitor.shared.connectionType.description
-                SessionLogger.shared.logAPI(.apiCallFailed, endpoint: call.endpointName,
-                    metadata: Self.makeTelemetryMetadata(
-                        requestType: call.telemetryRequestType,
-                        interfaceType: interfaceType,
-                        requestBytes: requestBytes,
-                        responseBytes: responseBytes,
-                        elapsedMs: elapsed,
-                        extras: ["statusCode": "429", "error": "rateLimited"]))
+
+            if statusCode == 200 {
+                break
             }
-            throw ClaudeAPIError.rateLimited
-        default:
-            let errorBody = String(data: data, encoding: .utf8) ?? "No error details"
-            AppLogger.api.error("\(call.endpointName) error (\(statusCode)): \(errorBody)")
-            let elapsed = elapsedMsInt()
-            let responseBytes = data.count
-            await MainActor.run {
-                let interfaceType = NetworkMonitor.shared.connectionType.description
-                SessionLogger.shared.logAPI(.apiCallFailed, endpoint: call.endpointName,
-                    metadata: Self.makeTelemetryMetadata(
-                        requestType: call.telemetryRequestType,
-                        interfaceType: interfaceType,
-                        requestBytes: requestBytes,
-                        responseBytes: responseBytes,
-                        elapsedMs: elapsed,
-                        extras: ["statusCode": "\(statusCode)"]))
+
+            switch statusCode {
+            case 401:
+                let elapsed = elapsedMsInt()
+                let responseBytes = data.count
+                await MainActor.run {
+                    let interfaceType = NetworkMonitor.shared.connectionType.description
+                    SessionLogger.shared.logAPI(.apiCallFailed, endpoint: call.endpointName,
+                        metadata: Self.makeTelemetryMetadata(
+                            requestType: call.telemetryRequestType,
+                            interfaceType: interfaceType,
+                            requestBytes: requestBytes,
+                            responseBytes: responseBytes,
+                            elapsedMs: elapsed,
+                            extras: ["statusCode": "401", "error": "authRequired"]))
+                }
+                throw ClaudeAPIError.authenticationRequired
+            case 429:
+                let elapsed = elapsedMsInt()
+                let responseBytes = data.count
+                await MainActor.run {
+                    let interfaceType = NetworkMonitor.shared.connectionType.description
+                    SessionLogger.shared.logAPI(.apiCallFailed, endpoint: call.endpointName,
+                        metadata: Self.makeTelemetryMetadata(
+                            requestType: call.telemetryRequestType,
+                            interfaceType: interfaceType,
+                            requestBytes: requestBytes,
+                            responseBytes: responseBytes,
+                            elapsedMs: elapsed,
+                            extras: ["statusCode": "429", "error": "rateLimited"]))
+                }
+                throw ClaudeAPIError.rateLimited
+            default:
+                let errorBody = String(data: data, encoding: .utf8) ?? "No error details"
+                let retrying = call.retryEligible && Self.isRetryableStatus(statusCode) && attempt < Self.maxAttempts
+                if !retrying {
+                    AppLogger.api.error("\(call.endpointName) error (\(statusCode)): \(errorBody)")
+                }
+                let elapsed = elapsedMsInt()
+                let responseBytes = data.count
+                await MainActor.run {
+                    let interfaceType = NetworkMonitor.shared.connectionType.description
+                    var extras = ["statusCode": "\(statusCode)"]
+                    if retrying { extras["attempt"] = "\(attempt)" }
+                    SessionLogger.shared.logAPI(.apiCallFailed, endpoint: call.endpointName,
+                        metadata: Self.makeTelemetryMetadata(
+                            requestType: call.telemetryRequestType,
+                            interfaceType: interfaceType,
+                            requestBytes: requestBytes,
+                            responseBytes: responseBytes,
+                            elapsedMs: elapsed,
+                            extras: extras))
+                }
+                guard retrying, await waitBeforeRetry() else { throw ClaudeAPIError.invalidResponse(statusCode, errorBody) }
+                continue
             }
-            throw ClaudeAPIError.invalidResponse(statusCode, errorBody)
         }
 
         // Decode the response (proxy/agent endpoints pass through Anthropic's response format)
@@ -313,7 +363,7 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
                     requestBytes: requestBytes,
                     responseBytes: responseBytes,
                     elapsedMs: elapsed,
-                    extras: ["statusCode": "200", "responseLength": "\(textCount)"]))
+                    extras: ["statusCode": "200", "responseLength": "\(textCount)", "attempt": "\(succeededAttempt)"]))
         }
 
         // Clean up the response — strip markdown code fences if present
@@ -336,7 +386,8 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
                 endpointName: "claudeProxy",
                 telemetryRequestType: requestType.rawValue,
                 timeout: 90,
-                bgTaskName: "claudeProxy-\(requestType.rawValue)"),
+                bgTaskName: "claudeProxy-\(requestType.rawValue)",
+                retryEligible: Self.isServiceRetryEligible(requestType)),
             body: bodyData)
     }
 
@@ -350,7 +401,8 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
                 endpointName: "agentInsights",
                 telemetryRequestType: "recovery_insights_agent",
                 timeout: 180,
-                bgTaskName: "agentInsights"),
+                bgTaskName: "agentInsights",
+                retryEligible: false),
             body: "{}".data(using: .utf8)!)
     }
 
@@ -372,7 +424,8 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
                 endpointName: "agentFormAnalysis",
                 telemetryRequestType: "form_analysis_agent",
                 timeout: 180,
-                bgTaskName: "agentFormAnalysis"),
+                bgTaskName: "agentFormAnalysis",
+                retryEligible: false),
             body: bodyData)
     }
 
