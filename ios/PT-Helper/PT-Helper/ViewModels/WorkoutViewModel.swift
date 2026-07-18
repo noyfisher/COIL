@@ -12,6 +12,7 @@ class WorkoutViewModel: ObservableObject {
     @Published private(set) var averagePain: Double = 0
 
     private let db = Firestore.firestore()
+    private static let sessionFetchLimit = 180
 
     init() {
         if TestDataSeeder.isUITesting && TestDataSeeder.shouldSeedMockData {
@@ -32,6 +33,7 @@ class WorkoutViewModel: ObservableObject {
         isLoading = true
         db.collection("users").document(uid).collection("workoutSessions")
             .order(by: "date", descending: true)
+            .limit(to: Self.sessionFetchLimit)
             .getDocuments { [weak self] snapshot, error in
                 DispatchQueue.main.async {
                     guard let self = self else { return }
