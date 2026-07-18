@@ -81,7 +81,7 @@ private struct WeeklyDateStrip: View {
                 // Month + "Today" button row
                 HStack {
                     Text(monthLabel)
-                        .font(Font.custom("Industry-Bold", size: 13))
+                        .font(AppFonts.cardTitle)
                         .kerning(0.5)
                         .foregroundColor(Color.white.opacity(0.55))
 
@@ -173,7 +173,7 @@ private struct DayCell: View {
                 .foregroundColor(isSelected ? .white : Color.white.opacity(0.40))
 
             Text(Self.numFmt.string(from: date))
-                .font(Font.custom("Industry-Bold", size: 20))
+                .font(AppFonts.sectionTitle)
                 .foregroundColor(
                     isSelected ? .white
                     : isToday  ? AppColors.accent
@@ -218,7 +218,7 @@ private struct HomeTabPicker: View {
             withAnimation(.easeInOut(duration: 0.2)) { selected = tab }
         } label: {
             Text(label)
-                .font(Font.custom("Industry-Bold", size: 13))
+                .font(AppFonts.cardTitle)
                 .textCase(.uppercase)
                 .kerning(0.5)
                 .foregroundColor(active ? .white : AppColors.secondaryText)

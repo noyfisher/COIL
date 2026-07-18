@@ -110,12 +110,12 @@ struct NotesView: View {
 
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(note.content)
-                    .font(.body)
+                    .font(AppFonts.body)
                     .foregroundColor(AppColors.primaryText)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Text(note.dateCreated, style: .date)
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
             }
 

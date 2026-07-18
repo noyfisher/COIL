@@ -11,7 +11,7 @@ struct FullTextDetailView: View {
 
             ScrollView {
                 Text(bodyText)
-                    .font(.body)
+                    .font(AppFonts.body)
                     .foregroundColor(.white)
                     .lineSpacing(4)
                     .frame(maxWidth: .infinity, alignment: .leading)

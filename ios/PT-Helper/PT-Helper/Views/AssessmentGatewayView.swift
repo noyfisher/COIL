@@ -107,7 +107,7 @@ struct AssessmentGatewayView: View {
 
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text(title)
-                        .font(Font.custom("Industry-Bold", size: 16))
+                        .font(AppFonts.cardTitle)
                         .textCase(.uppercase)
                         .kerning(0.3)
                         .foregroundColor(dark ? .white : AppColors.primaryText)

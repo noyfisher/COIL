@@ -20,9 +20,9 @@ struct AdaptiveProgressionBannerView: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(titleText)
-                        .font(.subheadline.weight(.semibold))
+                        .font(AppFonts.smallSemiBold)
                     Text(recommendation.reason)
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                         .lineLimit(2)
                 }
@@ -31,7 +31,7 @@ struct AdaptiveProgressionBannerView: View {
 
                 // Confidence indicator
                 Text(recommendation.confidence.rawValue.capitalized)
-                    .font(.caption2.weight(.medium))
+                    .font(AppFonts.microMedium)
                     .foregroundColor(accentColor)
                     .padding(.horizontal, AppSpacing.sm)
                     .padding(.vertical, AppSpacing.xs)
@@ -47,7 +47,7 @@ struct AdaptiveProgressionBannerView: View {
                         .frame(width: 5, height: 5)
                         .padding(.top, 5)
                     Text(point)
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                 }
             }
@@ -72,7 +72,7 @@ struct AdaptiveProgressionBannerView: View {
 
                     Button(action: onDismiss) {
                         Text("Not Now")
-                            .font(.subheadline.weight(.medium))
+                            .font(AppFonts.smallMedium)
                             .foregroundColor(AppColors.secondaryText)
                     }
                 }

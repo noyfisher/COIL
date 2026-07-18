@@ -284,7 +284,7 @@ struct AnalysisResultView: View {
 
                         // Explanation
                         Text(condition.explanation)
-                            .font(.body)
+                            .font(AppFonts.body)
                             .foregroundColor(AppColors.primaryText)
                             .lineSpacing(3)
                             .padding(.horizontal, AppSpacing.lg)
@@ -383,10 +383,10 @@ struct AnalysisResultView: View {
                     .foregroundColor(AppColors.ctaText)
                 VStack(alignment: .leading, spacing: AppSpacing.nano) {
                     Text("Important Safety Notice")
-                        .font(.headline)
+                        .font(AppFonts.cardTitle)
                         .foregroundColor(AppColors.ctaText)
                     Text("Based on what you reported, please read this carefully")
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.ctaText.opacity(0.9))
                 }
                 Spacer()
@@ -412,10 +412,10 @@ struct AnalysisResultView: View {
                     .foregroundColor(AppColors.ctaText)
                 VStack(alignment: .leading, spacing: AppSpacing.nano) {
                     Text("Please Read This Carefully")
-                        .font(.headline)
+                        .font(AppFonts.cardTitle)
                         .foregroundColor(AppColors.ctaText)
                     Text("Some of your symptoms may need urgent attention")
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.ctaText.opacity(0.9))
                 }
                 Spacer()

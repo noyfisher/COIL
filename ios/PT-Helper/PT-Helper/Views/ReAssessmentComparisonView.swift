@@ -20,7 +20,7 @@ struct ReAssessmentComparisonView: View {
                         .font(.system(.title2, design: .serif).weight(.bold))
 
                     Text("Comparing \(initial.assessmentType.rawValue) to \(latest.assessmentType.rawValue)")
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                 }
                 .frame(maxWidth: .infinity)
@@ -96,10 +96,10 @@ struct ReAssessmentComparisonView: View {
     private func painComparisonColumn(label: String, value: Double) -> some View {
         VStack(spacing: 4) {
             Text(label)
-                .font(.caption)
+                .font(AppFonts.caption)
                 .foregroundColor(AppColors.secondaryText)
             Text(String(format: "%.1f", value))
-                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .font(AppFonts.statNumber)
                 .foregroundColor(painColor(for: value))
         }
     }
@@ -111,7 +111,7 @@ struct ReAssessmentComparisonView: View {
             Image(systemName: improved ? "arrow.down" : (diff > 0 ? "arrow.up" : "equal"))
                 .font(.caption)
             Text(String(format: "%+.1f", diff))
-                .font(.caption.weight(.bold))
+                .font(AppFonts.captionSemiBold)
         }
         .foregroundColor(improved ? AppColors.success : (diff > 0 ? AppColors.danger : AppColors.secondaryText))
         .padding(.horizontal, AppSpacing.sm)
@@ -126,13 +126,13 @@ struct ReAssessmentComparisonView: View {
 
         return HStack {
             Text(RegionPainInputView.displayName(for: region))
-                .font(.subheadline)
+                .font(AppFonts.small)
                 .frame(width: 100, alignment: .leading)
 
             Spacer()
 
             Text(String(format: "%.0f", before))
-                .font(.caption.weight(.medium))
+                .font(AppFonts.captionMedium)
                 .foregroundColor(AppColors.danger.opacity(0.8))
                 .frame(width: 30)
 
@@ -141,7 +141,7 @@ struct ReAssessmentComparisonView: View {
                 .foregroundColor(AppColors.secondaryText)
 
             Text(String(format: "%.0f", after))
-                .font(.caption.weight(.medium))
+                .font(AppFonts.captionMedium)
                 .foregroundColor(AppColors.success)
                 .frame(width: 30)
 

@@ -34,7 +34,7 @@ struct ReportConcernView: View {
                     VStack(alignment: .leading, spacing: AppSpacing.xl) {
                         VStack(alignment: .leading, spacing: AppSpacing.sm) {
                             Text("Category")
-                                .font(.subheadline.weight(.semibold))
+                                .font(AppFonts.smallSemiBold)
                             Picker("Category", selection: $category) {
                                 ForEach(categories, id: \.self) { Text($0).tag($0) }
                             }
@@ -45,7 +45,7 @@ struct ReportConcernView: View {
 
                         VStack(alignment: .leading, spacing: AppSpacing.sm) {
                             Text("What happened?")
-                                .font(.subheadline.weight(.semibold))
+                                .font(AppFonts.smallSemiBold)
                             ZStack(alignment: .topLeading) {
                                 if message.isEmpty {
                                     Text("Describe what happened…")
@@ -74,7 +74,7 @@ struct ReportConcernView: View {
                                 .padding(.vertical, 16)
                                 .background(canSubmit ? AppColors.accent : AppColors.accent.opacity(0.4))
                                 .foregroundColor(AppColors.ctaText)
-                                .font(.headline)
+                                .font(AppFonts.cardTitle)
                                 .cornerRadius(AppCorners.large)
                         }
                         .disabled(!canSubmit)

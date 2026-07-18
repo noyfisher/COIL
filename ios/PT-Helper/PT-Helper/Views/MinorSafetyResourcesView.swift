@@ -76,7 +76,7 @@ struct MinorSafetyResourcesView: View {
                                 .padding(.vertical, 16)
                                 .background(AppColors.accent)
                                 .foregroundColor(AppColors.ctaText)
-                                .font(.headline)
+                                .font(AppFonts.cardTitle)
                                 .cornerRadius(AppCorners.large)
                         }
                         .accessibilityIdentifier("minorSafety.gotItButton")
@@ -102,9 +102,9 @@ struct MinorSafetyResourcesView: View {
 
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(title)
-                    .font(.subheadline.weight(.semibold))
+                    .font(AppFonts.smallSemiBold)
                 Text(text)
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(AppColors.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
             }

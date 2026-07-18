@@ -15,9 +15,9 @@ struct ReAssessmentPromptView: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(titleText)
-                        .font(.subheadline.weight(.semibold))
+                        .font(AppFonts.smallSemiBold)
                     Text(subtitleText)
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                 }
 

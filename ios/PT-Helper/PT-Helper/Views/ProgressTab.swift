@@ -280,7 +280,7 @@ struct ProgressTabContent: View {
                     .frame(width: 40, height: 40)
                     .overlay(
                         Text("\(Int(session.painLevel))")
-                            .font(.system(size: 14, weight: .bold, design: .rounded))
+                            .font(AppFonts.bodySemiBold)
                             .foregroundColor(painColor(for: session.painLevel))
                     )
 
@@ -550,7 +550,7 @@ struct ProgressTabContent: View {
                 .cornerRadius(AppCorners.small)
 
             Text(value)
-                .font(Font.custom("Industry-Bold", size: 26))
+                .font(AppFonts.statNumber)
                 .foregroundColor(AppColors.primaryText)
 
             Text(label)
@@ -594,7 +594,7 @@ struct ProgressTabContent: View {
                     .foregroundColor(AppColors.accent)
                     .font(.system(size: 16, weight: .semibold))
                 Text("Time for a Re-Assessment?")
-                    .font(Font.custom("Industry-Bold", size: 16))
+                    .font(AppFonts.cardTitle)
                     .foregroundColor(AppColors.primaryText)
                 Spacer()
             }
@@ -647,7 +647,7 @@ private struct StreakToolbarBadge: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(streakColor)
             Text("\(streakService.streakData.currentStreak)")
-                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .font(AppFonts.bodySemiBold)
                 .foregroundColor(streakColor)
         }
     }

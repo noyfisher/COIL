@@ -22,7 +22,7 @@ struct EditExerciseView: View {
                         // Name
                         CardSection(icon: "textformat", color: AppColors.accent, title: "Exercise Name") {
                             TextField("Exercise name", text: $name)
-                                .font(.body)
+                                .font(AppFonts.body)
                                 .padding(AppSpacing.md)
                                 .background(AppColors.inputBackground)
                                 .cornerRadius(AppCorners.medium)
@@ -33,7 +33,7 @@ struct EditExerciseView: View {
                             VStack(spacing: AppSpacing.md) {
                                 HStack {
                                     Text("Sets")
-                                        .font(.subheadline)
+                                        .font(AppFonts.small)
                                     Spacer()
                                     Stepper("\(sets)", value: $sets, in: 1...10)
                                         .fixedSize()
@@ -41,10 +41,10 @@ struct EditExerciseView: View {
 
                                 HStack {
                                     Text("Reps")
-                                        .font(.subheadline)
+                                        .font(AppFonts.small)
                                     Spacer()
                                     TextField("Reps", text: $reps)
-                                        .font(.body)
+                                        .font(AppFonts.body)
                                         .multilineTextAlignment(.trailing)
                                         .frame(width: 80)
                                         .padding(AppSpacing.sm)
@@ -54,7 +54,7 @@ struct EditExerciseView: View {
 
                                 HStack {
                                     Text("Rest (seconds)")
-                                        .font(.subheadline)
+                                        .font(AppFonts.small)
                                     Spacer()
                                     Stepper("\(restSeconds)s", value: $restSeconds, in: 5...180, step: 5)
                                         .fixedSize()

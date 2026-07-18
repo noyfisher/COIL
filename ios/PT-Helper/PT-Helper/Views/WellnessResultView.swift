@@ -66,7 +66,7 @@ struct WellnessResultView: View {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.title2).foregroundColor(AppColors.ctaText)
                 Text("Important Safety Notice")
-                    .font(.headline).foregroundColor(AppColors.ctaText)
+                    .font(AppFonts.cardTitle).foregroundColor(AppColors.ctaText)
                 Spacer()
             }
             ForEach(viewModel.validationWarnings.filter { $0.severity >= .serious }, id: \.message) { w in
