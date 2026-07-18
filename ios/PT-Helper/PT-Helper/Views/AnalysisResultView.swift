@@ -4,6 +4,9 @@ struct AnalysisResultView: View {
     let analysisResult: AnalysisResult
     var validationWarnings: [ValidationWarning] = []
     var redFlagAlerts: [ValidationWarning] = []
+    /// True when pushed from the Progress tab's "Your Last Analysis" card (D-6):
+    /// hides plan generation + assessment-flow navigation and skips the store re-save.
+    var isReadOnly: Bool = false
     @State private var showRehabPlan = false
     @State private var expandedConditions: Set<String> = []
     @State private var showConfidenceInfo = false
@@ -51,8 +54,10 @@ struct AnalysisResultView: View {
                         validationCautionBanner
                     }
                     disclaimerBanner
-                    buildRehabPlanButton
-                    navigationButtons
+                    if !isReadOnly {
+                        buildRehabPlanButton
+                        navigationButtons
+                    }
                 }
                 .padding(AppSpacing.xl)
             }
@@ -98,7 +103,7 @@ struct AnalysisResultView: View {
         }
         .trackScreen("AnalysisResult")
         .onAppear {
-            AnalysisResultStore.shared.save(analysisResult)
+            if !isReadOnly { AnalysisResultStore.shared.save(analysisResult) }
             cardsAppeared = true
         }
     }
