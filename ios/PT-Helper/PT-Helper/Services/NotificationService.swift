@@ -226,14 +226,11 @@ class NotificationService: ObservableObject {
         center.removePendingNotificationRequests(withIdentifiers: [inactivityNudgeId])
     }
 
-    /// Update reminder time and reschedule all active plans
-    func updateReminderTime(hour: Int, minute: Int, plans: [RehabPlan]) {
+    /// Update reminder time and reschedule everything the reconciler owns.
+    func updateReminderTime(hour: Int, minute: Int) {
         reminderHour = hour
         reminderMinute = minute
-        // Reschedule all plans with new time
-        for plan in plans {
-            scheduleReminders(for: plan)
-        }
+        Task { await resyncReminders() }
     }
 
     // MARK: - FCM Token Management

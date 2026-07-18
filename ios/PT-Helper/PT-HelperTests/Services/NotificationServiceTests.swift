@@ -133,4 +133,35 @@ final class NotificationServiceTests: XCTestCase {
         let request = mockCenter.addedRequests.first { $0.identifier.hasPrefix("plan-") }
         XCTAssertEqual(request?.content.userInfo["tab"] as? String, "plans")
     }
+
+    // MARK: - WS2-02: Settings wiring
+
+    func testUpdateReminderTime_persistsHourAndMinute() {
+        let sut = makeSUT()
+        sut.updateReminderTime(hour: 14, minute: 30)
+        XCTAssertEqual(sut.reminderHour, 14)
+        XCTAssertEqual(sut.reminderMinute, 30)
+        XCTAssertEqual(testDefaults.object(forKey: "notif_reminder_hour") as? Int, 14)
+        XCTAssertEqual(testDefaults.object(forKey: "notif_reminder_minute") as? Int, 30)
+    }
+
+    func testResync_afterTimeChange_reschedulesActivePlanAtNewTime() async {
+        let sut = makeSUT()
+        let plan = TestFixtures.makePlan(startDate: Date(), weeklySchedule: [["Squat"], [], [], [], [], [], []])
+        await sut.syncPlanReminders(plans: [plan])
+
+        sut.updateReminderTime(hour: 7, minute: 15)
+        await sut.resyncReminders()
+
+        let request = mockCenter.addedRequests.last { $0.identifier.hasPrefix("plan-") }
+        let trigger = request?.trigger as? UNCalendarNotificationTrigger
+        XCTAssertEqual(trigger?.dateComponents.hour, 7)
+        XCTAssertEqual(trigger?.dateComponents.minute, 15)
+    }
+
+    func testCancelAllReminders_callsRemoveAllOnCenter() {
+        let sut = makeSUT()
+        sut.cancelAllReminders()
+        XCTAssertEqual(mockCenter.removeAllCallCount, 1)
+    }
 }
