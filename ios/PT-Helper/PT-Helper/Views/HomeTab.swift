@@ -182,9 +182,9 @@ private struct DayCell: View {
         }
         .frame(width: 44, height: 60)
         .background(isSelected ? AppColors.accent : Color.clear)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .clipShape(RoundedRectangle(cornerRadius: AppCorners.small + 2))
         .overlay(
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: AppCorners.small + 2)
                 .stroke(
                     isToday && !isSelected ? AppColors.accent.opacity(0.55) : Color.clear,
                     lineWidth: 1.5

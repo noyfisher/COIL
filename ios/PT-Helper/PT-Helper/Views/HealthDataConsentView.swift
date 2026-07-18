@@ -84,7 +84,7 @@ struct HealthDataConsentView: View {
                         }) {
                             Text("Continue")
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
+                                .padding(.vertical, AppSpacing.lg)
                                 .background(canContinue ? AppColors.accent : AppColors.accent.opacity(0.4))
                                 .foregroundColor(AppColors.ctaText)
                                 .font(AppFonts.cardTitle)

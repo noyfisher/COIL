@@ -129,7 +129,7 @@ struct RehabPlanView: View {
                                 .font(.headline)
                                 .foregroundColor(AppColors.primaryText)
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
+                                .padding(.vertical, AppSpacing.md + 2)
                                 .background(AppColors.coolGradient)
                                 .cornerRadius(AppCorners.large)
                                 .shadow(color: AppColors.cardShadowColor, radius: 8, y: 4)

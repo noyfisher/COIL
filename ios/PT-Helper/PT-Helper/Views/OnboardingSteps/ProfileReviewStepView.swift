@@ -173,7 +173,7 @@ struct ReviewCard<Content: View>: View {
                     .foregroundColor(color)
                     .frame(width: 26, height: 26)
                     .background(color.opacity(0.15))
-                    .cornerRadius(7)
+                    .cornerRadius(AppCorners.small - 1)
                 Text(title)
                     .font(AppFonts.fieldLabel)
                     .textCase(.uppercase)

@@ -157,7 +157,7 @@ struct WellnessDetailView: View {
                         .font(AppFonts.captionMedium)
                         .foregroundColor(motivationColor)
                         .padding(.horizontal, AppSpacing.sm)
-                        .padding(.vertical, 4)
+                        .padding(.vertical, AppSpacing.xs)
                         .background(motivationColor.opacity(0.12))
                         .cornerRadius(AppCorners.small)
                 }
@@ -370,7 +370,7 @@ struct WellnessDetailView: View {
                         .foregroundColor(AppColors.accent)
                 }
                 .padding(.horizontal, AppSpacing.sm)
-                .padding(.vertical, 4)
+                .padding(.vertical, AppSpacing.xs)
                 .background(AppColors.accentTint)
                 .cornerRadius(AppCorners.small)
 

@@ -53,7 +53,7 @@ struct ExercisePhaseStepperView: View {
                                 .font(AppFonts.captionSemiBold)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
+                        .padding(.vertical, AppSpacing.comfortable)
                         .background(index == activePhase ? AppColors.accent : AppColors.accentTint)
                         .foregroundColor(index == activePhase ? .white : AppColors.accent)
                         .cornerRadius(AppCorners.small)

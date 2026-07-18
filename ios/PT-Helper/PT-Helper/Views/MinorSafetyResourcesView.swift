@@ -73,7 +73,7 @@ struct MinorSafetyResourcesView: View {
                         Button(action: onDismiss) {
                             Text("Got it")
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
+                                .padding(.vertical, AppSpacing.lg)
                                 .background(AppColors.accent)
                                 .foregroundColor(AppColors.ctaText)
                                 .font(AppFonts.cardTitle)

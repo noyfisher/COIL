@@ -590,7 +590,7 @@ struct FormAnalysisView: View {
                     .font(AppFonts.captionMedium)
                     .foregroundColor(severityColor(correction.severity))
                     .padding(.horizontal, AppSpacing.sm)
-                    .padding(.vertical, 2)
+                    .padding(.vertical, AppSpacing.nano)
                     .background(severityColor(correction.severity).opacity(0.15))
                     .cornerRadius(AppCorners.small)
             }

@@ -236,9 +236,9 @@ struct DifficultyBadge: View {
         Text(label)
             .font(AppFonts.badge)
             .foregroundColor(color)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 3)
+            .padding(.horizontal, AppSpacing.sm)
+            .padding(.vertical, AppSpacing.nano + 1)
             .background(color.opacity(0.12))
-            .cornerRadius(6)
+            .cornerRadius(AppCorners.small - 2)
     }
 }

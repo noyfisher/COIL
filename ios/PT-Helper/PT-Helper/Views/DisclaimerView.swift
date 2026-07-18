@@ -63,7 +63,7 @@ struct DisclaimerView: View {
                         }) {
                             Text("I Understand, Continue")
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
+                                .padding(.vertical, AppSpacing.lg)
                                 .background(AppColors.accent)
                                 .foregroundColor(AppColors.ctaText)
                                 .font(AppFonts.cardTitle)

@@ -16,7 +16,7 @@ struct AdaptiveProgressionBannerView: View {
                     .foregroundColor(AppColors.ctaText)
                     .frame(width: 28, height: 28)
                     .background(accentColor.opacity(0.9))
-                    .cornerRadius(7)
+                    .cornerRadius(AppCorners.small - 1)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(titleText)
@@ -45,7 +45,7 @@ struct AdaptiveProgressionBannerView: View {
                     Circle()
                         .fill(accentColor.opacity(0.6))
                         .frame(width: 5, height: 5)
-                        .padding(.top, 5)
+                        .padding(.top, AppSpacing.xs + 1)
                     Text(point)
                         .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)

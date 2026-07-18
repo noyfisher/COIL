@@ -276,7 +276,7 @@ struct FloatingTabBar: View {
                     tabButton(item)
                 }
             }
-            .padding(.top, 10)   // push tab icons down below the "+" button
+            .padding(.top, AppSpacing.comfortable)   // push tab icons down below the "+" button
             .frame(maxWidth: .infinity)
             .background(AppColors.navBackground)
 
@@ -326,7 +326,7 @@ struct FloatingTabBar: View {
             .foregroundColor(selectedTab == item.tag ? AppColors.tabActive : AppColors.tabInactive)
             .animation(AppAnimations.smooth, value: selectedTab)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 10)
+            .padding(.vertical, AppSpacing.comfortable)
         }
         .accessibilityLabel(item.label)
         .accessibilityAddTraits(selectedTab == item.tag ? [.isSelected] : [])

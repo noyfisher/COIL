@@ -142,7 +142,7 @@ struct WellnessResultView: View {
                                 .font(AppFonts.captionMedium)
                                 .foregroundColor(priorityColor)
                                 .padding(.horizontal, AppSpacing.sm)
-                                .padding(.vertical, 2)
+                                .padding(.vertical, AppSpacing.nano)
                                 .background(priorityColor.opacity(0.12))
                                 .cornerRadius(AppCorners.small)
 
@@ -224,7 +224,7 @@ struct WellnessResultView: View {
                                             Text(goal)
                                                 .font(AppFonts.caption)
                                                 .padding(.horizontal, AppSpacing.sm)
-                                                .padding(.vertical, 4)
+                                                .padding(.vertical, AppSpacing.xs)
                                                 .background(AppColors.accentTint)
                                                 .cornerRadius(AppCorners.small)
                                         }

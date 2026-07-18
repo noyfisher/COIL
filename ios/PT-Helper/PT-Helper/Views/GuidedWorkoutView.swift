@@ -168,9 +168,9 @@ struct GuidedWorkoutView: View {
                                         .font(AppFonts.captionSemiBold)
                                         .foregroundColor(.white)
                                         .padding(.horizontal, AppSpacing.sm)
-                                        .padding(.vertical, 4)
+                                        .padding(.vertical, AppSpacing.xs)
                                         .background(AppColors.accent.opacity(0.9))
-                                        .cornerRadius(100)
+                                        .cornerRadius(AppCorners.pill)
                                         .padding(AppSpacing.sm)
                                 }
                             }
@@ -197,10 +197,10 @@ struct GuidedWorkoutView: View {
                                             .font(AppFonts.captionSemiBold)
                                     }
                                     .foregroundColor(AppColors.accent)
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 5)
+                                    .padding(.horizontal, AppSpacing.comfortable)
+                                    .padding(.vertical, AppSpacing.xs + 1)
                                     .background(AppColors.accentTint)
-                                    .cornerRadius(100)
+                                    .cornerRadius(AppCorners.pill)
                                 }
                                 .accessibilityIdentifier("workout.howToButton")
                             }
@@ -614,7 +614,7 @@ struct GuidedWorkoutView: View {
                         .foregroundColor(AppColors.accent)
                         .frame(width: 28, height: 28)
                         .background(AppColors.accent.opacity(0.10))
-                        .cornerRadius(7)
+                        .cornerRadius(AppCorners.small - 1)
 
                     Text("Last time: ")
                         .font(AppFonts.captionMedium)

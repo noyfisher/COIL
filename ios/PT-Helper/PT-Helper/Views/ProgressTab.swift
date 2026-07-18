@@ -618,7 +618,7 @@ struct ProgressTabContent: View {
                 }
                 .foregroundColor(AppColors.accent)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
+                .padding(.vertical, AppSpacing.comfortable)
                 .overlay(Capsule().stroke(AppColors.accent, lineWidth: 1.5))
                 // .plain buttons only hit-test rendered pixels — the stroked
                 // capsule's interior is dead without an explicit content shape.

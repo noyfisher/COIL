@@ -163,7 +163,7 @@ struct WellnessGoalPickerView: View {
                         .foregroundColor(AppColors.accent)
                 }
                 .padding(.horizontal, AppSpacing.sm)
-                .padding(.vertical, 4)
+                .padding(.vertical, AppSpacing.xs)
                 .background(AppColors.accentTint)
                 .cornerRadius(AppCorners.small)
 

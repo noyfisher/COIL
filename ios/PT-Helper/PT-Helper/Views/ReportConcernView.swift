@@ -51,8 +51,8 @@ struct ReportConcernView: View {
                                     Text("Describe what happened…")
                                         .font(AppFonts.body)
                                         .foregroundColor(AppColors.mutedText)
-                                        .padding(.top, 8)
-                                        .padding(.leading, 4)
+                                        .padding(.top, AppSpacing.sm)
+                                        .padding(.leading, AppSpacing.xs)
                                 }
                                 TextEditor(text: $message)
                                     .frame(minHeight: 120)
@@ -71,7 +71,7 @@ struct ReportConcernView: View {
                         Button(action: submit) {
                             Text("Submit")
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
+                                .padding(.vertical, AppSpacing.lg)
                                 .background(canSubmit ? AppColors.accent : AppColors.accent.opacity(0.4))
                                 .foregroundColor(AppColors.ctaText)
                                 .font(AppFonts.cardTitle)

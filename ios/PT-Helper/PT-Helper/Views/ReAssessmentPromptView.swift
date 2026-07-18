@@ -32,7 +32,7 @@ struct ReAssessmentPromptView: View {
                 .font(.subheadline.weight(.medium))
                 .foregroundColor(AppColors.ctaText)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
+                .padding(.vertical, AppSpacing.comfortable)
                 .background(AppColors.accent)
                 .cornerRadius(AppCorners.medium)
             }
