@@ -225,7 +225,8 @@ struct SettingsView: View {
         SessionLogger.shared.clearAllLocalData()
         GuidedWorkoutViewModel.clearAllLocalWorkoutState()
         ConsentService.clearLocalMirrors()
-        UserDefaults.standard.removeObject(forKey: "hasSeenMinorSafetyScreen")  // plain string key — compiles fine before PR-5
+        UserDefaults.standard.removeObject(forKey: AppStorageKeys.hasSeenMinorSafetyScreen)
+        UserDefaults.standard.removeObject(forKey: AppStorageKeys.pendingMinorSafetyScreen)
     }
 
     // MARK: - Helpers

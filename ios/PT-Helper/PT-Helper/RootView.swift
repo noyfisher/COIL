@@ -20,9 +20,9 @@ struct RootView: View {
     /// Set by the skip gate when a 13–17 DOB is entered, or by
     /// checkProfileCompletion for a minor who completed onboarding; drives the
     /// one-time minor-safety interstitial (production branch only).
-    @AppStorage("pendingMinorSafetyScreen") private var pendingMinorSafetyScreen = false
+    @AppStorage(AppStorageKeys.pendingMinorSafetyScreen) private var pendingMinorSafetyScreen = false
     /// True once the minor-safety interstitial has been shown (so it appears once).
-    @AppStorage("hasSeenMinorSafetyScreen") private var hasSeenMinorSafetyScreen = false
+    @AppStorage(AppStorageKeys.hasSeenMinorSafetyScreen) private var hasSeenMinorSafetyScreen = false
     @AppStorage("hasSeenIntroCarousel") private var hasSeenIntroCarousel = false
     /// Set when the user taps Skip on onboarding, so the choice survives a
     /// relaunch instead of re-trapping them in the questionnaire every launch.

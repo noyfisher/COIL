@@ -105,7 +105,7 @@ enum TestDataSeeder {
         guard isUITesting else { return }
 
         if shouldClearCoachMark {
-            UserDefaults.standard.set(false, forKey: "hasSeenBodyMapCoach")
+            UserDefaults.standard.set(false, forKey: AppStorageKeys.hasSeenBodyMapCoach)
         }
 
         if shouldClearWorkoutCheckpoint {
