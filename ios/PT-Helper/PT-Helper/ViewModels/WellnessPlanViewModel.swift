@@ -96,11 +96,13 @@ class WellnessPlanViewModel: ObservableObject {
                 //       *actual* medical conditions, which is the safety-critical check.
                 //       Warnings from both stages are merged.
                 let conditions = goalCategories
-                let (validatedPlan, baseWarnings, graphVerification) = ResponseValidationPipeline.validateRehabPlan(
-                    plan,
-                    conditions: conditions,
-                    userProfile: wellnessResult.userProfileSnapshot
-                )
+                let (validatedPlan, baseWarnings, graphVerification) = await Task.detached(priority: .userInitiated) {
+                    ResponseValidationPipeline.validateRehabPlan(
+                        plan,
+                        conditions: conditions,
+                        userProfile: wellnessResult.userProfileSnapshot
+                    )
+                }.value
                 let planValidatorWarnings = WellnessPlanValidator.validate(
                     exercises: validatedPlan.exercises,
                     conditions: wellnessResult.userProfileSnapshot.medicalConditions
@@ -162,11 +164,13 @@ class WellnessPlanViewModel: ObservableObject {
                     sourceGoalCategories: goalCategories
                 )
 
-                let (validatedFallback, baseWarnings, _) = ResponseValidationPipeline.validateRehabPlan(
-                    fallbackPlan,
-                    conditions: goalCategories,
-                    userProfile: wellnessResult.userProfileSnapshot
-                )
+                let (validatedFallback, baseWarnings, _) = await Task.detached(priority: .userInitiated) {
+                    ResponseValidationPipeline.validateRehabPlan(
+                        fallbackPlan,
+                        conditions: goalCategories,
+                        userProfile: wellnessResult.userProfileSnapshot
+                    )
+                }.value
                 let planValidatorWarnings = WellnessPlanValidator.validate(
                     exercises: validatedFallback.exercises,
                     conditions: wellnessResult.userProfileSnapshot.medicalConditions

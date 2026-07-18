@@ -177,12 +177,14 @@ class RehabPlanViewModel: ObservableObject {
                 // Validate the plan (includes knowledge graph check)
                 AppLogger.rehab.info("Validating AI rehab plan...")
                 let painRegions = analysisResult.assessments.map { $0.selectedRegion.name }
-                let (validatedPlan, warnings, graphVerification) = ResponseValidationPipeline.validateRehabPlan(
-                    plan,
-                    conditions: conditions,
-                    userProfile: analysisResult.userProfileSnapshot,
-                    userPainRegions: painRegions
-                )
+                let (validatedPlan, warnings, graphVerification) = await Task.detached(priority: .userInitiated) {
+                    ResponseValidationPipeline.validateRehabPlan(
+                        plan,
+                        conditions: conditions,
+                        userProfile: analysisResult.userProfileSnapshot,
+                        userPainRegions: painRegions
+                    )
+                }.value
                 self.rehabPlan = validatedPlan
                 self.rehabPlanWarnings = warnings
                 self.isGenerating = false
@@ -265,12 +267,14 @@ class RehabPlanViewModel: ObservableObject {
                     notes: nil
                 )
                 // Validate fallback plan too
-                let (validatedFallback, warnings, _) = ResponseValidationPipeline.validateRehabPlan(
-                    fallbackPlan,
-                    conditions: conditions,
-                    userProfile: analysisResult.userProfileSnapshot,
-                    userPainRegions: analysisResult.assessments.map { $0.selectedRegion.name }
-                )
+                let (validatedFallback, warnings, _) = await Task.detached(priority: .userInitiated) {
+                    ResponseValidationPipeline.validateRehabPlan(
+                        fallbackPlan,
+                        conditions: conditions,
+                        userProfile: analysisResult.userProfileSnapshot,
+                        userPainRegions: analysisResult.assessments.map { $0.selectedRegion.name }
+                    )
+                }.value
                 self.rehabPlan = validatedFallback
                 self.rehabPlanWarnings = warnings
                 self.isGenerating = false
