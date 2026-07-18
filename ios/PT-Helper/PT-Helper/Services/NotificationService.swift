@@ -195,7 +195,13 @@ class NotificationService: ObservableObject {
                 scheduleReassessmentReminders(for: plan)
             }
         }
-        // WS2-04 appends the activation nudge.
+        if inactivityNudgesEnabled, let active = Self.reminderEligiblePlan(from: lastKnownPlans),
+           let start = active.startDate {
+            let lastWorkout = defaults.object(forKey: lastWorkoutAtKey) as? Date
+            if lastWorkout == nil || lastWorkout! < start {
+                scheduleActivationNudge(for: active)
+            }
+        }
     }
 
     // MARK: - Re-assessment reminders (audit #33)
@@ -274,6 +280,43 @@ class NotificationService: ObservableObject {
 
     func cancelInactivityNudge() {
         center.removePendingNotificationRequests(withIdentifiers: [inactivityNudgeId])
+    }
+
+    // MARK: - First-workout activation nudge (audit #34)
+
+    private let lastWorkoutAtKey = "notif_last_workout_at"
+
+    /// Called by WorkoutViewModel on session save: records activity, then
+    /// reconciles — the guard below sees the fresh timestamp and drops any
+    /// pending activation nudge.
+    func noteWorkoutCompleted() async {
+        defaults.set(Date(), forKey: lastWorkoutAtKey)
+        await resyncReminders()
+    }
+
+    /// One-shot "do your first session" nudge, 2 days after plan start at the
+    /// user's reminder time. Gated by inactivityNudgesEnabled (same "you haven't
+    /// trained" family as the 3-day nudge). Past fire dates are skipped.
+    private func scheduleActivationNudge(for plan: RehabPlan) {
+        guard let start = plan.startDate,
+              let fireDay = Calendar.current.date(byAdding: .day, value: 2, to: start) else { return }
+        var comps = Calendar.current.dateComponents([.year, .month, .day], from: fireDay)
+        comps.hour = reminderHour
+        comps.minute = reminderMinute
+        guard let fireDate = Calendar.current.date(from: comps), fireDate > Date() else { return }
+        let content = UNMutableNotificationContent()
+        content.title = "Your plan is ready when you are"
+        content.body = "\(plan.planName) — a first session today starts your streak."
+        content.sound = .default
+        content.userInfo = ["tab": "plans"]
+        let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)
+        let request = UNNotificationRequest(identifier: "activation-\(plan.id.uuidString)",
+                                            content: content, trigger: trigger)
+        center.add(request) { error in
+            if let error {
+                AppLogger.data.error("Failed to schedule activation nudge: \(error.localizedDescription)")
+            }
+        }
     }
 
     /// Update reminder time and reschedule everything the reconciler owns.

@@ -237,4 +237,68 @@ final class NotificationServiceTests: XCTestCase {
 
         XCTAssertTrue(mockCenter.addedRequests.filter { $0.identifier.hasPrefix("reassess-") }.isEmpty)
     }
+
+    // MARK: - WS2-04: First-workout activation nudge
+
+    func testActivation_freshlyStartedPlanNoWorkouts_schedulesNudgeTwoDaysOut() async {
+        let sut = makeSUT()
+        sut.reminderHour = 23
+        sut.reminderMinute = 59
+        let start = Date()
+        let plan = TestFixtures.makePlan(totalWeeks: 4, startDate: start)
+
+        await sut.syncPlanReminders(plans: [plan])
+
+        let activationRequests = mockCenter.addedRequests.filter { $0.identifier.hasPrefix("activation-") }
+        XCTAssertEqual(activationRequests.count, 1)
+        let trigger = activationRequests[0].trigger as? UNCalendarNotificationTrigger
+        let expected = Calendar.current.date(byAdding: .day, value: 2, to: start)!
+        XCTAssertEqual(trigger?.dateComponents.day, Calendar.current.component(.day, from: expected))
+    }
+
+    func testActivation_workoutLoggedAfterStart_notScheduled() async {
+        let sut = makeSUT()
+        let start = Date()
+        testDefaults.set(Calendar.current.date(byAdding: .hour, value: 1, to: start)!, forKey: "notif_last_workout_at")
+        let plan = TestFixtures.makePlan(totalWeeks: 4, startDate: start)
+
+        await sut.syncPlanReminders(plans: [plan])
+
+        XCTAssertTrue(mockCenter.addedRequests.filter { $0.identifier.hasPrefix("activation-") }.isEmpty)
+    }
+
+    func testActivation_startedThreeDaysAgo_pastFireDateSkipped() async {
+        let sut = makeSUT()
+        let start = Calendar.current.date(byAdding: .day, value: -3, to: Date())!
+        let plan = TestFixtures.makePlan(totalWeeks: 4, startDate: start)
+
+        await sut.syncPlanReminders(plans: [plan])
+
+        XCTAssertTrue(mockCenter.addedRequests.filter { $0.identifier.hasPrefix("activation-") }.isEmpty)
+    }
+
+    func testActivation_inactivityToggleOff_notScheduled() async {
+        let sut = makeSUT()
+        sut.inactivityNudgesEnabled = false
+        let plan = TestFixtures.makePlan(totalWeeks: 4, startDate: Date())
+
+        await sut.syncPlanReminders(plans: [plan])
+
+        XCTAssertTrue(mockCenter.addedRequests.filter { $0.identifier.hasPrefix("activation-") }.isEmpty)
+    }
+
+    func testNoteWorkoutCompleted_removesPendingActivationNudge() async {
+        let sut = makeSUT()
+        sut.reminderHour = 23
+        sut.reminderMinute = 59
+        let plan = TestFixtures.makePlan(totalWeeks: 4, startDate: Date())
+        await sut.syncPlanReminders(plans: [plan])
+        XCTAssertFalse(mockCenter.addedRequests.filter { $0.identifier.hasPrefix("activation-") }.isEmpty)
+
+        await sut.noteWorkoutCompleted()
+
+        XCTAssertTrue(mockCenter.removedIdentifiers.contains { $0.hasPrefix("activation-") })
+        let activationRequestsAfter = mockCenter.addedRequests.filter { $0.identifier.hasPrefix("activation-") }
+        XCTAssertEqual(activationRequestsAfter.count, 1, "no NEW activation request should be added after a workout")
+    }
 }
