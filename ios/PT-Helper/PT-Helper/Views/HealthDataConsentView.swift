@@ -72,7 +72,7 @@ struct HealthDataConsentView: View {
                         }
                         .padding(.horizontal, AppSpacing.xl)
 
-                        Text("You can withdraw consent at any time by deleting your account in Settings, or by emailing noyfisher2003@gmail.com.")
+                        Text("You can withdraw consent at any time in Settings, by deleting your account, or by emailing noyfisher2003@gmail.com.")
                             .font(AppFonts.caption)
                             .foregroundColor(AppColors.secondaryText)
                             .fixedSize(horizontal: false, vertical: true)

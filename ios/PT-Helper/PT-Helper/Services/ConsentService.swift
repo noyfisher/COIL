@@ -154,6 +154,30 @@ final class ConsentService: ObservableObject {
         objectWillChange.send()
     }
 
+    /// MHMDA withdrawal: removes the consent assertion server-side while keeping
+    /// an audit trail (revokedAt + prior timestamps survive; policyVersion is
+    /// field-deleted so `load()` reconciliation treats it as unconsented on every
+    /// device). Mirror cleared immediately so point-of-use gates re-fire this session.
+    func revokeHealthDataConsent() {
+        guard let uid = Auth.auth().currentUser?.uid else {
+            AppLogger.data.error("revokeHealthDataConsent: no signed-in user")
+            return
+        }
+        db.collection("users").document(uid)
+            .collection("consents").document("healthData")
+            .setData([
+                "policyVersion": FieldValue.delete(),
+                "revokedAt": FieldValue.serverTimestamp(),
+                "appVersion": appVersion
+            ], merge: true) { error in
+                if let error {
+                    AppLogger.data.error("Failed to record consent withdrawal: \(error.localizedDescription)")
+                }
+            }
+        UserDefaults.standard.removeObject(forKey: MirrorKeys.healthDataPolicyVersion)
+        objectWillChange.send()
+    }
+
     // MARK: - Local mirror lifecycle
 
     /// Removes both mirror keys (sign-out and account deletion).
