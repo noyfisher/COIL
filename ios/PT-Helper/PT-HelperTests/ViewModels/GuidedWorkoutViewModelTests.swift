@@ -512,4 +512,67 @@ final class GuidedWorkoutViewModelTests: XCTestCase {
 
         XCTAssertNil(GuidedWorkoutViewModel.savedCheckpoint(forPlanId: plan.id.uuidString))
     }
+
+    // MARK: - WS5-02: Wall-clock rest countdown
+
+    func testRestTimer_reconcile_afterTimeJump_derivesFromWallClock() {
+        let exercises = [makeExercise(name: "Ex1", sets: 2, restSeconds: 60)]
+        let vm = GuidedWorkoutViewModel(plan: makePlan(exercises: exercises))
+        let base = Date()
+        vm.now = { base }
+
+        vm.completeSet() // inter-set rest, 60s
+
+        vm.now = { base.addingTimeInterval(40) }
+        vm.reconcileRestFromWallClock()
+
+        XCTAssertEqual(vm.timeRemaining, 20)
+    }
+
+    func testRestTimer_reconcile_pastExpiry_endsRest() {
+        let exercises = [makeExercise(name: "Ex1", sets: 2, restSeconds: 60)]
+        let vm = GuidedWorkoutViewModel(plan: makePlan(exercises: exercises))
+        let base = Date()
+        vm.now = { base }
+
+        vm.completeSet() // inter-set rest, 60s
+
+        vm.now = { base.addingTimeInterval(61) }
+        vm.reconcileRestFromWallClock()
+
+        XCTAssertEqual(vm.phase, .exercise)
+        XCTAssertEqual(vm.currentSet, 2)
+    }
+
+    func testAdjustRestTime_reAnchorsEndDate() {
+        let exercises = [makeExercise(name: "Ex1", sets: 2, restSeconds: 60)]
+        let vm = GuidedWorkoutViewModel(plan: makePlan(exercises: exercises))
+        let base = Date()
+        vm.now = { base }
+        vm.completeSet()
+
+        vm.adjustRestTime(by: 15)
+        XCTAssertEqual(vm.timeRemaining, 75)
+
+        vm.reconcileRestFromWallClock()
+        XCTAssertEqual(vm.timeRemaining, 75)
+
+        vm.adjustRestTime(by: -1000)
+        XCTAssertEqual(vm.timeRemaining, 5)
+    }
+
+    func testPauseDuringRest_resumePreservesRemaining() {
+        let exercises = [makeExercise(name: "Ex1", sets: 2, restSeconds: 60)]
+        let vm = GuidedWorkoutViewModel(plan: makePlan(exercises: exercises))
+        var base = Date()
+        vm.now = { base }
+        vm.completeSet() // 60s rest
+
+        vm.togglePause()
+        base = base.addingTimeInterval(30)
+        vm.togglePause()
+        vm.reconcileRestFromWallClock()
+
+        XCTAssertEqual(vm.timeRemaining, 60)
+    }
 }

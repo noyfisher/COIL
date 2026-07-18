@@ -100,6 +100,10 @@ class GuidedWorkoutViewModel: ObservableObject {
     private var accumulatedTime: TimeInterval = 0
     /// Reference point for the current active segment (reset on each resume).
     private var lastResumeTime = Date()
+    /// Wall-clock end of the current rest. Source of truth for timeRemaining.
+    private var restEndDate: Date?
+    /// Injectable clock for the rest-timer paths (test seam). Production: real Date.
+    var now: () -> Date = { Date() }
 
     // MARK: - Computed Properties
 
@@ -195,6 +199,7 @@ class GuidedWorkoutViewModel: ObservableObject {
     func adjustRestTime(by seconds: Int) {
         timeRemaining = max(5, timeRemaining + seconds)
         restDuration = max(restDuration, timeRemaining)
+        restEndDate = now().addingTimeInterval(TimeInterval(timeRemaining))
     }
 
     /// Toggle pause state
@@ -214,7 +219,9 @@ class GuidedWorkoutViewModel: ObservableObject {
             // Reset reference point so the next segment starts fresh
             lastResumeTime = Date()
             if phase == .rest && timeRemaining > 0 {
-                resumeRestTimer()
+                restEndDate = now().addingTimeInterval(TimeInterval(timeRemaining))
+                isTimerRunning = true
+                startRestTicker()
             }
             startElapsedTimer()
         }
@@ -387,38 +394,32 @@ class GuidedWorkoutViewModel: ObservableObject {
         restKind = kind
         timeRemaining = max(seconds, 5)
         restDuration = timeRemaining
+        restEndDate = now().addingTimeInterval(TimeInterval(timeRemaining))
         isTimerRunning = true
+        startRestTicker()
+    }
 
+    private func startRestTicker() {
         timerSubscription = Foundation.Timer.publish(every: 1, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
-                guard let self = self, !self.isPaused else { return }
-                if self.timeRemaining > 0 {
-                    self.timeRemaining -= 1
-                    if self.timeRemaining == 5 {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    } else if self.timeRemaining == 0 {
-                        UINotificationFeedbackGenerator().notificationOccurred(.success)
-                    }
-                } else {
-                    self.endRest()
-                }
+                self?.reconcileRestFromWallClock()
             }
     }
 
-    private func resumeRestTimer() {
-        guard timeRemaining > 0 else { return }
-        isTimerRunning = true
-        timerSubscription = Foundation.Timer.publish(every: 1, on: .main, in: .common)
-            .autoconnect()
-            .sink { [weak self] _ in
-                guard let self = self, !self.isPaused else { return }
-                if self.timeRemaining > 0 {
-                    self.timeRemaining -= 1
-                } else {
-                    self.endRest()
-                }
-            }
+    /// Derive timeRemaining from the wall-clock end date. Called every ticker
+    /// tick and on foreground return; self-heals after any suspension.
+    func reconcileRestFromWallClock() {
+        guard !isPaused, phase == .rest, let end = restEndDate else { return }
+        let remaining = max(0, Int(end.timeIntervalSince(now()).rounded(.up)))
+        if timeRemaining > 5 && remaining <= 5 && remaining > 0 {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        }
+        timeRemaining = remaining
+        if remaining == 0 {
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            endRest()
+        }
     }
 
     private func stopTimer() {
@@ -426,6 +427,7 @@ class GuidedWorkoutViewModel: ObservableObject {
         timerSubscription = nil
         isTimerRunning = false
         timeRemaining = 0
+        restEndDate = nil
     }
 
     private func startElapsedTimer() {
