@@ -37,7 +37,7 @@ struct RegionPainInputView: View {
                         Text("Add")
                     }
                     .font(.caption.weight(.medium))
-                    .foregroundColor(AppColors.accent)
+                    .foregroundColor(AppColors.accentText)
                 }
             }
 

@@ -53,7 +53,7 @@ struct EditRehabPlanView: View {
                                 Image(systemName: "plus.circle.fill")
                                 Text("Add Custom Exercise")
                             }
-                            .foregroundColor(AppColors.accent)
+                            .foregroundColor(AppColors.accentText)
                         }
                     }
                 }

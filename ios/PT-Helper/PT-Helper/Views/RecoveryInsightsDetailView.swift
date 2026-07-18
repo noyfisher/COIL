@@ -253,7 +253,7 @@ struct RecoveryInsightsDetailView: View {
                 Text("Regenerate Insights")
             }
             .font(AppFonts.bodyMedium)
-            .foregroundColor(AppColors.accent)
+            .foregroundColor(AppColors.accentText)
         }
         .disabled(vm.isLoading)
         .padding(.top, AppSpacing.sm)

@@ -242,7 +242,7 @@ struct ProgressTabContent: View {
                     NavigationLink(destination: WorkoutSessionView()) {
                         Text("See All")
                             .font(AppFonts.captionSemiBold)
-                            .foregroundColor(AppColors.accent)
+                            .foregroundColor(AppColors.accentText)
                     }
                 }
             }
@@ -616,7 +616,7 @@ struct ProgressTabContent: View {
                     Image(systemName: "arrow.right")
                         .font(.system(size: 12, weight: .semibold))
                 }
-                .foregroundColor(AppColors.accent)
+                .foregroundColor(AppColors.accentText)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
                 .overlay(Capsule().stroke(AppColors.accent, lineWidth: 1.5))

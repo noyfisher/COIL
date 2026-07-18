@@ -411,7 +411,7 @@ extension PainDetailView {
                     ForEach(values, id: \.self) { value in
                         Text(value)
                             .font(AppFonts.captionMedium)
-                            .foregroundColor(AppColors.accent)
+                            .foregroundColor(AppColors.accentText)
                             .padding(.horizontal, AppSpacing.sm)
                             .padding(.vertical, AppSpacing.xs)
                             .background(AppColors.accentTint)

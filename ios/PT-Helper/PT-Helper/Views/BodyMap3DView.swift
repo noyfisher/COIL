@@ -200,7 +200,7 @@ struct BodyMap3DView: View {
                 // glutes & hamstrings live (audit #18).
                 Label("Drag to rotate — reach the back, glutes & hamstrings", systemImage: "arrow.triangle.2.circlepath")
                     .font(.caption2)
-                    .foregroundColor(AppColors.accent)
+                    .foregroundColor(AppColors.accentText)
                     .multilineTextAlignment(.center)
 
                 // Non-visual path: a VoiceOver user can't tap the 3D RealityKit
@@ -460,7 +460,7 @@ struct BodyMap3DView: View {
                 }) {
                     Text("Got it")
                         .font(.subheadline.weight(.semibold))
-                        .foregroundColor(AppColors.accent)
+                        .foregroundColor(AppColors.accentText)
                         .padding(.horizontal, AppSpacing.xxl)
                         .padding(.vertical, AppSpacing.sm)
                         .background(AppColors.cardBackground)
