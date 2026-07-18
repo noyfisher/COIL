@@ -164,4 +164,77 @@ final class NotificationServiceTests: XCTestCase {
         sut.cancelAllReminders()
         XCTAssertEqual(mockCenter.removeAllCallCount, 1)
     }
+
+    // MARK: - WS2-03: Re-assessment reminders
+
+    func testReassessment_fourWeekPlanStartedToday_schedulesMidpointAndCompletion() async {
+        let sut = makeSUT()
+        sut.reminderHour = 23
+        sut.reminderMinute = 59
+        let start = Date()
+        let plan = TestFixtures.makePlan(totalWeeks: 4, startDate: start)
+
+        await sut.syncPlanReminders(plans: [plan])
+
+        let reassessRequests = mockCenter.addedRequests.filter { $0.identifier.hasPrefix("reassess-") }
+        XCTAssertEqual(reassessRequests.count, 2)
+        XCTAssertTrue(reassessRequests.contains { $0.identifier.hasSuffix("-midpoint") })
+        XCTAssertTrue(reassessRequests.contains { $0.identifier.hasSuffix("-completion") })
+
+        let midpoint = reassessRequests.first { $0.identifier.hasSuffix("-midpoint") }
+        let midpointTrigger = midpoint?.trigger as? UNCalendarNotificationTrigger
+        let expectedMidpoint = Calendar.current.date(byAdding: .day, value: 7, to: start)!
+        XCTAssertEqual(midpointTrigger?.dateComponents.day, Calendar.current.component(.day, from: expectedMidpoint))
+
+        let completion = reassessRequests.first { $0.identifier.hasSuffix("-completion") }
+        let completionTrigger = completion?.trigger as? UNCalendarNotificationTrigger
+        let expectedCompletion = Calendar.current.date(byAdding: .day, value: 21, to: start)!
+        XCTAssertEqual(completionTrigger?.dateComponents.day, Calendar.current.component(.day, from: expectedCompletion))
+    }
+
+    func testReassessment_oneWeekPlan_schedulesOnlyCompletion() async {
+        let sut = makeSUT()
+        sut.reminderHour = 23
+        sut.reminderMinute = 59
+        let plan = TestFixtures.makePlan(totalWeeks: 1, startDate: Date())
+
+        await sut.syncPlanReminders(plans: [plan])
+
+        let reassessRequests = mockCenter.addedRequests.filter { $0.identifier.hasPrefix("reassess-") }
+        XCTAssertEqual(reassessRequests.count, 1)
+        XCTAssertTrue(reassessRequests[0].identifier.hasSuffix("-completion"))
+    }
+
+    func testReassessment_startedThreeWeeksAgo_skipsPastMidpoint() async {
+        let sut = makeSUT()
+        sut.reminderHour = 23
+        sut.reminderMinute = 59
+        let start = Calendar.current.date(byAdding: .day, value: -21, to: Date())!
+        let plan = TestFixtures.makePlan(totalWeeks: 4, startDate: start)
+
+        await sut.syncPlanReminders(plans: [plan])
+
+        let reassessRequests = mockCenter.addedRequests.filter { $0.identifier.hasPrefix("reassess-") }
+        XCTAssertEqual(reassessRequests.count, 1)
+        XCTAssertTrue(reassessRequests[0].identifier.hasSuffix("-completion"))
+    }
+
+    func testReassessment_toggleOff_schedulesNone() async {
+        let sut = makeSUT()
+        sut.reassessmentRemindersEnabled = false
+        let plan = TestFixtures.makePlan(totalWeeks: 4, startDate: Date())
+
+        await sut.syncPlanReminders(plans: [plan])
+
+        XCTAssertTrue(mockCenter.addedRequests.filter { $0.identifier.hasPrefix("reassess-") }.isEmpty)
+    }
+
+    func testSync_completedPlan_schedulesNoReassessmentReminders() async {
+        let sut = makeSUT()
+        let plan = TestFixtures.makePlan(totalWeeks: 1, startDate: Calendar.current.date(byAdding: .day, value: -30, to: Date()))
+
+        await sut.syncPlanReminders(plans: [plan])
+
+        XCTAssertTrue(mockCenter.addedRequests.filter { $0.identifier.hasPrefix("reassess-") }.isEmpty)
+    }
 }

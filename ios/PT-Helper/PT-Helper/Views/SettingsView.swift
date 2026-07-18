@@ -214,6 +214,7 @@ struct SettingsView: View {
                                             AnalyticsService.shared.log(.settingChanged,
                                                 parameters: ["key": "reassessment_reminders",
                                                              "value": enabled ? "true" : "false"])
+                                            Task { await notificationService.resyncReminders() }
                                         }
                                 }
                                 .padding(.horizontal, AppSpacing.lg)

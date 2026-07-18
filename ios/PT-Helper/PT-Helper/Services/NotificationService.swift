@@ -190,7 +190,57 @@ class NotificationService: ObservableObject {
         if workoutRemindersEnabled, let active = Self.reminderEligiblePlan(from: lastKnownPlans) {
             scheduleReminders(for: active)
         }
-        // WS2-03 appends re-assessment scheduling here; WS2-04 the activation nudge.
+        if reassessmentRemindersEnabled {
+            for plan in lastKnownPlans where plan.startDate != nil && !plan.isCompleted {
+                scheduleReassessmentReminders(for: plan)
+            }
+        }
+        // WS2-04 appends the activation nudge.
+    }
+
+    // MARK: - Re-assessment reminders (audit #33)
+
+    /// Midpoint + completion one-shot reminders mirroring the in-app prompt
+    /// (ReAssessmentViewModel.shouldShowReAssessment). Fires on the FIRST DAY of
+    /// the milestone week at the user's reminder time; past dates are skipped.
+    func scheduleReassessmentReminders(for plan: RehabPlan) {
+        guard isEnabled, isAuthorized, reassessmentRemindersEnabled,
+              let start = plan.startDate else { return }
+
+        let midpointWeek = max(plan.totalWeeks / 2, 1)
+        var milestones: [(suffix: String, week: Int, title: String, body: String)] = []
+        if midpointWeek < plan.totalWeeks {
+            milestones.append(("midpoint", midpointWeek,
+                "Halfway there — quick check-in",
+                "\(plan.planName): compare today's pain to week 1 with a 2-minute re-assessment."))
+        }
+        milestones.append(("completion", plan.totalWeeks,
+            "Final week — see your progress",
+            "\(plan.planName): run your final re-assessment to see how far you've come."))
+
+        for milestone in milestones {
+            guard let fireDay = Calendar.current.date(byAdding: .day,
+                                                      value: (milestone.week - 1) * 7,
+                                                      to: start) else { continue }
+            var comps = Calendar.current.dateComponents([.year, .month, .day], from: fireDay)
+            comps.hour = reminderHour
+            comps.minute = reminderMinute
+            guard let fireDate = Calendar.current.date(from: comps), fireDate > Date() else { continue }
+            let content = UNMutableNotificationContent()
+            content.title = milestone.title
+            content.body = milestone.body
+            content.sound = .default
+            content.userInfo = ["tab": "plans"]
+            let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)
+            let request = UNNotificationRequest(
+                identifier: "reassess-\(plan.id.uuidString)-\(milestone.suffix)",
+                content: content, trigger: trigger)
+            center.add(request) { error in
+                if let error {
+                    AppLogger.data.error("Failed to schedule re-assessment reminder: \(error.localizedDescription)")
+                }
+            }
+        }
     }
 
     // MARK: - Inactivity Nudge (audit #33)
