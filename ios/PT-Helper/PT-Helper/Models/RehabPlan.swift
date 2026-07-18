@@ -35,6 +35,13 @@ struct RehabPlan: Codable, Identifiable {
         let days = Calendar.current.dateComponents([.day], from: start, to: Date()).day ?? 0
         return min(max(days / 7 + 1, 1), totalWeeks)
     }
+
+    /// True once the plan's full duration has elapsed (started plans only).
+    var isCompleted: Bool {
+        guard let start = startDate else { return false }
+        let days = Calendar.current.dateComponents([.day], from: start, to: Date()).day ?? 0
+        return days >= totalWeeks * 7
+    }
 }
 
 struct RehabExercise: Codable, Identifiable {

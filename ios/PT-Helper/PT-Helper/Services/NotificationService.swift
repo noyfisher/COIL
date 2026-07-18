@@ -4,20 +4,32 @@ import FirebaseFirestore
 import FirebaseMessaging
 import UserNotifications
 
+/// Seam for unit-testing scheduling without the real notification center.
+protocol NotificationScheduling: AnyObject {
+    func add(_ request: UNNotificationRequest, withCompletionHandler completionHandler: ((Error?) -> Void)?)
+    func removePendingNotificationRequests(withIdentifiers identifiers: [String])
+    func removeAllPendingNotificationRequests()
+    func pendingNotificationRequests() async -> [UNNotificationRequest]
+}
+extension UNUserNotificationCenter: NotificationScheduling {}
+
 /// Manages local + remote push notification reminders for rehab plan schedules.
 @MainActor
 class NotificationService: ObservableObject {
     static let shared = NotificationService()
 
+    private let center: NotificationScheduling
+    private let defaults: UserDefaults
+
     @Published var isAuthorized: Bool = false
     @Published var reminderHour: Int {
-        didSet { UserDefaults.standard.set(reminderHour, forKey: "notif_reminder_hour") }
+        didSet { defaults.set(reminderHour, forKey: "notif_reminder_hour") }
     }
     @Published var reminderMinute: Int {
-        didSet { UserDefaults.standard.set(reminderMinute, forKey: "notif_reminder_minute") }
+        didSet { defaults.set(reminderMinute, forKey: "notif_reminder_minute") }
     }
     @Published var isEnabled: Bool {
-        didSet { UserDefaults.standard.set(isEnabled, forKey: "notif_enabled") }
+        didSet { defaults.set(isEnabled, forKey: "notif_enabled") }
     }
 
     // MARK: - FCM Token
@@ -27,13 +39,13 @@ class NotificationService: ObservableObject {
     // MARK: - Notification Type Preferences
 
     @Published var workoutRemindersEnabled: Bool {
-        didSet { UserDefaults.standard.set(workoutRemindersEnabled, forKey: "notif_workout_reminders") }
+        didSet { defaults.set(workoutRemindersEnabled, forKey: "notif_workout_reminders") }
     }
     @Published var reassessmentRemindersEnabled: Bool {
-        didSet { UserDefaults.standard.set(reassessmentRemindersEnabled, forKey: "notif_reassessment_reminders") }
+        didSet { defaults.set(reassessmentRemindersEnabled, forKey: "notif_reassessment_reminders") }
     }
     @Published var inactivityNudgesEnabled: Bool {
-        didSet { UserDefaults.standard.set(inactivityNudgesEnabled, forKey: "notif_inactivity_nudges") }
+        didSet { defaults.set(inactivityNudgesEnabled, forKey: "notif_inactivity_nudges") }
     }
 
     // MARK: - Deep Link Queue (for cold-launch)
@@ -41,14 +53,16 @@ class NotificationService: ObservableObject {
     /// Stores the target tab from a notification tap, consumed by MainTabView/DashboardMainTabView on appear.
     @Published var pendingDeepLink: String?
 
-    private init() {
-        self.reminderHour = UserDefaults.standard.object(forKey: "notif_reminder_hour") as? Int ?? 9
-        self.reminderMinute = UserDefaults.standard.object(forKey: "notif_reminder_minute") as? Int ?? 0
-        self.isEnabled = UserDefaults.standard.object(forKey: "notif_enabled") as? Bool ?? false
-        self.workoutRemindersEnabled = UserDefaults.standard.object(forKey: "notif_workout_reminders") as? Bool ?? true
-        self.reassessmentRemindersEnabled = UserDefaults.standard.object(forKey: "notif_reassessment_reminders") as? Bool ?? true
-        self.inactivityNudgesEnabled = UserDefaults.standard.object(forKey: "notif_inactivity_nudges") as? Bool ?? true
-        checkAuthorizationStatus()
+    init(center: NotificationScheduling = UNUserNotificationCenter.current(), defaults: UserDefaults = .standard, skipAuthCheck: Bool = false) {
+        self.center = center
+        self.defaults = defaults
+        self.reminderHour = defaults.object(forKey: "notif_reminder_hour") as? Int ?? 9
+        self.reminderMinute = defaults.object(forKey: "notif_reminder_minute") as? Int ?? 0
+        self.isEnabled = defaults.object(forKey: "notif_enabled") as? Bool ?? false
+        self.workoutRemindersEnabled = defaults.object(forKey: "notif_workout_reminders") as? Bool ?? true
+        self.reassessmentRemindersEnabled = defaults.object(forKey: "notif_reassessment_reminders") as? Bool ?? true
+        self.inactivityNudgesEnabled = defaults.object(forKey: "notif_inactivity_nudges") as? Bool ?? true
+        if !skipAuthCheck { checkAuthorizationStatus() }
     }
 
     // MARK: - Permission
@@ -80,12 +94,10 @@ class NotificationService: ObservableObject {
 
     /// Schedule weekly reminders based on a plan's weeklySchedule
     func scheduleReminders(for plan: RehabPlan) {
-        guard isEnabled, isAuthorized else { return }
+        guard isEnabled, isAuthorized, workoutRemindersEnabled else { return }
 
         // Cancel existing reminders for this plan first
         cancelReminders(for: plan.id)
-
-        let center = UNUserNotificationCenter.current()
 
         for (dayIndex, exercises) in plan.weeklySchedule.enumerated() {
             guard !exercises.isEmpty else { continue }
@@ -107,6 +119,7 @@ class NotificationService: ObservableObject {
             }
             content.sound = .default
             content.badge = 1
+            content.userInfo = ["tab": "plans"]
 
             var dateComponents = DateComponents()
             dateComponents.weekday = weekday
@@ -128,13 +141,56 @@ class NotificationService: ObservableObject {
     /// Cancel all reminders for a specific plan
     func cancelReminders(for planId: UUID) {
         let identifiers = (0..<7).map { notificationId(planId: planId, dayIndex: $0) }
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
+        center.removePendingNotificationRequests(withIdentifiers: identifiers)
     }
 
     /// Cancel all app reminders
     func cancelAllReminders() {
-        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+        center.removeAllPendingNotificationRequests()
         UNUserNotificationCenter.current().setBadgeCount(0)
+    }
+
+    // MARK: - Plan-lifecycle reconciliation (WS2)
+
+    /// Last plans list handed over by SavedPlansViewModel's listener; lets
+    /// Settings toggles resync without view-layer plumbing (SettingsView is
+    /// presented from three contexts, one of them dead code — no @EnvironmentObject).
+    private(set) var lastKnownPlans: [RehabPlan] = []
+
+    /// Identifier prefixes owned by the reconciler; every pass removes all
+    /// pending requests with these prefixes, then re-schedules from scratch.
+    static let reconciledPrefixes = ["plan-", "reassess-", "activation-"]
+
+    /// The one plan that gets weekly workout reminders: most recently started,
+    /// not yet completed. Single plan only — two overlapping schedules would
+    /// fire duplicate same-minute alerts (spam) and burn the 64-pending cap.
+    static func reminderEligiblePlan(from plans: [RehabPlan]) -> RehabPlan? {
+        plans.filter { $0.startDate != nil && !$0.isCompleted }
+            .max { ($0.startDate ?? .distantPast) < ($1.startDate ?? .distantPast) }
+    }
+
+    /// Store the latest plans and reconcile all plan-derived notifications.
+    func syncPlanReminders(plans: [RehabPlan]) async {
+        lastKnownPlans = plans
+        await reconcile()
+    }
+
+    /// Re-run reconciliation with the last known plans (Settings toggles / time picker).
+    func resyncReminders() async {
+        await reconcile()
+    }
+
+    private func reconcile() async {
+        let pending = await center.pendingNotificationRequests()
+        let stale = pending.map(\.identifier)
+            .filter { id in Self.reconciledPrefixes.contains { id.hasPrefix($0) } }
+        center.removePendingNotificationRequests(withIdentifiers: stale)
+
+        guard isEnabled, isAuthorized else { return }
+        if workoutRemindersEnabled, let active = Self.reminderEligiblePlan(from: lastKnownPlans) {
+            scheduleReminders(for: active)
+        }
+        // WS2-03 appends re-assessment scheduling here; WS2-04 the activation nudge.
     }
 
     // MARK: - Inactivity Nudge (audit #33)
@@ -159,7 +215,7 @@ class NotificationService: ObservableObject {
         let seconds = TimeInterval(inactivityNudgeDays * 24 * 60 * 60)
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: seconds, repeats: false)
         let request = UNNotificationRequest(identifier: inactivityNudgeId, content: content, trigger: trigger)
-        UNUserNotificationCenter.current().add(request) { error in
+        center.add(request) { error in
             if let error = error {
                 AppLogger.data.error("Failed to schedule inactivity nudge: \(error.localizedDescription)")
             }
@@ -167,7 +223,7 @@ class NotificationService: ObservableObject {
     }
 
     func cancelInactivityNudge() {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [inactivityNudgeId])
+        center.removePendingNotificationRequests(withIdentifiers: [inactivityNudgeId])
     }
 
     /// Update reminder time and reschedule all active plans

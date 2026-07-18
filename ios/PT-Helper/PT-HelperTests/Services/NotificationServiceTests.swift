@@ -1,0 +1,136 @@
+import XCTest
+import UserNotifications
+@testable import PT_Helper
+
+@MainActor
+final class NotificationServiceTests: XCTestCase {
+
+    var mockCenter: MockNotificationCenter!
+    var testDefaults: UserDefaults!
+
+    override func setUp() {
+        super.setUp()
+        mockCenter = MockNotificationCenter()
+        testDefaults = UserDefaults(suiteName: "NotificationServiceTests")
+        testDefaults.removePersistentDomain(forName: "NotificationServiceTests")
+    }
+
+    override func tearDown() {
+        testDefaults.removePersistentDomain(forName: "NotificationServiceTests")
+        mockCenter = nil
+        testDefaults = nil
+        super.tearDown()
+    }
+
+    private func makeSUT(enabled: Bool = true, authorized: Bool = true) -> NotificationService {
+        let sut = NotificationService(center: mockCenter, defaults: testDefaults, skipAuthCheck: true)
+        sut.isEnabled = enabled
+        sut.isAuthorized = authorized
+        return sut
+    }
+
+    // MARK: - reminderEligiblePlan
+
+    func testReminderEligiblePlan_twoStartedPlans_picksMostRecentlyStarted() {
+        let older = TestFixtures.makePlan(name: "Older", startDate: Calendar.current.date(byAdding: .day, value: -10, to: Date()))
+        let newer = TestFixtures.makePlan(name: "Newer", startDate: Calendar.current.date(byAdding: .day, value: -1, to: Date()))
+        let result = NotificationService.reminderEligiblePlan(from: [older, newer])
+        XCTAssertEqual(result?.planName, "Newer")
+    }
+
+    func testReminderEligiblePlan_unstartedAndCompletedPlans_returnsNil() {
+        let unstarted = TestFixtures.makePlan(name: "Unstarted")
+        let completed = TestFixtures.makePlan(name: "Completed", totalWeeks: 1, startDate: Calendar.current.date(byAdding: .day, value: -30, to: Date()))
+        let result = NotificationService.reminderEligiblePlan(from: [unstarted, completed])
+        XCTAssertNil(result)
+    }
+
+    // MARK: - isCompleted
+
+    func testIsCompleted_startedPastDuration_true() {
+        let plan = TestFixtures.makePlan(totalWeeks: 1, startDate: Calendar.current.date(byAdding: .day, value: -30, to: Date()))
+        XCTAssertTrue(plan.isCompleted)
+    }
+
+    func testIsCompleted_withinDuration_false() {
+        let plan = TestFixtures.makePlan(totalWeeks: 4, startDate: Calendar.current.date(byAdding: .day, value: -1, to: Date()))
+        XCTAssertFalse(plan.isCompleted)
+    }
+
+    func testIsCompleted_unstarted_false() {
+        let plan = TestFixtures.makePlan(totalWeeks: 4)
+        XCTAssertFalse(plan.isCompleted)
+    }
+
+    // MARK: - syncPlanReminders
+
+    func testSync_startedPlanWithThreeScheduledDays_addsThreeRequestsWithPlanPrefix() async {
+        let sut = makeSUT()
+        var schedule = Array(repeating: [String](), count: 7)
+        schedule[0] = ["Squat"]
+        schedule[2] = ["Lunge"]
+        schedule[4] = ["Bridge"]
+        let plan = TestFixtures.makePlan(startDate: Date(), weeklySchedule: schedule)
+
+        await sut.syncPlanReminders(plans: [plan])
+
+        let planRequests = mockCenter.addedRequests.filter { $0.identifier.hasPrefix("plan-") }
+        XCTAssertEqual(planRequests.count, 3)
+    }
+
+    func testSync_unstartedPlan_schedulesNothing() async {
+        let sut = makeSUT()
+        let plan = TestFixtures.makePlan()
+
+        await sut.syncPlanReminders(plans: [plan])
+
+        XCTAssertTrue(mockCenter.addedRequests.filter { $0.identifier.hasPrefix("plan-") }.isEmpty)
+    }
+
+    func testSync_masterDisabled_removesStalePlanRequestsAndAddsNone() async {
+        let sut = makeSUT(enabled: false)
+        let staleRequest = UNNotificationRequest(
+            identifier: "plan-stale-day-0",
+            content: UNMutableNotificationContent(),
+            trigger: nil)
+        mockCenter.pendingStub = [staleRequest]
+        let plan = TestFixtures.makePlan(startDate: Date(), weeklySchedule: [["Squat"], [], [], [], [], [], []])
+
+        await sut.syncPlanReminders(plans: [plan])
+
+        XCTAssertTrue(mockCenter.removedIdentifiers.contains("plan-stale-day-0"))
+        XCTAssertTrue(mockCenter.addedRequests.filter { $0.identifier.hasPrefix("plan-") }.isEmpty)
+    }
+
+    func testSync_workoutToggleOff_schedulesNoWorkoutReminders() async {
+        let sut = makeSUT()
+        sut.workoutRemindersEnabled = false
+        let plan = TestFixtures.makePlan(startDate: Date(), weeklySchedule: [["Squat"], [], [], [], [], [], []])
+
+        await sut.syncPlanReminders(plans: [plan])
+
+        XCTAssertTrue(mockCenter.addedRequests.filter { $0.identifier.hasPrefix("plan-") }.isEmpty)
+    }
+
+    func testSync_twoStartedPlans_schedulesOnlyMostRecent() async {
+        let sut = makeSUT()
+        let older = TestFixtures.makePlan(name: "Older", startDate: Calendar.current.date(byAdding: .day, value: -10, to: Date()), weeklySchedule: [["Squat"], [], [], [], [], [], []])
+        let newer = TestFixtures.makePlan(name: "Newer", startDate: Calendar.current.date(byAdding: .day, value: -1, to: Date()), weeklySchedule: [["Lunge"], [], [], [], [], [], []])
+
+        await sut.syncPlanReminders(plans: [older, newer])
+
+        let bodies = Set(mockCenter.addedRequests.filter { $0.identifier.hasPrefix("plan-") }.map { $0.content.body })
+        XCTAssertTrue(bodies.contains { $0.contains("Newer") })
+        XCTAssertFalse(bodies.contains { $0.contains("Older") })
+    }
+
+    func testScheduleReminders_userInfo_routesToPlansTab() async {
+        let sut = makeSUT()
+        let plan = TestFixtures.makePlan(startDate: Date(), weeklySchedule: [["Squat"], [], [], [], [], [], []])
+
+        await sut.syncPlanReminders(plans: [plan])
+
+        let request = mockCenter.addedRequests.first { $0.identifier.hasPrefix("plan-") }
+        XCTAssertEqual(request?.content.userInfo["tab"] as? String, "plans")
+    }
+}
