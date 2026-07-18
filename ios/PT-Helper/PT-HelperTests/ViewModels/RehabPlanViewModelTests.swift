@@ -193,7 +193,7 @@ final class RehabPlanViewModelTests: XCTestCase {
         vm.generateRehabPlan(from: result)
 
         // Wait for the internal Task to complete
-        try await Task.sleep(nanoseconds: 500_000_000)
+        await wait(for: vm.$isGenerating, until: { $0 == false })
 
         XCTAssertFalse(vm.isGenerating)
         XCTAssertNil(vm.generationError)
@@ -209,7 +209,7 @@ final class RehabPlanViewModelTests: XCTestCase {
         let result = TestFixtures.makeAnalysisResult()
 
         vm.generateRehabPlan(from: result)
-        try await Task.sleep(nanoseconds: 500_000_000)
+        await wait(for: vm.$isGenerating, until: { $0 == false })
 
         XCTAssertEqual(mock.sendMessageCallCount, 1)
         XCTAssertEqual(mock.lastRequestType, .rehab_plan)
@@ -224,7 +224,7 @@ final class RehabPlanViewModelTests: XCTestCase {
         let result = TestFixtures.makeAnalysisResult(conditions: [condition])
 
         vm.generateRehabPlan(from: result)
-        try await Task.sleep(nanoseconds: 500_000_000)
+        await wait(for: vm.$isGenerating, until: { $0 == false })
 
         XCTAssertFalse(vm.isGenerating)
         // Should have a fallback plan (either from exerciseDatabase or region-aware fallback)
@@ -239,7 +239,7 @@ final class RehabPlanViewModelTests: XCTestCase {
         let result = TestFixtures.makeAnalysisResult(conditions: [condition])
 
         vm.generateRehabPlan(from: result)
-        try await Task.sleep(nanoseconds: 500_000_000)
+        await wait(for: vm.$isGenerating, until: { $0 == false })
 
         XCTAssertFalse(vm.isGenerating)
         XCTAssertNotNil(vm.rehabPlan, "Should fallback to region-aware exercises")
@@ -253,7 +253,7 @@ final class RehabPlanViewModelTests: XCTestCase {
         let result = TestFixtures.makeAnalysisResult()
 
         vm.generateRehabPlan(from: result)
-        try await Task.sleep(nanoseconds: 500_000_000)
+        await wait(for: vm.$isGenerating, until: { $0 == false })
 
         // Warnings array should exist (may be empty for valid plans)
         XCTAssertNotNil(vm.rehabPlanWarnings)

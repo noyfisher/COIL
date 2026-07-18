@@ -326,7 +326,7 @@ final class InjuryAnalysisViewModelTests: XCTestCase {
         )
 
         vm.saveAndAnalyze(TestFixtures.makeAssessment(region: region))
-        try await Task.sleep(nanoseconds: 500_000_000)
+        await vm.analysisTask?.value
 
         XCTAssertFalse(vm.isAnalyzing)
         XCTAssertNotNil(vm.analysisResult)
@@ -345,7 +345,7 @@ final class InjuryAnalysisViewModelTests: XCTestCase {
         )
 
         vm.saveAndAnalyze(TestFixtures.makeAssessment(region: region))
-        try await Task.sleep(nanoseconds: 500_000_000)
+        await vm.analysisTask?.value
 
         // Two-call pipeline: primary analysis + verification
         XCTAssertEqual(mock.sendMessageCallCount, 2)
@@ -364,7 +364,7 @@ final class InjuryAnalysisViewModelTests: XCTestCase {
         )
 
         vm.saveAndAnalyze(TestFixtures.makeAssessment(region: region))
-        try await Task.sleep(nanoseconds: 500_000_000)
+        await vm.analysisTask?.value
 
         XCTAssertFalse(vm.isAnalyzing)
         XCTAssertNotNil(vm.analysisError)
@@ -404,14 +404,14 @@ final class InjuryAnalysisViewModelTests: XCTestCase {
 
         // First attempt fails (primary call throws, 1 API call)
         vm.saveAndAnalyze(TestFixtures.makeAssessment(region: region))
-        try await Task.sleep(nanoseconds: 500_000_000)
+        await vm.analysisTask?.value
         XCTAssertNotNil(vm.analysisError)
 
         // Retry succeeds (primary + verification = 2 API calls)
         mock.errorToThrow = nil
         mock.responseToReturn = TestFixtures.makeAnalysisResponseJSON()
         vm.retryAnalysis()
-        try await Task.sleep(nanoseconds: 500_000_000)
+        await vm.analysisTask?.value
 
         XCTAssertFalse(vm.isAnalyzing)
         XCTAssertNil(vm.analysisError)
