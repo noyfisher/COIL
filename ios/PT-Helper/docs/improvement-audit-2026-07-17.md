@@ -67,11 +67,11 @@ Sonnet's cross-session memory. Update the **Status** and **PR#** columns as you 
 | WS12-01 | Remove nightly_report from the client-callable request allow-list | WS12 | P1 | S | todo | |
 | WS12-02 | Restore a working, project-owned ESLint (config + devDependency + bounded fixes) | WS12 | P2 | M | todo | |
 | WS12-03 | Extract system prompts + model config into a side-effect-free src/prompts.ts module | WS12 | P2 | M | BLOCKED: soft — after WS12-01 (shared index.ts:723); WS12-02 for the lint Verify leg | |
-| WS13-01 | Convert the 12 Task.sleep VM waits (+ Timer fixed-delay) to deterministic await/expectation patterns | WS13 | P2 | M | todo | |
-| WS13-02 | Extract a NotificationLifecycleScheduling seam and test WS2's newly-wired notification behavior | WS13 | P2 | M | BLOCKED: WS2 | |
-| WS13-03 | Test ConsentService's newly-added withdraw path + policy/mirror contract (no production seam) | WS13 | P2 | S | BLOCKED: WS3 | |
-| WS13-04 | Post-WS1 SmokePlan integrity gate | WS13 | P3 | S | BLOCKED: WS1 | |
-| WS13-05 | Document FullPlan vs PreReleasePlan intent | WS13 | P3 | S | todo | |
+| WS13-01 | Convert the 12 Task.sleep VM waits (+ Timer fixed-delay) to deterministic await/expectation patterns | WS13 | P2 | M | PARTIAL: Timer left on Task.sleep (see PR notes — ExerciseTimer is a class, @Published won't observe in-place mutation, prod file out of scope) | #55 |
+| WS13-02 | Extract a NotificationLifecycleScheduling seam and test WS2's newly-wired notification behavior | WS13 | P2 | M | BLOCKED: WS2 (still unmerged, PR #44) | |
+| WS13-03 | Test ConsentService's newly-added withdraw path + policy/mirror contract (no production seam) | WS13 | P2 | S | BLOCKED: WS3 (still unmerged, PR #45) | |
+| WS13-04 | Post-WS1 SmokePlan integrity gate | WS13 | P3 | S | BLOCKED: WS1 (still unmerged, PR #43) | |
+| WS13-05 | Document FullPlan vs PreReleasePlan intent | WS13 | P3 | S | done | #55 |
 
 **58 items · 13 workstreams · 22 P1 · 26 P2 · 10 P3.**
 
