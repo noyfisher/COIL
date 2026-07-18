@@ -75,4 +75,23 @@ final class WellnessPlanViewModelTests: XCTestCase {
         XCTAssertTrue(message.contains("ACL sprain"), "Should include current injury")
         XCTAssertFalse(message.contains("Old sprain"), "Should not include past injury")
     }
+
+    // MARK: - WS8-01: Offline fail-fast
+
+    func testGenerateWellnessPlan_offline_setsErrorWithoutFallbackPlan() async {
+        _ = NetworkMonitor.shared
+        await Task.yield()
+        NetworkMonitor.shared.isConnected = false
+        defer { NetworkMonitor.shared.isConnected = true }
+
+        let vm = WellnessPlanViewModel(apiService: mockAPI)
+        let result = TestFixtures.makeWellnessAnalysisResult()
+
+        vm.generateWellnessPlan(from: result)
+
+        XCTAssertEqual(vm.generationError, "You're offline. Connect to the internet to build your wellness plan, then try again.")
+        XCTAssertFalse(vm.isGenerating)
+        XCTAssertNil(vm.wellnessPlan)
+        XCTAssertEqual(mockAPI.sendMessageCallCount, 0)
+    }
 }

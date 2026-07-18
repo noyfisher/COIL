@@ -70,6 +70,15 @@ class WellnessPlanViewModel: ObservableObject {
     /// Generate a wellness plan using AI, with fallback to basic exercises
     func generateWellnessPlan(from wellnessResult: WellnessAnalysisResult) {
         guard !isGenerating else { return }
+
+        // Fail fast when offline instead of making the user watch a doomed
+        // spinner before a generic network error (WS8-01, extends audit #58).
+        guard NetworkMonitor.shared.isConnected else {
+            generationError = "You're offline. Connect to the internet to build your wellness plan, then try again."
+            isGenerating = false
+            return
+        }
+
         let goalCategories = wellnessResult.recommendations.map { $0.goalCategory }
 
         isGenerating = true
