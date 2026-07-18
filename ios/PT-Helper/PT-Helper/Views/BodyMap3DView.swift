@@ -317,20 +317,21 @@ struct BodyMap3DView: View {
                 content.camera = .virtual
 
                 do {
-                    let entity = try await BodyModelCache.shared.loadModel()
+                    let regionKeys = Set(viewModel.regions.map(\.zoneKey))
+
+                    let entity = try await ConfiguredBodyModelCache.shared.configuredModel(regionKeys: regionKeys) { tpl in
+                        configureTemplateGeometry(for: tpl, regionKeys: regionKeys)
+                        createProxyEntities(for: tpl, regionKeys: regionKeys)
+                        createArmZoneProxies(for: tpl, regionKeys: regionKeys)
+                        createLegZoneProxies(for: tpl, regionKeys: regionKeys)
+                    }
+                    captureOriginalMaterials(from: entity, regionKeys: regionKeys)
+
                     entity.scale = SIMD3<Float>(repeating: BodyMapConstants.modelScale)
 
                     let pivot = Entity()
                     entity.position.y = -BodyMapConstants.modelHalfHeight
                     pivot.addChild(entity)
-
-                    let regionKeys = Set(viewModel.regions.map(\.zoneKey))
-
-                    configureCollisionShapes(for: entity, regionKeys: regionKeys)
-                    createProxyEntities(for: entity, regionKeys: regionKeys)
-                    createArmZoneProxies(for: entity, regionKeys: regionKeys)
-                    createLegZoneProxies(for: entity, regionKeys: regionKeys)
-
 
                     content.add(pivot)
                     pivotEntity = pivot
@@ -811,8 +812,10 @@ struct BodyMap3DView: View {
     // MARK: - Model Setup Helpers
 
     /// Configure each body-region child for tap interaction and apply region colors.
+    /// Pure function of the (fixed) model geometry and the (static) region-key set —
+    /// safe to run once on a shared template and reuse across every clone.
     @MainActor
-    private func configureCollisionShapes(for parent: Entity, regionKeys: Set<String>) {
+    private func configureTemplateGeometry(for parent: Entity, regionKeys: Set<String>) {
         let zoneBoxedRegions = Set(BodyMapConstants.armRegionOrder
             + BodyMapConstants.lowerLegRegionOrder)
         for child in parent.children {
@@ -832,12 +835,22 @@ struct BodyMap3DView: View {
                 }
 
                 applyRegionColor(to: child)
-
-                if let mc = child.components[ModelComponent.self] {
-                    originalMaterials[child.name] = mc.materials
-                }
             }
-            configureCollisionShapes(for: child, regionKeys: regionKeys)
+            configureTemplateGeometry(for: child, regionKeys: regionKeys)
+        }
+    }
+
+    /// Capture each region's post-configuration materials into per-view state
+    /// (`originalMaterials`) so selection restore has a baseline to revert to.
+    /// Read-only — must run per-open, since `originalMaterials` is view-instance state.
+    @MainActor
+    private func captureOriginalMaterials(from parent: Entity, regionKeys: Set<String>) {
+        for child in parent.children {
+            if regionKeys.contains(child.name),
+               let mc = child.components[ModelComponent.self] {
+                originalMaterials[child.name] = mc.materials
+            }
+            captureOriginalMaterials(from: child, regionKeys: regionKeys)
         }
     }
 
@@ -900,7 +913,7 @@ struct BodyMap3DView: View {
     /// Build Y-banded box proxies for the lower-leg chain (calf_shin →
     /// ankle_foot). Mirrors `createArmZoneProxies`: midpoint transitions
     /// between mesh centers, forward-protruding, fully owns taps because
-    /// the underlying convex hulls are disabled in `configureCollisionShapes`.
+    /// the underlying convex hulls are disabled in `configureTemplateGeometry`.
     @MainActor
     private func createLegZoneProxies(for entity: Entity, regionKeys: Set<String>) {
         for side in ["left", "right"] {
@@ -929,7 +942,7 @@ struct BodyMap3DView: View {
         // Calf_shin's mesh max.z extends up past the kneecap, so a naive
         // max.z top would eat the knee + lower-thigh tap area. Anchor at the
         // knee mesh's bottom instead — knee gets a real convex hull (it's not
-        // in lowerLegRegionOrder, see configureCollisionShapes), so capping
+        // in lowerLegRegionOrder, see configureTemplateGeometry), so capping
         // here cedes the upper band to that hull + the knee sphere proxy.
         let kneeBounds = entity.findEntity(named: "\(side)_knee")
             .map { $0.visualBounds(relativeTo: entity) }
