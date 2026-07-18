@@ -575,4 +575,63 @@ final class GuidedWorkoutViewModelTests: XCTestCase {
 
         XCTAssertEqual(vm.timeRemaining, 60)
     }
+
+    // MARK: - WS5-03: Scene phase handling
+
+    func testHandleAppBackgrounded_duringInterExerciseRest_savesAdvancedCheckpoint() {
+        let exercises = [
+            makeExercise(name: "Ex1", sets: 1, restSeconds: 10),
+            makeExercise(name: "Ex2", sets: 1, restSeconds: 10)
+        ]
+        let plan = makePlan(exercises: exercises)
+        let vm = GuidedWorkoutViewModel(plan: plan)
+
+        vm.completeSet() // now in inter-exercise rest
+        vm.handleAppBackgrounded()
+
+        guard let checkpoint = GuidedWorkoutViewModel.savedCheckpoint(forPlanId: plan.id.uuidString) else {
+            XCTFail("Expected checkpoint")
+            return
+        }
+        XCTAssertEqual(checkpoint.currentExerciseIndex, 1)
+        XCTAssertEqual(checkpoint.currentSet, 1)
+    }
+
+    func testHandleAppBackgrounded_midExercise_savesLiveState() {
+        let plan = makePlan()
+        let vm = GuidedWorkoutViewModel(plan: plan)
+
+        vm.handleAppBackgrounded()
+
+        guard let checkpoint = GuidedWorkoutViewModel.savedCheckpoint(forPlanId: plan.id.uuidString) else {
+            XCTFail("Expected checkpoint")
+            return
+        }
+        XCTAssertEqual(checkpoint.currentExerciseIndex, 0)
+        XCTAssertEqual(checkpoint.currentSet, 1)
+    }
+
+    func testHandleAppBackgrounded_afterComplete_savesNothing() {
+        let exercises = [makeExercise(name: "Ex1", sets: 1, restSeconds: 10)]
+        let plan = makePlan(exercises: exercises)
+        let vm = GuidedWorkoutViewModel(plan: plan)
+
+        vm.completeSet() // single-exercise plan completes
+        vm.handleAppBackgrounded()
+
+        XCTAssertNil(GuidedWorkoutViewModel.savedCheckpoint(forPlanId: plan.id.uuidString))
+    }
+
+    func testHandleAppForegrounded_duringRest_reconciles() {
+        let exercises = [makeExercise(name: "Ex1", sets: 2, restSeconds: 60)]
+        let vm = GuidedWorkoutViewModel(plan: makePlan(exercises: exercises))
+        let base = Date()
+        vm.now = { base }
+        vm.completeSet()
+
+        vm.now = { base.addingTimeInterval(40) }
+        vm.handleAppForegrounded()
+
+        XCTAssertEqual(vm.timeRemaining, 20)
+    }
 }

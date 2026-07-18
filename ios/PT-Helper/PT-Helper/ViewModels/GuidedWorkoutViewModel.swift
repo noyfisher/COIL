@@ -339,6 +339,31 @@ class GuidedWorkoutViewModel: ObservableObject {
         phase = .exercise
     }
 
+    // MARK: - Scene Phase
+
+    /// Persist an accurate checkpoint when the app is backgrounded mid-workout.
+    /// During an inter-exercise rest the live index still points at the exercise
+    /// just completed, so save the advanced position (same rule as completeSet's
+    /// final-set branch) — a live-state save here would resurrect the WS5-01 bug.
+    func handleAppBackgrounded() {
+        guard phase != .complete else { return }
+        if phase == .rest && restKind == .interExercise {
+            saveCheckpoint(forNextExercise: true)
+        } else {
+            saveCheckpoint()
+        }
+    }
+
+    /// Snap timers to the wall clock immediately on return to foreground
+    /// (instead of waiting up to 1s for the next ticker tick).
+    func handleAppForegrounded() {
+        guard !isPaused, phase != .complete else { return }
+        if phase == .rest {
+            reconcileRestFromWallClock()
+        }
+        totalElapsedTime = accumulatedTime + now().timeIntervalSince(lastResumeTime)
+    }
+
     // MARK: - Private
 
     private func moveToNextExercise() {
