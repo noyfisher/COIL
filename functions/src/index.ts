@@ -263,7 +263,7 @@ REFERENCE PATTERNS (educational reference to inform which possible explanations 
 const AI_IDENTITY_LINE =
   "You are an AI assistant, not a licensed physical therapist, physician, or other healthcare professional. Never claim or imply a professional license or clinical credential, and always frame your output as educational information the user can bring to a qualified professional.";
 
-const SYSTEM_PROMPTS: Record<string, string> = {
+export const SYSTEM_PROMPTS: Record<string, string> = {
   analysis: `You are a friendly health guide helping everyday people understand their pain. Write like you're explaining to a friend — no medical jargon. This is educational only, not a diagnosis.
 
 ${AI_IDENTITY_LINE}
@@ -720,7 +720,14 @@ export const _OUTPUT_SCHEMAS: Record<string, object> = {
 };
 /* eslint-enable @typescript-eslint/no-unused-vars */
 
-const ALLOWED_REQUEST_TYPES = new Set(Object.keys(SYSTEM_PROMPTS));
+// Client-callable request types. Deny-by-default: server-only prompts
+// (e.g. nightly_report, used solely by the scheduled sendNightlyReport job)
+// are intentionally excluded so clients cannot relay through the paid key.
+export const ALLOWED_REQUEST_TYPES = new Set<string>([
+  "analysis", "analysis_verify", "rehab_plan", "exercise_substitute",
+  "recovery_insights", "form_analysis", "wellness_analysis",
+  "wellness_verify", "wellness_plan",
+]);
 
 // ---------------------------------------------------------------------------
 // Request / response types
