@@ -33,20 +33,26 @@ struct HomeTab: View {
                     // Weekly strip — dark, visually extends the nav bar
                     WeekCompletionStrip(sessions: workoutViewModel.sessions)
 
-                    // Program / Preventative picker
-                    HomeTabPicker(selected: $selectedContentTab)
-                        .padding(.horizontal, AppSpacing.lg)
-                        .padding(.top, AppSpacing.md)
-                        .padding(.bottom, AppSpacing.sm)
+                    // Program / Preventative picker — only meaningful with an active plan
+                    if activePlan != nil {
+                        HomeTabPicker(selected: $selectedContentTab)
+                            .padding(.horizontal, AppSpacing.lg)
+                            .padding(.top, AppSpacing.md)
+                            .padding(.bottom, AppSpacing.sm)
+                    }
 
                     // Content
                     ScrollView {
                         VStack(spacing: AppSpacing.md) {
-                            switch selectedContentTab {
-                            case .program:
-                                ProgramDayView(plan: activePlan)
-                            case .preventative:
-                                PreventativeTasksView()
+                            if activePlan == nil {
+                                ProgramDayView(plan: nil)
+                            } else {
+                                switch selectedContentTab {
+                                case .program:
+                                    ProgramDayView(plan: activePlan)
+                                case .preventative:
+                                    PreventativeTasksView()
+                                }
                             }
                         }
                         .padding(.horizontal, AppSpacing.lg)
