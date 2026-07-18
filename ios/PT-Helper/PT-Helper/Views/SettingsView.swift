@@ -224,8 +224,6 @@ struct SettingsView: View {
         SeriousWarningAcknowledgements.clearAll()
         SessionLogger.shared.clearAllLocalData()
         GuidedWorkoutViewModel.clearAllLocalWorkoutState()
-        UserDefaults.standard.removeObject(forKey: "hasAcceptedTermsOfService")
-        UserDefaults.standard.removeObject(forKey: "tosAcceptedDate")
         ConsentService.clearLocalMirrors()
         UserDefaults.standard.removeObject(forKey: "hasSeenMinorSafetyScreen")  // plain string key — compiles fine before PR-5
     }
