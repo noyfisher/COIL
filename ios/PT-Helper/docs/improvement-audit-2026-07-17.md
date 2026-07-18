@@ -53,10 +53,10 @@ Sonnet's cross-session memory. Update the **Status** and **PR#** columns as you 
 | WS8-01 | Add offline fail-fast guards to the 5 ungated AI ViewModels | WS8 | P1 | M | todo | |
 | WS8-02 | Extract shared performProxyRequest helper in ClaudeAPIService | WS8 | P1 | M | todo | |
 | WS8-03 | Add service-level retry: 1 retry, 2s delay, transport/5xx only, never 429 | WS8 | P2 | S | BLOCKED: WS8-02 | |
-| WS9-01 | Tokenize text fonts in the 7 worst-offender screens (+ own the master mapping table) | WS9 | P2 | M | todo | |
-| WS9-02 | Tokenize text fonts across the remaining live screens (long tail; split 2a components/onboarding + 2b screens) | WS9 | P2 | L | BLOCKED: WS9-01 (shared table only; disjoint files, can parallelize) | |
-| WS9-03 | Tokenize numeric padding + corner-radius literals to AppSpacing/AppCorners | WS9 | P3 | M | todo | |
-| WS9-04 | Fold hand-rolled card stacks into .cardStyle() (33 quadruples) | WS9 | P3 | S | BLOCKED: WS9-03 (soft ordering; independent files) | |
+| WS9-01 | Tokenize text fonts in the 7 worst-offender screens (+ own the master mapping table) | WS9 | P2 | M | done | #51 |
+| WS9-02 | Tokenize text fonts across the remaining live screens (long tail; split 2a components/onboarding + 2b screens) | WS9 | P2 | L | done | #51 |
+| WS9-03 | Tokenize numeric padding + corner-radius literals to AppSpacing/AppCorners | WS9 | P3 | M | done | #51 |
+| WS9-04 | Fold hand-rolled card stacks into .cardStyle() (33 quadruples) | WS9 | P3 | S | done | #51 |
 | WS10-01 | Replace the cosmetic 21-day date strip with an honest completion-dot week strip | WS10 | P2 | M | todo | |
 | WS10-02 | Gate the Preventative section on an active plan (hide it when there is no plan) | WS10 | P2 | S | BLOCKED: WS10-01 | |
 | WS10-03 | Clear preventiveTasks_* UserDefaults keys on account deletion | WS10 | P3 | S | todo | |
