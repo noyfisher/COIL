@@ -152,14 +152,16 @@ class GuidedWorkoutViewModel: ObservableObject {
             // All sets done for this exercise
             completedExercises.append(exercise.name)
             Self.incrementCompletionCount(for: exercise.name)
-            saveCheckpoint()
 
             if currentExerciseIndex < totalExercises - 1 {
-                // Start rest before next exercise
+                // Start rest before next exercise. Save the ADVANCED position:
+                // the live index still points at the just-completed exercise
+                // (invariant — see saveCheckpoint doc comment).
+                saveCheckpoint(forNextExercise: true)
                 startRestTimer(seconds: exercise.restSeconds, kind: .interExercise)
             } else {
                 // Last exercise — workout complete
-                finishWorkout()
+                finishWorkout()   // clears the checkpoint — no save needed
             }
         } else {
             // More sets to do — brief inter-set rest
@@ -177,7 +179,6 @@ class GuidedWorkoutViewModel: ObservableObject {
         SessionLogger.shared.logUserAction(.buttonTapped, action: "skipExercise",
                                             metadata: ["exercise": exercise.name])
         skippedExercises.append(exercise.name)
-        saveCheckpoint()
         moveToNextExercise()
     }
 
@@ -280,11 +281,16 @@ class GuidedWorkoutViewModel: ObservableObject {
     // MARK: - Checkpointing
 
     /// Save current workout state so it can be resumed after a crash or interruption.
-    func saveCheckpoint() {
+    ///
+    /// Invariant: a checkpoint always records the next actionable exercise/set —
+    /// never state the user has already completed. Pass `forNextExercise: true`
+    /// when saving at the moment an exercise is completed but the index has not
+    /// yet advanced (inter-exercise rest window).
+    func saveCheckpoint(forNextExercise: Bool = false) {
         let checkpoint = WorkoutCheckpoint(
             planId: plan.id.uuidString,
-            currentExerciseIndex: currentExerciseIndex,
-            currentSet: currentSet,
+            currentExerciseIndex: forNextExercise ? currentExerciseIndex + 1 : currentExerciseIndex,
+            currentSet: forNextExercise ? 1 : currentSet,
             completedExercises: completedExercises,
             skippedExercises: skippedExercises,
             substitutedExercises: substitutedExercises,
@@ -334,6 +340,7 @@ class GuidedWorkoutViewModel: ObservableObject {
             currentExerciseIndex += 1
             currentSet = 1
             phase = .exercise
+            saveCheckpoint()
         } else {
             finishWorkout()
         }
