@@ -192,6 +192,7 @@ struct RehabPlanView: View {
                             Image(systemName: "pencil.circle")
                         }
                         .accessibilityIdentifier("rehabPlan.editButton")
+                        .accessibilityLabel("Edit plan")
                     }
                 }
             }

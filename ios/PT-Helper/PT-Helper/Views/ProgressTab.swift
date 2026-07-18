@@ -172,6 +172,7 @@ struct ProgressTabContent: View {
                             .foregroundColor(AppColors.accent)
                     }
                     .accessibilityIdentifier("progress.settingsButton")
+                    .accessibilityLabel("Settings")
                 }
             }
         }

@@ -56,6 +56,7 @@ struct GuidedWorkoutView: View {
                         Image(systemName: vm.isPaused ? "play.fill" : "pause.fill")
                     }
                     .accessibilityIdentifier("workout.pauseButton")
+                    .accessibilityLabel(vm.isPaused ? "Resume workout" : "Pause workout")
                 }
             }
         }

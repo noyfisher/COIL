@@ -295,6 +295,7 @@ struct BodyMap3DView: View {
                                     .font(.system(size: 12))
                                     .foregroundColor(Color.white.opacity(0.85))
                             }
+                            .accessibilityLabel("Deselect \(region.name)")
                         }
                         .padding(.horizontal, AppSpacing.md)
                         .padding(.vertical, AppSpacing.sm)

@@ -40,6 +40,7 @@ struct EditRehabPlanView: View {
                                         .foregroundColor(AppColors.accent)
                                 }
                                 .buttonStyle(.plain)
+                                .accessibilityLabel("Edit \(exercise.name)")
                             }
                         }
                         .onMove(perform: moveExercise)
