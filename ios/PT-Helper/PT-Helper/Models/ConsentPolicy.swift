@@ -6,6 +6,21 @@ enum ConsentPolicy {
                                        currentVersion: String = LegalContent.tosVersion) -> Bool {
         recordedVersion != currentVersion
     }
+
+    /// Post-read mirror value for one consent doc.
+    /// Read failed (offline) → keep mirror. Doc absent or field missing
+    /// (server authoritatively says "no consent") → nil (clear mirror).
+    /// Field present → server wins.
+    static func reconciledConsentVersion(
+        readFailed: Bool,
+        docExists: Bool,
+        serverVersion: String?,
+        mirrorVersion: String?
+    ) -> String? {
+        if readFailed { return mirrorVersion }
+        guard docExists, let serverVersion else { return nil }
+        return serverVersion
+    }
 }
 
 enum AgePolicy {

@@ -19,7 +19,7 @@ final class ConsentService: ObservableObject {
 
     // MARK: - UserDefaults mirror keys
 
-    private enum MirrorKeys {
+    enum MirrorKeys {
         static let tosVersion = "consent.tosVersion"
         static let healthDataPolicyVersion = "consent.healthDataPolicyVersion"
     }
@@ -59,21 +59,36 @@ final class ConsentService: ObservableObject {
         do {
             let snapshot = try await db.collection("users").document(uid)
                 .collection("consents").document("legal").getDocument()
-            if let data = snapshot.data(), let version = data["tosVersion"] as? String {
-                recordedTosVersion = version
-                UserDefaults.standard.set(version, forKey: MirrorKeys.tosVersion)
-            }
+            let reconciledTos = ConsentPolicy.reconciledConsentVersion(
+                readFailed: false,
+                docExists: snapshot.exists,
+                serverVersion: snapshot.data()?["tosVersion"] as? String,
+                mirrorVersion: recordedTosVersion)
+            recordedTosVersion = reconciledTos
+            setMirror(reconciledTos, forKey: MirrorKeys.tosVersion)
 
             let healthSnapshot = try await db.collection("users").document(uid)
                 .collection("consents").document("healthData").getDocument()
-            if let data = healthSnapshot.data(), let version = data["policyVersion"] as? String {
-                UserDefaults.standard.set(version, forKey: MirrorKeys.healthDataPolicyVersion)
-            }
+            let reconciledHealth = ConsentPolicy.reconciledConsentVersion(
+                readFailed: false,
+                docExists: healthSnapshot.exists,
+                serverVersion: healthSnapshot.data()?["policyVersion"] as? String,
+                mirrorVersion: UserDefaults.standard.string(forKey: MirrorKeys.healthDataPolicyVersion))
+            setMirror(reconciledHealth, forKey: MirrorKeys.healthDataPolicyVersion)
+            objectWillChange.send()
         } catch {
             AppLogger.data.error("Error loading consent record: \(error.localizedDescription)")
             // Fall back to the already-hydrated mirror values.
         }
         isLoaded = true
+    }
+
+    private func setMirror(_ value: String?, forKey key: String) {
+        if let value {
+            UserDefaults.standard.set(value, forKey: key)
+        } else {
+            UserDefaults.standard.removeObject(forKey: key)
+        }
     }
 
     // MARK: - Record
@@ -82,7 +97,10 @@ final class ConsentService: ObservableObject {
     /// published value + mirror. `source` is "onboarding", "reacceptance", or
     /// "skip_gate". `dateOfBirth` is recorded only from the skip gate.
     func recordLegalAcceptance(source: String, dateOfBirth: Date? = nil) {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
+        guard let uid = Auth.auth().currentUser?.uid else {
+            AppLogger.data.error("recordLegalAcceptance: no signed-in user")
+            return
+        }
 
         var data: [String: Any] = [
             "tosVersion": LegalContent.tosVersion,
@@ -97,7 +115,11 @@ final class ConsentService: ObservableObject {
 
         db.collection("users").document(uid)
             .collection("consents").document("legal")
-            .setData(data, merge: true)
+            .setData(data, merge: true) { error in
+                if let error {
+                    AppLogger.data.error("Failed to record legal acceptance: \(error.localizedDescription)")
+                }
+            }
 
         recordedTosVersion = LegalContent.tosVersion
         UserDefaults.standard.set(LegalContent.tosVersion, forKey: MirrorKeys.tosVersion)
@@ -107,7 +129,10 @@ final class ConsentService: ObservableObject {
     /// sharing recorded as separate timestamps — to `users/{uid}/consents/healthData`
     /// and updates the mirror. Called only after BOTH consent checkboxes are ticked.
     func recordHealthDataConsent() {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
+        guard let uid = Auth.auth().currentUser?.uid else {
+            AppLogger.data.error("recordHealthDataConsent: no signed-in user")
+            return
+        }
 
         let data: [String: Any] = [
             "policyVersion": LegalContent.healthDataPolicyVersion,
@@ -118,7 +143,11 @@ final class ConsentService: ObservableObject {
 
         db.collection("users").document(uid)
             .collection("consents").document("healthData")
-            .setData(data, merge: true)
+            .setData(data, merge: true) { error in
+                if let error {
+                    AppLogger.data.error("Failed to record health data consent: \(error.localizedDescription)")
+                }
+            }
 
         UserDefaults.standard.set(LegalContent.healthDataPolicyVersion,
                                   forKey: MirrorKeys.healthDataPolicyVersion)
