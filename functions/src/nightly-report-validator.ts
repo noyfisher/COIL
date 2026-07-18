@@ -159,7 +159,6 @@ function validateCodeFences(lines: string[]): string[] {
   const fenceRegex = /^```/;
   let i = 0;
   let fenceIndex = 0;
-  let openCount = 0;
   while (i < lines.length) {
     if (fenceRegex.test(lines[i])) {
       const openLine = i;
@@ -170,7 +169,6 @@ function validateCodeFences(lines: string[]): string[] {
       }
       if (i >= lines.length) {
         // Unclosed fence.
-        openCount++;
         reasons.push(`code fence ${++fenceIndex}: unclosed (started at line ${openLine + 1})`);
         break;
       }
