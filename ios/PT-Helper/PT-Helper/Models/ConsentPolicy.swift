@@ -21,6 +21,26 @@ enum ConsentPolicy {
         guard docExists, let serverVersion else { return nil }
         return serverVersion
     }
+
+    /// Launch-time MHMDA gate: fires only for users with a real health profile
+    /// (health data already on file) who lack consent for the CURRENT policy
+    /// version, and never while a higher-priority cover (legal gate,
+    /// minor-safety interstitial) is showing or pending.
+    static func shouldShowHealthConsentGate(
+        consentLoaded: Bool,
+        needsLegalReacceptance: Bool,
+        legalGateShowing: Bool,
+        minorSafetyPending: Bool,
+        hasHealthProfile: Bool,
+        hasHealthDataConsent: Bool
+    ) -> Bool {
+        consentLoaded
+            && !needsLegalReacceptance
+            && !legalGateShowing
+            && !minorSafetyPending
+            && hasHealthProfile
+            && !hasHealthDataConsent
+    }
 }
 
 enum AgePolicy {

@@ -13,6 +13,8 @@ struct RootView: View {
     @StateObject private var consentService = ConsentService.shared
     /// Drives the launch-time ToS re-acceptance gate (production branch only).
     @State private var showLegalGate = false
+    /// Drives the launch-time MHMDA health-data consent gate (production branch only).
+    @State private var showHealthGate = false
     /// Drives the skip-onboarding legal + age gate (production branch only).
     @State private var showSkipGate = false
     /// Set by the skip gate when a 13–17 DOB is entered, or by
@@ -156,12 +158,25 @@ struct RootView: View {
                             hasSeenMinorSafetyScreen = true
                         }
                     }
+                    .fullScreenCover(isPresented: $showHealthGate) {
+                        HealthDataConsentView(
+                            onConsented: { showHealthGate = false },
+                            onDeclineSignOut: {
+                                showHealthGate = false
+                                try? Auth.auth().signOut()
+                            })
+                    }
                     .onChange(of: consentService.isLoaded) { _, loaded in
                         if loaded && consentService.needsLegalReacceptance { showLegalGate = true }
+                        reevaluateHealthGate()
                     }
                     .onAppear {
                         if consentService.isLoaded && consentService.needsLegalReacceptance { showLegalGate = true }
+                        reevaluateHealthGate()
                     }
+                    .onChange(of: showLegalGate) { _, _ in reevaluateHealthGate() }
+                    .onChange(of: pendingMinorSafetyScreen) { _, _ in reevaluateHealthGate() }
+                    .onChange(of: isCheckingProfile) { _, _ in reevaluateHealthGate() }
             } else if !hasSeenIntroCarousel {
                 IntroCarouselView(onComplete: {
                     hasSeenIntroCarousel = true
@@ -187,6 +202,20 @@ struct RootView: View {
         } else {
             LoginView(onSignedIn: { signedIn = true })
         }
+    }
+
+    /// Re-evaluates the launch-time MHMDA gate. Accepted, documented limitation:
+    /// if consent is revoked mid-session, ungated downstream flows stay open
+    /// until next launch — immediate coverage is provided by the three
+    /// point-of-use gates (OnboardingView, WellnessGoalPickerView, BodyMap3DView).
+    private func reevaluateHealthGate() {
+        showHealthGate = ConsentPolicy.shouldShowHealthConsentGate(
+            consentLoaded: consentService.isLoaded,
+            needsLegalReacceptance: consentService.needsLegalReacceptance,
+            legalGateShowing: showLegalGate,
+            minorSafetyPending: pendingMinorSafetyScreen,
+            hasHealthProfile: profileService.profile != nil,
+            hasHealthDataConsent: consentService.hasHealthDataConsent)
     }
 
     private func checkProfileCompletion() {
