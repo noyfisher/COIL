@@ -86,14 +86,7 @@ struct FormCheckTab: View {
                     .font(.system(size: 12))
                     .foregroundColor(AppColors.accent)
             }
-            .padding(AppSpacing.lg)
-            .background(AppColors.cardBackground)
-            .cornerRadius(AppCorners.card)
-            .overlay(
-                RoundedRectangle(cornerRadius: AppCorners.card)
-                    .stroke(AppColors.cardBorder, lineWidth: 1)
-            )
-            .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+            .cardStyle()
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("formCheck.exercise.\(exercise.name)")

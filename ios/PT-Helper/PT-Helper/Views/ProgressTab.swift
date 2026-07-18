@@ -261,11 +261,7 @@ struct ProgressTabContent: View {
                         }
                 }
             }
-            .padding(AppSpacing.lg)
-            .background(AppColors.cardBackground)
-            .cornerRadius(AppCorners.card)
-            .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
-            .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+            .cardStyle()
         }
     }
 
@@ -475,11 +471,7 @@ struct ProgressTabContent: View {
             .accessibilityLabel("Pain trend chart")
             .accessibilityValue(painTrendAccessibilityValue)
         }
-        .padding(AppSpacing.lg)
-        .background(AppColors.cardBackground)
-        .cornerRadius(AppCorners.card)
-        .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
-        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+        .cardStyle()
     }
 
     private var filteredChartData: [WorkoutSession] {

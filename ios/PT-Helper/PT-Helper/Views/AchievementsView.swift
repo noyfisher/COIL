@@ -31,14 +31,7 @@ struct AchievementsView: View {
                             color: AppColors.accent
                         )
                     }
-                    .padding(AppSpacing.lg)
-                    .background(AppColors.cardBackground)
-                    .cornerRadius(AppCorners.card)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: AppCorners.card)
-                            .stroke(AppColors.cardBorder, lineWidth: 1)
-                    )
-                    .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+                    .cardStyle()
 
                     // Achievement list
                     ForEach(streakService.achievements) { achievement in
@@ -110,14 +103,7 @@ struct AchievementsView: View {
                     .foregroundColor(AppColors.mutedText.opacity(0.4))
             }
         }
-        .padding(AppSpacing.lg)
-        .background(AppColors.cardBackground)
-        .cornerRadius(AppCorners.card)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppCorners.card)
-                .stroke(AppColors.cardBorder, lineWidth: 1)
-        )
-        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+        .cardStyle()
         .opacity(achievement.isEarned ? 1 : 0.7)
     }
 
