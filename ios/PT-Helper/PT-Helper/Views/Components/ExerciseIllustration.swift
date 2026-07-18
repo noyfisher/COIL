@@ -109,7 +109,7 @@ struct ExerciseIllustrationView: View {
 
             // Difficulty badge
             Text(difficultyLabel)
-                .font(.caption.weight(.semibold))
+                .font(AppFonts.captionSemiBold)
                 .foregroundColor(difficultyColor)
                 .padding(.horizontal, AppSpacing.md)
                 .padding(.vertical, AppSpacing.xs)
@@ -197,10 +197,10 @@ struct ExercisePositionGuideView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(label)
-                    .font(.caption.weight(.semibold))
+                    .font(AppFonts.captionSemiBold)
                     .foregroundColor(color)
                 Text(text)
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(AppColors.primaryText)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -234,7 +234,7 @@ struct DifficultyBadge: View {
 
     var body: some View {
         Text(label)
-            .font(.caption2.weight(.semibold))
+            .font(AppFonts.badge)
             .foregroundColor(color)
             .padding(.horizontal, 8)
             .padding(.vertical, 3)

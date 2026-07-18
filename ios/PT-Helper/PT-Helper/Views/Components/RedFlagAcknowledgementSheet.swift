@@ -41,7 +41,7 @@ struct RedFlagAcknowledgementSheet: View {
                         .multilineTextAlignment(.center)
 
                     Text("Your results include warnings that a clinician should look at before you start a self-guided plan. You can still build a plan, but you do so at your own risk.")
-                        .font(.body)
+                        .font(AppFonts.body)
                         .multilineTextAlignment(.center)
                         .foregroundColor(AppColors.secondaryText)
                         .padding(.horizontal, AppSpacing.lg)
@@ -53,7 +53,7 @@ struct RedFlagAcknowledgementSheet: View {
                                     .foregroundColor(AppColors.warning)
                                     .font(.caption)
                                 Text(msg)
-                                    .font(.footnote)
+                                    .font(AppFonts.caption)
                                     .foregroundColor(AppColors.primaryText)
                             }
                         }
@@ -69,7 +69,7 @@ struct RedFlagAcknowledgementSheet: View {
             VStack(spacing: AppSpacing.md) {
                 Button(action: onAcknowledge) {
                     Text("I understand the risks — build my plan")
-                        .font(.body.weight(.semibold))
+                        .font(AppFonts.bodySemiBold)
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
@@ -81,7 +81,7 @@ struct RedFlagAcknowledgementSheet: View {
 
                 Button(action: onDismiss) {
                     Text("Not now")
-                        .font(.footnote)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.mutedText)
                 }
                 .accessibilityIdentifier("redFlagAcknowledgement.dismissButton")

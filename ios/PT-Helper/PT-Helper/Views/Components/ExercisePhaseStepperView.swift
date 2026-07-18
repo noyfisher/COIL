@@ -47,10 +47,10 @@ struct ExercisePhaseStepperView: View {
                     } label: {
                         VStack(spacing: 2) {
                             Text("STEP \(index + 1)")
-                                .font(.system(size: 10, weight: .bold))
+                                .font(AppFonts.badge)
                                 .opacity(0.7)
                             Text(phase.label)
-                                .font(.caption.weight(.semibold))
+                                .font(AppFonts.captionSemiBold)
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
@@ -65,7 +65,7 @@ struct ExercisePhaseStepperView: View {
             if activePhase < phases.count {
                 VStack(alignment: .leading, spacing: AppSpacing.sm) {
                     Text(phases[activePhase].text)
-                        .font(.subheadline)
+                        .font(AppFonts.small)
                         .foregroundColor(AppColors.primaryText)
                         .lineSpacing(3)
                 }
@@ -83,7 +83,7 @@ struct ExercisePhaseStepperView: View {
     private func descriptionFallback(_ description: String) -> some View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text(description)
-                .font(.subheadline)
+                .font(AppFonts.small)
                 .foregroundColor(AppColors.secondaryText)
                 .lineSpacing(3)
         }

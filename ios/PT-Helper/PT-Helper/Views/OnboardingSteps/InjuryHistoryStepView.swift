@@ -16,7 +16,7 @@ struct InjuryHistoryStepView: View {
                 HStack {
                     VStack(alignment: .leading, spacing: AppSpacing.xs) {
                         Text("Any current or past injuries?")
-                            .font(Font.custom("Inter-Medium", size: 15))
+                            .font(AppFonts.bodyMedium)
                             .foregroundColor(.white)
                         Text(viewModel.userProfile.injuries.isEmpty ? "Tap + to add" : "\(viewModel.userProfile.injuries.count) recorded")
                             .font(AppFonts.caption)
@@ -37,7 +37,7 @@ struct InjuryHistoryStepView: View {
                     VStack(spacing: AppSpacing.sm) {
                         HStack {
                             Text("Injury \(index + 1)")
-                                .font(Font.custom("Industry-Bold", size: 12))
+                                .font(AppFonts.fieldLabel)
                                 .textCase(.uppercase)
                                 .kerning(1.0)
                                 .foregroundColor(AppColors.accent)
