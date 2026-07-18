@@ -39,10 +39,10 @@ Sonnet's cross-session memory. Update the **Status** and **PR#** columns as you 
 | WS4-04 | Replace systemBlue with fixed COIL teal in PDFExportService | WS4 | P2 | S | todo | |
 | WS4-05 | Sweep stale red/Barlow comments and residual PT Helper brand strings in live files | WS4 | P3 | S | todo | |
 | WS4-06 | Remove dead Inter-Bold font (unregistered payload) | WS4 | P3 | S | todo | |
-| WS5-01 | Fix checkpoint double-count at the exercise boundary (save-point semantics) | WS5 | P1 | M | todo | |
-| WS5-02 | Convert rest countdown to wall-clock end-Date reconciliation | WS5 | P1 | M | todo | |
-| WS5-03 | Add scenePhase background-save and foreground wall-clock reconcile to GuidedWorkout | WS5 | P2 | S | BLOCKED: WS5-01, WS5-02 | |
-| WS5-04 | Delete the dead TimerViewModel/TimerView/ExerciseTimer trio | WS5 | P2 | S | todo | |
+| WS5-01 | Fix checkpoint double-count at the exercise boundary (save-point semantics) | WS5 | P1 | M | done | #47 |
+| WS5-02 | Convert rest countdown to wall-clock end-Date reconciliation | WS5 | P1 | M | done | #47 |
+| WS5-03 | Add scenePhase background-save and foreground wall-clock reconcile to GuidedWorkout | WS5 | P2 | S | done | #47 |
+| WS5-04 | Delete the dead TimerViewModel/TimerView/ExerciseTimer trio | WS5 | P2 | S | done | #47 |
 | WS6-01 | Add read-only "Your Last Analysis" card to the Progress tab | WS6 | P1 | S | BLOCKED: WS6-02 (must land with or after the sign-out PHI clear) | |
 | WS6-02 | Clear AnalysisResultStore on sign-out (cross-account PHI guard) | WS6 | P1 | S | todo | |
 | WS7-01 | Sweep accent-as-text to a new adaptive accentText token (35 sites) | WS7 | P1 | M | todo | |
