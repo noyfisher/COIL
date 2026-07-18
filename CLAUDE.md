@@ -68,19 +68,19 @@ Full rules: `~/.claude/projects/-Users-noyfisher-IOS-Projects-PT-Helper-Agent-v1
 ### MVVM + Services Pattern
 The iOS app (`ios/PT-Helper/PT-Helper/`) uses MVVM with a singleton service layer:
 
-- **Models/** (21 files) — Codable structs and analyzers:
+- **Models/** (20 files) — Codable structs and analyzers:
   - Core: `UserProfile`, `PainAssessment`, `RehabPlan`, `BodyRegion`, `BodyZone`, `BodyMapConstants`
   - Analysis: `InjuryAnalyzer`, `AssessmentSnapshot`
   - Wellness: `WellnessAnalyzer`, `WellnessAnalysisResult`, `WellnessAssessment`
   - Recovery: `RecoveryInsight`, `AdaptiveProgressionAnalyzer`, `ProgressionRule`
-  - Workout: `WorkoutSession`, `Achievement`, `Timer`
+  - Workout: `WorkoutSession`, `Achievement`
   - Form: `FormAnalysis`
   - Other: `Note`, `SessionEvent`, `LegalContent`
-- **ViewModels/** (15 files) — `@MainActor @ObservableObject` classes that own business logic and publish UI state
+- **ViewModels/** (14 files) — `@MainActor @ObservableObject` classes that own business logic and publish UI state
   - `InjuryAnalysisViewModel`, `RehabPlanViewModel`, `GuidedWorkoutViewModel`, `SavedPlansViewModel`, `WorkoutViewModel`
   - `WellnessAnalysisViewModel`, `WellnessPlanViewModel`, `RecoveryInsightsViewModel`
   - `FormAnalysisViewModel`, `ExerciseSwapViewModel`, `ReAssessmentViewModel`
-  - `BodyMapViewModel`, `OnboardingViewModel`, `TimerViewModel`, `NotesViewModel`
+  - `BodyMapViewModel`, `OnboardingViewModel`, `NotesViewModel`
 - **Views/** (69 files) — SwiftUI views using `@ObservedObject`/`@StateObject`. Navigation via `NavigationStack`
   - `Components/` — Reusable UI (exercise image, phase stepper, body silhouette, video recorder, etc.)
   - `Dashboard/` — Dashboard widgets (pain trend chart, confidence chart, differentials table, session history, etc.)
