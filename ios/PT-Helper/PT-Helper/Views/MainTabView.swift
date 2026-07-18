@@ -18,7 +18,6 @@ class TabSelection: ObservableObject {
     /// no assessment launcher).
     @Published var assessmentRequest: AssessmentRoute?
 
-    @Published var homeNavigationId = UUID()
     @Published var plansNavigationId = UUID()
     @Published var progressNavigationId = UUID()
 
