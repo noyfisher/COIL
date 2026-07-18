@@ -285,7 +285,7 @@ struct RehabPlanView: View {
             ScrollView {
                 VStack(spacing: AppSpacing.lg) {
                     Text("Rate your current pain levels")
-                        .font(.headline)
+                        .font(AppFonts.cardTitle)
                         .padding(.top, AppSpacing.lg)
 
                     // Overall pain
@@ -293,9 +293,9 @@ struct RehabPlanView: View {
                         VStack(spacing: AppSpacing.md) {
                             HStack {
                                 Text("\(Int(reAssessmentPain))")
-                                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                                    .font(AppFonts.display)
                                     .foregroundColor(reAssessmentPainColor)
-                                Text("/ 10").font(.title3).foregroundColor(AppColors.secondaryText)
+                                Text("/ 10").font(AppFonts.sectionTitle).foregroundColor(AppColors.secondaryText)
                                 Spacer()
                             }
                             Slider(value: $reAssessmentPain, in: 0...10, step: 1)
@@ -381,7 +381,7 @@ struct RehabPlanView: View {
 
             VStack(spacing: AppSpacing.sm) {
                 Text("Building Your Plan")
-                    .font(.system(.title2, design: .serif).weight(.bold))
+                    .font(AppFonts.title)
                     .foregroundColor(.white)
 
                 Text("Creating a personalized exercise program based on your conditions and fitness level...")
@@ -421,7 +421,7 @@ struct RehabPlanView: View {
 
             VStack(spacing: AppSpacing.sm) {
                 Text("Plan Generation Failed")
-                    .font(.system(.title3, design: .serif).weight(.bold))
+                    .font(AppFonts.sectionTitle)
                     .foregroundColor(.white)
 
                 Text(message)
@@ -499,7 +499,7 @@ struct RehabPlanView: View {
 
                     VStack(spacing: AppSpacing.sm) {
                         Text(dayNames[day])
-                            .font(.caption2.weight(.medium))
+                            .font(AppFonts.microMedium)
                             .foregroundColor(AppColors.secondaryText)
 
                         ZStack {
@@ -509,7 +509,7 @@ struct RehabPlanView: View {
 
                             if hasExercises {
                                 Text("\(exerciseCount)")
-                                    .font(.caption.weight(.bold))
+                                    .font(AppFonts.captionSemiBold)
                                     .foregroundColor(AppColors.accent)
                             } else {
                                 Text("-")
@@ -529,15 +529,15 @@ struct RehabPlanView: View {
                         .fill(AppColors.accentTint)
                         .frame(width: 8, height: 8)
                     Text("Exercise day")
-                        .font(.caption2)
+                        .font(AppFonts.micro)
                         .foregroundColor(AppColors.secondaryText)
                 }
                 HStack(spacing: AppSpacing.xs) {
                     Text("-")
-                        .font(.caption2)
+                        .font(AppFonts.micro)
                         .foregroundColor(Color(.systemGray4))
                     Text("Rest day")
-                        .font(.caption2)
+                        .font(AppFonts.micro)
                         .foregroundColor(AppColors.secondaryText)
                 }
             }
@@ -581,7 +581,7 @@ struct RehabPlanView: View {
             VStack(alignment: .leading, spacing: AppSpacing.tight) {
                 HStack(spacing: AppSpacing.xs) {
                     Text(exercise.name)
-                        .font(.body.weight(.semibold))
+                        .font(AppFonts.bodySemiBold)
                         .foregroundColor(AppColors.primaryText)
                         .lineLimit(2)
 
@@ -600,7 +600,7 @@ struct RehabPlanView: View {
                 // Position preview teaser
                 if let start = exercise.startPosition {
                     Text(start)
-                        .font(.caption2)
+                        .font(AppFonts.micro)
                         .foregroundColor(AppColors.secondaryText)
                         .lineLimit(1)
                         .italic()
@@ -621,7 +621,7 @@ struct RehabPlanView: View {
                    case .crossModelFlagged(let concerns) = status,
                    let firstConcern = concerns.first {
                     Text(firstConcern)
-                        .font(.caption2)
+                        .font(AppFonts.micro)
                         .foregroundColor(AppColors.warning)
                         .lineLimit(2)
                 }
@@ -666,30 +666,30 @@ struct RehabPlanView: View {
         switch status {
         case .verified:
             Label("Verified", systemImage: "checkmark.seal.fill")
-                .font(.caption2.weight(.medium))
+                .font(AppFonts.microMedium)
                 .foregroundColor(AppColors.success)
         case .contraindicated:
             Label("Warning", systemImage: "xmark.octagon.fill")
-                .font(.caption2.weight(.medium))
+                .font(AppFonts.microMedium)
                 .foregroundColor(AppColors.danger)
         case .crossModelVerified:
             Label("Checked", systemImage: "checkmark.seal")
-                .font(.caption2.weight(.medium))
+                .font(AppFonts.microMedium)
                 .foregroundColor(AppColors.accent)
         case .crossModelFlagged:
             Label("Review", systemImage: "exclamationmark.triangle.fill")
-                .font(.caption2.weight(.medium))
+                .font(AppFonts.microMedium)
                 .foregroundColor(AppColors.warning)
         case .crossModelFailed:
             Label("Unreviewed", systemImage: "questionmark.circle")
-                .font(.caption2.weight(.medium))
+                .font(AppFonts.microMedium)
                 .foregroundColor(AppColors.mutedText)
         case .checking:
             HStack(spacing: AppSpacing.xs) {
                 ProgressView()
                     .scaleEffect(0.6)
                 Text("Checking...")
-                    .font(.caption2)
+                    .font(AppFonts.micro)
                     .foregroundColor(AppColors.mutedText)
             }
         }
@@ -882,7 +882,7 @@ struct RehabPlanView: View {
                 Image(systemName: "calendar.badge.clock")
                     .foregroundColor(AppColors.accent)
                 Text("Week \(week) of \(totalWeeks)")
-                    .font(.headline)
+                    .font(AppFonts.cardTitle)
                 Spacer()
                 if let note = ProgressionRule.progressionNote(week: week, totalWeeks: totalWeeks) {
                     Text(note)

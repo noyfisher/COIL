@@ -37,7 +37,7 @@ struct SettingsView: View {
                         VStack(spacing: AppSpacing.lg) {
                             // Avatar
                             Text(initials)
-                                .font(.system(size: 28, weight: .bold, design: .rounded))
+                                .font(AppFonts.heroTitle)
                                 .foregroundColor(AppColors.ctaText)
                                 .frame(width: 72, height: 72)
                                 .background(
@@ -46,7 +46,7 @@ struct SettingsView: View {
                                 )
 
                             Text(userName.isEmpty ? "User" : userName)
-                                .font(.system(.title3, design: .serif).weight(.bold))
+                                .font(AppFonts.sectionTitle)
                                 .foregroundColor(AppColors.primaryText)
                         }
                         .frame(maxWidth: .infinity)
@@ -70,7 +70,7 @@ struct SettingsView: View {
                                     .cornerRadius(AppCorners.small)
 
                                 Text("Appearance")
-                                    .font(.body)
+                                    .font(AppFonts.body)
 
                                 Spacer()
                             }
@@ -107,7 +107,7 @@ struct SettingsView: View {
                                     .cornerRadius(AppCorners.small)
 
                                 Text("Reminders")
-                                    .font(.body)
+                                    .font(AppFonts.body)
 
                                 Spacer()
 
@@ -138,7 +138,7 @@ struct SettingsView: View {
                                         .cornerRadius(AppCorners.small)
 
                                     Text("Reminder Time")
-                                        .font(.body)
+                                        .font(AppFonts.body)
 
                                     Spacer()
 
@@ -176,7 +176,7 @@ struct SettingsView: View {
                                         .background(AppColors.success.opacity(0.12))
                                         .cornerRadius(AppCorners.small)
                                     Text("Workout Reminders")
-                                        .font(.body)
+                                        .font(AppFonts.body)
                                     Spacer()
                                     Toggle("", isOn: $notificationService.workoutRemindersEnabled)
                                         .labelsHidden()
@@ -199,7 +199,7 @@ struct SettingsView: View {
                                         .background(AppColors.accentTint)
                                         .cornerRadius(AppCorners.small)
                                     Text("Re-Assessment Prompts")
-                                        .font(.body)
+                                        .font(AppFonts.body)
                                     Spacer()
                                     Toggle("", isOn: $notificationService.reassessmentRemindersEnabled)
                                         .labelsHidden()
@@ -222,7 +222,7 @@ struct SettingsView: View {
                                         .background(AppColors.warning.opacity(0.12))
                                         .cornerRadius(AppCorners.small)
                                     Text("Inactivity Nudges")
-                                        .font(.body)
+                                        .font(AppFonts.body)
                                     Spacer()
                                     Toggle("", isOn: $notificationService.inactivityNudgesEnabled)
                                         .labelsHidden()
@@ -265,9 +265,9 @@ struct SettingsView: View {
 
                                 VStack(alignment: .leading, spacing: AppSpacing.nano) {
                                     Text("Session Events")
-                                        .font(.body)
+                                        .font(AppFonts.body)
                                     Text("\(SessionLogger.shared.eventCount) events this session")
-                                        .font(.caption2)
+                                        .font(AppFonts.micro)
                                         .foregroundColor(AppColors.secondaryText)
                                 }
 
@@ -371,7 +371,7 @@ struct SettingsView: View {
                                         .background(AppColors.warning.opacity(0.12))
                                         .cornerRadius(AppCorners.small)
                                     Text("Image Diagnostics (DEBUG)")
-                                        .font(.body)
+                                        .font(AppFonts.body)
                                     Spacer()
                                     Image(systemName: "chevron.right")
                                         .font(.system(size: 12, weight: .semibold))
@@ -415,7 +415,7 @@ struct SettingsView: View {
 
                         // App version
                         Text(appVersionText)
-                            .font(.caption2)
+                            .font(AppFonts.micro)
                             .foregroundColor(Color.white.opacity(0.5))
                             .padding(.top, AppSpacing.lg)
                     }
@@ -614,7 +614,7 @@ struct SettingsView: View {
                     .cornerRadius(AppCorners.small)
 
                 Text(title)
-                    .font(.body)
+                    .font(AppFonts.body)
                     .foregroundColor(title == "Sign Out" ? AppColors.danger : AppColors.primaryText)
 
                 Spacer()

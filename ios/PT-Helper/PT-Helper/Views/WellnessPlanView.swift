@@ -44,13 +44,13 @@ struct WellnessPlanView: View {
 
             VStack(spacing: AppSpacing.sm) {
                 Text("Building Your Plan")
-                    .font(.system(.title2, design: .serif).weight(.bold))
+                    .font(AppFonts.title)
                     .foregroundColor(.white)
                 // Honest copy: the plan renders exercises (habit guidance lands in
                 // Notes); a structured "Daily Habits" section is a deploy-gated
                 // follow-up (audit #39), so don't promise a habits section here.
                 Text("Building your personalized wellness plan...")
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(Color.white.opacity(0.7))
             }
 
@@ -70,10 +70,10 @@ struct WellnessPlanView: View {
                 // Plan header
                 VStack(spacing: AppSpacing.sm) {
                     Text(plan.planName)
-                        .font(.system(.title3, design: .serif).weight(.bold))
+                        .font(AppFonts.sectionTitle)
                         .foregroundColor(.white)
                     Text("\(plan.exercises.count) exercises · \(plan.totalWeeks) weeks")
-                        .font(.subheadline)
+                        .font(AppFonts.small)
                         .foregroundColor(Color.white.opacity(0.7))
                 }
                 .padding(.top, AppSpacing.md)
@@ -125,9 +125,9 @@ struct WellnessPlanView: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(exercise.name)
-                        .font(.headline)
+                        .font(AppFonts.cardTitle)
                     Text(exercise.targetArea)
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                     HStack(spacing: AppSpacing.sm) {
                         Text("\(exercise.sets) sets")
@@ -137,7 +137,7 @@ struct WellnessPlanView: View {
                         Text(exercise.difficulty.rawValue.capitalized)
                             .foregroundColor(difficultyColor(exercise.difficulty))
                     }
-                    .font(.caption2)
+                    .font(AppFonts.micro)
                     .foregroundColor(AppColors.secondaryText)
                 }
 
@@ -150,21 +150,21 @@ struct WellnessPlanView: View {
             }
 
             Text(exercise.description)
-                .font(.subheadline)
+                .font(AppFonts.small)
                 .foregroundColor(AppColors.secondaryText)
 
             // Tips
             if !exercise.tips.isEmpty {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Tips")
-                        .font(.caption.weight(.semibold))
+                        .font(AppFonts.captionSemiBold)
                         .foregroundColor(AppColors.accent)
                     ForEach(exercise.tips, id: \.self) { tip in
                         HStack(alignment: .top, spacing: 4) {
                             Text("•")
                             Text(tip)
                         }
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                     }
                 }
@@ -220,7 +220,7 @@ struct WellnessPlanView: View {
                         .foregroundColor(AppColors.warning)
                         .font(.caption)
                     Text(warning.message)
-                        .font(.caption)
+                        .font(AppFonts.caption)
                 }
             }
         }
@@ -259,10 +259,10 @@ struct WellnessPlanView: View {
                 .font(.system(size: 60))
                 .foregroundColor(AppColors.warning)
             Text("Plan Generation Failed")
-                .font(.system(.title2, design: .serif).weight(.bold))
+                .font(AppFonts.title)
                 .foregroundColor(.white)
             Text(message)
-                .font(.subheadline)
+                .font(AppFonts.small)
                 .foregroundColor(Color.white.opacity(0.7))
             Button(action: {
                 viewModel.generateWellnessPlan(from: wellnessResult)

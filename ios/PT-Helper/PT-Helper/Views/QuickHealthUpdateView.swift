@@ -40,10 +40,10 @@ struct QuickHealthUpdateView: View {
                             // Header
                             VStack(spacing: AppSpacing.xs) {
                                 Text("Quick Health Update")
-                                    .font(.system(.title2, design: .serif).weight(.bold))
+                                    .font(AppFonts.title)
                                     .foregroundColor(AppColors.primaryText)
                                 Text("Update any changes since your last visit")
-                                    .font(.subheadline)
+                                    .font(AppFonts.small)
                                     .foregroundColor(AppColors.secondaryText)
                             }
                             .padding(.top, AppSpacing.md)
@@ -63,7 +63,7 @@ struct QuickHealthUpdateView: View {
                                     Image(systemName: "exclamationmark.triangle.fill")
                                         .foregroundColor(AppColors.warning)
                                     Text("Failed to save. Please try again.")
-                                        .font(.caption)
+                                        .font(AppFonts.caption)
                                         .foregroundColor(AppColors.secondaryText)
                                 }
                                 .padding(AppSpacing.md)
@@ -123,7 +123,7 @@ struct QuickHealthUpdateView: View {
         CardSection(icon: "pills.fill", color: AppColors.accent, title: "Current Medications") {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 Text("Update your current medications")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
 
                 FlowLayout(spacing: AppSpacing.sm) {
@@ -131,7 +131,7 @@ struct QuickHealthUpdateView: View {
                         let isSelected = viewModel.userProfile.medications?.contains(med) ?? false
                         Button(action: { toggleMedication(med) }) {
                             Text(med)
-                                .font(.subheadline.weight(.medium))
+                                .font(AppFonts.smallMedium)
                                 .foregroundColor(isSelected ? AppColors.ctaText : AppColors.primaryText)
                                 .padding(.horizontal, AppSpacing.md)
                                 .padding(.vertical, AppSpacing.sm)
@@ -148,13 +148,13 @@ struct QuickHealthUpdateView: View {
                 // Custom medication input
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text("Other Medications")
-                        .font(.caption.weight(.semibold))
+                        .font(AppFonts.captionSemiBold)
                         .foregroundColor(AppColors.secondaryText)
                         .padding(.top, AppSpacing.sm)
 
                     HStack(spacing: AppSpacing.sm) {
                         TextField("Type medication name", text: $customMedicationText)
-                            .font(.subheadline)
+                            .font(AppFonts.small)
                             .foregroundColor(AppColors.primaryText)
                             .padding(AppSpacing.md)
                             .background(AppColors.inputBackground)
@@ -176,7 +176,7 @@ struct QuickHealthUpdateView: View {
                                 ForEach(customMeds, id: \.self) { med in
                                     HStack(spacing: 4) {
                                         Text(med)
-                                            .font(.subheadline.weight(.medium))
+                                            .font(AppFonts.smallMedium)
                                         Button(action: { toggleMedication(med) }) {
                                             Image(systemName: "xmark.circle.fill")
                                                 .font(.caption)
@@ -201,7 +201,7 @@ struct QuickHealthUpdateView: View {
         CardSection(icon: "bandage.fill", color: AppColors.warning, title: "New Surgeries") {
             VStack(spacing: AppSpacing.sm) {
                 Text("Add any surgeries since your last visit")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -209,7 +209,7 @@ struct QuickHealthUpdateView: View {
                     VStack(spacing: AppSpacing.sm) {
                         HStack {
                             Text("Surgery \(index + 1)")
-                                .font(.caption.weight(.semibold))
+                                .font(AppFonts.captionSemiBold)
                                 .foregroundColor(AppColors.warning)
                             Spacer()
                             Button(action: {
@@ -233,7 +233,7 @@ struct QuickHealthUpdateView: View {
                         // Year picker
                         HStack {
                             Text("Year")
-                                .font(.subheadline)
+                                .font(AppFonts.small)
                                 .foregroundColor(AppColors.secondaryText)
                             Spacer()
                             Picker("Year", selection: Binding(
@@ -285,7 +285,7 @@ struct QuickHealthUpdateView: View {
         CardSection(icon: "cross.case.fill", color: AppColors.danger, title: "New Injuries") {
             VStack(spacing: AppSpacing.sm) {
                 Text("Add any injuries since your last visit")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -293,7 +293,7 @@ struct QuickHealthUpdateView: View {
                     VStack(spacing: AppSpacing.sm) {
                         HStack {
                             Text("Injury \(index + 1)")
-                                .font(.caption.weight(.semibold))
+                                .font(AppFonts.captionSemiBold)
                                 .foregroundColor(AppColors.danger)
                             Spacer()
                             Button(action: {
