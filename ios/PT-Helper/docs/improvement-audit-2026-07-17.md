@@ -27,12 +27,12 @@ Sonnet's cross-session memory. Update the **Status** and **PR#** columns as you 
 | WS2-02 | Make the Settings toggles, time picker, and sign-out honor notification state | WS2 | P1 | S | BLOCKED: WS2-01 | |
 | WS2-03 | Schedule re-assessment reminders at plan midpoint and completion (audit #33) | WS2 | P2 | S | BLOCKED: WS2-01 | |
 | WS2-04 | First-workout activation nudge for freshly started plans (audit #34) | WS2 | P2 | S | BLOCKED: WS2-01 | |
-| WS3-01 | Close the grandfathered-user consent bypass with a launch-time health-consent gate | WS3 | P1 | M | BLOCKED: WS3-03 (soft, execution-order) | |
-| WS3-02 | Add the policy-promised consent-withdraw control in Settings with defined downstream effects | WS3 | P1 | M | BLOCKED: WS3-01, WS3-03 | |
-| WS3-03 | Make server state authoritative in ConsentService.load() and surface record-write failures; add ConsentService tests | WS3 | P1 | M | todo | |
-| WS3-04 | Delete the write-only legacy ToS UserDefaults keys | WS3 | P2 | S | todo | |
-| WS3-05 | Centralize duplicated UserDefaults key literals and clear the stale minor-safety flag on account deletion | WS3 | P2 | S | todo | |
-| WS3-06 | Update the Consumer Health Data Policy withdrawal-mechanism text | WS3 | P2 | S | BLOCKED: WS3-02 + legal review (BLOCKED-on-legal per D-2) | |
+| WS3-01 | Close the grandfathered-user consent bypass with a launch-time health-consent gate | WS3 | P1 | M | done | #45 |
+| WS3-02 | Add the policy-promised consent-withdraw control in Settings with defined downstream effects | WS3 | P1 | M | done | #45 |
+| WS3-03 | Make server state authoritative in ConsentService.load() and surface record-write failures; add ConsentService tests | WS3 | P1 | M | done | #45 |
+| WS3-04 | Delete the write-only legacy ToS UserDefaults keys | WS3 | P2 | S | done | #45 |
+| WS3-05 | Centralize duplicated UserDefaults key literals and clear the stale minor-safety flag on account deletion | WS3 | P2 | S | done | #45 |
+| WS3-06 | Update the Consumer Health Data Policy withdrawal-mechanism text | WS3 | P2 | S | BLOCKED: legal review (BLOCKED-on-legal per D-2) | |
 | WS4-01 | Re-skin IntroCarouselView hero to COIL tokens and fix the light-mode status-bar strip | WS4 | P1 | S | todo | |
 | WS4-02 | Add branded launch screen and dark/tinted app-icon variants | WS4 | P2 | M | todo | |
 | WS4-03 | Rename "PT Helper" to "COIL" in LegalContent (verbatim spec) | WS4 | P2 | S | BLOCKED: Legal sign-off (D-2) — bumps tosVersion, re-triggers acceptance gate for all users | |
