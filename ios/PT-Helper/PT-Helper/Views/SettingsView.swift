@@ -567,6 +567,10 @@ struct SettingsView: View {
         UserDefaults.standard.removeObject(forKey: "tosAcceptedDate")
         ConsentService.clearLocalMirrors()
         UserDefaults.standard.removeObject(forKey: "hasSeenMinorSafetyScreen")  // plain string key — compiles fine before PR-5
+        for key in UserDefaults.standard.dictionaryRepresentation().keys
+            where key.hasPrefix("preventiveTasks_") {
+            UserDefaults.standard.removeObject(forKey: key)
+        }
     }
 
     // MARK: - Helpers
