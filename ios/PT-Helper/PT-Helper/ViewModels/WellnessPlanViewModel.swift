@@ -71,15 +71,17 @@ class WellnessPlanViewModel: ObservableObject {
     func generateWellnessPlan(from wellnessResult: WellnessAnalysisResult) {
         guard !isGenerating else { return }
 
-        // Fail fast when offline instead of making the user watch a doomed
-        // spinner before a generic network error (WS8-01, extends audit #58).
+        let goalCategories = wellnessResult.recommendations.map { $0.goalCategory }
+
+        // Offline: skip the doomed API call and go straight to the same local
+        // fallback plan the catch block below builds on a network failure —
+        // this VM has a genuine network-free fallback, unlike the other
+        // WS8-01 offline guards, so failing fast here would take away a
+        // feature that already worked offline (WS8-01, extends audit #58).
         guard NetworkMonitor.shared.isConnected else {
-            generationError = "You're offline. Connect to the internet to build your wellness plan, then try again."
-            isGenerating = false
+            applyFallbackPlan(for: wellnessResult, goalCategories: goalCategories, reason: "offline")
             return
         }
-
-        let goalCategories = wellnessResult.recommendations.map { $0.goalCategory }
 
         isGenerating = true
         generationError = nil
@@ -144,55 +146,62 @@ class WellnessPlanViewModel: ObservableObject {
                 // Preload exercise images
                 ExerciseImageService.shared.preloadImages(for: plan.exercises)
             } catch {
-                // Fallback
-                AppLogger.rehab.warning("AI wellness plan generation failed, using fallback: \(error.localizedDescription)")
                 // Tier 1: ai_response_invalid breadcrumb (server Zod rejection).
                 if let apiError = error as? ClaudeAPIError, apiError.isResponseInvalid {
                     SessionLogger.shared.log(.errorOccurred, category: .api,
                         message: "Wellness plan rejected by server schema (ai_response_invalid)",
                         metadata: ["error_kind": "ai_response_invalid"])
                 }
-
-                let weeklySchedule = createWeeklySchedule(
-                    for: wellnessFallbackExercises,
-                    activityLevel: wellnessResult.userProfileSnapshot.activityLevel
-                )
-
-                let fallbackPlan = RehabPlan(
-                    id: UUID(),
-                    planName: "Wellness Improvement Plan",
-                    conditions: goalCategories,
-                    exercises: wellnessFallbackExercises,
-                    weeklySchedule: weeklySchedule,
-                    totalWeeks: 4,
-                    createdDate: Date(),
-                    notes: nil,
-                    planType: .wellness,
-                    sourceGoalCategories: goalCategories
-                )
-
-                let (validatedFallback, baseWarnings, _) = ResponseValidationPipeline.validateRehabPlan(
-                    fallbackPlan,
-                    conditions: goalCategories,
-                    userProfile: wellnessResult.userProfileSnapshot
-                )
-                let planValidatorWarnings = WellnessPlanValidator.validate(
-                    exercises: validatedFallback.exercises,
-                    conditions: wellnessResult.userProfileSnapshot.medicalConditions
-                )
-                let warnings = baseWarnings + planValidatorWarnings
-                self.wellnessPlan = validatedFallback
-                self.rehabPlanWarnings = warnings
-                self.isGenerating = false
-                for exercise in validatedFallback.exercises {
-                    exerciseVerifications[exercise.name] = .verified
-                }
-                verificationComplete = true
-
-                SessionLogger.shared.log(.loadingFinished, category: .stateChange, message: "Wellness plan generated (fallback)",
-                                          metadata: ["source": "fallback", "reason": error.localizedDescription])
+                applyFallbackPlan(for: wellnessResult, goalCategories: goalCategories, reason: error.localizedDescription)
             }
         }
+    }
+
+    /// Builds and applies the local, network-free fallback wellness plan —
+    /// used both when offline (no API call attempted) and when the AI call
+    /// fails (`reason` is the caught error's description in that case).
+    private func applyFallbackPlan(for wellnessResult: WellnessAnalysisResult, goalCategories: [String], reason: String) {
+        AppLogger.rehab.warning("Using fallback wellness plan: \(reason)")
+
+        let weeklySchedule = createWeeklySchedule(
+            for: wellnessFallbackExercises,
+            activityLevel: wellnessResult.userProfileSnapshot.activityLevel
+        )
+
+        let fallbackPlan = RehabPlan(
+            id: UUID(),
+            planName: "Wellness Improvement Plan",
+            conditions: goalCategories,
+            exercises: wellnessFallbackExercises,
+            weeklySchedule: weeklySchedule,
+            totalWeeks: 4,
+            createdDate: Date(),
+            notes: nil,
+            planType: .wellness,
+            sourceGoalCategories: goalCategories
+        )
+
+        let (validatedFallback, baseWarnings, _) = ResponseValidationPipeline.validateRehabPlan(
+            fallbackPlan,
+            conditions: goalCategories,
+            userProfile: wellnessResult.userProfileSnapshot
+        )
+        let planValidatorWarnings = WellnessPlanValidator.validate(
+            exercises: validatedFallback.exercises,
+            conditions: wellnessResult.userProfileSnapshot.medicalConditions
+        )
+        let warnings = baseWarnings + planValidatorWarnings
+        self.wellnessPlan = validatedFallback
+        self.rehabPlanWarnings = warnings
+        self.isGenerating = false
+        self.generationError = nil
+        for exercise in validatedFallback.exercises {
+            exerciseVerifications[exercise.name] = .verified
+        }
+        verificationComplete = true
+
+        SessionLogger.shared.log(.loadingFinished, category: .stateChange, message: "Wellness plan generated (fallback)",
+                                  metadata: ["source": "fallback", "reason": reason])
     }
 
     // MARK: - AI Wellness Plan Generation

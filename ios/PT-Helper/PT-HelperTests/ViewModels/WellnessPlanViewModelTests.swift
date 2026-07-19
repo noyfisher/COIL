@@ -76,9 +76,13 @@ final class WellnessPlanViewModelTests: XCTestCase {
         XCTAssertFalse(message.contains("Old sprain"), "Should not include past injury")
     }
 
-    // MARK: - WS8-01: Offline fail-fast
+    // MARK: - WS8-01: Offline uses the local fallback plan
 
-    func testGenerateWellnessPlan_offline_setsErrorWithoutFallbackPlan() async {
+    /// Unlike the other WS8-01 offline guards, this VM has a genuine
+    /// network-free fallback plan — offline must route straight to it
+    /// instead of surfacing an error and losing a feature that already
+    /// worked offline.
+    func testGenerateWellnessPlan_offline_appliesFallbackPlanWithoutAPICall() async {
         _ = NetworkMonitor.shared
         await Task.yield()
         NetworkMonitor.shared.isConnected = false
@@ -89,9 +93,10 @@ final class WellnessPlanViewModelTests: XCTestCase {
 
         vm.generateWellnessPlan(from: result)
 
-        XCTAssertEqual(vm.generationError, "You're offline. Connect to the internet to build your wellness plan, then try again.")
+        XCTAssertNil(vm.generationError)
         XCTAssertFalse(vm.isGenerating)
-        XCTAssertNil(vm.wellnessPlan)
-        XCTAssertEqual(mockAPI.sendMessageCallCount, 0)
+        XCTAssertNotNil(vm.wellnessPlan, "Offline should still produce the local fallback plan")
+        XCTAssertGreaterThan(vm.wellnessPlan?.exercises.count ?? 0, 0)
+        XCTAssertEqual(mockAPI.sendMessageCallCount, 0, "Offline must never attempt the API call")
     }
 }
