@@ -60,10 +60,10 @@ Sonnet's cross-session memory. Update the **Status** and **PR#** columns as you 
 | WS10-01 | Replace the cosmetic 21-day date strip with an honest completion-dot week strip | WS10 | P2 | M | done | #52 |
 | WS10-02 | Gate the Preventative section on an active plan (hide it when there is no plan) | WS10 | P2 | S | done | #52 |
 | WS10-03 | Clear preventiveTasks_* UserDefaults keys on account deletion | WS10 | P3 | S | done | #52 |
-| WS11-01 | Move rehab/wellness image validation off the main thread | WS11 | P1 | M | todo | |
-| WS11-02 | Stop recomputing ProgressTab chart/stat data every render | WS11 | P1 | S | todo | |
-| WS11-03 | Configure body-model collision shapes + proxies once on a cached template | WS11 | P2 | M | todo | |
-| WS11-04 | Bound the workout-session Firestore fetch | WS11 | P3 | S | BLOCKED: WS11-02 (merge-ordering only, same file) | |
+| WS11-01 | Move rehab/wellness image validation off the main thread | WS11 | P1 | M | done | #53 |
+| WS11-02 | Stop recomputing ProgressTab chart/stat data every render | WS11 | P1 | S | done | #53 |
+| WS11-03 | Configure body-model collision shapes + proxies once on a cached template | WS11 | P2 | M | done | #53 |
+| WS11-04 | Bound the workout-session Firestore fetch | WS11 | P3 | S | done | #53 |
 | WS12-01 | Remove nightly_report from the client-callable request allow-list | WS12 | P1 | S | todo | |
 | WS12-02 | Restore a working, project-owned ESLint (config + devDependency + bounded fixes) | WS12 | P2 | M | todo | |
 | WS12-03 | Extract system prompts + model config into a side-effect-free src/prompts.ts module | WS12 | P2 | M | BLOCKED: soft — after WS12-01 (shared index.ts:723); WS12-02 for the lint Verify leg | |

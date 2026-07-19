@@ -79,7 +79,7 @@ class WellnessPlanViewModel: ObservableObject {
         // WS8-01 offline guards, so failing fast here would take away a
         // feature that already worked offline (WS8-01, extends audit #58).
         guard NetworkMonitor.shared.isConnected else {
-            applyFallbackPlan(for: wellnessResult, goalCategories: goalCategories, reason: "offline")
+            Task { await applyFallbackPlan(for: wellnessResult, goalCategories: goalCategories, reason: "offline") }
             return
         }
 
@@ -107,11 +107,13 @@ class WellnessPlanViewModel: ObservableObject {
                 //       *actual* medical conditions, which is the safety-critical check.
                 //       Warnings from both stages are merged.
                 let conditions = goalCategories
-                let (validatedPlan, baseWarnings, graphVerification) = ResponseValidationPipeline.validateRehabPlan(
-                    plan,
-                    conditions: conditions,
-                    userProfile: wellnessResult.userProfileSnapshot
-                )
+                let (validatedPlan, baseWarnings, graphVerification) = await Task.detached(priority: .userInitiated) {
+                    ResponseValidationPipeline.validateRehabPlan(
+                        plan,
+                        conditions: conditions,
+                        userProfile: wellnessResult.userProfileSnapshot
+                    )
+                }.value
                 let planValidatorWarnings = WellnessPlanValidator.validate(
                     exercises: validatedPlan.exercises,
                     conditions: wellnessResult.userProfileSnapshot.medicalConditions
@@ -152,7 +154,7 @@ class WellnessPlanViewModel: ObservableObject {
                         message: "Wellness plan rejected by server schema (ai_response_invalid)",
                         metadata: ["error_kind": "ai_response_invalid"])
                 }
-                applyFallbackPlan(for: wellnessResult, goalCategories: goalCategories, reason: error.localizedDescription)
+                await applyFallbackPlan(for: wellnessResult, goalCategories: goalCategories, reason: error.localizedDescription)
             }
         }
     }
@@ -160,7 +162,7 @@ class WellnessPlanViewModel: ObservableObject {
     /// Builds and applies the local, network-free fallback wellness plan —
     /// used both when offline (no API call attempted) and when the AI call
     /// fails (`reason` is the caught error's description in that case).
-    private func applyFallbackPlan(for wellnessResult: WellnessAnalysisResult, goalCategories: [String], reason: String) {
+    private func applyFallbackPlan(for wellnessResult: WellnessAnalysisResult, goalCategories: [String], reason: String) async {
         AppLogger.rehab.warning("Using fallback wellness plan: \(reason)")
 
         let weeklySchedule = createWeeklySchedule(
@@ -181,11 +183,13 @@ class WellnessPlanViewModel: ObservableObject {
             sourceGoalCategories: goalCategories
         )
 
-        let (validatedFallback, baseWarnings, _) = ResponseValidationPipeline.validateRehabPlan(
-            fallbackPlan,
-            conditions: goalCategories,
-            userProfile: wellnessResult.userProfileSnapshot
-        )
+        let (validatedFallback, baseWarnings, _) = await Task.detached(priority: .userInitiated) {
+            ResponseValidationPipeline.validateRehabPlan(
+                fallbackPlan,
+                conditions: goalCategories,
+                userProfile: wellnessResult.userProfileSnapshot
+            )
+        }.value
         let planValidatorWarnings = WellnessPlanValidator.validate(
             exercises: validatedFallback.exercises,
             conditions: wellnessResult.userProfileSnapshot.medicalConditions

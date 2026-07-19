@@ -93,6 +93,13 @@ final class WellnessPlanViewModelTests: XCTestCase {
 
         vm.generateWellnessPlan(from: result)
 
+        // The offline fallback now runs validation off the main actor
+        // (WS11-01's Task.detached), so it's no longer synchronous — poll
+        // briefly for it to land.
+        for _ in 0..<50 where vm.wellnessPlan == nil {
+            try? await Task.sleep(nanoseconds: 20_000_000)
+        }
+
         XCTAssertNil(vm.generationError)
         XCTAssertFalse(vm.isGenerating)
         XCTAssertNotNil(vm.wellnessPlan, "Offline should still produce the local fallback plan")
