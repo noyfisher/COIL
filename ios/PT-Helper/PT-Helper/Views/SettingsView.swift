@@ -227,6 +227,10 @@ struct SettingsView: View {
         ConsentService.clearLocalMirrors()
         UserDefaults.standard.removeObject(forKey: AppStorageKeys.hasSeenMinorSafetyScreen)
         UserDefaults.standard.removeObject(forKey: AppStorageKeys.pendingMinorSafetyScreen)
+        for key in UserDefaults.standard.dictionaryRepresentation().keys
+            where key.hasPrefix("preventiveTasks_") {
+            UserDefaults.standard.removeObject(forKey: key)
+        }
     }
 
     // MARK: - Helpers

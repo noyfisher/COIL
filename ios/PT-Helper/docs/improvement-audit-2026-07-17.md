@@ -57,9 +57,9 @@ Sonnet's cross-session memory. Update the **Status** and **PR#** columns as you 
 | WS9-02 | Tokenize text fonts across the remaining live screens (long tail; split 2a components/onboarding + 2b screens) | WS9 | P2 | L | done | #51 |
 | WS9-03 | Tokenize numeric padding + corner-radius literals to AppSpacing/AppCorners | WS9 | P3 | M | done | #51 |
 | WS9-04 | Fold hand-rolled card stacks into .cardStyle() (33 quadruples) | WS9 | P3 | S | done | #51 |
-| WS10-01 | Replace the cosmetic 21-day date strip with an honest completion-dot week strip | WS10 | P2 | M | todo | |
-| WS10-02 | Gate the Preventative section on an active plan (hide it when there is no plan) | WS10 | P2 | S | BLOCKED: WS10-01 | |
-| WS10-03 | Clear preventiveTasks_* UserDefaults keys on account deletion | WS10 | P3 | S | todo | |
+| WS10-01 | Replace the cosmetic 21-day date strip with an honest completion-dot week strip | WS10 | P2 | M | done | #52 |
+| WS10-02 | Gate the Preventative section on an active plan (hide it when there is no plan) | WS10 | P2 | S | done | #52 |
+| WS10-03 | Clear preventiveTasks_* UserDefaults keys on account deletion | WS10 | P3 | S | done | #52 |
 | WS11-01 | Move rehab/wellness image validation off the main thread | WS11 | P1 | M | todo | |
 | WS11-02 | Stop recomputing ProgressTab chart/stat data every render | WS11 | P1 | S | todo | |
 | WS11-03 | Configure body-model collision shapes + proxies once on a cached template | WS11 | P2 | M | todo | |
