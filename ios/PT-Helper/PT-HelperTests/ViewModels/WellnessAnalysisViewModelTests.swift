@@ -186,4 +186,22 @@ final class WellnessAnalysisViewModelTests: XCTestCase {
         XCTAssertNotNil(vm.assessments[0])
         XCTAssertTrue(vm.showAnalyzingScreen)
     }
+
+    // MARK: - WS8-01: Offline fail-fast
+
+    func testStartAnalysis_offline_failsFastWithoutAPICall() async {
+        _ = NetworkMonitor.shared
+        await Task.yield()
+        NetworkMonitor.shared.isConnected = false
+        defer { NetworkMonitor.shared.isConnected = true }
+
+        let vm = makeVM(goalCount: 1)
+        let assessment = TestFixtures.makeWellnessAssessment()
+        vm.saveAndAnalyze(assessment)
+
+        XCTAssertEqual(vm.analysisError, "You're offline. Connect to the internet to run your wellness assessment, then tap Try Again.")
+        XCTAssertFalse(vm.isAnalyzing)
+        XCTAssertTrue(vm.showAnalyzingScreen)
+        XCTAssertEqual(mockAPI.sendMessageCallCount, 0)
+    }
 }

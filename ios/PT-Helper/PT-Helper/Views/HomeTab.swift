@@ -101,7 +101,7 @@ private struct WeeklyDateStrip: View {
                                 Text("Today")
                                     .font(AppFonts.captionSemiBold)
                             }
-                            .foregroundColor(AppColors.accent)
+                            .foregroundColor(AppColors.accentText)
                         }
                         .transition(.opacity.combined(with: .scale(scale: 0.85)))
                     }

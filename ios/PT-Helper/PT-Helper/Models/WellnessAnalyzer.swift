@@ -1,7 +1,7 @@
 import Foundation
 import os
 
-private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "PT-Helper", category: "WellnessAnalyzer")
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "COIL", category: "WellnessAnalyzer")
 
 // MARK: - Intermediate Decodable Types for AI Response
 

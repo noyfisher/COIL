@@ -158,7 +158,7 @@ struct WellnessPlanView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Tips")
                         .font(AppFonts.captionSemiBold)
-                        .foregroundColor(AppColors.accent)
+                        .foregroundColor(AppColors.accentText)
                     ForEach(exercise.tips, id: \.self) { tip in
                         HStack(alignment: .top, spacing: 4) {
                             Text("•")

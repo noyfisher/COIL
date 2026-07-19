@@ -46,10 +46,10 @@ ios/PT-Helper/PT-Helper/
     TimerViewModel.swift          # Rest timer management
     NotesViewModel.swift          # User notes CRUD
 
-  Views/ (69 files)
-    ThreeTabView.swift            # 3-tab navigation container (Assess / My Plan / Progress)
-    MainTabView.swift             # Legacy 4-tab wrapper (--use-legacy-ui)
-    AssessTab.swift               # Dual gateway: pain analysis or wellness goals
+  Views/ (72 files)
+    ThreeTabView.swift            # 4-tab shell (Home / My Plan / Progress / Profile) + floating '+'
+    MainTabView.swift             # Thin passthrough + TabSelection
+    OnboardingEditView.swift      # Profile edit wrapper
     MyPlanTab.swift               # Active plan hero + saved plans list
     ProgressTab.swift             # Charts, insights, settings, session history
 
@@ -86,12 +86,8 @@ ios/PT-Helper/PT-Helper/
 
     ReAssessmentPromptView.swift  # Re-assessment prompt
     ReAssessmentComparisonView.swift  # Current vs. previous comparison
-    QuickHealthUpdateView.swift   # Quick health profile update
-    HealthCheckPromptView.swift   # Returning user health check
 
-    ProgressChartView.swift       # Pain trend charts
     AchievementsView.swift        # Achievements display
-    PlansTab.swift                # Legacy plans tab
 
     OnboardingView.swift          # Onboarding container
     SettingsView.swift            # App settings
@@ -110,19 +106,6 @@ ios/PT-Helper/PT-Helper/
       VideoRecorderView.swift     # Video capture for form analysis
       StreakBadgeView.swift        # Workout streak badge
       ShareSheet.swift            # Share sheet wrapper
-
-    Dashboard/ (11 files)
-      DashboardMainTabView.swift  # Dashboard container
-      AnalysisDashboardView.swift # Analysis results dashboard
-      DashPainTrendChart.swift    # Pain trend line chart
-      DashConfidenceChart.swift   # Condition confidence chart
-      DashDifferentialsTable.swift  # Conditions differential table
-      DashExercisePerformanceTable.swift  # Exercise performance table
-      DashSessionHistoryList.swift  # Recent workout sessions list
-      DashActivePlansList.swift   # Active plans widget
-      DashProfileView.swift       # Profile summary widget
-      DashboardComponents.swift   # Shared dashboard UI components
-      RehabMetricsView.swift      # Rehab metrics display
 
     OnboardingSteps/ (6 files)
       BasicInfoStepView.swift     # Name, DOB, sex, height/weight
@@ -172,7 +155,6 @@ ios/PT-Helper/PT-HelperTests/
 ios/PT-Helper/PT-HelperUITests/
   DashboardUITests.swift          # Dashboard layout tests
   GuidedWorkoutUITests.swift      # Workout flow tests
-  PlansTabUITests.swift           # Plans display tests
   SettingsUITests.swift           # Settings navigation tests
   + more UI test files
 ```

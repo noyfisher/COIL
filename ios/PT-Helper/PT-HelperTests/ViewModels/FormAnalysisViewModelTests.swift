@@ -434,4 +434,22 @@ final class FormAnalysisViewModelTests: XCTestCase {
         XCTAssertEqual(FormAnalysisState.error("test"), FormAnalysisState.error("test"))
         XCTAssertNotEqual(FormAnalysisState.error("a"), FormAnalysisState.error("b"))
     }
+
+    // MARK: - WS8-01: Offline fail-fast
+
+    func testAnalyzeVideo_offline_setsErrorState() async {
+        _ = NetworkMonitor.shared
+        await Task.yield()
+        NetworkMonitor.shared.isConnected = false
+        defer { NetworkMonitor.shared.isConnected = true }
+
+        let vm = FormAnalysisViewModel(apiService: mockAPI)
+        let exercise = TestFixtures.makeExercise(name: "Squat", targetArea: "Quadriceps")
+
+        await vm.analyzeVideo(url: URL(fileURLWithPath: "/nonexistent.mov"), exercise: exercise)
+
+        XCTAssertEqual(vm.state, .error("You're offline. Connect to the internet to analyze your form, then try again."))
+        XCTAssertEqual(mockAPI.sendMessageCallCount, 0)
+        XCTAssertEqual(mockAPI.requestAgentFormAnalysisCallCount, 0)
+    }
 }

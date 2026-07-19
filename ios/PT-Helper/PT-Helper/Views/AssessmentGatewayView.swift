@@ -124,7 +124,7 @@ struct AssessmentGatewayView: View {
                         .font(AppFonts.caption)
                         .textCase(.uppercase)
                         .kerning(0.5)
-                        .foregroundColor(AppColors.accent)
+                        .foregroundColor(AppColors.accentText)
                     Spacer()
                     Image(systemName: "chevron.right")
                         .font(.system(size: 12, weight: .semibold))

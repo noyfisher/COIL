@@ -111,6 +111,7 @@ class SavedPlansViewModel: ObservableObject {
                     // batch-persist. Subsequent listener fires see schemaVersion=2
                     // and skip; the in-session set guards against listener loops.
                     self.runRepairPass(on: parsed)
+                    await NotificationService.shared.syncPlanReminders(plans: parsed)
                 }
             }
     }
@@ -272,6 +273,7 @@ class SavedPlansViewModel: ObservableObject {
         if let index = rehabPlans.firstIndex(where: { $0.id == plan.id }) {
             rehabPlans[index] = plan
         }
+        Task { await NotificationService.shared.syncPlanReminders(plans: rehabPlans) }
 
         // Serialize exercises
         let exercisesData: [[String: Any]] = plan.exercises.map { e in
@@ -339,6 +341,7 @@ class SavedPlansViewModel: ObservableObject {
 
         // Remove locally first for instant UI feedback
         rehabPlans.removeAll { $0.id == plan.id }
+        Task { await NotificationService.shared.syncPlanReminders(plans: rehabPlans) }
 
         // Remove from Firestore
         db.collection("users").document(uid).collection("rehabPlans")

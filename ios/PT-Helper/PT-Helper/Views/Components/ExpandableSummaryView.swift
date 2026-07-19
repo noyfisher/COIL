@@ -52,7 +52,7 @@ struct ExpandableSummaryView: View {
                         Image(systemName: "chevron.right")
                             .font(.caption2.weight(.semibold))
                     }
-                    .foregroundColor(AppColors.accent)
+                    .foregroundColor(AppColors.accentText)
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("\(accessibilityPrefix).seeFullOverviewButton")
