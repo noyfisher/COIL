@@ -6,6 +6,7 @@ import SwiftUI
 /// (see Gotchas #1). Both checkboxes must be ticked before Continue is enabled.
 struct HealthDataConsentView: View {
     let onConsented: () -> Void
+    var onDeclineSignOut: (() -> Void)? = nil
 
     @State private var consentCollection = false
     @State private var consentSharing = false
@@ -71,7 +72,7 @@ struct HealthDataConsentView: View {
                         }
                         .padding(.horizontal, AppSpacing.xl)
 
-                        Text("You can withdraw consent at any time by deleting your account in Settings, or by emailing noyfisher2003@gmail.com.")
+                        Text("You can withdraw consent at any time in Settings, by deleting your account, or by emailing noyfisher2003@gmail.com.")
                             .font(AppFonts.caption)
                             .foregroundColor(AppColors.secondaryText)
                             .fixedSize(horizontal: false, vertical: true)
@@ -94,6 +95,25 @@ struct HealthDataConsentView: View {
                         .accessibilityIdentifier("healthConsent.continueButton")
                         .padding(.horizontal, AppSpacing.xl)
                         .padding(.top, AppSpacing.lg)
+
+                        if let onDeclineSignOut {
+                            VStack(spacing: AppSpacing.xs) {
+                                Button("Sign out instead") {
+                                    onDeclineSignOut()
+                                }
+                                .font(AppFonts.bodyMedium)
+                                .foregroundColor(AppColors.secondaryText)
+                                .accessibilityIdentifier("healthConsent.signOutButton")
+
+                                Text("If you don't consent, COIL can't provide assessments or plans. You can also email noyfisher2003@gmail.com to request deletion of your data.")
+                                    .font(AppFonts.caption)
+                                    .foregroundColor(AppColors.secondaryText)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.horizontal, AppSpacing.xl)
+                            }
+                            .padding(.top, AppSpacing.sm)
+                        }
 
                         Spacer(minLength: 40)
                     }
