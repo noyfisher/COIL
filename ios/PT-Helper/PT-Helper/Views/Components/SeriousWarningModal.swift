@@ -89,7 +89,7 @@ struct SeriousWarningModal: View {
                 Button(action: onRequestSaferPlan) {
                     Text("Request a safer plan")
                         .font(.subheadline.weight(.medium))
-                        .foregroundColor(AppColors.accent)
+                        .foregroundColor(AppColors.accentText)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, AppSpacing.sm)
                 }

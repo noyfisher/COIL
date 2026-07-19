@@ -131,6 +131,7 @@ struct NotesView: View {
                     .padding(AppSpacing.sm)
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Delete note")
         }
         .cardStyle()
     }

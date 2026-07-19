@@ -176,6 +176,7 @@ struct ProgressTabContent: View {
                             .foregroundColor(AppColors.accent)
                     }
                     .accessibilityIdentifier("progress.settingsButton")
+                    .accessibilityLabel("Settings")
                 }
             }
         }
@@ -332,7 +333,7 @@ struct ProgressTabContent: View {
                     NavigationLink(destination: WorkoutSessionView()) {
                         Text("See All")
                             .font(AppFonts.captionSemiBold)
-                            .foregroundColor(AppColors.accent)
+                            .foregroundColor(AppColors.accentText)
                     }
                 }
             }
@@ -549,13 +550,13 @@ struct ProgressTabContent: View {
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [4]))
                         .foregroundStyle(AppColors.mutedText.opacity(0.3))
                     AxisValueLabel()
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(AppColors.secondaryText)
                 }
             }
             .chartXAxis {
                 AxisMarks { _ in
                     AxisValueLabel(format: .dateTime.month(.abbreviated).day())
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(AppColors.secondaryText)
                 }
             }
             .frame(height: 220)
@@ -702,7 +703,7 @@ struct ProgressTabContent: View {
                     Image(systemName: "arrow.right")
                         .font(.system(size: 12, weight: .semibold))
                 }
-                .foregroundColor(AppColors.accent)
+                .foregroundColor(AppColors.accentText)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
                 .overlay(Capsule().stroke(AppColors.accent, lineWidth: 1.5))

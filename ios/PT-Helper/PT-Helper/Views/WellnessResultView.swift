@@ -170,7 +170,7 @@ struct WellnessResultView: View {
                             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                                 Label("Where you are now", systemImage: "location.fill")
                                     .font(AppFonts.bodySemiBold)
-                                    .foregroundColor(AppColors.accent)
+                                    .foregroundColor(AppColors.accentText)
                                 Text(rec.currentStateAssessment)
                                     .font(AppFonts.body)
                             }

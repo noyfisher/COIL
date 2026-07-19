@@ -298,7 +298,7 @@ struct AnalysisResultView: View {
                         VStack(alignment: .leading, spacing: AppSpacing.sm) {
                             Label("What's happening", systemImage: "figure.stand")
                                 .font(AppFonts.bodySemiBold)
-                                .foregroundColor(AppColors.accent)
+                                .foregroundColor(AppColors.accentText)
                             Text(condition.whatItMeans)
                                 .font(AppFonts.body)
                                 .foregroundColor(AppColors.secondaryText)
@@ -310,12 +310,12 @@ struct AnalysisResultView: View {
                         VStack(alignment: .leading, spacing: AppSpacing.sm) {
                             Label("Suggested next steps", systemImage: "list.number")
                                 .font(AppFonts.bodySemiBold)
-                                .foregroundColor(AppColors.accent)
+                                .foregroundColor(AppColors.accentText)
                             ForEach(Array(condition.nextSteps.enumerated()), id: \.offset) { index, step in
                                 HStack(alignment: .top, spacing: AppSpacing.sm) {
                                     Text("\(index + 1).")
                                         .font(AppFonts.bodySemiBold)
-                                        .foregroundColor(AppColors.accent)
+                                        .foregroundColor(AppColors.accentText)
                                         .frame(width: 20, alignment: .leading)
                                     Text(step)
                                         .font(AppFonts.body)
@@ -331,7 +331,7 @@ struct AnalysisResultView: View {
                             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                                 Label("How to manage this", systemImage: "cross.case")
                                     .font(AppFonts.bodySemiBold)
-                                    .foregroundColor(AppColors.accent)
+                                    .foregroundColor(AppColors.accentText)
                                 Text(condition.howToManage)
                                     .font(AppFonts.body)
                                     .foregroundColor(AppColors.secondaryText)

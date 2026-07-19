@@ -75,6 +75,9 @@ struct ReAssessmentComparisonView: View {
                         .chartYScale(domain: 0...10)
                         .chartForegroundStyleScale(["Before": AppColors.danger.opacity(0.7), "After": AppColors.success.opacity(0.7)])
                         .frame(height: 220)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Pain comparison chart")
+                        .accessibilityValue(comparisonChartAccessibilityValue)
                     }
                 }
 
@@ -154,6 +157,18 @@ struct ReAssessmentComparisonView: View {
     private var allRegions: [String] {
         let regions = Set(initial.regionPainLevels.keys).union(Set(latest.regionPainLevels.keys))
         return regions.sorted()
+    }
+
+    private var comparisonChartAccessibilityValue: String {
+        guard !allRegions.isEmpty else { return "No region data to compare." }
+        return allRegions.map { region -> String in
+            let before = Int(initial.regionPainLevels[region] ?? 0)
+            let after = Int(latest.regionPainLevels[region] ?? 0)
+            let delta = before - after
+            let change = delta > 0 ? "improved by \(delta)"
+                       : (delta < 0 ? "worse by \(-delta)" : "unchanged")
+            return "\(RegionPainInputView.displayName(for: region)): before \(before), after \(after) out of 10, \(change)."
+        }.joined(separator: " ")
     }
 
     private var overallImproved: Bool {

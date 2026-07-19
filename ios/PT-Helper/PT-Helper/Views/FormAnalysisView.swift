@@ -146,7 +146,7 @@ struct FormAnalysisView: View {
 
                     Text("\(Int(vm.processingProgress * 100))%")
                         .font(.system(.title3, design: .serif).weight(.bold))
-                        .foregroundColor(AppColors.accent)
+                        .foregroundColor(AppColors.accentText)
                 }
             }
 
@@ -375,7 +375,7 @@ struct FormAnalysisView: View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
             Label("Progress Over Time", systemImage: "chart.line.uptrend.xyaxis")
                 .font(.headline)
-                .foregroundColor(AppColors.accent)
+                .foregroundColor(AppColors.accentText)
 
             // How today compares to the user's own prior sessions
             Text(insights.sessionComparison)

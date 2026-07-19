@@ -160,7 +160,7 @@ struct WellnessGoalPickerView: View {
                         .foregroundColor(AppColors.accent)
                     Text("AI-powered")
                         .font(.caption2.weight(.medium))
-                        .foregroundColor(AppColors.accent)
+                        .foregroundColor(AppColors.accentText)
                 }
                 .padding(.horizontal, AppSpacing.sm)
                 .padding(.vertical, 4)

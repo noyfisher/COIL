@@ -116,7 +116,7 @@ struct RecoveryInsightsCardView: View {
                         Spacer()
                         Text("View Full Digest")
                             .font(.caption.weight(.medium))
-                            .foregroundColor(AppColors.accent)
+                            .foregroundColor(AppColors.accentText)
                         Image(systemName: "chevron.right")
                             .font(.caption2.weight(.semibold))
                             .foregroundColor(AppColors.accent)

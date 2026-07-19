@@ -102,10 +102,11 @@ enum AppColors {
     static let accentLight = Color(CoilPalette.accentBright)
     static let accentDark  = Color(CoilPalette.accentDeeper)
     static let accentTint  = Color(CoilPalette.accent).opacity(0.10)
+    static let accentText = Color(CoilPalette.accentDeep)  // AA text: 5.16:1 on white, 5.7:1 on dark cards
 
     // MARK: Chip
-    static let chipSelectedBg     = Color(CoilPalette.accent)
-    static let chipSelectedBorder = Color(CoilPalette.accent)
+    static let chipSelectedBg     = Color(CoilPalette.accentDeeper)
+    static let chipSelectedBorder = Color(CoilPalette.accentDeeper)
     static let chipSelectedText   = Color.white
 
     // MARK: Card styling
@@ -458,7 +459,7 @@ struct CoilBadge: View {
             .foregroundColor(AppColors.ctaText)
             .padding(.horizontal, AppSpacing.comfortable)
             .padding(.vertical, AppSpacing.nano + 1)
-            .background(AppColors.accent)
+            .background(AppColors.accentDark)
             .clipShape(Capsule())
     }
 }

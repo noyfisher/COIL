@@ -53,7 +53,7 @@ struct HealthDataConsentView: View {
                             showPolicy = true
                         }
                         .font(AppFonts.bodyMedium)
-                        .foregroundColor(AppColors.accent)
+                        .foregroundColor(AppColors.accentText)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, AppSpacing.xl)
 

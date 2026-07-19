@@ -45,11 +45,11 @@ Sonnet's cross-session memory. Update the **Status** and **PR#** columns as you 
 | WS5-04 | Delete the dead TimerViewModel/TimerView/ExerciseTimer trio | WS5 | P2 | S | done | #47 |
 | WS6-01 | Add read-only "Your Last Analysis" card to the Progress tab | WS6 | P1 | S | done | #48 |
 | WS6-02 | Clear AnalysisResultStore on sign-out (cross-account PHI guard) | WS6 | P1 | S | done | #48 |
-| WS7-01 | Sweep accent-as-text to a new adaptive accentText token (35 sites) | WS7 | P1 | M | todo | |
-| WS7-02 | Fix Progress pain-trend chart axis labels (1.61:1 worst audit failure) | WS7 | P1 | S | todo | |
-| WS7-03 | Darken chip/badge selected fills so white text passes AA (CoilBadge + ChipButton) | WS7 | P2 | S | todo | |
-| WS7-04 | Add accessibilityLabels to 9 icon-only buttons | WS7 | P2 | S | todo | |
-| WS7-05 | Add VoiceOver summary to ReAssessment comparison chart | WS7 | P2 | S | todo | |
+| WS7-01 | Sweep accent-as-text to a new adaptive accentText token (35 sites) | WS7 | P1 | M | done | #49 |
+| WS7-02 | Fix Progress pain-trend chart axis labels (1.61:1 worst audit failure) | WS7 | P1 | S | done | #49 |
+| WS7-03 | Darken chip/badge selected fills so white text passes AA (CoilBadge + ChipButton) | WS7 | P2 | S | done | #49 |
+| WS7-04 | Add accessibilityLabels to 9 icon-only buttons | WS7 | P2 | S | done | #49 |
+| WS7-05 | Add VoiceOver summary to ReAssessment comparison chart | WS7 | P2 | S | done | #49 |
 | WS8-01 | Add offline fail-fast guards to the 5 ungated AI ViewModels | WS8 | P1 | M | todo | |
 | WS8-02 | Extract shared performProxyRequest helper in ClaudeAPIService | WS8 | P1 | M | todo | |
 | WS8-03 | Add service-level retry: 1 retry, 2s delay, transport/5xx only, never 429 | WS8 | P2 | S | BLOCKED: WS8-02 | |

@@ -57,6 +57,7 @@ struct GuidedWorkoutView: View {
                         Image(systemName: vm.isPaused ? "play.fill" : "pause.fill")
                     }
                     .accessibilityIdentifier("workout.pauseButton")
+                    .accessibilityLabel(vm.isPaused ? "Resume workout" : "Pause workout")
                 }
             }
         }
@@ -204,7 +205,7 @@ struct GuidedWorkoutView: View {
                                         Text(showInstructions ? "Hide" : "How to")
                                             .font(AppFonts.captionSemiBold)
                                     }
-                                    .foregroundColor(AppColors.accent)
+                                    .foregroundColor(AppColors.accentText)
                                     .padding(.horizontal, 10)
                                     .padding(.vertical, 5)
                                     .background(AppColors.accentTint)
@@ -498,7 +499,7 @@ struct GuidedWorkoutView: View {
 
     private var timerColor: Color {
         switch restProgress {
-        case 0.66...: return AppColors.accent
+        case 0.66...: return AppColors.accentText
         case 0.33..<0.66: return AppColors.warning
         default: return AppColors.danger
         }
@@ -548,7 +549,7 @@ struct GuidedWorkoutView: View {
             HStack {
                 Text("Exercise \(vm.exerciseProgress)")
                     .font(AppFonts.captionSemiBold)
-                    .foregroundColor(AppColors.accent)
+                    .foregroundColor(AppColors.accentText)
                 Spacer()
                 Text(vm.formattedElapsedTime)
                     .font(AppFonts.captionMedium)
@@ -584,7 +585,7 @@ struct GuidedWorkoutView: View {
             Text(text)
                 .font(AppFonts.captionMedium)
         }
-        .foregroundColor(AppColors.accent)
+        .foregroundColor(AppColors.accentText)
         .padding(.horizontal, AppSpacing.sm)
         .padding(.vertical, AppSpacing.xs)
         .background(AppColors.accentTint)
