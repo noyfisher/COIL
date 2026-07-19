@@ -84,6 +84,9 @@ struct RootView: View {
                     skippedOnboarding = false
                     isCheckingProfile = true
                     profileService.clear()
+                    // PHI: the last-analysis file must not survive into another account's
+                    // session — the Progress tab's "Your Last Analysis" card reads it (WS6-01).
+                    AnalysisResultStore.shared.clear()
                     ConsentService.clearLocalMirrors()
                 }
             }
