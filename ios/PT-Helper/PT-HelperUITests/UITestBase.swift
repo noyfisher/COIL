@@ -1,6 +1,6 @@
 import XCTest
 
-/// Base class for all PT Helper UI tests.
+/// Base class for all COIL UI tests.
 /// Configures the app with test mode launch arguments and provides common helpers.
 class UITestBase: XCTestCase {
     var app: XCUIApplication!

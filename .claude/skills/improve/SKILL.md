@@ -170,7 +170,7 @@ grep -rn "\.padding(" ios/PT-Helper/PT-Helper/Views/ --include="*.swift" | grep 
 3. Check if the View actually displays error/empty states
 
 **Reference patterns**:
-- Empty state: Read `ios/PT-Helper/PT-Helper/Views/PlansTab.swift` — shows how to display a message when no data exists
+- Empty state: Read `ios/PT-Helper/PT-Helper/Views/MyPlanTab.swift` — shows how to display a message when no data exists
 - Error display: Read `ios/PT-Helper/PT-Helper/Views/GuidedWorkoutView.swift` — shows error banner pattern
 
 **What to add**:
@@ -219,23 +219,21 @@ Use this mapping to find the view file. If the screen name is not listed, STOP a
 
 | Screen Name | View File |
 |-------------|-----------|
-| `dashboard` | `ios/PT-Helper/PT-Helper/Views/Dashboard/AnalysisDashboardView.swift` |
 | `form-check` | `ios/PT-Helper/PT-Helper/Views/FormCheckTab.swift` |
-| `rehab-metrics` | `ios/PT-Helper/PT-Helper/Views/Dashboard/RehabMetricsView.swift` |
-| `profile` | `ios/PT-Helper/PT-Helper/Views/Dashboard/DashProfileView.swift` |
+| `profile` | `ios/PT-Helper/PT-Helper/Views/ThreeTabView.swift` (ProfileTab) |
 | `settings` | `ios/PT-Helper/PT-Helper/Views/SettingsView.swift` |
 | `onboarding` | `ios/PT-Helper/PT-Helper/Views/OnboardingView.swift` |
-| `plans` | `ios/PT-Helper/PT-Helper/Views/PlansTab.swift` |
+| `plans` | `ios/PT-Helper/PT-Helper/Views/MyPlanTab.swift` |
 | `rehab-plan` | `ios/PT-Helper/PT-Helper/Views/RehabPlanView.swift` |
 | `workout` | `ios/PT-Helper/PT-Helper/Views/GuidedWorkoutView.swift` |
 | `workout-summary` | `ios/PT-Helper/PT-Helper/Views/GuidedWorkoutSummaryView.swift` |
-| `progress` | `ios/PT-Helper/PT-Helper/Views/ProgressChartView.swift` |
+| `progress` | `ios/PT-Helper/PT-Helper/Views/ProgressTab.swift` |
 | `recovery` | `ios/PT-Helper/PT-Helper/Views/RecoveryInsightsDetailView.swift` |
 | `wellness` | `ios/PT-Helper/PT-Helper/Views/WellnessGoalPickerView.swift` |
 | `timer` | `ios/PT-Helper/PT-Helper/Views/TimerView.swift` |
 | `notes` | `ios/PT-Helper/PT-Helper/Views/NotesView.swift` |
 | `achievements` | `ios/PT-Helper/PT-Helper/Views/AchievementsView.swift` |
-| `home` | `ios/PT-Helper/PT-Helper/ContentView.swift` |
+| `home` | `ios/PT-Helper/PT-Helper/Views/ThreeTabView.swift` (HomeTab) |
 
 **Step 2 — Build and launch app**
 
@@ -269,7 +267,7 @@ Use this mapping to find the view file. If the screen name is not listed, STOP a
 | `timer` | From workout, timer is embedded |
 | `notes` | From dashboard or home, tap notes entry |
 | `onboarding` | Stop app → relaunch with `["--uitesting"]` only (no --skip-onboarding) |
-| `home` | Stop app → relaunch with `["--uitesting", "--skip-onboarding", "--seed-mock-data", "--use-legacy-ui"]` |
+| `home` | Stop app → relaunch with `["--uitesting", "--skip-onboarding", "--seed-mock-data"]` |
 
 Use `snapshot_ui` to find element labels/IDs before tapping. Prefer tap by `label` or `id` over coordinates. Wait 1-2 seconds after navigation for animations to settle.
 

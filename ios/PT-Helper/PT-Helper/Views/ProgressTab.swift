@@ -48,11 +48,13 @@ struct ProgressTabContent: View {
     @ObservedObject var insightsVM: RecoveryInsightsViewModel
     @ObservedObject var savedPlansVM: SavedPlansViewModel
     @ObservedObject private var streakService = StreakService.shared
+    @ObservedObject private var analysisStore = AnalysisResultStore.shared
     var onSettingsTapped: () -> Void
 
     @State private var selectedRegion: String? = nil
     @State private var sessionToDelete: WorkoutSession?
     @State private var showDeleteConfirmation = false
+    @State private var navigateToLastAnalysis = false
 
     /// Tier 3 PR D + followup: outcome-prompt visibility. Re-evaluated on
     /// every render — when the user submits or dismisses the prompt,
@@ -63,6 +65,8 @@ struct ProgressTabContent: View {
     var body: some View {
         ScrollView {
             VStack(spacing: AppSpacing.lg) {
+                lastAnalysisSection
+
                 if let loadError = workoutViewModel.loadError {
                     // A fetch failure must not masquerade as "No Data Yet" — that's
                     // the brand-new-user message and makes a longtime user fear their
@@ -201,6 +205,92 @@ struct ProgressTabContent: View {
             .sorted { ($0.startDate ?? .distantFuture) < ($1.startDate ?? .distantFuture) }
         guard let oldest = eligible.first else { return nil }
         return (plan: oldest, analysisId: oldest.id)
+    }
+
+    // MARK: - Last Analysis (D-6, recovered from orphaned AssessTab card — vuser F2)
+
+    /// Re-entry point to the most recent AI analysis. Hidden when no analysis has
+    /// been run (nil) or when the stored result is the empty defensive fallback
+    /// AnalyzingView can construct (conditions.isEmpty — nothing to display).
+    @ViewBuilder
+    private var lastAnalysisSection: some View {
+        if let lastResult = analysisStore.lastResult, !lastResult.conditions.isEmpty {
+            VStack(alignment: .leading, spacing: AppSpacing.md) {
+                CoilDividerHeader(title: "Your Last Analysis")
+
+                Button {
+                    SessionLogger.shared.logUserAction(.buttonTapped,
+                        action: "lastAnalysisOpened",
+                        metadata: [:])
+                    navigateToLastAnalysis = true
+                } label: {
+                    lastAnalysisCard(for: lastResult)
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("progress.lastAnalysisCard")
+                .navigationDestination(isPresented: $navigateToLastAnalysis) {
+                    AnalysisResultView(analysisResult: lastResult, isReadOnly: true)
+                }
+            }
+        }
+    }
+
+    private func lastAnalysisCard(for result: AnalysisResult) -> some View {
+        let topCondition = result.conditions.first
+        let strength = topCondition.map { ConfidenceCalibrator.matchStrength(for: $0.confidence) }
+
+        return HStack(spacing: AppSpacing.md) {
+            Image(systemName: "stethoscope")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(AppColors.accent)
+                .frame(width: 40, height: 40)
+                .background(AppColors.accent.opacity(0.12))
+                .cornerRadius(AppCorners.small)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(topCondition?.commonName ?? "Analysis Results")
+                    .font(AppFonts.bodySemiBold)
+                    .foregroundColor(AppColors.primaryText)
+
+                HStack(spacing: AppSpacing.xs) {
+                    if let strength {
+                        Text(strength.rawValue)
+                            .font(AppFonts.captionSemiBold)
+                            .foregroundColor(matchStrengthColor(strength))
+                        Text("•")
+                            .font(AppFonts.caption)
+                            .foregroundColor(AppColors.mutedText)
+                    }
+                    Text(result.generatedDate.formatted(.relative(presentation: .named)))
+                        .font(AppFonts.caption)
+                        .foregroundColor(AppColors.secondaryText)
+                }
+
+                Text("View your results")
+                    .font(AppFonts.micro)
+                    .foregroundColor(AppColors.mutedText)
+            }
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(AppColors.accent)
+        }
+        .padding(.horizontal, AppSpacing.lg)
+        .padding(.vertical, AppSpacing.md)
+        .background(AppColors.cardBackground)
+        .cornerRadius(AppCorners.card)
+        .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
+        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+    }
+
+    private func matchStrengthColor(_ strength: MatchStrength) -> Color {
+        switch strength {
+        case .strong: return AppColors.success
+        case .moderate: return AppColors.warning
+        case .weak: return AppColors.mutedText
+        }
     }
 
     // MARK: - Navigation Link Row
@@ -580,10 +670,6 @@ struct ProgressTabContent: View {
         case 4...6: return AppColors.warning
         default: return AppColors.danger
         }
-    }
-
-    private var totalMinutes: Int {
-        Int(workoutViewModel.sessions.reduce(0.0) { $0 + $1.duration } / 60)
     }
 
     // MARK: - Re-Assessment Card

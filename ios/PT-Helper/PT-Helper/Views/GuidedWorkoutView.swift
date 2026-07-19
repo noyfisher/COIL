@@ -7,6 +7,7 @@ struct GuidedWorkoutView: View {
     @EnvironmentObject private var workoutViewModel: WorkoutViewModel
     @EnvironmentObject private var savedPlansVM: SavedPlansViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
     @State private var showSwapSheet = false
     @State private var showSkipConfirmation = false
     @State private var showFormAnalysis = false
@@ -118,6 +119,13 @@ struct GuidedWorkoutView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                     completedSegmentIndex = nil
                 }
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            switch newPhase {
+            case .background: vm.handleAppBackgrounded()
+            case .active: vm.handleAppForegrounded()
+            default: break
             }
         }
         .sheet(isPresented: $showSwapSheet) {

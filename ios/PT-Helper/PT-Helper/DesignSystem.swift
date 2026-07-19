@@ -426,7 +426,7 @@ struct DestructiveButtonStyle: ButtonStyle {
 
 // MARK: - COIL Shared Components
 
-/// Red gradient rule with uppercase Barlow Condensed title — use for all content section breaks.
+/// Teal gradient rule with uppercase Industry-Bold title — use for all content section breaks.
 struct CoilDividerHeader: View {
     let title: String
 
@@ -447,7 +447,7 @@ struct CoilDividerHeader: View {
     }
 }
 
-/// Small red pill badge — "ACTIVE", "ON FIRE", count indicators, etc.
+/// Small teal pill badge — "ACTIVE", "ON FIRE", count indicators, etc.
 struct CoilBadge: View {
     let text: String
 

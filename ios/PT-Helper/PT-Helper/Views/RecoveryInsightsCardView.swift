@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Compact card showing AI recovery insights, a generate button, or an insufficient-data prompt.
-/// Used in ProgressChartView and HomeTab.
+/// Used in ProgressTab.
 struct RecoveryInsightsCardView: View {
     @ObservedObject var vm: RecoveryInsightsViewModel
     @EnvironmentObject private var workoutViewModel: WorkoutViewModel
