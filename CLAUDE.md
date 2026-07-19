@@ -83,7 +83,6 @@ The iOS app (`ios/PT-Helper/PT-Helper/`) uses MVVM with a singleton service laye
   - `BodyMapViewModel`, `OnboardingViewModel`, `TimerViewModel`, `NotesViewModel`
 - **Views/** (69 files) — SwiftUI views using `@ObservedObject`/`@StateObject`. Navigation via `NavigationStack`
   - `Components/` — Reusable UI (exercise image, phase stepper, body silhouette, video recorder, etc.)
-  - `Dashboard/` — Dashboard widgets (pain trend chart, confidence chart, differentials table, session history, etc.)
   - `OnboardingSteps/` — Multi-step health profile collection (basic info, injury/surgical/medical history, activity level, review)
 - **Services/** (24 files) — Singletons (`static let shared`) for API, persistence, validation, logging
   - API: `ClaudeAPIService`, `APIConfig`
@@ -145,7 +144,7 @@ The wellness analysis follows the same two-call pattern (`wellness_analysis` + `
 - **backgroundOnly** — Old, unrelated history (included as context only)
 
 ### Wellness Goals System
-`AssessTab` provides a dual gateway: pain analysis or wellness goals. The wellness flow:
+`AssessmentGatewayView` (presented from the floating "+") provides a dual gateway: pain analysis or wellness goals. The wellness flow:
 1. User selects wellness goals in `WellnessGoalPickerView` (posture, sleep, mobility, strength, pain management)
 2. `WellnessAnalysisViewModel` runs a two-call analysis (`wellness_analysis` + `wellness_verify`)
 3. `WellnessPlanViewModel` generates an exercise + habit plan (`wellness_plan`)
@@ -216,20 +215,20 @@ Supporting modules:
 - `missingExerciseImages` — Public collection for logging missing images
 
 ### Navigation & Shared State
-`ThreeTabView` is the primary navigation container with 3 tabs:
-- **Tab 0: Assess** — Dual gateway (pain analysis or wellness goals)
-- **Tab 1: My Plan** — Active plan hero card + saved plans list
-- **Tab 2: Progress** — Charts, recovery insights, settings, session history
+`MainTabView` is a thin passthrough to `ThreeTabView`; `MainTabView.swift` also hosts the shared `TabSelection` class and `AssessmentRoute` enum. `ThreeTabView` (named for a historical 3-tab IA) is the primary navigation shell with 4 tabs plus a floating "+":
+- **Tab 0: Home** — weekly date strip, today's program + preventative tasks
+- **Tab 1: My Plan** — active plan hero card + saved plans list
+- **Tab 2: Progress** — charts, recovery insights, settings, session history
+- **Tab 3: Profile** — profile summary + edit (`OnboardingEditView`)
+- **Floating "+"** — sets `TabSelection.assessmentRequest = .gateway`, presenting `AssessmentGatewayView` in a full-screen cover (dual gateway: pain analysis or wellness goals)
 
 `ThreeTabView` injects shared state via `@EnvironmentObject`:
-- `TabSelection` — Cross-tab navigation
+- `TabSelection` — Cross-tab navigation + assessment routing
 - `SavedPlansViewModel` — Rehab plans (real-time Firestore listener)
 - `WorkoutViewModel` — Workout session tracking
 - `NetworkMonitor` — Connectivity status
 - `RecoveryInsightsViewModel` — Recovery insights state
 - `AnalysisResultStore` — Persisted analysis results
-
-Note: `MainTabView` still exists as a legacy wrapper; `--use-legacy-ui` forces the old 4-tab layout.
 
 ### UI Testing Infrastructure
 The app supports UI testing via launch arguments handled by `TestDataSeeder`:
@@ -238,7 +237,6 @@ The app supports UI testing via launch arguments handled by `TestDataSeeder`:
 - `--seed-mock-data` — Populates plans, sessions, analysis result, streak data
 - `--simulate-offline` — Forces `NetworkMonitor.isConnected = false`
 - `--clear-coach-mark` — Resets body map coach mark
-- `--use-legacy-ui` — Forces 4-tab legacy layout
 - `--clear-workout-checkpoint` — Removes any saved workout checkpoint
 - `--prefill-weight` — Pre-populates weight in profile
 

@@ -14,25 +14,25 @@ Sonnet's cross-session memory. Update the **Status** and **PR#** columns as you 
 
 | Item ID | Title | WS | Priority | Effort | Status | PR# |
 |---|---|---|---|---|---|---|
-| WS1-01 | Collapse MainTabView to a ThreeTabView passthrough and delete the legacy 4-tab shell wiring (+ LegacyUITests, --use-legacy-ui) | WS1 | P1 | M | todo | |
-| WS1-02 | Delete the --showcase screenshot harness (ShowcaseHostView + PT_HelperApp entry) | WS1 | P1 | S | todo | |
-| WS1-03 | Delete Views/Dashboard/* (10 files, 1,341 LOC) and the last dashboard TabSelection ids | WS1 | P1 | S | BLOCKED: WS1-01, WS1-02 | |
-| WS1-04 | Split ContentView.swift: extract live OnboardingEditView, delete LegacyHomeTab, delete the file | WS1 | P1 | S | BLOCKED: WS1-01 | |
-| WS1-05 | Delete legacy-orphaned view files: PlansTab, ProgressChartView, HealthCheckPromptView | WS1 | P1 | S | BLOCKED: WS1-01 | |
-| WS1-06 | Delete AssessTab.swift and QuickHealthUpdateView.swift | WS1 | P2 | S | BLOCKED: WS1-01 | |
-| WS1-07 | Remove dead ProgressTabContent.totalMinutes (ProgressTab.swift:584-586) | WS1 | P3 | S | todo | |
-| WS1-08 | Commit the cosmetic pbxproj diff (unquoted CFBundleDisplayName) | WS1 | P3 | S | todo | |
-| WS1-09 | Fix stale navigation docs and purge references to deleted files (CLAUDE.md, ux_flows, PT-Helper-Documentation, LAYOUT.md, improve skill) | WS1 | P2 | S | BLOCKED: WS1-01…06 | |
-| WS2-01 | Build the reminder reconciliation engine and wire it into the plan lifecycle | WS2 | P1 | M | todo | |
-| WS2-02 | Make the Settings toggles, time picker, and sign-out honor notification state | WS2 | P1 | S | BLOCKED: WS2-01 | |
-| WS2-03 | Schedule re-assessment reminders at plan midpoint and completion (audit #33) | WS2 | P2 | S | BLOCKED: WS2-01 | |
-| WS2-04 | First-workout activation nudge for freshly started plans (audit #34) | WS2 | P2 | S | BLOCKED: WS2-01 | |
-| WS3-01 | Close the grandfathered-user consent bypass with a launch-time health-consent gate | WS3 | P1 | M | BLOCKED: WS3-03 (soft, execution-order) | |
-| WS3-02 | Add the policy-promised consent-withdraw control in Settings with defined downstream effects | WS3 | P1 | M | BLOCKED: WS3-01, WS3-03 | |
-| WS3-03 | Make server state authoritative in ConsentService.load() and surface record-write failures; add ConsentService tests | WS3 | P1 | M | todo | |
-| WS3-04 | Delete the write-only legacy ToS UserDefaults keys | WS3 | P2 | S | todo | |
-| WS3-05 | Centralize duplicated UserDefaults key literals and clear the stale minor-safety flag on account deletion | WS3 | P2 | S | todo | |
-| WS3-06 | Update the Consumer Health Data Policy withdrawal-mechanism text | WS3 | P2 | S | BLOCKED: WS3-02 + legal review (BLOCKED-on-legal per D-2) | |
+| WS1-01 | Collapse MainTabView to a ThreeTabView passthrough and delete the legacy 4-tab shell wiring (+ LegacyUITests, --use-legacy-ui) | WS1 | P1 | M | done | #43 |
+| WS1-02 | Delete the --showcase screenshot harness (ShowcaseHostView + PT_HelperApp entry) | WS1 | P1 | S | done | #43 |
+| WS1-03 | Delete Views/Dashboard/* (10 files, 1,341 LOC) and the last dashboard TabSelection ids | WS1 | P1 | S | done | #43 |
+| WS1-04 | Split ContentView.swift: extract live OnboardingEditView, delete LegacyHomeTab, delete the file | WS1 | P1 | S | done | #43 |
+| WS1-05 | Delete legacy-orphaned view files: PlansTab, ProgressChartView, HealthCheckPromptView | WS1 | P1 | S | done | #43 |
+| WS1-06 | Delete AssessTab.swift and QuickHealthUpdateView.swift | WS1 | P2 | S | done | #43 |
+| WS1-07 | Remove dead ProgressTabContent.totalMinutes (ProgressTab.swift:584-586) | WS1 | P3 | S | done | #43 |
+| WS1-08 | Commit the cosmetic pbxproj diff (unquoted CFBundleDisplayName) | WS1 | P3 | S | done | #43 |
+| WS1-09 | Fix stale navigation docs and purge references to deleted files (CLAUDE.md, ux_flows, PT-Helper-Documentation, LAYOUT.md, improve skill) | WS1 | P2 | S | done | #43 |
+| WS2-01 | Build the reminder reconciliation engine and wire it into the plan lifecycle | WS2 | P1 | M | done | #44 |
+| WS2-02 | Make the Settings toggles, time picker, and sign-out honor notification state | WS2 | P1 | S | done | #44 |
+| WS2-03 | Schedule re-assessment reminders at plan midpoint and completion (audit #33) | WS2 | P2 | S | done | #44 |
+| WS2-04 | First-workout activation nudge for freshly started plans (audit #34) | WS2 | P2 | S | done | #44 |
+| WS3-01 | Close the grandfathered-user consent bypass with a launch-time health-consent gate | WS3 | P1 | M | done | #45 |
+| WS3-02 | Add the policy-promised consent-withdraw control in Settings with defined downstream effects | WS3 | P1 | M | done | #45 |
+| WS3-03 | Make server state authoritative in ConsentService.load() and surface record-write failures; add ConsentService tests | WS3 | P1 | M | done | #45 |
+| WS3-04 | Delete the write-only legacy ToS UserDefaults keys | WS3 | P2 | S | done | #45 |
+| WS3-05 | Centralize duplicated UserDefaults key literals and clear the stale minor-safety flag on account deletion | WS3 | P2 | S | done | #45 |
+| WS3-06 | Update the Consumer Health Data Policy withdrawal-mechanism text | WS3 | P2 | S | BLOCKED: legal review (BLOCKED-on-legal per D-2) | |
 | WS4-01 | Re-skin IntroCarouselView hero to COIL tokens and fix the light-mode status-bar strip | WS4 | P1 | S | done | #46 |
 | WS4-02 | Add branded launch screen and dark/tinted app-icon variants | WS4 | P2 | M | done | #46 |
 | WS4-03 | Rename "PT Helper" to "COIL" in LegalContent (verbatim spec) | WS4 | P2 | S | BLOCKED: Legal sign-off (D-2) — bumps tosVersion, re-triggers acceptance gate for all users | |
