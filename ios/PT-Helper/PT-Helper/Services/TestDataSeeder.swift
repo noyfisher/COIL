@@ -50,14 +50,6 @@ enum TestDataSeeder {
         #endif
     }
 
-    static var shouldUseLegacyUI: Bool {
-        #if DEBUG
-        ProcessInfo.processInfo.arguments.contains("--use-legacy-ui")
-        #else
-        false
-        #endif
-    }
-
     static var shouldClearWorkoutCheckpoint: Bool {
         #if DEBUG
         ProcessInfo.processInfo.arguments.contains("--clear-workout-checkpoint")
