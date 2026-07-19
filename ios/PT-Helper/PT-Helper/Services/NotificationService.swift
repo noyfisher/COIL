@@ -50,7 +50,7 @@ class NotificationService: ObservableObject {
 
     // MARK: - Deep Link Queue (for cold-launch)
 
-    /// Stores the target tab from a notification tap, consumed by MainTabView/DashboardMainTabView on appear.
+    /// Stores the target tab from a notification tap, consumed by ThreeTabView on appear.
     @Published var pendingDeepLink: String?
 
     init(center: NotificationScheduling = UNUserNotificationCenter.current(), defaults: UserDefaults = .standard, skipAuthCheck: Bool = false) {
@@ -148,6 +148,10 @@ class NotificationService: ObservableObject {
     func cancelAllReminders() {
         center.removeAllPendingNotificationRequests()
         UNUserNotificationCenter.current().setBadgeCount(0)
+        // Drop the cached plan list too — otherwise a Settings toggle flipped
+        // before the next user's plans listener fires would resync reminders
+        // from the previous account's plan names (found in code review).
+        lastKnownPlans = []
     }
 
     // MARK: - Plan-lifecycle reconciliation (WS2)
