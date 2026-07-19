@@ -105,8 +105,6 @@ class OnboardingViewModel: ObservableObject {
                         completion(false)
                     } else {
                         AnalyticsService.shared.log(.onboardingCompleted)
-                        UserDefaults.standard.set(true, forKey: "hasAcceptedTermsOfService")
-                        UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: "tosAcceptedDate")
                         Task { @MainActor in
                             ConsentService.shared.recordLegalAcceptance(source: "onboarding", dateOfBirth: self.userProfile.dateOfBirth)
                         }
