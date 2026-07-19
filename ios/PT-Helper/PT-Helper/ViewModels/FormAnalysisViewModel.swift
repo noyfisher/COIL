@@ -88,6 +88,13 @@ class FormAnalysisViewModel: ObservableObject {
         // accumulate in the app container indefinitely.
         defer { try? FileManager.default.removeItem(at: url) }
 
+        // Fail fast when offline instead of making the user watch a doomed
+        // spinner before a generic network error (WS8-01, extends audit #58).
+        guard NetworkMonitor.shared.isConnected else {
+            state = .error("You're offline. Connect to the internet to analyze your form, then try again.")
+            return
+        }
+
         state = .processing(progress: 0)
         processingProgress = 0
 

@@ -50,9 +50,9 @@ Sonnet's cross-session memory. Update the **Status** and **PR#** columns as you 
 | WS7-03 | Darken chip/badge selected fills so white text passes AA (CoilBadge + ChipButton) | WS7 | P2 | S | done | #49 |
 | WS7-04 | Add accessibilityLabels to 9 icon-only buttons | WS7 | P2 | S | done | #49 |
 | WS7-05 | Add VoiceOver summary to ReAssessment comparison chart | WS7 | P2 | S | done | #49 |
-| WS8-01 | Add offline fail-fast guards to the 5 ungated AI ViewModels | WS8 | P1 | M | todo | |
-| WS8-02 | Extract shared performProxyRequest helper in ClaudeAPIService | WS8 | P1 | M | todo | |
-| WS8-03 | Add service-level retry: 1 retry, 2s delay, transport/5xx only, never 429 | WS8 | P2 | S | BLOCKED: WS8-02 | |
+| WS8-01 | Add offline fail-fast guards to the 5 ungated AI ViewModels | WS8 | P1 | M | done | #50 |
+| WS8-02 | Extract shared performProxyRequest helper in ClaudeAPIService | WS8 | P1 | M | done | #50 |
+| WS8-03 | Add service-level retry: 1 retry, 2s delay, transport/5xx only, never 429 | WS8 | P2 | S | done | #50 |
 | WS9-01 | Tokenize text fonts in the 7 worst-offender screens (+ own the master mapping table) | WS9 | P2 | M | todo | |
 | WS9-02 | Tokenize text fonts across the remaining live screens (long tail; split 2a components/onboarding + 2b screens) | WS9 | P2 | L | BLOCKED: WS9-01 (shared table only; disjoint files, can parallelize) | |
 | WS9-03 | Tokenize numeric padding + corner-radius literals to AppSpacing/AppCorners | WS9 | P3 | M | todo | |
