@@ -244,7 +244,7 @@ Accessibility identifiers follow `screenName.elementName` convention (e.g., `wor
 
 ### Pre-Release Process
 See `ios/PT-Helper/docs/manual-qa-checklist.md` for the full manual QA checklist.
-Test plans: SmokePlan (11 tests), UnitPlan (all unit), FullPlan (all + collision + UI), PreReleasePlan (all + UI + coverage).
+Test plans: SmokePlan (11 tests), UnitPlan (all unit), FullPlan (all + collision + UI), PreReleasePlan (all + UI + coverage). FullPlan and PreReleasePlan run identical test targets — they intentionally aren't merged: FullPlan is the fast pre-merge gate (no coverage, 300s timeout) and PreReleasePlan is the thorough release gate (same tests + code coverage, 600s timeout).
 
 ## Code Conventions
 

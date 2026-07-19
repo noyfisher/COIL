@@ -28,7 +28,7 @@ final class WellnessAnalysisViewModelRoutingTests: XCTestCase {
         let vm = makeVM(goals: [TestFixtures.makeGoalSelection(category: .improvePosture)])
 
         vm.saveAndAnalyze(TestFixtures.makeWellnessAssessment(goalCategory: .improvePosture))
-        try await Task.sleep(nanoseconds: 500_000_000)
+        await vm.analysisTask?.value
 
         XCTAssertNotNil(vm.analysisResult, "Benign goals should produce a normal analysis result")
         XCTAssertNil(vm.emergencyMessages, "Benign goals must not trigger the emergency path")
