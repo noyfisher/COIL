@@ -193,10 +193,10 @@ struct AnalyzingView: View {
 
             VStack(spacing: AppSpacing.sm) {
                 Text("Analyzing Your Symptoms")
-                    .font(.title2.weight(.bold))
+                    .font(AppFonts.title)
 
                 Text("Our AI is reviewing your pain assessments and health profile to identify potential conditions...")
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.xl)
@@ -208,7 +208,7 @@ struct AnalyzingView: View {
                     .tint(AppColors.accent)
 
                 Text(elapsedTimeText)
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(.secondary)
                     .monospacedDigit()
             }
@@ -284,10 +284,10 @@ struct AnalyzingView: View {
 
             VStack(spacing: AppSpacing.sm) {
                 Text("Analysis Failed")
-                    .font(.title2.weight(.bold))
+                    .font(AppFonts.title)
 
                 Text(message)
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.lg)
@@ -306,7 +306,7 @@ struct AnalyzingView: View {
                     viewModel.showAnalyzingScreen = false
                 }) {
                     Text("Go Back to Assessment")
-                        .font(.subheadline.weight(.medium))
+                        .font(AppFonts.smallMedium)
                 }
                 .buttonStyle(SecondaryButtonStyle())
             }
@@ -335,7 +335,7 @@ private struct AnalysisStepRow: View {
                 .frame(width: 24)
 
             Text(text)
-                .font(.subheadline.weight(isActive ? .medium : .regular))
+                .font(isActive ? AppFonts.smallMedium : AppFonts.small)
                 .foregroundColor(isActive ? .primary : .secondary)
 
             Spacer()

@@ -7,6 +7,7 @@ enum PDFExportService {
     private static let pageHeight: CGFloat = 792
     private static let margin: CGFloat = 50
     private static let contentWidth: CGFloat = 612 - 100 // pageWidth - 2 * margin
+    private static let brandAccent = CoilPalette.hex(0x0B7A78) // fixed print-safe COIL teal (accentDeep-light). PDFs render with no trait environment — never use dynamic AppColors/CoilPalette.accent here; #0FB5B0 also fails contrast on white paper.
 
     /// Generate a PDF Data object for a rehab plan
     static func generatePDF(for plan: RehabPlan) -> Data {
@@ -45,7 +46,7 @@ enum PDFExportService {
         // App branding
         let brandAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 12, weight: .medium),
-            .foregroundColor: UIColor.systemBlue
+            .foregroundColor: brandAccent
         ]
         "COIL".draw(at: CGPoint(x: margin, y: y), withAttributes: brandAttrs)
         y += 20
@@ -121,7 +122,7 @@ enum PDFExportService {
         ]
         let countAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 10),
-            .foregroundColor: UIColor.systemBlue
+            .foregroundColor: brandAccent
         ]
 
         for (index, dayName) in dayNames.enumerated() {

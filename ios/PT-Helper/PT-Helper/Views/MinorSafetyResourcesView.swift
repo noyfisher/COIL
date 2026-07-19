@@ -73,10 +73,10 @@ struct MinorSafetyResourcesView: View {
                         Button(action: onDismiss) {
                             Text("Got it")
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
+                                .padding(.vertical, AppSpacing.lg)
                                 .background(AppColors.accent)
                                 .foregroundColor(AppColors.ctaText)
-                                .font(.headline)
+                                .font(AppFonts.cardTitle)
                                 .cornerRadius(AppCorners.large)
                         }
                         .accessibilityIdentifier("minorSafety.gotItButton")
@@ -102,9 +102,9 @@ struct MinorSafetyResourcesView: View {
 
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(title)
-                    .font(.subheadline.weight(.semibold))
+                    .font(AppFonts.smallSemiBold)
                 Text(text)
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(AppColors.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
             }

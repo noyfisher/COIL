@@ -63,10 +63,10 @@ struct DisclaimerView: View {
                         }) {
                             Text("I Understand, Continue")
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
+                                .padding(.vertical, AppSpacing.lg)
                                 .background(AppColors.accent)
                                 .foregroundColor(AppColors.ctaText)
-                                .font(.headline)
+                                .font(AppFonts.cardTitle)
                                 .cornerRadius(AppCorners.large)
                         }
                         .padding(.horizontal, AppSpacing.xl)
@@ -101,9 +101,9 @@ struct DisclaimerView: View {
 
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(title)
-                    .font(.subheadline.weight(.semibold))
+                    .font(AppFonts.smallSemiBold)
                 Text(text)
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(AppColors.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
             }

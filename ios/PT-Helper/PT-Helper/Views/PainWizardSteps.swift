@@ -133,7 +133,7 @@ extension PainDetailView {
             VStack(alignment: .leading, spacing: AppSpacing.lg) {
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text("Review Your\nAssessment")
-                        .font(Font.custom("Industry-Bold", size: 32))
+                        .font(AppFonts.heroTitle)
                         .textCase(.uppercase)
                         .kerning(0.3)
                         .foregroundColor(AppColors.primaryText)
@@ -225,7 +225,7 @@ extension PainDetailView {
                     .foregroundColor(isSelected ? AppColors.accent : AppColors.secondaryText)
                     .frame(width: 28)
                 Text(label)
-                    .font(Font.custom(isSelected ? "Inter-SemiBold" : "Inter-Regular", size: 15))
+                    .font(isSelected ? AppFonts.bodySemiBold : AppFonts.body)
                     .foregroundColor(AppColors.primaryText)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
@@ -368,7 +368,7 @@ extension PainDetailView {
     func questionTitle(_ text: String, hint: String? = nil) -> some View {
         VStack(alignment: .leading, spacing: AppSpacing.xs) {
             Text(text)
-                .font(Font.custom("Industry-Bold", size: 32))
+                .font(AppFonts.heroTitle)
                 .textCase(.uppercase)
                 .kerning(0.3)
                 .foregroundColor(AppColors.primaryText)
@@ -411,7 +411,7 @@ extension PainDetailView {
                     ForEach(values, id: \.self) { value in
                         Text(value)
                             .font(AppFonts.captionMedium)
-                            .foregroundColor(AppColors.accent)
+                            .foregroundColor(AppColors.accentText)
                             .padding(.horizontal, AppSpacing.sm)
                             .padding(.vertical, AppSpacing.xs)
                             .background(AppColors.accentTint)

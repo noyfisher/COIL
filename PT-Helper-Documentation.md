@@ -245,7 +245,7 @@ Before generating a rehab plan, `AnalysisResultView` shows a preferences sheet w
 - `missingExerciseImages` — Public collection for logging missing images
 
 ### Shared State via EnvironmentObject
-`MainTabView` injects shared state into the view hierarchy:
+`ThreeTabView` injects shared state into the view hierarchy:
 - `TabSelection` — Cross-tab navigation
 - `SavedPlansViewModel` — Rehab plans (real-time Firestore listener)
 - `WorkoutViewModel` — Workout session tracking
@@ -293,11 +293,12 @@ Use `.trackScreen("ScreenName")` modifier on new views. `SessionLogger` auto-tra
 # 4. UX Flows
 
 ## Navigation Structure
-4-tab layout via `MainTabView`:
-- **Home** (Tab 0) — Dashboard, quick actions, recent plans
-- **Analyze** (Tab 1) — 3D body map → pain assessment → AI analysis
-- **Plans** (Tab 2) — Saved rehab plans list
-- **Progress** (Tab 3) — Pain trend charts, recovery insights
+`MainTabView` is a thin passthrough to `ThreeTabView`; `MainTabView.swift` also hosts the shared `TabSelection` class and `AssessmentRoute` enum. `ThreeTabView` (named for a historical 3-tab IA) is the primary navigation shell with 4 tabs plus a floating "+":
+- **Home** (Tab 0) — weekly date strip, today's program + preventative tasks
+- **My Plan** (Tab 1) — Active plan hero card + saved plans list
+- **Progress** (Tab 2) — Pain trend charts, recovery insights, settings, session history
+- **Profile** (Tab 3) — profile summary + edit (`OnboardingEditView`)
+- **Floating "+"** — Dual gateway: pain analysis or wellness goals (`AssessmentGatewayView`)
 
 ## Core Flow: Analysis → Plan → Workout
 
@@ -395,7 +396,6 @@ Use `.trackScreen("ScreenName")` modifier on new views. `SessionLogger` auto-tra
 ```
 ios/PT-Helper/PT-Helper/
   PT_HelperApp.swift              # App entry point, Firebase init
-  ContentView.swift               # HomeTab + OnboardingEditView
   DesignSystem.swift              # Tokens: AppColors, AppSpacing, AppFonts, AppCorners, AppAnimations + reusable components
 
   Models/
@@ -418,7 +418,8 @@ ios/PT-Helper/PT-Helper/
     RecoveryInsightsViewModel.swift # Weekly digest generation + caching
 
   Views/
-    MainTabView.swift             # 4-tab navigation + shared state injection
+    MainTabView.swift             # Thin passthrough to ThreeTabView + TabSelection/AssessmentRoute
+    OnboardingEditView.swift      # Profile edit wrapper
     BodyMap3DView.swift           # RealityKit 3D body map + coach marks
     PainDetailView.swift          # Per-region pain form (collapsible sections)
     AnalyzingView.swift           # AI analysis loading screen
@@ -426,7 +427,6 @@ ios/PT-Helper/PT-Helper/
     RehabPlanView.swift           # Plan display, edit, swap, guided workout entry
     GuidedWorkoutView.swift       # Exercise execution with resume support
     GuidedWorkoutSummaryView.swift # Post-workout stats + pain input
-    ProgressChartView.swift       # Pain trend charts + recovery insights
     ExerciseSwapSheet.swift       # Exercise substitution modal
     RecoveryInsightsCardView.swift
     RecoveryInsightsDetailView.swift

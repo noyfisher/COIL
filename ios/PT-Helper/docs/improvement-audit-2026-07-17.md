@@ -14,49 +14,49 @@ Sonnet's cross-session memory. Update the **Status** and **PR#** columns as you 
 
 | Item ID | Title | WS | Priority | Effort | Status | PR# |
 |---|---|---|---|---|---|---|
-| WS1-01 | Collapse MainTabView to a ThreeTabView passthrough and delete the legacy 4-tab shell wiring (+ LegacyUITests, --use-legacy-ui) | WS1 | P1 | M | todo | |
-| WS1-02 | Delete the --showcase screenshot harness (ShowcaseHostView + PT_HelperApp entry) | WS1 | P1 | S | todo | |
-| WS1-03 | Delete Views/Dashboard/* (10 files, 1,341 LOC) and the last dashboard TabSelection ids | WS1 | P1 | S | BLOCKED: WS1-01, WS1-02 | |
-| WS1-04 | Split ContentView.swift: extract live OnboardingEditView, delete LegacyHomeTab, delete the file | WS1 | P1 | S | BLOCKED: WS1-01 | |
-| WS1-05 | Delete legacy-orphaned view files: PlansTab, ProgressChartView, HealthCheckPromptView | WS1 | P1 | S | BLOCKED: WS1-01 | |
-| WS1-06 | Delete AssessTab.swift and QuickHealthUpdateView.swift | WS1 | P2 | S | BLOCKED: WS1-01 | |
-| WS1-07 | Remove dead ProgressTabContent.totalMinutes (ProgressTab.swift:584-586) | WS1 | P3 | S | todo | |
-| WS1-08 | Commit the cosmetic pbxproj diff (unquoted CFBundleDisplayName) | WS1 | P3 | S | todo | |
-| WS1-09 | Fix stale navigation docs and purge references to deleted files (CLAUDE.md, ux_flows, PT-Helper-Documentation, LAYOUT.md, improve skill) | WS1 | P2 | S | BLOCKED: WS1-01…06 | |
-| WS2-01 | Build the reminder reconciliation engine and wire it into the plan lifecycle | WS2 | P1 | M | todo | |
-| WS2-02 | Make the Settings toggles, time picker, and sign-out honor notification state | WS2 | P1 | S | BLOCKED: WS2-01 | |
-| WS2-03 | Schedule re-assessment reminders at plan midpoint and completion (audit #33) | WS2 | P2 | S | BLOCKED: WS2-01 | |
-| WS2-04 | First-workout activation nudge for freshly started plans (audit #34) | WS2 | P2 | S | BLOCKED: WS2-01 | |
-| WS3-01 | Close the grandfathered-user consent bypass with a launch-time health-consent gate | WS3 | P1 | M | BLOCKED: WS3-03 (soft, execution-order) | |
-| WS3-02 | Add the policy-promised consent-withdraw control in Settings with defined downstream effects | WS3 | P1 | M | BLOCKED: WS3-01, WS3-03 | |
-| WS3-03 | Make server state authoritative in ConsentService.load() and surface record-write failures; add ConsentService tests | WS3 | P1 | M | todo | |
-| WS3-04 | Delete the write-only legacy ToS UserDefaults keys | WS3 | P2 | S | todo | |
-| WS3-05 | Centralize duplicated UserDefaults key literals and clear the stale minor-safety flag on account deletion | WS3 | P2 | S | todo | |
-| WS3-06 | Update the Consumer Health Data Policy withdrawal-mechanism text | WS3 | P2 | S | BLOCKED: WS3-02 + legal review (BLOCKED-on-legal per D-2) | |
-| WS4-01 | Re-skin IntroCarouselView hero to COIL tokens and fix the light-mode status-bar strip | WS4 | P1 | S | todo | |
-| WS4-02 | Add branded launch screen and dark/tinted app-icon variants | WS4 | P2 | M | todo | |
+| WS1-01 | Collapse MainTabView to a ThreeTabView passthrough and delete the legacy 4-tab shell wiring (+ LegacyUITests, --use-legacy-ui) | WS1 | P1 | M | done | #43 |
+| WS1-02 | Delete the --showcase screenshot harness (ShowcaseHostView + PT_HelperApp entry) | WS1 | P1 | S | done | #43 |
+| WS1-03 | Delete Views/Dashboard/* (10 files, 1,341 LOC) and the last dashboard TabSelection ids | WS1 | P1 | S | done | #43 |
+| WS1-04 | Split ContentView.swift: extract live OnboardingEditView, delete LegacyHomeTab, delete the file | WS1 | P1 | S | done | #43 |
+| WS1-05 | Delete legacy-orphaned view files: PlansTab, ProgressChartView, HealthCheckPromptView | WS1 | P1 | S | done | #43 |
+| WS1-06 | Delete AssessTab.swift and QuickHealthUpdateView.swift | WS1 | P2 | S | done | #43 |
+| WS1-07 | Remove dead ProgressTabContent.totalMinutes (ProgressTab.swift:584-586) | WS1 | P3 | S | done | #43 |
+| WS1-08 | Commit the cosmetic pbxproj diff (unquoted CFBundleDisplayName) | WS1 | P3 | S | done | #43 |
+| WS1-09 | Fix stale navigation docs and purge references to deleted files (CLAUDE.md, ux_flows, PT-Helper-Documentation, LAYOUT.md, improve skill) | WS1 | P2 | S | done | #43 |
+| WS2-01 | Build the reminder reconciliation engine and wire it into the plan lifecycle | WS2 | P1 | M | done | #44 |
+| WS2-02 | Make the Settings toggles, time picker, and sign-out honor notification state | WS2 | P1 | S | done | #44 |
+| WS2-03 | Schedule re-assessment reminders at plan midpoint and completion (audit #33) | WS2 | P2 | S | done | #44 |
+| WS2-04 | First-workout activation nudge for freshly started plans (audit #34) | WS2 | P2 | S | done | #44 |
+| WS3-01 | Close the grandfathered-user consent bypass with a launch-time health-consent gate | WS3 | P1 | M | done | #45 |
+| WS3-02 | Add the policy-promised consent-withdraw control in Settings with defined downstream effects | WS3 | P1 | M | done | #45 |
+| WS3-03 | Make server state authoritative in ConsentService.load() and surface record-write failures; add ConsentService tests | WS3 | P1 | M | done | #45 |
+| WS3-04 | Delete the write-only legacy ToS UserDefaults keys | WS3 | P2 | S | done | #45 |
+| WS3-05 | Centralize duplicated UserDefaults key literals and clear the stale minor-safety flag on account deletion | WS3 | P2 | S | done | #45 |
+| WS3-06 | Update the Consumer Health Data Policy withdrawal-mechanism text | WS3 | P2 | S | BLOCKED: legal review (BLOCKED-on-legal per D-2) | |
+| WS4-01 | Re-skin IntroCarouselView hero to COIL tokens and fix the light-mode status-bar strip | WS4 | P1 | S | done | #46 |
+| WS4-02 | Add branded launch screen and dark/tinted app-icon variants | WS4 | P2 | M | done | #46 |
 | WS4-03 | Rename "PT Helper" to "COIL" in LegalContent (verbatim spec) | WS4 | P2 | S | BLOCKED: Legal sign-off (D-2) — bumps tosVersion, re-triggers acceptance gate for all users | |
-| WS4-04 | Replace systemBlue with fixed COIL teal in PDFExportService | WS4 | P2 | S | todo | |
-| WS4-05 | Sweep stale red/Barlow comments and residual PT Helper brand strings in live files | WS4 | P3 | S | todo | |
-| WS4-06 | Remove dead Inter-Bold font (unregistered payload) | WS4 | P3 | S | todo | |
-| WS5-01 | Fix checkpoint double-count at the exercise boundary (save-point semantics) | WS5 | P1 | M | todo | |
-| WS5-02 | Convert rest countdown to wall-clock end-Date reconciliation | WS5 | P1 | M | todo | |
-| WS5-03 | Add scenePhase background-save and foreground wall-clock reconcile to GuidedWorkout | WS5 | P2 | S | BLOCKED: WS5-01, WS5-02 | |
-| WS5-04 | Delete the dead TimerViewModel/TimerView/ExerciseTimer trio | WS5 | P2 | S | todo | |
-| WS6-01 | Add read-only "Your Last Analysis" card to the Progress tab | WS6 | P1 | S | BLOCKED: WS6-02 (must land with or after the sign-out PHI clear) | |
-| WS6-02 | Clear AnalysisResultStore on sign-out (cross-account PHI guard) | WS6 | P1 | S | todo | |
-| WS7-01 | Sweep accent-as-text to a new adaptive accentText token (35 sites) | WS7 | P1 | M | todo | |
-| WS7-02 | Fix Progress pain-trend chart axis labels (1.61:1 worst audit failure) | WS7 | P1 | S | todo | |
-| WS7-03 | Darken chip/badge selected fills so white text passes AA (CoilBadge + ChipButton) | WS7 | P2 | S | todo | |
-| WS7-04 | Add accessibilityLabels to 9 icon-only buttons | WS7 | P2 | S | todo | |
-| WS7-05 | Add VoiceOver summary to ReAssessment comparison chart | WS7 | P2 | S | todo | |
-| WS8-01 | Add offline fail-fast guards to the 5 ungated AI ViewModels | WS8 | P1 | M | todo | |
-| WS8-02 | Extract shared performProxyRequest helper in ClaudeAPIService | WS8 | P1 | M | todo | |
-| WS8-03 | Add service-level retry: 1 retry, 2s delay, transport/5xx only, never 429 | WS8 | P2 | S | BLOCKED: WS8-02 | |
-| WS9-01 | Tokenize text fonts in the 7 worst-offender screens (+ own the master mapping table) | WS9 | P2 | M | todo | |
-| WS9-02 | Tokenize text fonts across the remaining live screens (long tail; split 2a components/onboarding + 2b screens) | WS9 | P2 | L | BLOCKED: WS9-01 (shared table only; disjoint files, can parallelize) | |
-| WS9-03 | Tokenize numeric padding + corner-radius literals to AppSpacing/AppCorners | WS9 | P3 | M | todo | |
-| WS9-04 | Fold hand-rolled card stacks into .cardStyle() (33 quadruples) | WS9 | P3 | S | BLOCKED: WS9-03 (soft ordering; independent files) | |
+| WS4-04 | Replace systemBlue with fixed COIL teal in PDFExportService | WS4 | P2 | S | done | #46 |
+| WS4-05 | Sweep stale red/Barlow comments and residual PT Helper brand strings in live files | WS4 | P3 | S | done | #46 |
+| WS4-06 | Remove dead Inter-Bold font (unregistered payload) | WS4 | P3 | S | done | #46 |
+| WS5-01 | Fix checkpoint double-count at the exercise boundary (save-point semantics) | WS5 | P1 | M | done | #47 |
+| WS5-02 | Convert rest countdown to wall-clock end-Date reconciliation | WS5 | P1 | M | done | #47 |
+| WS5-03 | Add scenePhase background-save and foreground wall-clock reconcile to GuidedWorkout | WS5 | P2 | S | done | #47 |
+| WS5-04 | Delete the dead TimerViewModel/TimerView/ExerciseTimer trio | WS5 | P2 | S | done | #47 |
+| WS6-01 | Add read-only "Your Last Analysis" card to the Progress tab | WS6 | P1 | S | done | #48 |
+| WS6-02 | Clear AnalysisResultStore on sign-out (cross-account PHI guard) | WS6 | P1 | S | done | #48 |
+| WS7-01 | Sweep accent-as-text to a new adaptive accentText token (35 sites) | WS7 | P1 | M | done | #49 |
+| WS7-02 | Fix Progress pain-trend chart axis labels (1.61:1 worst audit failure) | WS7 | P1 | S | done | #49 |
+| WS7-03 | Darken chip/badge selected fills so white text passes AA (CoilBadge + ChipButton) | WS7 | P2 | S | done | #49 |
+| WS7-04 | Add accessibilityLabels to 9 icon-only buttons | WS7 | P2 | S | done | #49 |
+| WS7-05 | Add VoiceOver summary to ReAssessment comparison chart | WS7 | P2 | S | done | #49 |
+| WS8-01 | Add offline fail-fast guards to the 5 ungated AI ViewModels | WS8 | P1 | M | done | #50 |
+| WS8-02 | Extract shared performProxyRequest helper in ClaudeAPIService | WS8 | P1 | M | done | #50 |
+| WS8-03 | Add service-level retry: 1 retry, 2s delay, transport/5xx only, never 429 | WS8 | P2 | S | done | #50 |
+| WS9-01 | Tokenize text fonts in the 7 worst-offender screens (+ own the master mapping table) | WS9 | P2 | M | done | #51 |
+| WS9-02 | Tokenize text fonts across the remaining live screens (long tail; split 2a components/onboarding + 2b screens) | WS9 | P2 | L | done | #51 |
+| WS9-03 | Tokenize numeric padding + corner-radius literals to AppSpacing/AppCorners | WS9 | P3 | M | done | #51 |
+| WS9-04 | Fold hand-rolled card stacks into .cardStyle() (33 quadruples) | WS9 | P3 | S | done | #51 |
 | WS10-01 | Replace the cosmetic 21-day date strip with an honest completion-dot week strip | WS10 | P2 | M | done | #52 |
 | WS10-02 | Gate the Preventative section on an active plan (hide it when there is no plan) | WS10 | P2 | S | done | #52 |
 | WS10-03 | Clear preventiveTasks_* UserDefaults keys on account deletion | WS10 | P3 | S | done | #52 |

@@ -100,6 +100,10 @@ class GuidedWorkoutViewModel: ObservableObject {
     private var accumulatedTime: TimeInterval = 0
     /// Reference point for the current active segment (reset on each resume).
     private var lastResumeTime = Date()
+    /// Wall-clock end of the current rest. Source of truth for timeRemaining.
+    private var restEndDate: Date?
+    /// Injectable clock for the rest-timer paths (test seam). Production: real Date.
+    var now: () -> Date = { Date() }
 
     // MARK: - Computed Properties
 
@@ -152,14 +156,16 @@ class GuidedWorkoutViewModel: ObservableObject {
             // All sets done for this exercise
             completedExercises.append(exercise.name)
             Self.incrementCompletionCount(for: exercise.name)
-            saveCheckpoint()
 
             if currentExerciseIndex < totalExercises - 1 {
-                // Start rest before next exercise
+                // Start rest before next exercise. Save the ADVANCED position:
+                // the live index still points at the just-completed exercise
+                // (invariant — see saveCheckpoint doc comment).
+                saveCheckpoint(forNextExercise: true)
                 startRestTimer(seconds: exercise.restSeconds, kind: .interExercise)
             } else {
                 // Last exercise — workout complete
-                finishWorkout()
+                finishWorkout()   // clears the checkpoint — no save needed
             }
         } else {
             // More sets to do — brief inter-set rest
@@ -177,7 +183,6 @@ class GuidedWorkoutViewModel: ObservableObject {
         SessionLogger.shared.logUserAction(.buttonTapped, action: "skipExercise",
                                             metadata: ["exercise": exercise.name])
         skippedExercises.append(exercise.name)
-        saveCheckpoint()
         moveToNextExercise()
     }
 
@@ -194,6 +199,7 @@ class GuidedWorkoutViewModel: ObservableObject {
     func adjustRestTime(by seconds: Int) {
         timeRemaining = max(5, timeRemaining + seconds)
         restDuration = max(restDuration, timeRemaining)
+        restEndDate = now().addingTimeInterval(TimeInterval(timeRemaining))
     }
 
     /// Toggle pause state
@@ -213,7 +219,9 @@ class GuidedWorkoutViewModel: ObservableObject {
             // Reset reference point so the next segment starts fresh
             lastResumeTime = Date()
             if phase == .rest && timeRemaining > 0 {
-                resumeRestTimer()
+                restEndDate = now().addingTimeInterval(TimeInterval(timeRemaining))
+                isTimerRunning = true
+                startRestTicker()
             }
             startElapsedTimer()
         }
@@ -280,11 +288,16 @@ class GuidedWorkoutViewModel: ObservableObject {
     // MARK: - Checkpointing
 
     /// Save current workout state so it can be resumed after a crash or interruption.
-    func saveCheckpoint() {
+    ///
+    /// Invariant: a checkpoint always records the next actionable exercise/set —
+    /// never state the user has already completed. Pass `forNextExercise: true`
+    /// when saving at the moment an exercise is completed but the index has not
+    /// yet advanced (inter-exercise rest window).
+    func saveCheckpoint(forNextExercise: Bool = false) {
         let checkpoint = WorkoutCheckpoint(
             planId: plan.id.uuidString,
-            currentExerciseIndex: currentExerciseIndex,
-            currentSet: currentSet,
+            currentExerciseIndex: forNextExercise ? currentExerciseIndex + 1 : currentExerciseIndex,
+            currentSet: forNextExercise ? 1 : currentSet,
             completedExercises: completedExercises,
             skippedExercises: skippedExercises,
             substitutedExercises: substitutedExercises,
@@ -326,6 +339,31 @@ class GuidedWorkoutViewModel: ObservableObject {
         phase = .exercise
     }
 
+    // MARK: - Scene Phase
+
+    /// Persist an accurate checkpoint when the app is backgrounded mid-workout.
+    /// During an inter-exercise rest the live index still points at the exercise
+    /// just completed, so save the advanced position (same rule as completeSet's
+    /// final-set branch) — a live-state save here would resurrect the WS5-01 bug.
+    func handleAppBackgrounded() {
+        guard phase != .complete else { return }
+        if phase == .rest && restKind == .interExercise {
+            saveCheckpoint(forNextExercise: true)
+        } else {
+            saveCheckpoint()
+        }
+    }
+
+    /// Snap timers to the wall clock immediately on return to foreground
+    /// (instead of waiting up to 1s for the next ticker tick).
+    func handleAppForegrounded() {
+        guard !isPaused, phase != .complete else { return }
+        if phase == .rest {
+            reconcileRestFromWallClock()
+        }
+        totalElapsedTime = accumulatedTime + now().timeIntervalSince(lastResumeTime)
+    }
+
     // MARK: - Private
 
     private func moveToNextExercise() {
@@ -334,6 +372,7 @@ class GuidedWorkoutViewModel: ObservableObject {
             currentExerciseIndex += 1
             currentSet = 1
             phase = .exercise
+            saveCheckpoint()
         } else {
             finishWorkout()
         }
@@ -380,38 +419,32 @@ class GuidedWorkoutViewModel: ObservableObject {
         restKind = kind
         timeRemaining = max(seconds, 5)
         restDuration = timeRemaining
+        restEndDate = now().addingTimeInterval(TimeInterval(timeRemaining))
         isTimerRunning = true
+        startRestTicker()
+    }
 
+    private func startRestTicker() {
         timerSubscription = Foundation.Timer.publish(every: 1, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
-                guard let self = self, !self.isPaused else { return }
-                if self.timeRemaining > 0 {
-                    self.timeRemaining -= 1
-                    if self.timeRemaining == 5 {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    } else if self.timeRemaining == 0 {
-                        UINotificationFeedbackGenerator().notificationOccurred(.success)
-                    }
-                } else {
-                    self.endRest()
-                }
+                self?.reconcileRestFromWallClock()
             }
     }
 
-    private func resumeRestTimer() {
-        guard timeRemaining > 0 else { return }
-        isTimerRunning = true
-        timerSubscription = Foundation.Timer.publish(every: 1, on: .main, in: .common)
-            .autoconnect()
-            .sink { [weak self] _ in
-                guard let self = self, !self.isPaused else { return }
-                if self.timeRemaining > 0 {
-                    self.timeRemaining -= 1
-                } else {
-                    self.endRest()
-                }
-            }
+    /// Derive timeRemaining from the wall-clock end date. Called every ticker
+    /// tick and on foreground return; self-heals after any suspension.
+    func reconcileRestFromWallClock() {
+        guard !isPaused, phase == .rest, let end = restEndDate else { return }
+        let remaining = max(0, Int(end.timeIntervalSince(now()).rounded(.up)))
+        if timeRemaining > 5 && remaining <= 5 && remaining > 0 {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        }
+        timeRemaining = remaining
+        if remaining == 0 {
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            endRest()
+        }
     }
 
     private func stopTimer() {
@@ -419,6 +452,7 @@ class GuidedWorkoutViewModel: ObservableObject {
         timerSubscription = nil
         isTimerRunning = false
         timeRemaining = 0
+        restEndDate = nil
     }
 
     private func startElapsedTimer() {

@@ -48,11 +48,13 @@ struct ProgressTabContent: View {
     @ObservedObject var insightsVM: RecoveryInsightsViewModel
     @ObservedObject var savedPlansVM: SavedPlansViewModel
     @ObservedObject private var streakService = StreakService.shared
+    @ObservedObject private var analysisStore = AnalysisResultStore.shared
     var onSettingsTapped: () -> Void
 
     @State private var selectedRegion: String? = nil
     @State private var sessionToDelete: WorkoutSession?
     @State private var showDeleteConfirmation = false
+    @State private var navigateToLastAnalysis = false
 
     /// Tier 3 PR D + followup: outcome-prompt visibility. Re-evaluated on
     /// every render — when the user submits or dismisses the prompt,
@@ -63,6 +65,8 @@ struct ProgressTabContent: View {
     var body: some View {
         ScrollView {
             VStack(spacing: AppSpacing.lg) {
+                lastAnalysisSection
+
                 if let loadError = workoutViewModel.loadError {
                     // A fetch failure must not masquerade as "No Data Yet" — that's
                     // the brand-new-user message and makes a longtime user fear their
@@ -172,6 +176,7 @@ struct ProgressTabContent: View {
                             .foregroundColor(AppColors.accent)
                     }
                     .accessibilityIdentifier("progress.settingsButton")
+                    .accessibilityLabel("Settings")
                 }
             }
         }
@@ -200,6 +205,92 @@ struct ProgressTabContent: View {
             .sorted { ($0.startDate ?? .distantFuture) < ($1.startDate ?? .distantFuture) }
         guard let oldest = eligible.first else { return nil }
         return (plan: oldest, analysisId: oldest.id)
+    }
+
+    // MARK: - Last Analysis (D-6, recovered from orphaned AssessTab card — vuser F2)
+
+    /// Re-entry point to the most recent AI analysis. Hidden when no analysis has
+    /// been run (nil) or when the stored result is the empty defensive fallback
+    /// AnalyzingView can construct (conditions.isEmpty — nothing to display).
+    @ViewBuilder
+    private var lastAnalysisSection: some View {
+        if let lastResult = analysisStore.lastResult, !lastResult.conditions.isEmpty {
+            VStack(alignment: .leading, spacing: AppSpacing.md) {
+                CoilDividerHeader(title: "Your Last Analysis")
+
+                Button {
+                    SessionLogger.shared.logUserAction(.buttonTapped,
+                        action: "lastAnalysisOpened",
+                        metadata: [:])
+                    navigateToLastAnalysis = true
+                } label: {
+                    lastAnalysisCard(for: lastResult)
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("progress.lastAnalysisCard")
+                .navigationDestination(isPresented: $navigateToLastAnalysis) {
+                    AnalysisResultView(analysisResult: lastResult, isReadOnly: true)
+                }
+            }
+        }
+    }
+
+    private func lastAnalysisCard(for result: AnalysisResult) -> some View {
+        let topCondition = result.conditions.first
+        let strength = topCondition.map { ConfidenceCalibrator.matchStrength(for: $0.confidence) }
+
+        return HStack(spacing: AppSpacing.md) {
+            Image(systemName: "stethoscope")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(AppColors.accent)
+                .frame(width: 40, height: 40)
+                .background(AppColors.accent.opacity(0.12))
+                .cornerRadius(AppCorners.small)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(topCondition?.commonName ?? "Analysis Results")
+                    .font(AppFonts.bodySemiBold)
+                    .foregroundColor(AppColors.primaryText)
+
+                HStack(spacing: AppSpacing.xs) {
+                    if let strength {
+                        Text(strength.rawValue)
+                            .font(AppFonts.captionSemiBold)
+                            .foregroundColor(matchStrengthColor(strength))
+                        Text("•")
+                            .font(AppFonts.caption)
+                            .foregroundColor(AppColors.mutedText)
+                    }
+                    Text(result.generatedDate.formatted(.relative(presentation: .named)))
+                        .font(AppFonts.caption)
+                        .foregroundColor(AppColors.secondaryText)
+                }
+
+                Text("View your results")
+                    .font(AppFonts.micro)
+                    .foregroundColor(AppColors.mutedText)
+            }
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(AppColors.accent)
+        }
+        .padding(.horizontal, AppSpacing.lg)
+        .padding(.vertical, AppSpacing.md)
+        .background(AppColors.cardBackground)
+        .cornerRadius(AppCorners.card)
+        .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
+        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+    }
+
+    private func matchStrengthColor(_ strength: MatchStrength) -> Color {
+        switch strength {
+        case .strong: return AppColors.success
+        case .moderate: return AppColors.warning
+        case .weak: return AppColors.mutedText
+        }
     }
 
     // MARK: - Navigation Link Row
@@ -242,7 +333,7 @@ struct ProgressTabContent: View {
                     NavigationLink(destination: WorkoutSessionView()) {
                         Text("See All")
                             .font(AppFonts.captionSemiBold)
-                            .foregroundColor(AppColors.accent)
+                            .foregroundColor(AppColors.accentText)
                     }
                 }
             }
@@ -261,11 +352,7 @@ struct ProgressTabContent: View {
                         }
                 }
             }
-            .padding(AppSpacing.lg)
-            .background(AppColors.cardBackground)
-            .cornerRadius(AppCorners.card)
-            .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
-            .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+            .cardStyle()
         }
     }
 
@@ -280,7 +367,7 @@ struct ProgressTabContent: View {
                     .frame(width: 40, height: 40)
                     .overlay(
                         Text("\(Int(session.painLevel))")
-                            .font(.system(size: 14, weight: .bold, design: .rounded))
+                            .font(AppFonts.bodySemiBold)
                             .foregroundColor(painColor(for: session.painLevel))
                     )
 
@@ -459,13 +546,13 @@ struct ProgressTabContent: View {
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [4]))
                         .foregroundStyle(AppColors.mutedText.opacity(0.3))
                     AxisValueLabel()
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(AppColors.secondaryText)
                 }
             }
             .chartXAxis {
                 AxisMarks { _ in
                     AxisValueLabel(format: .dateTime.month(.abbreviated).day())
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(AppColors.secondaryText)
                 }
             }
             .frame(height: 220)
@@ -475,11 +562,7 @@ struct ProgressTabContent: View {
             .accessibilityLabel("Pain trend chart")
             .accessibilityValue(painTrendAccessibilityValue)
         }
-        .padding(AppSpacing.lg)
-        .background(AppColors.cardBackground)
-        .cornerRadius(AppCorners.card)
-        .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
-        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+        .cardStyle()
     }
 
     private var filteredChartData: [WorkoutSession] {
@@ -550,7 +633,7 @@ struct ProgressTabContent: View {
                 .cornerRadius(AppCorners.small)
 
             Text(value)
-                .font(Font.custom("Industry-Bold", size: 26))
+                .font(AppFonts.statNumber)
                 .foregroundColor(AppColors.primaryText)
 
             Text(label)
@@ -581,10 +664,6 @@ struct ProgressTabContent: View {
         }
     }
 
-    private var totalMinutes: Int {
-        Int(workoutViewModel.sessions.reduce(0.0) { $0 + $1.duration } / 60)
-    }
-
     // MARK: - Re-Assessment Card
 
     private var reassessmentCard: some View {
@@ -594,7 +673,7 @@ struct ProgressTabContent: View {
                     .foregroundColor(AppColors.accent)
                     .font(.system(size: 16, weight: .semibold))
                 Text("Time for a Re-Assessment?")
-                    .font(Font.custom("Industry-Bold", size: 16))
+                    .font(AppFonts.cardTitle)
                     .foregroundColor(AppColors.primaryText)
                 Spacer()
             }
@@ -616,9 +695,9 @@ struct ProgressTabContent: View {
                     Image(systemName: "arrow.right")
                         .font(.system(size: 12, weight: .semibold))
                 }
-                .foregroundColor(AppColors.accent)
+                .foregroundColor(AppColors.accentText)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
+                .padding(.vertical, AppSpacing.comfortable)
                 .overlay(Capsule().stroke(AppColors.accent, lineWidth: 1.5))
                 // .plain buttons only hit-test rendered pixels — the stroked
                 // capsule's interior is dead without an explicit content shape.
@@ -647,7 +726,7 @@ private struct StreakToolbarBadge: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(streakColor)
             Text("\(streakService.streakData.currentStreak)")
-                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .font(AppFonts.bodySemiBold)
                 .foregroundColor(streakColor)
         }
     }

@@ -103,6 +103,14 @@ class RecoveryInsightsViewModel: ObservableObject {
             return
         }
 
+        // Fail fast when offline instead of making the user watch a doomed
+        // spinner before a generic network error (WS8-01, extends audit #58).
+        guard NetworkMonitor.shared.isConnected else {
+            error = "You're offline. Connect to the internet to load your recovery insights, then try again."
+            isLoading = false
+            return
+        }
+
         isLoading = true
         loadingMessage = Self.loadingMessages[0]
         error = nil

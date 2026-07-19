@@ -95,7 +95,7 @@ private struct WeekCompletionStrip: View {
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text(monthLabel)
-                .font(Font.custom("Industry-Bold", size: 13))
+                .font(AppFonts.cardTitle)
                 .kerning(0.5)
                 .foregroundColor(Color.white.opacity(0.55))
                 .padding(.horizontal, AppSpacing.lg)
@@ -139,7 +139,7 @@ private struct DayCell: View {
                 .foregroundColor(Color.white.opacity(0.40))
 
             Text(Self.numFmt.string(from: date))
-                .font(Font.custom("Industry-Bold", size: 20))
+                .font(AppFonts.sectionTitle)
                 .foregroundColor(isToday ? AppColors.accent : Color.white.opacity(0.55))
 
             if isCompleted {
@@ -150,9 +150,9 @@ private struct DayCell: View {
         }
         .frame(width: 44, height: 66)
         .background(Color.clear)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .clipShape(RoundedRectangle(cornerRadius: AppCorners.small + 2))
         .overlay(
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: AppCorners.small + 2)
                 .stroke(
                     isToday ? AppColors.accent.opacity(0.55) : Color.clear,
                     lineWidth: 1.5
@@ -186,7 +186,7 @@ private struct HomeTabPicker: View {
             withAnimation(.easeInOut(duration: 0.2)) { selected = tab }
         } label: {
             Text(label)
-                .font(Font.custom("Industry-Bold", size: 13))
+                .font(AppFonts.cardTitle)
                 .textCase(.uppercase)
                 .kerning(0.5)
                 .foregroundColor(active ? .white : AppColors.secondaryText)
