@@ -44,11 +44,11 @@ struct LegalAcceptanceGateView: View {
                             .padding(.top, AppSpacing.xxl)
 
                         Text(title)
-                            .font(.system(.title2, design: .serif).weight(.bold))
+                            .font(AppFonts.title)
                             .multilineTextAlignment(.center)
 
                         Text(bodyText)
-                            .font(.subheadline)
+                            .font(AppFonts.small)
                             .foregroundColor(AppColors.secondaryText)
                             .multilineTextAlignment(.center)
                             .fixedSize(horizontal: false, vertical: true)
@@ -69,10 +69,10 @@ struct LegalAcceptanceGateView: View {
                             Button(action: accept) {
                                 Text("Accept & Continue")
                                     .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 16)
+                                    .padding(.vertical, AppSpacing.lg)
                                     .background(canAccept ? AppColors.accent : AppColors.accent.opacity(0.4))
                                     .foregroundColor(AppColors.ctaText)
-                                    .font(.headline)
+                                    .font(AppFonts.cardTitle)
                                     .cornerRadius(AppCorners.large)
                             }
                             .disabled(!canAccept)
@@ -80,7 +80,7 @@ struct LegalAcceptanceGateView: View {
                             Button("Sign Out") {
                                 try? Auth.auth().signOut()
                             }
-                            .font(.subheadline)
+                            .font(AppFonts.small)
                             .foregroundColor(AppColors.secondaryText)
                         }
                         .padding(.horizontal, AppSpacing.xl)
@@ -108,7 +108,7 @@ struct LegalAcceptanceGateView: View {
     private var dobSection: some View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             Text("Date of Birth")
-                .font(.subheadline.weight(.semibold))
+                .font(AppFonts.smallSemiBold)
             DatePicker("", selection: $dob, in: ...Date(), displayedComponents: .date)
                 .datePickerStyle(.compact)
                 .labelsHidden()

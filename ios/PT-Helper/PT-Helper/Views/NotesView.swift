@@ -20,8 +20,8 @@ struct NotesView: View {
                                 if viewModel.newNoteContent.isEmpty {
                                     Text("How are you feeling today? Any progress or setbacks...")
                                         .foregroundColor(AppColors.secondaryText.opacity(0.5))
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 12)
+                                        .padding(.horizontal, AppSpacing.md)
+                                        .padding(.vertical, AppSpacing.md)
                                 }
                                 TextEditor(text: $viewModel.newNoteContent)
                                     .focused($isEditorFocused)
@@ -106,16 +106,16 @@ struct NotesView: View {
                 .foregroundColor(AppColors.success)
                 .frame(width: 28, height: 28)
                 .background(AppColors.success.opacity(0.15))
-                .cornerRadius(7)
+                .cornerRadius(AppCorners.small - 1)
 
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(note.content)
-                    .font(.body)
+                    .font(AppFonts.body)
                     .foregroundColor(AppColors.primaryText)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Text(note.dateCreated, style: .date)
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
             }
 

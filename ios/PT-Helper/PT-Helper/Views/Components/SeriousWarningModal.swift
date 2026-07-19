@@ -46,7 +46,7 @@ struct SeriousWarningModal: View {
                         .foregroundColor(AppColors.primaryText)
 
                     Text("This plan contains exercises that may not be appropriate for some items in your health profile. Please review the concerns below and talk to your PT before starting.")
-                        .font(.body)
+                        .font(AppFonts.body)
                         .multilineTextAlignment(.center)
                         .foregroundColor(AppColors.secondaryText)
                         .padding(.horizontal, AppSpacing.lg)
@@ -58,7 +58,7 @@ struct SeriousWarningModal: View {
                                     .foregroundColor(AppColors.warning)
                                     .font(.caption)
                                 Text(msg)
-                                    .font(.footnote)
+                                    .font(AppFonts.caption)
                                     .foregroundColor(AppColors.primaryText)
                             }
                         }
@@ -77,7 +77,7 @@ struct SeriousWarningModal: View {
                     onAcknowledge()
                 }) {
                     Text("I've read this & accept the risk")
-                        .font(.body.weight(.semibold))
+                        .font(AppFonts.bodySemiBold)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, AppSpacing.md)
@@ -88,7 +88,7 @@ struct SeriousWarningModal: View {
 
                 Button(action: onRequestSaferPlan) {
                     Text("Request a safer plan")
-                        .font(.subheadline.weight(.medium))
+                        .font(AppFonts.smallMedium)
                         .foregroundColor(AppColors.accentText)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, AppSpacing.sm)
@@ -97,7 +97,7 @@ struct SeriousWarningModal: View {
 
                 Button(action: onDismiss) {
                     Text("Not now")
-                        .font(.footnote)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.mutedText)
                 }
             }

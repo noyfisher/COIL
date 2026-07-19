@@ -30,7 +30,7 @@ struct HealthDataConsentView: View {
                             .padding(.top, AppSpacing.xxl)
 
                         Text("Your Health Data")
-                            .font(.system(.title2, design: .serif).weight(.bold))
+                            .font(AppFonts.title)
 
                         VStack(alignment: .leading, spacing: AppSpacing.lg) {
                             consentSection(
@@ -85,10 +85,10 @@ struct HealthDataConsentView: View {
                         }) {
                             Text("Continue")
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
+                                .padding(.vertical, AppSpacing.lg)
                                 .background(canContinue ? AppColors.accent : AppColors.accent.opacity(0.4))
                                 .foregroundColor(AppColors.ctaText)
-                                .font(.headline)
+                                .font(AppFonts.cardTitle)
                                 .cornerRadius(AppCorners.large)
                         }
                         .disabled(!canContinue)
@@ -140,9 +140,9 @@ struct HealthDataConsentView: View {
 
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(title)
-                    .font(.subheadline.weight(.semibold))
+                    .font(AppFonts.smallSemiBold)
                 Text(text)
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(AppColors.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
             }

@@ -27,7 +27,7 @@ struct RegionPainInputView: View {
                     .cornerRadius(AppCorners.small)
 
                 Text("Pain by Region")
-                    .font(.subheadline.weight(.semibold))
+                    .font(AppFonts.smallSemiBold)
 
                 Spacer()
 
@@ -43,7 +43,7 @@ struct RegionPainInputView: View {
 
             if regionPainLevels.isEmpty {
                 Text("Tap \"Add\" to track pain for specific body regions")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(.secondary)
                     .padding(.vertical, AppSpacing.sm)
             } else {
@@ -67,12 +67,12 @@ struct RegionPainInputView: View {
         VStack(spacing: 4) {
             HStack {
                 Text(Self.displayName(for: region))
-                    .font(.caption.weight(.medium))
+                    .font(AppFonts.captionMedium)
 
                 Spacer()
 
                 Text(String(format: "%.0f", regionPainLevels[region] ?? 0))
-                    .font(.caption.weight(.bold))
+                    .font(AppFonts.captionSemiBold)
                     .foregroundColor(painColor(for: regionPainLevels[region] ?? 0))
 
                 Button(action: { regionPainLevels.removeValue(forKey: region) }) {

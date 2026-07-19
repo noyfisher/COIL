@@ -31,7 +31,7 @@ struct RecoveryInsightsCardView: View {
         CardSection(icon: "brain.head.profile", color: AppColors.accent, title: "Recovery Insights") {
             VStack(spacing: AppSpacing.md) {
                 Text("Your AI recovery coach can analyze your recent workouts and share personalized insights.")
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(AppColors.secondaryText)
 
                 if let error = vm.error {
@@ -40,7 +40,7 @@ struct RecoveryInsightsCardView: View {
                             .foregroundColor(AppColors.warning)
                             .font(.caption)
                         Text(error)
-                            .font(.caption)
+                            .font(AppFonts.caption)
                             .foregroundColor(AppColors.secondaryText)
                     }
                 }
@@ -64,7 +64,7 @@ struct RecoveryInsightsCardView: View {
                 ProgressView()
                     .scaleEffect(0.9)
                 Text(vm.loadingMessage)
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(AppColors.secondaryText)
                     .animation(.easeInOut(duration: 0.3), value: vm.loadingMessage)
             }
@@ -85,7 +85,7 @@ struct RecoveryInsightsCardView: View {
 
                 // Summary
                 Text(insight.summary)
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(AppColors.secondaryText)
                     .lineLimit(3)
 
@@ -115,7 +115,7 @@ struct RecoveryInsightsCardView: View {
                     HStack {
                         Spacer()
                         Text("View Full Digest")
-                            .font(.caption.weight(.medium))
+                            .font(AppFonts.captionMedium)
                             .foregroundColor(AppColors.accentText)
                         Image(systemName: "chevron.right")
                             .font(.caption2.weight(.semibold))
@@ -146,7 +146,7 @@ struct RecoveryInsightsCardView: View {
         return CardSection(icon: "brain.head.profile", color: AppColors.mutedText, title: "Recovery Insights") {
             VStack(spacing: AppSpacing.sm) {
                 Text("Complete \(remaining) more workout\(remaining == 1 ? "" : "s") in the next 2 weeks to unlock AI recovery insights.")
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(AppColors.secondaryText)
 
                 // Progress dots
@@ -180,10 +180,10 @@ struct RecoveryInsightsCardView: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(color)
             Text(value)
-                .font(.caption.weight(.bold))
+                .font(AppFonts.captionSemiBold)
                 .foregroundColor(AppColors.primaryText)
             Text(label)
-                .font(.caption2)
+                .font(AppFonts.micro)
                 .foregroundColor(AppColors.secondaryText)
         }
         .frame(maxWidth: .infinity)

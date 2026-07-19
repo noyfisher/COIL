@@ -15,14 +15,14 @@ struct LegalDocumentView: View {
                     options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
                 ) {
                     Text(attributedContent)
-                        .font(.subheadline)
+                        .font(AppFonts.small)
                         .foregroundColor(AppColors.primaryText)
                         .padding(AppSpacing.xl)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 } else {
                     // Fallback: render as plain text
                     Text(markdownContent)
-                        .font(.subheadline)
+                        .font(AppFonts.small)
                         .foregroundColor(AppColors.primaryText)
                         .padding(AppSpacing.xl)
                         .frame(maxWidth: .infinity, alignment: .leading)

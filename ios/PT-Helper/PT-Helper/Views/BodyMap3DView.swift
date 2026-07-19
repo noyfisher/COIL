@@ -163,7 +163,7 @@ struct BodyMap3DView: View {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 12, weight: .bold))
                             Text("Back")
-                                .font(.subheadline.weight(.medium))
+                                .font(AppFonts.smallMedium)
                         }
                         .foregroundColor(AppColors.primaryText.opacity(0.8))
                     }
@@ -184,7 +184,7 @@ struct BodyMap3DView: View {
                     Color.clear.frame(width: 60, height: 1)
                 }
                 Text("Tap regions to select specific areas")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.mutedText)
             } else {
                 // Overview header
@@ -192,14 +192,14 @@ struct BodyMap3DView: View {
                     .font(AppFonts.sectionTitle)
                     .foregroundColor(AppColors.primaryText)
                 Text("Tap a body zone to zoom in")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.mutedText)
                     .multilineTextAlignment(.center)
                 // Always-visible rotate cue (not just the one-time coach mark) so
                 // returning users know the model turns — that's where the back,
                 // glutes & hamstrings live (audit #18).
                 Label("Drag to rotate — reach the back, glutes & hamstrings", systemImage: "arrow.triangle.2.circlepath")
-                    .font(.caption2)
+                    .font(AppFonts.micro)
                     .foregroundColor(AppColors.accentText)
                     .multilineTextAlignment(.center)
 
@@ -210,7 +210,7 @@ struct BodyMap3DView: View {
                     showRegionList = true
                 } label: {
                     Label("Choose from a list", systemImage: "list.bullet")
-                        .font(.caption.weight(.medium))
+                        .font(AppFonts.captionMedium)
                 }
                 .padding(.top, AppSpacing.xs)
                 .accessibilityIdentifier("bodyMap.chooseFromListButton")
@@ -270,7 +270,7 @@ struct BodyMap3DView: View {
             HStack(spacing: AppSpacing.sm) {
                 if viewModel.selectedRegions.isEmpty {
                     Text("No areas selected")
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.mutedText)
                         .padding(.horizontal, AppSpacing.md)
                         .padding(.vertical, AppSpacing.sm)
@@ -283,7 +283,7 @@ struct BodyMap3DView: View {
                                 .fill(Color(uiColor: BodyMapConstants.highlightColor))
                                 .frame(width: 8, height: 8)
                             Text(region.name)
-                                .font(.caption.weight(.medium))
+                                .font(AppFonts.captionMedium)
                                 .foregroundColor(.white)
                             Button(action: {
                                 withAnimation(AppAnimations.springy) {
@@ -372,7 +372,7 @@ struct BodyMap3DView: View {
                 .scaleEffect(1.5)
                 .tint(AppColors.mutedText)
             Text("Loading 3D Model...")
-                .font(.subheadline)
+                .font(AppFonts.small)
                 .foregroundColor(AppColors.mutedText)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -390,7 +390,7 @@ struct BodyMap3DView: View {
                     .font(AppFonts.cardTitle)
                     .foregroundColor(AppColors.primaryText)
                 Text("Please try again or restart the app.")
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(AppColors.mutedText)
                     .multilineTextAlignment(.center)
             }
@@ -426,7 +426,7 @@ struct BodyMap3DView: View {
                             .foregroundColor(AppColors.primaryText)
                             .symbolEffect(.pulse, options: .repeating)
                         Text("Tap to zoom in")
-                            .font(.caption.weight(.semibold))
+                            .font(AppFonts.captionSemiBold)
                             .foregroundColor(AppColors.primaryText)
                     }
 
@@ -436,7 +436,7 @@ struct BodyMap3DView: View {
                             .foregroundColor(AppColors.primaryText)
                             .symbolEffect(.pulse, options: .repeating)
                         Text("Drag to rotate")
-                            .font(.caption.weight(.semibold))
+                            .font(AppFonts.captionSemiBold)
                             .foregroundColor(AppColors.primaryText)
                     }
 
@@ -446,13 +446,13 @@ struct BodyMap3DView: View {
                             .foregroundColor(AppColors.primaryText)
                             .symbolEffect(.pulse, options: .repeating)
                         Text("Pinch to zoom")
-                            .font(.caption.weight(.semibold))
+                            .font(AppFonts.captionSemiBold)
                             .foregroundColor(AppColors.primaryText)
                     }
                 }
 
                 Text("Tap a body zone, then select specific areas")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.primaryText.opacity(0.8))
 
                 Button(action: {
@@ -460,7 +460,7 @@ struct BodyMap3DView: View {
                     hasSeenCoach = true
                 }) {
                     Text("Got it")
-                        .font(.subheadline.weight(.semibold))
+                        .font(AppFonts.smallSemiBold)
                         .foregroundColor(AppColors.accentText)
                         .padding(.horizontal, AppSpacing.xxl)
                         .padding(.vertical, AppSpacing.sm)
@@ -486,7 +486,7 @@ struct BodyMap3DView: View {
     private func regionNameToast(_ name: String) -> some View {
         VStack {
             Text(name)
-                .font(.caption.weight(.semibold))
+                .font(AppFonts.captionSemiBold)
                 .foregroundColor(AppColors.ctaText)
                 .padding(.horizontal, AppSpacing.lg)
                 .padding(.vertical, AppSpacing.sm)
@@ -729,7 +729,7 @@ struct BodyMap3DView: View {
                 Image(systemName: "arrow.counterclockwise")
                     .font(.system(size: 14, weight: .semibold))
                 Text("Reset")
-                    .font(.caption.weight(.semibold))
+                    .font(AppFonts.captionSemiBold)
             }
             .foregroundColor(AppColors.primaryText)
             .padding(.horizontal, AppSpacing.lg)
@@ -757,13 +757,13 @@ struct BodyMap3DView: View {
         VStack(spacing: AppSpacing.md) {
             HStack {
                 Text(selectionSummary)
-                    .font(.subheadline.weight(.medium))
+                    .font(AppFonts.smallMedium)
                     .foregroundColor(AppColors.primaryText)
                 Spacer()
                 if !viewModel.selectedRegions.isEmpty {
                     Button(action: { clearAllSelections() }) {
                         Text("Clear All")
-                            .font(.subheadline.weight(.medium))
+                            .font(AppFonts.smallMedium)
                             .foregroundColor(AppColors.danger)
                     }
                     .accessibilityIdentifier("bodyMap3D.clearAllButton")
@@ -1314,7 +1314,7 @@ struct BodyMap3DView: View {
                                 .fill(regionStripColor(for: region))
                                 .frame(width: 8, height: 8)
                             Text(region.name)
-                                .font(.caption.weight(.medium))
+                                .font(AppFonts.captionMedium)
                                 .foregroundColor(AppColors.primaryText)
                             if region.isSelected {
                                 Image(systemName: "checkmark")

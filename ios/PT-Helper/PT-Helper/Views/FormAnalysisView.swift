@@ -67,7 +67,7 @@ struct FormAnalysisView: View {
                         .foregroundStyle(AppColors.accent)
 
                     Text(exercise.name)
-                        .font(.system(.title2, design: .serif).weight(.bold))
+                        .font(AppFonts.title)
 
                     Text("Record yourself performing this exercise and get AI-powered form feedback.")
                         .font(AppFonts.body)
@@ -79,7 +79,7 @@ struct FormAnalysisView: View {
                 // Tips card
                 VStack(alignment: .leading, spacing: AppSpacing.md) {
                     Label("Recording Tips", systemImage: "lightbulb.fill")
-                        .font(.headline)
+                        .font(AppFonts.cardTitle)
                         .foregroundColor(AppColors.warning)
 
                     tipRow(icon: "person.fill", text: "Ensure your full body is visible in frame")
@@ -115,7 +115,7 @@ struct FormAnalysisView: View {
             ProgressView()
                 .scaleEffect(1.5)
             Text("Recording...")
-                .font(.headline)
+                .font(AppFonts.cardTitle)
                 .foregroundColor(AppColors.secondaryText)
         }
     }
@@ -145,14 +145,14 @@ struct FormAnalysisView: View {
                         .symbolEffect(.pulse)
 
                     Text("\(Int(vm.processingProgress * 100))%")
-                        .font(.system(.title3, design: .serif).weight(.bold))
+                        .font(AppFonts.sectionTitle)
                         .foregroundColor(AppColors.accentText)
                 }
             }
 
             VStack(spacing: AppSpacing.sm) {
                 Text("Analyzing Your Form")
-                    .font(.system(.title3, design: .serif).weight(.bold))
+                    .font(AppFonts.sectionTitle)
 
                 Text("Detecting body pose and computing joint angles...")
                     .font(AppFonts.body)
@@ -177,7 +177,7 @@ struct FormAnalysisView: View {
 
             VStack(spacing: AppSpacing.sm) {
                 Text("Getting AI Feedback")
-                    .font(.system(.title3, design: .serif).weight(.bold))
+                    .font(AppFonts.sectionTitle)
 
                 Text("Our AI is reviewing your form metrics...")
                     .font(AppFonts.body)
@@ -231,7 +231,7 @@ struct FormAnalysisView: View {
                 if !blockingWarnings.isEmpty {
                     VStack(alignment: .leading, spacing: AppSpacing.sm) {
                         Label("Important", systemImage: "exclamationmark.triangle.fill")
-                            .font(.headline)
+                            .font(AppFonts.cardTitle)
                             .foregroundColor(AppColors.ctaText)
                         ForEach(blockingWarnings.map { $0.message }, id: \.self) { msg in
                             Text(msg)
@@ -286,7 +286,7 @@ struct FormAnalysisView: View {
                 if !feedback.corrections.isEmpty {
                     VStack(alignment: .leading, spacing: AppSpacing.md) {
                         Label("Areas to Improve", systemImage: "exclamationmark.triangle.fill")
-                            .font(.headline)
+                            .font(AppFonts.cardTitle)
                             .foregroundColor(AppColors.warning)
 
                         ForEach(Array(feedback.corrections.enumerated()), id: \.offset) { _, correction in
@@ -303,7 +303,7 @@ struct FormAnalysisView: View {
                 if !feedback.positivePoints.isEmpty {
                     VStack(alignment: .leading, spacing: AppSpacing.md) {
                         Label("What You're Doing Well", systemImage: "checkmark.seal.fill")
-                            .font(.headline)
+                            .font(AppFonts.cardTitle)
                             .foregroundColor(AppColors.success)
 
                         ForEach(feedback.positivePoints, id: \.self) { point in
@@ -326,7 +326,7 @@ struct FormAnalysisView: View {
                 if !feedback.safetyNotes.isEmpty {
                     VStack(alignment: .leading, spacing: AppSpacing.md) {
                         Label("Safety Notes", systemImage: "heart.text.square.fill")
-                            .font(.headline)
+                            .font(AppFonts.cardTitle)
                             .foregroundColor(AppColors.danger)
 
                         ForEach(feedback.safetyNotes, id: \.self) { note in
@@ -374,12 +374,12 @@ struct FormAnalysisView: View {
     private func progressInsightsCard(_ insights: FormProgressInsights) -> some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
             Label("Progress Over Time", systemImage: "chart.line.uptrend.xyaxis")
-                .font(.headline)
+                .font(AppFonts.cardTitle)
                 .foregroundColor(AppColors.accentText)
 
             // How today compares to the user's own prior sessions
             Text(insights.sessionComparison)
-                .font(.subheadline)
+                .font(AppFonts.small)
                 .foregroundColor(AppColors.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
 
@@ -393,9 +393,9 @@ struct FormAnalysisView: View {
                                 .foregroundColor(trendColor(for: trend.direction))
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(trend.metric)
-                                    .font(.subheadline.weight(.semibold))
+                                    .font(AppFonts.smallSemiBold)
                                 Text(trend.description)
-                                    .font(.caption)
+                                    .font(AppFonts.caption)
                                     .foregroundColor(AppColors.secondaryText)
                                     .fixedSize(horizontal: false, vertical: true)
                             }
@@ -408,7 +408,7 @@ struct FormAnalysisView: View {
             if !insights.recurringIssues.isEmpty {
                 VStack(alignment: .leading, spacing: AppSpacing.sm) {
                     Text("Recurring Patterns")
-                        .font(.subheadline.weight(.semibold))
+                        .font(AppFonts.smallSemiBold)
                         .foregroundColor(AppColors.warning)
 
                     ForEach(Array(insights.recurringIssues.enumerated()), id: \.offset) { _, issue in
@@ -418,9 +418,9 @@ struct FormAnalysisView: View {
                                 .foregroundColor(AppColors.warning)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("\(issue.issue) — \(issue.sessionsObserved) sessions")
-                                    .font(.subheadline.weight(.semibold))
+                                    .font(AppFonts.smallSemiBold)
                                 Text(issue.description)
-                                    .font(.caption)
+                                    .font(AppFonts.caption)
                                     .foregroundColor(AppColors.secondaryText)
                                     .fixedSize(horizontal: false, vertical: true)
                             }
@@ -467,7 +467,7 @@ struct FormAnalysisView: View {
 
             VStack(spacing: AppSpacing.sm) {
                 Text("Analysis Failed")
-                    .font(.system(.title3, design: .serif).weight(.bold))
+                    .font(AppFonts.sectionTitle)
 
                 Text(message)
                     .font(AppFonts.body)
@@ -540,17 +540,17 @@ struct FormAnalysisView: View {
 
                 VStack(spacing: AppSpacing.nano) {
                     Text("\(feedback.overallScore)")
-                        .font(.system(size: 36, weight: .bold, design: .rounded))
+                        .font(AppFonts.display)
                         .foregroundColor(scoreColor(feedback.verdict))
 
                     Text("/ 100")
-                        .font(.caption2)
+                        .font(AppFonts.micro)
                         .foregroundColor(AppColors.secondaryText)
                 }
             }
 
             Text(verdictText(feedback.verdict))
-                .font(.title3.weight(.semibold))
+                .font(AppFonts.sectionTitle)
                 .foregroundColor(scoreColor(feedback.verdict))
 
             Text(exercise.name)
@@ -590,7 +590,7 @@ struct FormAnalysisView: View {
                     .font(AppFonts.captionMedium)
                     .foregroundColor(severityColor(correction.severity))
                     .padding(.horizontal, AppSpacing.sm)
-                    .padding(.vertical, 2)
+                    .padding(.vertical, AppSpacing.nano)
                     .background(severityColor(correction.severity).opacity(0.15))
                     .cornerRadius(AppCorners.small)
             }
@@ -614,7 +614,7 @@ struct FormAnalysisView: View {
                         .font(.caption2)
                         .foregroundColor(AppColors.accent.opacity(0.7))
                     Text("Based on: \(ref)")
-                        .font(.caption2)
+                        .font(AppFonts.micro)
                         .foregroundColor(.secondary.opacity(0.8))
                         .italic()
                 }

@@ -92,7 +92,7 @@ struct WellnessDetailView: View {
         VStack(spacing: AppSpacing.sm) {
             if viewModel.hasMultipleGoals {
                 Text("Goal \(viewModel.currentGoalIndex + 1) of \(viewModel.totalGoals)")
-                    .font(.caption.weight(.medium))
+                    .font(AppFonts.captionMedium)
                     .foregroundColor(Color.white.opacity(0.7))
 
                 GeometryReader { geo in
@@ -114,7 +114,7 @@ struct WellnessDetailView: View {
                     Image(systemName: goal.category.icon)
                         .foregroundColor(goal.category.color)
                     Text("Tell us more about: \(goal.category.displayName)")
-                        .font(.subheadline.weight(.medium))
+                        .font(AppFonts.smallMedium)
                         .foregroundColor(.white)
                 }
                 .padding(AppSpacing.md)
@@ -148,25 +148,25 @@ struct WellnessDetailView: View {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 HStack {
                     Text("\(Int(motivationLevel))")
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .font(AppFonts.statNumber)
                         .foregroundColor(motivationColor)
                     Text("/ 10")
                         .foregroundColor(AppColors.secondaryText)
                     Spacer()
                     Text(motivationDescription)
-                        .font(.caption.weight(.medium))
+                        .font(AppFonts.captionMedium)
                         .foregroundColor(motivationColor)
                         .padding(.horizontal, AppSpacing.sm)
-                        .padding(.vertical, 4)
+                        .padding(.vertical, AppSpacing.xs)
                         .background(motivationColor.opacity(0.12))
                         .cornerRadius(AppCorners.small)
                 }
                 Slider(value: $motivationLevel, in: 1...10, step: 1)
                     .tint(motivationColor)
                 HStack {
-                    Text("Low").font(.caption2).foregroundColor(AppColors.secondaryText)
+                    Text("Low").font(AppFonts.micro).foregroundColor(AppColors.secondaryText)
                     Spacer()
-                    Text("Very High").font(.caption2).foregroundColor(AppColors.secondaryText)
+                    Text("Very High").font(AppFonts.micro).foregroundColor(AppColors.secondaryText)
                 }
             }
         }
@@ -368,16 +368,16 @@ struct WellnessDetailView: View {
                         .font(.caption2)
                         .foregroundColor(AppColors.accent)
                     Text("AI-powered")
-                        .font(.caption2.weight(.medium))
+                        .font(AppFonts.microMedium)
                         .foregroundColor(AppColors.accentText)
                 }
                 .padding(.horizontal, AppSpacing.sm)
-                .padding(.vertical, 4)
+                .padding(.vertical, AppSpacing.xs)
                 .background(AppColors.accentTint)
                 .cornerRadius(AppCorners.small)
 
                 Text("What does a typical day look like? What would improvement mean for you? The more detail you provide, the better your personalized plan will be.")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
 
                 TextField("Share your story...", text: $specificContext, axis: .vertical)

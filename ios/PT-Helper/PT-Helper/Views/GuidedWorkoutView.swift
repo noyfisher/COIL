@@ -174,12 +174,12 @@ struct GuidedWorkoutView: View {
                             .overlay(alignment: .topTrailing) {
                                 if currentFamiliarity == .mastered {
                                     Text("Mastered")
-                                        .font(.caption2.weight(.bold))
+                                        .font(AppFonts.captionSemiBold)
                                         .foregroundColor(.white)
                                         .padding(.horizontal, AppSpacing.sm)
-                                        .padding(.vertical, 4)
+                                        .padding(.vertical, AppSpacing.xs)
                                         .background(AppColors.accent.opacity(0.9))
-                                        .cornerRadius(100)
+                                        .cornerRadius(AppCorners.pill)
                                         .padding(AppSpacing.sm)
                                 }
                             }
@@ -187,7 +187,7 @@ struct GuidedWorkoutView: View {
                         // Exercise name + How To toggle
                         HStack {
                             Text(exercise.name)
-                                .font(.system(.title3, design: .serif).weight(.bold))
+                                .font(AppFonts.sectionTitle)
                                 .foregroundColor(AppColors.primaryText)
                                 .accessibilityIdentifier("workout.exerciseName")
 
@@ -206,10 +206,10 @@ struct GuidedWorkoutView: View {
                                             .font(AppFonts.captionSemiBold)
                                     }
                                     .foregroundColor(AppColors.accentText)
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 5)
+                                    .padding(.horizontal, AppSpacing.comfortable)
+                                    .padding(.vertical, AppSpacing.xs + 1)
                                     .background(AppColors.accentTint)
-                                    .cornerRadius(100)
+                                    .cornerRadius(AppCorners.pill)
                                 }
                                 .accessibilityIdentifier("workout.howToButton")
                             }
@@ -409,7 +409,7 @@ struct GuidedWorkoutView: View {
 
                 VStack(spacing: AppSpacing.sm) {
                     Text(vm.formattedTimeRemaining)
-                        .font(.system(size: 52, weight: .bold, design: .rounded))
+                        .font(AppFonts.display)
                         .foregroundColor(timerColor)
                         .contentTransition(.numericText())
 
@@ -424,7 +424,7 @@ struct GuidedWorkoutView: View {
             HStack(spacing: AppSpacing.wide) {
                 Button { vm.adjustRestTime(by: -15) } label: {
                     Text("\u{2212}15")
-                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .font(AppFonts.bodySemiBold)
                         .foregroundColor(AppColors.secondaryText)
                         .frame(width: 48, height: 48)
                         .background(AppColors.cardBackground)
@@ -435,7 +435,7 @@ struct GuidedWorkoutView: View {
 
                 Button { vm.adjustRestTime(by: 15) } label: {
                     Text("+15")
-                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .font(AppFonts.bodySemiBold)
                         .foregroundColor(AppColors.secondaryText)
                         .frame(width: 48, height: 48)
                         .background(AppColors.cardBackground)
@@ -481,7 +481,7 @@ struct GuidedWorkoutView: View {
                     .foregroundColor(AppColors.mutedText)
                     .textCase(.uppercase)
                 Text(exercise.name)
-                    .font(.system(.headline, design: .serif))
+                    .font(AppFonts.cardTitle)
                     .foregroundColor(AppColors.primaryText)
                 Text(subtitle)
                     .font(AppFonts.body)
@@ -517,7 +517,7 @@ struct GuidedWorkoutView: View {
 
             VStack(spacing: AppSpacing.sm) {
                 Text("No Exercises Available")
-                    .font(.system(.title3, design: .serif).weight(.bold))
+                    .font(AppFonts.sectionTitle)
                     .foregroundColor(AppColors.primaryText)
 
                 Text("This plan doesn't have any exercises yet. Please go back and regenerate the plan.")
@@ -623,7 +623,7 @@ struct GuidedWorkoutView: View {
                         .foregroundColor(AppColors.accent)
                         .frame(width: 28, height: 28)
                         .background(AppColors.accent.opacity(0.10))
-                        .cornerRadius(7)
+                        .cornerRadius(AppCorners.small - 1)
 
                     Text("Last time: ")
                         .font(AppFonts.captionMedium)

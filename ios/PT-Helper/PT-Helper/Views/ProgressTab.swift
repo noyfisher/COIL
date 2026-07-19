@@ -352,11 +352,7 @@ struct ProgressTabContent: View {
                         }
                 }
             }
-            .padding(AppSpacing.lg)
-            .background(AppColors.cardBackground)
-            .cornerRadius(AppCorners.card)
-            .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
-            .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+            .cardStyle()
         }
     }
 
@@ -371,7 +367,7 @@ struct ProgressTabContent: View {
                     .frame(width: 40, height: 40)
                     .overlay(
                         Text("\(Int(session.painLevel))")
-                            .font(.system(size: 14, weight: .bold, design: .rounded))
+                            .font(AppFonts.bodySemiBold)
                             .foregroundColor(painColor(for: session.painLevel))
                     )
 
@@ -566,11 +562,7 @@ struct ProgressTabContent: View {
             .accessibilityLabel("Pain trend chart")
             .accessibilityValue(painTrendAccessibilityValue)
         }
-        .padding(AppSpacing.lg)
-        .background(AppColors.cardBackground)
-        .cornerRadius(AppCorners.card)
-        .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
-        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+        .cardStyle()
     }
 
     private var filteredChartData: [WorkoutSession] {
@@ -641,7 +633,7 @@ struct ProgressTabContent: View {
                 .cornerRadius(AppCorners.small)
 
             Text(value)
-                .font(Font.custom("Industry-Bold", size: 26))
+                .font(AppFonts.statNumber)
                 .foregroundColor(AppColors.primaryText)
 
             Text(label)
@@ -681,7 +673,7 @@ struct ProgressTabContent: View {
                     .foregroundColor(AppColors.accent)
                     .font(.system(size: 16, weight: .semibold))
                 Text("Time for a Re-Assessment?")
-                    .font(Font.custom("Industry-Bold", size: 16))
+                    .font(AppFonts.cardTitle)
                     .foregroundColor(AppColors.primaryText)
                 Spacer()
             }
@@ -705,7 +697,7 @@ struct ProgressTabContent: View {
                 }
                 .foregroundColor(AppColors.accentText)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
+                .padding(.vertical, AppSpacing.comfortable)
                 .overlay(Capsule().stroke(AppColors.accent, lineWidth: 1.5))
                 // .plain buttons only hit-test rendered pixels — the stroked
                 // capsule's interior is dead without an explicit content shape.
@@ -734,7 +726,7 @@ private struct StreakToolbarBadge: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(streakColor)
             Text("\(streakService.streakData.currentStreak)")
-                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .font(AppFonts.bodySemiBold)
                 .foregroundColor(streakColor)
         }
     }

@@ -70,7 +70,7 @@ struct WellnessGoalPickerView: View {
         VStack(spacing: AppSpacing.sm) {
             CoilDividerHeader(title: "What Do You Want to Improve?")
             Text("Select one or more goals below, or describe your own.")
-                .font(.subheadline)
+                .font(AppFonts.small)
                 .foregroundColor(AppColors.secondaryText)
                 .multilineTextAlignment(.center)
         }
@@ -109,14 +109,14 @@ struct WellnessGoalPickerView: View {
                 }
 
                 Text(category.displayName)
-                    .font(.caption.weight(.medium))
+                    .font(AppFonts.captionMedium)
                     .foregroundColor(isSelected ? AppColors.primaryText : AppColors.secondaryText)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Text(category.subtitle)
-                    .font(.caption2)
+                    .font(AppFonts.micro)
                     .foregroundColor(AppColors.mutedText)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
@@ -159,11 +159,11 @@ struct WellnessGoalPickerView: View {
                         .font(.caption2)
                         .foregroundColor(AppColors.accent)
                     Text("AI-powered")
-                        .font(.caption2.weight(.medium))
+                        .font(AppFonts.microMedium)
                         .foregroundColor(AppColors.accentText)
                 }
                 .padding(.horizontal, AppSpacing.sm)
-                .padding(.vertical, 4)
+                .padding(.vertical, AppSpacing.xs)
                 .background(AppColors.accentTint)
                 .cornerRadius(AppCorners.small)
 

@@ -47,7 +47,7 @@ struct OutcomePromptView: View {
             }
 
             Text("Thinking back to the original analysis — how accurate did it turn out to be?")
-                .font(.subheadline)
+                .font(AppFonts.small)
                 .foregroundColor(AppColors.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
 
@@ -56,7 +56,7 @@ struct OutcomePromptView: View {
                     Image(systemName: chosen.icon)
                         .foregroundColor(AppColors.success)
                     Text("Thanks — recorded as \(chosen.displayName.lowercased()).")
-                        .font(.footnote)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                 }
                 .padding(.top, AppSpacing.xs)
@@ -68,7 +68,7 @@ struct OutcomePromptView: View {
                                 Image(systemName: feedback.icon)
                                     .frame(width: 18)
                                 Text(feedback.displayName)
-                                    .font(.subheadline)
+                                    .font(AppFonts.small)
                                 Spacer()
                             }
                             .padding(.vertical, AppSpacing.sm)

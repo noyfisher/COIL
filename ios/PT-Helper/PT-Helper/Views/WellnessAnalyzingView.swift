@@ -78,7 +78,7 @@ struct WellnessAnalyzingView: View {
                     .font(.system(.title2, design: .serif).weight(.bold))
                     .foregroundColor(.white)
                 Text("Our AI is building your personalized wellness plan...")
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(Color.white.opacity(0.7))
                     .multilineTextAlignment(.center)
             }
@@ -88,7 +88,7 @@ struct WellnessAnalyzingView: View {
                     .scaleEffect(1.3)
                     .tint(AppColors.accent)
                 Text(elapsedTimeText)
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .monospacedDigit()
                     .foregroundColor(Color.white.opacity(0.7))
             }
@@ -128,7 +128,7 @@ struct WellnessAnalyzingView: View {
                 Text(isOffline
                      ? "You appear to be offline. Reconnect and try again."
                      : message)
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(Color.white.opacity(0.7))
                     .multilineTextAlignment(.center)
             }
@@ -176,7 +176,7 @@ struct WellnessAnalyzingView: View {
                 .foregroundColor(isCompleted ? AppColors.success : (isActive ? AppColors.accent : Color.gray.opacity(0.4)))
                 .frame(width: 24)
             Text(text)
-                .font(.subheadline.weight(isActive ? .medium : .regular))
+                .font(isActive ? AppFonts.smallMedium : AppFonts.small)
                 .foregroundColor(isActive ? AppColors.primaryText : AppColors.mutedText)
         }
     }

@@ -66,7 +66,7 @@ struct RecoveryInsightsDetailView: View {
 
             if let date = formattedDate(insight.generatedDate) {
                 Text("Generated \(date)")
-                    .font(.caption2)
+                    .font(AppFonts.micro)
                     .foregroundColor(AppColors.mutedText)
             }
         }
@@ -132,17 +132,17 @@ struct RecoveryInsightsDetailView: View {
             VStack(alignment: .leading, spacing: AppSpacing.md) {
                 HStack {
                     Text("\(adherence.score)")
-                        .font(.system(size: 36, weight: .bold, design: .rounded))
+                        .font(AppFonts.display)
                         .foregroundColor(adherenceColor(adherence.score))
                     Text("/ 100")
-                        .font(.title3)
+                        .font(AppFonts.sectionTitle)
                         .foregroundColor(AppColors.secondaryText)
                     Spacer()
                     VStack(alignment: .trailing, spacing: AppSpacing.nano) {
                         Text("\(adherence.sessionsCompleted) of \(adherence.sessionsExpected)")
                             .font(AppFonts.captionSemiBold)
                         Text("sessions")
-                            .font(.caption2)
+                            .font(AppFonts.micro)
                             .foregroundColor(AppColors.secondaryText)
                     }
                 }
@@ -177,7 +177,7 @@ struct RecoveryInsightsDetailView: View {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 14))
                             .foregroundColor(AppColors.success)
-                            .padding(.top, 2)
+                            .padding(.top, AppSpacing.nano)
                         Text(win)
                             .font(AppFonts.body)
                             .foregroundColor(AppColors.primaryText)
@@ -197,7 +197,7 @@ struct RecoveryInsightsDetailView: View {
                         Image(systemName: "arrow.right.circle.fill")
                             .font(.system(size: 14))
                             .foregroundColor(AppColors.warning)
-                            .padding(.top, 2)
+                            .padding(.top, AppSpacing.nano)
                         Text(area)
                             .font(AppFonts.body)
                             .foregroundColor(AppColors.primaryText)
@@ -263,7 +263,7 @@ struct RecoveryInsightsDetailView: View {
 
     private var disclaimerText: some View {
         Text("These insights are educational only and not a substitute for professional medical advice. Always consult your healthcare provider about your recovery.")
-            .font(.caption2)
+            .font(AppFonts.micro)
             .foregroundColor(AppColors.mutedText)
             .multilineTextAlignment(.center)
             .padding(.horizontal, AppSpacing.lg)

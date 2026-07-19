@@ -35,7 +35,7 @@ struct FormCheckTab: View {
                 // Header
                 VStack(alignment: .leading, spacing: AppSpacing.sm) {
                     Text("Select an exercise to check your form")
-                        .font(.subheadline)
+                        .font(AppFonts.small)
                         .foregroundColor(Color.white.opacity(0.7))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -44,7 +44,7 @@ struct FormCheckTab: View {
                 ForEach(savedPlansVM.rehabPlans) { plan in
                     VStack(alignment: .leading, spacing: AppSpacing.md) {
                         Text(plan.planName)
-                            .font(.caption.weight(.semibold))
+                            .font(AppFonts.captionSemiBold)
                             .foregroundColor(Color.white.opacity(0.7))
                             .textCase(.uppercase)
 
@@ -73,10 +73,10 @@ struct FormCheckTab: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(exercise.name)
-                        .font(.subheadline.weight(.semibold))
+                        .font(AppFonts.smallSemiBold)
                         .foregroundColor(AppColors.primaryText)
                     Text("\(exercise.targetArea) • \(exercise.sets) sets × \(exercise.reps)")
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                 }
 
@@ -86,14 +86,7 @@ struct FormCheckTab: View {
                     .font(.system(size: 12))
                     .foregroundColor(AppColors.accent)
             }
-            .padding(AppSpacing.lg)
-            .background(AppColors.cardBackground)
-            .cornerRadius(AppCorners.card)
-            .overlay(
-                RoundedRectangle(cornerRadius: AppCorners.card)
-                    .stroke(AppColors.cardBorder, lineWidth: 1)
-            )
-            .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+            .cardStyle()
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("formCheck.exercise.\(exercise.name)")
@@ -115,7 +108,7 @@ struct FormCheckTab: View {
                     .foregroundColor(.white)
 
                 Text("Create a rehab plan first, then you can check your form on any exercise.")
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(Color.white.opacity(0.7))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppSpacing.lg)

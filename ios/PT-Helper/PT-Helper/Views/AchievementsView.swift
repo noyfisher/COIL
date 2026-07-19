@@ -31,14 +31,7 @@ struct AchievementsView: View {
                             color: AppColors.accent
                         )
                     }
-                    .padding(AppSpacing.lg)
-                    .background(AppColors.cardBackground)
-                    .cornerRadius(AppCorners.card)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: AppCorners.card)
-                            .stroke(AppColors.cardBorder, lineWidth: 1)
-                    )
-                    .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+                    .cardStyle()
 
                     // Achievement list
                     ForEach(streakService.achievements) { achievement in
@@ -63,9 +56,9 @@ struct AchievementsView: View {
                 .font(.title3)
                 .foregroundColor(color)
             Text(value)
-                .font(.system(size: 24, weight: .bold, design: .rounded))
+                .font(AppFonts.title)
             Text(label)
-                .font(.caption2)
+                .font(AppFonts.micro)
                 .foregroundColor(AppColors.secondaryText)
         }
         .frame(maxWidth: .infinity)
@@ -86,16 +79,16 @@ struct AchievementsView: View {
             // Info
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(achievement.title)
-                    .font(.subheadline.weight(.semibold))
+                    .font(AppFonts.smallSemiBold)
                     .foregroundColor(achievement.isEarned ? AppColors.primaryText : AppColors.secondaryText)
 
                 Text(achievement.description)
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
 
                 if let date = achievement.dateEarned {
                     Text("Earned \(date.formatted(date: .abbreviated, time: .omitted))")
-                        .font(.caption2)
+                        .font(AppFonts.micro)
                         .foregroundColor(AppColors.success)
                 }
             }
@@ -110,14 +103,7 @@ struct AchievementsView: View {
                     .foregroundColor(AppColors.mutedText.opacity(0.4))
             }
         }
-        .padding(AppSpacing.lg)
-        .background(AppColors.cardBackground)
-        .cornerRadius(AppCorners.card)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppCorners.card)
-                .stroke(AppColors.cardBorder, lineWidth: 1)
-        )
-        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+        .cardStyle()
         .opacity(achievement.isEarned ? 1 : 0.7)
     }
 
