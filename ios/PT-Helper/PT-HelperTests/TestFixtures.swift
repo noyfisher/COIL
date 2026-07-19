@@ -181,7 +181,9 @@ enum TestFixtures {
         name: String = "Test Plan",
         conditions: [String] = ["Test Condition"],
         exercises: [RehabExercise]? = nil,
-        totalWeeks: Int = 4
+        totalWeeks: Int = 4,
+        startDate: Date? = nil,
+        weeklySchedule: [[String]]? = nil
     ) -> RehabPlan {
         let exs = exercises ?? [makeExercise()]
         return RehabPlan(
@@ -189,10 +191,11 @@ enum TestFixtures {
             planName: name,
             conditions: conditions,
             exercises: exs,
-            weeklySchedule: Array(repeating: [], count: 7),
+            weeklySchedule: weeklySchedule ?? Array(repeating: [], count: 7),
             totalWeeks: totalWeeks,
             createdDate: Date(),
-            notes: nil
+            notes: nil,
+            startDate: startDate
         )
     }
 

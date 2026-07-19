@@ -56,7 +56,7 @@ struct BodyMap3DView: View {
 
     @State private var lastTappedName: String?
     @State private var showCoachMark = false
-    @AppStorage("hasSeenBodyMapCoach") private var hasSeenCoach = false
+    @AppStorage(AppStorageKeys.hasSeenBodyMapCoach) private var hasSeenCoach = false
 
     // MARK: - Body
 

@@ -581,10 +581,6 @@ struct ProgressTabContent: View {
         }
     }
 
-    private var totalMinutes: Int {
-        Int(workoutViewModel.sessions.reduce(0.0) { $0 + $1.duration } / 60)
-    }
-
     // MARK: - Re-Assessment Card
 
     private var reassessmentCard: some View {
