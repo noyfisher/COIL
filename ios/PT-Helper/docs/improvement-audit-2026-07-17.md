@@ -64,9 +64,9 @@ Sonnet's cross-session memory. Update the **Status** and **PR#** columns as you 
 | WS11-02 | Stop recomputing ProgressTab chart/stat data every render | WS11 | P1 | S | done | #53 |
 | WS11-03 | Configure body-model collision shapes + proxies once on a cached template | WS11 | P2 | M | done | #53 |
 | WS11-04 | Bound the workout-session Firestore fetch | WS11 | P3 | S | done | #53 |
-| WS12-01 | Remove nightly_report from the client-callable request allow-list | WS12 | P1 | S | todo | |
-| WS12-02 | Restore a working, project-owned ESLint (config + devDependency + bounded fixes) | WS12 | P2 | M | todo | |
-| WS12-03 | Extract system prompts + model config into a side-effect-free src/prompts.ts module | WS12 | P2 | M | BLOCKED: soft — after WS12-01 (shared index.ts:723); WS12-02 for the lint Verify leg | |
+| WS12-01 | Remove nightly_report from the client-callable request allow-list | WS12 | P1 | S | done | #54 |
+| WS12-02 | Restore a working, project-owned ESLint (config + devDependency + bounded fixes) | WS12 | P2 | M | done | #54 |
+| WS12-03 | Extract system prompts + model config into a side-effect-free src/prompts.ts module | WS12 | P2 | M | done | #54 |
 | WS13-01 | Convert the 12 Task.sleep VM waits (+ Timer fixed-delay) to deterministic await/expectation patterns | WS13 | P2 | M | todo | |
 | WS13-02 | Extract a NotificationLifecycleScheduling seam and test WS2's newly-wired notification behavior | WS13 | P2 | M | BLOCKED: WS2 | |
 | WS13-03 | Test ConsentService's newly-added withdraw path + policy/mirror contract (no production seam) | WS13 | P2 | S | BLOCKED: WS3 | |

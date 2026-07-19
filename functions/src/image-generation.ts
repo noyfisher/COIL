@@ -164,7 +164,7 @@ interface MatchResult {
 function fuzzyMatch(
   normalized: string,
   mappingKeys: Set<string>,
-  aliasMap: Record<string, string>,
+  _aliasMap: Record<string, string>,
 ): MatchResult | null {
   // Layer 1-3: exact matches handled by caller
 
