@@ -76,6 +76,7 @@ struct RootView: View {
                     Crashlytics.crashlytics().setUserID("")
                     AnalyticsService.shared.setUserId(nil)
                     NotificationService.shared.clearFCMToken()
+                    NotificationService.shared.cancelAllReminders()
                     OnboardingViewModel.clearDraft()
                     profileCompleted = false
                     // Reset the skip flag so a different account on this device
