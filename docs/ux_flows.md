@@ -1,12 +1,12 @@
 # UX Flows
 
 ## Navigation Structure
-3-tab layout via `ThreeTabView`:
-- **Assess** (Tab 0) — Dual gateway: pain analysis or wellness goals
+4-tab shell via `ThreeTabView` (named for a historical 3-tab IA) plus a floating "+":
+- **Home** (Tab 0) — weekly date strip, today's program + preventative tasks
 - **My Plan** (Tab 1) — Active plan hero card + saved plans list
 - **Progress** (Tab 2) — Charts, recovery insights, settings, session history
-
-Note: Legacy 4-tab layout (`MainTabView`) accessible via `--use-legacy-ui` launch argument.
+- **Profile** (Tab 3) — profile summary + edit
+- **Floating "+"** — Dual gateway: pain analysis or wellness goals (`AssessmentGatewayView`)
 
 ## Core Flow: Analysis → Plan → Workout
 

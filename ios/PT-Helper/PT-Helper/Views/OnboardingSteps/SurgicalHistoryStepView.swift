@@ -16,7 +16,7 @@ struct SurgicalHistoryStepView: View {
                 HStack {
                     VStack(alignment: .leading, spacing: AppSpacing.xs) {
                         Text("Have you had any surgeries?")
-                            .font(Font.custom("Inter-Medium", size: 15))
+                            .font(AppFonts.bodyMedium)
                             .foregroundColor(.white)
                         Text(viewModel.userProfile.surgeries.isEmpty ? "Tap + to add" : "\(viewModel.userProfile.surgeries.count) recorded")
                             .font(AppFonts.caption)
@@ -70,7 +70,7 @@ struct SurgicalHistoryStepView: View {
         VStack(spacing: AppSpacing.sm) {
             HStack {
                 Text("Surgery \(index + 1)")
-                    .font(Font.custom("Industry-Bold", size: 12))
+                    .font(AppFonts.fieldLabel)
                     .textCase(.uppercase)
                     .kerning(1.0)
                     .foregroundColor(AppColors.warning)

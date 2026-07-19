@@ -26,7 +26,7 @@ struct ThreeTabView: View {
                 Image(systemName: "wifi.slash")
                     .font(.system(size: 12, weight: .semibold))
                 Text("You're offline. Changes will sync when reconnected.")
-                    .font(.caption)
+                    .font(AppFonts.caption)
             }
             .foregroundColor(AppColors.ctaText)
             .frame(maxWidth: .infinity)
@@ -276,7 +276,7 @@ struct FloatingTabBar: View {
                     tabButton(item)
                 }
             }
-            .padding(.top, 10)   // push tab icons down below the "+" button
+            .padding(.top, AppSpacing.comfortable)   // push tab icons down below the "+" button
             .frame(maxWidth: .infinity)
             .background(AppColors.navBackground)
 
@@ -299,7 +299,7 @@ struct FloatingTabBar: View {
                     // Visible caption so the app's most important action reads as
                     // "start a pain/wellness assessment", not a generic "add item".
                     Text("Assess")
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(AppFonts.microMedium)
                         .foregroundColor(AppColors.accent)
                 }
             }
@@ -326,7 +326,7 @@ struct FloatingTabBar: View {
             .foregroundColor(selectedTab == item.tag ? AppColors.tabActive : AppColors.tabInactive)
             .animation(AppAnimations.smooth, value: selectedTab)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 10)
+            .padding(.vertical, AppSpacing.comfortable)
         }
         .accessibilityLabel(item.label)
         .accessibilityAddTraits(selectedTab == item.tag ? [.isSelected] : [])

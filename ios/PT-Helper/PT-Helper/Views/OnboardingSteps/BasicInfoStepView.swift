@@ -75,7 +75,7 @@ struct BasicInfoStepView: View {
                         } label: {
                             HStack {
                                 Text("\(viewModel.userProfile.heightFeet) ft")
-                                    .font(Font.custom("Inter-Medium", size: 15))
+                                    .font(AppFonts.bodyMedium)
                                     .foregroundColor(.white)
                                 Spacer()
                                 Image(systemName: "chevron.up.chevron.down")
@@ -95,7 +95,7 @@ struct BasicInfoStepView: View {
                         } label: {
                             HStack {
                                 Text("\(viewModel.userProfile.heightInches) in")
-                                    .font(Font.custom("Inter-Medium", size: 15))
+                                    .font(AppFonts.bodyMedium)
                                     .foregroundColor(.white)
                                 Spacer()
                                 Image(systemName: "chevron.up.chevron.down")

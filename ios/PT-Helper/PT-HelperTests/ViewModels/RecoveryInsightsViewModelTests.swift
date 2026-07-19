@@ -266,4 +266,21 @@ final class RecoveryInsightsViewModelTests: XCTestCase {
         XCTAssertNotEqual(insight.id, UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
         XCTAssertTrue(Date().timeIntervalSince(insight.generatedDate) < 5, "generatedDate should be recent")
     }
+
+    // MARK: - WS8-01: Offline fail-fast
+
+    func testGenerateInsights_offline_setsErrorWithoutAPICall() async {
+        _ = NetworkMonitor.shared
+        await Task.yield()
+        NetworkMonitor.shared.isConnected = false
+        defer { NetworkMonitor.shared.isConnected = true }
+
+        let sessions = makeSessions(count: 3)
+        await vm.generateInsights(sessions: sessions, plans: [], profile: nil, forceRegenerate: true)
+
+        XCTAssertEqual(vm.error, "You're offline. Connect to the internet to load your recovery insights, then try again.")
+        XCTAssertFalse(vm.isLoading)
+        XCTAssertEqual(mockAPI.sendMessageCallCount, 0)
+        XCTAssertEqual(mockAPI.requestAgentInsightsCallCount, 0)
+    }
 }

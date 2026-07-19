@@ -25,10 +25,10 @@ struct WorkoutSessionView: View {
                         VStack(spacing: AppSpacing.md) {
                             HStack {
                                 Text("\(Int(painLevel))")
-                                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                                    .font(AppFonts.display)
                                     .foregroundColor(painColor)
                                 Text("/ 10")
-                                    .font(.title3)
+                                    .font(AppFonts.sectionTitle)
                                     .foregroundColor(AppColors.secondaryText)
                                 Spacer()
                                 Text(painDescription)
@@ -68,10 +68,10 @@ struct WorkoutSessionView: View {
                         VStack(spacing: AppSpacing.md) {
                             HStack {
                                 Text("\(Int(durationMinutes))")
-                                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                                    .font(AppFonts.display)
                                     .foregroundColor(AppColors.warning)
                                 Text("min")
-                                    .font(.title3)
+                                    .font(AppFonts.sectionTitle)
                                     .foregroundColor(AppColors.secondaryText)
                                 Spacer()
                             }
@@ -307,7 +307,7 @@ struct WorkoutSessionView: View {
                 .frame(width: 44, height: 44)
                 .overlay(
                     Text("\(Int(session.painLevel))")
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                        .font(AppFonts.bodySemiBold)
                         .foregroundColor(colorForPain(session.painLevel))
                 )
 

@@ -18,11 +18,11 @@ struct StreakBadgeView: View {
             }
 
             Text("\(streakService.streakData.currentStreak)")
-                .font(.system(size: 22, weight: .bold, design: .rounded))
+                .font(AppFonts.statNumber)
                 .foregroundColor(AppColors.primaryText)
 
             Text("Streak")
-                .font(.caption2)
+                .font(AppFonts.micro)
                 .foregroundColor(AppColors.secondaryText)
         }
         .frame(maxWidth: .infinity)

@@ -32,7 +32,7 @@ struct EmergencyRedirectView: View {
                     .foregroundColor(AppColors.primaryText)
 
                 Text("Your reported symptoms include warning signs that need urgent evaluation by a healthcare provider. This app cannot safely advise on your situation.")
-                    .font(.body)
+                    .font(AppFonts.body)
                     .multilineTextAlignment(.center)
                     .foregroundColor(AppColors.secondaryText)
                     .padding(.horizontal, AppSpacing.xl)
@@ -44,7 +44,7 @@ struct EmergencyRedirectView: View {
                                 Text("•")
                                     .foregroundColor(AppColors.danger)
                                 Text(msg)
-                                    .font(.footnote)
+                                    .font(AppFonts.caption)
                                     .foregroundColor(AppColors.primaryText)
                             }
                         }
@@ -61,18 +61,18 @@ struct EmergencyRedirectView: View {
                     // Always display the number as large selectable text so a user
                     // in a crisis is never left staring at a dead button (audit #80).
                     Text(emergencyNumber)
-                        .font(.system(size: 44, weight: .bold, design: .rounded))
+                        .font(AppFonts.display)
                         .foregroundColor(AppColors.danger)
                         .textSelection(.enabled)
                         .accessibilityLabel("Emergency number \(emergencyNumber)")
                     Text("Call \(emergencyNumber) from a phone, or dial your local emergency number.")
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                         .multilineTextAlignment(.center)
 
                     Button(action: callEmergencyServices) {
                         Label("Call Emergency Services", systemImage: "phone.fill")
-                            .font(.body.weight(.semibold))
+                            .font(AppFonts.bodySemiBold)
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, AppSpacing.md)
@@ -83,7 +83,7 @@ struct EmergencyRedirectView: View {
 
                     Button(action: onDismiss) {
                         Text("Go Back")
-                            .font(.subheadline)
+                            .font(AppFonts.small)
                             .foregroundColor(AppColors.secondaryText)
                     }
                     .padding(.top, AppSpacing.sm)

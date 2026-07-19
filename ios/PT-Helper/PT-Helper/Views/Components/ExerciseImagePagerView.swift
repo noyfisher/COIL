@@ -55,13 +55,13 @@ struct ExerciseImagePagerView: View {
 
             HStack(spacing: AppSpacing.xs) {
                 Text(page == 0 ? "Start position" : "End position")
-                    .font(.caption.weight(.medium))
+                    .font(AppFonts.captionMedium)
                     .foregroundColor(AppColors.secondaryText)
                 Image(systemName: "hand.draw")
                     .font(.caption2)
                     .foregroundColor(AppColors.secondaryText)
                 Text("swipe")
-                    .font(.caption2)
+                    .font(AppFonts.micro)
                     .foregroundColor(AppColors.secondaryText)
             }
 
