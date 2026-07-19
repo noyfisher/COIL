@@ -2,11 +2,19 @@ import SwiftUI
 
 // MARK: - Home Tab
 
+/// True iff a completed workout session falls on `day`.
+enum HomeStripLogic {
+    static func hasCompletedSession(on day: Date, in sessions: [WorkoutSession],
+                                     calendar: Calendar = .current) -> Bool {
+        sessions.contains { $0.isCompleted && calendar.isDate($0.date, inSameDayAs: day) }
+    }
+}
+
 struct HomeTab: View {
     @EnvironmentObject private var savedPlansViewModel: SavedPlansViewModel
     @EnvironmentObject private var tabSelection: TabSelection
+    @EnvironmentObject private var workoutViewModel: WorkoutViewModel
 
-    @State private var selectedDate: Date = Date()
     @State private var selectedContentTab: HomeContentTab = .program
 
     enum HomeContentTab { case program, preventative }
@@ -23,22 +31,28 @@ struct HomeTab: View {
 
                 VStack(spacing: 0) {
                     // Weekly strip — dark, visually extends the nav bar
-                    WeeklyDateStrip(selectedDate: $selectedDate)
+                    WeekCompletionStrip(sessions: workoutViewModel.sessions)
 
-                    // Program / Preventative picker
-                    HomeTabPicker(selected: $selectedContentTab)
-                        .padding(.horizontal, AppSpacing.lg)
-                        .padding(.top, AppSpacing.md)
-                        .padding(.bottom, AppSpacing.sm)
+                    // Program / Preventative picker — only meaningful with an active plan
+                    if activePlan != nil {
+                        HomeTabPicker(selected: $selectedContentTab)
+                            .padding(.horizontal, AppSpacing.lg)
+                            .padding(.top, AppSpacing.md)
+                            .padding(.bottom, AppSpacing.sm)
+                    }
 
                     // Content
                     ScrollView {
                         VStack(spacing: AppSpacing.md) {
-                            switch selectedContentTab {
-                            case .program:
-                                ProgramDayView(plan: activePlan, date: selectedDate)
-                            case .preventative:
-                                PreventativeTasksView(date: selectedDate)
+                            if activePlan == nil {
+                                ProgramDayView(plan: nil)
+                            } else {
+                                switch selectedContentTab {
+                                case .program:
+                                    ProgramDayView(plan: activePlan)
+                                case .preventative:
+                                    PreventativeTasksView()
+                                }
                             }
                         }
                         .padding(.horizontal, AppSpacing.lg)
@@ -52,19 +66,22 @@ struct HomeTab: View {
             .coilNavBar()
         }
         .trackScreen("HomeTab")
+        .onAppear { workoutViewModel.fetchSessions() }
     }
 }
 
-// MARK: - Weekly Date Strip
+// MARK: - Week Completion Strip
 
-private struct WeeklyDateStrip: View {
-    @Binding var selectedDate: Date
+private struct WeekCompletionStrip: View {
+    let sessions: [WorkoutSession]
 
-    /// 10 days back → 10 days forward (21 total), centred on today.
-    private var scrollableDays: [Date] {
+    /// Fixed rolling 7-day window ending today (today at the trailing edge).
+    /// Every cell is today-or-past, so a missing dot unambiguously means
+    /// "no completed session that day" — no future cell can ever carry a dot.
+    private var weekDays: [Date] {
         let cal = Calendar.current
         let today = cal.startOfDay(for: Date())
-        return (-10...10).compactMap { offset -> Date? in
+        return (-6...0).compactMap { offset -> Date? in
             cal.date(byAdding: .day, value: offset, to: today)
         }
     }
@@ -72,83 +89,32 @@ private struct WeeklyDateStrip: View {
     private var monthLabel: String {
         let fmt = DateFormatter()
         fmt.dateFormat = "MMMM yyyy"
-        return fmt.string(from: selectedDate).uppercased()
+        return fmt.string(from: Date()).uppercased()
     }
 
     var body: some View {
-        ScrollViewReader { proxy in
-            VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                // Month + "Today" button row
-                HStack {
-                    Text(monthLabel)
-                        .font(Font.custom("Industry-Bold", size: 13))
-                        .kerning(0.5)
-                        .foregroundColor(Color.white.opacity(0.55))
-
-                    Spacer()
-
-                    if !Calendar.current.isDateInToday(selectedDate) {
-                        Button {
-                            let today = Calendar.current.startOfDay(for: Date())
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
-                                selectedDate = Date()
-                                proxy.scrollTo(today, anchor: .center)
-                            }
-                        } label: {
-                            HStack(spacing: 4) {
-                                Image(systemName: "arrow.uturn.left")
-                                    .font(.system(size: 10, weight: .bold))
-                                Text("Today")
-                                    .font(AppFonts.captionSemiBold)
-                            }
-                            .foregroundColor(AppColors.accent)
-                        }
-                        .transition(.opacity.combined(with: .scale(scale: 0.85)))
-                    }
-                }
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            Text(monthLabel)
+                .font(AppFonts.cardTitle)
+                .kerning(0.5)
+                .foregroundColor(Color.white.opacity(0.55))
                 .padding(.horizontal, AppSpacing.lg)
-                .animation(.easeInOut(duration: 0.2), value: Calendar.current.isDateInToday(selectedDate))
 
-                // Day cells — scrollable ±10 days with edge fade
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: AppSpacing.xs) {
-                        ForEach(scrollableDays, id: \.self) { day in
-                            DayCell(
-                                date: day,
-                                isSelected: Calendar.current.isDate(day, inSameDayAs: selectedDate),
-                                isToday: Calendar.current.isDateInToday(day)
-                            )
-                            .id(day)
-                            .onTapGesture {
-                                withAnimation(.spring(response: 0.28, dampingFraction: 0.72)) {
-                                    selectedDate = day
-                                }
-                            }
-                        }
-                    }
-                    .padding(.horizontal, AppSpacing.lg)
-                }
-                .mask(
-                    LinearGradient(
-                        stops: [
-                            .init(color: .clear, location: 0.00),
-                            .init(color: .black, location: 0.12),
-                            .init(color: .black, location: 0.88),
-                            .init(color: .clear, location: 1.00),
-                        ],
-                        startPoint: .leading,
-                        endPoint: .trailing
+            HStack(spacing: AppSpacing.xs) {
+                ForEach(weekDays, id: \.self) { day in
+                    DayCell(
+                        date: day,
+                        isToday: Calendar.current.isDateInToday(day),
+                        isCompleted: HomeStripLogic.hasCompletedSession(on: day, in: sessions)
                     )
-                )
-                .onAppear {
-                    let today = Calendar.current.startOfDay(for: Date())
-                    proxy.scrollTo(today, anchor: .center)
                 }
             }
-            .padding(.top, AppSpacing.sm)
-            .padding(.bottom, AppSpacing.md)
-            .background(AppColors.navBackground)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, AppSpacing.lg)
         }
+        .padding(.top, AppSpacing.sm)
+        .padding(.bottom, AppSpacing.md)
+        .background(AppColors.navBackground)
     }
 }
 
@@ -156,8 +122,8 @@ private struct WeeklyDateStrip: View {
 
 private struct DayCell: View {
     let date: Date
-    let isSelected: Bool
     let isToday: Bool
+    let isCompleted: Bool
 
     private static let dayFmt: DateFormatter = {
         let f = DateFormatter(); f.dateFormat = "EEE"; return f
@@ -170,23 +136,25 @@ private struct DayCell: View {
         VStack(spacing: 3) {
             Text(Self.dayFmt.string(from: date).uppercased())
                 .font(AppFonts.micro)
-                .foregroundColor(isSelected ? .white : Color.white.opacity(0.40))
+                .foregroundColor(Color.white.opacity(0.40))
 
             Text(Self.numFmt.string(from: date))
-                .font(Font.custom("Industry-Bold", size: 20))
-                .foregroundColor(
-                    isSelected ? .white
-                    : isToday  ? AppColors.accent
-                    : Color.white.opacity(0.55)
-                )
+                .font(AppFonts.sectionTitle)
+                .foregroundColor(isToday ? AppColors.accent : Color.white.opacity(0.55))
+
+            if isCompleted {
+                Circle().fill(AppColors.success).frame(width: 6, height: 6)
+            } else {
+                Circle().stroke(AppColors.cardBorder, lineWidth: 1).frame(width: 6, height: 6)
+            }
         }
-        .frame(width: 44, height: 60)
-        .background(isSelected ? AppColors.accent : Color.clear)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .frame(width: 44, height: 66)
+        .background(Color.clear)
+        .clipShape(RoundedRectangle(cornerRadius: AppCorners.small + 2))
         .overlay(
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: AppCorners.small + 2)
                 .stroke(
-                    isToday && !isSelected ? AppColors.accent.opacity(0.55) : Color.clear,
+                    isToday ? AppColors.accent.opacity(0.55) : Color.clear,
                     lineWidth: 1.5
                 )
         )
@@ -218,7 +186,7 @@ private struct HomeTabPicker: View {
             withAnimation(.easeInOut(duration: 0.2)) { selected = tab }
         } label: {
             Text(label)
-                .font(Font.custom("Industry-Bold", size: 13))
+                .font(AppFonts.cardTitle)
                 .textCase(.uppercase)
                 .kerning(0.5)
                 .foregroundColor(active ? .white : AppColors.secondaryText)
@@ -235,21 +203,13 @@ private struct HomeTabPicker: View {
 
 struct ProgramDayView: View {
     let plan: RehabPlan?
-    let date: Date
 
     @EnvironmentObject private var tabSelection: TabSelection
-
-    private var dayLabel: String {
-        if Calendar.current.isDateInToday(date) { return "Today" }
-        if Calendar.current.isDateInYesterday(date) { return "Yesterday" }
-        let fmt = DateFormatter(); fmt.dateFormat = "EEEE"
-        return fmt.string(from: date)
-    }
 
     var body: some View {
         if let plan = plan {
             VStack(alignment: .leading, spacing: AppSpacing.md) {
-                CoilDividerHeader(title: "\(dayLabel)'s Program")
+                CoilDividerHeader(title: "Today's Program")
 
                 // Plan name badge
                 HStack(spacing: AppSpacing.sm) {
@@ -362,8 +322,6 @@ private struct ExerciseProgramRow: View {
 // MARK: - Preventative Tasks View
 
 struct PreventativeTasksView: View {
-    let date: Date
-
     private static let taskDefinitions: [String] = [
         "Morning movement (5 min)",
         "Ice / heat therapy",
@@ -379,7 +337,7 @@ struct PreventativeTasksView: View {
     private var dateKey: String {
         let fmt = DateFormatter()
         fmt.dateFormat = "yyyy-MM-dd"
-        return fmt.string(from: date)
+        return fmt.string(from: Date())
     }
 
     private var completedCount: Int { checkedStates.filter { $0 }.count }
@@ -441,7 +399,6 @@ struct PreventativeTasksView: View {
             }
         }
         .onAppear { loadState() }
-        .onChange(of: date) { _, _ in loadState() }
     }
 
     private func saveState() {

@@ -4,11 +4,15 @@ import FirebaseAuth
 
 @MainActor
 class WorkoutViewModel: ObservableObject {
-    @Published var sessions: [WorkoutSession] = []
+    @Published var sessions: [WorkoutSession] = [] {
+        didSet { recomputeDerivedStats() }
+    }
     @Published var loadError: String?
     @Published var isLoading: Bool = false
+    @Published private(set) var averagePain: Double = 0
 
     private let db = Firestore.firestore()
+    private static let sessionFetchLimit = 180
 
     init() {
         if TestDataSeeder.isUITesting && TestDataSeeder.shouldSeedMockData {
@@ -20,11 +24,16 @@ class WorkoutViewModel: ObservableObject {
         }
     }
 
+    private func recomputeDerivedStats() {
+        averagePain = sessions.isEmpty ? 0 : sessions.reduce(0.0) { $0 + $1.painLevel } / Double(sessions.count)
+    }
+
     func fetchSessions() {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         isLoading = true
         db.collection("users").document(uid).collection("workoutSessions")
             .order(by: "date", descending: true)
+            .limit(to: Self.sessionFetchLimit)
             .getDocuments { [weak self] snapshot, error in
                 DispatchQueue.main.async {
                     guard let self = self else { return }
@@ -98,6 +107,7 @@ class WorkoutViewModel: ObservableObject {
         StreakService.shared.evaluatePainImprovement(sessions: sessions)
         // Reset the inactivity-nudge clock — the user is active today (audit #33).
         NotificationService.shared.scheduleInactivityNudge()
+        Task { await NotificationService.shared.noteWorkoutCompleted() }
 
         // Persist to Firestore
         guard let uid = Auth.auth().currentUser?.uid else { return }

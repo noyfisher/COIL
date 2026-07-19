@@ -123,7 +123,7 @@ struct PainDetailView: View {
                 // multi-region users know they won't have to re-answer every area —
                 // the actionable "Apply to All" button lives on the summary step (audit #15).
                 Label("Similar pain in all \(viewModel.totalRegions) areas? You can apply these answers to all of them at the summary.", systemImage: "square.on.square")
-                    .font(.caption2)
+                    .font(AppFonts.micro)
                     .foregroundColor(AppColors.secondaryText)
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -187,7 +187,7 @@ struct PainDetailView: View {
             if currentStep > 0 || !viewModel.isFirstRegion {
                 Button(action: handleBack) {
                     Text("Back")
-                        .font(.body.weight(.medium))
+                        .font(AppFonts.bodyMedium)
                         .foregroundColor(AppColors.secondaryText)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, AppSpacing.md)
@@ -352,7 +352,7 @@ struct PainDetailView: View {
                     .foregroundColor(AppColors.secondaryText)
                     .frame(width: 28)
                 Text("Add your own")
-                    .font(Font.custom("Inter-Regular", size: 15))
+                    .font(AppFonts.body)
                     .foregroundColor(AppColors.secondaryText)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -409,10 +409,10 @@ struct PainDetailView: View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             HStack {
                 Text("\(Int(painIntensity))")
-                    .font(.system(size: 40, weight: .bold, design: .rounded))
+                    .font(AppFonts.display)
                     .foregroundColor(painColor)
                 Text("/ 10")
-                    .font(.title3)
+                    .font(AppFonts.sectionTitle)
                     .foregroundColor(AppColors.secondaryText)
                 Spacer()
                 Text(painDescription)

@@ -34,7 +34,7 @@ struct ReportConcernView: View {
                     VStack(alignment: .leading, spacing: AppSpacing.xl) {
                         VStack(alignment: .leading, spacing: AppSpacing.sm) {
                             Text("Category")
-                                .font(.subheadline.weight(.semibold))
+                                .font(AppFonts.smallSemiBold)
                             Picker("Category", selection: $category) {
                                 ForEach(categories, id: \.self) { Text($0).tag($0) }
                             }
@@ -45,14 +45,14 @@ struct ReportConcernView: View {
 
                         VStack(alignment: .leading, spacing: AppSpacing.sm) {
                             Text("What happened?")
-                                .font(.subheadline.weight(.semibold))
+                                .font(AppFonts.smallSemiBold)
                             ZStack(alignment: .topLeading) {
                                 if message.isEmpty {
                                     Text("Describe what happened…")
                                         .font(AppFonts.body)
                                         .foregroundColor(AppColors.mutedText)
-                                        .padding(.top, 8)
-                                        .padding(.leading, 4)
+                                        .padding(.top, AppSpacing.sm)
+                                        .padding(.leading, AppSpacing.xs)
                                 }
                                 TextEditor(text: $message)
                                     .frame(minHeight: 120)
@@ -71,10 +71,10 @@ struct ReportConcernView: View {
                         Button(action: submit) {
                             Text("Submit")
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
+                                .padding(.vertical, AppSpacing.lg)
                                 .background(canSubmit ? AppColors.accent : AppColors.accent.opacity(0.4))
                                 .foregroundColor(AppColors.ctaText)
-                                .font(.headline)
+                                .font(AppFonts.cardTitle)
                                 .cornerRadius(AppCorners.large)
                         }
                         .disabled(!canSubmit)

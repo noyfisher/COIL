@@ -7,20 +7,25 @@ struct IntroCarouselView: View {
     @State private var page: Int = 0
 
     var body: some View {
-        TabView(selection: $page) {
-            IntroPrecisionRecovery(onSkip: onComplete)
-                .tag(0)
-            IntroFastTrack(onSkip: onComplete)
-                .tag(1)
-            IntroStartJourney(onStart: onComplete)
-                .tag(2)
+        ZStack {
+            AppColors.darkSurface.ignoresSafeArea()
+
+            TabView(selection: $page) {
+                IntroPrecisionRecovery(onSkip: onComplete)
+                    .tag(0)
+                IntroFastTrack(onSkip: onComplete)
+                    .tag(1)
+                IntroStartJourney(onStart: onComplete)
+                    .tag(2)
+            }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            // No .ignoresSafeArea() here: it zeroes geo.safeAreaInsets inside the
+            // pages, collapsing their status-bar spacers and pushing the nav bar
+            // (incl. the xmark close button) under the status bar (F6). Page
+            // backgrounds ignore the safe area themselves, so the bleed is kept.
+            .trackScreen("IntroCarousel")
         }
-        .tabViewStyle(.page(indexDisplayMode: .never))
-        // No .ignoresSafeArea() here: it zeroes geo.safeAreaInsets inside the
-        // pages, collapsing their status-bar spacers and pushing the nav bar
-        // (incl. the xmark close button) under the status bar (F6). Page
-        // backgrounds ignore the safe area themselves, so the bleed is kept.
-        .trackScreen("IntroCarousel")
+        .preferredColorScheme(.dark) // hero screen is intentionally dark in both app modes
     }
 }
 
@@ -109,11 +114,11 @@ private struct IntroPrecisionRecovery: View {
 
                     // Hero image area
                     ZStack {
-                        // Deep red radial background filling the hero zone
+                        // Deep teal radial background filling the hero zone
                         RadialGradient(
                             colors: [
-                                Color(red: 0.35, green: 0.02, blue: 0.02),
-                                Color(red: 0.13, green: 0.02, blue: 0.02),
+                                AppColors.accentDark,
+                                AppColors.darkSurfaceElevated,
                                 AppColors.darkSurface
                             ],
                             center: .center,
@@ -404,7 +409,7 @@ private struct BodySkeletonView: View {
                 Image(systemName: "figure.stand")
                     .resizable()
                     .scaledToFit()
-                    .foregroundColor(Color(red: 0.15, green: 0.04, blue: 0.04).opacity(0.9))
+                    .foregroundColor(AppColors.darkSurfaceElevated.opacity(0.9))
 
                 // Skeleton lines
                 SkeletonLines(w: w, h: h)

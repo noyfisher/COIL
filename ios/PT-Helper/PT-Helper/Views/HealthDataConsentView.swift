@@ -6,6 +6,7 @@ import SwiftUI
 /// (see Gotchas #1). Both checkboxes must be ticked before Continue is enabled.
 struct HealthDataConsentView: View {
     let onConsented: () -> Void
+    var onDeclineSignOut: (() -> Void)? = nil
 
     @State private var consentCollection = false
     @State private var consentSharing = false
@@ -29,7 +30,7 @@ struct HealthDataConsentView: View {
                             .padding(.top, AppSpacing.xxl)
 
                         Text("Your Health Data")
-                            .font(.system(.title2, design: .serif).weight(.bold))
+                            .font(AppFonts.title)
 
                         VStack(alignment: .leading, spacing: AppSpacing.lg) {
                             consentSection(
@@ -52,7 +53,7 @@ struct HealthDataConsentView: View {
                             showPolicy = true
                         }
                         .font(AppFonts.bodyMedium)
-                        .foregroundColor(AppColors.accent)
+                        .foregroundColor(AppColors.accentText)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, AppSpacing.xl)
 
@@ -71,7 +72,7 @@ struct HealthDataConsentView: View {
                         }
                         .padding(.horizontal, AppSpacing.xl)
 
-                        Text("You can withdraw consent at any time by deleting your account in Settings, or by emailing noyfisher2003@gmail.com.")
+                        Text("You can withdraw consent at any time in Settings, by deleting your account, or by emailing noyfisher2003@gmail.com.")
                             .font(AppFonts.caption)
                             .foregroundColor(AppColors.secondaryText)
                             .fixedSize(horizontal: false, vertical: true)
@@ -84,16 +85,35 @@ struct HealthDataConsentView: View {
                         }) {
                             Text("Continue")
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
+                                .padding(.vertical, AppSpacing.lg)
                                 .background(canContinue ? AppColors.accent : AppColors.accent.opacity(0.4))
                                 .foregroundColor(AppColors.ctaText)
-                                .font(.headline)
+                                .font(AppFonts.cardTitle)
                                 .cornerRadius(AppCorners.large)
                         }
                         .disabled(!canContinue)
                         .accessibilityIdentifier("healthConsent.continueButton")
                         .padding(.horizontal, AppSpacing.xl)
                         .padding(.top, AppSpacing.lg)
+
+                        if let onDeclineSignOut {
+                            VStack(spacing: AppSpacing.xs) {
+                                Button("Sign out instead") {
+                                    onDeclineSignOut()
+                                }
+                                .font(AppFonts.bodyMedium)
+                                .foregroundColor(AppColors.secondaryText)
+                                .accessibilityIdentifier("healthConsent.signOutButton")
+
+                                Text("If you don't consent, COIL can't provide assessments or plans. You can also email noyfisher2003@gmail.com to request deletion of your data.")
+                                    .font(AppFonts.caption)
+                                    .foregroundColor(AppColors.secondaryText)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.horizontal, AppSpacing.xl)
+                            }
+                            .padding(.top, AppSpacing.sm)
+                        }
 
                         Spacer(minLength: 40)
                     }
@@ -120,9 +140,9 @@ struct HealthDataConsentView: View {
 
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(title)
-                    .font(.subheadline.weight(.semibold))
+                    .font(AppFonts.smallSemiBold)
                 Text(text)
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(AppColors.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
             }

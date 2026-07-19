@@ -162,7 +162,7 @@ struct MyPlanTab: View {
                         }
 
                         Text(plan.planName)
-                            .font(Font.custom("Industry-Bold", size: 18))
+                            .font(AppFonts.sectionTitle)
                             .textCase(.uppercase)
                             .kerning(0.3)
                             .foregroundColor(AppColors.primaryText)
@@ -188,7 +188,7 @@ struct MyPlanTab: View {
 
                     VStack(alignment: .trailing, spacing: AppSpacing.nano) {
                         Text("\(plan.totalWeeks)")
-                            .font(Font.custom("Industry-Bold", size: 32))
+                            .font(AppFonts.heroTitle)
                             .foregroundColor(AppColors.primaryText)
                         Text("weeks")
                             .font(Font.custom("Inter-Regular", size: 10))

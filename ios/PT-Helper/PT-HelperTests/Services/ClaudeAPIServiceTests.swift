@@ -125,4 +125,31 @@ final class ClaudeAPIServiceTests: XCTestCase {
         let service: ClaudeAPIServiceProtocol = mock
         XCTAssertNotNil(service)
     }
+
+    // MARK: - WS8-03: Retry policy
+
+    func testIsServiceRetryEligible_allRequestTypes() {
+        for requestType in [
+            AIRequestType.analysis, .analysis_verify, .rehab_plan, .exercise_substitute,
+            .recovery_insights, .form_analysis, .wellness_analysis, .wellness_verify, .wellness_plan
+        ] {
+            let expected = requestType != .exercise_substitute
+            XCTAssertEqual(ClaudeAPIService.isServiceRetryEligible(requestType), expected,
+                           "\(requestType) eligibility should be \(expected)")
+        }
+    }
+
+    func testIsRetryableStatus_matrix() {
+        for statusCode in [500, 502, 503, 599] {
+            XCTAssertTrue(ClaudeAPIService.isRetryableStatus(statusCode), "\(statusCode) should be retryable")
+        }
+        for statusCode in [200, 400, 401, 404, 429, 600] {
+            XCTAssertFalse(ClaudeAPIService.isRetryableStatus(statusCode), "\(statusCode) should not be retryable")
+        }
+    }
+
+    func testRetryConstants() {
+        XCTAssertEqual(ClaudeAPIService.maxAttempts, 2)
+        XCTAssertEqual(ClaudeAPIService.retryDelaySeconds, 2)
+    }
 }

@@ -16,7 +16,7 @@ struct LoginView: View {
             // Ink background (fixed dark)
             AppColors.darkSurface.ignoresSafeArea()
 
-            // Diagonal red accent — top-right
+            // Diagonal teal accent — top-right
             GeometryReader { geo in
                 LinearGradient(
                     colors: [AppColors.accent.opacity(0.18), .clear],

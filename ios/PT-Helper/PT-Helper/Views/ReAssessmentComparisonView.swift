@@ -20,7 +20,7 @@ struct ReAssessmentComparisonView: View {
                         .font(.system(.title2, design: .serif).weight(.bold))
 
                     Text("Comparing \(initial.assessmentType.rawValue) to \(latest.assessmentType.rawValue)")
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                 }
                 .frame(maxWidth: .infinity)
@@ -75,6 +75,9 @@ struct ReAssessmentComparisonView: View {
                         .chartYScale(domain: 0...10)
                         .chartForegroundStyleScale(["Before": AppColors.danger.opacity(0.7), "After": AppColors.success.opacity(0.7)])
                         .frame(height: 220)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Pain comparison chart")
+                        .accessibilityValue(comparisonChartAccessibilityValue)
                     }
                 }
 
@@ -96,10 +99,10 @@ struct ReAssessmentComparisonView: View {
     private func painComparisonColumn(label: String, value: Double) -> some View {
         VStack(spacing: 4) {
             Text(label)
-                .font(.caption)
+                .font(AppFonts.caption)
                 .foregroundColor(AppColors.secondaryText)
             Text(String(format: "%.1f", value))
-                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .font(AppFonts.statNumber)
                 .foregroundColor(painColor(for: value))
         }
     }
@@ -111,7 +114,7 @@ struct ReAssessmentComparisonView: View {
             Image(systemName: improved ? "arrow.down" : (diff > 0 ? "arrow.up" : "equal"))
                 .font(.caption)
             Text(String(format: "%+.1f", diff))
-                .font(.caption.weight(.bold))
+                .font(AppFonts.captionSemiBold)
         }
         .foregroundColor(improved ? AppColors.success : (diff > 0 ? AppColors.danger : AppColors.secondaryText))
         .padding(.horizontal, AppSpacing.sm)
@@ -126,13 +129,13 @@ struct ReAssessmentComparisonView: View {
 
         return HStack {
             Text(RegionPainInputView.displayName(for: region))
-                .font(.subheadline)
+                .font(AppFonts.small)
                 .frame(width: 100, alignment: .leading)
 
             Spacer()
 
             Text(String(format: "%.0f", before))
-                .font(.caption.weight(.medium))
+                .font(AppFonts.captionMedium)
                 .foregroundColor(AppColors.danger.opacity(0.8))
                 .frame(width: 30)
 
@@ -141,7 +144,7 @@ struct ReAssessmentComparisonView: View {
                 .foregroundColor(AppColors.secondaryText)
 
             Text(String(format: "%.0f", after))
-                .font(.caption.weight(.medium))
+                .font(AppFonts.captionMedium)
                 .foregroundColor(AppColors.success)
                 .frame(width: 30)
 
@@ -154,6 +157,18 @@ struct ReAssessmentComparisonView: View {
     private var allRegions: [String] {
         let regions = Set(initial.regionPainLevels.keys).union(Set(latest.regionPainLevels.keys))
         return regions.sorted()
+    }
+
+    private var comparisonChartAccessibilityValue: String {
+        guard !allRegions.isEmpty else { return "No region data to compare." }
+        return allRegions.map { region -> String in
+            let before = Int(initial.regionPainLevels[region] ?? 0)
+            let after = Int(latest.regionPainLevels[region] ?? 0)
+            let delta = before - after
+            let change = delta > 0 ? "improved by \(delta)"
+                       : (delta < 0 ? "worse by \(-delta)" : "unchanged")
+            return "\(RegionPainInputView.displayName(for: region)): before \(before), after \(after) out of 10, \(change)."
+        }.joined(separator: " ")
     }
 
     private var overallImproved: Bool {

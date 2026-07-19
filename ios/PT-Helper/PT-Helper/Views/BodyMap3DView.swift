@@ -56,7 +56,7 @@ struct BodyMap3DView: View {
 
     @State private var lastTappedName: String?
     @State private var showCoachMark = false
-    @AppStorage("hasSeenBodyMapCoach") private var hasSeenCoach = false
+    @AppStorage(AppStorageKeys.hasSeenBodyMapCoach) private var hasSeenCoach = false
 
     // MARK: - Body
 
@@ -163,7 +163,7 @@ struct BodyMap3DView: View {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 12, weight: .bold))
                             Text("Back")
-                                .font(.subheadline.weight(.medium))
+                                .font(AppFonts.smallMedium)
                         }
                         .foregroundColor(AppColors.primaryText.opacity(0.8))
                     }
@@ -184,7 +184,7 @@ struct BodyMap3DView: View {
                     Color.clear.frame(width: 60, height: 1)
                 }
                 Text("Tap regions to select specific areas")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.mutedText)
             } else {
                 // Overview header
@@ -192,15 +192,15 @@ struct BodyMap3DView: View {
                     .font(AppFonts.sectionTitle)
                     .foregroundColor(AppColors.primaryText)
                 Text("Tap a body zone to zoom in")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.mutedText)
                     .multilineTextAlignment(.center)
                 // Always-visible rotate cue (not just the one-time coach mark) so
                 // returning users know the model turns — that's where the back,
                 // glutes & hamstrings live (audit #18).
                 Label("Drag to rotate — reach the back, glutes & hamstrings", systemImage: "arrow.triangle.2.circlepath")
-                    .font(.caption2)
-                    .foregroundColor(AppColors.accent)
+                    .font(AppFonts.micro)
+                    .foregroundColor(AppColors.accentText)
                     .multilineTextAlignment(.center)
 
                 // Non-visual path: a VoiceOver user can't tap the 3D RealityKit
@@ -210,7 +210,7 @@ struct BodyMap3DView: View {
                     showRegionList = true
                 } label: {
                     Label("Choose from a list", systemImage: "list.bullet")
-                        .font(.caption.weight(.medium))
+                        .font(AppFonts.captionMedium)
                 }
                 .padding(.top, AppSpacing.xs)
                 .accessibilityIdentifier("bodyMap.chooseFromListButton")
@@ -270,7 +270,7 @@ struct BodyMap3DView: View {
             HStack(spacing: AppSpacing.sm) {
                 if viewModel.selectedRegions.isEmpty {
                     Text("No areas selected")
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.mutedText)
                         .padding(.horizontal, AppSpacing.md)
                         .padding(.vertical, AppSpacing.sm)
@@ -283,7 +283,7 @@ struct BodyMap3DView: View {
                                 .fill(Color(uiColor: BodyMapConstants.highlightColor))
                                 .frame(width: 8, height: 8)
                             Text(region.name)
-                                .font(.caption.weight(.medium))
+                                .font(AppFonts.captionMedium)
                                 .foregroundColor(.white)
                             Button(action: {
                                 withAnimation(AppAnimations.springy) {
@@ -295,6 +295,7 @@ struct BodyMap3DView: View {
                                     .font(.system(size: 12))
                                     .foregroundColor(Color.white.opacity(0.85))
                             }
+                            .accessibilityLabel("Deselect \(region.name)")
                         }
                         .padding(.horizontal, AppSpacing.md)
                         .padding(.vertical, AppSpacing.sm)
@@ -317,20 +318,21 @@ struct BodyMap3DView: View {
                 content.camera = .virtual
 
                 do {
-                    let entity = try await BodyModelCache.shared.loadModel()
+                    let regionKeys = Set(viewModel.regions.map(\.zoneKey))
+
+                    let entity = try await ConfiguredBodyModelCache.shared.configuredModel(regionKeys: regionKeys) { tpl in
+                        configureTemplateGeometry(for: tpl, regionKeys: regionKeys)
+                        createProxyEntities(for: tpl, regionKeys: regionKeys)
+                        createArmZoneProxies(for: tpl, regionKeys: regionKeys)
+                        createLegZoneProxies(for: tpl, regionKeys: regionKeys)
+                    }
+                    captureOriginalMaterials(from: entity, regionKeys: regionKeys)
+
                     entity.scale = SIMD3<Float>(repeating: BodyMapConstants.modelScale)
 
                     let pivot = Entity()
                     entity.position.y = -BodyMapConstants.modelHalfHeight
                     pivot.addChild(entity)
-
-                    let regionKeys = Set(viewModel.regions.map(\.zoneKey))
-
-                    configureCollisionShapes(for: entity, regionKeys: regionKeys)
-                    createProxyEntities(for: entity, regionKeys: regionKeys)
-                    createArmZoneProxies(for: entity, regionKeys: regionKeys)
-                    createLegZoneProxies(for: entity, regionKeys: regionKeys)
-
 
                     content.add(pivot)
                     pivotEntity = pivot
@@ -371,7 +373,7 @@ struct BodyMap3DView: View {
                 .scaleEffect(1.5)
                 .tint(AppColors.mutedText)
             Text("Loading 3D Model...")
-                .font(.subheadline)
+                .font(AppFonts.small)
                 .foregroundColor(AppColors.mutedText)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -389,7 +391,7 @@ struct BodyMap3DView: View {
                     .font(AppFonts.cardTitle)
                     .foregroundColor(AppColors.primaryText)
                 Text("Please try again or restart the app.")
-                    .font(.subheadline)
+                    .font(AppFonts.small)
                     .foregroundColor(AppColors.mutedText)
                     .multilineTextAlignment(.center)
             }
@@ -425,7 +427,7 @@ struct BodyMap3DView: View {
                             .foregroundColor(AppColors.primaryText)
                             .symbolEffect(.pulse, options: .repeating)
                         Text("Tap to zoom in")
-                            .font(.caption.weight(.semibold))
+                            .font(AppFonts.captionSemiBold)
                             .foregroundColor(AppColors.primaryText)
                     }
 
@@ -435,7 +437,7 @@ struct BodyMap3DView: View {
                             .foregroundColor(AppColors.primaryText)
                             .symbolEffect(.pulse, options: .repeating)
                         Text("Drag to rotate")
-                            .font(.caption.weight(.semibold))
+                            .font(AppFonts.captionSemiBold)
                             .foregroundColor(AppColors.primaryText)
                     }
 
@@ -445,13 +447,13 @@ struct BodyMap3DView: View {
                             .foregroundColor(AppColors.primaryText)
                             .symbolEffect(.pulse, options: .repeating)
                         Text("Pinch to zoom")
-                            .font(.caption.weight(.semibold))
+                            .font(AppFonts.captionSemiBold)
                             .foregroundColor(AppColors.primaryText)
                     }
                 }
 
                 Text("Tap a body zone, then select specific areas")
-                    .font(.caption)
+                    .font(AppFonts.caption)
                     .foregroundColor(AppColors.primaryText.opacity(0.8))
 
                 Button(action: {
@@ -459,8 +461,8 @@ struct BodyMap3DView: View {
                     hasSeenCoach = true
                 }) {
                     Text("Got it")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundColor(AppColors.accent)
+                        .font(AppFonts.smallSemiBold)
+                        .foregroundColor(AppColors.accentText)
                         .padding(.horizontal, AppSpacing.xxl)
                         .padding(.vertical, AppSpacing.sm)
                         .background(AppColors.cardBackground)
@@ -485,7 +487,7 @@ struct BodyMap3DView: View {
     private func regionNameToast(_ name: String) -> some View {
         VStack {
             Text(name)
-                .font(.caption.weight(.semibold))
+                .font(AppFonts.captionSemiBold)
                 .foregroundColor(AppColors.ctaText)
                 .padding(.horizontal, AppSpacing.lg)
                 .padding(.vertical, AppSpacing.sm)
@@ -728,7 +730,7 @@ struct BodyMap3DView: View {
                 Image(systemName: "arrow.counterclockwise")
                     .font(.system(size: 14, weight: .semibold))
                 Text("Reset")
-                    .font(.caption.weight(.semibold))
+                    .font(AppFonts.captionSemiBold)
             }
             .foregroundColor(AppColors.primaryText)
             .padding(.horizontal, AppSpacing.lg)
@@ -756,13 +758,13 @@ struct BodyMap3DView: View {
         VStack(spacing: AppSpacing.md) {
             HStack {
                 Text(selectionSummary)
-                    .font(.subheadline.weight(.medium))
+                    .font(AppFonts.smallMedium)
                     .foregroundColor(AppColors.primaryText)
                 Spacer()
                 if !viewModel.selectedRegions.isEmpty {
                     Button(action: { clearAllSelections() }) {
                         Text("Clear All")
-                            .font(.subheadline.weight(.medium))
+                            .font(AppFonts.smallMedium)
                             .foregroundColor(AppColors.danger)
                     }
                     .accessibilityIdentifier("bodyMap3D.clearAllButton")
@@ -811,8 +813,10 @@ struct BodyMap3DView: View {
     // MARK: - Model Setup Helpers
 
     /// Configure each body-region child for tap interaction and apply region colors.
+    /// Pure function of the (fixed) model geometry and the (static) region-key set —
+    /// safe to run once on a shared template and reuse across every clone.
     @MainActor
-    private func configureCollisionShapes(for parent: Entity, regionKeys: Set<String>) {
+    private func configureTemplateGeometry(for parent: Entity, regionKeys: Set<String>) {
         let zoneBoxedRegions = Set(BodyMapConstants.armRegionOrder
             + BodyMapConstants.lowerLegRegionOrder)
         for child in parent.children {
@@ -832,12 +836,22 @@ struct BodyMap3DView: View {
                 }
 
                 applyRegionColor(to: child)
-
-                if let mc = child.components[ModelComponent.self] {
-                    originalMaterials[child.name] = mc.materials
-                }
             }
-            configureCollisionShapes(for: child, regionKeys: regionKeys)
+            configureTemplateGeometry(for: child, regionKeys: regionKeys)
+        }
+    }
+
+    /// Capture each region's post-configuration materials into per-view state
+    /// (`originalMaterials`) so selection restore has a baseline to revert to.
+    /// Read-only — must run per-open, since `originalMaterials` is view-instance state.
+    @MainActor
+    private func captureOriginalMaterials(from parent: Entity, regionKeys: Set<String>) {
+        for child in parent.children {
+            if regionKeys.contains(child.name),
+               let mc = child.components[ModelComponent.self] {
+                originalMaterials[child.name] = mc.materials
+            }
+            captureOriginalMaterials(from: child, regionKeys: regionKeys)
         }
     }
 
@@ -900,7 +914,7 @@ struct BodyMap3DView: View {
     /// Build Y-banded box proxies for the lower-leg chain (calf_shin →
     /// ankle_foot). Mirrors `createArmZoneProxies`: midpoint transitions
     /// between mesh centers, forward-protruding, fully owns taps because
-    /// the underlying convex hulls are disabled in `configureCollisionShapes`.
+    /// the underlying convex hulls are disabled in `configureTemplateGeometry`.
     @MainActor
     private func createLegZoneProxies(for entity: Entity, regionKeys: Set<String>) {
         for side in ["left", "right"] {
@@ -929,7 +943,7 @@ struct BodyMap3DView: View {
         // Calf_shin's mesh max.z extends up past the kneecap, so a naive
         // max.z top would eat the knee + lower-thigh tap area. Anchor at the
         // knee mesh's bottom instead — knee gets a real convex hull (it's not
-        // in lowerLegRegionOrder, see configureCollisionShapes), so capping
+        // in lowerLegRegionOrder, see configureTemplateGeometry), so capping
         // here cedes the upper band to that hull + the knee sphere proxy.
         let kneeBounds = entity.findEntity(named: "\(side)_knee")
             .map { $0.visualBounds(relativeTo: entity) }
@@ -1313,7 +1327,7 @@ struct BodyMap3DView: View {
                                 .fill(regionStripColor(for: region))
                                 .frame(width: 8, height: 8)
                             Text(region.name)
-                                .font(.caption.weight(.medium))
+                                .font(AppFonts.captionMedium)
                                 .foregroundColor(AppColors.primaryText)
                             if region.isSelected {
                                 Image(systemName: "checkmark")

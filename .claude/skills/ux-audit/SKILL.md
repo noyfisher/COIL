@@ -71,18 +71,17 @@ Execute in this order to minimize backtracking:
 
 | Step | Screen | Navigation Action | View File |
 |------|--------|------------------|-----------|
-| 1 | Dashboard | Already visible after launch | `ios/PT-Helper/PT-Helper/Views/Dashboard/AnalysisDashboardView.swift` |
-| 2 | Form Check | Tap "Form Check" tab (tab index 1) | `ios/PT-Helper/PT-Helper/Views/FormCheckTab.swift` |
-| 3 | Rehab Metrics | Tap "Rehab" tab (tab index 2) | `ios/PT-Helper/PT-Helper/Views/Dashboard/RehabMetricsView.swift` |
-| 4 | Profile | Tap "Profile" tab (tab index 3) | `ios/PT-Helper/PT-Helper/Views/Dashboard/DashProfileView.swift` |
-| 5 | Settings | From Profile, tap the settings/gear button | `ios/PT-Helper/PT-Helper/Views/SettingsView.swift` |
-| 6 | Plans | Navigate back to Profile, then look for plans navigation. Or tap "Rehab" tab → tap a plan | `ios/PT-Helper/PT-Helper/Views/PlansTab.swift` |
-| 7 | Rehab Plan | From Plans or Rehab tab, tap a plan card | `ios/PT-Helper/PT-Helper/Views/RehabPlanView.swift` |
+| 1 | Home | Already visible after launch (tab index 0) | `ios/PT-Helper/PT-Helper/Views/ThreeTabView.swift` (HomeTab) |
+| 2 | Assessment Gateway | Tap the floating "+" | `ios/PT-Helper/PT-Helper/Views/AssessmentGatewayView.swift` |
+| 3 | My Plan | Tap "My Plan" tab (tab index 1) | `ios/PT-Helper/PT-Helper/Views/MyPlanTab.swift` |
+| 4 | Progress | Tap "Progress" tab (tab index 2) | `ios/PT-Helper/PT-Helper/Views/ProgressTab.swift` |
+| 5 | Profile | Tap "Profile" tab (tab index 3) | `ios/PT-Helper/PT-Helper/Views/ThreeTabView.swift` (ProfileTab) |
+| 6 | Settings | From Progress, tap the settings/gear button | `ios/PT-Helper/PT-Helper/Views/SettingsView.swift` |
+| 7 | Rehab Plan | From My Plan, tap a plan card | `ios/PT-Helper/PT-Helper/Views/RehabPlanView.swift` |
 | 8 | Guided Workout | From Rehab Plan, tap "Start Workout" button | `ios/PT-Helper/PT-Helper/Views/GuidedWorkoutView.swift` |
-| 9 | Progress | Navigate back to dashboard, find progress/chart entry | `ios/PT-Helper/PT-Helper/Views/ProgressChartView.swift` |
-| 10 | Recovery Insights | From dashboard, tap recovery insights card | `ios/PT-Helper/PT-Helper/Views/RecoveryInsightsDetailView.swift` |
-| 11 | Achievements | Look for achievements entry in profile or dashboard | `ios/PT-Helper/PT-Helper/Views/AchievementsView.swift` |
-| 12 | Onboarding | Stop app, relaunch with `["--uitesting"]` only (no --skip-onboarding) | `ios/PT-Helper/PT-Helper/Views/OnboardingView.swift` |
+| 9 | Recovery Insights | From Progress, tap recovery insights card | `ios/PT-Helper/PT-Helper/Views/RecoveryInsightsDetailView.swift` |
+| 10 | Achievements | Look for achievements entry in Progress or Profile | `ios/PT-Helper/PT-Helper/Views/AchievementsView.swift` |
+| 11 | Onboarding | Stop app, relaunch with `["--uitesting"]` only (no --skip-onboarding) | `ios/PT-Helper/PT-Helper/Views/OnboardingView.swift` |
 
 **Navigation tips:**
 - Use `snapshot_ui` to find element labels/IDs before tapping

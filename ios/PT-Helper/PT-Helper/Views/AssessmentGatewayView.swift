@@ -107,7 +107,7 @@ struct AssessmentGatewayView: View {
 
                 VStack(alignment: .leading, spacing: AppSpacing.xs) {
                     Text(title)
-                        .font(Font.custom("Industry-Bold", size: 16))
+                        .font(AppFonts.cardTitle)
                         .textCase(.uppercase)
                         .kerning(0.3)
                         .foregroundColor(dark ? .white : AppColors.primaryText)
@@ -124,7 +124,7 @@ struct AssessmentGatewayView: View {
                         .font(AppFonts.caption)
                         .textCase(.uppercase)
                         .kerning(0.5)
-                        .foregroundColor(AppColors.accent)
+                        .foregroundColor(AppColors.accentText)
                     Spacer()
                     Image(systemName: "chevron.right")
                         .font(.system(size: 12, weight: .semibold))
