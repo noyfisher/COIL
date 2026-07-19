@@ -118,8 +118,15 @@ struct SettingsView: View {
                                         AnalyticsService.shared.log(.settingChanged,
                                             parameters: ["key": "reminders_enabled",
                                                          "value": enabled ? "true" : "false"])
-                                        if enabled && !notificationService.isAuthorized {
-                                            Task { await notificationService.requestPermission() }
+                                        if enabled {
+                                            Task {
+                                                if !notificationService.isAuthorized {
+                                                    _ = await notificationService.requestPermission()
+                                                }
+                                                await notificationService.resyncReminders()
+                                            }
+                                        } else {
+                                            notificationService.cancelAllReminders()
                                         }
                                     }
                             }
@@ -146,8 +153,7 @@ struct SettingsView: View {
                                         .labelsHidden()
                                         .onChange(of: reminderDate) { _, newDate in
                                             let components = Calendar.current.dateComponents([.hour, .minute], from: newDate)
-                                            notificationService.reminderHour = components.hour ?? 9
-                                            notificationService.reminderMinute = components.minute ?? 0
+                                            notificationService.updateReminderTime(hour: components.hour ?? 9, minute: components.minute ?? 0)
                                             let timeString = String(format: "%02d:%02d", components.hour ?? 9, components.minute ?? 0)
                                             AnalyticsService.shared.log(.settingChanged,
                                                 parameters: ["key": "reminder_time", "value": timeString])
@@ -184,6 +190,7 @@ struct SettingsView: View {
                                             AnalyticsService.shared.log(.settingChanged,
                                                 parameters: ["key": "workout_reminders",
                                                              "value": enabled ? "true" : "false"])
+                                            Task { await notificationService.resyncReminders() }
                                         }
                                 }
                                 .padding(.horizontal, AppSpacing.lg)
@@ -207,6 +214,7 @@ struct SettingsView: View {
                                             AnalyticsService.shared.log(.settingChanged,
                                                 parameters: ["key": "reassessment_reminders",
                                                              "value": enabled ? "true" : "false"])
+                                            Task { await notificationService.resyncReminders() }
                                         }
                                 }
                                 .padding(.horizontal, AppSpacing.lg)
@@ -230,6 +238,7 @@ struct SettingsView: View {
                                             AnalyticsService.shared.log(.settingChanged,
                                                 parameters: ["key": "inactivity_nudges",
                                                              "value": enabled ? "true" : "false"])
+                                            if !enabled { notificationService.cancelInactivityNudge() }
                                         }
                                 }
                                 .padding(.horizontal, AppSpacing.lg)

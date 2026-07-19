@@ -23,10 +23,10 @@ Sonnet's cross-session memory. Update the **Status** and **PR#** columns as you 
 | WS1-07 | Remove dead ProgressTabContent.totalMinutes (ProgressTab.swift:584-586) | WS1 | P3 | S | done | #43 |
 | WS1-08 | Commit the cosmetic pbxproj diff (unquoted CFBundleDisplayName) | WS1 | P3 | S | done | #43 |
 | WS1-09 | Fix stale navigation docs and purge references to deleted files (CLAUDE.md, ux_flows, PT-Helper-Documentation, LAYOUT.md, improve skill) | WS1 | P2 | S | done | #43 |
-| WS2-01 | Build the reminder reconciliation engine and wire it into the plan lifecycle | WS2 | P1 | M | todo | |
-| WS2-02 | Make the Settings toggles, time picker, and sign-out honor notification state | WS2 | P1 | S | BLOCKED: WS2-01 | |
-| WS2-03 | Schedule re-assessment reminders at plan midpoint and completion (audit #33) | WS2 | P2 | S | BLOCKED: WS2-01 | |
-| WS2-04 | First-workout activation nudge for freshly started plans (audit #34) | WS2 | P2 | S | BLOCKED: WS2-01 | |
+| WS2-01 | Build the reminder reconciliation engine and wire it into the plan lifecycle | WS2 | P1 | M | done | #44 |
+| WS2-02 | Make the Settings toggles, time picker, and sign-out honor notification state | WS2 | P1 | S | done | #44 |
+| WS2-03 | Schedule re-assessment reminders at plan midpoint and completion (audit #33) | WS2 | P2 | S | done | #44 |
+| WS2-04 | First-workout activation nudge for freshly started plans (audit #34) | WS2 | P2 | S | done | #44 |
 | WS3-01 | Close the grandfathered-user consent bypass with a launch-time health-consent gate | WS3 | P1 | M | BLOCKED: WS3-03 (soft, execution-order) | |
 | WS3-02 | Add the policy-promised consent-withdraw control in Settings with defined downstream effects | WS3 | P1 | M | BLOCKED: WS3-01, WS3-03 | |
 | WS3-03 | Make server state authoritative in ConsentService.load() and surface record-write failures; add ConsentService tests | WS3 | P1 | M | todo | |
