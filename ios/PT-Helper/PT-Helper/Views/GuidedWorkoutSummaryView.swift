@@ -50,10 +50,10 @@ struct GuidedWorkoutSummaryView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                         HStack {
                             Text("\(Int(overallPain))")
-                                .font(.system(size: 36, weight: .bold, design: .rounded))
+                                .font(AppFonts.display)
                                 .foregroundColor(painColor)
                             Text("/ 10")
-                                .font(.title3)
+                                .font(AppFonts.sectionTitle)
                                 .foregroundColor(AppColors.secondaryText)
                             Spacer()
                         }
@@ -61,11 +61,11 @@ struct GuidedWorkoutSummaryView: View {
                             .tint(painColor)
                         HStack {
                             Text("No pain")
-                                .font(.caption2)
+                                .font(AppFonts.micro)
                                 .foregroundColor(AppColors.secondaryText)
                             Spacer()
                             Text("Severe")
-                                .font(.caption2)
+                                .font(AppFonts.micro)
                                 .foregroundColor(AppColors.secondaryText)
                         }
                     }
@@ -167,7 +167,7 @@ struct GuidedWorkoutSummaryView: View {
                 .symbolEffect(.bounce, value: trophyBounce)
 
             Text("Workout Complete!")
-                .font(.system(.title2, design: .serif).weight(.bold))
+                .font(AppFonts.heroTitle)
                 .foregroundColor(AppColors.primaryText)
 
             Text(vm.plan.planName)
@@ -241,7 +241,7 @@ struct GuidedWorkoutSummaryView: View {
                 .foregroundColor(AppColors.primaryText)
 
             Text(label)
-                .font(.caption2)
+                .font(AppFonts.micro)
                 .foregroundColor(AppColors.secondaryText)
         }
         .frame(maxWidth: .infinity)

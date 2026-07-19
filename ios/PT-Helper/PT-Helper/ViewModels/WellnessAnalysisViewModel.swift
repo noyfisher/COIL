@@ -114,6 +114,15 @@ class WellnessAnalysisViewModel: ObservableObject {
             return
         }
 
+        // Fail fast when offline instead of making the user watch a doomed
+        // spinner before a generic network error (WS8-01, extends audit #58).
+        guard NetworkMonitor.shared.isConnected else {
+            analysisError = "You're offline. Connect to the internet to run your wellness assessment, then tap Try Again."
+            isAnalyzing = false
+            showAnalyzingScreen = true
+            return
+        }
+
         let goalNames = completed.map { $0.goalCategory.displayName }
 
         isAnalyzing = true

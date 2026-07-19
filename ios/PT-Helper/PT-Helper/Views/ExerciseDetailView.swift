@@ -49,7 +49,7 @@ struct ExerciseDetailView: View {
                     .font(AppFonts.body)
                     .foregroundColor(AppColors.secondaryText)
                 Text(exercise.description)
-                    .font(.body)
+                    .font(AppFonts.body)
                     .foregroundColor(AppColors.primaryText)
                 HStack {
                     Text("Sets: \(exercise.sets)")

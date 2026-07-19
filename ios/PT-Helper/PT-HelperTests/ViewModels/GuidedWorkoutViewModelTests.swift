@@ -7,8 +7,9 @@ import XCTest
 final class GuidedWorkoutViewModelTests: XCTestCase {
 
     override func tearDown() {
-        // Clean up any workout checkpoints saved to UserDefaults during tests
-        UserDefaults.standard.removeObject(forKey: "GuidedWorkoutCheckpoint")
+        // Clean up any workout checkpoints + completion counters saved to
+        // UserDefaults during tests
+        GuidedWorkoutViewModel.clearAllLocalWorkoutState()
         super.tearDown()
     }
 
@@ -411,5 +412,226 @@ final class GuidedWorkoutViewModelTests: XCTestCase {
         XCTAssertTrue(vm.completedExercises.contains("Ex2"))
         XCTAssertEqual(vm.completedExercises.count, 2)
         XCTAssertTrue(vm.skippedExercises.isEmpty)
+    }
+
+    // MARK: - WS5-01: Checkpoint save-point semantics
+
+    func testCheckpoint_afterFinalSetOfExercise_pointsToNextExercise() {
+        let exercises = [
+            makeExercise(name: "Ex1", sets: 1, restSeconds: 10),
+            makeExercise(name: "Ex2", sets: 1, restSeconds: 10)
+        ]
+        let plan = makePlan(exercises: exercises)
+        let vm = GuidedWorkoutViewModel(plan: plan)
+
+        vm.completeSet()
+
+        guard let checkpoint = GuidedWorkoutViewModel.savedCheckpoint(forPlanId: plan.id.uuidString) else {
+            XCTFail("Expected checkpoint after completeSet")
+            return
+        }
+        XCTAssertEqual(checkpoint.currentExerciseIndex, 1)
+        XCTAssertEqual(checkpoint.currentSet, 1)
+        XCTAssertEqual(checkpoint.completedExercises, ["Ex1"])
+    }
+
+    func testCheckpoint_resumeAfterFinalSet_doesNotDoubleCount() {
+        let exercises = [
+            makeExercise(name: "Ex1", sets: 1, restSeconds: 10),
+            makeExercise(name: "Ex2", sets: 1, restSeconds: 10)
+        ]
+        let plan = makePlan(exercises: exercises)
+        let vm = GuidedWorkoutViewModel(plan: plan)
+        vm.completeSet()
+
+        guard let checkpoint = GuidedWorkoutViewModel.savedCheckpoint(forPlanId: plan.id.uuidString) else {
+            XCTFail("Expected checkpoint after completeSet")
+            return
+        }
+
+        let restored = GuidedWorkoutViewModel(plan: plan)
+        restored.restoreFromCheckpoint(checkpoint)
+
+        XCTAssertEqual(restored.currentExercise?.name, "Ex2")
+        XCTAssertEqual(restored.completedExercises, ["Ex1"])
+        XCTAssertEqual(GuidedWorkoutViewModel.completionCount(for: "Ex1"), 1)
+
+        restored.completeSet()
+        XCTAssertEqual(restored.completedExercises, ["Ex1", "Ex2"])
+    }
+
+    func testCheckpoint_afterInterExerciseRestEnds_pointsToNextExercise() {
+        let exercises = [
+            makeExercise(name: "Ex1", sets: 1, restSeconds: 10),
+            makeExercise(name: "Ex2", sets: 1, restSeconds: 10)
+        ]
+        let plan = makePlan(exercises: exercises)
+        let vm = GuidedWorkoutViewModel(plan: plan)
+
+        vm.completeSet()
+        vm.skipRest()
+
+        guard let checkpoint = GuidedWorkoutViewModel.savedCheckpoint(forPlanId: plan.id.uuidString) else {
+            XCTFail("Expected checkpoint after rest ends")
+            return
+        }
+        XCTAssertEqual(checkpoint.currentExerciseIndex, 1)
+        XCTAssertEqual(checkpoint.currentSet, 1)
+    }
+
+    func testCheckpoint_afterSkip_pointsToNextExercise() {
+        let exercises = [
+            makeExercise(name: "Wall Sits", sets: 2, restSeconds: 30),
+            makeExercise(name: "Quad Sets", sets: 3, restSeconds: 20),
+            makeExercise(name: "Calf Raises", sets: 2, restSeconds: 15)
+        ]
+        let plan = makePlan(exercises: exercises)
+        let vm = GuidedWorkoutViewModel(plan: plan)
+
+        vm.skipExercise()
+
+        guard let checkpoint = GuidedWorkoutViewModel.savedCheckpoint(forPlanId: plan.id.uuidString) else {
+            XCTFail("Expected checkpoint after skip")
+            return
+        }
+        XCTAssertEqual(checkpoint.currentExerciseIndex, 1)
+        XCTAssertEqual(checkpoint.currentSet, 1)
+        XCTAssertEqual(checkpoint.skippedExercises, ["Wall Sits"])
+
+        let restored = GuidedWorkoutViewModel(plan: plan)
+        restored.restoreFromCheckpoint(checkpoint)
+        XCTAssertEqual(restored.currentExercise?.name, "Quad Sets")
+    }
+
+    func testCheckpoint_lastExercise_clearedOnCompletion() {
+        let exercises = [makeExercise(name: "Ex1", sets: 1, restSeconds: 10)]
+        let plan = makePlan(exercises: exercises)
+        let vm = GuidedWorkoutViewModel(plan: plan)
+
+        vm.completeSet()
+
+        XCTAssertNil(GuidedWorkoutViewModel.savedCheckpoint(forPlanId: plan.id.uuidString))
+    }
+
+    // MARK: - WS5-02: Wall-clock rest countdown
+
+    func testRestTimer_reconcile_afterTimeJump_derivesFromWallClock() {
+        let exercises = [makeExercise(name: "Ex1", sets: 2, restSeconds: 60)]
+        let vm = GuidedWorkoutViewModel(plan: makePlan(exercises: exercises))
+        let base = Date()
+        vm.now = { base }
+
+        vm.completeSet() // inter-set rest, 60s
+
+        vm.now = { base.addingTimeInterval(40) }
+        vm.reconcileRestFromWallClock()
+
+        XCTAssertEqual(vm.timeRemaining, 20)
+    }
+
+    func testRestTimer_reconcile_pastExpiry_endsRest() {
+        let exercises = [makeExercise(name: "Ex1", sets: 2, restSeconds: 60)]
+        let vm = GuidedWorkoutViewModel(plan: makePlan(exercises: exercises))
+        let base = Date()
+        vm.now = { base }
+
+        vm.completeSet() // inter-set rest, 60s
+
+        vm.now = { base.addingTimeInterval(61) }
+        vm.reconcileRestFromWallClock()
+
+        XCTAssertEqual(vm.phase, .exercise)
+        XCTAssertEqual(vm.currentSet, 2)
+    }
+
+    func testAdjustRestTime_reAnchorsEndDate() {
+        let exercises = [makeExercise(name: "Ex1", sets: 2, restSeconds: 60)]
+        let vm = GuidedWorkoutViewModel(plan: makePlan(exercises: exercises))
+        let base = Date()
+        vm.now = { base }
+        vm.completeSet()
+
+        vm.adjustRestTime(by: 15)
+        XCTAssertEqual(vm.timeRemaining, 75)
+
+        vm.reconcileRestFromWallClock()
+        XCTAssertEqual(vm.timeRemaining, 75)
+
+        vm.adjustRestTime(by: -1000)
+        XCTAssertEqual(vm.timeRemaining, 5)
+    }
+
+    func testPauseDuringRest_resumePreservesRemaining() {
+        let exercises = [makeExercise(name: "Ex1", sets: 2, restSeconds: 60)]
+        let vm = GuidedWorkoutViewModel(plan: makePlan(exercises: exercises))
+        var base = Date()
+        vm.now = { base }
+        vm.completeSet() // 60s rest
+
+        vm.togglePause()
+        base = base.addingTimeInterval(30)
+        vm.togglePause()
+        vm.reconcileRestFromWallClock()
+
+        XCTAssertEqual(vm.timeRemaining, 60)
+    }
+
+    // MARK: - WS5-03: Scene phase handling
+
+    func testHandleAppBackgrounded_duringInterExerciseRest_savesAdvancedCheckpoint() {
+        let exercises = [
+            makeExercise(name: "Ex1", sets: 1, restSeconds: 10),
+            makeExercise(name: "Ex2", sets: 1, restSeconds: 10)
+        ]
+        let plan = makePlan(exercises: exercises)
+        let vm = GuidedWorkoutViewModel(plan: plan)
+
+        vm.completeSet() // now in inter-exercise rest
+        vm.handleAppBackgrounded()
+
+        guard let checkpoint = GuidedWorkoutViewModel.savedCheckpoint(forPlanId: plan.id.uuidString) else {
+            XCTFail("Expected checkpoint")
+            return
+        }
+        XCTAssertEqual(checkpoint.currentExerciseIndex, 1)
+        XCTAssertEqual(checkpoint.currentSet, 1)
+    }
+
+    func testHandleAppBackgrounded_midExercise_savesLiveState() {
+        let plan = makePlan()
+        let vm = GuidedWorkoutViewModel(plan: plan)
+
+        vm.handleAppBackgrounded()
+
+        guard let checkpoint = GuidedWorkoutViewModel.savedCheckpoint(forPlanId: plan.id.uuidString) else {
+            XCTFail("Expected checkpoint")
+            return
+        }
+        XCTAssertEqual(checkpoint.currentExerciseIndex, 0)
+        XCTAssertEqual(checkpoint.currentSet, 1)
+    }
+
+    func testHandleAppBackgrounded_afterComplete_savesNothing() {
+        let exercises = [makeExercise(name: "Ex1", sets: 1, restSeconds: 10)]
+        let plan = makePlan(exercises: exercises)
+        let vm = GuidedWorkoutViewModel(plan: plan)
+
+        vm.completeSet() // single-exercise plan completes
+        vm.handleAppBackgrounded()
+
+        XCTAssertNil(GuidedWorkoutViewModel.savedCheckpoint(forPlanId: plan.id.uuidString))
+    }
+
+    func testHandleAppForegrounded_duringRest_reconciles() {
+        let exercises = [makeExercise(name: "Ex1", sets: 2, restSeconds: 60)]
+        let vm = GuidedWorkoutViewModel(plan: makePlan(exercises: exercises))
+        let base = Date()
+        vm.now = { base }
+        vm.completeSet()
+
+        vm.now = { base.addingTimeInterval(40) }
+        vm.handleAppForegrounded()
+
+        XCTAssertEqual(vm.timeRemaining, 20)
     }
 }

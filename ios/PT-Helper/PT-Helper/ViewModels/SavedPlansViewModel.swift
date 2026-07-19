@@ -110,7 +110,8 @@ class SavedPlansViewModel: ObservableObject {
                     // pre-substitution names to canonical catalog entries, and
                     // batch-persist. Subsequent listener fires see schemaVersion=2
                     // and skip; the in-session set guards against listener loops.
-                    self.runRepairPass(on: parsed)
+                    await self.runRepairPass(on: parsed)
+                    await NotificationService.shared.syncPlanReminders(plans: parsed)
                 }
             }
     }
@@ -213,7 +214,7 @@ class SavedPlansViewModel: ObservableObject {
     /// exercises whose names no longer resolve to a catalog image, and persist.
     /// The repair pass uses the same `ImageAvailabilityValidator` as PR 2's
     /// validateRehabPlan step so substitution choices are consistent.
-    private func runRepairPass(on plans: [RehabPlan]) {
+    private func runRepairPass(on plans: [RehabPlan]) async {
         var repairsThisCall = 0
         for original in plans {
             guard original.schemaVersion < 2 else { continue }
@@ -233,11 +234,13 @@ class SavedPlansViewModel: ObservableObject {
             // safety guards in `ImageAvailabilityValidator` will conservatively
             // refuse to substitute exercises with safety-flagged keywords
             // regardless of conditions.
-            let result = ImageAvailabilityValidator.validate(
-                exercises: original.exercises,
-                userConditions: [],
-                userPainRegions: []
-            )
+            let result = await Task.detached(priority: .userInitiated) {
+                ImageAvailabilityValidator.validate(
+                    exercises: original.exercises,
+                    userConditions: [],
+                    userPainRegions: []
+                )
+            }.value
 
             if result.substitutionCount == 0 {
                 // Nothing to rewrite, but still bump schemaVersion so we don't
@@ -272,6 +275,7 @@ class SavedPlansViewModel: ObservableObject {
         if let index = rehabPlans.firstIndex(where: { $0.id == plan.id }) {
             rehabPlans[index] = plan
         }
+        Task { await NotificationService.shared.syncPlanReminders(plans: rehabPlans) }
 
         // Serialize exercises
         let exercisesData: [[String: Any]] = plan.exercises.map { e in
@@ -339,6 +343,7 @@ class SavedPlansViewModel: ObservableObject {
 
         // Remove locally first for instant UI feedback
         rehabPlans.removeAll { $0.id == plan.id }
+        Task { await NotificationService.shared.syncPlanReminders(plans: rehabPlans) }
 
         // Remove from Firestore
         db.collection("users").document(uid).collection("rehabPlans")

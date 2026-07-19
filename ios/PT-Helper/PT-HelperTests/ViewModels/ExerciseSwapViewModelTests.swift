@@ -199,4 +199,23 @@ final class ExerciseSwapViewModelTests: XCTestCase {
         XCTAssertNotNil(reason)
         XCTAssertTrue(reason!.contains("same muscles"))
     }
+
+    // MARK: - WS8-01: Offline fail-fast
+
+    func testFetchSubstitutes_offline_setsErrorWithoutAPICall() async {
+        _ = NetworkMonitor.shared
+        await Task.yield()
+        NetworkMonitor.shared.isConnected = false
+        defer { NetworkMonitor.shared.isConnected = true }
+
+        let vm = ExerciseSwapViewModel(exercise: exercise, plan: plan, apiService: mockAPI)
+        vm.selectedReason = .tooPainful
+
+        await vm.fetchSubstitutes()
+
+        XCTAssertEqual(vm.error, "You're offline. Connect to the internet to find substitute exercises, then try again.")
+        XCTAssertFalse(vm.isLoading)
+        XCTAssertFalse(vm.noSafeSubstituteAvailable)
+        XCTAssertEqual(mockAPI.sendMessageCallCount, 0)
+    }
 }

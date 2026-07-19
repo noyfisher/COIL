@@ -105,6 +105,15 @@ class ExerciseSwapViewModel: ObservableObject {
     /// consultation.
     func fetchSubstitutes() async {
         guard let reason = selectedReason else { return }
+
+        // Fail fast when offline instead of making the user watch a doomed
+        // spinner before a generic network error (WS8-01, extends audit #58).
+        guard NetworkMonitor.shared.isConnected else {
+            error = "You're offline. Connect to the internet to find substitute exercises, then try again."
+            isLoading = false
+            return
+        }
+
         isLoading = true
         error = nil
         noSafeSubstituteAvailable = false

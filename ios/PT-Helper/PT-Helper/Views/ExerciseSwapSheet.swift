@@ -226,7 +226,7 @@ struct ExerciseSwapSheet: View {
                             Task { await vm.fetchSubstitutes() }
                         }
                         .font(AppFonts.captionSemiBold)
-                        .foregroundColor(AppColors.accent)
+                        .foregroundColor(AppColors.accentText)
                     }
                     .padding(AppSpacing.md)
                     .background(AppColors.warning.opacity(0.08))
@@ -340,7 +340,7 @@ struct ExerciseSwapSheet: View {
         case .crossModelVerified:
             Label("Checked", systemImage: "checkmark.seal")
                 .font(AppFonts.microMedium)
-                .foregroundColor(AppColors.accent)
+                .foregroundColor(AppColors.accentText)
         case .crossModelFlagged:
             Label("Review", systemImage: "exclamationmark.triangle.fill")
                 .font(AppFonts.microMedium)

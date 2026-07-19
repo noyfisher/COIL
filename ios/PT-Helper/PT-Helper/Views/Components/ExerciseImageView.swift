@@ -145,7 +145,7 @@ struct ExerciseImageView: View {
                         ProgressView()
                             .scaleEffect(1.2)
                         Text("Creating illustration...")
-                            .font(.caption)
+                            .font(AppFonts.caption)
                             .foregroundStyle(.secondary)
                     }
                 )

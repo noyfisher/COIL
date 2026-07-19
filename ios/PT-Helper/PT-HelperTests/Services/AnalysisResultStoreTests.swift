@@ -54,4 +54,14 @@ final class AnalysisResultStoreTests: XCTestCase {
         let store = AnalysisResultStore()
         XCTAssertNil(store.lastResult, "Corrupt data should result in nil, not a crash")
     }
+
+    func testClear_thenFreshStore_loadsNil() {
+        let store = AnalysisResultStore()
+        store.save(TestFixtures.makeAnalysisResult())
+        store.clear()
+
+        let freshStore = AnalysisResultStore()
+        XCTAssertNil(freshStore.lastResult,
+            "clear() must remove the backing file so a new account's store starts empty")
+    }
 }

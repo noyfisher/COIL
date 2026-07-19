@@ -48,11 +48,11 @@ struct ExpandableSummaryView: View {
                 )) {
                     HStack(spacing: AppSpacing.xs) {
                         Text("See Full Overview")
-                            .font(.caption.weight(.medium))
+                            .font(AppFonts.captionMedium)
                         Image(systemName: "chevron.right")
                             .font(.caption2.weight(.semibold))
                     }
-                    .foregroundColor(AppColors.accent)
+                    .foregroundColor(AppColors.accentText)
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("\(accessibilityPrefix).seeFullOverviewButton")

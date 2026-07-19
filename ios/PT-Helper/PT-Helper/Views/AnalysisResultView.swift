@@ -4,6 +4,9 @@ struct AnalysisResultView: View {
     let analysisResult: AnalysisResult
     var validationWarnings: [ValidationWarning] = []
     var redFlagAlerts: [ValidationWarning] = []
+    /// True when pushed from the Progress tab's "Your Last Analysis" card (D-6):
+    /// hides plan generation + assessment-flow navigation and skips the store re-save.
+    var isReadOnly: Bool = false
     @State private var showRehabPlan = false
     @State private var expandedConditions: Set<String> = []
     @State private var showConfidenceInfo = false
@@ -51,8 +54,10 @@ struct AnalysisResultView: View {
                         validationCautionBanner
                     }
                     disclaimerBanner
-                    buildRehabPlanButton
-                    navigationButtons
+                    if !isReadOnly {
+                        buildRehabPlanButton
+                        navigationButtons
+                    }
                 }
                 .padding(AppSpacing.xl)
             }
@@ -98,7 +103,7 @@ struct AnalysisResultView: View {
         }
         .trackScreen("AnalysisResult")
         .onAppear {
-            AnalysisResultStore.shared.save(analysisResult)
+            if !isReadOnly { AnalysisResultStore.shared.save(analysisResult) }
             cardsAppeared = true
         }
     }
@@ -284,7 +289,7 @@ struct AnalysisResultView: View {
 
                         // Explanation
                         Text(condition.explanation)
-                            .font(.body)
+                            .font(AppFonts.body)
                             .foregroundColor(AppColors.primaryText)
                             .lineSpacing(3)
                             .padding(.horizontal, AppSpacing.lg)
@@ -293,7 +298,7 @@ struct AnalysisResultView: View {
                         VStack(alignment: .leading, spacing: AppSpacing.sm) {
                             Label("What's happening", systemImage: "figure.stand")
                                 .font(AppFonts.bodySemiBold)
-                                .foregroundColor(AppColors.accent)
+                                .foregroundColor(AppColors.accentText)
                             Text(condition.whatItMeans)
                                 .font(AppFonts.body)
                                 .foregroundColor(AppColors.secondaryText)
@@ -305,12 +310,12 @@ struct AnalysisResultView: View {
                         VStack(alignment: .leading, spacing: AppSpacing.sm) {
                             Label("Suggested next steps", systemImage: "list.number")
                                 .font(AppFonts.bodySemiBold)
-                                .foregroundColor(AppColors.accent)
+                                .foregroundColor(AppColors.accentText)
                             ForEach(Array(condition.nextSteps.enumerated()), id: \.offset) { index, step in
                                 HStack(alignment: .top, spacing: AppSpacing.sm) {
                                     Text("\(index + 1).")
                                         .font(AppFonts.bodySemiBold)
-                                        .foregroundColor(AppColors.accent)
+                                        .foregroundColor(AppColors.accentText)
                                         .frame(width: 20, alignment: .leading)
                                     Text(step)
                                         .font(AppFonts.body)
@@ -326,7 +331,7 @@ struct AnalysisResultView: View {
                             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                                 Label("How to manage this", systemImage: "cross.case")
                                     .font(AppFonts.bodySemiBold)
-                                    .foregroundColor(AppColors.accent)
+                                    .foregroundColor(AppColors.accentText)
                                 Text(condition.howToManage)
                                     .font(AppFonts.body)
                                     .foregroundColor(AppColors.secondaryText)
@@ -383,10 +388,10 @@ struct AnalysisResultView: View {
                     .foregroundColor(AppColors.ctaText)
                 VStack(alignment: .leading, spacing: AppSpacing.nano) {
                     Text("Important Safety Notice")
-                        .font(.headline)
+                        .font(AppFonts.cardTitle)
                         .foregroundColor(AppColors.ctaText)
                     Text("Based on what you reported, please read this carefully")
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.ctaText.opacity(0.9))
                 }
                 Spacer()
@@ -412,10 +417,10 @@ struct AnalysisResultView: View {
                     .foregroundColor(AppColors.ctaText)
                 VStack(alignment: .leading, spacing: AppSpacing.nano) {
                     Text("Please Read This Carefully")
-                        .font(.headline)
+                        .font(AppFonts.cardTitle)
                         .foregroundColor(AppColors.ctaText)
                     Text("Some of your symptoms may need urgent attention")
-                        .font(.caption)
+                        .font(AppFonts.caption)
                         .foregroundColor(AppColors.ctaText.opacity(0.9))
                 }
                 Spacer()

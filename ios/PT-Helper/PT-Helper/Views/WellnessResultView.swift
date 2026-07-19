@@ -66,7 +66,7 @@ struct WellnessResultView: View {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.title2).foregroundColor(AppColors.ctaText)
                 Text("Important Safety Notice")
-                    .font(.headline).foregroundColor(AppColors.ctaText)
+                    .font(AppFonts.cardTitle).foregroundColor(AppColors.ctaText)
                 Spacer()
             }
             ForEach(viewModel.validationWarnings.filter { $0.severity >= .serious }, id: \.message) { w in
@@ -142,7 +142,7 @@ struct WellnessResultView: View {
                                 .font(AppFonts.captionMedium)
                                 .foregroundColor(priorityColor)
                                 .padding(.horizontal, AppSpacing.sm)
-                                .padding(.vertical, 2)
+                                .padding(.vertical, AppSpacing.nano)
                                 .background(priorityColor.opacity(0.12))
                                 .cornerRadius(AppCorners.small)
 
@@ -170,7 +170,7 @@ struct WellnessResultView: View {
                             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                                 Label("Where you are now", systemImage: "location.fill")
                                     .font(AppFonts.bodySemiBold)
-                                    .foregroundColor(AppColors.accent)
+                                    .foregroundColor(AppColors.accentText)
                                 Text(rec.currentStateAssessment)
                                     .font(AppFonts.body)
                             }
@@ -224,7 +224,7 @@ struct WellnessResultView: View {
                                             Text(goal)
                                                 .font(AppFonts.caption)
                                                 .padding(.horizontal, AppSpacing.sm)
-                                                .padding(.vertical, 4)
+                                                .padding(.vertical, AppSpacing.xs)
                                                 .background(AppColors.accentTint)
                                                 .cornerRadius(AppCorners.small)
                                         }
