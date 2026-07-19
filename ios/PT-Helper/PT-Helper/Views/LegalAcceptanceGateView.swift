@@ -128,10 +128,10 @@ struct LegalAcceptanceGateView: View {
         VStack(alignment: .leading, spacing: AppSpacing.xs) {
             Button("Terms of Service") { showTerms = true }
                 .font(AppFonts.bodyMedium)
-                .foregroundColor(AppColors.accent)
+                .foregroundColor(AppColors.accentText)
             Button("Privacy Policy") { showPrivacy = true }
                 .font(AppFonts.bodyMedium)
-                .foregroundColor(AppColors.accent)
+                .foregroundColor(AppColors.accentText)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

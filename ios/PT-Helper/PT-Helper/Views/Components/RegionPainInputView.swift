@@ -37,7 +37,7 @@ struct RegionPainInputView: View {
                         Text("Add")
                     }
                     .font(.caption.weight(.medium))
-                    .foregroundColor(AppColors.accent)
+                    .foregroundColor(AppColors.accentText)
                 }
             }
 
@@ -80,6 +80,7 @@ struct RegionPainInputView: View {
                         .font(.system(size: 14))
                         .foregroundColor(.secondary.opacity(0.5))
                 }
+                .accessibilityLabel("Remove \(Self.displayName(for: region))")
             }
 
             Slider(

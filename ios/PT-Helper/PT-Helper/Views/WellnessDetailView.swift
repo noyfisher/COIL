@@ -277,6 +277,7 @@ struct WellnessDetailView: View {
                             .foregroundColor(AppColors.accent)
                     }
                     .disabled(customActivityText.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .accessibilityLabel("Add custom activity")
                 }
             }
         }
@@ -322,6 +323,7 @@ struct WellnessDetailView: View {
                             .foregroundColor(AppColors.accent)
                     }
                     .disabled(customHabitText.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .accessibilityLabel("Add custom habit")
                 }
             }
         }
@@ -367,7 +369,7 @@ struct WellnessDetailView: View {
                         .foregroundColor(AppColors.accent)
                     Text("AI-powered")
                         .font(.caption2.weight(.medium))
-                        .foregroundColor(AppColors.accent)
+                        .foregroundColor(AppColors.accentText)
                 }
                 .padding(.horizontal, AppSpacing.sm)
                 .padding(.vertical, 4)

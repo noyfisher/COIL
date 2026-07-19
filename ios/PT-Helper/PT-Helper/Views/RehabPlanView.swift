@@ -107,7 +107,7 @@ struct RehabPlanView: View {
                                     Text("View Progress Comparison")
                                 }
                                 .font(AppFonts.bodyMedium)
-                                .foregroundColor(AppColors.accent)
+                                .foregroundColor(AppColors.accentText)
                                 .padding(AppSpacing.md)
                                 .frame(maxWidth: .infinity)
                                 .background(AppColors.accentTint)
@@ -192,6 +192,7 @@ struct RehabPlanView: View {
                             Image(systemName: "pencil.circle")
                         }
                         .accessibilityIdentifier("rehabPlan.editButton")
+                        .accessibilityLabel("Edit plan")
                     }
                 }
             }
@@ -510,7 +511,7 @@ struct RehabPlanView: View {
                             if hasExercises {
                                 Text("\(exerciseCount)")
                                     .font(.caption.weight(.bold))
-                                    .foregroundColor(AppColors.accent)
+                                    .foregroundColor(AppColors.accentText)
                             } else {
                                 Text("-")
                                     .font(AppFonts.caption)
@@ -675,7 +676,7 @@ struct RehabPlanView: View {
         case .crossModelVerified:
             Label("Checked", systemImage: "checkmark.seal")
                 .font(.caption2.weight(.medium))
-                .foregroundColor(AppColors.accent)
+                .foregroundColor(AppColors.accentText)
         case .crossModelFlagged:
             Label("Review", systemImage: "exclamationmark.triangle.fill")
                 .font(.caption2.weight(.medium))

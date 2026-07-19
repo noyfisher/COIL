@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Compact card showing AI recovery insights, a generate button, or an insufficient-data prompt.
-/// Used in ProgressChartView and HomeTab.
+/// Used in ProgressTab.
 struct RecoveryInsightsCardView: View {
     @ObservedObject var vm: RecoveryInsightsViewModel
     @EnvironmentObject private var workoutViewModel: WorkoutViewModel
@@ -116,7 +116,7 @@ struct RecoveryInsightsCardView: View {
                         Spacer()
                         Text("View Full Digest")
                             .font(.caption.weight(.medium))
-                            .foregroundColor(AppColors.accent)
+                            .foregroundColor(AppColors.accentText)
                         Image(systemName: "chevron.right")
                             .font(.caption2.weight(.semibold))
                             .foregroundColor(AppColors.accent)

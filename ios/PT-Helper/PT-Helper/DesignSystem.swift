@@ -102,10 +102,11 @@ enum AppColors {
     static let accentLight = Color(CoilPalette.accentBright)
     static let accentDark  = Color(CoilPalette.accentDeeper)
     static let accentTint  = Color(CoilPalette.accent).opacity(0.10)
+    static let accentText = Color(CoilPalette.accentDeep)  // AA text: 5.16:1 on white, 5.7:1 on dark cards
 
     // MARK: Chip
-    static let chipSelectedBg     = Color(CoilPalette.accent)
-    static let chipSelectedBorder = Color(CoilPalette.accent)
+    static let chipSelectedBg     = Color(CoilPalette.accentDeeper)
+    static let chipSelectedBorder = Color(CoilPalette.accentDeeper)
     static let chipSelectedText   = Color.white
 
     // MARK: Card styling
@@ -425,7 +426,7 @@ struct DestructiveButtonStyle: ButtonStyle {
 
 // MARK: - COIL Shared Components
 
-/// Red gradient rule with uppercase Barlow Condensed title — use for all content section breaks.
+/// Teal gradient rule with uppercase Industry-Bold title — use for all content section breaks.
 struct CoilDividerHeader: View {
     let title: String
 
@@ -446,7 +447,7 @@ struct CoilDividerHeader: View {
     }
 }
 
-/// Small red pill badge — "ACTIVE", "ON FIRE", count indicators, etc.
+/// Small teal pill badge — "ACTIVE", "ON FIRE", count indicators, etc.
 struct CoilBadge: View {
     let text: String
 
@@ -458,7 +459,7 @@ struct CoilBadge: View {
             .foregroundColor(AppColors.ctaText)
             .padding(.horizontal, AppSpacing.comfortable)
             .padding(.vertical, AppSpacing.nano + 1)
-            .background(AppColors.accent)
+            .background(AppColors.accentDark)
             .clipShape(Capsule())
     }
 }
