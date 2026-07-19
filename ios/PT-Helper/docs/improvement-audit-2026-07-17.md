@@ -33,12 +33,12 @@ Sonnet's cross-session memory. Update the **Status** and **PR#** columns as you 
 | WS3-04 | Delete the write-only legacy ToS UserDefaults keys | WS3 | P2 | S | done | #45 |
 | WS3-05 | Centralize duplicated UserDefaults key literals and clear the stale minor-safety flag on account deletion | WS3 | P2 | S | done | #45 |
 | WS3-06 | Update the Consumer Health Data Policy withdrawal-mechanism text | WS3 | P2 | S | BLOCKED: legal review (BLOCKED-on-legal per D-2) | |
-| WS4-01 | Re-skin IntroCarouselView hero to COIL tokens and fix the light-mode status-bar strip | WS4 | P1 | S | todo | |
-| WS4-02 | Add branded launch screen and dark/tinted app-icon variants | WS4 | P2 | M | todo | |
+| WS4-01 | Re-skin IntroCarouselView hero to COIL tokens and fix the light-mode status-bar strip | WS4 | P1 | S | done | #46 |
+| WS4-02 | Add branded launch screen and dark/tinted app-icon variants | WS4 | P2 | M | done | #46 |
 | WS4-03 | Rename "PT Helper" to "COIL" in LegalContent (verbatim spec) | WS4 | P2 | S | BLOCKED: Legal sign-off (D-2) — bumps tosVersion, re-triggers acceptance gate for all users | |
-| WS4-04 | Replace systemBlue with fixed COIL teal in PDFExportService | WS4 | P2 | S | todo | |
-| WS4-05 | Sweep stale red/Barlow comments and residual PT Helper brand strings in live files | WS4 | P3 | S | todo | |
-| WS4-06 | Remove dead Inter-Bold font (unregistered payload) | WS4 | P3 | S | todo | |
+| WS4-04 | Replace systemBlue with fixed COIL teal in PDFExportService | WS4 | P2 | S | done | #46 |
+| WS4-05 | Sweep stale red/Barlow comments and residual PT Helper brand strings in live files | WS4 | P3 | S | done | #46 |
+| WS4-06 | Remove dead Inter-Bold font (unregistered payload) | WS4 | P3 | S | done | #46 |
 | WS5-01 | Fix checkpoint double-count at the exercise boundary (save-point semantics) | WS5 | P1 | M | todo | |
 | WS5-02 | Convert rest countdown to wall-clock end-Date reconciliation | WS5 | P1 | M | todo | |
 | WS5-03 | Add scenePhase background-save and foreground wall-clock reconcile to GuidedWorkout | WS5 | P2 | S | BLOCKED: WS5-01, WS5-02 | |
