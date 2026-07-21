@@ -15,16 +15,16 @@
   "testTargets" : [
     {
       "target" : {
-        "containerPath" : "container:PT-Helper.xcodeproj",
+        "containerPath" : "container:COIL.xcodeproj",
         "identifier" : "7A071B032E8236EE00497F94",
-        "name" : "PT-HelperTests"
+        "name" : "COILTests"
       }
     },
     {
       "target" : {
-        "containerPath" : "container:PT-Helper.xcodeproj",
+        "containerPath" : "container:COIL.xcodeproj",
         "identifier" : "7A071B0D2E8236EE00497F94",
-        "name" : "PT-HelperUITests"
+        "name" : "COILUITests"
       }
     }
   ],

@@ -7,8 +7,8 @@ platform :ios do
   desc "Run smoke tests"
   lane :test do
     scan(
-      project: "PT-Helper.xcodeproj",
-      scheme: "PT-Helper",
+      project: "COIL.xcodeproj",
+      scheme: "COIL",
       device: ENV["TEST_DEVICE"] || "iPhone 16",
       testplan: "SmokePlan",
       output_types: "junit",
@@ -24,12 +24,12 @@ platform :ios do
     key_path = File.expand_path("../fastlane/AuthKey.p8", __dir__)
 
     increment_build_number(
-      xcodeproj: "PT-Helper.xcodeproj"
+      xcodeproj: "COIL.xcodeproj"
     )
 
     build_app(
-      project: "PT-Helper.xcodeproj",
-      scheme: "PT-Helper",
+      project: "COIL.xcodeproj",
+      scheme: "COIL",
       output_directory: "./build",
       clean: true,
       export_options: "./fastlane/ExportOptions.plist",

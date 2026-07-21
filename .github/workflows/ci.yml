@@ -45,11 +45,11 @@ jobs:
       - name: Run SmokePlan
         run: |
           xcodebuild test \
-            -project PT-Helper.xcodeproj \
-            -scheme PT-Helper \
+            -project COIL.xcodeproj \
+            -scheme COIL \
             -testPlan SmokePlan \
             -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest' \
-            -only-testing:PT-HelperTests \
+            -only-testing:COILTests \
             clean test
 
       - name: Upload test results
@@ -146,7 +146,7 @@ jobs:
             exit 0
           fi
           echo "Uploading dSYMs from: $DSYM_DIR"
-          "$UPLOAD_SCRIPT" -gsp PT-Helper/GoogleService-Info.plist -p ios "$DSYM_DIR"
+          "$UPLOAD_SCRIPT" -gsp COIL/GoogleService-Info.plist -p ios "$DSYM_DIR"
 
       - name: Upload IPA artifact
         if: always()

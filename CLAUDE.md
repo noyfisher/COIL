@@ -7,34 +7,34 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### iOS App
 ```bash
 # Build
-xcodebuild build -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild build -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Run all unit tests (default: UnitPlan)
-xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Run smoke tests only (11 key tests, 60s timeout)
-xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper -testPlan SmokePlan -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL -testPlan SmokePlan -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Run full suite including collision tests (300s timeout)
-xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper -testPlan FullPlan -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL -testPlan FullPlan -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Run pre-release suite: all unit + UI tests with code coverage (600s timeout)
-xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper -testPlan PreReleasePlan -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL -testPlan PreReleasePlan -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Run a single test class
-xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper -destination 'platform=iOS Simulator,name=iPhone 16' \
-  -only-testing:PT-HelperTests/UserProfileTests
+xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16' \
+  -only-testing:COILTests/UserProfileTests
 
 # Run a single test method
-xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper -destination 'platform=iOS Simulator,name=iPhone 16' \
-  -only-testing:PT-HelperTests/UserProfileTests/testDefaultUserProfile
+xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16' \
+  -only-testing:COILTests/UserProfileTests/testDefaultUserProfile
 ```
 
 ### Cloud Functions (Firebase)
@@ -66,7 +66,7 @@ Full rules: `~/.claude/projects/-Users-noyfisher-IOS-Projects-PT-Helper-Agent-v1
 ## Architecture
 
 ### MVVM + Services Pattern
-The iOS app (`ios/PT-Helper/PT-Helper/`) uses MVVM with a singleton service layer:
+The iOS app (`ios/PT-Helper/COIL/`) uses MVVM with a singleton service layer:
 
 - **Models/** (20 files) — Codable structs and analyzers:
   - Core: `UserProfile`, `PainAssessment`, `RehabPlan`, `BodyRegion`, `BodyZone`, `BodyMapConstants`
@@ -281,6 +281,6 @@ Use `.trackScreen("ScreenName")` modifier on new views. `SessionLogger` auto-tra
 1. Add metadata to `scripts/exercise_list.json`
 2. Generate: `python scripts/generate_exercise_images.py --api-key KEY --exercise "name"`
 3. QA: `python scripts/qa_exercise_images.py --api-key KEY`
-4. Copy PNGs + `exercise_image_mapping.json` to `ios/PT-Helper/PT-Helper/Resources/`
+4. Copy PNGs + `exercise_image_mapping.json` to `ios/PT-Helper/COIL/Resources/`
 
 Image resolution in `ExerciseImageService.swift` uses 7-layer fuzzy matching: exact name → normalized → alias → prefix → suffix → plural toggle → synonym expansion.

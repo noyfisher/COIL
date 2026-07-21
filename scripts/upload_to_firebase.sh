@@ -99,5 +99,5 @@ fi
 
 echo
 echo "Next steps:"
-echo "  1. Ensure exercise_image_mapping.json is in ios/PT-Helper/PT-Helper/Resources/"
+echo "  1. Ensure exercise_image_mapping.json is in ios/PT-Helper/COIL/Resources/"
 echo "  2. Build and test the app"

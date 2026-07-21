@@ -1,12 +1,12 @@
 <!-- GENERATED MIRROR — canonical text lives in ios/PT-Helper/PT-Helper/Models/LegalContent.swift. Edit there, then re-sync this file. -->
 # Privacy Policy
 
-**PT Helper**
+**COIL**
 **Last Updated: July 2026**
 
 ## Overview
 
-PT Helper ("the App") is a wellness guidance application that uses artificial intelligence to help users understand their pain and follow personalized exercise plans. This privacy policy explains what data we collect, how we use it, and your rights.
+COIL ("the App") is a wellness guidance application that uses artificial intelligence to help users understand their pain and follow personalized exercise plans. This privacy policy explains what data we collect, how we use it, and your rights.
 
 ## Data We Collect
 
@@ -99,7 +99,7 @@ Users aged 13–17 should use the App with a parent or guardian's knowledge. The
 
 ## Health Data Disclaimer
 
-PT Helper provides **wellness guidance only, not medical diagnosis**. The AI-generated analysis and exercise recommendations are educational and should not replace professional medical advice. Always consult a healthcare provider for medical concerns.
+COIL provides **wellness guidance only, not medical diagnosis**. The AI-generated analysis and exercise recommendations are educational and should not replace professional medical advice. Always consult a healthcare provider for medical concerns.
 
 ## Changes to This Policy
 

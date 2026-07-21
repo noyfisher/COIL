@@ -1,16 +1,16 @@
 <!-- GENERATED MIRROR — canonical text lives in ios/PT-Helper/PT-Helper/Models/LegalContent.swift. Edit there, then re-sync this file. -->
 # Terms of Service
 
-**PT Helper**
+**COIL**
 **Last Updated: July 2026**
 
 ## 1. Acceptance of Terms
 
-By downloading, installing, or using PT Helper ("the App"), you agree to these Terms of Service. If you do not agree, do not use the App.
+By downloading, installing, or using COIL ("the App"), you agree to these Terms of Service. If you do not agree, do not use the App.
 
 ## 2. Description of Service
 
-PT Helper is a wellness guidance application that uses artificial intelligence to:
+COIL is a wellness guidance application that uses artificial intelligence to:
 - Help users understand potential causes of musculoskeletal pain
 - Generate personalized exercise and rehabilitation plans
 - Guide users through workout sessions
@@ -18,7 +18,7 @@ PT Helper is a wellness guidance application that uses artificial intelligence t
 
 ## 3. Medical Disclaimer
 
-**PT Helper is NOT a medical device and does NOT provide medical diagnosis, treatment, or advice.**
+**COIL is NOT a medical device and does NOT provide medical diagnosis, treatment, or advice.**
 
 - All analysis results are educational and informational only
 - AI-generated conditions and recommendations are possible explanations, not diagnoses
@@ -76,7 +76,7 @@ To the maximum extent permitted by law:
 
 ## 9. Indemnification
 
-You agree to indemnify and hold harmless PT Helper, its developers, and affiliates from any claims, damages, or expenses arising from your use of the App or violation of these terms.
+You agree to indemnify and hold harmless COIL, its developers, and affiliates from any claims, damages, or expenses arising from your use of the App or violation of these terms.
 
 ## 10. Changes to Terms
 
