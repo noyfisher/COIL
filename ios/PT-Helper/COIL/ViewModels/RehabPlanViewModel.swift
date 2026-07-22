@@ -161,10 +161,11 @@ class RehabPlanViewModel: ObservableObject {
         generationError = nil
 
         AppLogger.rehab.info("Starting rehab plan generation for \(conditions.count) condition(s): \(conditions.joined(separator: ", "))")
+        // Session logs upload to Firebase; per the privacy policy they must not
+        // carry condition names (P1-05). Log the count, not the names.
         SessionLogger.shared.log(.loadingStarted, category: .stateChange, message: "Rehab plan generation started",
                                   metadata: [
                                     "conditionCount": "\(conditions.count)",
-                                    "conditions": conditions.joined(separator: ", "),
                                     "activityLevel": analysisResult.userProfileSnapshot.activityLevel
                                   ])
 
@@ -196,10 +197,11 @@ class RehabPlanViewModel: ObservableObject {
 
                 let exerciseNames = plan.exercises.map { $0.name }
                 AppLogger.rehab.info("Rehab plan finalized: \(exerciseNames.joined(separator: ", "))")
+                // A rehab plan's exercise prescription reveals health/treatment;
+                // keep names out of the uploaded session log (P1-05) — count only.
                 SessionLogger.shared.log(.loadingFinished, category: .stateChange, message: "Rehab plan generated (AI)",
                                           metadata: [
                                             "exerciseCount": "\(plan.exercises.count)",
-                                            "exercises": exerciseNames.prefix(5).joined(separator: ", "),
                                             "totalWeeks": "\(plan.totalWeeks)",
                                             "warningCount": "\(warnings.count)",
                                             "source": "ai"
@@ -284,12 +286,14 @@ class RehabPlanViewModel: ObservableObject {
                 }
                 verificationComplete = true
 
+                // Condition names stay out of the uploaded session log (P1-05) —
+                // matched/unmatched counts are enough to diagnose fallback coverage.
                 SessionLogger.shared.log(.loadingFinished, category: .stateChange, message: "Rehab plan generated (fallback)",
                                           metadata: [
                                             "exerciseCount": "\(finalExercises.count)",
                                             "source": "fallback",
-                                            "matchedConditions": matchedConditions.joined(separator: ", "),
-                                            "unmatchedConditions": unmatchedConditions.joined(separator: ", ")
+                                            "matchedConditionCount": "\(matchedConditions.count)",
+                                            "unmatchedConditionCount": "\(unmatchedConditions.count)"
                                           ])
 
                 // Preload exercise images in background
@@ -575,10 +579,11 @@ class RehabPlanViewModel: ObservableObject {
         saferPlanRetryCount += 1
 
         AppLogger.rehab.info("Safer-plan retry \(self.saferPlanRetryCount)/\(Self.maxSaferPlanRetries) — avoiding: \(self.originalFlaggedExerciseNames.joined(separator: ", "))")
+        // The avoid-list is exercise names (health-revealing); log the count only.
         SessionLogger.shared.log(.stateUpdated, category: .stateChange, message: "Safer-plan retry requested",
                                   metadata: [
                                     "retryCount": "\(saferPlanRetryCount)",
-                                    "avoided": originalFlaggedExerciseNames.joined(separator: ", ")
+                                    "avoidedCount": "\(originalFlaggedExerciseNames.count)"
                                   ])
 
         // Clear current plan state and regenerate via the same entry point — the avoid-list
