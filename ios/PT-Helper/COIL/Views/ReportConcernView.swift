@@ -19,6 +19,8 @@ struct ReportConcernView: View {
     @State private var message = ""
     @State private var isSubmitting = false
     @State private var showConfirmation = false
+    @State private var showError = false
+    @State private var errorMessage = ""
 
     private var canSubmit: Bool {
         !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isSubmitting
@@ -97,23 +99,44 @@ struct ReportConcernView: View {
         } message: {
             Text("Your report was submitted. If this is an emergency, call 911. If you're in crisis, call or text 988.")
         }
+        // A safety/privacy report silently failing is worse than most bugs — show
+        // the real failure and let the user retry (the draft is preserved). (P2-03)
+        .alert("Couldn't submit", isPresented: $showError) {
+            Button("Retry") { submit() }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text(errorMessage)
+        }
         .trackScreen("ReportConcern")
     }
 
     // MARK: - Actions
 
     private func submit() {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
+        guard let uid = Auth.auth().currentUser?.uid else {
+            errorMessage = "You need to be signed in to submit a report."
+            showError = true
+            return
+        }
         isSubmitting = true
+        // addDocument (not a stable id): concernReports is create-only in rules, so
+        // an idempotent overwrite isn't permitted. A retry after a transient error
+        // that actually succeeded may create a duplicate — harmless for a report,
+        // and far better than silently losing a safety/privacy complaint.
         Firestore.firestore().collection("concernReports").addDocument(data: [
             "userId": uid,
             "category": category,
             "message": message.trimmingCharacters(in: .whitespacesAndNewlines),
             "createdAt": FieldValue.serverTimestamp(),
             "appVersion": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
-        ]) { _ in
+        ]) { error in
             isSubmitting = false
-            showConfirmation = true
+            if let error {
+                errorMessage = "Your report couldn't be sent (\(error.localizedDescription)). Please try again."
+                showError = true
+            } else {
+                showConfirmation = true
+            }
         }
     }
 }
