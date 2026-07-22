@@ -842,6 +842,19 @@ export const deleteAccount = functions
         if (snap.size < 300) break;
       }
 
+      // 2b. Top-level concernReports authored by this user. These live outside
+      //     the users/{uid} tree (rules grant create/read only), so recursiveDelete
+      //     does not reach them — delete them explicitly or they outlive the account.
+      for (;;) {
+        const snap = await db.collection("concernReports")
+          .where("userId", "==", uid).limit(300).get();
+        if (snap.empty) break;
+        const batch = db.batch();
+        snap.docs.forEach((d) => batch.delete(d.ref));
+        await batch.commit();
+        if (snap.size < 300) break;
+      }
+
       // 3. Storage session-log JSON blobs.
       await admin.storage().bucket().deleteFiles({ prefix: `sessionLogs/${uid}/` });
 
