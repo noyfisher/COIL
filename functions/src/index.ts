@@ -480,21 +480,18 @@ export const claudeProxy = functions
       return;
     }
 
-    // Global daily AI spend ceiling (denial-of-wallet guard). Per-user quotas
-    // are bypassable by minting identities; this caps total paid AI calls/day.
-    if (!(await checkGlobalDailyBudget())) {
-      res.status(429).json({ error: "daily_capacity_reached" });
-      return;
-    }
-
     // -----------------------------------------------------------------------
-    // 3. Validate request body
+    // 3. Validate request body BEFORE consuming the global budget, so malformed
+    // or ineligible requests never burn the shared daily AI ceiling (P1-07).
     // -----------------------------------------------------------------------
     const body = req.body as ProxyRequestBody;
 
-    if (!body.requestType || !body.messages) {
+    // `messages` must be a non-empty ARRAY. A truthy non-array (a string or
+    // object) previously passed this guard and consumed budget before failing
+    // later at `.find` / `.reduce`.
+    if (!body.requestType || !Array.isArray(body.messages) || body.messages.length === 0) {
       res.status(400).json({
-        error: "Missing required fields: requestType, messages",
+        error: "Missing or invalid fields: requestType, messages",
       });
       return;
     }
@@ -522,6 +519,14 @@ export const claudeProxy = functions
     const totalMessageLength = body.messages.reduce((sum, m) => sum + (m.content?.length || 0), 0);
     if (totalMessageLength > maxMessageLength) {
       res.status(400).json({ error: "Message content too long" });
+      return;
+    }
+
+    // Global daily AI spend ceiling (denial-of-wallet guard). Per-user quotas
+    // are bypassable by minting identities; this caps total paid AI calls/day.
+    // Checked AFTER validation so malformed requests don't consume it (P1-07).
+    if (!(await checkGlobalDailyBudget())) {
+      res.status(429).json({ error: "daily_capacity_reached" });
       return;
     }
 
@@ -1368,6 +1373,26 @@ export const agentInsights = functions
       return;
     }
 
+    // Per-user daily/monthly quota — charged only now that the request is
+    // eligible AND has enough data to call the provider, so this agent route
+    // can't draw a disproportionate share of shared AI spend and users aren't
+    // charged for ineligible/insufficient requests (P1-07).
+    let insightsQuota: QuotaResult;
+    try {
+      insightsQuota = await checkAndIncrementQuota(uid);
+    } catch (err) {
+      logError(ctx, err, { stage: "quota_check" });
+      res.status(500).json({ error: "Quota check failed" });
+      return;
+    }
+    if (!insightsQuota.ok) {
+      res.status(429).json({
+        error: `${insightsQuota.reason === "daily" ? "Daily" : "Monthly"} usage limit reached (${insightsQuota.limit}). Please try again ${insightsQuota.reason === "daily" ? "tomorrow" : "next month"}.`,
+        quotaReason: insightsQuota.reason,
+      });
+      return;
+    }
+
     // 4. Try managed agent
     let resultJson: string;
     try {
@@ -1555,6 +1580,24 @@ export const agentFormAnalysis = functions
     if (history.sessionCount < MINIMUM_FORM_HISTORY_COUNT) {
       res.status(400).json({
         error: `Need at least ${MINIMUM_FORM_HISTORY_COUNT} prior sessions of this exercise`,
+      });
+      return;
+    }
+
+    // Per-user daily/monthly quota — charged only now that the request is
+    // eligible AND has enough history to call the provider (P1-07).
+    let formQuota: QuotaResult;
+    try {
+      formQuota = await checkAndIncrementQuota(uid);
+    } catch (err) {
+      logError(ctx, err, { stage: "quota_check" });
+      res.status(500).json({ error: "Quota check failed" });
+      return;
+    }
+    if (!formQuota.ok) {
+      res.status(429).json({
+        error: `${formQuota.reason === "daily" ? "Daily" : "Monthly"} usage limit reached (${formQuota.limit}). Please try again ${formQuota.reason === "daily" ? "tomorrow" : "next month"}.`,
+        quotaReason: formQuota.reason,
       });
       return;
     }
