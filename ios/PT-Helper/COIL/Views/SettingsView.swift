@@ -82,17 +82,24 @@ struct SettingsView: View {
                 Button("Sign Out", role: .destructive) {
                     AnalyticsService.shared.log(.signedOut)
                     SessionLogger.shared.logUserAction(.buttonTapped, action: "signOut")
-                    do {
-                        try Auth.auth().signOut()
-                    } catch {
-                        SessionLogger.shared.logError(error, context: "Auth.signOut",
-                                                       metadata: ["screen": "SettingsView"])
-                        AnalyticsService.shared.log(.errorShown, parameters: [
-                            "screen": "SettingsView",
-                            "error_type": "sign_out_failed"
-                        ])
-                        signOutErrorMessage = error.localizedDescription
-                        showSignOutError = true
+                    Task {
+                        // Clear the FCM token while STILL authenticated — after
+                        // signOut the client can't write Firestore and the token
+                        // would linger on this (possibly shared) device under the
+                        // former account (P2-01).
+                        await NotificationService.shared.clearFCMToken()
+                        do {
+                            try Auth.auth().signOut()
+                        } catch {
+                            SessionLogger.shared.logError(error, context: "Auth.signOut",
+                                                           metadata: ["screen": "SettingsView"])
+                            AnalyticsService.shared.log(.errorShown, parameters: [
+                                "screen": "SettingsView",
+                                "error_type": "sign_out_failed"
+                            ])
+                            signOutErrorMessage = error.localizedDescription
+                            showSignOutError = true
+                        }
                     }
                 }
                 Button("Cancel", role: .cancel) {}

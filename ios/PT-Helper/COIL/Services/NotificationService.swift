@@ -355,19 +355,21 @@ class NotificationService: ObservableObject {
         }
     }
 
-    /// Clears the FCM token from Firestore (called on sign-out).
-    func clearFCMToken() {
+    /// Clears the FCM token from Firestore. MUST be called while the user is
+    /// still authenticated — i.e. at the sign-out action, BEFORE `Auth.signOut()`
+    /// (this awaits the delete so it completes first). After sign-out the client
+    /// can't write Firestore, so the token would linger under the former account
+    /// and keep receiving that account's notifications on a shared device (P2-01).
+    func clearFCMToken() async {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         fcmToken = nil
-
-        let db = Firestore.firestore()
-        db.collection("users").document(uid).updateData([
-            "fcmToken": FieldValue.delete(),
-            "fcmTokenUpdatedAt": FieldValue.delete()
-        ]) { error in
-            if let error {
-                AppLogger.data.error("Failed to clear FCM token: \(error.localizedDescription)")
-            }
+        do {
+            try await Firestore.firestore().collection("users").document(uid).updateData([
+                "fcmToken": FieldValue.delete(),
+                "fcmTokenUpdatedAt": FieldValue.delete()
+            ])
+        } catch {
+            AppLogger.data.error("Failed to clear FCM token: \(error.localizedDescription)")
         }
     }
 

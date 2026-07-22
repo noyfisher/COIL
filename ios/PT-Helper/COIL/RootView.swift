@@ -39,6 +39,10 @@ struct RootView: View {
     }
 
     @State private var hasAttemptedVirtualSignIn = false
+    /// Retained so exactly one auth-state listener is registered for this view's
+    /// lifetime (P2-05) — onAppear can fire again and would otherwise stack
+    /// duplicate listeners.
+    @State private var authListenerHandle: AuthStateDidChangeListenerHandle?
 
     var body: some View {
         Group {
@@ -59,7 +63,12 @@ struct RootView: View {
         }
         .onAppear {
             guard !isUITesting else { return }
-            _ = Auth.auth().addStateDidChangeListener { _, user in
+            // Register exactly one auth-state listener for this view's lifetime.
+            // onAppear can fire again on re-presentation; without this guard each
+            // fire stacked a duplicate listener → repeated session starts / cleanup
+            // (P2-05). Root view lives for the app's lifetime, so it is not removed.
+            guard authListenerHandle == nil else { return }
+            authListenerHandle = Auth.auth().addStateDidChangeListener { _, user in
                 signedIn = (user != nil)
                 if let user = user {
                     SessionLogger.shared.startSession(userId: user.uid)
@@ -78,7 +87,9 @@ struct RootView: View {
                     AccountSessionContext.signOutCleanup()
                     Crashlytics.crashlytics().setUserID("")
                     AnalyticsService.shared.setUserId(nil)
-                    NotificationService.shared.clearFCMToken()
+                    // FCM token is cleared at the sign-out ACTION while still
+                    // authenticated (see SettingsView) — by the time this listener
+                    // fires the user is nil and the Firestore write would be denied.
                     NotificationService.shared.cancelAllReminders()
                     OnboardingViewModel.clearDraft()
                     profileCompleted = false
