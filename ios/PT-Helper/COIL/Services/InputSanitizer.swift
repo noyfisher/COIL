@@ -1,12 +1,18 @@
 import Foundation
 
-/// Sanitizes user-provided text before it is sent to the AI API.
-/// Prevents prompt injection by stripping instruction-like patterns
-/// and enforcing length limits.
+/// Best-effort scrubbing of user-provided text before it is sent to the AI API.
+/// This is DEFENSE IN DEPTH, not a guarantee: blacklist-based pattern stripping
+/// is inherently bypassable, so safety must not depend on it — user content is
+/// also delimited (`delimit`), kept out of the system prompt server-side, and
+/// constrained by output schemas. It reduces the easy injection surface and
+/// enforces length limits.
 ///
 /// Tier 2 expansions:
-/// 1. Unicode NFKC normalization — defeats homoglyph attacks where lookalike
-///    glyphs (e.g. Cyrillic "а" vs Latin "a") bypass pattern matching.
+/// 1. Unicode NFKC normalization — collapses compatibility characters (ligatures,
+///    full-width forms, etc.). NOTE: NFKC does NOT map cross-script homoglyphs —
+///    e.g. Cyrillic "а" (U+0430) has no compatibility mapping to Latin "a", so a
+///    homoglyph-based bypass survives normalization. This step is not a homoglyph
+///    defense; the delimiting + server-side prompt separation are the real controls.
 /// 2. HTML/XML tag strip — prevents users from injecting their own
 ///    `<user_notes>` delimiters around instructions.
 /// 3. JSON role markers — blocks `"role":"system"` / `"role":"assistant"`
@@ -21,10 +27,11 @@ enum InputSanitizer {
 
     /// Sanitize a single text field (pain description, notes, etc.)
     static func sanitize(_ text: String) -> String {
-        // 0. Unicode NFKC normalization — collapses compatibility characters and
-        //    homoglyphs to their canonical Latin forms before any pattern matching.
-        //    This defeats attacks like using Cyrillic "іgnore" to bypass the
-        //    "ignore previous instructions" filter.
+        // 0. Unicode NFKC normalization — collapses compatibility characters
+        //    (ligatures, full-width forms, etc.) to canonical forms before pattern
+        //    matching. This does NOT map cross-script homoglyphs (Cyrillic "а" is
+        //    not decomposed to Latin "a"), so a homoglyph "іgnore" still survives —
+        //    the pattern list is a speed bump, not the primary control.
         var cleaned = text.precomposedStringWithCompatibilityMapping
 
         // 1. Trim whitespace
