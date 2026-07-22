@@ -333,7 +333,17 @@ const ageCache = new Map<string, { age: number | null; fetchedAt: number }>();
 const AGE_CACHE_TTL_MS = 15 * 60_000;
 
 export function computeAgeFromDob(dobMs: number, nowMs: number): number {
-  return Math.floor((nowMs - dobMs) / (365.25 * 24 * 3600 * 1000));
+  // Calendar age: whole years since birth, decremented if this year's birthday
+  // has not yet occurred. UTC throughout for determinism — avoids the ~1-day
+  // drift a 365.25-day approximation accrues right at a birthday boundary.
+  const dob = new Date(dobMs);
+  const now = new Date(nowMs);
+  let age = now.getUTCFullYear() - dob.getUTCFullYear();
+  const monthDelta = now.getUTCMonth() - dob.getUTCMonth();
+  if (monthDelta < 0 || (monthDelta === 0 && now.getUTCDate() < dob.getUTCDate())) {
+    age -= 1;
+  }
+  return age;
 }
 
 async function getUserAge(uid: string): Promise<number | null> {
@@ -347,9 +357,69 @@ async function getUserAge(uid: string): Promise<number | null> {
     if (dob && typeof dob.toDate === "function") {
       age = computeAgeFromDob(dob.toDate().getTime(), Date.now());
     }
-  } catch { /* fail open (adult); the client gate is primary */ }
+  } catch {
+    // DOB unreadable → null. Callers treat unknown age as a MINOR (restricted
+    // path), NOT as an adult — see evaluateEligibility.
+  }
   ageCache.set(uid, { age, fetchedAt: Date.now() });
   return age;
+}
+
+// ---------------------------------------------------------------------------
+// Eligibility: minor safeguards + health-data consent, enforced server-side on
+// every AI endpoint BEFORE any budget/quota/provider spend (P1-04).
+//
+// The DOB and consent records read here are currently client-writable, so this
+// gate is authoritative against a STALE client (it reads the live, possibly
+// withdrawn, record) but not yet against a maliciously FORGED one. Rules-level
+// immutability of DOB/consent audit fields and a server-owned consent write
+// path are tracked in PR-8 (they need the emulator rules-test harness to land
+// without regressing legitimate writes).
+// ---------------------------------------------------------------------------
+export interface Eligibility {
+  under13: boolean;          // hard block
+  isMinor: boolean;          // extra safety system block
+  consentWithdrawn: boolean; // health-data consent explicitly withdrawn
+}
+
+/**
+ * Pure eligibility decision from already-resolved inputs (unit-testable).
+ *
+ * - Unknown age cannot prove under-13, so it is NOT hard-blocked; it is treated
+ *   as a MINOR (restricted path) rather than failing open to adult.
+ * - Health-data consent withdrawal is authoritative at the processing boundary:
+ *   once withdrawn (revokedAt set + policyVersion cleared) even a stale client
+ *   that still believes it has consent is blocked. A never-created consent doc
+ *   is NOT "withdrawn" — first consent is gated client-side during onboarding.
+ */
+export function evaluateEligibility(
+  age: number | null,
+  consent: { docExists: boolean; hasPolicyVersion: boolean; wasRevoked: boolean },
+): Eligibility {
+  return {
+    under13: age !== null && age < 13,
+    isMinor: age === null || age < 18,
+    consentWithdrawn: consent.docExists && consent.wasRevoked && !consent.hasPolicyVersion,
+  };
+}
+
+async function checkEligibility(uid: string): Promise<Eligibility> {
+  const age = await getUserAge(uid);
+  let consent = { docExists: false, hasPolicyVersion: false, wasRevoked: false };
+  try {
+    const doc = await admin.firestore().doc(`users/${uid}/consents/healthData`).get();
+    const pv = doc.get("policyVersion");
+    consent = {
+      docExists: doc.exists,
+      hasPolicyVersion: typeof pv === "string" && pv.length > 0,
+      wasRevoked: doc.get("revokedAt") != null,
+    };
+  } catch {
+    // Consent read failed: do NOT fabricate a withdrawal (that would deny
+    // legitimate users on a transient Firestore error). The age gate still
+    // applies; forgery hardening is PR-8, not this read.
+  }
+  return evaluateEligibility(age, consent);
 }
 
 // ---------------------------------------------------------------------------
@@ -383,6 +453,22 @@ export const claudeProxy = functions
       ctx.uid = uid;
     } catch {
       res.status(401).json({ error: "Invalid Firebase ID token" });
+      return;
+    }
+
+    // -----------------------------------------------------------------------
+    // 1b. Eligibility gate (P1-04): minor + health-data consent, enforced
+    // BEFORE any budget/quota/provider spend so ineligible requests cost
+    // nothing. Under-13 hard-blocks; a withdrawn consent is authoritative even
+    // for a stale/patched client. `eligibility.isMinor` drives the safety block.
+    // -----------------------------------------------------------------------
+    const eligibility = await checkEligibility(uid);
+    if (eligibility.under13) {
+      res.status(403).json({ error: "age_policy" });
+      return;
+    }
+    if (eligibility.consentWithdrawn) {
+      res.status(403).json({ error: "consent_required" });
       return;
     }
 
@@ -471,17 +557,9 @@ export const claudeProxy = functions
       return;
     }
 
-    // -----------------------------------------------------------------------
-    // 4c. Minor-user safeguards. Under-13 is a hard block; 13–17 receives an
-    // extra system block. Age is derived server-side (tamper-resistant) and
-    // fails open to adult if unavailable (the client gate is primary).
-    // -----------------------------------------------------------------------
-    const userAge = await getUserAge(uid);
-    if (userAge !== null && userAge < 13) {
-      res.status(403).json({ error: "age_policy" });
-      return;
-    }
-    const isMinor = userAge !== null && userAge < 18;
+    // Minor safeguards were resolved by the eligibility gate above (section 1b),
+    // before any budget/quota spend. `eligibility.isMinor` drives the extra
+    // safety system block appended below.
 
     // -----------------------------------------------------------------------
     // 5. Build request with SERVER-SIDE prompt and model config
@@ -506,7 +584,7 @@ export const claudeProxy = functions
 
     // Minors get an extra, cacheable safety block appended last (catalog +
     // prompt + minors = at most 3 of the 4 cache breakpoints — safe).
-    if (isMinor) {
+    if (eligibility.isMinor) {
       systemBlocks.push({ type: "text", text: MINOR_SAFETY_PROMPT, cache_control: { type: "ephemeral" } });
     }
 
@@ -634,6 +712,19 @@ export const crossVerify = functions
       ctx.uid = uid;
     } catch {
       res.status(401).json({ error: "Invalid Firebase ID token" });
+      return;
+    }
+
+    // Eligibility gate (P1-04): minor + health-data consent, before any
+    // budget/quota/provider spend. Under-13 hard-blocks; withdrawn consent is
+    // authoritative even for a stale/patched client.
+    const eligibility = await checkEligibility(uid);
+    if (eligibility.under13) {
+      res.status(403).json({ error: "age_policy" });
+      return;
+    }
+    if (eligibility.consentWithdrawn) {
+      res.status(403).json({ error: "consent_required" });
       return;
     }
 
@@ -1233,6 +1324,19 @@ export const agentInsights = functions
       return;
     }
 
+    // Eligibility gate (P1-04): minor + health-data consent, before any
+    // budget/quota/provider spend. Under-13 hard-blocks; withdrawn consent is
+    // authoritative even for a stale/patched client.
+    const eligibility = await checkEligibility(uid);
+    if (eligibility.under13) {
+      res.status(403).json({ error: "age_policy" });
+      return;
+    }
+    if (eligibility.consentWithdrawn) {
+      res.status(403).json({ error: "consent_required" });
+      return;
+    }
+
     // 2. Rate limit
     if (await isRateLimited(uid)) {
       res.status(429).json({ error: "Rate limit exceeded. Please wait and try again." });
@@ -1393,6 +1497,19 @@ export const agentFormAnalysis = functions
       ctx.uid = uid;
     } catch {
       res.status(401).json({ error: "Invalid Firebase ID token" });
+      return;
+    }
+
+    // Eligibility gate (P1-04): minor + health-data consent, before any
+    // budget/quota/provider spend. Under-13 hard-blocks; withdrawn consent is
+    // authoritative even for a stale/patched client.
+    const eligibility = await checkEligibility(uid);
+    if (eligibility.under13) {
+      res.status(403).json({ error: "age_policy" });
+      return;
+    }
+    if (eligibility.consentWithdrawn) {
+      res.status(403).json({ error: "consent_required" });
       return;
     }
 
@@ -1558,6 +1675,19 @@ export const generateExerciseImage = functions
       ctx.uid = uid;
     } catch {
       res.status(401).json({ error: "Invalid Firebase ID token" });
+      return;
+    }
+
+    // Eligibility gate (P1-04): minor + health-data consent, before any
+    // provider spend. Under-13 hard-blocks; withdrawn consent is authoritative
+    // even for a stale/patched client.
+    const eligibility = await checkEligibility(uid);
+    if (eligibility.under13) {
+      res.status(403).json({ error: "age_policy" });
+      return;
+    }
+    if (eligibility.consentWithdrawn) {
+      res.status(403).json({ error: "consent_required" });
       return;
     }
 

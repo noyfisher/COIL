@@ -1,50 +1,57 @@
 /**
- * WP-5.3: tests for the server-side age approximation used by the minors
- * safeguard in `claudeProxy`. `computeAgeFromDob` uses 365.25-day years, so a
- * DOB exactly N years before `nowMs` yields age N. We pass a fixed `nowMs` so
- * the test is deterministic and independent of the machine clock.
+ * Server-side calendar age used by the minor safeguards in the eligibility gate
+ * (P1-04). `computeAgeFromDob` does a UTC calendar comparison — whole years
+ * since birth, minus one if this year's birthday has not yet occurred — rather
+ * than the old 365.25-day approximation that drifted by ~a day near a birthday.
+ * A fixed `nowMs` keeps the test independent of the machine clock.
  */
 
 import { computeAgeFromDob } from "../src/index";
 
-// Fixed reference "now": 2026-07-05T00:00:00.000Z.
-const NOW_MS = Date.UTC(2026, 6, 5, 0, 0, 0, 0);
-const YEAR_MS = 365.25 * 24 * 3600 * 1000;
+// Fixed reference "now": 2026-07-05 (month is 0-indexed: 6 = July).
+const NOW = Date.UTC(2026, 6, 5);
 
-/** DOB that is exactly `years` (365.25-day) years before NOW_MS. */
-function dobYearsAgo(years: number): number {
-  return NOW_MS - years * YEAR_MS;
+/** UTC epoch millis for a calendar date (month given 1–12). */
+function dob(year: number, month1to12: number, day: number): number {
+  return Date.UTC(year, month1to12 - 1, day);
 }
 
-describe("computeAgeFromDob", () => {
-  it("returns 12 for a DOB exactly 12 years ago (under-13 block)", () => {
-    expect(computeAgeFromDob(dobYearsAgo(12), NOW_MS)).toBe(12);
+describe("computeAgeFromDob (calendar)", () => {
+  it("exact 13th birthday today → 13 (minimum age met)", () => {
+    expect(computeAgeFromDob(dob(2013, 7, 5), NOW)).toBe(13);
   });
 
-  it("returns 13 for a DOB exactly 13 years ago (minimum age)", () => {
-    expect(computeAgeFromDob(dobYearsAgo(13), NOW_MS)).toBe(13);
+  it("day before 13th birthday → 12 (still under-13)", () => {
+    expect(computeAgeFromDob(dob(2013, 7, 6), NOW)).toBe(12);
   });
 
-  it("returns 17 for a DOB exactly 17 years ago (still a minor)", () => {
-    expect(computeAgeFromDob(dobYearsAgo(17), NOW_MS)).toBe(17);
+  it("day after 13th birthday → 13", () => {
+    expect(computeAgeFromDob(dob(2013, 7, 4), NOW)).toBe(13);
   });
 
-  it("returns 18 for a DOB exactly 18 years ago (no longer a minor)", () => {
-    expect(computeAgeFromDob(dobYearsAgo(18), NOW_MS)).toBe(18);
+  it("exact 18th birthday today → 18 (no longer a minor)", () => {
+    expect(computeAgeFromDob(dob(2008, 7, 5), NOW)).toBe(18);
   });
 
-  it("floors toward the just-completed year (18y minus a day is still 17)", () => {
-    const oneDayMs = 24 * 3600 * 1000;
-    expect(computeAgeFromDob(dobYearsAgo(18) + oneDayMs, NOW_MS)).toBe(17);
+  it("day before 18th birthday → 17 (still a minor)", () => {
+    expect(computeAgeFromDob(dob(2008, 7, 6), NOW)).toBe(17);
   });
 
-  it("classifies the 12/13 boundary correctly for the under-13 gate", () => {
-    expect(computeAgeFromDob(dobYearsAgo(12), NOW_MS) < 13).toBe(true);
-    expect(computeAgeFromDob(dobYearsAgo(13), NOW_MS) < 13).toBe(false);
+  it("birthday earlier this year (already passed) → full age", () => {
+    expect(computeAgeFromDob(dob(2000, 1, 1), NOW)).toBe(26);
   });
 
-  it("classifies the 17/18 boundary correctly for the minor gate", () => {
-    expect(computeAgeFromDob(dobYearsAgo(17), NOW_MS) < 18).toBe(true);
-    expect(computeAgeFromDob(dobYearsAgo(18), NOW_MS) < 18).toBe(false);
+  it("birthday later this year (not yet occurred) → age minus one", () => {
+    expect(computeAgeFromDob(dob(2000, 12, 31), NOW)).toBe(25);
+  });
+
+  it("under-13 gate: 12 blocks, 13 passes", () => {
+    expect(computeAgeFromDob(dob(2013, 7, 6), NOW) < 13).toBe(true);  // 12
+    expect(computeAgeFromDob(dob(2013, 7, 5), NOW) < 13).toBe(false); // 13
+  });
+
+  it("minor gate: 17 is a minor, 18 is not", () => {
+    expect(computeAgeFromDob(dob(2008, 7, 6), NOW) < 18).toBe(true);  // 17
+    expect(computeAgeFromDob(dob(2008, 7, 5), NOW) < 18).toBe(false); // 18
   });
 });
