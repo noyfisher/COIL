@@ -72,7 +72,10 @@ struct RootView: View {
                     Task { await ConsentService.shared.load() }
                     checkProfileCompletion()
                 } else {
-                    SessionLogger.shared.log(.signedOut, category: .auth, message: "User signed out")
+                    // Finalize + clear the signing-out user's session log so it
+                    // can't upload under the next account or bleed into their
+                    // session (P1-03). Logs `.signedOut` internally.
+                    AccountSessionContext.signOutCleanup()
                     Crashlytics.crashlytics().setUserID("")
                     AnalyticsService.shared.setUserId(nil)
                     NotificationService.shared.clearFCMToken()
