@@ -9,7 +9,8 @@
     "lint": "eslint src",
     "setup-agent": "ts-node src/setup-managed-agent.ts",
     "setup-form-agent": "ts-node src/setup-form-agent.ts",
-    "test": "jest"
+    "test": "jest",
+    "test:integration": "firebase emulators:exec --only firestore --config ../firebase.json --project demo-coil \"jest --config jest.integration.config.js\""
   },
   "engines": {
     "node": "22"
