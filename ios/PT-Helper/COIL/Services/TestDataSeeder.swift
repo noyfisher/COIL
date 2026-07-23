@@ -101,7 +101,10 @@ enum TestDataSeeder {
         }
 
         if shouldClearWorkoutCheckpoint {
-            UserDefaults.standard.removeObject(forKey: "GuidedWorkoutCheckpoint")
+            // Clears the file-protected checkpoint (P2-08), the legacy UserDefaults
+            // copy, and per-exercise completion counters — so the launch arg truly
+            // guarantees a checkpoint-free state after the store moved to a file.
+            GuidedWorkoutViewModel.clearAllLocalWorkoutState()
         }
 
         if shouldSimulateOffline {
