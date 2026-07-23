@@ -57,7 +57,15 @@ service cloud.firestore {
     match /users/{userId}/notes/{doc}             { allow write: if isOwner(userId); }
     match /users/{userId}/wellnessPlans/{doc}     { allow write: if isOwner(userId); }
     match /users/{userId}/analysisOutcomes/{doc}  { allow write: if isOwner(userId); }
-    match /users/{userId}/consents/{doc}             { allow write: if isOwner(userId); }
+    // Consents — owner-writable, but `dateOfBirth` is immutable once set (age-gate
+    // integrity, P1-04/P2-02): it can be set once, re-written with the SAME value
+    // (merge writes preserve it), but never changed or cleared to forge an age.
+    match /users/{userId}/consents/{doc} {
+      allow write: if isOwner(userId)
+        && (resource == null
+            || !('dateOfBirth' in resource.data)
+            || request.resource.data.dateOfBirth == resource.data.dateOfBirth);
+    }
     match /users/{userId}/riskAcknowledgements/{doc} { allow write: if isOwner(userId); }
 
     // Missing exercise images — telemetry of unmatched exercise images. No PII.
@@ -79,9 +87,19 @@ service cloud.firestore {
     }
 
     // Concern reports — user-submitted safety/moderation reports. Create-only;
-    // only the Admin SDK reads these.
+    // only the Admin SDK reads these. Field-bounded (P2-02): a client can only
+    // write these exact keys, with a non-empty bounded message + bounded category,
+    // so a report doc can't be used to smuggle arbitrary/oversized data.
     match /concernReports/{doc} {
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['userId', 'category', 'message', 'createdAt', 'appVersion'])
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.category is string
+        && request.resource.data.category.size() <= 100
+        && request.resource.data.message is string
+        && request.resource.data.message.size() > 0
+        && request.resource.data.message.size() <= 5000
+        && request.resource.data.createdAt is timestamp;
     }
 
     // Remote config (e.g. config/exerciseImageAliases) — readable by any signed-in
