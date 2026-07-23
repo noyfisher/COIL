@@ -166,7 +166,8 @@ class SessionLogger: ObservableObject {
         message: String,
         metadata: [String: String]? = nil
     ) {
-        let event = SessionEvent(category: category, type: type, message: message, metadata: metadata)
+        let event = SessionEvent(category: category, type: type, message: message,
+                                 metadata: Self.sanitizeMetadata(metadata))
         currentLog.events.append(event)
         eventCount = currentLog.events.count
         trimEventsIfNeeded()
@@ -197,12 +198,69 @@ class SessionLogger: ObservableObject {
         log(type, category: .api, message: endpoint, metadata: meta)
     }
 
+    /// Bounds and scrubs an error description before it enters an uploaded
+    /// session log. Provider / parse / network errors can embed URLs, tokens,
+    /// emails, or fragments of user input; this strips the common offenders and
+    /// caps length so the debugging value survives without exfiltrating
+    /// sensitive detail (P3-05). Never rely on callers to pre-sanitize.
+    nonisolated static func redactedErrorSummary(_ description: String, maxLength: Int = 300) -> String {
+        var s = description
+        // Order matters: URLs first (they contain token-like substrings), then
+        // emails, then any remaining long opaque token.
+        let patterns = [
+            "https?://[^\\s]+",
+            "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+            "[A-Za-z0-9_\\-]{20,}",
+        ]
+        for pattern in patterns {
+            s = s.replacingOccurrences(of: pattern, with: "<redacted>", options: .regularExpression)
+        }
+        if s.count > maxLength {
+            s = String(s.prefix(maxLength)) + "…"
+        }
+        return s
+    }
+
+    /// Metadata keys whose values name a user's health context — exercise
+    /// prescriptions, conditions/diagnoses, wellness goals, AI-generated pain
+    /// summaries, or body-location fragments. Session logs upload to Firebase,
+    /// so per the privacy policy they must not carry such names (P1-05). The
+    /// value is dropped; that the event happened is still recorded.
+    nonisolated static let sensitiveMetadataKeys: Set<String> = [
+        "exercise", "exerciseName", "newExercise", "originalExercise",
+        "substitute", "substituteName", "droppedNames",
+        "condition", "conditions", "diagnosis", "diagnoses",
+        "goal", "goals",
+        "headline", "painTrend", "recommendation", "focusAreas",
+        "missingFields",
+    ]
+
+    /// Central scrub applied to EVERY event's metadata before it is stored and
+    /// uploaded. Health-name keys (`sensitiveMetadataKeys`) are redacted
+    /// outright; all other values are run through `redactedErrorSummary`
+    /// (URL / email / token strip + length cap) so a raw `error.localizedDescription`
+    /// passed by any call site can't exfiltrate secrets or user input. This
+    /// lives in `log()` rather than a convenience method so no caller can bypass
+    /// it (P1-05 / P3-05).
+    nonisolated static func sanitizeMetadata(_ metadata: [String: String]?) -> [String: String]? {
+        guard let metadata, !metadata.isEmpty else { return metadata }
+        var sanitized: [String: String] = [:]
+        sanitized.reserveCapacity(metadata.count)
+        for (key, value) in metadata {
+            sanitized[key] = sensitiveMetadataKeys.contains(key)
+                ? "<redacted>"
+                : redactedErrorSummary(value)
+        }
+        return sanitized
+    }
+
     func logError(_ error: Error, context: String, metadata: [String: String]? = nil) {
         var meta = metadata ?? [:]
         meta["context"] = context
         meta["errorDomain"] = String(describing: Swift.type(of: error))
-        meta["errorDescription"] = error.localizedDescription
-        log(.errorOccurred, category: .error, message: "\(context): \(error.localizedDescription)", metadata: meta)
+        let safeDescription = Self.redactedErrorSummary(error.localizedDescription)
+        meta["errorDescription"] = safeDescription
+        log(.errorOccurred, category: .error, message: "\(context): \(safeDescription)", metadata: meta)
 
         // Record non-fatal in Crashlytics for crash-free metrics
         Crashlytics.crashlytics().record(error: error, userInfo: ["context": context])
