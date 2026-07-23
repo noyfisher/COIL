@@ -11,6 +11,34 @@ class GuidedWorkoutViewModel: ObservableObject {
 
     private static let checkpointKey = "GuidedWorkoutCheckpoint"
 
+    /// Protected on-disk location for the checkpoint. The checkpoint reveals
+    /// plan/exercise names + progress (health/fitness treatment), so it lives in
+    /// a file-protected store like the app's other PHI — not plain UserDefaults,
+    /// which lacks `.completeFileProtection` and can end up in device backups (P2-08).
+    private static var checkpointURL: URL? {
+        let fm = FileManager.default
+        guard let dir = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else { return nil }
+        try? fm.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir.appendingPathComponent("guided_workout_checkpoint.json")
+    }
+
+    /// Reads the checkpoint bytes from the protected file, migrating a legacy
+    /// UserDefaults checkpoint into the file on the first read after upgrade so an
+    /// in-progress workout survives the move (then removing the legacy copy).
+    private static func loadCheckpointData() -> Data? {
+        if let url = checkpointURL, let data = try? Data(contentsOf: url) {
+            return data
+        }
+        if let legacy = UserDefaults.standard.data(forKey: checkpointKey) {
+            if let url = checkpointURL {
+                try? legacy.write(to: url, options: [.atomic, .completeFileProtection])
+            }
+            UserDefaults.standard.removeObject(forKey: checkpointKey)
+            return legacy
+        }
+        return nil
+    }
+
     struct WorkoutCheckpoint: Codable {
         let planId: String
         let currentExerciseIndex: Int
@@ -85,7 +113,8 @@ class GuidedWorkoutViewModel: ObservableObject {
     /// Clears the workout checkpoint and all per-exercise completion counters
     /// (account deletion).
     static func clearAllLocalWorkoutState() {
-        UserDefaults.standard.removeObject(forKey: checkpointKey)
+        if let url = checkpointURL { try? FileManager.default.removeItem(at: url) }
+        UserDefaults.standard.removeObject(forKey: checkpointKey) // legacy copy
         for key in UserDefaults.standard.dictionaryRepresentation().keys
         where key.hasPrefix("exerciseCompletions_") {
             UserDefaults.standard.removeObject(forKey: key)
@@ -304,19 +333,20 @@ class GuidedWorkoutViewModel: ObservableObject {
             accumulatedTime: isPaused ? accumulatedTime : accumulatedTime + Date().timeIntervalSince(lastResumeTime),
             savedAt: Date()
         )
-        if let data = try? JSONEncoder().encode(checkpoint) {
-            UserDefaults.standard.set(data, forKey: Self.checkpointKey)
+        if let data = try? JSONEncoder().encode(checkpoint), let url = Self.checkpointURL {
+            try? data.write(to: url, options: [.atomic, .completeFileProtection])
         }
     }
 
     /// Clear saved checkpoint (called on workout completion or discard).
     func clearCheckpoint() {
-        UserDefaults.standard.removeObject(forKey: Self.checkpointKey)
+        if let url = Self.checkpointURL { try? FileManager.default.removeItem(at: url) }
+        UserDefaults.standard.removeObject(forKey: Self.checkpointKey) // drop any legacy copy
     }
 
     /// Check if a saved checkpoint exists for the given plan.
     static func savedCheckpoint(forPlanId planId: String) -> WorkoutCheckpoint? {
-        guard let data = UserDefaults.standard.data(forKey: checkpointKey),
+        guard let data = loadCheckpointData(),
               let checkpoint = try? JSONDecoder().decode(WorkoutCheckpoint.self, from: data),
               checkpoint.planId == planId,
               // Discard checkpoints older than 24 hours
