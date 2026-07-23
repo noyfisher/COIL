@@ -40,4 +40,49 @@ final class SessionLogRedactionTests: XCTestCase {
         let msg = "The network connection was lost."
         XCTAssertEqual(SessionLogger.redactedErrorSummary(msg), msg)
     }
+
+    // MARK: - Central metadata scrub (P1-05): applied in log() so no call site bypasses it
+
+    func testSanitizeMetadata_redactsHealthNameKeys() {
+        // These are the exact keys that ExerciseSwap / FormAnalysis / Recovery
+        // Insights call sites were passing raw into uploaded telemetry.
+        let input = [
+            "exercise": "Barbell Back Squat",
+            "newExercise": "Goblet Squat",
+            "originalExercise": "Barbell Back Squat",
+            "droppedNames": "Deadlift, Lunge",
+            "headline": "Your lower-back pain is trending down this week",
+            "painTrend": "improving",
+        ]
+        let out = SessionLogger.sanitizeMetadata(input)!
+        for key in input.keys {
+            XCTAssertEqual(out[key], "<redacted>", "\(key) should be redacted")
+        }
+        XCTAssertFalse(out.values.contains { $0.contains("Squat") || $0.contains("pain") })
+    }
+
+    func testSanitizeMetadata_scrubsRawErrorValuesUnderAnyKey() {
+        // A raw error.localizedDescription passed under a non-sensitive key must
+        // still be stripped of URLs/tokens — the P3-05 raw-error leak.
+        let out = SessionLogger.sanitizeMetadata([
+            "error": "upload failed: https://api.example.com/v1?token=abcdef1234567890abcdef"
+        ])!
+        XCTAssertFalse(out["error"]!.contains("https://"))
+        XCTAssertFalse(out["error"]!.contains("token=abcdef1234567890abcdef"))
+        XCTAssertTrue(out["error"]!.contains("<redacted>"))
+    }
+
+    func testSanitizeMetadata_passesCleanNonSensitiveValues() {
+        let out = SessionLogger.sanitizeMetadata([
+            "screen": "GuidedWorkout",
+            "count": "5",
+        ])!
+        XCTAssertEqual(out["screen"], "GuidedWorkout")
+        XCTAssertEqual(out["count"], "5")
+    }
+
+    func testSanitizeMetadata_nilAndEmptyPassThrough() {
+        XCTAssertNil(SessionLogger.sanitizeMetadata(nil))
+        XCTAssertEqual(SessionLogger.sanitizeMetadata([:]), [:])
+    }
 }

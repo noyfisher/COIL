@@ -166,7 +166,8 @@ class SessionLogger: ObservableObject {
         message: String,
         metadata: [String: String]? = nil
     ) {
-        let event = SessionEvent(category: category, type: type, message: message, metadata: metadata)
+        let event = SessionEvent(category: category, type: type, message: message,
+                                 metadata: Self.sanitizeMetadata(metadata))
         currentLog.events.append(event)
         eventCount = currentLog.events.count
         trimEventsIfNeeded()
@@ -218,6 +219,39 @@ class SessionLogger: ObservableObject {
             s = String(s.prefix(maxLength)) + "…"
         }
         return s
+    }
+
+    /// Metadata keys whose values name a user's health context — exercise
+    /// prescriptions, conditions/diagnoses, wellness goals, AI-generated pain
+    /// summaries, or body-location fragments. Session logs upload to Firebase,
+    /// so per the privacy policy they must not carry such names (P1-05). The
+    /// value is dropped; that the event happened is still recorded.
+    nonisolated static let sensitiveMetadataKeys: Set<String> = [
+        "exercise", "exerciseName", "newExercise", "originalExercise",
+        "substitute", "substituteName", "droppedNames",
+        "condition", "conditions", "diagnosis", "diagnoses",
+        "goal", "goals",
+        "headline", "painTrend", "recommendation", "focusAreas",
+        "missingFields",
+    ]
+
+    /// Central scrub applied to EVERY event's metadata before it is stored and
+    /// uploaded. Health-name keys (`sensitiveMetadataKeys`) are redacted
+    /// outright; all other values are run through `redactedErrorSummary`
+    /// (URL / email / token strip + length cap) so a raw `error.localizedDescription`
+    /// passed by any call site can't exfiltrate secrets or user input. This
+    /// lives in `log()` rather than a convenience method so no caller can bypass
+    /// it (P1-05 / P3-05).
+    nonisolated static func sanitizeMetadata(_ metadata: [String: String]?) -> [String: String]? {
+        guard let metadata, !metadata.isEmpty else { return metadata }
+        var sanitized: [String: String] = [:]
+        sanitized.reserveCapacity(metadata.count)
+        for (key, value) in metadata {
+            sanitized[key] = sensitiveMetadataKeys.contains(key)
+                ? "<redacted>"
+                : redactedErrorSummary(value)
+        }
+        return sanitized
     }
 
     func logError(_ error: Error, context: String, metadata: [String: String]? = nil) {
