@@ -134,4 +134,6 @@ Backend note: verify which Firebase project this build points at before testing 
 - [ ] Archive builds successfully
 - [ ] dSYMs upload to Crashlytics
 - [ ] App version / build number incremented
+- [ ] **APNs entitlement (P3-06):** the source `COIL.entitlements` carries `aps-environment = development`; signing/provisioning is expected to override it to `production` for the distribution archive. Verify the SIGNED archive with `codesign -d --entitlements - <App>.app` (or Transporter/distribution tooling) shows `production` before submitting — a mismatch breaks push delivery. If it does not, switch to configuration-specific entitlements (Debug=development / Release=production).
+- [ ] **Nightly report recipient (P3-03):** `REPORT_RECIPIENT_EMAIL` is set to an org-controlled distribution address in the target environment (the job now skips sending when unset — there is no personal-email fallback).
 - [ ] **Public/GA only:** legal wording counsel-signed (LegalContent renames per audit WS4-03/WS3-06), support contact is a real address (not a personal Gmail), and the intended production Firebase project is fully provisioned (functions, secrets, Managed Agents, Firestore rules/indexes, exercise images in Storage)

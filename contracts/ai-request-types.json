@@ -1,0 +1,14 @@
+{
+  "_comment": "Canonical, cross-stack contract for the AI request types the iOS client sends through the claudeProxy Cloud Function. This is the single source of truth (P3-02). Both stacks are asserted against it: functions/test/contract.test.ts reads THIS file and requires ALLOWED_REQUEST_TYPES + SYSTEM_PROMPTS + MODEL_CONFIG to match exactly; ios AIRequestTypeContractTests.swift pins AIRequestType.allCases to the same list. Adding/renaming/removing a type requires editing this file AND both stacks, or a test fails. nightly_report is intentionally EXCLUDED — it is a scheduled-job-only prompt and must never be client-callable.",
+  "clientRequestTypes": [
+    "analysis",
+    "analysis_verify",
+    "rehab_plan",
+    "exercise_substitute",
+    "recovery_insights",
+    "form_analysis",
+    "wellness_analysis",
+    "wellness_verify",
+    "wellness_plan"
+  ]
+}

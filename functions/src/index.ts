@@ -7,6 +7,7 @@ import { fetchRecoveryInsightsData, MINIMUM_SESSION_COUNT, fetchFormHistoryData,
 import { runRecoveryInsightsAgent, validateInsightResult } from "./managed-agent";
 import { runFormAnalysisAgent, validateFormResult } from "./form-agent";
 import { handleGenerateExerciseImage } from "./image-generation";
+import { deleteUserFirestoreData } from "./account-deletion";
 import { newRequestContext, logCompleted, logError, logWarn } from "./logger";
 import { validateClaudeResponse } from "./response-schemas";
 import { validateNightlyReport } from "./nightly-report-validator";
@@ -333,7 +334,17 @@ const ageCache = new Map<string, { age: number | null; fetchedAt: number }>();
 const AGE_CACHE_TTL_MS = 15 * 60_000;
 
 export function computeAgeFromDob(dobMs: number, nowMs: number): number {
-  return Math.floor((nowMs - dobMs) / (365.25 * 24 * 3600 * 1000));
+  // Calendar age: whole years since birth, decremented if this year's birthday
+  // has not yet occurred. UTC throughout for determinism — avoids the ~1-day
+  // drift a 365.25-day approximation accrues right at a birthday boundary.
+  const dob = new Date(dobMs);
+  const now = new Date(nowMs);
+  let age = now.getUTCFullYear() - dob.getUTCFullYear();
+  const monthDelta = now.getUTCMonth() - dob.getUTCMonth();
+  if (monthDelta < 0 || (monthDelta === 0 && now.getUTCDate() < dob.getUTCDate())) {
+    age -= 1;
+  }
+  return age;
 }
 
 async function getUserAge(uid: string): Promise<number | null> {
@@ -347,9 +358,69 @@ async function getUserAge(uid: string): Promise<number | null> {
     if (dob && typeof dob.toDate === "function") {
       age = computeAgeFromDob(dob.toDate().getTime(), Date.now());
     }
-  } catch { /* fail open (adult); the client gate is primary */ }
+  } catch {
+    // DOB unreadable → null. Callers treat unknown age as a MINOR (restricted
+    // path), NOT as an adult — see evaluateEligibility.
+  }
   ageCache.set(uid, { age, fetchedAt: Date.now() });
   return age;
+}
+
+// ---------------------------------------------------------------------------
+// Eligibility: minor safeguards + health-data consent, enforced server-side on
+// every AI endpoint BEFORE any budget/quota/provider spend (P1-04).
+//
+// The DOB and consent records read here are currently client-writable, so this
+// gate is authoritative against a STALE client (it reads the live, possibly
+// withdrawn, record) but not yet against a maliciously FORGED one. Rules-level
+// immutability of DOB/consent audit fields and a server-owned consent write
+// path are tracked in PR-8 (they need the emulator rules-test harness to land
+// without regressing legitimate writes).
+// ---------------------------------------------------------------------------
+export interface Eligibility {
+  under13: boolean;          // hard block
+  isMinor: boolean;          // extra safety system block
+  consentWithdrawn: boolean; // health-data consent explicitly withdrawn
+}
+
+/**
+ * Pure eligibility decision from already-resolved inputs (unit-testable).
+ *
+ * - Unknown age cannot prove under-13, so it is NOT hard-blocked; it is treated
+ *   as a MINOR (restricted path) rather than failing open to adult.
+ * - Health-data consent withdrawal is authoritative at the processing boundary:
+ *   once withdrawn (revokedAt set + policyVersion cleared) even a stale client
+ *   that still believes it has consent is blocked. A never-created consent doc
+ *   is NOT "withdrawn" — first consent is gated client-side during onboarding.
+ */
+export function evaluateEligibility(
+  age: number | null,
+  consent: { docExists: boolean; hasPolicyVersion: boolean; wasRevoked: boolean },
+): Eligibility {
+  return {
+    under13: age !== null && age < 13,
+    isMinor: age === null || age < 18,
+    consentWithdrawn: consent.docExists && consent.wasRevoked && !consent.hasPolicyVersion,
+  };
+}
+
+async function checkEligibility(uid: string): Promise<Eligibility> {
+  const age = await getUserAge(uid);
+  let consent = { docExists: false, hasPolicyVersion: false, wasRevoked: false };
+  try {
+    const doc = await admin.firestore().doc(`users/${uid}/consents/healthData`).get();
+    const pv = doc.get("policyVersion");
+    consent = {
+      docExists: doc.exists,
+      hasPolicyVersion: typeof pv === "string" && pv.length > 0,
+      wasRevoked: doc.get("revokedAt") != null,
+    };
+  } catch {
+    // Consent read failed: do NOT fabricate a withdrawal (that would deny
+    // legitimate users on a transient Firestore error). The age gate still
+    // applies; forgery hardening is PR-8, not this read.
+  }
+  return evaluateEligibility(age, consent);
 }
 
 // ---------------------------------------------------------------------------
@@ -387,6 +458,22 @@ export const claudeProxy = functions
     }
 
     // -----------------------------------------------------------------------
+    // 1b. Eligibility gate (P1-04): minor + health-data consent, enforced
+    // BEFORE any budget/quota/provider spend so ineligible requests cost
+    // nothing. Under-13 hard-blocks; a withdrawn consent is authoritative even
+    // for a stale/patched client. `eligibility.isMinor` drives the safety block.
+    // -----------------------------------------------------------------------
+    const eligibility = await checkEligibility(uid);
+    if (eligibility.under13) {
+      res.status(403).json({ error: "age_policy" });
+      return;
+    }
+    if (eligibility.consentWithdrawn) {
+      res.status(403).json({ error: "consent_required" });
+      return;
+    }
+
+    // -----------------------------------------------------------------------
     // 2. Rate limit
     // -----------------------------------------------------------------------
     if (await isRateLimited(uid)) {
@@ -394,21 +481,18 @@ export const claudeProxy = functions
       return;
     }
 
-    // Global daily AI spend ceiling (denial-of-wallet guard). Per-user quotas
-    // are bypassable by minting identities; this caps total paid AI calls/day.
-    if (!(await checkGlobalDailyBudget())) {
-      res.status(429).json({ error: "daily_capacity_reached" });
-      return;
-    }
-
     // -----------------------------------------------------------------------
-    // 3. Validate request body
+    // 3. Validate request body BEFORE consuming the global budget, so malformed
+    // or ineligible requests never burn the shared daily AI ceiling (P1-07).
     // -----------------------------------------------------------------------
     const body = req.body as ProxyRequestBody;
 
-    if (!body.requestType || !body.messages) {
+    // `messages` must be a non-empty ARRAY. A truthy non-array (a string or
+    // object) previously passed this guard and consumed budget before failing
+    // later at `.find` / `.reduce`.
+    if (!body.requestType || !Array.isArray(body.messages) || body.messages.length === 0) {
       res.status(400).json({
-        error: "Missing required fields: requestType, messages",
+        error: "Missing or invalid fields: requestType, messages",
       });
       return;
     }
@@ -436,6 +520,14 @@ export const claudeProxy = functions
     const totalMessageLength = body.messages.reduce((sum, m) => sum + (m.content?.length || 0), 0);
     if (totalMessageLength > maxMessageLength) {
       res.status(400).json({ error: "Message content too long" });
+      return;
+    }
+
+    // Global daily AI spend ceiling (denial-of-wallet guard). Per-user quotas
+    // are bypassable by minting identities; this caps total paid AI calls/day.
+    // Checked AFTER validation so malformed requests don't consume it (P1-07).
+    if (!(await checkGlobalDailyBudget())) {
+      res.status(429).json({ error: "daily_capacity_reached" });
       return;
     }
 
@@ -471,17 +563,9 @@ export const claudeProxy = functions
       return;
     }
 
-    // -----------------------------------------------------------------------
-    // 4c. Minor-user safeguards. Under-13 is a hard block; 13–17 receives an
-    // extra system block. Age is derived server-side (tamper-resistant) and
-    // fails open to adult if unavailable (the client gate is primary).
-    // -----------------------------------------------------------------------
-    const userAge = await getUserAge(uid);
-    if (userAge !== null && userAge < 13) {
-      res.status(403).json({ error: "age_policy" });
-      return;
-    }
-    const isMinor = userAge !== null && userAge < 18;
+    // Minor safeguards were resolved by the eligibility gate above (section 1b),
+    // before any budget/quota spend. `eligibility.isMinor` drives the extra
+    // safety system block appended below.
 
     // -----------------------------------------------------------------------
     // 5. Build request with SERVER-SIDE prompt and model config
@@ -506,7 +590,7 @@ export const claudeProxy = functions
 
     // Minors get an extra, cacheable safety block appended last (catalog +
     // prompt + minors = at most 3 of the 4 cache breakpoints — safe).
-    if (isMinor) {
+    if (eligibility.isMinor) {
       systemBlocks.push({ type: "text", text: MINOR_SAFETY_PROMPT, cache_control: { type: "ephemeral" } });
     }
 
@@ -634,6 +718,19 @@ export const crossVerify = functions
       ctx.uid = uid;
     } catch {
       res.status(401).json({ error: "Invalid Firebase ID token" });
+      return;
+    }
+
+    // Eligibility gate (P1-04): minor + health-data consent, before any
+    // budget/quota/provider spend. Under-13 hard-blocks; withdrawn consent is
+    // authoritative even for a stale/patched client.
+    const eligibility = await checkEligibility(uid);
+    if (eligibility.under13) {
+      res.status(403).json({ error: "age_policy" });
+      return;
+    }
+    if (eligibility.consentWithdrawn) {
+      res.status(403).json({ error: "consent_required" });
       return;
     }
 
@@ -825,30 +922,14 @@ export const deleteAccount = functions
 
     const db = admin.firestore();
     try {
-      // 1. Entire user tree (recursiveDelete covers every subcollection:
-      //    profile, rehabPlans, workoutSessions, notes, wellnessPlans,
-      //    assessments, formAnalyses, streakData, analysisOutcomes, quotas,
-      //    consents, riskAcknowledgements).
-      await db.recursiveDelete(db.collection("users").doc(uid));
+      // Firestore data: user tree + top-level sessionLogs/concernReports +
+      // rate limits (extracted + emulator-tested in account-deletion.ts).
+      await deleteUserFirestoreData(db, uid);
 
-      // 2. Top-level sessionLogs index docs (rules grant clients create/read only).
-      for (;;) {
-        const snap = await db.collection("sessionLogs")
-          .where("userId", "==", uid).limit(300).get();
-        if (snap.empty) break;
-        const batch = db.batch();
-        snap.docs.forEach((d) => batch.delete(d.ref));
-        await batch.commit();
-        if (snap.size < 300) break;
-      }
-
-      // 3. Storage session-log JSON blobs.
+      // Storage session-log JSON blobs.
       await admin.storage().bucket().deleteFiles({ prefix: `sessionLogs/${uid}/` });
 
-      // 4. Rate-limit counters (admin-only path).
-      await db.recursiveDelete(db.collection("rateLimits").doc(uid));
-
-      // 5. Auth user — LAST. A retry after a lost success response may arrive
+      // Auth user — LAST. A retry after a lost success response may arrive
       //    with a still-valid token for an already-deleted user; user-not-found
       //    here means the desired end state is already reached.
       try {
@@ -1058,6 +1139,18 @@ function markdownToHtml(md: string): string {
     .replace(/\n/g, "<br>");
 }
 
+/**
+ * The nightly-report recipient MUST be configured explicitly. Returns null when
+ * `REPORT_RECIPIENT_EMAIL` is unset/blank so the caller skips sending — there is
+ * NO personal-email fallback (P3-03): operational data must never fail open to an
+ * individual mailbox that can silently survive into another environment. Use an
+ * organization-controlled distribution address.
+ */
+export function resolveReportRecipient(env: NodeJS.ProcessEnv = process.env): string | null {
+  const recipient = env.REPORT_RECIPIENT_EMAIL?.trim();
+  return recipient ? recipient : null;
+}
+
 export const sendNightlyReport = onSchedule(
   {
     schedule: "every day 07:00",
@@ -1151,7 +1244,13 @@ export const sendNightlyReport = onSchedule(
 
     // --- 3. Send email via SendGrid ---
     const sendgridKey = process.env.SENDGRID_API_KEY;
-    const recipientEmail = process.env.REPORT_RECIPIENT_EMAIL || "noyfisher2003@gmail.com";
+    const recipientEmail = resolveReportRecipient();
+
+    // No personal-email fallback (P3-03): skip the send when no org recipient is set.
+    if (!recipientEmail) {
+      console.warn("sendNightlyReport: REPORT_RECIPIENT_EMAIL not configured — skipping send");
+      return;
+    }
 
     if (!sendgridKey) {
       console.error("SENDGRID_API_KEY not configured — logging report to console instead");
@@ -1233,6 +1332,19 @@ export const agentInsights = functions
       return;
     }
 
+    // Eligibility gate (P1-04): minor + health-data consent, before any
+    // budget/quota/provider spend. Under-13 hard-blocks; withdrawn consent is
+    // authoritative even for a stale/patched client.
+    const eligibility = await checkEligibility(uid);
+    if (eligibility.under13) {
+      res.status(403).json({ error: "age_policy" });
+      return;
+    }
+    if (eligibility.consentWithdrawn) {
+      res.status(403).json({ error: "consent_required" });
+      return;
+    }
+
     // 2. Rate limit
     if (await isRateLimited(uid)) {
       res.status(429).json({ error: "Rate limit exceeded. Please wait and try again." });
@@ -1260,6 +1372,26 @@ export const agentInsights = functions
     if (data.sessionCount < MINIMUM_SESSION_COUNT) {
       res.status(400).json({
         error: `Need at least ${MINIMUM_SESSION_COUNT} sessions in the past 14 days`,
+      });
+      return;
+    }
+
+    // Per-user daily/monthly quota — charged only now that the request is
+    // eligible AND has enough data to call the provider, so this agent route
+    // can't draw a disproportionate share of shared AI spend and users aren't
+    // charged for ineligible/insufficient requests (P1-07).
+    let insightsQuota: QuotaResult;
+    try {
+      insightsQuota = await checkAndIncrementQuota(uid);
+    } catch (err) {
+      logError(ctx, err, { stage: "quota_check" });
+      res.status(500).json({ error: "Quota check failed" });
+      return;
+    }
+    if (!insightsQuota.ok) {
+      res.status(429).json({
+        error: `${insightsQuota.reason === "daily" ? "Daily" : "Monthly"} usage limit reached (${insightsQuota.limit}). Please try again ${insightsQuota.reason === "daily" ? "tomorrow" : "next month"}.`,
+        quotaReason: insightsQuota.reason,
       });
       return;
     }
@@ -1396,6 +1528,19 @@ export const agentFormAnalysis = functions
       return;
     }
 
+    // Eligibility gate (P1-04): minor + health-data consent, before any
+    // budget/quota/provider spend. Under-13 hard-blocks; withdrawn consent is
+    // authoritative even for a stale/patched client.
+    const eligibility = await checkEligibility(uid);
+    if (eligibility.under13) {
+      res.status(403).json({ error: "age_policy" });
+      return;
+    }
+    if (eligibility.consentWithdrawn) {
+      res.status(403).json({ error: "consent_required" });
+      return;
+    }
+
     // 2. Rate limit
     if (await isRateLimited(uid)) {
       res.status(429).json({ error: "Rate limit exceeded. Please wait and try again." });
@@ -1438,6 +1583,24 @@ export const agentFormAnalysis = functions
     if (history.sessionCount < MINIMUM_FORM_HISTORY_COUNT) {
       res.status(400).json({
         error: `Need at least ${MINIMUM_FORM_HISTORY_COUNT} prior sessions of this exercise`,
+      });
+      return;
+    }
+
+    // Per-user daily/monthly quota — charged only now that the request is
+    // eligible AND has enough history to call the provider (P1-07).
+    let formQuota: QuotaResult;
+    try {
+      formQuota = await checkAndIncrementQuota(uid);
+    } catch (err) {
+      logError(ctx, err, { stage: "quota_check" });
+      res.status(500).json({ error: "Quota check failed" });
+      return;
+    }
+    if (!formQuota.ok) {
+      res.status(429).json({
+        error: `${formQuota.reason === "daily" ? "Daily" : "Monthly"} usage limit reached (${formQuota.limit}). Please try again ${formQuota.reason === "daily" ? "tomorrow" : "next month"}.`,
+        quotaReason: formQuota.reason,
       });
       return;
     }
@@ -1558,6 +1721,19 @@ export const generateExerciseImage = functions
       ctx.uid = uid;
     } catch {
       res.status(401).json({ error: "Invalid Firebase ID token" });
+      return;
+    }
+
+    // Eligibility gate (P1-04): minor + health-data consent, before any
+    // provider spend. Under-13 hard-blocks; withdrawn consent is authoritative
+    // even for a stale/patched client.
+    const eligibility = await checkEligibility(uid);
+    if (eligibility.under13) {
+      res.status(403).json({ error: "age_policy" });
+      return;
+    }
+    if (eligibility.consentWithdrawn) {
+      res.status(403).json({ error: "consent_required" });
       return;
     }
 
