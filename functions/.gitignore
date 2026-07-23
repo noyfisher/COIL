@@ -1,2 +1,5 @@
 lib/
 node_modules/
+
+# Firebase emulator debug logs
+*-debug.log

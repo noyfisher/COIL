@@ -9,6 +9,7 @@
  */
 
 import * as admin from "firebase-admin";
+import { EXERCISE_CATALOG_CSV } from "./generated/exerciseCatalog";
 
 // Lazy-initialized to avoid "no default app" error at import time
 // (admin.initializeApp() is called in index.ts before these are used)
@@ -621,19 +622,21 @@ const DAILY_BUDGET = 50;
 async function checkDailyBudget(): Promise<boolean> {
   const today = new Date().toISOString().slice(0, 10);
   const counterRef = getDb().collection("config").doc("imageGenBudget");
-  const doc = await counterRef.get();
-  const data = doc.data();
-
-  if (data?.date === today && data?.count >= DAILY_BUDGET) {
-    return false; // Budget exhausted
-  }
-
-  if (data?.date !== today) {
-    await counterRef.set({ date: today, count: 1 });
-  } else {
-    await counterRef.update({ count: admin.firestore.FieldValue.increment(1) });
-  }
-  return true;
+  // Atomic read-check-increment (P2-07): the previous read-then-write let
+  // concurrent instances both observe an under-budget count and both proceed.
+  return getDb().runTransaction(async (tx) => {
+    const doc = await tx.get(counterRef);
+    const data = doc.data();
+    if (data?.date === today) {
+      if ((data.count ?? 0) >= DAILY_BUDGET) {
+        return false; // Budget exhausted
+      }
+      tx.update(counterRef, { count: admin.firestore.FieldValue.increment(1) });
+    } else {
+      tx.set(counterRef, { date: today, count: 1 });
+    }
+    return true;
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -644,25 +647,24 @@ const LOCK_TTL_MS = 10 * 60 * 1000; // 10 minutes
 
 async function acquireGenerationLock(normalizedKey: string): Promise<boolean> {
   const docRef = getDb().collection("missingExerciseImages").doc(normalizedKey);
-  const doc = await docRef.get();
-  const data = doc.data();
-
-  if (data?.status === "generating") {
-    const startedAt = data.generatingStartedAt?.toMillis?.() || 0;
-    if (Date.now() - startedAt < LOCK_TTL_MS) {
-      return false; // Another instance is generating
+  // Atomic acquire (P2-07): the previous read-then-write let two instances both
+  // see "not generating" and both take the lock, duplicating a paid generation.
+  return getDb().runTransaction(async (tx) => {
+    const doc = await tx.get(docRef);
+    const data = doc.data();
+    if (data?.status === "generating") {
+      const startedAt = data.generatingStartedAt?.toMillis?.() || 0;
+      if (Date.now() - startedAt < LOCK_TTL_MS) {
+        return false; // Another instance holds a live lock
+      }
+      // Lock expired — take it over.
     }
-    // Lock expired, take over
-  }
-
-  await docRef.set(
-    {
+    tx.set(docRef, {
       status: "generating",
       generatingStartedAt: admin.firestore.FieldValue.serverTimestamp(),
-    },
-    { merge: true },
-  );
-  return true;
+    }, { merge: true });
+    return true;
+  });
 }
 
 async function markGenerated(normalizedKey: string): Promise<void> {
@@ -670,6 +672,62 @@ async function markGenerated(normalizedKey: string): Promise<void> {
     { status: "generated", generatedAt: admin.firestore.FieldValue.serverTimestamp() },
     { merge: true },
   );
+}
+
+// ---------------------------------------------------------------------------
+// Request validation + canonical-catalog gate (P1-08)
+// ---------------------------------------------------------------------------
+
+const MAX_EXERCISE_NAME_LEN = 100;
+const MAX_METADATA_FIELD_LEN = 200;
+
+/**
+ * Strict schema/length check on the generation request. Returns an error
+ * message, or null when the request is well-formed. Length caps bound prompt
+ * size (cost) and abuse.
+ */
+export function validateGenerateRequest(body: GenerateRequest): string | null {
+  const { exerciseName, exerciseCategory, targetArea, bodyPosition, poseDescription } = body;
+  if (typeof exerciseName !== "string" || exerciseName.trim().length === 0) {
+    return "exerciseName is required";
+  }
+  if (exerciseName.length > MAX_EXERCISE_NAME_LEN) {
+    return "exerciseName is too long";
+  }
+  for (const [field, value] of Object.entries({ exerciseCategory, targetArea, bodyPosition, poseDescription })) {
+    if (value !== undefined && (typeof value !== "string" || value.length > MAX_METADATA_FIELD_LEN)) {
+      return `${field} is invalid`;
+    }
+  }
+  return null;
+}
+
+// Canonical catalog keys (normalized names + slugs), parsed once from the
+// server-side exercise catalog CSV whose lines are `name|slug|category|...`.
+let _canonicalKeys: Set<string> | null = null;
+function canonicalKeys(): Set<string> {
+  if (_canonicalKeys) return _canonicalKeys;
+  const set = new Set<string>();
+  for (const line of EXERCISE_CATALOG_CSV.split("\n")) {
+    if (!line.trim()) continue;
+    const [name, slug] = line.split("|");
+    if (name) set.add(normalizeName(name));
+    if (slug && slug.trim()) set.add(slug.trim().toLowerCase());
+  }
+  _canonicalKeys = set;
+  return set;
+}
+
+/**
+ * True when the requested exercise is one the server catalogues. Generation is
+ * restricted to catalogued exercises so arbitrary / AI-hallucinated names can't
+ * create cost, poison the shared alias mapping, or promote an unvetted asset
+ * into shared application state (P1-08). Non-catalogued names fall back to the
+ * client's missing-image placeholder.
+ */
+export function isCanonicalExercise(name: string): boolean {
+  const keys = canonicalKeys();
+  return keys.has(normalizeName(name)) || keys.has(name.trim().toLowerCase());
 }
 
 // ---------------------------------------------------------------------------
@@ -681,8 +739,10 @@ export async function handleGenerateExerciseImage(
 ): Promise<GenerateResponse> {
   const { exerciseName, exerciseCategory, targetArea, bodyPosition, poseDescription } = req.body;
 
-  if (!exerciseName) {
-    return { status: "generation_failed", message: "exerciseName is required" };
+  // Strict schema + length validation (P1-08): reject malformed / oversized input.
+  const validationError = validateGenerateRequest(req.body);
+  if (validationError) {
+    return { status: "generation_failed", message: validationError, retryable: false };
   }
 
   // Rate limit
@@ -698,6 +758,19 @@ export async function handleGenerateExerciseImage(
       status: resolution.matchType === "exact" ? "already_exists" : "alias_added",
       key: resolution.key,
       matchType: resolution.matchType,
+    };
+  }
+
+  // Restrict GENERATION to the server's canonical catalog. Existing images still
+  // resolve above; only creating a NEW asset for an off-catalog name is blocked,
+  // so arbitrary / AI-hallucinated names can't create cost, poison the shared
+  // mapping, or promote an unvetted illustration into shared state (P1-08). The
+  // client shows its missing-image placeholder for non-catalogued exercises.
+  if (!isCanonicalExercise(exerciseName)) {
+    return {
+      status: "generation_failed",
+      message: "Exercise is not in the catalog",
+      retryable: false,
     };
   }
 
@@ -750,7 +823,20 @@ export async function handleGenerateExerciseImage(
     return { status: "generation_failed", message: "Image generation failed", retryable: true };
   }
 
-  // Step 5: QA gate
+  // Step 5: QA gate — REQUIRED. An unvetted image must never be published, so a
+  // missing QA key fails CLOSED (quarantine + telemetry) rather than open (P1-08):
+  // previously the whole QA block was skipped and the image was published with
+  // qaSkipped:true.
+  if (!geminiApiKey) {
+    await bumpQaUnavailableCounter(normalizedKey, "gemini_key_unconfigured");
+    return {
+      status: "qa_failed",
+      message: "Image quality check is unavailable. Image was not published.",
+      retryable: true,
+    };
+  }
+
+  // geminiApiKey is guaranteed present past the guard above.
   if (geminiApiKey) {
     const qa = await runGeminiQA(
       imageBuffer,
@@ -825,7 +911,6 @@ export async function handleGenerateExerciseImage(
       status: "success",
       key: normalizedKey,
       imageUrl,
-      qaSkipped: !geminiApiKey,
     };
   } catch (err) {
     console.error("Upload/mapping update failed:", err);

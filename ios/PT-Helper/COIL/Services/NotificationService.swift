@@ -357,25 +357,82 @@ class NotificationService: ObservableObject {
 
     /// Clears the FCM token from Firestore. MUST be called while the user is
     /// still authenticated — i.e. at the sign-out action, BEFORE `Auth.signOut()`
-    /// (this awaits the delete so it completes first). After sign-out the client
-    /// can't write Firestore, so the token would linger under the former account
-    /// and keep receiving that account's notifications on a shared device (P2-01).
+    /// so the delete is authorized. After sign-out the client can't write
+    /// Firestore, so the token would linger under the former account and keep
+    /// receiving that account's notifications on a shared device (P2-01).
+    ///
+    /// The write is time-bounded: the app enables Firestore offline persistence,
+    /// so a write's completion never resolves while offline. A plain `await`
+    /// here would then suspend forever and `Auth.signOut()` would never run —
+    /// silently leaving the user signed in on a shared device (the exact leak
+    /// this path closes). We wait up to `fcmClearTimeoutSeconds` for the delete
+    /// to reach the backend, then let sign-out proceed regardless: offline the
+    /// server token can't be cleared anyway, and it is rebound on next sign-in.
     func clearFCMToken() async {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         fcmToken = nil
-        do {
-            try await Firestore.firestore().collection("users").document(uid).updateData([
-                "fcmToken": FieldValue.delete(),
-                "fcmTokenUpdatedAt": FieldValue.delete()
-            ])
-        } catch {
-            AppLogger.data.error("Failed to clear FCM token: \(error.localizedDescription)")
+        await Self.awaitWithTimeout(seconds: Self.fcmClearTimeoutSeconds) {
+            do {
+                try await Firestore.firestore().collection("users").document(uid).updateData([
+                    "fcmToken": FieldValue.delete(),
+                    "fcmTokenUpdatedAt": FieldValue.delete()
+                ])
+            } catch {
+                AppLogger.data.error("Failed to clear FCM token: \(error.localizedDescription)")
+            }
         }
+    }
+
+    /// Upper bound (seconds) on how long sign-out waits for the FCM-token delete
+    /// to acknowledge before proceeding anyway.
+    nonisolated static let fcmClearTimeoutSeconds: Double = 3
+
+    /// Runs `operation`, returning when it finishes or after `seconds`,
+    /// whichever comes first. Past the deadline `operation` keeps running
+    /// detached — we simply stop waiting on it — so a caller never blocks on a
+    /// non-cancellable async call (e.g. a Firestore write that can't ack under
+    /// offline persistence). Returns as soon as `operation` completes when the
+    /// backend is reachable, so the online sign-out path is not slowed.
+    nonisolated static func awaitWithTimeout(
+        seconds: Double,
+        _ operation: @escaping @Sendable () async -> Void
+    ) async {
+        let gate = OneShotGate()
+        let work = Task.detached { await operation(); await gate.open() }
+        let timer = Task.detached {
+            try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+            await gate.open()
+        }
+        await gate.wait()
+        work.cancel()
+        timer.cancel()
     }
 
     // MARK: - Helpers
 
     private func notificationId(planId: UUID, dayIndex: Int) -> String {
         "plan-\(planId.uuidString)-day-\(dayIndex)"
+    }
+}
+
+/// One-shot gate used to implement `awaitWithTimeout`. The first `open()`
+/// releases a single pending `wait()`; a `wait()` that arrives after `open()`
+/// returns immediately, and additional `open()` calls are no-ops. Actor
+/// isolation serializes `wait`/`open`, so the single continuation is resumed
+/// exactly once.
+fileprivate actor OneShotGate {
+    private var isOpen = false
+    private var waiter: CheckedContinuation<Void, Never>?
+
+    func wait() async {
+        if isOpen { return }
+        await withCheckedContinuation { waiter = $0 }
+    }
+
+    func open() {
+        guard !isOpen else { return }
+        isOpen = true
+        waiter?.resume()
+        waiter = nil
     }
 }
