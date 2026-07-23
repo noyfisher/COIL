@@ -61,9 +61,12 @@ final class OutcomeRecorder {
             planAgeDays: planAgeDays
         )
 
-        // 3. Firestore write — fire-and-forget detached Task, auth-safe.
+        // 3. Firestore write — capture the acting user's UID NOW (not later, at
+        //    execution time) so an account switch between this action and the
+        //    detached write can't misattribute the outcome to the next account (P2-04).
+        let uid = Auth.auth().currentUser?.uid
         Task.detached { [logger] in
-            await Self.persistRemote(record: record, logger: logger)
+            await Self.persistRemote(record: record, uid: uid, logger: logger)
         }
     }
 
@@ -129,8 +132,8 @@ final class OutcomeRecorder {
 
     // MARK: - Firestore
 
-    private static func persistRemote(record: AnalysisOutcomeRecord, logger: Logger) async {
-        guard let uid = Auth.auth().currentUser?.uid else {
+    private static func persistRemote(record: AnalysisOutcomeRecord, uid: String?, logger: Logger) async {
+        guard let uid else {
             logger.debug("Skipping outcome persistence: no authenticated user")
             return
         }

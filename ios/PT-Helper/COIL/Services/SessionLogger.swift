@@ -130,6 +130,34 @@ class SessionLogger: ObservableObject {
         if wasEnded { persistToDisk() }
     }
 
+    /// Completes and clears session logging on sign-out so the signing-out
+    /// user's trail neither uploads under the next account nor bleeds into their
+    /// in-memory session (P1-03). The trail is discarded rather than uploaded:
+    /// by the time the auth listener reports sign-out the user's credentials are
+    /// already gone, so it cannot be uploaded under its true owner — and
+    /// uploading it under the next user is exactly the cross-account leak we are
+    /// preventing. Invoked via `AccountSessionContext.signOutCleanup()`.
+    func finalizeForSignOut() {
+        log(.signedOut, category: .auth, message: "User signed out")
+        // Discard the signing-out user's on-disk trail (owned by them; cannot be
+        // uploaded now, and must never upload under the next account).
+        try? fileManager.removeItem(at: currentLogURL)
+        try? fileManager.removeItem(at: previousLogURL)
+        // Reset the in-memory trail so the next account starts clean.
+        currentLog = SessionLog(
+            sessionId: UUID(),
+            userId: "anonymous",
+            startedAt: Date(),
+            deviceContext: DeviceContext.current(),
+            events: [],
+            crashMarker: false
+        )
+        eventCount = 0
+        eventsSinceLastPersist = 0
+        lastUploadAt = nil
+        lastUploadedEventCount = 0
+    }
+
     // MARK: - Logging API
 
     func log(
@@ -252,12 +280,43 @@ class SessionLogger: ObservableObject {
 
     // MARK: - Auto-Upload
 
+    /// Whether a session log may be uploaded, given its immutable owner and the
+    /// currently signed-in user. A log is bound to the account that created it;
+    /// only that account may upload it (Storage rules enforce the same), so a
+    /// mismatch means an account switch on a shared device and the log must be
+    /// quarantined — never re-homed under the current account (P1-03).
+    enum SessionLogUploadDecision: Equatable {
+        case upload(owner: String)
+        case skipNoUser            // nobody signed in — cannot upload now, keep for later
+        case quarantineForeignOwner // belongs to a different (or anonymous) account
+    }
+
+    nonisolated static func uploadDecision(
+        logOwner: String,
+        currentUser: String?
+    ) -> SessionLogUploadDecision {
+        guard let currentUser else { return .skipNoUser }
+        guard logOwner != "anonymous", logOwner == currentUser else {
+            return .quarantineForeignOwner
+        }
+        return .upload(owner: logOwner)
+    }
+
     /// - Parameter force: bypasses the time throttle (not the no-new-events
     ///   dedup). Used when the app is backgrounding — the last chance to
     ///   upload this session's trail before suspension.
     func uploadToFirestore(force: Bool = false) async {
         guard !Self.isTestHost else { return }
-        guard let userId = Auth.auth().currentUser?.uid else { return }
+
+        // Bind the upload to the log's immutable owner, not whoever is currently
+        // signed in. On an account switch this returns before any IO so one
+        // user's trail is never written into another user's storage (P1-03).
+        let userId: String
+        switch Self.uploadDecision(logOwner: currentLog.userId,
+                                   currentUser: Auth.auth().currentUser?.uid) {
+        case .upload(let owner): userId = owner
+        case .skipNoUser, .quarantineForeignOwner: return
+        }
 
         // Dedup: skip if no new events since the last upload.
         if currentLog.events.count == lastUploadedEventCount { return }
@@ -312,9 +371,25 @@ class SessionLogger: ObservableObject {
 
     private func uploadPreviousSessionLog() async {
         guard !Self.isTestHost else { return }
-        guard let userId = Auth.auth().currentUser?.uid else { return }
         guard let data = try? Data(contentsOf: previousLogURL),
               let previousLog = try? decoder.decode(SessionLog.self, from: data) else { return }
+
+        // Upload only under the account that created this log. If the current
+        // user differs (account switch on a shared device), Storage rules would
+        // reject a write to the true owner's path anyway, and writing it under
+        // the current user would leak one user's trail into another's account —
+        // so quarantine it by erasing the local file instead (P1-03).
+        let userId: String
+        switch Self.uploadDecision(logOwner: previousLog.userId,
+                                   currentUser: Auth.auth().currentUser?.uid) {
+        case .upload(let owner):
+            userId = owner
+        case .skipNoUser:
+            return  // no auth right now — leave the file for a later signed-in launch
+        case .quarantineForeignOwner:
+            try? fileManager.removeItem(at: previousLogURL)
+            return
+        }
 
         let sessionId = previousLog.sessionId.uuidString
 

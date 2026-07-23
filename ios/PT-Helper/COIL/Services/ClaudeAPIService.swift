@@ -64,7 +64,7 @@ enum ClaudeAPIError: LocalizedError {
 // MARK: - API Request/Response Models
 
 /// Request type determines which server-side system prompt and model config to use
-enum AIRequestType: String, Encodable {
+enum AIRequestType: String, Encodable, CaseIterable {
     case analysis
     case analysis_verify
     case rehab_plan

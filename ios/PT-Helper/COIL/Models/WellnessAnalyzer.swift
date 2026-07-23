@@ -124,7 +124,7 @@ class WellnessAnalyzer {
         }
 
         if !profile.medicalConditions.isEmpty {
-            message += "\n- Medical Conditions: \(profile.medicalConditions.joined(separator: ", "))"
+            message += "\n- Medical Conditions: \(profile.medicalConditions.map { InputSanitizer.sanitize($0) }.joined(separator: ", "))"
         }
 
         if let other = profile.otherMedicalConditions, !other.isEmpty {
@@ -136,7 +136,8 @@ class WellnessAnalyzer {
         }
 
         if let meds = profile.medications, !meds.isEmpty {
-            message += "\n- Current Medications: \(meds.joined(separator: ", "))"
+            // Custom medications are free text — sanitize like the neighboring fields (P2-06).
+            message += "\n- Current Medications: \(meds.map { InputSanitizer.sanitize($0) }.joined(separator: ", "))"
         }
 
         // Medication change history
@@ -146,7 +147,7 @@ class WellnessAnalyzer {
             let recentChanges = history.suffix(10)
             message += "\n\nMEDICATION HISTORY:"
             for change in recentChanges {
-                message += "\n- \(change.action.capitalized) \(change.medication) on \(dateFormatter.string(from: change.date))"
+                message += "\n- \(change.action.capitalized) \(InputSanitizer.sanitize(change.medication)) on \(dateFormatter.string(from: change.date))"
             }
         }
 
