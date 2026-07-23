@@ -173,4 +173,13 @@ class StreakService: ObservableObject {
     func clearNewlyEarned() {
         newlyEarned = nil
     }
+
+    /// Resets this process-wide singleton's in-memory state to defaults on
+    /// sign-out, so the next account on a shared device does not briefly see the
+    /// previous user's streak/achievements before its own data loads (P2-04).
+    func reset() {
+        streakData = StreakData()
+        achievements = Achievement.catalog
+        newlyEarned = nil
+    }
 }
