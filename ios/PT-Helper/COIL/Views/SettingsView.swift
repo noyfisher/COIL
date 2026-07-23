@@ -177,25 +177,32 @@ struct SettingsView: View {
 
     // MARK: - Account Deletion
 
+    /// Classifies the `deleteAccount` endpoint response. Only HTTP 200 is a
+    /// confirmed server-side deletion. The server authenticates *before* it
+    /// deletes anything, so a 401 means the request was never authorized and
+    /// nothing was deleted — retry once with a force-refreshed token, then fail.
+    /// A 401 must never be treated as success: that would tell the user their
+    /// health data was erased while it still lives on the server. (An idempotent
+    /// retry against an already-deleted account returns 200, not 401, because the
+    /// server swallows `auth/user-not-found`.)
+    enum AccountDeletionOutcome: Equatable {
+        case deleted
+        case retryWithFreshToken
+        case failed(status: Int)
+
+        static func classify(status: Int, didRefreshToken: Bool) -> AccountDeletionOutcome {
+            if status == 200 { return .deleted }
+            if status == 401 && !didRefreshToken { return .retryWithFreshToken }
+            return .failed(status: status)
+        }
+    }
+
     private func deleteAccount() {
         guard let user = Auth.auth().currentUser else { return }
         isDeletingAccount = true
         Task {
             do {
-                let idToken = try await user.getIDToken()
-                var request = URLRequest(url: URL(string: APIConfig.deleteAccountURL)!)
-                request.httpMethod = "POST"
-                request.timeoutInterval = 120
-                request.setValue("Bearer \(idToken)", forHTTPHeaderField: "Authorization")
-                let (_, response) = try await URLSession.shared.data(for: request)
-                let status = (response as? HTTPURLResponse)?.statusCode ?? 0
-                // 200 = deleted. 401 = token already invalid — a previous attempt
-                // finished server-side (auth user gone); treat as success.
-                guard status == 200 || status == 401 else {
-                    throw NSError(domain: "DeleteAccount", code: status,
-                        userInfo: [NSLocalizedDescriptionKey:
-                            "The server couldn't complete the deletion (code \(status)). Your account was NOT deleted — please try again."])
-                }
+                try await performAccountDeletion(user: user, didRefreshToken: false)
                 await MainActor.run { clearAllLocalUserData() }
                 try? Auth.auth().signOut()
                 await MainActor.run {
@@ -212,6 +219,31 @@ struct SettingsView: View {
                     showDeleteError = true
                 }
             }
+        }
+    }
+
+    /// Calls the `deleteAccount` endpoint and succeeds ONLY on a confirmed 200.
+    /// A first 401 forces a token refresh and retries exactly once; anything that
+    /// isn't a 200 throws, so the caller never clears local data or claims
+    /// deletion on an unconfirmed response.
+    private func performAccountDeletion(user: User, didRefreshToken: Bool) async throws {
+        let idToken = try await user.getIDToken(forcingRefresh: didRefreshToken)
+        var request = URLRequest(url: URL(string: APIConfig.deleteAccountURL)!)
+        request.httpMethod = "POST"
+        request.timeoutInterval = 120
+        request.setValue("Bearer \(idToken)", forHTTPHeaderField: "Authorization")
+        let (_, response) = try await URLSession.shared.data(for: request)
+        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+
+        switch AccountDeletionOutcome.classify(status: status, didRefreshToken: didRefreshToken) {
+        case .deleted:
+            return
+        case .retryWithFreshToken:
+            try await performAccountDeletion(user: user, didRefreshToken: true)
+        case .failed(let code):
+            throw NSError(domain: "DeleteAccount", code: code,
+                userInfo: [NSLocalizedDescriptionKey:
+                    "The server couldn't complete the deletion (code \(code)). Your account was NOT deleted — please try again."])
         }
     }
 

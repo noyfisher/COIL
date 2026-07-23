@@ -65,7 +65,7 @@ export async function runRecoveryInsightsAgent(
   // 3. Send user message
   // 4. Process events with timeout
 
-  return new Promise<RecoveryInsightResult>((resolve, reject) => {
+  const runPromise = new Promise<RecoveryInsightResult>((resolve, reject) => {
     let result: RecoveryInsightResult | null = null;
     let settled = false;
 
@@ -142,6 +142,21 @@ export async function runRecoveryInsightsAgent(
       }
     })();
   });
+
+  try {
+    return await runPromise;
+  } finally {
+    // Best-effort delete of the ephemeral session so the user's recovery data
+    // does not persist at the provider after this one-shot use — on success,
+    // error, OR timeout. A failed delete must not change the caller's result,
+    // and (per P1-02) it means account deletion has nothing to reach here.
+    try {
+      await client.beta.sessions.delete(session.id);
+      console.log(`Deleted agent session: ${session.id}`);
+    } catch (delErr) {
+      console.error(`Failed to delete agent session ${session.id}:`, delErr);
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------

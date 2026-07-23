@@ -7,6 +7,7 @@ import { fetchRecoveryInsightsData, MINIMUM_SESSION_COUNT, fetchFormHistoryData,
 import { runRecoveryInsightsAgent, validateInsightResult } from "./managed-agent";
 import { runFormAnalysisAgent, validateFormResult } from "./form-agent";
 import { handleGenerateExerciseImage } from "./image-generation";
+import { deleteUserFirestoreData } from "./account-deletion";
 import { newRequestContext, logCompleted, logError, logWarn } from "./logger";
 import { validateClaudeResponse } from "./response-schemas";
 import { validateNightlyReport } from "./nightly-report-validator";
@@ -825,30 +826,14 @@ export const deleteAccount = functions
 
     const db = admin.firestore();
     try {
-      // 1. Entire user tree (recursiveDelete covers every subcollection:
-      //    profile, rehabPlans, workoutSessions, notes, wellnessPlans,
-      //    assessments, formAnalyses, streakData, analysisOutcomes, quotas,
-      //    consents, riskAcknowledgements).
-      await db.recursiveDelete(db.collection("users").doc(uid));
+      // Firestore data: user tree + top-level sessionLogs/concernReports +
+      // rate limits (extracted + emulator-tested in account-deletion.ts).
+      await deleteUserFirestoreData(db, uid);
 
-      // 2. Top-level sessionLogs index docs (rules grant clients create/read only).
-      for (;;) {
-        const snap = await db.collection("sessionLogs")
-          .where("userId", "==", uid).limit(300).get();
-        if (snap.empty) break;
-        const batch = db.batch();
-        snap.docs.forEach((d) => batch.delete(d.ref));
-        await batch.commit();
-        if (snap.size < 300) break;
-      }
-
-      // 3. Storage session-log JSON blobs.
+      // Storage session-log JSON blobs.
       await admin.storage().bucket().deleteFiles({ prefix: `sessionLogs/${uid}/` });
 
-      // 4. Rate-limit counters (admin-only path).
-      await db.recursiveDelete(db.collection("rateLimits").doc(uid));
-
-      // 5. Auth user — LAST. A retry after a lost success response may arrive
+      // Auth user — LAST. A retry after a lost success response may arrive
       //    with a still-valid token for an already-deleted user; user-not-found
       //    here means the desired end state is already reached.
       try {
