@@ -1058,6 +1058,18 @@ function markdownToHtml(md: string): string {
     .replace(/\n/g, "<br>");
 }
 
+/**
+ * The nightly-report recipient MUST be configured explicitly. Returns null when
+ * `REPORT_RECIPIENT_EMAIL` is unset/blank so the caller skips sending — there is
+ * NO personal-email fallback (P3-03): operational data must never fail open to an
+ * individual mailbox that can silently survive into another environment. Use an
+ * organization-controlled distribution address.
+ */
+export function resolveReportRecipient(env: NodeJS.ProcessEnv = process.env): string | null {
+  const recipient = env.REPORT_RECIPIENT_EMAIL?.trim();
+  return recipient ? recipient : null;
+}
+
 export const sendNightlyReport = onSchedule(
   {
     schedule: "every day 07:00",
@@ -1151,7 +1163,13 @@ export const sendNightlyReport = onSchedule(
 
     // --- 3. Send email via SendGrid ---
     const sendgridKey = process.env.SENDGRID_API_KEY;
-    const recipientEmail = process.env.REPORT_RECIPIENT_EMAIL || "noyfisher2003@gmail.com";
+    const recipientEmail = resolveReportRecipient();
+
+    // No personal-email fallback (P3-03): skip the send when no org recipient is set.
+    if (!recipientEmail) {
+      console.warn("sendNightlyReport: REPORT_RECIPIENT_EMAIL not configured — skipping send");
+      return;
+    }
 
     if (!sendgridKey) {
       console.error("SENDGRID_API_KEY not configured — logging report to console instead");
