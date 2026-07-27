@@ -371,16 +371,19 @@ Structure your response EXACTLY like this (use markdown headers):
 1 sentence: is the app healthy? Sum it up.
 
 ## Users
-DAU, new signups, total users, trend vs yesterday.
+New users and total users from the day-over-day deltas, trend vs yesterday.
 
 ## Engagement
-Sessions, workout completions, plans generated, avg activity.
+DAU, sessions, workout completions, plans generated, avg activity — from the GA4 Engagement figures in the metrics.
 
 ## Funnel
-Conversion rates at each step, any notable drops.
+Sign-ins, assessments, rehab plans generated, workouts started from the GA4 Engagement figures; conversion rates at each step, any notable drops.
 
 ## Stability
 API success rate, error count, crash logs.
+
+## AI Usage & Cost
+Calls today vs the daily budget, error rate; approximate $ spend today (note that prices are unverified estimates) vs yesterday; per-request-type cost breakdown AS A BULLET LIST, one bullet per request type — NEVER a table, since a variable number of request types breaks table formatting.
 
 ## Action Items
 0-3 bullet points of things that need attention. If everything looks good, say so.
@@ -388,7 +391,7 @@ API success rate, error count, crash logs.
 RULES:
 - Keep it conversational, use plain numbers (not jargon)
 - Flag anything unusual with a warning emoji
-- If a metric is missing or zero (pre-launch or no data), say so briefly and move on
+- If a metric is genuinely missing (not yet available in the metrics, e.g. GA4 pipeline pending), say so honestly and briefly, then move on
 - Compare today vs yesterday when both are available
 - Be honest — if there are problems, call them out clearly
 - End with an encouraging note if things are going well`,

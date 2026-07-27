@@ -18,7 +18,14 @@ import {
   AI_DAILY_BUDGET,
   AI_BUDGET_COLLECTION,
   AI_BUDGET_DOC_ID,
+  AI_USAGE_DAILY_COLLECTION,
 } from "./ai-usage";
+import {
+  dashboardDailyCollection,
+  computeTotalsDeltas,
+  resolveAiCallsToday,
+  shapeAiUsageDaily,
+} from "./dashboard-data";
 
 // Hard billing shutoff (Pub/Sub triggered). Exported so firebase-tools
 // picks it up on deploy. See billing-shutoff.ts for arming instructions.
@@ -1173,14 +1180,46 @@ export const aggregateDailyMetrics = onSchedule("every day 01:00", async () => {
 // Runs at 07:00 local time, collects metrics, calls Claude for summary,
 // sends via SendGrid.
 // ---------------------------------------------------------------------------
+
+/**
+ * Format a day-over-day delta with an explicit sign so a negative number
+ * (e.g. after a deletion) is never mistaken for a missing value. Zero is
+ * printed bare — signing "+0"/"-0" would be noise. Non-finite input (should
+ * never happen; defensive only) collapses to "0".
+ */
+export function formatDelta(delta: number): string {
+  if (!Number.isFinite(delta) || delta === 0) return "0";
+  return delta > 0 ? `+${delta}` : `${delta}`;
+}
+
+/**
+ * Top `limit` request types from an `aiUsageDaily.byType` cost map, sorted by
+ * cost descending. Ties broken alphabetically for deterministic output (the
+ * report otherwise reads differently run-to-run for equal-cost days).
+ */
+export function topRequestTypesByCost(
+  byTypeCostUSD: Record<string, number> | undefined | null,
+  limit = 5,
+): Array<{ type: string; costUSD: number }> {
+  if (!byTypeCostUSD) return [];
+  return Object.entries(byTypeCostUSD)
+    .map(([type, costUSD]) => ({
+      type,
+      costUSD: typeof costUSD === "number" && Number.isFinite(costUSD) ? costUSD : 0,
+    }))
+    .sort((a, b) => b.costUSD - a.costUSD || a.type.localeCompare(b.type))
+    .slice(0, Math.max(0, limit));
+}
+
 async function collectMetrics(): Promise<string> {
   const db = admin.firestore();
   const today = new Date().toISOString().split("T")[0];
   const yesterday = new Date(Date.now() - 86_400_000).toISOString().split("T")[0];
+  const dayBefore = new Date(Date.now() - 2 * 86_400_000).toISOString().split("T")[0];
 
   const lines: string[] = [`Report date: ${today}`, ""];
 
-  // --- Firestore daily aggregates (from aggregateDailyMetrics) ---
+  // --- Firestore daily aggregates (from aggregateDailyMetrics) + deltas ---
   try {
     const todayDoc = await db
       .collection("analytics").doc("dailyAggregates").collection("days").doc(today)
@@ -1208,17 +1247,40 @@ async function collectMetrics(): Promise<string> {
       lines.push(`- Total workout sessions: ${d.totalWorkoutSessions}`);
       lines.push(`- Active plans (last 14d): ${d.activePlansCount}`);
     }
+
+    // Day-over-day deltas (Phase 6). Reuses the same pure helper the
+    // dashboard's "totals" tile uses so the two surfaces never disagree on
+    // the math. Deltas can be negative after deletions — printed as-is via
+    // formatDelta, never clamped or hidden.
+    const deltas = computeTotalsDeltas(
+      todayDoc.exists ? (todayDoc.data() as Record<string, unknown>) : undefined,
+      yesterdayDoc.exists ? (yesterdayDoc.data() as Record<string, unknown>) : undefined,
+    );
+    if (deltas) {
+      lines.push("\n## Day-over-Day Deltas (today vs yesterday)");
+      lines.push(`- New users: ${formatDelta(deltas.totalUsers)}`);
+      lines.push(`- New rehab plans: ${formatDelta(deltas.totalPlans)}`);
+      lines.push(`- New workout sessions: ${formatDelta(deltas.totalWorkoutSessions)}`);
+      lines.push(`- Active plans (14d) change: ${formatDelta(deltas.activePlansCount)}`);
+    } else {
+      lines.push("\n## Day-over-Day Deltas: no data yet (need both today's and yesterday's aggregate)");
+    }
   } catch (err) {
     lines.push(`Firestore aggregate error: ${err}`);
   }
 
-  // --- Crash logs (last 24h) ---
+  // --- Crash count (last 24h) ---
+  // Was `collectionGroup("crashLogs")` — nothing ever writes that collection,
+  // so this count was permanently 0. Replaced with the real crashMarker field
+  // on sessionLogs, served by the same COLLECTION_GROUP composite index
+  // (crashMarker ASC, uploadedAt ASC) Phase 3's dashboard crash tile uses.
   const oneDayAgo = admin.firestore.Timestamp.fromDate(new Date(Date.now() - 86_400_000));
 
   try {
     const crashSnap = await db
-      .collectionGroup("crashLogs")
-      .where("timestamp", ">=", oneDayAgo)
+      .collectionGroup("sessionLogs")
+      .where("crashMarker", "==", true)
+      .where("uploadedAt", ">=", oneDayAgo)
       .count()
       .get();
     lines.push(`\n## Crash Logs (last 24h): ${crashSnap.data().count}`);
@@ -1244,6 +1306,106 @@ async function collectMetrics(): Promise<string> {
     lines.push(`\n## Missing Exercise Images reported: ${missingSnap.data().count}`);
   } catch (err) {
     lines.push(`Missing images query error: ${err}`);
+  }
+
+  // --- GA4 engagement & funnel (Phase 6; materialized by pullDailyAnalytics) ---
+  // GA4's export lands the following morning, so "today" has no shard yet —
+  // this reads yesterday (+ the day before, for a comparison line).
+  try {
+    const [yesterdayGa4, dayBeforeGa4] = await Promise.all([
+      dashboardDailyCollection(db).doc(yesterday).get(),
+      dashboardDailyCollection(db).doc(dayBefore).get(),
+    ]);
+
+    if (!yesterdayGa4.exists) {
+      lines.push(
+        "\n## GA4 Engagement (yesterday): no data yet (GA4 export pending or pipeline not yet run)",
+      );
+    } else {
+      const y = yesterdayGa4.data() as Record<string, unknown>;
+      const engagement = (y.engagement ?? {}) as Record<string, unknown>;
+      const funnel = (y.funnel ?? {}) as Record<string, unknown>;
+      const workout = (y.workout ?? {}) as Record<string, unknown>;
+
+      lines.push("\n## GA4 Engagement (yesterday)");
+      lines.push(`- DAU: ${Number(engagement.dau) || 0}`);
+      lines.push(`- Sessions: ${Number(engagement.totalSessions) || 0}`);
+      lines.push(`- Workouts completed: ${Number(workout.completed) || 0}`);
+      lines.push(`- Sign-ins: ${Number(funnel.signIns) || 0}`);
+      lines.push(`- Assessments completed: ${Number(funnel.assessmentCompleted) || 0}`);
+      lines.push(`- Rehab plans generated: ${Number(funnel.rehabPlanGenerated) || 0}`);
+      lines.push(`- Workouts started: ${Number(funnel.workoutStarted) || 0}`);
+
+      if (dayBeforeGa4.exists) {
+        const p = dayBeforeGa4.data() as Record<string, unknown>;
+        const pEngagement = (p.engagement ?? {}) as Record<string, unknown>;
+        const pWorkout = (p.workout ?? {}) as Record<string, unknown>;
+        const dauDelta = (Number(engagement.dau) || 0) - (Number(pEngagement.dau) || 0);
+        const sessionsDelta =
+          (Number(engagement.totalSessions) || 0) - (Number(pEngagement.totalSessions) || 0);
+        const completedDelta = (Number(workout.completed) || 0) - (Number(pWorkout.completed) || 0);
+        lines.push(
+          `- vs day before: DAU ${formatDelta(dauDelta)}, Sessions ${formatDelta(sessionsDelta)}, ` +
+          `Workouts completed ${formatDelta(completedDelta)}`,
+        );
+      } else {
+        lines.push(
+          "- vs day before: no data yet (GA4 export pending or pipeline not yet run)",
+        );
+      }
+    }
+  } catch (err) {
+    lines.push(`\nGA4 engagement query error: ${err}`);
+  }
+
+  // --- AI usage & cost (Phase 6; written by recordAiUsage on every attempted call) ---
+  try {
+    const [aiTodaySnap, aiYesterdaySnap, budgetSnap] = await Promise.all([
+      db.collection(AI_USAGE_DAILY_COLLECTION).doc(today).get(),
+      db.collection(AI_USAGE_DAILY_COLLECTION).doc(yesterday).get(),
+      db.collection(AI_BUDGET_COLLECTION).doc(AI_BUDGET_DOC_ID).get(),
+    ]);
+
+    const todayAi = shapeAiUsageDaily(
+      today,
+      aiTodaySnap.exists ? (aiTodaySnap.data() as Record<string, unknown>) : undefined,
+    );
+    const yesterdayAi = shapeAiUsageDaily(
+      yesterday,
+      aiYesterdaySnap.exists ? (aiYesterdaySnap.data() as Record<string, unknown>) : undefined,
+    );
+    // Live budget counter resets lazily (only when the NEXT AI call's
+    // transaction sees data.date !== today) — apply the same date check the
+    // dashboard uses so a quiet morning doesn't show yesterday's leftover
+    // count as "today".
+    const callsToday = resolveAiCallsToday(
+      budgetSnap.exists ? (budgetSnap.data() as Record<string, unknown>) : undefined,
+      today,
+    );
+
+    lines.push("\n## AI Usage & Cost");
+    lines.push(`- Budget: ${callsToday}/${AI_DAILY_BUDGET} calls used today`);
+    lines.push(
+      `- Today: ${todayAi.calls} calls, ${todayAi.errors} errors ` +
+      `(${todayAi.errorRatePct}% error rate), $${todayAi.totalCostUSD.toFixed(4)} spent, ` +
+      `${todayAi.avgLatencyMs}ms avg latency`,
+    );
+    lines.push(
+      `- Yesterday: ${yesterdayAi.calls} calls, ${yesterdayAi.errors} errors ` +
+      `(${yesterdayAi.errorRatePct}% error rate), $${yesterdayAi.totalCostUSD.toFixed(4)} spent`,
+    );
+
+    const topToday = topRequestTypesByCost(todayAi.byTypeCostUSD);
+    if (topToday.length > 0) {
+      lines.push("- Top request types by cost (today):");
+      for (const { type, costUSD } of topToday) {
+        lines.push(`  - ${type}: $${costUSD.toFixed(4)}`);
+      }
+    } else {
+      lines.push("- Top request types by cost (today): no calls recorded yet");
+    }
+  } catch (err) {
+    lines.push(`\nAI usage query error: ${err}`);
   }
 
   return lines.join("\n");
