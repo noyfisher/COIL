@@ -24,6 +24,9 @@ struct RehabPlanView: View {
     @State private var showProgressionBanner = true
     /// Brief "Your Plan Is Ready!" flash when generation completes (audit #49).
     @State private var showPlanReadyCelebration = false
+    /// One-shot guard for the `plan_viewed` analytics event — `.onAppear` re-fires on
+    /// every sheet dismissal, so this ensures the event logs once per viewed saved plan.
+    @State private var hasLoggedPlanViewed = false
 
     // Tier 1 — serious-warning modal gating.
     @AppStorage("strictValidationV1Enabled") private var strictValidationV1Enabled: Bool = true
@@ -91,7 +94,12 @@ struct RehabPlanView: View {
                             ReAssessmentPromptView(
                                 plan: plan,
                                 assessmentType: assessmentType,
-                                onStartAssessment: { showReAssessment = true }
+                                onStartAssessment: {
+                                    AnalyticsService.shared.log(.reassessmentStarted, parameters: [
+                                        "assessment_type": assessmentType.rawValue
+                                    ])
+                                    showReAssessment = true
+                                }
                             )
                         }
 
@@ -186,6 +194,13 @@ struct RehabPlanView: View {
                                 Image(systemName: "square.and.arrow.up")
                             }
                             .accessibilityIdentifier("rehabPlan.shareButton")
+                            // ShareLink has no completion callback, so opening the share
+                            // sheet is the best available signal for a PDF export attempt.
+                            .simultaneousGesture(TapGesture().onEnded {
+                                AnalyticsService.shared.log(.pdfExported, parameters: [
+                                    "exercise_count": plan.exercises.count
+                                ])
+                            })
                         }
 
                         Button(action: { showEditSheet = true }) {
@@ -275,6 +290,18 @@ struct RehabPlanView: View {
             if analysisResult == nil, let plan = viewModel.rehabPlan {
                 cachedPDFData = PDFExportService.generatePDF(for: plan)
             }
+        }
+        // `plan_viewed` — saved-plan viewing only (the generation flow already emits
+        // rehab_plan_generated). `initial: true` covers existingPlan being set
+        // synchronously in onAppear, and the one-shot guard covers later arrival plus
+        // repeat .onAppear calls from sheet dismissals.
+        .onChange(of: viewModel.rehabPlan?.id, initial: true) { _, _ in
+            guard !hasLoggedPlanViewed, analysisResult == nil, let plan = viewModel.rehabPlan else { return }
+            hasLoggedPlanViewed = true
+            AnalyticsService.shared.log(.planViewed, parameters: [
+                "exercise_count": plan.exercises.count,
+                "has_started": plan.startDate != nil ? "true" : "false"
+            ])
         }
         .trackScreen("RehabPlan")
     }
