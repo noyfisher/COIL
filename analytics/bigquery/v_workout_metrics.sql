@@ -12,6 +12,9 @@ WITH workout_events AS (
     (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'duration_seconds') AS duration_seconds,
     (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'exercises_completed') AS exercises_completed,
     (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'exercises_skipped') AS exercises_skipped,
+    -- workout_ended_early emits completed_count/skipped_count instead of exercises_completed/exercises_skipped
+    (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'completed_count') AS completed_count,
+    (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'skipped_count') AS skipped_count,
     (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'exercise_count') AS exercise_count,
     (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'swap_reason') AS swap_reason
   FROM
@@ -37,8 +40,10 @@ SELECT
   AVG(CASE WHEN event_name = 'workout_completed' THEN duration_seconds END) AS avg_duration_seconds,
 
   -- Exercise metrics
-  AVG(CASE WHEN event_name = 'workout_completed' THEN exercises_completed END) AS avg_exercises_completed,
-  AVG(CASE WHEN event_name IN ('workout_completed', 'workout_ended_early') THEN exercises_skipped END) AS avg_exercises_skipped,
+  -- workout_ended_early has no exercises_completed/exercises_skipped params (it emits
+  -- completed_count/skipped_count instead), so COALESCE across both param names
+  AVG(CASE WHEN event_name = 'workout_completed' THEN COALESCE(exercises_completed, completed_count) END) AS avg_exercises_completed,
+  AVG(CASE WHEN event_name IN ('workout_completed', 'workout_ended_early') THEN COALESCE(exercises_skipped, skipped_count) END) AS avg_exercises_skipped,
 
   -- Swap reasons
   COUNTIF(event_name = 'exercise_swapped') AS total_swaps,
