@@ -13,11 +13,21 @@ import { validateClaudeResponse } from "./response-schemas";
 import { validateNightlyReport } from "./nightly-report-validator";
 import { EXERCISE_CATALOG_CSV } from "./generated/exerciseCatalog";
 import { SYSTEM_PROMPTS, MODEL_CONFIG, MINOR_SAFETY_PROMPT } from "./prompts";
-import { recordAiUsage } from "./ai-usage";
+import {
+  recordAiUsage,
+  AI_DAILY_BUDGET,
+  AI_BUDGET_COLLECTION,
+  AI_BUDGET_DOC_ID,
+} from "./ai-usage";
 
 // Hard billing shutoff (Pub/Sub triggered). Exported so firebase-tools
 // picks it up on deploy. See billing-shutoff.ts for arming instructions.
 export { onBudgetAlert } from "./billing-shutoff";
+
+// Monitoring dashboard (Phases 2 & 3). Exported here so firebase-tools picks
+// them up on deploy; the handlers live in their own modules.
+export { pullDailyAnalytics, backfillAnalytics } from "./analytics-pull";
+export { dashboardData } from "./dashboard-data";
 
 admin.initializeApp();
 
@@ -188,15 +198,15 @@ async function decrementQuota(uid: string): Promise<void> {
 // Increment-on-admit: over-budget calls are rejected (never admitted); admitted
 // calls count — a hard ceiling, not precise per-call accounting.
 // ---------------------------------------------------------------------------
-// Global daily ceiling across ALL AI request types and ALL users. Dev value
-// sized to survive virtual-user batches / manual QA without tripping the 429
-// ceiling; denial-of-wallet is a prod concern and dev has no public account
-// minting. Revisit (likely raise + per-tier scaling) before production.
-const AI_DAILY_BUDGET = 200;
+// The ceiling itself (AI_DAILY_BUDGET) lives in ai-usage.ts so the enforcer
+// here and the dashboard tile that reports "n / limit" read the SAME number.
+// Dev value is sized to survive virtual-user batches / manual QA without
+// tripping the 429 ceiling; denial-of-wallet is a prod concern and dev has no
+// public account minting.
 
 async function checkGlobalDailyBudget(): Promise<boolean> {
   const today = new Date().toISOString().slice(0, 10);
-  const ref = admin.firestore().collection("config").doc("aiDailyBudget");
+  const ref = admin.firestore().collection(AI_BUDGET_COLLECTION).doc(AI_BUDGET_DOC_ID);
   return admin.firestore().runTransaction(async (tx) => {
     const snap = await tx.get(ref);
     const data = snap.exists ? snap.data() || {} : {};

@@ -7,6 +7,14 @@
         { "fieldPath": "exerciseName", "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "sessionLogs",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "crashMarker", "order": "ASCENDING" },
+        { "fieldPath": "uploadedAt", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": [

@@ -26,6 +26,26 @@ export const AI_USAGE_COLLECTION = "aiUsage";
 export const AI_USAGE_DAILY_COLLECTION = "aiUsageDaily";
 
 /**
+ * Global daily ceiling across ALL AI request types and ALL users
+ * (denial-of-wallet guard). Enforced by `checkGlobalDailyBudget` in index.ts
+ * against the `config/aiDailyBudget` counter; read by `dashboardData` for the
+ * "AI calls today n/LIMIT" tile.
+ *
+ * It lives here — a leaf module that imports only ./logger and ./ai-pricing —
+ * precisely so the enforcer (index.ts) and the reporter (dashboard-data.ts)
+ * share ONE number without an import cycle. Do not re-declare it elsewhere.
+ *
+ * Dev value is sized to survive virtual-user batches / manual QA without
+ * tripping the 429 ceiling. Revisit (likely raise + per-tier scaling) before
+ * production.
+ */
+export const AI_DAILY_BUDGET = 200;
+
+/** Firestore location of the counter `AI_DAILY_BUDGET` is enforced against. */
+export const AI_BUDGET_COLLECTION = "config";
+export const AI_BUDGET_DOC_ID = "aiDailyBudget";
+
+/**
  * - `ok`               — provider returned a usable response
  * - `upstream_error`   — provider returned a non-2xx
  * - `invalid_response` — provider responded 2xx but the payload failed validation
