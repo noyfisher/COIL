@@ -13,6 +13,7 @@ import { validateClaudeResponse } from "./response-schemas";
 import { validateNightlyReport } from "./nightly-report-validator";
 import { EXERCISE_CATALOG_CSV } from "./generated/exerciseCatalog";
 import { SYSTEM_PROMPTS, MODEL_CONFIG, MINOR_SAFETY_PROMPT } from "./prompts";
+import { recordAiUsage } from "./ai-usage";
 
 // Hard billing shutoff (Pub/Sub triggered). Exported so firebase-tools
 // picks it up on deploy. See billing-shutoff.ts for arming instructions.
@@ -594,7 +595,16 @@ export const claudeProxy = functions
       systemBlocks.push({ type: "text", text: MINOR_SAFETY_PROMPT, cache_control: { type: "ephemeral" } });
     }
 
+    // AI usage telemetry (Phase 1). `providerStartedAt` doubles as the
+    // "did we actually call the provider?" flag: it is set as the FIRST
+    // statement inside the try, so the catch below can tell a provider
+    // failure apart from a pre-provider one. Every pre-provider rejection
+    // above (401 / 403 / 429 / quota / config) returns before this point and
+    // is deliberately NOT recorded — no call, no cost.
+    let providerStartedAt = 0;
+
     try {
+      providerStartedAt = Date.now();
       const anthropicResponse = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
@@ -623,6 +633,16 @@ export const claudeProxy = functions
       if (!anthropicResponse.ok) {
         // Refund quota — user didn't get a usable response.
         await decrementQuota(uid);
+        // Error envelopes carry no usage — record zeros so the call still
+        // counts toward the daily error rate.
+        await recordAiUsage({
+          fn: "claudeProxy",
+          requestType: body.requestType,
+          provider: "anthropic",
+          model: config.model,
+          durationMs: Date.now() - providerStartedAt,
+          status: "upstream_error",
+        });
         // Don't forward the raw upstream error envelope (leaks model/internal
         // details); log it server-side and return a generic error.
         logError(ctx, new Error("anthropic upstream error"),
@@ -638,6 +658,16 @@ export const claudeProxy = functions
         ctx.metadata.cacheCreateTokens = responseData.usage.cache_creation_input_tokens;
         ctx.metadata.cacheReadTokens = responseData.usage.cache_read_input_tokens;
       }
+
+      // Same numbers, shaped for the durable aiUsage record (Cloud Logging is
+      // ephemeral). Used by both the success and schema-failure paths below —
+      // tokens were spent either way.
+      const usageTokens = {
+        tokensIn: responseData.usage?.input_tokens,
+        tokensOut: responseData.usage?.output_tokens,
+        cacheCreateTokens: responseData.usage?.cache_creation_input_tokens,
+        cacheReadTokens: responseData.usage?.cache_read_input_tokens,
+      };
 
       // Tier 1: validate the AI response against the per-type Zod schema before
       // passing it back. If validation fails, bump a counter and return HTTP 502
@@ -662,6 +692,15 @@ export const claudeProxy = functions
           // Counter is telemetry — never let its failure block the error response.
           logError(ctx, counterError, { stage: "response_validation_counter" });
         }
+        await recordAiUsage({
+          fn: "claudeProxy",
+          requestType: body.requestType,
+          provider: "anthropic",
+          model: config.model,
+          ...usageTokens,
+          durationMs: Date.now() - providerStartedAt,
+          status: "invalid_response",
+        });
         // Quota already consumed (we did reach Anthropic) — do NOT refund. Treat
         // this as "we wasted a request" for quota purposes. 502 so the client
         // categorizes it as a server issue, matching existing invalidResponse(5xx)
@@ -673,10 +712,31 @@ export const claudeProxy = functions
         return;
       }
 
+      await recordAiUsage({
+        fn: "claudeProxy",
+        requestType: body.requestType,
+        provider: "anthropic",
+        model: config.model,
+        ...usageTokens,
+        durationMs: Date.now() - providerStartedAt,
+        status: "ok",
+      });
+
       res.status(200).json(responseData);
     } catch (error) {
       // Fetch threw (network error, timeout, etc.) — refund quota.
       await decrementQuota(uid);
+      if (providerStartedAt > 0) {
+        // Only record when the provider call was actually attempted.
+        await recordAiUsage({
+          fn: "claudeProxy",
+          requestType: body.requestType,
+          provider: "anthropic",
+          model: config.model,
+          durationMs: Date.now() - providerStartedAt,
+          status: "error",
+        });
+      }
       logError(ctx, error, { stage: "anthropic_call" });
       res.status(502).json({ error: "Failed to reach AI service" });
     }
@@ -689,6 +749,10 @@ interface CrossVerifyRequestBody {
   exercises: { name: string; condition: string }[];
   patientContext: string;
 }
+
+// Single source of truth for the verifier model: sent to OpenAI AND used as the
+// price-table key in ai-pricing.ts, so the two can't drift apart.
+const CROSS_VERIFY_MODEL = "gpt-4o-mini";
 
 export const crossVerify = functions
   .runWith({ timeoutSeconds: 30, memory: "256MB", secrets: ["ANTHROPIC_API_KEY", "OPENAI_API_KEY"] })
@@ -808,6 +872,8 @@ export const crossVerify = functions
     // -----------------------------------------------------------------------
     // 5. Call GPT-4o-mini for each exercise (batched in one prompt)
     // -----------------------------------------------------------------------
+    let providerStartedAt = 0;
+
     try {
       const clamp = (s: unknown) => String(s ?? "").slice(0, 200);
       const exerciseList = body.exercises
@@ -834,6 +900,9 @@ For EACH exercise, respond with a JSON object in this exact format:
 
 Return results in the same order as the exercises listed above.`;
 
+      // AI usage telemetry (Phase 1): 0 means "provider not called yet", so the
+      // catch below can distinguish a provider failure from a pre-provider one.
+      providerStartedAt = Date.now();
       const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -841,7 +910,7 @@ Return results in the same order as the exercises listed above.`;
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "gpt-4o-mini",
+          model: CROSS_VERIFY_MODEL,
           temperature: 0.2,
           max_tokens: 2048,
           response_format: { type: "json_object" },
@@ -861,6 +930,14 @@ Return results in the same order as the exercises listed above.`;
       if (!openaiResponse.ok) {
         const errorData = await openaiResponse.text();
         await decrementQuota(uid);
+        await recordAiUsage({
+          fn: "crossVerify",
+          requestType: "cross_verify",
+          provider: "openai",
+          model: CROSS_VERIFY_MODEL,
+          durationMs: Date.now() - providerStartedAt,
+          status: "upstream_error",
+        });
         logError(ctx, new Error(`OpenAI API returned ${openaiResponse.status}: ${errorData}`), { stage: "openai_call" });
         res.status(502).json({ error: "Failed to reach verification service" });
         return;
@@ -868,22 +945,56 @@ Return results in the same order as the exercises listed above.`;
 
       const openaiData = await openaiResponse.json() as {
         choices?: { message?: { content?: string } }[];
+        usage?: { prompt_tokens?: number; completion_tokens?: number };
       };
       const content = openaiData.choices?.[0]?.message?.content;
+
+      // OpenAI reports no prompt-cache split on this call — cache fields are 0.
+      const crossVerifyUsage = {
+        fn: "crossVerify" as const,
+        requestType: "cross_verify" as const,
+        provider: "openai" as const,
+        model: CROSS_VERIFY_MODEL,
+        tokensIn: openaiData.usage?.prompt_tokens,
+        tokensOut: openaiData.usage?.completion_tokens,
+        cacheCreateTokens: 0,
+        cacheReadTokens: 0,
+      };
 
       if (!content) {
         // Upstream delivered nothing useful — refund quota.
         await decrementQuota(uid);
+        await recordAiUsage({
+          ...crossVerifyUsage,
+          durationMs: Date.now() - providerStartedAt,
+          status: "invalid_response",
+        });
         res.status(502).json({ error: "Empty response from verification service" });
         return;
       }
 
       // Parse the GPT response and forward to client
       const parsed = JSON.parse(content);
+      await recordAiUsage({
+        ...crossVerifyUsage,
+        durationMs: Date.now() - providerStartedAt,
+        status: "ok",
+      });
       res.status(200).json(parsed);
     } catch (error) {
       // Fetch threw or JSON.parse of response threw — refund quota.
       await decrementQuota(uid);
+      if (providerStartedAt > 0) {
+        // Only record when the provider call was actually attempted.
+        await recordAiUsage({
+          fn: "crossVerify",
+          requestType: "cross_verify",
+          provider: "openai",
+          model: CROSS_VERIFY_MODEL,
+          durationMs: Date.now() - providerStartedAt,
+          status: "error",
+        });
+      }
       logError(ctx, error, { stage: "openai_call" });
       res.status(502).json({ error: "Failed to reach verification service" });
     }
@@ -1173,6 +1284,7 @@ export const sendNightlyReport = onSchedule(
     const config = MODEL_CONFIG.nightly_report;
 
     let summary: string;
+    const reportStartedAt = Date.now();
     try {
       const response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
@@ -1192,10 +1304,38 @@ export const sendNightlyReport = onSchedule(
 
       const data = await response.json() as {
         content?: { type: string; text: string }[];
+        usage?: {
+          input_tokens?: number;
+          output_tokens?: number;
+          cache_creation_input_tokens?: number;
+          cache_read_input_tokens?: number;
+        };
       };
+      // AI usage telemetry (Phase 1) — recorded between two existing statements
+      // so it cannot alter the summary/fallback logic below.
+      await recordAiUsage({
+        fn: "sendNightlyReport",
+        requestType: "nightly_report",
+        provider: "anthropic",
+        model: config.model,
+        tokensIn: data.usage?.input_tokens,
+        tokensOut: data.usage?.output_tokens,
+        cacheCreateTokens: data.usage?.cache_creation_input_tokens,
+        cacheReadTokens: data.usage?.cache_read_input_tokens,
+        durationMs: Date.now() - reportStartedAt,
+        status: response.ok ? "ok" : "upstream_error",
+      });
       summary = data.content?.[0]?.text || "Failed to generate summary";
     } catch (err) {
       console.error("Claude API error:", err);
+      await recordAiUsage({
+        fn: "sendNightlyReport",
+        requestType: "nightly_report",
+        provider: "anthropic",
+        model: config.model,
+        durationMs: Date.now() - reportStartedAt,
+        status: "error",
+      });
       summary = `Error generating AI summary. Raw metrics:\n\n${metricsText}`;
     }
 
@@ -1398,6 +1538,7 @@ export const agentInsights = functions
 
     // 4. Try managed agent
     let resultJson: string;
+    const agentStartedAt = Date.now();
     try {
       const result = await runRecoveryInsightsAgent(data.userMessage);
 
@@ -1423,6 +1564,7 @@ export const agentInsights = functions
         const systemPrompt = SYSTEM_PROMPTS.recovery_insights;
         const config = MODEL_CONFIG.recovery_insights;
 
+        const fallbackStartedAt = Date.now();
         const fallbackResponse = await fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
           headers: {
@@ -1442,6 +1584,23 @@ export const agentInsights = functions
         });
 
         const fallbackData = await fallbackResponse.json();
+
+        // AI usage telemetry (Phase 1). Placed between two existing statements
+        // so it can't disturb control flow; one record covers both the ok and
+        // upstream-error branches below. A later validation failure still counts
+        // as "ok" here — the provider call itself succeeded and was billed.
+        await recordAiUsage({
+          fn: "agentInsights",
+          requestType: "recovery_insights",
+          provider: "anthropic",
+          model: config.model,
+          tokensIn: fallbackData?.usage?.input_tokens,
+          tokensOut: fallbackData?.usage?.output_tokens,
+          cacheCreateTokens: fallbackData?.usage?.cache_creation_input_tokens,
+          cacheReadTokens: fallbackData?.usage?.cache_read_input_tokens,
+          durationMs: Date.now() - fallbackStartedAt,
+          status: fallbackResponse.ok ? "ok" : "upstream_error",
+        });
 
         if (!fallbackResponse.ok) {
           // Don't forward the raw upstream error envelope to the client.
@@ -1478,6 +1637,21 @@ export const agentInsights = functions
         return;
       }
     }
+
+    // AI usage telemetry (Phase 1): only the managed-agent success path reaches
+    // here (the fallback returns early). The agent runs server-side at Anthropic
+    // and its stream events expose no token counts to this handler, so tokens
+    // are 0 and cost is explicitly unknown (null) rather than a fabricated 0.
+    await recordAiUsage({
+      fn: "agentInsights",
+      requestType: "recovery_insights",
+      provider: "anthropic",
+      model: "managed_agent",
+      durationMs: Date.now() - agentStartedAt,
+      status: "ok",
+      costUSD: null,
+      estimated: true,
+    });
 
     // 6. Wrap agent result in Anthropic response format for iOS compatibility
     res.status(200).json({
@@ -1608,6 +1782,7 @@ export const agentFormAnalysis = functions
     // 5. Try managed agent with history + current session
     const combinedMessage = `${history.userMessage}\n\nCURRENT SESSION:\n${userMessage}`;
     let resultJson: string;
+    const agentStartedAt = Date.now();
     try {
       const result = await runFormAnalysisAgent(combinedMessage);
 
@@ -1635,6 +1810,7 @@ export const agentFormAnalysis = functions
         const systemPrompt = SYSTEM_PROMPTS.form_analysis;
         const config = MODEL_CONFIG.form_analysis;
 
+        const fallbackStartedAt = Date.now();
         const fallbackResponse = await fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
           headers: {
@@ -1654,6 +1830,21 @@ export const agentFormAnalysis = functions
         });
 
         const fallbackData = await fallbackResponse.json();
+
+        // AI usage telemetry (Phase 1). Additive between two existing statements;
+        // one record covers both the ok and upstream-error branches below.
+        await recordAiUsage({
+          fn: "agentFormAnalysis",
+          requestType: "form_analysis",
+          provider: "anthropic",
+          model: config.model,
+          tokensIn: fallbackData?.usage?.input_tokens,
+          tokensOut: fallbackData?.usage?.output_tokens,
+          cacheCreateTokens: fallbackData?.usage?.cache_creation_input_tokens,
+          cacheReadTokens: fallbackData?.usage?.cache_read_input_tokens,
+          durationMs: Date.now() - fallbackStartedAt,
+          status: fallbackResponse.ok ? "ok" : "upstream_error",
+        });
 
         if (!fallbackResponse.ok) {
           logError(ctx, new Error("form fallback upstream error"),
@@ -1680,6 +1871,20 @@ export const agentFormAnalysis = functions
         return;
       }
     }
+
+    // AI usage telemetry (Phase 1): managed-agent success path only (the
+    // fallback returns early). Tokens are not observable from the agent stream,
+    // so cost is explicitly unknown rather than a fabricated 0.
+    await recordAiUsage({
+      fn: "agentFormAnalysis",
+      requestType: "form_analysis",
+      provider: "anthropic",
+      model: "managed_agent",
+      durationMs: Date.now() - agentStartedAt,
+      status: "ok",
+      costUSD: null,
+      estimated: true,
+    });
 
     // 7. Wrap agent result in Anthropic response format for iOS compatibility
     res.status(200).json({

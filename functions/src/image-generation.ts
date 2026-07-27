@@ -10,6 +10,13 @@
 
 import * as admin from "firebase-admin";
 import { EXERCISE_CATALOG_CSV } from "./generated/exerciseCatalog";
+import { recordAiUsage } from "./ai-usage";
+import { FLAT_COST_USD } from "./ai-pricing";
+
+// Model identifiers for usage telemetry. BFL and Gemini bill per operation, so
+// these carry FLAT_COST_USD estimates rather than token math.
+const BFL_IMAGE_MODEL = "flux-2-pro";
+const GEMINI_QA_MODEL = "gemini-2.5-flash";
 
 // Lazy-initialized to avoid "no default app" error at import time
 // (admin.initializeApp() is called in index.ts before these are used)
@@ -358,6 +365,7 @@ async function callBflApi(
   seed?: number,
 ): Promise<Buffer | null> {
   const submitUrl = "https://api.bfl.ai/v1/flux-2-pro";
+  const startedAt = Date.now();
 
   // Submit generation request
   const submitBody: Record<string, unknown> = {
@@ -400,6 +408,20 @@ async function callBflApi(
     const result = (await pollResp.json()) as { status: string; result?: { sample: string } };
 
     if (result.status === "Ready" && result.result?.sample) {
+      // AI usage telemetry (Phase 1): BFL has produced (and billed for) an
+      // image at this point, whether or not the download below succeeds.
+      // recordAiUsage never throws, so this cannot change the return value.
+      await recordAiUsage({
+        fn: "generateExerciseImage",
+        requestType: "exercise_image",
+        provider: "bfl",
+        model: BFL_IMAGE_MODEL,
+        durationMs: Date.now() - startedAt,
+        status: "ok",
+        costUSD: FLAT_COST_USD.bfl_flux_image,
+        estimated: true,
+      });
+
       // Download the image
       const imgResp = await fetch(result.result.sample);
       if (imgResp.ok) {
@@ -460,7 +482,8 @@ Return ONLY a JSON object with this exact format:
 
 Set overall_pass to true only if ALL checks pass AND pose_score >= 2. List failed check names in "failures".`;
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_QA_MODEL}:generateContent?key=${geminiApiKey}`;
+  const startedAt = Date.now();
 
   try {
     const resp = await fetch(url, {
@@ -477,6 +500,20 @@ Set overall_pass to true only if ALL checks pass AND pose_score >= 2. List faile
           responseMimeType: "application/json",
         },
       }),
+    });
+
+    // AI usage telemetry (Phase 1): one record per QA call, placed between two
+    // existing statements. Gemini reports no usable token accounting here, so
+    // the flat per-call estimate stands in; a failed call is not billed.
+    await recordAiUsage({
+      fn: "generateExerciseImage",
+      requestType: "image_qa",
+      provider: "google",
+      model: GEMINI_QA_MODEL,
+      durationMs: Date.now() - startedAt,
+      status: resp.ok ? "ok" : "upstream_error",
+      costUSD: resp.ok ? FLAT_COST_USD.gemini_flash_qa : 0,
+      estimated: true,
     });
 
     if (!resp.ok) {
