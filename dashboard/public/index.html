@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Overview · COIL monitoring</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <!-- Vendored ECharts 5.6.0 (Apache-2.0) — see vendor/README.md. Classic
+       script so it is ready before the deferred module scripts run. -->
+  <script src="vendor/echarts.min.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">COIL <span class="brand-sub">monitoring</span></div>
+  <nav class="topnav" aria-label="Dashboard pages">
+    <a href="index.html" aria-current="page">Overview</a>
+    <a href="graphs.html">Graphs</a>
+  </nav>
+  <div class="topbar-right">
+    <span class="mock-badge" data-mock-badge hidden>Mock data</span>
+    <span data-user-email></span>
+    <button type="button" class="btn btn-ghost" data-signout hidden>Sign out</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ---------------------------------------------------------- gates -->
+  <section class="screen" id="screen-loading">
+    <div class="screen-card">
+      <p>Loading…</p>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-signin" hidden>
+    <div class="screen-card">
+      <h2>COIL monitoring</h2>
+      <p>Internal dashboard. Sign in with the Google account on the admin allowlist.</p>
+      <button type="button" class="btn btn-primary" data-signin>Sign in with Google</button>
+      <p data-message></p>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-denied" hidden>
+    <div class="screen-card">
+      <div class="screen-icon" aria-hidden="true">&#9888;</div>
+      <h2>Not authorised</h2>
+      <p>
+        You are signed in as <strong data-user-email></strong>, but that address is not on the
+        dashboard allowlist. Ask someone with deploy access to add it to
+        <code>ADMIN_EMAILS</code> in <code>functions/.env</code> and redeploy
+        <code>dashboardData</code>.
+      </p>
+      <button type="button" class="btn" data-signout>Sign out</button>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-config" hidden>
+    <div class="screen-card">
+      <h2>Firebase config missing</h2>
+      <p>
+        <code>js/firebase-config.js</code> still holds placeholder values, so sign-in cannot start.
+        Fill it in with the output of <code>firebase apps:sdkconfig web</code> (a web config is not
+        a secret) and reload.
+      </p>
+      <p>To preview the UI without a backend, open this page with <code>?mock=1</code>.</p>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-error" hidden>
+    <div class="screen-card">
+      <h2>Something went wrong</h2>
+      <p data-message></p>
+      <button type="button" class="btn" onclick="window.location.reload()">Reload</button>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------ app -->
+  <div id="screen-app" hidden>
+
+    <div class="banner" id="pollBanner" hidden></div>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Live</h2>
+        <span class="section-note">polls every 60&nbsp;s · <span id="lastUpdated">—</span></span>
+        <span class="card-actions" style="margin-left:auto">
+          <button type="button" class="btn btn-ghost" id="refreshBtn">Refresh</button>
+        </span>
+      </div>
+      <div class="tile-grid" id="row-live"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Yesterday</h2>
+        <span class="section-note" id="head-yesterday"></span>
+      </div>
+      <div class="tile-grid" id="row-yesterday"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Totals</h2>
+        <span class="section-note">counters from the 01:00 UTC aggregate</span>
+      </div>
+      <div class="tile-grid" id="row-totals"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Last 14 days</h2>
+        <span class="section-note">GA4 days (AI cost is UTC) — the two clocks are not reconciled</span>
+      </div>
+      <div class="chart-grid">
+        <figure class="card spark-card" id="card-spark-dau" data-metric="DAU">
+          <div class="card-head">
+            <h3>Daily active users</h3>
+            <span class="card-note">GA4</span>
+            <div class="card-actions">
+              <button type="button" class="btn btn-ghost" data-table-toggle aria-pressed="false">Table</button>
+            </div>
+          </div>
+          <div class="card-plot"></div>
+          <div class="card-table" hidden></div>
+        </figure>
+
+        <figure class="card spark-card" id="card-spark-workouts" data-metric="Workouts completed">
+          <div class="card-head">
+            <h3>Workouts completed</h3>
+            <span class="card-note">GA4</span>
+            <div class="card-actions">
+              <button type="button" class="btn btn-ghost" data-table-toggle aria-pressed="false">Table</button>
+            </div>
+          </div>
+          <div class="card-plot"></div>
+          <div class="card-table" hidden></div>
+        </figure>
+
+        <figure class="card spark-card" id="card-spark-cost" data-metric="AI cost (USD)">
+          <div class="card-head">
+            <h3>AI cost per day</h3>
+            <span class="card-note">UTC · estimated</span>
+            <div class="card-actions">
+              <button type="button" class="btn btn-ghost" data-table-toggle aria-pressed="false">Table</button>
+            </div>
+          </div>
+          <div class="card-plot"></div>
+          <div class="card-table" hidden></div>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Data quality</h2>
+        <span class="section-note">today (UTC)</span>
+      </div>
+      <figure class="card" id="dataQuality">
+        <div class="card-head">
+          <h3>Rejections &amp; gaps</h3>
+          <span class="card-note">response validation + exercise images</span>
+        </div>
+        <div id="dataQualityBody"></div>
+      </figure>
+    </section>
+
+  </div>
+</main>
+
+<script type="module" src="js/overview.js"></script>
+</body>
+</html>

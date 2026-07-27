@@ -2,6 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "dashboard-static",
+      "runtimeExecutable": "/usr/bin/python3",
+      "runtimeArgs": ["-m", "http.server", "5301", "--directory", "dashboard/public"],
+      "port": 5301
+    },
+    {
       "name": "pitch-preview",
       "runtimeExecutable": "/usr/bin/python3",
       "runtimeArgs": ["-m", "http.server", "8090", "--directory", ".claude/plans"],

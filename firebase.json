@@ -10,7 +10,23 @@
   "storage": {
     "rules": "storage.rules"
   },
+  "hosting": {
+    "public": "dashboard/public",
+    "ignore": [
+      "**/.*",
+      "**/vendor/README.md"
+    ],
+    "rewrites": [
+      {
+        "source": "/api/dashboard",
+        "function": "dashboardData"
+      }
+    ]
+  },
   "emulators": {
+    "hosting": {
+      "port": 5000
+    },
     "functions": {
       "port": 5001
     },

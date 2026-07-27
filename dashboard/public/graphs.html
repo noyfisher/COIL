@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Graphs · COIL monitoring</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <!-- Vendored ECharts 5.6.0 (Apache-2.0) — see vendor/README.md. -->
+  <script src="vendor/echarts.min.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">COIL <span class="brand-sub">monitoring</span></div>
+  <nav class="topnav" aria-label="Dashboard pages">
+    <a href="index.html">Overview</a>
+    <a href="graphs.html" aria-current="page">Graphs</a>
+  </nav>
+  <div class="topbar-right">
+    <span class="mock-badge" data-mock-badge hidden>Mock data</span>
+    <span data-user-email></span>
+    <button type="button" class="btn btn-ghost" data-signout hidden>Sign out</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ---------------------------------------------------------- gates -->
+  <section class="screen" id="screen-loading">
+    <div class="screen-card">
+      <p>Loading…</p>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-signin" hidden>
+    <div class="screen-card">
+      <h2>COIL monitoring</h2>
+      <p>Internal dashboard. Sign in with the Google account on the admin allowlist.</p>
+      <button type="button" class="btn btn-primary" data-signin>Sign in with Google</button>
+      <p data-message></p>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-denied" hidden>
+    <div class="screen-card">
+      <div class="screen-icon" aria-hidden="true">&#9888;</div>
+      <h2>Not authorised</h2>
+      <p>
+        You are signed in as <strong data-user-email></strong>, but that address is not on the
+        dashboard allowlist. Ask someone with deploy access to add it to
+        <code>ADMIN_EMAILS</code> in <code>functions/.env</code> and redeploy
+        <code>dashboardData</code>.
+      </p>
+      <button type="button" class="btn" data-signout>Sign out</button>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-config" hidden>
+    <div class="screen-card">
+      <h2>Firebase config missing</h2>
+      <p>
+        <code>js/firebase-config.js</code> still holds placeholder values, so sign-in cannot start.
+        Fill it in with the output of <code>firebase apps:sdkconfig web</code> (a web config is not
+        a secret) and reload.
+      </p>
+      <p>To preview the UI without a backend, open this page with <code>?mock=1</code>.</p>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-error" hidden>
+    <div class="screen-card">
+      <h2>Something went wrong</h2>
+      <p data-message></p>
+      <button type="button" class="btn" onclick="window.location.reload()">Reload</button>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------ app -->
+  <div id="screen-app" hidden>
+
+    <div class="banner" id="loadBanner" hidden></div>
+
+    <!-- One filter row, above everything it scopes. -->
+    <div class="filterbar">
+      <span class="filter-label" id="rangeLabel">Date range</span>
+      <div class="segmented" id="rangeButtons" role="group" aria-labelledby="rangeLabel"></div>
+      <span class="section-note">GA4 days, ending yesterday</span>
+    </div>
+
+    <div class="chart-grid" style="grid-template-columns: 1fr;">
+      <figure class="card" id="card-engagement">
+        <div class="card-head">
+          <h3>Daily active users &amp; sessions</h3>
+          <span class="card-note">GA4, one shared count axis</span>
+          <div class="card-actions">
+            <button type="button" class="btn btn-ghost" data-table-toggle aria-pressed="false">Table</button>
+          </div>
+        </div>
+        <div class="card-plot" style="height:300px"></div>
+        <div class="card-table" hidden></div>
+      </figure>
+    </div>
+
+    <div class="chart-grid" style="margin-top:16px;">
+      <figure class="card" id="card-funnel">
+        <div class="card-head">
+          <h3>Activation funnel</h3>
+          <span class="card-note">distinct users over the range · % of step 1</span>
+          <div class="card-actions">
+            <button type="button" class="btn btn-ghost" data-table-toggle aria-pressed="false">Table</button>
+          </div>
+        </div>
+        <div class="card-plot" style="height:360px"></div>
+        <div class="card-table" hidden></div>
+      </figure>
+
+      <figure class="card" id="card-retention">
+        <div class="card-head">
+          <h3>Weekly retention cohorts</h3>
+          <span class="card-note">% of the cohort active in week W+n</span>
+          <div class="card-actions">
+            <button type="button" class="btn btn-ghost" data-table-toggle aria-pressed="false">Table</button>
+          </div>
+        </div>
+        <div class="card-plot" style="height:360px"></div>
+        <div class="card-table" hidden></div>
+      </figure>
+    </div>
+
+    <!-- Completion rate (%) and duration (min) are two scales: two charts,
+         never two y-axes on one plot. -->
+    <div class="chart-grid" style="margin-top:16px;">
+      <figure class="card" id="card-completion">
+        <div class="card-head">
+          <h3>Workout completion rate</h3>
+          <span class="card-note">completed ÷ started, per day</span>
+          <div class="card-actions">
+            <button type="button" class="btn btn-ghost" data-table-toggle aria-pressed="false">Table</button>
+          </div>
+        </div>
+        <div class="card-plot" style="height:240px"></div>
+        <div class="card-table" hidden></div>
+      </figure>
+
+      <figure class="card" id="card-duration">
+        <div class="card-head">
+          <h3>Average workout duration</h3>
+          <span class="card-note">minutes per completed session</span>
+          <div class="card-actions">
+            <button type="button" class="btn btn-ghost" data-table-toggle aria-pressed="false">Table</button>
+          </div>
+        </div>
+        <div class="card-plot" style="height:240px"></div>
+        <div class="card-table" hidden></div>
+      </figure>
+    </div>
+
+    <div class="chart-grid" style="grid-template-columns: 1fr; margin-top:16px;">
+      <figure class="card" id="card-ai-cost">
+        <div class="card-head">
+          <h3>AI cost by request type</h3>
+          <span class="card-note" id="aiCostNote"></span>
+          <div class="card-actions">
+            <button type="button" class="btn btn-ghost" data-table-toggle aria-pressed="false">Table</button>
+          </div>
+        </div>
+        <div class="card-plot" style="height:400px"></div>
+        <div class="card-table" hidden></div>
+      </figure>
+    </div>
+
+    <div class="chart-grid" style="grid-template-columns: 1fr; margin-top:16px;">
+      <figure class="card" id="card-latency">
+        <div class="card-head">
+          <h3>AI latency</h3>
+          <span class="card-note">average round-trip per day (UTC)</span>
+          <div class="card-actions">
+            <button type="button" class="btn btn-ghost" data-table-toggle aria-pressed="false">Table</button>
+          </div>
+        </div>
+        <div class="card-plot" style="height:240px"></div>
+        <div class="card-table" hidden></div>
+      </figure>
+    </div>
+
+    <div class="chart-grid" style="grid-template-columns: 1fr; margin-top:16px;">
+      <figure class="card" id="card-sankey">
+        <div class="card-head">
+          <h3>Screen flow</h3>
+          <span class="card-note" id="sankeyNote"></span>
+          <div class="card-actions">
+            <button type="button" class="btn btn-ghost" data-table-toggle aria-pressed="false">Table</button>
+          </div>
+        </div>
+        <div class="card-plot" style="height:560px"></div>
+        <div class="card-table" hidden></div>
+      </figure>
+    </div>
+
+  </div>
+</main>
+
+<script type="module" src="js/graphs.js"></script>
+</body>
+</html>
