@@ -15,10 +15,10 @@
  */
 
 export const firebaseConfig = {
-  apiKey: 'REPLACE_WITH_API_KEY',
-  authDomain: 'REPLACE_WITH_PROJECT_ID.firebaseapp.com',
-  projectId: 'REPLACE_WITH_PROJECT_ID',
-  appId: 'REPLACE_WITH_APP_ID',
+  apiKey: 'AIzaSyCmvLpY0K6_1HZGyrkHNs-BbDUjItjIeO8',
+  authDomain: 'pt-helper-dev.firebaseapp.com',
+  projectId: 'pt-helper-dev',
+  appId: '1:892493410961:web:131927c9b676e8d70ec530',
 };
 
 /** Pinned Firebase JS SDK (loaded as ESM from gstatic — no bundler here). */

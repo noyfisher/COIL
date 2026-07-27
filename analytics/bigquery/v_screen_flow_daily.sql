@@ -9,7 +9,11 @@ WITH screen_views AS (
     event_date,
     user_pseudo_id,
     event_timestamp,
-    (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'screen_name') AS screen_name,
+    -- GA4 exports the screen name as 'firebase_screen', not 'screen_name'
+    COALESCE(
+      (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'firebase_screen'),
+      (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'screen_name')
+    ) AS screen_name,
     (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'ga_session_id') AS ga_session_id
   FROM
     `pt-helper-dev.analytics_506142273.events_*`

@@ -269,7 +269,13 @@ WITH sv AS (
   SELECT
     user_pseudo_id,
     event_timestamp,
-    (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'screen_name') AS screen_name,
+    -- The SDK exports the screen name as 'firebase_screen', NOT 'screen_name'
+    -- (verified against the live dataset — 'screen_name' never appears).
+    -- COALESCE keeps a fallback in case a future SDK reverts the mapping.
+    COALESCE(
+      (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'firebase_screen'),
+      (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'screen_name')
+    ) AS screen_name,
     (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'ga_session_id') AS ga_session_id
   FROM ${wildcardTable()}
   WHERE event_name = 'screen_view'
