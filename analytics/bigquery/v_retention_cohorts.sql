@@ -17,6 +17,20 @@ WITH user_first_seen AS (
     user_pseudo_id
 ),
 
+-- Cohort size must be computed OUTSIDE the activity join: within a
+-- (signup_week, weeks_since_signup) group the joined rows only contain users
+-- active that week, so counting f.user_pseudo_id there equals active_users and
+-- retention_pct reads 100% in every cell.
+cohort_sizes AS (
+  SELECT
+    signup_week,
+    COUNT(DISTINCT user_pseudo_id) AS cohort_size
+  FROM
+    user_first_seen
+  GROUP BY
+    signup_week
+),
+
 user_activity AS (
   SELECT DISTINCT
     user_pseudo_id,
@@ -31,14 +45,16 @@ SELECT
   f.signup_week,
   DATE_DIFF(a.activity_week, f.signup_week, WEEK) AS weeks_since_signup,
   COUNT(DISTINCT a.user_pseudo_id) AS active_users,
-  COUNT(DISTINCT f.user_pseudo_id) AS cohort_size,
-  ROUND(COUNT(DISTINCT a.user_pseudo_id) / COUNT(DISTINCT f.user_pseudo_id) * 100, 1) AS retention_pct
+  c.cohort_size,
+  ROUND(COUNT(DISTINCT a.user_pseudo_id) / c.cohort_size * 100, 1) AS retention_pct
 FROM
   user_first_seen f
+JOIN
+  cohort_sizes c ON c.signup_week = f.signup_week
 LEFT JOIN
   user_activity a ON f.user_pseudo_id = a.user_pseudo_id AND a.activity_week >= f.signup_week
 GROUP BY
-  f.signup_week, weeks_since_signup
+  f.signup_week, weeks_since_signup, c.cohort_size
 HAVING
   weeks_since_signup >= 0
 ORDER BY
