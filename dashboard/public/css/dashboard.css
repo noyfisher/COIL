@@ -436,6 +436,8 @@ table.dv-table .swatch {
 .banner[hidden] { display: none; }
 .banner strong { color: var(--status-critical); }
 
+.mock-badge[hidden] { display: none; }
+
 .mock-badge {
   display: inline-flex;
   align-items: center;
