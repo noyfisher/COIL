@@ -351,17 +351,28 @@ async function safeRead<T>(
   }
 }
 
-/** Most recent N docs of a date-keyed collection, returned oldest→newest. */
+/**
+ * Most recent N docs of a date-keyed collection, returned oldest→newest.
+ *
+ * Deliberately queries ASCENDING over a __name__ range and slices the tail:
+ * a bare `orderBy(documentId(), "desc")` is NOT served by Firestore's
+ * automatic indexes (FAILED_PRECONDITION in production), while an ascending
+ * range is. Doc ids are YYYY-MM-DD, so lexicographic == chronological. The
+ * lookback window is padded (min 7 days) so gaps from missed runs don't
+ * shrink the result below `limit` unnecessarily.
+ */
 async function readRecentDateKeyedDocs(
   collection: admin.firestore.CollectionReference,
   limit: number,
 ): Promise<Map<string, Record<string, unknown>>> {
+  const lookbackDays = Math.max(limit + 2, 7);
+  const sinceKey = new Date(Date.now() - lookbackDays * 86_400_000).toISOString().slice(0, 10);
   const snap = await collection
-    .orderBy(admin.firestore.FieldPath.documentId(), "desc")
-    .limit(limit)
+    .orderBy(admin.firestore.FieldPath.documentId())
+    .startAt(sinceKey)
     .get();
   const out = new Map<string, Record<string, unknown>>();
-  for (const doc of snap.docs.reverse()) {
+  for (const doc of snap.docs.slice(-limit)) {
     out.set(doc.id, doc.data() as Record<string, unknown>);
   }
   return out;
@@ -446,13 +457,13 @@ async function buildOverviewPayload(
     }),
 
     safeRead(ctx, "totals", async () => {
-      const latestSnap = await dailyAggregatesCollection(db)
-        .orderBy(admin.firestore.FieldPath.documentId(), "desc")
-        .limit(1)
-        .get();
-      if (latestSnap.empty) return null;
-      const latestDoc = latestSnap.docs[0];
-      const latest = latestDoc.data() as Record<string, unknown>;
+      // Same ascending-range trick as readRecentDateKeyedDocs — descending
+      // documentId() orderBy would demand a manual index.
+      const recent = await readRecentDateKeyedDocs(dailyAggregatesCollection(db), 1);
+      const latestId = [...recent.keys()].pop();
+      if (!latestId) return null;
+      const latestDoc = { id: latestId };
+      const latest = recent.get(latestId) as Record<string, unknown>;
 
       const priorKey = shiftDayKey(latestDoc.id, -7);
       const priorSnap = await dailyAggregatesCollection(db).doc(priorKey).get();
