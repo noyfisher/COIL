@@ -8,7 +8,7 @@ import { runRecoveryInsightsAgent, validateInsightResult } from "./managed-agent
 import { runFormAnalysisAgent, validateFormResult } from "./form-agent";
 import { handleGenerateExerciseImage } from "./image-generation";
 import { deleteUserFirestoreData } from "./account-deletion";
-import { newRequestContext, logCompleted, logError, logWarn } from "./logger";
+import { RequestContext, newRequestContext, logCompleted, logError, logWarn } from "./logger";
 import { validateClaudeResponse } from "./response-schemas";
 import { validateNightlyReport } from "./nightly-report-validator";
 import { EXERCISE_CATALOG_CSV } from "./generated/exerciseCatalog";
@@ -22,9 +22,11 @@ import {
 } from "./ai-usage";
 import {
   dashboardDailyCollection,
+  dashboardReportsCollection,
   computeTotalsDeltas,
   resolveAiCallsToday,
   shapeAiUsageDaily,
+  NightlyReportEmailStatus,
 } from "./dashboard-data";
 
 // Hard billing shutoff (Pub/Sub triggered). Exported so firebase-tools
@@ -1434,6 +1436,139 @@ export function resolveReportRecipient(env: NodeJS.ProcessEnv = process.env): st
   return recipient ? recipient : null;
 }
 
+// ---------------------------------------------------------------------------
+// Nightly report → dashboard persistence
+// ---------------------------------------------------------------------------
+//
+// SendGrid is not a durable channel (the account can be — and has been —
+// deactivated), so the report is written to
+// `analytics/dashboard/reports/{YYYY-MM-DD}` BEFORE any send is attempted and
+// surfaced on the monitoring dashboard's overview page. Email became the
+// secondary channel; a delivery failure now costs the notification, never the
+// report itself.
+
+/** Longest text field we will store. Guards Firestore's 1 MiB doc ceiling —
+ *  a rejected write would lose the whole report, the one thing this must not
+ *  do. Real reports are a few KB, so this never fires in practice. */
+export const NIGHTLY_REPORT_MAX_FIELD_CHARS = 100_000;
+
+/** Trim an arbitrary thrown value down to a short, storable message. */
+export function shortErrorMessage(err: unknown, maxLength = 200): string {
+  const raw = err instanceof Error ? err.message : String(err);
+  const clean = raw.replace(/\s+/g, " ").trim();
+  if (clean.length === 0) return "unknown error";
+  return clean.length > maxLength ? `${clean.slice(0, maxLength - 1)}…` : clean;
+}
+
+function truncateField(value: string): string {
+  return value.length > NIGHTLY_REPORT_MAX_FIELD_CHARS
+    ? `${value.slice(0, NIGHTLY_REPORT_MAX_FIELD_CHARS)}\n…[truncated]`
+    : value;
+}
+
+export interface NightlyReportEmailOutcome {
+  emailStatus: NightlyReportEmailStatus;
+  /** Short failure message; null on every non-"failed" status. Written (not
+   *  omitted) so a same-day re-run can't leave yesterday's error behind. */
+  emailError: string | null;
+}
+
+/**
+ * Resolve the delivery status stored on the report doc.
+ *
+ * Called TWICE per run: once before the send with `attempted` unset — nothing
+ * has gone out yet, so the doc lands as "skipped" — and once after the attempt
+ * resolves, which merges "sent" or "failed" over it. Missing config short-
+ * circuits to "skipped" because no send is possible at all.
+ */
+export function resolveEmailOutcome(input: {
+  recipientConfigured: boolean;
+  sendgridConfigured: boolean;
+  attempted?: boolean;
+  sendError?: unknown;
+}): NightlyReportEmailOutcome {
+  if (!input.recipientConfigured || !input.sendgridConfigured) {
+    return { emailStatus: "skipped", emailError: null };
+  }
+  if (!input.attempted) return { emailStatus: "skipped", emailError: null };
+  if (input.sendError !== undefined && input.sendError !== null) {
+    return { emailStatus: "failed", emailError: shortErrorMessage(input.sendError) };
+  }
+  return { emailStatus: "sent", emailError: null };
+}
+
+export interface NightlyReportDoc {
+  date: string;
+  summaryMarkdown: string;
+  summaryHtml: string;
+  validationPassed: boolean;
+  metricsText: string;
+  emailStatus: NightlyReportEmailStatus;
+  emailError: string | null;
+}
+
+/**
+ * Assemble the Firestore document. `generatedAt` is added by the writer (it is
+ * a server sentinel, not a value), which keeps this pure and unit-testable.
+ */
+export function buildNightlyReportDoc(input: {
+  date: string;
+  summaryMarkdown: string;
+  summaryHtml: string;
+  validationPassed: boolean;
+  metricsText: string;
+  outcome: NightlyReportEmailOutcome;
+}): NightlyReportDoc {
+  return {
+    date: input.date,
+    summaryMarkdown: truncateField(input.summaryMarkdown),
+    summaryHtml: truncateField(input.summaryHtml),
+    validationPassed: input.validationPassed,
+    metricsText: truncateField(input.metricsText),
+    emailStatus: input.outcome.emailStatus,
+    emailError: input.outcome.emailError,
+  };
+}
+
+/** Write the report. Never throws — a persistence problem must not take the
+ *  email path down with it (and vice versa). */
+async function persistNightlyReport(ctx: RequestContext, doc: NightlyReportDoc): Promise<void> {
+  try {
+    await dashboardReportsCollection(admin.firestore())
+      .doc(doc.date)
+      .set(
+        { ...doc, generatedAt: admin.firestore.FieldValue.serverTimestamp() },
+        { merge: true },
+      );
+  } catch (err) {
+    logWarn(ctx, "nightly_report_persist_failed", {
+      date: doc.date,
+      errorMessage: shortErrorMessage(err),
+    });
+  }
+}
+
+/** Merge the post-send delivery status onto an already-persisted report. */
+async function updateNightlyReportEmailStatus(
+  ctx: RequestContext,
+  date: string,
+  outcome: NightlyReportEmailOutcome,
+): Promise<void> {
+  try {
+    await dashboardReportsCollection(admin.firestore())
+      .doc(date)
+      .set(
+        { emailStatus: outcome.emailStatus, emailError: outcome.emailError },
+        { merge: true },
+      );
+  } catch (err) {
+    logWarn(ctx, "nightly_report_status_update_failed", {
+      date,
+      errorMessage: shortErrorMessage(err),
+    });
+  }
+}
+
 export const sendNightlyReport = onSchedule(
   {
     schedule: "every day 07:00",
@@ -1554,10 +1689,31 @@ export const sendNightlyReport = onSchedule(
       ].join("\n");
     }
 
-    // --- 3. Send email via SendGrid ---
+    // --- 3. Persist to the dashboard BEFORE attempting the email ---
+    // The dashboard is now the primary channel: whatever happens to SendGrid
+    // below, the report is already readable at analytics/dashboard/reports.
+    const ctx = newRequestContext("sendNightlyReport");
+    const reportDate = new Date().toISOString().split("T")[0];
+    const summaryHtml = markdownToHtml(summary);
     const sendgridKey = process.env.SENDGRID_API_KEY;
     const recipientEmail = resolveReportRecipient();
 
+    await persistNightlyReport(
+      ctx,
+      buildNightlyReportDoc({
+        date: reportDate,
+        summaryMarkdown: summary,
+        summaryHtml,
+        validationPassed: reportValidation.ok,
+        metricsText,
+        outcome: resolveEmailOutcome({
+          recipientConfigured: Boolean(recipientEmail),
+          sendgridConfigured: Boolean(sendgridKey),
+        }),
+      }),
+    );
+
+    // --- 4. Send email via SendGrid (best-effort) ---
     // No personal-email fallback (P3-03): skip the send when no org recipient is set.
     if (!recipientEmail) {
       console.warn("sendNightlyReport: REPORT_RECIPIENT_EMAIL not configured — skipping send");
@@ -1579,9 +1735,9 @@ export const sendNightlyReport = onSchedule(
 <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#3D3D3D;background:#F5F2EC;">
   <div style="background:#FFFFFF;border-radius:12px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
     <h1 style="color:#6B7F6B;font-size:22px;margin:0 0 4px;">PT Helper Daily Report</h1>
-    <p style="color:#9B8F80;font-size:14px;margin:0 0 20px;">${new Date().toISOString().split("T")[0]}</p>
+    <p style="color:#9B8F80;font-size:14px;margin:0 0 20px;">${reportDate}</p>
     <hr style="border:none;border-top:1px solid #E8E3DA;margin:16px 0;">
-    ${markdownToHtml(summary)}
+    ${summaryHtml}
     <hr style="border:none;border-top:1px solid #E8E3DA;margin:16px 0;">
     <p style="color:#9B8F80;font-size:12px;text-align:center;margin:0;">
       Generated by PT Helper Nightly Report &bull; Powered by Claude AI
@@ -1590,8 +1746,7 @@ export const sendNightlyReport = onSchedule(
 </body>
 </html>`;
 
-    const reportDate = new Date().toISOString().split("T")[0];
-
+    let sendError: unknown = null;
     try {
       await sgMail.send({
         to: recipientEmail,
@@ -1601,8 +1756,21 @@ export const sendNightlyReport = onSchedule(
       });
       console.log(`Nightly report sent to ${recipientEmail}`);
     } catch (err) {
+      sendError = err;
       console.error("SendGrid error:", err);
     }
+
+    // --- 5. Record how the send went on the already-persisted report ---
+    await updateNightlyReportEmailStatus(
+      ctx,
+      reportDate,
+      resolveEmailOutcome({
+        recipientConfigured: true,
+        sendgridConfigured: true,
+        attempted: true,
+        sendError,
+      }),
+    );
   }
 );
 

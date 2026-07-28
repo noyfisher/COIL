@@ -168,6 +168,30 @@
       </figure>
     </section>
 
+    <section class="section">
+      <div class="section-head">
+        <h2>Nightly report</h2>
+        <span class="section-note">written by sendNightlyReport at 07:00 Asia/Jerusalem</span>
+      </div>
+      <figure class="card report-card" id="nightlyReport">
+        <div class="card-head">
+          <h3>Latest report</h3>
+          <span class="card-note" id="nightlyReportMeta"></span>
+          <span class="report-chip" id="nightlyReportStatus" hidden></span>
+          <div class="card-actions">
+            <button type="button" class="btn btn-ghost" id="nightlyReportToggle"
+                    aria-expanded="false" aria-controls="nightlyReportBody" hidden>
+              Show full report
+            </button>
+          </div>
+        </div>
+        <p class="report-warning" id="nightlyReportWarning" hidden></p>
+        <!-- summaryHtml (AI-generated, server-rendered) is written here and
+             nowhere else — see renderNightlyReport in js/overview.js. -->
+        <div class="report-body" id="nightlyReportBody"></div>
+      </figure>
+    </section>
+
   </div>
 </main>
 

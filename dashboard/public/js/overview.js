@@ -158,6 +158,38 @@ function renderLiveRow(live = {}, nowDate) {
   ]);
 }
 
+/**
+ * API-shape adapters. `buildOverviewPayload` (functions/src/dashboard-data.ts)
+ * returns `yesterday` NESTED (engagement/funnel/workout/ai) and `totals` with
+ * a `deltas{}` object + `date` — the tile renderers below want flat fields.
+ * Each adapter also passes through an already-flat shape, so a fixture or a
+ * future API change in either direction can't blank the row again.
+ */
+function flattenYesterday(y) {
+  if (!y || typeof y !== 'object') return y;
+  const e = y.engagement ?? {};
+  const f = y.funnel ?? {};
+  const w = y.workout ?? {};
+  return {
+    date: y.date,
+    dau: y.dau ?? e.dau ?? null,
+    sessions: y.sessions ?? e.totalSessions ?? null,
+    workoutsCompleted: y.workoutsCompleted ?? w.completed ?? e.workoutsCompleted ?? null,
+    plansGenerated: y.plansGenerated ?? f.rehabPlanGenerated ?? null,
+  };
+}
+
+function flattenTotals(t) {
+  if (!t || typeof t !== 'object') return t;
+  const d = t.deltas ?? {};
+  return {
+    ...t,
+    asOf: t.asOf ?? t.date ?? null,
+    totalUsersDelta7d: t.totalUsersDelta7d ?? d.totalUsers ?? null,
+    totalPlansDelta7d: t.totalPlansDelta7d ?? d.totalPlans ?? null,
+  };
+}
+
 function renderYesterdayRow(yesterday) {
   const head = document.getElementById('head-yesterday');
   if (head) {
@@ -267,6 +299,93 @@ function renderDataQuality(live = {}) {
   host.replaceChildren(list);
 }
 
+/* ----------------------------------------------------------- nightly report */
+
+/**
+ * Delivery chip. "skipped" is the honest label for BOTH "no recipient
+ * configured" and "SendGrid never attempted" — the report is on the dashboard
+ * either way, which is the point of persisting it before the send.
+ */
+const REPORT_STATUS_CHIP = {
+  sent: { text: 'email sent', cls: 'is-sent' },
+  failed: { text: 'email failed', cls: 'is-failed' },
+  skipped: { text: 'email off — dashboard only', cls: 'is-off' },
+};
+
+let reportKey = null;   // don't re-render (and collapse) an unchanged report
+
+function renderNightlyReport(report) {
+  const body = document.getElementById('nightlyReportBody');
+  const meta = document.getElementById('nightlyReportMeta');
+  const chip = document.getElementById('nightlyReportStatus');
+  const toggle = document.getElementById('nightlyReportToggle');
+  const warning = document.getElementById('nightlyReportWarning');
+  if (!body) return;
+
+  if (isEmptySection(report)) {
+    reportKey = null;
+    if (meta) meta.textContent = '';
+    if (chip) chip.hidden = true;
+    if (toggle) toggle.hidden = true;
+    if (warning) warning.hidden = true;
+    const empty = document.createElement('div');
+    empty.className = 'empty';
+    empty.textContent = 'No report yet — first one lands after the next 07:00 run.';
+    body.classList.remove('is-collapsed');
+    body.replaceChildren(empty);
+    return;
+  }
+
+  const key = `${report.date}|${report.generatedAt}|${report.emailStatus}`;
+  if (key === reportKey) return;            // same report — leave the reader's toggle alone
+  reportKey = key;
+
+  if (meta) {
+    const when = report.generatedAt ? ` · generated ${fmtClockUTC(report.generatedAt)}` : '';
+    meta.textContent = `${fmtDayShort(report.date)}${when}`;
+  }
+
+  if (chip) {
+    const spec = REPORT_STATUS_CHIP[report.emailStatus];
+    chip.className = `report-chip${spec ? ` ${spec.cls}` : ''}`;
+    chip.textContent = spec ? spec.text : 'email status unknown';
+    chip.hidden = false;
+  }
+
+  if (warning) {
+    warning.hidden = report.validationPassed !== false;
+    if (!warning.hidden) {
+      warning.textContent = 'This report failed structural validation — it is the degraded fallback, not Claude’s summary.';
+    }
+  }
+
+  // The ONLY innerHTML on this page. `summaryHtml` is server-rendered by
+  // markdownToHtml() in functions/src/index.ts — the same HTML already trusted
+  // as an email body — and never leaves this container.
+  body.classList.add('is-collapsed');
+  body.innerHTML = report.summaryHtml ?? '';
+
+  if (toggle) {
+    // Only offer the toggle when there is something hidden below the fold.
+    const overflows = body.scrollHeight > body.clientHeight + 8;
+    toggle.hidden = !overflows;
+    toggle.textContent = 'Show full report';
+    toggle.setAttribute('aria-expanded', 'false');
+    if (!overflows) body.classList.remove('is-collapsed');
+  }
+}
+
+function wireReportToggle() {
+  const toggle = document.getElementById('nightlyReportToggle');
+  const body = document.getElementById('nightlyReportBody');
+  if (!toggle || !body) return;
+  toggle.addEventListener('click', () => {
+    const expanded = body.classList.toggle('is-collapsed') === false;
+    toggle.textContent = expanded ? 'Show less' : 'Show full report';
+    toggle.setAttribute('aria-expanded', String(expanded));
+  });
+}
+
 /* ------------------------------------------------------------- trend strip */
 
 function sparkline(card, { rows, valueKey, color, format, axisFormat }) {
@@ -356,7 +475,7 @@ function renderTrend(trend14d) {
 
 function setUpdated(payload) {
   const el = document.getElementById('lastUpdated');
-  if (el) el.textContent = `updated ${fmtClockUTC(payload?.now?.serverTime)}`;
+  if (el) el.textContent = `updated ${fmtClockUTC(payload?.generatedAt ?? payload?.now?.serverTime)}`;
 }
 
 function setStale(stale) {
@@ -365,11 +484,12 @@ function setStale(stale) {
 }
 
 function renderAll(payload) {
-  renderLiveRow(payload?.live ?? {}, payload?.now?.date);
-  renderYesterdayRow(payload?.yesterday);
-  renderTotalsRow(payload?.totals, payload?.live ?? {});
+  renderLiveRow(payload?.live ?? {}, payload?.today ?? payload?.now?.date);
+  renderYesterdayRow(flattenYesterday(payload?.yesterday));
+  renderTotalsRow(flattenTotals(payload?.totals), payload?.live ?? {});
   renderDataQuality(payload?.live ?? {});
   renderTrend(payload?.trend14d);
+  renderNightlyReport(payload?.nightlyReport);
   setUpdated(payload);
 }
 
@@ -405,6 +525,7 @@ async function load({ first }) {
 bootPage(async () => {
   const refresh = document.getElementById('refreshBtn');
   if (refresh) refresh.addEventListener('click', () => { void load({ first: false }); });
+  wireReportToggle();
 
   await load({ first: true });
 

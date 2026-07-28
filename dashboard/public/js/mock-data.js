@@ -109,6 +109,71 @@ export const MOCK_SCREEN_FLOW_EDGES = [
   { source: 'Body map', target: 'Home', count: 80 },
 ];
 
+/* --------------------------------------------------------- nightly report */
+
+/**
+ * Mirror of `markdownToHtml()` in functions/src/index.ts, inline styles and
+ * all. Kept literal on purpose: the card has to be styled against the HTML the
+ * server actually stores (h2s carrying an email-green inline colour, stray
+ * <br>s inside lists), not against an idealised version of it.
+ */
+function mockMarkdownToHtml(md) {
+  return md
+    .replace(/^## (.+)$/gm, '<h2 style="color:#6B7F6B;margin:16px 0 8px;font-size:18px;">$1</h2>')
+    .replace(/^- (.+)$/gm, '<li style="margin:4px 0;">$1</li>')
+    .replace(/(<li[^>]*>.*<\/li>\n?)+/g, (match) => `<ul style="padding-left:20px;">${match}</ul>`)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+}
+
+const MOCK_REPORT_MARKDOWN = [
+  '## TL;DR',
+  '',
+  '- **Steady day.** 195 DAU (+8 vs the day before) and 98 workouts completed — the highest since the plan-preferences release.',
+  '- **AI spend is flat at $0.42**, 21% of the daily call budget. No request type is drifting.',
+  '- **Two crash markers** landed overnight, both on the guided-workout screen. Worth a look, not an incident.',
+  '',
+  '## Engagement',
+  '',
+  '- Daily active users: 195 (+8 day over day)',
+  '- Sessions: 283, averaging 1.45 per active user',
+  '- Workouts completed: 98 of 121 started — a 81% completion rate',
+  '- Recovery insights viewed by 29 users, the third day of gentle growth',
+  '',
+  '## Funnel & Conversion',
+  '',
+  '- Sign-ins → onboarding completed: 82%',
+  '- Assessment started → submitted: 80%',
+  '- Submitted → plan generated: 63%, the weakest step of the funnel again',
+  '- Plan generated → workout started: 73%',
+  '',
+  '## AI Usage & Cost',
+  '',
+  '- Budget: 84/200 calls used today',
+  '- Today: 84 calls, 3 errors (3.6% error rate), $0.4184 spent, 2,400ms avg latency',
+  '- Yesterday: 91 calls, 1 error (1.1% error rate), $0.4530 spent',
+  '- Top request types by cost (today):',
+  '  - analysis: $0.1088',
+  '  - analysis_verify: $0.0837',
+  '  - rehab_plan: $0.0753',
+  '  - exercise_substitute: $0.0335',
+  '  - recovery_insights: $0.0293',
+  '',
+  '## Reliability & Data Quality',
+  '',
+  '- Crash markers (24h): 2, both on the guided-workout screen',
+  '- Session logs uploaded (24h): 145',
+  '- Response-validation rejections: 3 contraindication, 2 anatomical relevance, 1 parameter range',
+  '- Missing exercise images reported: 5',
+  '',
+  '## Watch List',
+  '',
+  '- **Submitted → plan generated (63%)** has sat below 70% for four days. The preferences sheet is the likeliest drop-off.',
+  '- **Contraindication rejections** are small but non-zero every day — worth sampling three of them by hand.',
+  '- **Missing exercise images** crept from 3 to 5; add the reported names to the next generation batch.',
+].join('\n');
+
 /* ------------------------------------------------------------------ overview */
 
 export function mockOverview() {
@@ -130,7 +195,9 @@ export function mockOverview() {
   const last = trend14d[trend14d.length - 1];
 
   return {
-    now: { serverTime: new Date().toISOString(), date: today },
+    // Mirrors buildOverviewPayload's top level (functions/src/dashboard-data.ts)
+    generatedAt: new Date().toISOString(),
+    today,
     live: {
       aiCallsToday: 84,
       aiBudgetLimit: 200,
@@ -146,24 +213,44 @@ export function mockOverview() {
       },
       missingExerciseImages: 5,
     },
+    // Both sections use the REAL API shapes (nested yesterday, deltas object)
+    // so mock mode exercises the same flatten adapters as production.
     totals: {
+      date: today,
       totalUsers: 1250,
       totalPlans: 3400,
       totalWorkoutSessions: 9800,
       activePlansCount: 260,
-      asOf: `${today}T01:00:00.000Z`,
-      totalUsersDelta7d: 45,
-      totalPlansDelta7d: 120,
+      comparedTo: isoDaysAgo(7),
+      deltas: {
+        totalUsers: 45,
+        totalPlans: 120,
+        totalWorkoutSessions: 210,
+        activePlansCount: 12,
+      },
     },
     yesterday: {
       date: yesterday,
-      dau: last.dau,
-      sessions: last.sessions,
-      workoutsCompleted: last.workoutsCompleted,
-      plansGenerated: 25,
-      aiCostUSD: last.aiCostUSD,
+      source: 'bigquery',
+      engagement: {
+        dau: last.dau,
+        totalSessions: last.sessions,
+        workoutsCompleted: last.workoutsCompleted,
+      },
+      funnel: { rehabPlanGenerated: 25 },
+      workout: { completed: last.workoutsCompleted },
+      ai: { totalCostUSD: last.aiCostUSD },
     },
     trend14d,
+    // "failed" is the realistic default here: SendGrid's account is
+    // deactivated, which is exactly why the report lives on the dashboard.
+    nightlyReport: {
+      date: today,
+      generatedAt: `${today}T04:03:12.000Z`,
+      summaryHtml: mockMarkdownToHtml(MOCK_REPORT_MARKDOWN),
+      validationPassed: true,
+      emailStatus: 'failed',
+    },
   };
 }
 

@@ -73,6 +73,36 @@ export const META_SCREEN_FLOW = "screenFlow";
 export const META_FUNNEL_SUMMARY = "funnelSummary";
 export const META_RETENTION = "retention";
 
+export const REPORTS_SUBCOLLECTION = "reports";
+
+/**
+ * `analytics/dashboard/reports` — one doc per nightly report, id = YYYY-MM-DD.
+ *
+ * Written by `sendNightlyReport` (index.ts) BEFORE it attempts the email, so
+ * the report survives a dead SendGrid account; read back here for the
+ * overview page's "Nightly report" card. Admin SDK only — `analytics/**` has
+ * no Firestore rule, so it is default-deny to every client.
+ */
+export function dashboardReportsCollection(
+  db: admin.firestore.Firestore,
+): admin.firestore.CollectionReference {
+  return db
+    .collection(ANALYTICS_ROOT_COLLECTION)
+    .doc(DASHBOARD_DOC_ID)
+    .collection(REPORTS_SUBCOLLECTION);
+}
+
+/**
+ * Delivery outcome recorded on a nightly-report doc.
+ *
+ * "skipped" covers both "no recipient configured" and "no SendGrid key" — and
+ * is also the value written on the pre-send persist, since at that moment
+ * nothing has been sent yet. The post-send merge write flips it to
+ * "sent"/"failed".
+ */
+export const NIGHTLY_REPORT_EMAIL_STATUSES = ["sent", "failed", "skipped"] as const;
+export type NightlyReportEmailStatus = (typeof NIGHTLY_REPORT_EMAIL_STATUSES)[number];
+
 /** `analytics/dailyAggregates/days` — written by aggregateDailyMetrics. */
 function dailyAggregatesCollection(
   db: admin.firestore.Firestore,
@@ -327,6 +357,43 @@ export function toJsonSafe(value: unknown): unknown {
   return value;
 }
 
+export interface NightlyReportSummary {
+  date: string;
+  generatedAt: string | null;
+  summaryHtml: string;
+  validationPassed: boolean;
+  emailStatus: NightlyReportEmailStatus | null;
+}
+
+/**
+ * Shape one `analytics/dashboard/reports/{YYYY-MM-DD}` doc for the API.
+ *
+ * Deliberately DROPS `summaryMarkdown` and `metricsText`: both are kept in
+ * Firestore for debugging, and shipping all three copies would triple a
+ * payload the overview page polls every 60s. Only the HTML is rendered.
+ *
+ * `validationPassed` defaults to false on a malformed doc — a report whose
+ * flag we can't read must not claim it passed. `emailStatus` is narrowed to
+ * the known union so the frontend's chip can switch on it safely.
+ */
+export function shapeNightlyReport(
+  date: string,
+  data: Record<string, unknown> | undefined,
+): NightlyReportSummary | null {
+  if (!data) return null;
+  const generatedAt = toJsonSafe(data.generatedAt ?? null);
+  const status = data.emailStatus;
+  return {
+    date: typeof data.date === "string" ? data.date : date,
+    generatedAt: typeof generatedAt === "string" ? generatedAt : null,
+    summaryHtml: typeof data.summaryHtml === "string" ? data.summaryHtml : "",
+    validationPassed: data.validationPassed === true,
+    emailStatus: (NIGHTLY_REPORT_EMAIL_STATUSES as readonly unknown[]).includes(status)
+      ? (status as NightlyReportEmailStatus)
+      : null,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Read helpers
 // ---------------------------------------------------------------------------
@@ -410,6 +477,7 @@ async function buildOverviewPayload(
     totals,
     yesterday,
     trend,
+    nightlyReport,
   ] = await Promise.all([
     // Live AI budget counter — lazily reset, see resolveAiCallsToday.
     safeRead(ctx, "aiDailyBudget", async () => {
@@ -510,6 +578,17 @@ async function buildOverviewPayload(
         .slice(-TREND_DAYS)
         .map((date) => buildTrendPoint(date, daily.get(date), ai.get(date)));
     }),
+
+    // Latest nightly report. Same ascending-range read as `totals` (a
+    // descending documentId() orderBy needs a manual index — see
+    // readRecentDateKeyedDocs). Its lookback is 7 days, so a job that has
+    // been dead for over a week correctly reads as "no report".
+    safeRead(ctx, "nightlyReport", async () => {
+      const recent = await readRecentDateKeyedDocs(dashboardReportsCollection(db), 1);
+      const latestId = [...recent.keys()].pop();
+      if (!latestId) return null;
+      return shapeNightlyReport(latestId, recent.get(latestId));
+    }),
   ]);
 
   return {
@@ -532,6 +611,7 @@ async function buildOverviewPayload(
     totals,
     yesterday,
     trend14d: trend,
+    nightlyReport,
   };
 }
 
