@@ -195,7 +195,7 @@ final class ExerciseImageService: @unchecked Sendable {
             if let existing = activeDownloads[cacheKey] { return existing }
             let new = Task<UIImage?, Never> {
                 let image = await self.downloadFromStorageByFilename(filename, cacheKey: cacheKey)
-                self.lock.withLock { self.activeDownloads.removeValue(forKey: cacheKey) }
+                _ = self.lock.withLock { self.activeDownloads.removeValue(forKey: cacheKey) }
                 return image
             }
             activeDownloads[cacheKey] = new
@@ -236,7 +236,7 @@ final class ExerciseImageService: @unchecked Sendable {
 
             let newTask = Task<UIImage?, Never> {
                 defer {
-                    self.lock.withLock { self.activeGenerations.removeValue(forKey: normalized) }
+                    _ = self.lock.withLock { self.activeGenerations.removeValue(forKey: normalized) }
                 }
                 return await self.performImageGeneration(for: exercise, user: user, normalized: normalized)
             }
@@ -278,7 +278,7 @@ final class ExerciseImageService: @unchecked Sendable {
                     // Image was found or generated — reload from Firebase Storage
                     // Update in-memory mapping if it's a new image
                     if status == "success", let imageUrl = json?["imageUrl"] as? String {
-                        AppLogger.images.info("On-demand image generated for \(exercise.name)")
+                        AppLogger.images.info("On-demand image generated for \(exercise.name) at \(imageUrl)")
                     }
                     return await loadImage(forKey: key)
                 }
@@ -565,7 +565,7 @@ final class ExerciseImageService: @unchecked Sendable {
 
             let newTask = Task<UIImage?, Never> {
                 let image = await self.downloadFromStorage(key: key)
-                self.lock.withLock { self.activeDownloads.removeValue(forKey: key) }
+                _ = self.lock.withLock { self.activeDownloads.removeValue(forKey: key) }
                 return image
             }
 

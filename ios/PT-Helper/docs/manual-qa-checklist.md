@@ -21,8 +21,10 @@ Backend note: verify which Firebase project this build points at before testing 
 - [ ] Grandfathered/returning user with no prior consent is still gated (not silently let through)
 
 ### Onboarding
+- [ ] 3-screen intro carousel appears before onboarding on first launch (and not on re-launch)
+- [ ] Intro carousel swipe + "Get Started" advance to onboarding correctly
 - [ ] Intro carousel shows COIL branding (teal, no red/"PT Helper" leftovers)
-- [ ] Onboarding steps show correct titles
+- [ ] Onboarding shows all 6 steps with correct titles
 - [ ] Fill basic info (name, DOB, sex, height, weight) — Continue enables
 - [ ] Skip through remaining steps — main app loads
 - [ ] Profile data persists on re-launch

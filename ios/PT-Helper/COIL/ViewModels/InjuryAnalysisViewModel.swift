@@ -161,8 +161,15 @@ class InjuryAnalysisViewModel: ObservableObject {
                                     "missingFields": missingFields.isEmpty ? "none" : missingFields.joined(separator: "; ")
                                   ])
 
+        // Snapshot values needed by the detached task before crossing the actor
+        // boundary. This avoids capturing `self` implicitly (Swift 6 forbids it
+        // inside Sendable closures) and removes a captured-var race between the
+        // outer Task's `[weak self]` and the inner Sendable `stageHandler`.
+        let profileSnapshot = userProfile
+        let apiServiceSnapshot = apiService
+
         analysisTask = Task { [weak self] in
-            let stageHandler: @Sendable (InjuryAnalyzer.Stage) -> Void = { stage in
+            let stageHandler: @Sendable (InjuryAnalyzer.Stage) -> Void = { [weak self] stage in
                 Task { @MainActor [weak self] in
                     self?.currentStage = stage
                 }
@@ -171,8 +178,8 @@ class InjuryAnalysisViewModel: ObservableObject {
             do {
                 let validated = try await InjuryAnalyzer.analyze(
                     assessments: completed,
-                    profile: userProfile,
-                    apiService: self?.apiService ?? ClaudeAPIService.shared,
+                    profile: profileSnapshot,
+                    apiService: apiServiceSnapshot,
                     onStage: stageHandler
                 )
                 guard !Task.isCancelled else {

@@ -17,14 +17,14 @@
 
 ```
 ios/PT-Helper/PT-Helper/
-├── Models/          # Data models (21 files)
-├── Services/        # API, validation, logging, caching (24 files)
+├── Models/          # Data models (22 files)
+├── Services/        # API, validation, logging, caching (27 files)
 ├── ViewModels/      # Business logic, state management (15 files)
-├── Views/           # SwiftUI views (69 files)
+├── Views/           # SwiftUI views (79 files)
 │   ├── Components/  # Reusable UI components
 │   ├── Dashboard/   # Dashboard widgets and charts
 │   └── OnboardingSteps/
-├── Resources/       # Exercise images (~190), JSON mappings
+├── Resources/       # Exercise images (1364 start+end frames), JSON mappings
 └── DesignSystem.swift  # Design tokens and shared components
 ```
 

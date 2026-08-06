@@ -5,6 +5,8 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # TestFlight uploads are manual only — see the `beta` job.
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -95,7 +97,12 @@ jobs:
   beta:
     name: TestFlight Upload
     needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Manual dispatch only. This job signs a real build and submits it to Apple,
+    # and `changelog_from_git_commits` publishes the last 10 commit subjects
+    # verbatim to testers — so it must never fire as a side effect of a merge or
+    # a branch promotion. Run it deliberately from the Actions tab, after
+    # checking what the changelog will say.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: macos-15
     timeout-minutes: 45
     defaults:

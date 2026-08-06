@@ -499,9 +499,6 @@ class PoseAnalysisEngine {
             var atMax: [String: Double] = [:]
 
             for pair in symmetryPairs {
-                let leftName = "left_\(String(pair.left.rawValue.dropFirst(4)))"  // leftShoulder → left_shoulder
-                let rightName = "right_\(String(pair.right.rawValue.dropFirst(5)))"  // rightShoulder → right_shoulder
-
                 // Get the angle name from commonAngles
                 let leftAngleName = BodyJoint3D.commonAngles.first { $0.name.hasPrefix("left_") && $0.vertex == pair.left }?.name
                 let rightAngleName = BodyJoint3D.commonAngles.first { $0.name.hasPrefix("right_") && $0.vertex == pair.right }?.name

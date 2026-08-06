@@ -57,9 +57,9 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
 ├── ios/PT-Helper/
 │   └── PT-Helper/
 │       ├── Models/            # Data models (22 files)
-│       ├── Services/          # API, validation, logging (28 files)
-│       ├── ViewModels/        # Business logic (15 files)
-│       ├── Views/             # SwiftUI views (81 files)
+│       ├── Services/          # API, validation, logging (33 files)
+│       ├── ViewModels/        # Business logic (14 files)
+│       ├── Views/             # SwiftUI views (71 files)
 │       │   ├── Components/    # Reusable UI components
 │       │   ├── Dashboard/     # Dashboard widgets and charts
 │       │   └── OnboardingSteps/  # Onboarding flow steps
@@ -79,8 +79,8 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
 │   ├── regen_with_auto_prompts.py  # Auto-prompt correction loop
 │   ├── qa_exercise_images.py
 │   ├── upload_to_firebase.sh
-│   ├── exercise_list.json          # Curated exercise metadata
-│   └── output/                     # Generated images + QA reports
+│   ├── exercise_list.json          # Curated exercise metadata (legacy 190)
+│   └── output/                     # 1364 generated start+end frames + QA reports
 ├── docs/                      # Brief, UX flows, safety, API, data models, privacy/terms
 ├── firebase.json              # Firebase deployment config
 └── firestore.rules            # Security rules
@@ -175,21 +175,32 @@ The app includes multiple safety layers:
 
 ## Exercise Image Pipeline
 
-1,364 exercise illustrations (start + end frames) generated with AI and uploaded to Firebase Storage:
+1,364 canonical exercises with start + end frame pairs, generated with AI and uploaded to Firebase Storage.
+
+> **Primary pipeline (current):** Nano Banana Pro (`gemini-3-pro-image-preview`) via
+> `scripts/generate_missing_images.py` and the auto-prompt correction loop in
+> `scripts/regen_with_auto_prompts.py`.
+>
+> **Legacy pipeline:** FLUX 2 Pro via BFL API (`scripts/generate_exercise_images.py`) is
+> deprecated for new image work. Note: the on-demand `generateExerciseImage` Cloud
+> Function may still call FLUX — migration to Nano Banana Pro is an open item.
 
 ```bash
-# Generate missing images (requires Gemini API key)
+# Generate missing images with Nano Banana Pro (Gemini API key)
 cd scripts
 python generate_missing_images.py --api-key YOUR_GEMINI_KEY
 
-# Auto-prompt correction loop: re-prompt failures with anti-error cues
+# Auto-prompt correction loop (regenerate failures with targeted prompts)
 python regen_with_auto_prompts.py --api-key YOUR_GEMINI_KEY
 
-# Run automated QA
+# Run automated QA (Gemini 2.5 Flash)
 python qa_exercise_images.py --api-key YOUR_GEMINI_KEY
 
 # Upload PNGs + mapping to Firebase Storage (needs `gcloud auth login`)
 ./upload_to_firebase.sh
+
+# Legacy: FLUX 2 Pro generation (requires BFL API key)
+python generate_exercise_images.py --api-key YOUR_BFL_KEY
 ```
 
 - **Generator**: Nano Banana Pro (`gemini-3-pro-image-preview`) with structured pose descriptions — far better prompt adherence than the legacy FLUX pipeline

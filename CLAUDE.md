@@ -68,28 +68,30 @@ Full rules: `~/.claude/projects/-Users-noyfisher-IOS-Projects-PT-Helper-Agent-v1
 ### MVVM + Services Pattern
 The iOS app (`ios/PT-Helper/COIL/`) uses MVVM with a singleton service layer:
 
-- **Models/** (20 files) — Codable structs and analyzers:
+- **Models/** (22 files) — Codable structs and analyzers:
   - Core: `UserProfile`, `PainAssessment`, `RehabPlan`, `BodyRegion`, `BodyZone`, `BodyMapConstants`
   - Analysis: `InjuryAnalyzer`, `AssessmentSnapshot`
   - Wellness: `WellnessAnalyzer`, `WellnessAnalysisResult`, `WellnessAssessment`
   - Recovery: `RecoveryInsight`, `AdaptiveProgressionAnalyzer`, `ProgressionRule`
   - Workout: `WorkoutSession`, `Achievement`
   - Form: `FormAnalysis`
+  - Outcome: `OutcomeFeedback`
   - Other: `Note`, `SessionEvent`, `LegalContent`
 - **ViewModels/** (14 files) — `@MainActor @ObservableObject` classes that own business logic and publish UI state
   - `InjuryAnalysisViewModel`, `RehabPlanViewModel`, `GuidedWorkoutViewModel`, `SavedPlansViewModel`, `WorkoutViewModel`
   - `WellnessAnalysisViewModel`, `WellnessPlanViewModel`, `RecoveryInsightsViewModel`
   - `FormAnalysisViewModel`, `ExerciseSwapViewModel`, `ReAssessmentViewModel`
   - `BodyMapViewModel`, `OnboardingViewModel`, `NotesViewModel`
-- **Views/** (69 files) — SwiftUI views using `@ObservedObject`/`@StateObject`. Navigation via `NavigationStack`
+- **Views/** (71 files total: 45 top-level + 19 Components + 6 OnboardingSteps + 1 Debug) — SwiftUI views using `@ObservedObject`/`@StateObject`. Navigation via `NavigationStack`
   - `Components/` — Reusable UI (exercise image, phase stepper, body silhouette, video recorder, etc.)
   - `OnboardingSteps/` — Multi-step health profile collection (basic info, injury/surgical/medical history, activity level, review)
-- **Services/** (24 files) — Singletons (`static let shared`) for API, persistence, validation, logging
+- **Services/** (33 files) — Singletons (`static let shared`) for API, persistence, validation, logging
   - API: `ClaudeAPIService`, `APIConfig`
-  - Validation: `ResponseValidationPipeline`, `BiomechanicalRuleEngine`, `FormFeedbackValidationPipeline`, `KnowledgeGraphService`, `CrossModelVerificationService`, `DataQualityScorer`, `InputSanitizer`
+  - Validation: `ResponseValidationPipeline`, `BiomechanicalRuleEngine`, `FormFeedbackValidationPipeline`, `KnowledgeGraphService`, `CrossModelVerificationService`, `DataQualityScorer`, `InputSanitizer`, `ShadowModeJSONParser`
   - Pose: `PoseDetectionService`, `PoseAnalysisEngine`
-  - Data: `UserProfileService`, `ExerciseImageService`, `BodyModelCache`, `AnalysisResultStore`
+  - Data: `UserProfileService`, `ExerciseImageService`, `BodyModelCache`, `AnalysisResultStore`, `OutcomeRecorder`
   - Logging: `SessionLogger`, `AppLogger`, `AnalyticsService`
+  - Safety: `SeriousWarningAcknowledgements`
   - Infra: `NetworkMonitor`, `NotificationService`, `StreakService`, `PDFExportService`, `HistoryRelevanceFilter`, `TestDataSeeder`
 
 ### AI Request Types
@@ -126,7 +128,7 @@ The core injury analysis uses a two-call pipeline in `InjuryAnalyzer.swift`:
 The wellness analysis follows the same two-call pattern (`wellness_analysis` + `wellness_verify`) in `WellnessAnalyzer.swift`.
 
 ### Rehab Plan Validation
-`ResponseValidationPipeline.validateRehabPlan()` runs 8 steps:
+`ResponseValidationPipeline.validateRehabPlan()` runs 9 steps:
 1. Hardcoded contraindication check (exercise vs. condition)
 2. Knowledge graph validation (`KnowledgeGraphService` — deterministic verification)
 3. Parameter range validation (sets, reps, rest within safe bounds)
@@ -192,12 +194,14 @@ Firebase Cloud Functions in `functions/src/`:
 
 | Function | Type | Purpose |
 |---|---|---|
+| `onBudgetAlert` | Pub/Sub | Hard billing shutoff on budget overspend |
 | `claudeProxy` | HTTP | Routes AI requests to Claude API with rate limiting (20 req/min/user) |
 | `crossVerify` | HTTP | Cross-model verification for rehab plans |
 | `agentInsights` | HTTP | Managed Agent for recovery insights |
 | `createVirtualUserToken` | HTTP | Virtual user token for testing |
-| `aggregateDailyMetrics` | Scheduled (daily 01:00) | Daily analytics aggregation |
-| `sendNightlyReport` | Scheduled | Nightly product analytics digest via SendGrid |
+| `generateExerciseImage` | HTTP | On-demand exercise image generation |
+| `aggregateDailyMetrics` | Scheduled (daily 01:00 UTC) | Daily analytics aggregation |
+| `sendNightlyReport` | Scheduled (07:00 Asia/Jerusalem) | Nightly product analytics digest via SendGrid |
 
 Supporting modules:
 - `managed-agent.ts` — Managed Agents API client, ephemeral session handling, `submit_recovery_insights` tool
@@ -239,6 +243,7 @@ The app supports UI testing via launch arguments handled by `TestDataSeeder`:
 - `--clear-coach-mark` — Resets body map coach mark
 - `--clear-workout-checkpoint` — Removes any saved workout checkpoint
 - `--prefill-weight` — Pre-populates weight in profile
+- `--show-intro` — Forces the intro carousel to display on launch
 
 Accessibility identifiers follow `screenName.elementName` convention (e.g., `workout.completeSetButton`).
 
@@ -277,10 +282,12 @@ Xcode 16 uses `PBXFileSystemSynchronizedRootGroup` — new Swift files are auto-
 Use `.trackScreen("ScreenName")` modifier on new views. `SessionLogger` auto-tracks navigation, API calls, errors, and crash recovery.
 
 ## Exercise Image Pipeline
-~190 AI-generated exercise illustrations in `scripts/output/`. Generation uses FLUX 2 Pro (BFL API), QA uses Gemini 2.5 Flash vision. To add a new exercise:
-1. Add metadata to `scripts/exercise_list.json`
-2. Generate: `python scripts/generate_exercise_images.py --api-key KEY --exercise "name"`
-3. QA: `python scripts/qa_exercise_images.py --api-key KEY`
-4. Copy PNGs + `exercise_image_mapping.json` to `ios/PT-Helper/COIL/Resources/`
+1364 AI-generated exercise illustrations (start + end frame pairs) in `scripts/output/`. Primary generation uses **Nano Banana Pro** (`gemini-3-pro-image-preview`); QA uses Gemini 2.5 Flash vision. FLUX 2 Pro (BFL API) is legacy and only retained for the on-demand `generateExerciseImage` Cloud Function (migration to Nano Banana Pro is an open item).
 
-Image resolution in `ExerciseImageService.swift` uses 7-layer fuzzy matching: exact name → normalized → alias → prefix → suffix → plural toggle → synonym expansion.
+To add a new exercise:
+1. Add metadata to `scripts/output/all_exercises_metadata.json` (canonical) or `scripts/exercise_list.json` (legacy curated 190)
+2. Generate: `python scripts/generate_missing_images.py` (Nano Banana Pro + inline QA)
+3. For failures: `python scripts/regen_with_auto_prompts.py` (Gemini observation → targeted anti-error prompt → regen)
+4. Rebuild mapping: `python scripts/rebuild_image_mapping.py` (syncs PNGs + mapping to iOS Resources)
+
+Image resolution in `ExerciseImageService.swift` uses 8-layer fuzzy matching: exact name → normalized → alias → prefix → suffix → plural toggle → synonym expansion → stockpile alias fallback.

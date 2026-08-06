@@ -10,8 +10,10 @@ PT Helper uses Firebase Cloud Functions as a secure proxy between the iOS app an
 | `crossVerify` | HTTP POST | Cross-model verification for rehab plans |
 | `agentInsights` | HTTP POST | Managed Agent for recovery insights |
 | `createVirtualUserToken` | HTTP POST | Virtual user token for testing |
+| `generateExerciseImage` | HTTP POST | On-demand exercise image generation |
 | `aggregateDailyMetrics` | Scheduled (daily 01:00) | Daily analytics aggregation |
 | `sendNightlyReport` | Scheduled | Nightly product analytics digest via SendGrid |
+| `onBudgetAlert` | Pub/Sub | Billing budget alert handler (auto-disable on threshold) |
 
 ## claudeProxy Endpoint
 
