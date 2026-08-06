@@ -38,6 +38,7 @@ import {
   shapeScreenFlow,
   buildFunnelSummarySteps,
   shapeRetentionCohorts,
+  summarizeRunFailures,
 } from "../src/analytics-pull";
 
 // ---------------------------------------------------------------------------
@@ -104,9 +105,20 @@ describe("day key offsets", () => {
     expect(recentDayKeys(-5, now)).toEqual([]);
   });
 
-  it("builds an inclusive window ending today", () => {
-    expect(windowSuffixes(30, now)).toEqual({ start: "20260627", end: "20260726" });
-    expect(windowSuffixes(1, now)).toEqual({ start: "20260726", end: "20260726" });
+  it("builds an inclusive window ending yesterday", () => {
+    // Today is excluded — GA4 has published no shard for it. A 30-day window
+    // must therefore cover 30 COMPLETED days, ending yesterday.
+    expect(windowSuffixes(30, now)).toEqual({ start: "20260626", end: "20260725" });
+    expect(windowSuffixes(1, now)).toEqual({ start: "20260725", end: "20260725" });
+  });
+
+  it("covers exactly `days` completed shards, matching what recentDayKeys lists", () => {
+    // The two helpers must agree: whatever recentDayKeys(n) enumerates is
+    // exactly what windowSuffixes(n) must bound.
+    const days = recentDayKeys(30, now);
+    const window = windowSuffixes(30, now);
+    expect(window.end).toBe(shardSuffix(days[0]));            // most recent = yesterday
+    expect(window.start).toBe(shardSuffix(days[days.length - 1])); // oldest
   });
 });
 
@@ -497,5 +509,68 @@ describe("shapeRetentionCohorts", () => {
 
   it("returns an empty list for no rows", () => {
     expect(shapeRetentionCohorts([])).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Fail-closed scheduling
+// ---------------------------------------------------------------------------
+
+describe("summarizeRunFailures", () => {
+  const cleanRollups = {
+    screenFlow: "ok" as const,
+    funnelSummary: "ok" as const,
+    retention: "ok" as const,
+  };
+
+  it("returns null when every step succeeded", () => {
+    expect(summarizeRunFailures(
+      [{ date: "2026-07-25", status: "ok" }, { date: "2026-07-24", status: "ok" }],
+      cleanRollups,
+    )).toBeNull();
+  });
+
+  it("treats no_data as success, not failure", () => {
+    // A quiet day with no GA4 rows is a legitimate outcome. Failing the run
+    // for it would cry wolf every low-traffic day on dev.
+    expect(summarizeRunFailures(
+      [{ date: "2026-07-25", status: "no_data" }],
+      { ...cleanRollups, screenFlow: "no_data" },
+    )).toBeNull();
+  });
+
+  it("names a failed day", () => {
+    const msg = summarizeRunFailures(
+      [{ date: "2026-07-25", status: "error" }, { date: "2026-07-24", status: "ok" }],
+      cleanRollups,
+    );
+    expect(msg).toContain("2026-07-25");
+    expect(msg).not.toContain("2026-07-24");
+  });
+
+  it("names failed rollups", () => {
+    const msg = summarizeRunFailures([], { ...cleanRollups, retention: "error" });
+    expect(msg).toContain("retention");
+    expect(msg).not.toContain("screenFlow");
+  });
+
+  it("reports days and rollups together when both fail", () => {
+    const msg = summarizeRunFailures(
+      [{ date: "2026-07-25", status: "error" }],
+      { screenFlow: "error", funnelSummary: "ok", retention: "error" },
+    );
+    expect(msg).toContain("2026-07-25");
+    expect(msg).toContain("screenFlow");
+    expect(msg).toContain("retention");
+    expect(msg).not.toContain("funnelSummary");
+  });
+
+  it("fails the run when a total outage makes every step error", () => {
+    // Expired BigQuery credentials look like this. Before the fix it was
+    // indistinguishable from a clean run.
+    expect(summarizeRunFailures(
+      [{ date: "2026-07-25", status: "error" }, { date: "2026-07-24", status: "error" }],
+      { screenFlow: "error", funnelSummary: "error", retention: "error" },
+    )).not.toBeNull();
   });
 });

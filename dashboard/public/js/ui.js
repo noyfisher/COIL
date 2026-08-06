@@ -13,10 +13,20 @@
  * area washes, and a crosshair tooltip on every time series.
  */
 
+import { isMockAllowed } from './mock-gate.js';
+
 /* ---------------------------------------------------------------- mock mode */
 
-/** `?mock=1` short-circuits auth and serves fixtures (see js/mock-data.js). */
-export const IS_MOCK = new URLSearchParams(window.location.search).get('mock') === '1';
+/**
+ * `?mock=1` short-circuits auth and serves fixtures (see js/mock-data.js), and
+ * is honoured on local hosts ONLY — see js/mock-gate.js for why the predicate
+ * lives in its own module.
+ *
+ * Defined here because api.js and auth.js both import `IS_MOCK` from ui.js;
+ * gating it once at this definition closes the path everywhere without
+ * touching those call sites.
+ */
+export const IS_MOCK = isMockAllowed(window.location.hostname, window.location.search);
 
 /* ------------------------------------------------------------------ screens */
 

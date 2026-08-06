@@ -119,6 +119,12 @@ export const MOCK_SCREEN_FLOW_EDGES = [
  */
 function mockMarkdownToHtml(md) {
   return md
+    // Escape first, exactly as the server does — the fixture must not imply
+    // the card can render raw HTML the real pipeline would have escaped.
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
     .replace(/^## (.+)$/gm, '<h2 style="color:#6B7F6B;margin:16px 0 8px;font-size:18px;">$1</h2>')
     .replace(/^- (.+)$/gm, '<li style="margin:4px 0;">$1</li>')
     .replace(/(<li[^>]*>.*<\/li>\n?)+/g, (match) => `<ul style="padding-left:20px;">${match}</ul>`)

@@ -245,12 +245,20 @@ export async function recordAiUsage(entry: AiUsageEntry): Promise<void> {
   try {
     const normalized = normalizeAiUsageEntry(entry);
     const db = admin.firestore();
-    await Promise.all([
-      db.collection(AI_USAGE_COLLECTION).add(buildUsageDoc(normalized)),
-      db.collection(AI_USAGE_DAILY_COLLECTION)
-        .doc(normalized.day)
-        .set(buildDailyRollup(normalized), { merge: true }),
-    ]);
+
+    // ONE atomic commit, not two independent writes. The per-call record and
+    // the daily rollup describe the same event: if only one lands, the rollup
+    // silently disagrees with the records it summarizes, forever — there is no
+    // retry and no reconciliation pass. A batch makes partial application
+    // impossible, so a failure loses both or neither.
+    const batch = db.batch();
+    batch.set(db.collection(AI_USAGE_COLLECTION).doc(), buildUsageDoc(normalized));
+    batch.set(
+      db.collection(AI_USAGE_DAILY_COLLECTION).doc(normalized.day),
+      buildDailyRollup(normalized),
+      { merge: true },
+    );
+    await batch.commit();
   } catch (err) {
     // Telemetry must never surface to the caller. Warn and move on.
     try {

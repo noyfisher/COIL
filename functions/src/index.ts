@@ -1413,9 +1413,31 @@ async function collectMetrics(): Promise<string> {
   return lines.join("\n");
 }
 
-function markdownToHtml(md: string): string {
-  // Simple markdown → HTML for email
-  return md
+/**
+ * Escape the four characters that can break out of HTML text or an attribute
+ * value. MUST run before the markdown replaces below, which inject their own
+ * trusted tags — escaping afterwards would mangle those.
+ */
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/**
+ * Simple markdown → HTML. The input is NOT trusted: it is either Claude's
+ * generated nightly summary or, on the validation-failure path, `metricsText`
+ * with raw thrown errors interpolated into it. The output is stored on the
+ * report doc and assigned to `innerHTML` by the dashboard
+ * (dashboard/public/js/overview.js), so unescaped input here is stored XSS
+ * against whoever opens the dashboard. Escape first, then add markup.
+ *
+ * Exported for testing — see functions/test/markdown-to-html.test.ts.
+ */
+export function markdownToHtml(md: string): string {
+  return escapeHtml(md)
     .replace(/^## (.+)$/gm, "<h2 style=\"color:#6B7F6B;margin:16px 0 8px;font-size:18px;\">$1</h2>")
     .replace(/^- (.+)$/gm, "<li style=\"margin:4px 0;\">$1</li>")
     .replace(/(<li[^>]*>.*<\/li>\n?)+/g, (match) => `<ul style="padding-left:20px;">${match}</ul>`)
@@ -1894,6 +1916,23 @@ export const agentInsights = functions
       logWarn(ctx, "agent_fallback", { stage: "managed_agent", fallbackReason: agentErr instanceof Error ? agentErr.message : String(agentErr) });
       ctx.metadata.path = "fallback";
 
+      // The agent attempt happened and must be counted, even though it failed.
+      // Without this record the only trace of a managed-agent call is the
+      // fallback that replaced it, so the dashboard reads a 100% agent success
+      // rate no matter how often the agent is actually failing. Cost stays null
+      // for the same reason as the success path: agent tokens are not
+      // observable from this handler.
+      await recordAiUsage({
+        fn: "agentInsights",
+        requestType: "recovery_insights",
+        provider: "anthropic",
+        model: "managed_agent",
+        durationMs: Date.now() - agentStartedAt,
+        status: "error",
+        costUSD: null,
+        estimated: true,
+      });
+
       const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
       if (!anthropicApiKey) {
         res.status(500).json({ error: "Server configuration error" });
@@ -2139,6 +2178,18 @@ export const agentFormAnalysis = functions
       // its JSON shape has no cross-session fields).
       logWarn(ctx, "agent_fallback", { stage: "form_agent", fallbackReason: agentErr instanceof Error ? agentErr.message : String(agentErr) });
       ctx.metadata.path = "fallback";
+
+      // Count the failed agent attempt — see the matching note in agentInsights.
+      await recordAiUsage({
+        fn: "agentFormAnalysis",
+        requestType: "form_analysis",
+        provider: "anthropic",
+        model: "managed_agent",
+        durationMs: Date.now() - agentStartedAt,
+        status: "error",
+        costUSD: null,
+        estimated: true,
+      });
 
       const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
       if (!anthropicApiKey) {

@@ -123,12 +123,19 @@ export function recentDayKeys(count: number, now: Date): string[] {
   return days;
 }
 
-/** Inclusive `_TABLE_SUFFIX` bounds for a window of `days` ending today. */
+/**
+ * Inclusive `_TABLE_SUFFIX` bounds for a window of `days` ending YESTERDAY.
+ *
+ * Today is excluded for the same reason as in `recentDayKeys`: GA4 has not
+ * exported a shard for it. Ending on today would scan one fewer completed day
+ * than the caller asked for while the meta doc still advertised the full
+ * `windowDays` — a "30-day" rollup built from 29 days of data.
+ */
 export function windowSuffixes(days: number, now: Date): { start: string; end: string } {
   const span = Math.max(1, Math.floor(days));
   return {
-    start: assertShardSuffix(shardSuffix(offsetDayKey(now, -(span - 1)))),
-    end: assertShardSuffix(shardSuffix(dayKeyOf(now))),
+    start: assertShardSuffix(shardSuffix(offsetDayKey(now, -span))),
+    end: assertShardSuffix(shardSuffix(offsetDayKey(now, -1))),
   };
 }
 
@@ -722,7 +729,10 @@ export async function materializeRollups(parentCtx?: RequestContext): Promise<Ro
   const now = new Date();
   const window = windowSuffixes(ROLLUP_WINDOW_DAYS, now);
   const retentionWindow = windowSuffixes(RETENTION_WINDOW_DAYS, now);
-  const windowEnd = dayKeyOf(now);
+  // Must name the last shard actually aggregated, not "now" — `windowSuffixes`
+  // ends on yesterday, so dating these docs today would make the stored
+  // metadata contradict the data it describes.
+  const windowEnd = offsetDayKey(now, -1);
   const serverTimestamp = () => admin.firestore.FieldValue.serverTimestamp();
 
   const screenFlow = await runRollup(ctx, META_SCREEN_FLOW, async () => {
@@ -766,6 +776,31 @@ export async function materializeRollups(parentCtx?: RequestContext): Promise<Ro
 // ---------------------------------------------------------------------------
 // Cloud Function: pullDailyAnalytics (scheduled)
 // ---------------------------------------------------------------------------
+
+/**
+ * Name the steps that failed, or `null` when the run was clean.
+ *
+ * `no_data` is NOT a failure: a day with no GA4 rows is a legitimate outcome
+ * (a quiet day, or a shard GA4 published empty). Only `"error"` counts.
+ *
+ * Exported and pure so the fail-closed behavior below is testable — the
+ * `onSchedule` handler itself is never invoked by the Jest suite.
+ */
+export function summarizeRunFailures(
+  results: DayResult[],
+  rollups: RollupResults,
+): string | null {
+  const failedDays = results.filter((r) => r.status === "error").map((r) => r.date);
+  const failedRollups = (Object.keys(rollups) as (keyof RollupResults)[])
+    .filter((k) => rollups[k] === "error");
+
+  if (failedDays.length === 0 && failedRollups.length === 0) return null;
+
+  const parts: string[] = [];
+  if (failedDays.length > 0) parts.push(`days: ${failedDays.join(", ")}`);
+  if (failedRollups.length > 0) parts.push(`rollups: ${failedRollups.join(", ")}`);
+  return `pullDailyAnalytics had failing steps — ${parts.join("; ")}`;
+}
 
 /**
  * 17:00 UTC — comfortably after GA4's daily export lands (~08:00–09:30 PT,
@@ -814,6 +849,15 @@ export const pullDailyAnalytics = onSchedule(
       days: results.map((r) => `${r.date}:${r.status}`).join(","),
       rollups: `screenFlow:${rollups.screenFlow},funnelSummary:${rollups.funnelSummary},retention:${rollups.retention}`,
     });
+
+    // Fail the execution if any step errored. Every step above is deliberately
+    // isolated so one failure cannot skip the rest — but swallowing them all
+    // and returning normally made a total outage (expired BigQuery
+    // permissions, say) indistinguishable from a clean run, leaving the
+    // dashboard silently stale. Throw AFTER the completion log so the
+    // per-step detail is still recorded.
+    const failure = summarizeRunFailures(results, rollups);
+    if (failure) throw new Error(failure);
   },
 );
 

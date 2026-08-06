@@ -360,8 +360,10 @@ function renderNightlyReport(report) {
   }
 
   // The ONLY innerHTML on this page. `summaryHtml` is server-rendered by
-  // markdownToHtml() in functions/src/index.ts — the same HTML already trusted
-  // as an email body — and never leaves this container.
+  // markdownToHtml() in functions/src/index.ts, which HTML-escapes its input
+  // before adding markup — the report text itself (Claude's summary, or raw
+  // error strings on the degraded path) is NOT trusted and must stay escaped
+  // at that choke point. Do not render report text through any other sink.
   body.classList.add('is-collapsed');
   body.innerHTML = report.summaryHtml ?? '';
 
