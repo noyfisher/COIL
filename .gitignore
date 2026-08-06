@@ -29,6 +29,14 @@ ios/PT-Helper/build/
 .claude/worktrees/
 .claude/scheduled_tasks.lock
 
+# Agent tooling — local mirrors of .claude/skills, not the tracked source of truth
+.agents/
+.codex/
+
+# Firebase CLI deploy cache
+.firebase/
+firebase-debug.log
+
 # Exercise image pipeline — local iteration artifacts (not shipped)
 scripts/output/_auto_prompt_backup/
 scripts/output/_flux_backup/
