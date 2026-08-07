@@ -1458,6 +1458,21 @@ export function resolveReportRecipient(env: NodeJS.ProcessEnv = process.env): st
   return recipient ? recipient : null;
 }
 
+/**
+ * The nightly-report SendGrid sender, configured the same way and for the same
+ * reason as the recipient above. Returns null when `REPORT_SENDER_EMAIL` is
+ * unset/blank so the caller skips sending — no personal-email fallback.
+ *
+ * A hardcoded sender is worse than a hardcoded recipient: it ships an individual's
+ * address in source (this repo's default branch is public), and SendGrid rejects
+ * any sender that isn't verified on the account, so a baked-in address silently
+ * becomes wrong the moment the sending account changes.
+ */
+export function resolveReportSender(env: NodeJS.ProcessEnv = process.env): string | null {
+  const sender = env.REPORT_SENDER_EMAIL?.trim();
+  return sender ? sender : null;
+}
+
 // ---------------------------------------------------------------------------
 // Nightly report → dashboard persistence
 // ---------------------------------------------------------------------------
@@ -1719,6 +1734,7 @@ export const sendNightlyReport = onSchedule(
     const summaryHtml = markdownToHtml(summary);
     const sendgridKey = process.env.SENDGRID_API_KEY;
     const recipientEmail = resolveReportRecipient();
+    const senderEmail = resolveReportSender();
 
     await persistNightlyReport(
       ctx,
@@ -1739,6 +1755,11 @@ export const sendNightlyReport = onSchedule(
     // No personal-email fallback (P3-03): skip the send when no org recipient is set.
     if (!recipientEmail) {
       console.warn("sendNightlyReport: REPORT_RECIPIENT_EMAIL not configured — skipping send");
+      return;
+    }
+
+    if (!senderEmail) {
+      console.warn("sendNightlyReport: REPORT_SENDER_EMAIL not configured — skipping send");
       return;
     }
 
@@ -1772,7 +1793,7 @@ export const sendNightlyReport = onSchedule(
     try {
       await sgMail.send({
         to: recipientEmail,
-        from: { email: "noyfisher2003@gmail.com", name: "PT Helper Reports" },
+        from: { email: senderEmail, name: "PT Helper Reports" },
         subject: `PT Helper Daily Report — ${reportDate}`,
         html: htmlBody,
       });
