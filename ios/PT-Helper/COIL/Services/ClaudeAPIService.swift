@@ -317,9 +317,12 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
                 }
                 let elapsed = elapsedMsInt()
                 let responseBytes = data.count
+                // Snapshot the loop-mutated var before it crosses into the
+                // MainActor closure — capturing it directly is a Swift 6 error.
+                let failedStatusCode = statusCode
                 await MainActor.run {
                     let interfaceType = NetworkMonitor.shared.connectionType.description
-                    var extras = ["statusCode": "\(statusCode)"]
+                    var extras = ["statusCode": "\(failedStatusCode)"]
                     if retrying { extras["attempt"] = "\(attempt)" }
                     SessionLogger.shared.logAPI(.apiCallFailed, endpoint: call.endpointName,
                         metadata: Self.makeTelemetryMetadata(
@@ -354,6 +357,8 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
         let elapsed = elapsedMsInt()
         let responseBytes = data.count
         let textCount = text.count
+        // Same reason as the failure path above: snapshot before the closure.
+        let winningAttempt = succeededAttempt
         await MainActor.run {
             let interfaceType = NetworkMonitor.shared.connectionType.description
             SessionLogger.shared.logAPI(.apiCallSucceeded, endpoint: call.endpointName,
@@ -363,7 +368,7 @@ class ClaudeAPIService: ClaudeAPIServiceProtocol {
                     requestBytes: requestBytes,
                     responseBytes: responseBytes,
                     elapsedMs: elapsed,
-                    extras: ["statusCode": "200", "responseLength": "\(textCount)", "attempt": "\(succeededAttempt)"]))
+                    extras: ["statusCode": "200", "responseLength": "\(textCount)", "attempt": "\(winningAttempt)"]))
         }
 
         // Clean up the response — strip markdown code fences if present

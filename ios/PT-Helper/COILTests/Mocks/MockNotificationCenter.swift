@@ -8,7 +8,7 @@ final class MockNotificationCenter: NotificationScheduling, @unchecked Sendable 
     var removeAllCallCount: Int = 0
     var pendingStub: [UNNotificationRequest] = []
 
-    func add(_ request: UNNotificationRequest, withCompletionHandler completionHandler: ((Error?) -> Void)?) {
+    func add(_ request: UNNotificationRequest, withCompletionHandler completionHandler: (@Sendable (Error?) -> Void)?) {
         addedRequests.append(request)
         completionHandler?(nil)
     }

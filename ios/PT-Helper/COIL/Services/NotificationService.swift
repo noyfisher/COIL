@@ -6,7 +6,10 @@ import UserNotifications
 
 /// Seam for unit-testing scheduling without the real notification center.
 protocol NotificationScheduling: AnyObject {
-    func add(_ request: UNNotificationRequest, withCompletionHandler completionHandler: ((Error?) -> Void)?)
+    // The completion handler must be @Sendable to match UNUserNotificationCenter's
+    // own signature under the iOS 26 SDK — without it the conformance below is a
+    // Swift 6 sendability mismatch (and an error here, since warnings are errors).
+    func add(_ request: UNNotificationRequest, withCompletionHandler completionHandler: (@Sendable (Error?) -> Void)?)
     func removePendingNotificationRequests(withIdentifiers identifiers: [String])
     func removeAllPendingNotificationRequests()
     func pendingNotificationRequests() async -> [UNNotificationRequest]

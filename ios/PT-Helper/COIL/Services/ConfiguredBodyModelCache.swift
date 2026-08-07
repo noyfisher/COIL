@@ -24,13 +24,13 @@ final class ConfiguredBodyModelCache {
     /// on first use and reusing it for every subsequent call.
     func configuredModel(regionKeys: Set<String>, buildTemplate: (Entity) -> Void) async throws -> Entity {
         if let template {
-            return await template.clone(recursive: true)
+            return template.clone(recursive: true)
         }
 
         let raw = try await BodyModelCache.shared.loadModel()
         buildTemplate(raw)
         template = raw
-        return await raw.clone(recursive: true)
+        return raw.clone(recursive: true)
     }
 
     @objc private func handleMemoryWarning() {

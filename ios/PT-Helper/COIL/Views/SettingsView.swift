@@ -297,7 +297,9 @@ struct SettingsView: View {
     private func requestAppReview() {
         guard let scene = UIApplication.shared.connectedScenes
             .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene else { return }
-        SKStoreReviewController.requestReview(in: scene)
+        // SKStoreReviewController was deprecated in iOS 18; the deployment
+        // target is 18.2, so the StoreKit 2 entry point is always available.
+        AppStore.requestReview(in: scene)
     }
 
     private var appVersionText: String {
