@@ -26,6 +26,20 @@ a plain `npm audit fix` reached every critical/high advisory, and the patched ve
 are the newest-in-range, so a fresh resolve keeps them. The CI advisory gate is the
 durable backstop against any regression.
 
+### 2026-08-06 — `brace-expansion` returned, fixed in-range again
+
+The gate caught a **second** high on the same package, published after the PR-5 sweep:
+GHSA-rgw5-rvv9-x895 (CVSS 7.5), which bypasses the CVE-2026-14257 mitigation that the
+first fix relied on, plus GHSA-mh99-v99m-4gvg. Reached transitively via
+`@google-cloud/billing → google-gax → rimraf → glob → minimatch`.
+
+Fixed with `npm update brace-expansion` (2.1.2 → 2.1.4); `minimatch` declares
+`^2.0.2`, so this is in-range and lockfile-only. Build clean, 291 tests green.
+
+This is the gate working as designed — the advisory set drifts over time even when
+the lockfile does not, so a previously-cleared package can go red again without any
+dependency change on our side.
+
 ## Accepted residuals (9 moderate)
 
 | Package | Advisory | Fix requires | Accepted because |
