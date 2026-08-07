@@ -23,21 +23,21 @@ Parse `$ARGUMENTS` to determine what to run:
 
 1. **No arguments** → run UnitPlan (the default for day-to-day development)
 2. **Plan name** (`smoke`, `unit`, `full`, `prerelease`) → run the corresponding test plan
-3. **Test path** (contains `/`, e.g. `PT-HelperTests/UserProfileTests` or `PT-HelperTests/UserProfileTests/testDefaultUserProfile`) → run that specific test class or method
+3. **Test path** (contains `/`, e.g. `COILTests/UserProfileTests` or `COILTests/UserProfileTests/testDefaultUserProfile`) → run that specific test class or method
 
 ## How to Run
 
 **Prefer XcodeBuildMCP** — check session defaults with `session_show_defaults` first. If project/scheme/simulator are configured, use `test_sim` with the appropriate `extraArgs`:
 
 - For a test plan: `extraArgs: ["-testPlan", "<PlanName>"]`
-- For a specific test: `extraArgs: ["-only-testing:PT-HelperTests/<path>"]`
+- For a specific test: `extraArgs: ["-only-testing:COILTests/<path>"]`
 
 **Fallback to xcodebuild CLI** if XcodeBuildMCP is not configured:
 
 ```bash
 xcodebuild test \
-  -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper \
+  -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL \
   -destination 'platform=iOS Simulator,name=iPhone 16' \
   -testPlan <PlanName>
 ```
@@ -45,10 +45,10 @@ xcodebuild test \
 For a specific test class/method:
 ```bash
 xcodebuild test \
-  -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper \
+  -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL \
   -destination 'platform=iOS Simulator,name=iPhone 16' \
-  -only-testing:PT-HelperTests/<TestClass>/<testMethod>
+  -only-testing:COILTests/<TestClass>/<testMethod>
 ```
 
 ## After Tests Complete

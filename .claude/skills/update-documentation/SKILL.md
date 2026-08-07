@@ -86,28 +86,28 @@ Run these surveys in parallel:
 ### Survey A — File Inventory
 Spawn `Explore` agent:
 > Count Swift files in each top-level iOS directory and list the names. Run these and report each as a count plus a one-line names list:
-> - `find ios/PT-Helper/PT-Helper/Models -maxdepth 1 -name "*.swift" -type f`
-> - `find ios/PT-Helper/PT-Helper/ViewModels -maxdepth 1 -name "*.swift" -type f`
-> - `find ios/PT-Helper/PT-Helper/Views -name "*.swift" -type f` (and subfolders Components, Dashboard, OnboardingSteps separately)
-> - `find ios/PT-Helper/PT-Helper/Services -maxdepth 1 -name "*.swift" -type f`
+> - `find ios/PT-Helper/COIL/Models -maxdepth 1 -name "*.swift" -type f`
+> - `find ios/PT-Helper/COIL/ViewModels -maxdepth 1 -name "*.swift" -type f`
+> - `find ios/PT-Helper/COIL/Views -name "*.swift" -type f` (and subfolders Components, Dashboard, OnboardingSteps separately)
+> - `find ios/PT-Helper/COIL/Services -maxdepth 1 -name "*.swift" -type f`
 >
 > Report under 300 words.
 
 ### Survey B — AI Pipeline State
 Spawn `Explore` agent:
-> In `ios/PT-Helper/PT-Helper/Services/ClaudeAPIService.swift`, list every `case ` in the `AIRequestType` enum with its raw value and a 1-line purpose comment if present. Also in `functions/src/index.ts`, list every key in `SYSTEM_PROMPTS` and every key in `MODEL_CONFIG`. Also list every `export const ` in `functions/src/index.ts` (Cloud Functions). Report as three short tables. Under 300 words.
+> In `ios/PT-Helper/COIL/Services/ClaudeAPIService.swift`, list every `case ` in the `AIRequestType` enum with its raw value and a 1-line purpose comment if present. Also in `functions/src/index.ts`, list every key in `SYSTEM_PROMPTS` and every key in `MODEL_CONFIG`. Also list every `export const ` in `functions/src/index.ts` (Cloud Functions). Report as three short tables. Under 300 words.
 
 ### Survey C — Validation & Pipelines
 Spawn `Explore` agent:
-> In `ios/PT-Helper/PT-Helper/Services/ResponseValidationPipeline.swift`, list the steps in `validateAnalysis()` and `validateRehabPlan()` in order, with one line each. Same for `WellnessAnalyzer.swift` (call sequence) and `InjuryAnalyzer.swift` (call sequence). Also list every public method in `HistoryRelevanceFilter.swift`. Report as ordered lists. Under 250 words.
+> In `ios/PT-Helper/COIL/Services/ResponseValidationPipeline.swift`, list the steps in `validateAnalysis()` and `validateRehabPlan()` in order, with one line each. Same for `WellnessAnalyzer.swift` (call sequence) and `InjuryAnalyzer.swift` (call sequence). Also list every public method in `HistoryRelevanceFilter.swift`. Report as ordered lists. Under 250 words.
 
 ### Survey D — Navigation & Tabs
 Spawn `Explore` agent:
-> In `ios/PT-Helper/PT-Helper/Views/ThreeTabView.swift` (or whatever the current root tab view is), list the tabs in order with the tab index and the view name shown. List every `@EnvironmentObject` injected at the root. Also identify any legacy nav wrappers and the launch arg that activates them. Under 200 words.
+> In `ios/PT-Helper/COIL/Views/ThreeTabView.swift` (or whatever the current root tab view is), list the tabs in order with the tab index and the view name shown. List every `@EnvironmentObject` injected at the root. Also identify any legacy nav wrappers and the launch arg that activates them. Under 200 words.
 
 ### Survey E — Test Plans & Launch Args
 Spawn `Explore` agent:
-> Find all `*.xctestplan` files under `ios/PT-Helper/` and list each one's name + the test classes it includes (read the JSON). In `ios/PT-Helper/PT-Helper/Services/TestDataSeeder.swift`, list every launch argument the seeder reads via `CommandLine.arguments.contains(...)` with a 1-line behavior summary. Under 250 words.
+> Find all `*.xctestplan` files under `ios/PT-Helper/` and list each one's name + the test classes it includes (read the JSON). In `ios/PT-Helper/COIL/Services/TestDataSeeder.swift`, list every launch argument the seeder reads via `CommandLine.arguments.contains(...)` with a 1-line behavior summary. Under 250 words.
 
 ### Survey F — Memory Drift Check
 Spawn `Explore` agent:
@@ -190,7 +190,7 @@ Agent prompt skeleton:
 Agent prompt skeleton:
 > Update these files using the survey facts:
 > - `docs/API.md` — must match Cloud Functions list from Survey B
-> - `docs/data_models.md` — must match Codable structs in `ios/PT-Helper/PT-Helper/Models/`. Read each model file briefly. Update field lists where structs have changed.
+> - `docs/data_models.md` — must match Codable structs in `ios/PT-Helper/COIL/Models/`. Read each model file briefly. Update field lists where structs have changed.
 > - `docs/ux_flows.md` — must match navigation structure from Survey D
 > - `docs/safety.md` — must match validation pipelines from Survey C
 > - `docs/brief.md` — typically stable, but update any feature claims that no longer match the code

@@ -9,8 +9,8 @@ import os
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-APPICON_DIR = os.path.join(ROOT, "ios/PT-Helper/PT-Helper/Assets.xcassets/AppIcon.appiconset")
-LAUNCHLOGO_DIR = os.path.join(ROOT, "ios/PT-Helper/PT-Helper/Assets.xcassets/LaunchLogo.imageset")
+APPICON_DIR = os.path.join(ROOT, "ios/PT-Helper/COIL/Assets.xcassets/AppIcon.appiconset")
+LAUNCHLOGO_DIR = os.path.join(ROOT, "ios/PT-Helper/COIL/Assets.xcassets/LaunchLogo.imageset")
 SRC = os.path.join(APPICON_DIR, "AppIcon.png")
 
 BG = (15, 181, 176)

@@ -1060,7 +1060,7 @@ def main():
         print("\nNext steps:")
         print(f"  1. Review generated images in {OUTPUT_DIR}/")
         print(f"  2. Run upload_to_firebase.sh to upload to Firebase Storage")
-        print(f"  3. Copy {MAPPING_FILE.name} to ios/PT-Helper/PT-Helper/Resources/")
+        print(f"  3. Copy {MAPPING_FILE.name} to ios/PT-Helper/COIL/Resources/")
 
 
 if __name__ == "__main__":

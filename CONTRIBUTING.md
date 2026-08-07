@@ -9,14 +9,14 @@
 - Firebase CLI (`npm install -g firebase-tools`)
 
 ### Getting Started
-1. Clone the repo and open `ios/PT-Helper/PT-Helper.xcodeproj`
-2. Add your `GoogleService-Info.plist` to `ios/PT-Helper/PT-Helper/`
+1. Clone the repo and open `ios/PT-Helper/COIL.xcodeproj`
+2. Add your `GoogleService-Info.plist` to `ios/PT-Helper/COIL/`
 3. Build and run on a simulator
 
 ## Project Structure
 
 ```
-ios/PT-Helper/PT-Helper/
+ios/PT-Helper/COIL/
 ├── Models/          # Data models (22 files)
 ├── Services/        # API, validation, logging, caching (27 files)
 ├── ViewModels/      # Business logic, state management (15 files)
@@ -80,7 +80,7 @@ CardSection(icon: "heart.fill", color: .red, title: "Medical") {
 1. Add to `scripts/exercise_list.json` with metadata
 2. Generate image: `python scripts/generate_exercise_images.py --exercise "exercise-name"`
 3. Run QA: `python scripts/qa_exercise_images.py`
-4. Copy to `ios/PT-Helper/PT-Helper/Resources/`
+4. Copy to `ios/PT-Helper/COIL/Resources/`
 5. Update `exercise_image_mapping.json`
 
 ## Testing
@@ -88,8 +88,8 @@ CardSection(icon: "heart.fill", color: .red, title: "Medical") {
 ### Running Tests
 ```bash
 # All tests
-xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Or use Cmd+U in Xcode
 ```

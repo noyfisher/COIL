@@ -40,7 +40,7 @@ If no argument provided, default to `full`.
 1. Call `session_show_defaults` to check XcodeBuildMCP configuration. If not configured:
    ```
    session_set_defaults:
-     projectPath: ios/PT-Helper/PT-Helper.xcodeproj
+     projectPath: ios/PT-Helper/COIL.xcodeproj
      scheme: PT-Helper
      simulatorName: iPhone 16
    ```
@@ -71,17 +71,17 @@ Execute in this order to minimize backtracking:
 
 | Step | Screen | Navigation Action | View File |
 |------|--------|------------------|-----------|
-| 1 | Home | Already visible after launch (tab index 0) | `ios/PT-Helper/PT-Helper/Views/ThreeTabView.swift` (HomeTab) |
-| 2 | Assessment Gateway | Tap the floating "+" | `ios/PT-Helper/PT-Helper/Views/AssessmentGatewayView.swift` |
-| 3 | My Plan | Tap "My Plan" tab (tab index 1) | `ios/PT-Helper/PT-Helper/Views/MyPlanTab.swift` |
-| 4 | Progress | Tap "Progress" tab (tab index 2) | `ios/PT-Helper/PT-Helper/Views/ProgressTab.swift` |
-| 5 | Profile | Tap "Profile" tab (tab index 3) | `ios/PT-Helper/PT-Helper/Views/ThreeTabView.swift` (ProfileTab) |
-| 6 | Settings | From Progress, tap the settings/gear button | `ios/PT-Helper/PT-Helper/Views/SettingsView.swift` |
-| 7 | Rehab Plan | From My Plan, tap a plan card | `ios/PT-Helper/PT-Helper/Views/RehabPlanView.swift` |
-| 8 | Guided Workout | From Rehab Plan, tap "Start Workout" button | `ios/PT-Helper/PT-Helper/Views/GuidedWorkoutView.swift` |
-| 9 | Recovery Insights | From Progress, tap recovery insights card | `ios/PT-Helper/PT-Helper/Views/RecoveryInsightsDetailView.swift` |
-| 10 | Achievements | Look for achievements entry in Progress or Profile | `ios/PT-Helper/PT-Helper/Views/AchievementsView.swift` |
-| 11 | Onboarding | Stop app, relaunch with `["--uitesting"]` only (no --skip-onboarding) | `ios/PT-Helper/PT-Helper/Views/OnboardingView.swift` |
+| 1 | Home | Already visible after launch (tab index 0) | `ios/PT-Helper/COIL/Views/ThreeTabView.swift` (HomeTab) |
+| 2 | Assessment Gateway | Tap the floating "+" | `ios/PT-Helper/COIL/Views/AssessmentGatewayView.swift` |
+| 3 | My Plan | Tap "My Plan" tab (tab index 1) | `ios/PT-Helper/COIL/Views/MyPlanTab.swift` |
+| 4 | Progress | Tap "Progress" tab (tab index 2) | `ios/PT-Helper/COIL/Views/ProgressTab.swift` |
+| 5 | Profile | Tap "Profile" tab (tab index 3) | `ios/PT-Helper/COIL/Views/ThreeTabView.swift` (ProfileTab) |
+| 6 | Settings | From Progress, tap the settings/gear button | `ios/PT-Helper/COIL/Views/SettingsView.swift` |
+| 7 | Rehab Plan | From My Plan, tap a plan card | `ios/PT-Helper/COIL/Views/RehabPlanView.swift` |
+| 8 | Guided Workout | From Rehab Plan, tap "Start Workout" button | `ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift` |
+| 9 | Recovery Insights | From Progress, tap recovery insights card | `ios/PT-Helper/COIL/Views/RecoveryInsightsDetailView.swift` |
+| 10 | Achievements | Look for achievements entry in Progress or Profile | `ios/PT-Helper/COIL/Views/AchievementsView.swift` |
+| 11 | Onboarding | Stop app, relaunch with `["--uitesting"]` only (no --skip-onboarding) | `ios/PT-Helper/COIL/Views/OnboardingView.swift` |
 
 **Navigation tips:**
 - Use `snapshot_ui` to find element labels/IDs before tapping

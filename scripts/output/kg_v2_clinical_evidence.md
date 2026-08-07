@@ -986,10 +986,10 @@ verified against published evidence and flips held:
 ## Next session's job (separate)
 
 1. Run `python3 scripts/merge_kg_review.py` (without `--dry-run`) — writes
-   `ios/PT-Helper/PT-Helper/Resources/medical_knowledge_graph_v2.json`.
+   `ios/PT-Helper/COIL/Resources/medical_knowledge_graph_v2.json`.
 2. Optional: review the merged file to spot-check structure.
 3. Flip `@AppStorage("knowledgeGraphV2Enabled")` default → `true` in
-   `ios/PT-Helper/PT-Helper/Services/KnowledgeGraphService.swift`.
+   `ios/PT-Helper/COIL/Services/KnowledgeGraphService.swift`.
 4. Run `KnowledgeGraphExpansionTests` (13/13 expected green).
 5. Run SmokePlan (11/11 expected green).
 6. Manual smoke per `scripts/PR-C-2-handoff.md` Step 5.

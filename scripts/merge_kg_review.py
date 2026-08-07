@@ -68,7 +68,7 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DRAFT_INPUT = REPO_ROOT / "scripts/output/knowledge_graph_v2_draft.json"
 DECISIONS_INPUT = REPO_ROOT / "scripts/output/kg_review_decisions.json"
-DEFAULT_OUTPUT = REPO_ROOT / "ios/PT-Helper/PT-Helper/Resources/medical_knowledge_graph_v2.json"
+DEFAULT_OUTPUT = REPO_ROOT / "ios/PT-Helper/COIL/Resources/medical_knowledge_graph_v2.json"
 
 
 def load_json(path: Path, label: str) -> Any:
@@ -230,7 +230,7 @@ def main() -> int:
     args.output.write_text(json.dumps(output_payload, indent=2))
     print(f"\nWrote {args.output}")
     print("\nNext: flip @AppStorage(\"knowledgeGraphV2Enabled\") default to true in")
-    print("ios/PT-Helper/PT-Helper/Services/KnowledgeGraphService.swift")
+    print("ios/PT-Helper/COIL/Services/KnowledgeGraphService.swift")
     print("(currently OFF by default — see KnowledgeGraphFeatureFlag).")
     return 0
 

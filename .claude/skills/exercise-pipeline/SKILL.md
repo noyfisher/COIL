@@ -39,7 +39,7 @@ Run `scripts/process_missing_images.py` with `--dry-run` to fetch the `missingEx
 
 For each exercise name from the missing log:
 
-1. **Normalize the name** — match `ExerciseImageService.normalizeName()` logic at `ios/PT-Helper/PT-Helper/Services/ExerciseImageService.swift:474`:
+1. **Normalize the name** — match `ExerciseImageService.normalizeName()` logic at `ios/PT-Helper/COIL/Services/ExerciseImageService.swift:474`:
    - Lowercase
    - Replace spaces and underscores with hyphens
    - Strip content in parentheses
@@ -59,7 +59,7 @@ For each exercise name from the missing log:
 
 **For mapping issues:**
 - Identify the closest existing mapping key (the PNG that matches)
-- Suggest the exact alias to add to `ExerciseImageService.aliasMap` at `ios/PT-Helper/PT-Helper/Services/ExerciseImageService.swift:128`
+- Suggest the exact alias to add to `ExerciseImageService.aliasMap` at `ios/PT-Helper/COIL/Services/ExerciseImageService.swift:128`
 - Follow the existing alias pattern, e.g.:
   ```swift
   "ai-generated-exercise-name": "existing-mapping-key",
@@ -142,8 +142,8 @@ Exercise Images Status:
 
 Copy generated and approved images to the iOS app resources:
 
-1. Copy `scripts/output/exercise_image_mapping.json` → `ios/PT-Helper/PT-Helper/Resources/exercise_image_mapping.json`
-2. Copy all PNGs from `scripts/output/poses/` → `ios/PT-Helper/PT-Helper/Resources/` (only those in the mapping)
+1. Copy `scripts/output/exercise_image_mapping.json` → `ios/PT-Helper/COIL/Resources/exercise_image_mapping.json`
+2. Copy all PNGs from `scripts/output/poses/` → `ios/PT-Helper/COIL/Resources/` (only those in the mapping)
 3. Report how many files were copied/updated
 
 ---
@@ -152,11 +152,11 @@ Copy generated and approved images to the iOS app resources:
 
 | File | Purpose |
 |------|---------|
-| `ios/PT-Helper/PT-Helper/Services/ExerciseImageService.swift` | 7-layer image resolution + `aliasMap` (line ~128) + `normalizeName()` (line ~474) |
-| `ios/PT-Helper/PT-Helper/ViewModels/RehabPlanViewModel.swift` | `logMissingImages()` (line ~664) |
+| `ios/PT-Helper/COIL/Services/ExerciseImageService.swift` | 7-layer image resolution + `aliasMap` (line ~128) + `normalizeName()` (line ~474) |
+| `ios/PT-Helper/COIL/ViewModels/RehabPlanViewModel.swift` | `logMissingImages()` (line ~664) |
 | `scripts/process_missing_images.py` | Firestore fetch → generate → map → upload |
 | `scripts/generate_exercise_images.py` | FLUX 2 Pro image generation |
 | `scripts/qa_exercise_images.py` | Gemini 2.5 Flash vision QA |
 | `scripts/output/exercise_image_mapping.json` | Source of truth mapping |
-| `ios/PT-Helper/PT-Helper/Resources/exercise_image_mapping.json` | Bundled app copy |
+| `ios/PT-Helper/COIL/Resources/exercise_image_mapping.json` | Bundled app copy |
 | `scripts/exercise_list.json` | Master exercise metadata |

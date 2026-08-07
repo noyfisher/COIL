@@ -65,7 +65,7 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
 │       │   └── OnboardingSteps/  # Onboarding flow steps
 │       ├── Resources/         # exercise_image_mapping.json (images live in Firebase Storage)
 │       └── DesignSystem.swift # Colors, spacing, typography
-│   └── PT-HelperTests/        # Unit + UI tests
+│   └── COILTests/        # Unit + UI tests
 ├── functions/src/             # Firebase Cloud Functions
 │   ├── index.ts               # Rate limiting, system prompts, AI proxy endpoints
 │   ├── managed-agent.ts       # Managed Agents API client (recovery insights)
@@ -101,13 +101,13 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
 1. **Clone and open in Xcode**
    ```bash
    git clone <repo-url>
-   open ios/PT-Helper/PT-Helper.xcodeproj
+   open ios/PT-Helper/COIL.xcodeproj
    ```
 
 2. **Firebase configuration**
    - Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
    - Enable Firestore and Authentication (Apple Sign-In, Google Sign-In)
-   - Download `GoogleService-Info.plist` and add it to `ios/PT-Helper/PT-Helper/`
+   - Download `GoogleService-Info.plist` and add it to `ios/PT-Helper/COIL/`
 
 3. **Deploy Cloud Functions**
    ```bash
@@ -117,7 +117,7 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
    ```
 
 4. **Configure API endpoint**
-   - Update `ios/PT-Helper/PT-Helper/Services/APIConfig.swift` with your Cloud Functions URL
+   - Update `ios/PT-Helper/COIL/Services/APIConfig.swift` with your Cloud Functions URL
 
 5. **Deploy Firestore rules**
    ```bash
@@ -154,8 +154,8 @@ This produces focused AI prompts with detailed relevant history and condensed ba
 
 ```bash
 # Run all tests from Xcode or command line
-xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
 Test plans: SmokePlan (11 key tests), UnitPlan (all unit), FullPlan (all + collision + UI), PreReleasePlan (all + UI + coverage).

@@ -57,9 +57,10 @@ except ImportError:
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-CASES_PATH = REPO_ROOT / "ios/PT-Helper/PT-Helper/PT-HelperTests/GroundTruth/cases.json"
-# Fallback (the path above is wrong — fix to test target's real location):
-ALT_CASES_PATH = REPO_ROOT / "ios/PT-Helper/PT-HelperTests/GroundTruth/cases.json"
+CASES_PATH = REPO_ROOT / "ios/PT-Helper/COILTests/GroundTruth/cases.json"
+# Kept so the resolver below stays a two-candidate search; both now point at the
+# same real location, so the fallback is inert rather than load-bearing.
+ALT_CASES_PATH = CASES_PATH
 
 
 # ---------------------------------------------------------------------------
@@ -224,7 +225,7 @@ def main() -> int:
 
     path.write_text(json.dumps(cases_doc, indent=2))
     print(f"\nUpdated {updated} cases in {path}")
-    print("Run `xcodebuild test -only-testing:PT-HelperTests/ValidationRegressionRunner`")
+    print("Run `xcodebuild test -only-testing:COILTests/ValidationRegressionRunner`")
     print("to verify the new goldens still satisfy expectedOutcomes.")
     return 0
 

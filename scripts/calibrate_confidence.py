@@ -275,7 +275,7 @@ def main() -> int:
         if delta > 5:
             print(f"DELTA: {delta} pts — worth updating the cap.")
             print("Edit ConfidenceCalibrator.maxDisplayConfidence in")
-            print("ios/PT-Helper/PT-Helper/Services/ResponseValidationPipeline.swift")
+            print("ios/PT-Helper/COIL/Services/ResponseValidationPipeline.swift")
         else:
             print(f"DELTA: {delta} pts — too small to justify a code change.")
 

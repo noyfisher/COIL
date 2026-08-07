@@ -87,20 +87,20 @@ gh pr list --label agent-improvement --state open --json number --jq 'length'
 **Goal**: Add unit tests for untested or under-tested ViewModels.
 
 **Priority targets** (check in order — skip if already tested):
-1. `ios/PT-Helper/PT-Helper/ViewModels/WellnessAnalysisViewModel.swift` — no test file exists
-2. `ios/PT-Helper/PT-Helper/ViewModels/WellnessPlanViewModel.swift` — no test file exists
+1. `ios/PT-Helper/COIL/ViewModels/WellnessAnalysisViewModel.swift` — no test file exists
+2. `ios/PT-Helper/COIL/ViewModels/WellnessPlanViewModel.swift` — no test file exists
 3. Any ViewModel where the test file exists but has fewer than 3 test methods
 
-**Reference pattern**: Read `ios/PT-Helper/PT-HelperTests/ViewModels/RecoveryInsightsViewModelTests.swift` and follow this structure exactly:
+**Reference pattern**: Read `ios/PT-Helper/COILTests/ViewModels/RecoveryInsightsViewModelTests.swift` and follow this structure exactly:
 - `@MainActor final class {Name}Tests: XCTestCase`
 - `private var mockAPI: MockClaudeAPIService!` + `private var vm: {ViewModel}!` in setUp
-- Use `TestFixtures` factory methods from `ios/PT-Helper/PT-HelperTests/TestFixtures.swift`
+- Use `TestFixtures` factory methods from `ios/PT-Helper/COILTests/TestFixtures.swift`
 - Test naming: `test<What>_<Condition>_<Expected>`
 - Minimum 3 test methods per new file
 
-**Also read**: `ios/PT-Helper/PT-HelperTests/Mocks/MockClaudeAPIService.swift` to understand available mock capabilities.
+**Also read**: `ios/PT-Helper/COILTests/Mocks/MockClaudeAPIService.swift` to understand available mock capabilities.
 
-**New test files go in**: `ios/PT-Helper/PT-HelperTests/ViewModels/`
+**New test files go in**: `ios/PT-Helper/COILTests/ViewModels/`
 
 **Scope**: 1 new test file OR add tests to 1 existing test file per cycle.
 
@@ -113,11 +113,11 @@ gh pr list --label agent-improvement --state open --json number --jq 'length'
 **Naming convention**: `screenName.elementName` (e.g., `dashboard.streakBadge`, `settings.logoutButton`)
 
 **Priority targets** (lowest coverage first):
-1. Views in `ios/PT-Helper/PT-Helper/Views/Dashboard/` — check each file for missing identifiers
-2. Views in `ios/PT-Helper/PT-Helper/Views/Components/` — reusable components often lack identifiers
+1. Views in `ios/PT-Helper/COIL/Views/Dashboard/` — check each file for missing identifiers
+2. Views in `ios/PT-Helper/COIL/Views/Components/` — reusable components often lack identifiers
 3. Any View file with buttons, text fields, or toggles that lack identifiers
 
-**Reference pattern**: Read `ios/PT-Helper/PT-Helper/Views/GuidedWorkoutView.swift` to see how identifiers are applied consistently.
+**Reference pattern**: Read `ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift` to see how identifiers are applied consistently.
 
 **What to add identifiers to**:
 - Buttons and navigation links
@@ -140,16 +140,16 @@ gh pr list --label agent-improvement --state open --json number --jq 'length'
 **Step 1 — Find violations**: Search for raw color/spacing values:
 ```
 # Find hardcoded colors
-grep -rn "Color(red:" ios/PT-Helper/PT-Helper/Views/ --include="*.swift" | head -20
+grep -rn "Color(red:" ios/PT-Helper/COIL/Views/ --include="*.swift" | head -20
 
 # Find hardcoded corner radii
-grep -rn "cornerRadius:" ios/PT-Helper/PT-Helper/Views/ --include="*.swift" | grep -v "AppCorners" | head -20
+grep -rn "cornerRadius:" ios/PT-Helper/COIL/Views/ --include="*.swift" | grep -v "AppCorners" | head -20
 
 # Find hardcoded padding values
-grep -rn "\.padding(" ios/PT-Helper/PT-Helper/Views/ --include="*.swift" | grep -E "\.[0-9]+" | head -20
+grep -rn "\.padding(" ios/PT-Helper/COIL/Views/ --include="*.swift" | grep -E "\.[0-9]+" | head -20
 ```
 
-**Step 2 — Read design tokens**: Read `ios/PT-Helper/PT-Helper/DesignSystem.swift` to find the correct replacement tokens:
+**Step 2 — Read design tokens**: Read `ios/PT-Helper/COIL/DesignSystem.swift` to find the correct replacement tokens:
 - `AppColors.accent`, `.success`, `.warning`, `.danger`, `.cardBackground`, etc.
 - `AppSpacing.xs` (4), `.sm` (8), `.md` (12), `.lg` (16), `.xl` (24), `.xxl` (32), `.xxxl` (40)
 - `AppCorners.small` (8), `.medium` (12), `.card` (16), `.large` (20), `.xl` (24), `.pill` (100)
@@ -170,8 +170,8 @@ grep -rn "\.padding(" ios/PT-Helper/PT-Helper/Views/ --include="*.swift" | grep 
 3. Check if the View actually displays error/empty states
 
 **Reference patterns**:
-- Empty state: Read `ios/PT-Helper/PT-Helper/Views/MyPlanTab.swift` — shows how to display a message when no data exists
-- Error display: Read `ios/PT-Helper/PT-Helper/Views/GuidedWorkoutView.swift` — shows error banner pattern
+- Empty state: Read `ios/PT-Helper/COIL/Views/MyPlanTab.swift` — shows how to display a message when no data exists
+- Error display: Read `ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift` — shows error banner pattern
 
 **What to add**:
 - `if let errorMessage = vm.errorMessage { ... }` blocks showing the error
@@ -200,7 +200,7 @@ grep -rn "\.padding(" ios/PT-Helper/PT-Helper/Views/ --include="*.swift" | grep 
 **How to find targets**:
 ```
 # Find non-lazy stacks inside ScrollViews
-grep -rn "ScrollView" ios/PT-Helper/PT-Helper/Views/ --include="*.swift" -A 5 | grep "VStack\|HStack" | grep -v "Lazy"
+grep -rn "ScrollView" ios/PT-Helper/COIL/Views/ --include="*.swift" -A 5 | grep "VStack\|HStack" | grep -v "Lazy"
 ```
 
 **Reference**: Read the target file thoroughly before making any changes. Understand the data flow.
@@ -219,28 +219,28 @@ Use this mapping to find the view file. If the screen name is not listed, STOP a
 
 | Screen Name | View File |
 |-------------|-----------|
-| `form-check` | `ios/PT-Helper/PT-Helper/Views/FormCheckTab.swift` |
-| `profile` | `ios/PT-Helper/PT-Helper/Views/ThreeTabView.swift` (ProfileTab) |
-| `settings` | `ios/PT-Helper/PT-Helper/Views/SettingsView.swift` |
-| `onboarding` | `ios/PT-Helper/PT-Helper/Views/OnboardingView.swift` |
-| `plans` | `ios/PT-Helper/PT-Helper/Views/MyPlanTab.swift` |
-| `rehab-plan` | `ios/PT-Helper/PT-Helper/Views/RehabPlanView.swift` |
-| `workout` | `ios/PT-Helper/PT-Helper/Views/GuidedWorkoutView.swift` |
-| `workout-summary` | `ios/PT-Helper/PT-Helper/Views/GuidedWorkoutSummaryView.swift` |
-| `progress` | `ios/PT-Helper/PT-Helper/Views/ProgressTab.swift` |
-| `recovery` | `ios/PT-Helper/PT-Helper/Views/RecoveryInsightsDetailView.swift` |
-| `wellness` | `ios/PT-Helper/PT-Helper/Views/WellnessGoalPickerView.swift` |
-| `timer` | `ios/PT-Helper/PT-Helper/Views/TimerView.swift` |
-| `notes` | `ios/PT-Helper/PT-Helper/Views/NotesView.swift` |
-| `achievements` | `ios/PT-Helper/PT-Helper/Views/AchievementsView.swift` |
-| `home` | `ios/PT-Helper/PT-Helper/Views/ThreeTabView.swift` (HomeTab) |
+| `form-check` | `ios/PT-Helper/COIL/Views/FormCheckTab.swift` |
+| `profile` | `ios/PT-Helper/COIL/Views/ThreeTabView.swift` (ProfileTab) |
+| `settings` | `ios/PT-Helper/COIL/Views/SettingsView.swift` |
+| `onboarding` | `ios/PT-Helper/COIL/Views/OnboardingView.swift` |
+| `plans` | `ios/PT-Helper/COIL/Views/MyPlanTab.swift` |
+| `rehab-plan` | `ios/PT-Helper/COIL/Views/RehabPlanView.swift` |
+| `workout` | `ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift` |
+| `workout-summary` | `ios/PT-Helper/COIL/Views/GuidedWorkoutSummaryView.swift` |
+| `progress` | `ios/PT-Helper/COIL/Views/ProgressTab.swift` |
+| `recovery` | `ios/PT-Helper/COIL/Views/RecoveryInsightsDetailView.swift` |
+| `wellness` | `ios/PT-Helper/COIL/Views/WellnessGoalPickerView.swift` |
+| `timer` | `ios/PT-Helper/COIL/ViewModels/GuidedWorkoutViewModel.swift` (rest timer; there is no standalone TimerView) |
+| `notes` | `ios/PT-Helper/COIL/Views/NotesView.swift` |
+| `achievements` | `ios/PT-Helper/COIL/Views/AchievementsView.swift` |
+| `home` | `ios/PT-Helper/COIL/Views/ThreeTabView.swift` (HomeTab) |
 
 **Step 2 — Build and launch app**
 
 1. Call `session_show_defaults` to verify XcodeBuildMCP configuration. If not set:
    ```
    session_set_defaults:
-     projectPath: ios/PT-Helper/PT-Helper.xcodeproj
+     projectPath: ios/PT-Helper/COIL.xcodeproj
      scheme: PT-Helper
      simulatorName: iPhone 16
    ```
@@ -276,7 +276,7 @@ Use `snapshot_ui` to find element labels/IDs before tapping. Prefer tap by `labe
 1. Call `screenshot` — this is the "before" reference
 2. Call `snapshot_ui` — get the accessibility tree with coordinates
 3. Read the target view file with the Read tool
-4. Read `ios/PT-Helper/PT-Helper/DesignSystem.swift` for design token reference
+4. Read `ios/PT-Helper/COIL/DesignSystem.swift` for design token reference
 
 **Step 5 — Identify 1-3 improvements**
 
@@ -333,19 +333,19 @@ When `$ARGUMENTS` is empty or `auto`, pick a category automatically using this p
 1. **tests** — Check if untested ViewModels still exist:
    ```bash
    # If either file exists without a corresponding test, pick tests
-   ls ios/PT-Helper/PT-HelperTests/ViewModels/WellnessAnalysisViewModelTests.swift 2>/dev/null
-   ls ios/PT-Helper/PT-HelperTests/ViewModels/WellnessPlanViewModelTests.swift 2>/dev/null
+   ls ios/PT-Helper/COILTests/ViewModels/WellnessAnalysisViewModelTests.swift 2>/dev/null
+   ls ios/PT-Helper/COILTests/ViewModels/WellnessPlanViewModelTests.swift 2>/dev/null
    ```
 
 2. **accessibility** — Check for views missing identifiers:
    ```bash
    # If many views lack identifiers, pick accessibility
-   grep -rL "accessibilityIdentifier" ios/PT-Helper/PT-Helper/Views/Dashboard/ --include="*.swift" | head -5
+   grep -rL "accessibilityIdentifier" ios/PT-Helper/COIL/Views/Dashboard/ --include="*.swift" | head -5
    ```
 
 3. **code-quality** — Check for hardcoded colors:
    ```bash
-   grep -c "Color(red:" ios/PT-Helper/PT-Helper/Views/**/*.swift 2>/dev/null | grep -v ":0$" | head -5
+   grep -c "Color(red:" ios/PT-Helper/COIL/Views/**/*.swift 2>/dev/null | grep -v ":0$" | head -5
    ```
 
 4. **error-handling** — Check for views missing error display
@@ -364,8 +364,8 @@ After making changes, build to verify compilation:
 **Fallback**:
 ```bash
 xcodebuild build \
-  -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper \
+  -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL \
   -destination 'platform=iOS Simulator,name=iPhone 16' \
   -quiet
 ```
@@ -387,8 +387,8 @@ Run SmokePlan to verify no regressions:
 **Fallback**:
 ```bash
 xcodebuild test \
-  -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper \
+  -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL \
   -destination 'platform=iOS Simulator,name=iPhone 16' \
   -testPlan SmokePlan
 ```
@@ -405,8 +405,8 @@ If tests fail:
 
 1. **Stage only changed files** (list them explicitly):
    ```bash
-   git add ios/PT-Helper/PT-HelperTests/ViewModels/NewTestFile.swift
-   git add ios/PT-Helper/PT-Helper/Views/SomeView.swift
+   git add ios/PT-Helper/COILTests/ViewModels/NewTestFile.swift
+   git add ios/PT-Helper/COIL/Views/SomeView.swift
    ```
 
 2. **Commit** with a descriptive message:

@@ -83,13 +83,13 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
 1. **Clone and open in Xcode**
    ```bash
    git clone <repo-url>
-   open ios/PT-Helper/PT-Helper.xcodeproj
+   open ios/PT-Helper/COIL.xcodeproj
    ```
 
 2. **Firebase configuration**
    - Create a Firebase project at console.firebase.google.com
    - Enable Firestore and Authentication (Apple Sign-In, Google Sign-In)
-   - Download `GoogleService-Info.plist` and add it to `ios/PT-Helper/PT-Helper/`
+   - Download `GoogleService-Info.plist` and add it to `ios/PT-Helper/COIL/`
 
 3. **Deploy Cloud Functions**
    ```bash
@@ -99,7 +99,7 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
    ```
 
 4. **Configure API endpoint**
-   - Update `ios/PT-Helper/PT-Helper/Services/APIConfig.swift` with your Cloud Functions URL
+   - Update `ios/PT-Helper/COIL/Services/APIConfig.swift` with your Cloud Functions URL
 
 5. **Deploy Firestore rules**
    ```bash
@@ -109,8 +109,8 @@ Users tap where it hurts on a 3D body model, answer targeted questions, and rece
 ## Testing
 
 ```bash
-xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
 ## Key Files
@@ -165,30 +165,30 @@ Users: Athletes and fitness enthusiasts (self-directed rehabilitation).
 ### iOS App
 ```bash
 # Build
-xcodebuild build -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild build -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Run all unit tests (default: UnitPlan)
-xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Run smoke tests only (11 key tests, 60s timeout)
-xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper -testPlan SmokePlan -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL -testPlan SmokePlan -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Run full suite including collision tests (300s timeout)
-xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper -testPlan FullPlan -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL -testPlan FullPlan -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Run a single test class
-xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper -destination 'platform=iOS Simulator,name=iPhone 16' \
-  -only-testing:PT-HelperTests/UserProfileTests
+xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16' \
+  -only-testing:COILTests/UserProfileTests
 
 # Run a single test method
-xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper -destination 'platform=iOS Simulator,name=iPhone 16' \
-  -only-testing:PT-HelperTests/UserProfileTests/testDefaultUserProfile
+xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16' \
+  -only-testing:COILTests/UserProfileTests/testDefaultUserProfile
 ```
 
 ### Cloud Functions (Firebase)
@@ -204,7 +204,7 @@ firebase deploy --only functions
 ## Architecture
 
 ### MVVM + Services Pattern
-The iOS app (`ios/PT-Helper/PT-Helper/`) uses MVVM with a singleton service layer:
+The iOS app (`ios/PT-Helper/COIL/`) uses MVVM with a singleton service layer:
 
 - **Models/** — Codable structs (`UserProfile`, `PainAssessment`, `RehabPlan`, `AnalysisResult`, `BodyRegion`)
 - **ViewModels/** — `@MainActor @ObservableObject` classes that own business logic and publish UI state
@@ -286,7 +286,7 @@ Use `.trackScreen("ScreenName")` modifier on new views. `SessionLogger` auto-tra
 1. Add metadata to `scripts/exercise_list.json`
 2. Generate: `python scripts/generate_exercise_images.py --api-key KEY --exercise "name"`
 3. QA: `python scripts/qa_exercise_images.py --api-key KEY`
-4. Copy PNGs + `exercise_image_mapping.json` to `ios/PT-Helper/PT-Helper/Resources/`
+4. Copy PNGs + `exercise_image_mapping.json` to `ios/PT-Helper/COIL/Resources/`
 
 ---
 
@@ -394,7 +394,7 @@ Use `.trackScreen("ScreenName")` modifier on new views. `SessionLogger` auto-tra
 # 5. iOS App Layout
 
 ```
-ios/PT-Helper/PT-Helper/
+ios/PT-Helper/COIL/
   PT_HelperApp.swift              # App entry point, Firebase init
   DesignSystem.swift              # Tokens: AppColors, AppSpacing, AppFonts, AppCorners, AppAnimations + reusable components
 
@@ -442,7 +442,7 @@ ios/PT-Helper/PT-Helper/
     exercise_image_mapping.json   # Exercise name → image filename mapping
     *.png                         # 178 AI-generated exercise illustrations
 
-ios/PT-Helper/PT-HelperTests/
+ios/PT-Helper/COILTests/
   TestFixtures.swift              # Factory methods for test data
   BodyMap3D/                      # Collision tests (FullPlan only)
   Models/                         # Model unit tests
@@ -791,8 +791,8 @@ python qa_exercise_images.py --api-key YOUR_GEMINI_KEY
 
 ## Deploying to iOS
 ```bash
-cp output/*.png ../ios/PT-Helper/PT-Helper/Resources/
-cp output/exercise_image_mapping.json ../ios/PT-Helper/PT-Helper/Resources/
+cp output/*.png ../ios/PT-Helper/COIL/Resources/
+cp output/exercise_image_mapping.json ../ios/PT-Helper/COIL/Resources/
 ```
 
 ---
@@ -821,7 +821,7 @@ cp output/exercise_image_mapping.json ../ios/PT-Helper/PT-Helper/Resources/
 - Xcode 16+, iOS 17+, Node.js 20, Firebase CLI
 
 ### Getting Started
-1. Clone the repo and open `ios/PT-Helper/PT-Helper.xcodeproj`
+1. Clone the repo and open `ios/PT-Helper/COIL.xcodeproj`
 2. Add your `GoogleService-Info.plist`
 3. Build and run on a simulator
 
@@ -861,8 +861,8 @@ Use tokens from `DesignSystem.swift`:
 
 ## Testing
 ```bash
-xcodebuild test -project ios/PT-Helper/PT-Helper.xcodeproj \
-  -scheme PT-Helper -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+  -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
 Test naming: `test_classifySurgery_sameRegion_recentWithRestrictions`

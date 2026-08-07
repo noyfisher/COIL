@@ -147,15 +147,15 @@ The QA script:
 
 4. If the pose is hard to generate accurately, add a custom visual prompt to `_CUSTOM_VISUAL_PROMPTS` in `generate_exercise_images.py`.
 
-5. Copy the image to `ios/PT-Helper/PT-Helper/Resources/` and update `exercise_image_mapping.json`.
+5. Copy the image to `ios/PT-Helper/COIL/Resources/` and update `exercise_image_mapping.json`.
 
 ## Deploying to iOS
 
 Images in `output/` need to be copied to the iOS app's Resources directory:
 
 ```bash
-cp output/*.png ../ios/PT-Helper/PT-Helper/Resources/
-cp output/exercise_image_mapping.json ../ios/PT-Helper/PT-Helper/Resources/
+cp output/*.png ../ios/PT-Helper/COIL/Resources/
+cp output/exercise_image_mapping.json ../ios/PT-Helper/COIL/Resources/
 ```
 
 The `ExerciseImageService` in the iOS app loads images by filename from this mapping.

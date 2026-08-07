@@ -99,7 +99,7 @@ The script:
 - Refuses to ship if any contraindicated/unclear verdict is still PENDING
   (override with `--allow-pending` only if you accept the risk)
 - Applies decisions: APPROVE keeps, REJECT drops, FLIP inverts, EDIT overrides reason
-- Outputs `ios/PT-Helper/PT-Helper/Resources/medical_knowledge_graph_v2.json`
+- Outputs `ios/PT-Helper/COIL/Resources/medical_knowledge_graph_v2.json`
 
 Note: **the v2 file contains only the NEW pairs** — the in-app
 `KnowledgeGraphService.merge(v1:v2:)` unions v1 + v2 at runtime. So v1's expert
@@ -117,7 +117,7 @@ build picks it up (Xcode auto-syncs new resources via
 `PBXFileSystemSynchronizedRootGroup`), enable v2 by default:
 
 ```swift
-// ios/PT-Helper/PT-Helper/Services/KnowledgeGraphService.swift
+// ios/PT-Helper/COIL/Services/KnowledgeGraphService.swift
 enum KnowledgeGraphFeatureFlag {
     static let key = "knowledgeGraphV2Enabled"
     static var isEnabled: Bool {
@@ -133,10 +133,10 @@ graph still satisfies all v1 invariants:
 
 ```bash
 xcodebuild test \
-    -project ios/PT-Helper/PT-Helper.xcodeproj \
-    -scheme PT-Helper \
+    -project ios/PT-Helper/COIL.xcodeproj \
+    -scheme COIL \
     -destination 'platform=iOS Simulator,name=iPhone 16' \
-    -only-testing:PT-HelperTests/KnowledgeGraphExpansionTests
+    -only-testing:COILTests/KnowledgeGraphExpansionTests
 ```
 
 Should report 13/13 green.

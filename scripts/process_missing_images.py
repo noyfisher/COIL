@@ -273,7 +273,7 @@ def update_mapping(mapping: dict, succeeded: list[dict]) -> dict:
     """
     Add new entries to the mapping and write to both locations:
     - scripts/output/exercise_image_mapping.json
-    - ios/PT-Helper/PT-Helper/Resources/exercise_image_mapping.json
+    - ios/PT-Helper/COIL/Resources/exercise_image_mapping.json
 
     Returns the updated mapping.
     """

@@ -1,7 +1,7 @@
 # iOS App Layout
 
 ```
-ios/PT-Helper/PT-Helper/
+ios/PT-Helper/COIL/
   PT_HelperApp.swift              # App entry point, Firebase init
   RootView.swift                  # Navigation root (auth check, onboarding gate)
   DesignSystem.swift              # Tokens: AppColors, AppSpacing, AppFonts, AppCorners, AppAnimations + reusable components
@@ -145,14 +145,14 @@ ios/PT-Helper/PT-Helper/
     exercise_image_mapping.json   # Exercise name → image filename mapping
     *.png                         # 1364 AI-generated exercise illustrations (start+end frame pairs, Nano Banana Pro)
 
-ios/PT-Helper/PT-HelperTests/
+ios/PT-Helper/COILTests/
   TestFixtures.swift              # Factory methods for test data
   BodyMap3D/                      # Collision tests (FullPlan only)
   Models/                         # Model unit tests
   ViewModels/                     # ViewModel unit tests
   Services/                       # Service unit tests
 
-ios/PT-Helper/PT-HelperUITests/
+ios/PT-Helper/COILUITests/
   DashboardUITests.swift          # Dashboard layout tests
   GuidedWorkoutUITests.swift      # Workout flow tests
   SettingsUITests.swift           # Settings navigation tests

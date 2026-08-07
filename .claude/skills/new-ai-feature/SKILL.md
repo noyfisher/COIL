@@ -47,7 +47,7 @@ feature_name: { model: "claude-haiku-4-5-20251001", max_tokens: 4096, temperatur
 
 ### 2. Client Side — AIRequestType Enum
 
-**File:** `ios/PT-Helper/PT-Helper/Services/ClaudeAPIService.swift` (line ~51)
+**File:** `ios/PT-Helper/COIL/Services/ClaudeAPIService.swift` (line ~51)
 
 Add a new case to the `AIRequestType` enum:
 ```swift
@@ -103,12 +103,12 @@ If the feature needs response validation, add validation layers to `Services/Res
 
 ### 4. Tests
 
-**Add raw value test** in `ios/PT-Helper/PT-HelperTests/Services/ClaudeAPIServiceTests.swift`:
+**Add raw value test** in `ios/PT-Helper/COILTests/Services/ClaudeAPIServiceTests.swift`:
 ```swift
 XCTAssertEqual(AIRequestType.feature_name.rawValue, "feature_name")
 ```
 
-**Add mock handling** in `ios/PT-Helper/PT-HelperTests/Mocks/MockClaudeAPIService.swift`:
+**Add mock handling** in `ios/PT-Helper/COILTests/Mocks/MockClaudeAPIService.swift`:
 - The mock already handles all request types generically via `sendMessage(requestType:userMessage:)` — just verify `lastRequestType` and `allRequestTypes` work with the new case
 
 **Add ViewModel tests** following the `@MainActor` test pattern with `MockClaudeAPIService`.
@@ -130,7 +130,7 @@ Then build and run the app to verify the new request type works end-to-end.
 | File | Change |
 |------|--------|
 | `functions/src/index.ts` | Add to `SYSTEM_PROMPTS` + `MODEL_CONFIG` |
-| `ios/PT-Helper/PT-Helper/Services/ClaudeAPIService.swift` | Add `AIRequestType` case |
-| `ios/PT-Helper/PT-Helper/ViewModels/<New>ViewModel.swift` | New or modified ViewModel |
-| `ios/PT-Helper/PT-HelperTests/Services/ClaudeAPIServiceTests.swift` | Add raw value assertion |
-| `ios/PT-Helper/PT-HelperTests/ViewModels/<New>ViewModelTests.swift` | New ViewModel tests |
+| `ios/PT-Helper/COIL/Services/ClaudeAPIService.swift` | Add `AIRequestType` case |
+| `ios/PT-Helper/COIL/ViewModels/<New>ViewModel.swift` | New or modified ViewModel |
+| `ios/PT-Helper/COILTests/Services/ClaudeAPIServiceTests.swift` | Add raw value assertion |
+| `ios/PT-Helper/COILTests/ViewModels/<New>ViewModelTests.swift` | New ViewModel tests |

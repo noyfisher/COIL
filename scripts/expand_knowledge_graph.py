@@ -71,7 +71,7 @@ except ImportError:
 # ---------------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-KG_V1_PATH = REPO_ROOT / "ios/PT-Helper/PT-Helper/Resources/medical_knowledge_graph.json"
+KG_V1_PATH = REPO_ROOT / "ios/PT-Helper/COIL/Resources/medical_knowledge_graph.json"
 EXERCISE_METADATA_PATH = REPO_ROOT / "scripts/output/all_exercises_metadata.json"
 OUTPUT_DIR = REPO_ROOT / "scripts/output"
 DRAFT_OUTPUT = OUTPUT_DIR / "knowledge_graph_v2_draft.json"
