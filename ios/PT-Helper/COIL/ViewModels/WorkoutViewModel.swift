@@ -29,6 +29,10 @@ class WorkoutViewModel: ObservableObject {
     }
 
     func fetchSessions() {
+        // See `SavedPlansViewModel.startListening()`. HomeTab calls this on every
+        // appear, so without this guard a persisted auth session would overwrite the
+        // seeded mock sessions as soon as the Home tab renders.
+        guard !TestDataSeeder.isUITesting else { return }
         guard let uid = Auth.auth().currentUser?.uid else { return }
         isLoading = true
         db.collection("users").document(uid).collection("workoutSessions")

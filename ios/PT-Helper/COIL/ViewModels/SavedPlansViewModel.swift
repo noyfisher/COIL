@@ -81,6 +81,12 @@ class SavedPlansViewModel: ObservableObject {
     /// Start real-time Firestore listener for rehab plans.
     /// Idempotent — if a listener is already active, this is a no-op.
     func startListening() {
+        // UI tests must never reach the real Firestore. `--uitesting` bypasses auth in
+        // RootView but does not sign the user out, so a persisted session would stream
+        // live plans in here — making both the seeded fixtures and the empty state
+        // unreachable, and letting the repair pass write back to real data. Seeded
+        // plans are injected in `init`; without `--seed-mock-data` the tab stays empty.
+        guard !TestDataSeeder.isUITesting else { return }
         guard listenerRegistration == nil else { return }
         guard let uid = Auth.auth().currentUser?.uid else { return }
         isLoading = true
