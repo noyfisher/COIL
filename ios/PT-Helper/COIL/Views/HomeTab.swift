@@ -33,26 +33,22 @@ struct HomeTab: View {
                     // Weekly strip — dark, visually extends the nav bar
                     WeekCompletionStrip(sessions: workoutViewModel.sessions)
 
-                    // Program / Preventative picker — only meaningful with an active plan
-                    if activePlan != nil {
-                        HomeTabPicker(selected: $selectedContentTab)
-                            .padding(.horizontal, AppSpacing.lg)
-                            .padding(.top, AppSpacing.md)
-                            .padding(.bottom, AppSpacing.sm)
-                    }
+                    // Program / Prevention picker — Prevention is reachable even
+                    // without an active plan (it guides toward setup instead of
+                    // blocking); Program keeps its own no-plan empty state.
+                    HomeTabPicker(selected: $selectedContentTab)
+                        .padding(.horizontal, AppSpacing.lg)
+                        .padding(.top, AppSpacing.md)
+                        .padding(.bottom, AppSpacing.sm)
 
                     // Content
                     ScrollView {
                         VStack(spacing: AppSpacing.md) {
-                            if activePlan == nil {
-                                ProgramDayView(plan: nil)
-                            } else {
-                                switch selectedContentTab {
-                                case .program:
-                                    ProgramDayView(plan: activePlan)
-                                case .preventative:
-                                    PreventativeTasksView()
-                                }
+                            switch selectedContentTab {
+                            case .program:
+                                ProgramDayView(plan: activePlan)
+                            case .preventative:
+                                TodaysPreventionView()
                             }
                         }
                         .padding(.horizontal, AppSpacing.lg)
@@ -169,7 +165,7 @@ private struct HomeTabPicker: View {
     var body: some View {
         HStack(spacing: 0) {
             pickerButton("Program", tab: .program)
-            pickerButton("Preventative", tab: .preventative)
+            pickerButton("Prevention", tab: .preventative)
         }
         .background(AppColors.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: AppCorners.card))

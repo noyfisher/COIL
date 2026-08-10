@@ -693,4 +693,73 @@ enum TestFixtures {
         }
         """
     }
+
+    // MARK: - Prevention
+
+    static func makePreventionProfile(
+        focus: PreventionFocus = .mobility,
+        typicalContext: DailyContext = .deskHeavy,
+        equipment: RehabPlanPreferences.Equipment = .none,
+        preferredLength: PreventionRoutineLength = .medium,
+        hasCompletedSetup: Bool = true
+    ) -> PreventionProfile {
+        PreventionProfile(
+            focus: focus, typicalContext: typicalContext, equipment: equipment,
+            preferredLength: preferredLength, reminderHour: nil, reminderMinute: nil,
+            hasCompletedSetup: hasCompletedSetup, lastUpdated: Date()
+        )
+    }
+
+    static func makeCheckIn(
+        dateKey: String = PreventionDateKey.key(),
+        context: DailyContext = .deskHeavy,
+        hasSymptoms: Bool = false,
+        length: PreventionRoutineLength = .medium
+    ) -> DailyPreventionCheckIn {
+        DailyPreventionCheckIn(dateKey: dateKey, context: context, hasNewOrWorseningSymptoms: hasSymptoms, length: length)
+    }
+
+    static func makePreventionExercise(
+        name: String = "Test Prevention Exercise",
+        targetArea: String = "Neck",
+        category: PreventionCategory = .mobilityControl,
+        isMicroAction: Bool = false,
+        catalogKey: String = "test-prevention-exercise"
+    ) -> PreventionExercise {
+        PreventionExercise(
+            exercise: makeExercise(name: name, targetArea: targetArea),
+            category: category, isMicroAction: isMicroAction, catalogKey: catalogKey
+        )
+    }
+
+    static func makeCompletion(
+        dateKey: String = PreventionDateKey.key(),
+        routineId: UUID = UUID(),
+        categories: [PreventionCategory] = [.mobilityControl],
+        focus: PreventionFocus = .mobility,
+        context: DailyContext = .deskHeavy,
+        minutes: Int = 6,
+        completedDate: Date = Date(),
+        includedMicroAction: Bool = true
+    ) -> PreventionCompletion {
+        PreventionCompletion(
+            dateKey: dateKey, routineId: routineId, categories: categories, focus: focus,
+            context: context, minutes: minutes, completedDate: completedDate,
+            includedMicroAction: includedMicroAction
+        )
+    }
+
+    static func makeFeedback(
+        routineId: UUID = UUID(),
+        dateKey: String = PreventionDateKey.key(),
+        categories: [PreventionCategory] = [.mobilityControl],
+        difficulty: PreventionDifficultyRating = .aboutRight,
+        pain: PreventionPainLevel? = nil,
+        submittedDate: Date = Date()
+    ) -> PreventionFeedback {
+        PreventionFeedback(
+            routineId: routineId, dateKey: dateKey, categories: categories,
+            difficulty: difficulty, pain: pain, submittedDate: submittedDate
+        )
+    }
 }

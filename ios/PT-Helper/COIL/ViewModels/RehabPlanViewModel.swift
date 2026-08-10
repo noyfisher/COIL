@@ -38,7 +38,7 @@ private struct AIRehabExercise: Decodable {
 // MARK: - Rehab Plan Preferences
 
 struct RehabPlanPreferences {
-    enum Equipment: String, CaseIterable {
+    enum Equipment: String, CaseIterable, Codable {
         case none = "No equipment"
         case bands = "Resistance bands"
         case dumbbells = "Dumbbells"

@@ -55,6 +55,12 @@ final class AnalyticsService {
         case formAnalysisStarted = "form_analysis_started"
         case settingChanged = "setting_changed"
         case errorShown = "error_shown"
+        case preventionRoutineStarted = "prevention_routine_started"
+        case preventionRoutineCompleted = "prevention_routine_completed"
+        case preventionCheckInCompleted = "prevention_check_in_completed"
+        case preventionSymptomsFlagged = "prevention_symptoms_flagged"
+        case preventionProfileSaved = "prevention_profile_saved"
+        case preventionWeeklyReviewViewed = "prevention_weekly_review_viewed"
     }
 
     // MARK: - Logging
