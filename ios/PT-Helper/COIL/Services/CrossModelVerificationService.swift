@@ -271,7 +271,11 @@ class CrossModelVerificationService {
 
     // MARK: - Response Parsing
 
-    private func parseCrossModelResponse(_ data: Data, exercises: [(name: String, condition: String)]) throws -> [CrossModelResult] {
+    /// Internal rather than private so the response-mapping logic is testable. `verify` and
+    /// `sendBatch` require a signed-in Firebase user before any network call, so they throw
+    /// `.authenticationRequired` in a unit-test process — this is the only reachable seam
+    /// for asserting on how the two response shapes are decoded.
+    func parseCrossModelResponse(_ data: Data, exercises: [(name: String, condition: String)]) throws -> [CrossModelResult] {
         guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             throw CrossModelError.decodingError
         }
