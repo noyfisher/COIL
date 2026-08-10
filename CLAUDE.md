@@ -249,7 +249,20 @@ Accessibility identifiers follow `screenName.elementName` convention (e.g., `wor
 
 ### Pre-Release Process
 See `ios/PT-Helper/docs/manual-qa-checklist.md` for the full manual QA checklist.
-Test plans: SmokePlan (11 tests), UnitPlan (all unit), FullPlan (all + collision + UI), PreReleasePlan (all + UI + coverage). FullPlan and PreReleasePlan run identical test targets — they intentionally aren't merged: FullPlan is the fast pre-merge gate (no coverage, 300s timeout) and PreReleasePlan is the thorough release gate (same tests + code coverage, 600s timeout).
+
+Test plans: SmokePlan (11 tests), UnitPlan (all unit), FullPlan (all + collision + UI), PreReleasePlan (all + UI + coverage). FullPlan and PreReleasePlan run identical test targets — they intentionally aren't merged: FullPlan is the nightly gate (no coverage, 300s timeout) and PreReleasePlan is the release gate (same tests + code coverage, 600s timeout).
+
+**What runs automatically** (`.github/workflows/`):
+
+| Trigger | Plan | Blocking |
+|---|---|---|
+| push/PR to `main` | UnitPlan (all unit tests) | Yes |
+| push/PR to `main` | Cloud Functions: lint, build, jest, `npm audit` | Yes |
+| push/PR to `main` | Firestore rules + integration tests (emulator) | Yes |
+| nightly 09:00 UTC | FullPlan on iPhone 16 Pro + iPhone SE | No — triage next morning |
+| `workflow_dispatch` (before TestFlight) | PreReleasePlan + coverage artifact | Yes, gates `beta` |
+
+SmokePlan is no longer a CI gate — it was an 11-test allow-list guarding a ~1,140-method suite, so almost nothing was actually enforced. It's kept only for fast local iteration. Don't reintroduce it as the PR gate.
 
 ## Code Conventions
 
