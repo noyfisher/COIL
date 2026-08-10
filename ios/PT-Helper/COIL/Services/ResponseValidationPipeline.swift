@@ -1257,7 +1257,7 @@ struct WellnessAnalysisValidator {
     }
 
     /// Run the full wellness analysis validation pipeline.
-    /// Returns the (unchanged) result + a `ValidationResult` carrying any warnings.
+    /// Returns the bounded result + a `ValidationResult` carrying any warnings.
     static func validate(
         _ result: WellnessAnalysisResult,
         assessments: [WellnessAssessment]
@@ -1270,10 +1270,16 @@ struct WellnessAnalysisValidator {
         if result.recommendations.isEmpty {
             warnings.append(ValidationWarning(severity: .caution, message: "No wellness recommendations were generated."))
         }
-        if result.recommendations.count > 5 {
-            fixes.append("Trimmed wellness recommendations from \(result.recommendations.count) to 5")
+        // Enforce the 1–5 bound for real. This previously appended the "Trimmed…" fix
+        // message and then returned the untouched result, so an over-long AI response
+        // reached the user in full while the pipeline reported a correction it had not
+        // performed. Mirrors `validateAnalysis`'s `conditions.prefix(3)` on the injury side.
+        var boundedRecommendations = result.recommendations
+        if boundedRecommendations.count > 5 {
+            fixes.append("Trimmed wellness recommendations from \(boundedRecommendations.count) to 5")
+            boundedRecommendations = Array(boundedRecommendations.prefix(5))
         }
-        for rec in result.recommendations {
+        for rec in boundedRecommendations {
             if rec.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 warnings.append(ValidationWarning(severity: .info, message: "A wellness recommendation was missing a title."))
             }
@@ -1295,7 +1301,17 @@ struct WellnessAnalysisValidator {
 
         let isValid = warnings.filter({ $0.severity >= .serious }).isEmpty
         let validation = ValidationResult(isValid: isValid, warnings: warnings, appliedFixes: fixes)
-        return (result, validation)
+
+        let boundedResult = WellnessAnalysisResult(
+            id: result.id,
+            assessments: result.assessments,
+            recommendations: boundedRecommendations,
+            overallSummary: result.overallSummary,
+            disclaimerText: result.disclaimerText,
+            generatedDate: result.generatedDate,
+            userProfileSnapshot: result.userProfileSnapshot
+        )
+        return (boundedResult, validation)
     }
 }
 

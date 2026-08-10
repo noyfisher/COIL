@@ -6,7 +6,11 @@ import Foundation
 /// Cross-session fields are optional so one decoder handles both the agent
 /// payload (which includes them) and the single-call Haiku payload (which doesn't).
 private struct AIFormFeedbackResponse: Decodable {
-    let overallScore: Int
+    /// `Double`, not `Int`, to match the server contract: `formAnalysisSchema.overallScore`
+    /// in `functions/src/response-schemas.ts` is `z.number().min(0).max(100)`, which accepts
+    /// fractional values. Decoding a fractional score into `Int` threw and failed the whole
+    /// analysis. Rounded to the domain model's `Int` (0–100) at the mapping site below.
+    let overallScore: Double
     let verdict: String
     let corrections: [AICorrection]
     let positivePoints: [String]
@@ -377,7 +381,11 @@ class FormAnalysisViewModel: ObservableObject {
 
     // MARK: - Response Parsing
 
-    private func parseFormFeedback(from text: String, exerciseName: String) throws -> FormFeedback {
+    /// Internal rather than private so tests can exercise the AI-response decode path.
+    /// `analyzeVideo` needs a real video file and pose extraction, so this is the only
+    /// reachable seam for asserting on wire-format handling. Same rationale as
+    /// `buildUserMessage` above.
+    func parseFormFeedback(from text: String, exerciseName: String) throws -> FormFeedback {
         // Tier 3 PR C: shadow-mode strict parsing (see ShadowModeJSONParser).
         let aiResponse = try ShadowModeJSONParser.parse(
             text,
@@ -445,7 +453,7 @@ class FormAnalysisViewModel: ObservableObject {
 
         return FormFeedback(
             exerciseName: exerciseName,
-            overallScore: max(0, min(100, aiResponse.overallScore)),
+            overallScore: max(0, min(100, Int(aiResponse.overallScore.rounded()))),
             verdict: verdict,
             corrections: corrections,
             positivePoints: aiResponse.positivePoints,
