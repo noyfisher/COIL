@@ -310,12 +310,15 @@ enum TestFixtures {
         impactLevel: WellnessAssessment.ImpactLevel = .moderate,
         motivationLevel: Int = 7,
         duration: WellnessAssessment.Duration = .fewMonths,
-        commitmentLevel: WellnessAssessment.CommitmentLevel = .fifteenMin
+        commitmentLevel: WellnessAssessment.CommitmentLevel = .fifteenMin,
+        customGoalText: String? = nil,
+        specificContext: String? = nil,
+        additionalNotes: String? = nil
     ) -> WellnessAssessment {
         WellnessAssessment(
             id: UUID(),
             goalCategory: goalCategory,
-            customGoalText: nil,
+            customGoalText: customGoalText,
             impactLevel: impactLevel,
             motivationLevel: motivationLevel,
             duration: duration,
@@ -324,8 +327,8 @@ enum TestFixtures {
             currentHabits: ["Walking"],
             priorAttempts: [.stretching],
             commitmentLevel: commitmentLevel,
-            specificContext: nil,
-            additionalNotes: nil
+            specificContext: specificContext,
+            additionalNotes: additionalNotes
         )
     }
 
