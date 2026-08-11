@@ -58,7 +58,7 @@ class RecoveryInsightsViewModel: ObservableObject {
 
     let apiService: ClaudeAPIServiceProtocol
 
-    init(apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.shared) {
+    init(apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.resolved) {
         self.apiService = apiService
     }
 

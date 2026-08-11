@@ -52,7 +52,7 @@ class InjuryAnalyzer {
     static func analyze(
         assessments: [PainAssessment],
         profile: UserProfile,
-        apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.shared,
+        apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.resolved,
         onStage: (@Sendable (Stage) -> Void)? = nil
     ) async throws -> ValidatedAnalysis {
 

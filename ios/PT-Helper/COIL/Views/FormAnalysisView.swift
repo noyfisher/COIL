@@ -9,7 +9,7 @@ struct FormAnalysisView: View {
     let exercise: RehabExercise
     @State private var showCamera = false
 
-    init(exercise: RehabExercise, apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.shared) {
+    init(exercise: RehabExercise, apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.resolved) {
         self.exercise = exercise
         _vm = StateObject(wrappedValue: FormAnalysisViewModel(apiService: apiService))
     }

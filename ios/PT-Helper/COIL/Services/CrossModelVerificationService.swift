@@ -48,8 +48,29 @@ extension URLSession: HTTPSession {}
 
 // MARK: - Cross-Model Verification Service
 
-class CrossModelVerificationService {
+/// The one behaviour callers depend on. Extracted so UI tests can substitute an
+/// in-process implementation — this service is reached via `.shared` rather than
+/// constructor injection, so there was previously no seam at all.
+protocol CrossModelVerifying {
+    func verify(
+        exercises: [(name: String, condition: String)],
+        patientContext: String
+    ) async throws -> [CrossModelResult]
+}
+
+class CrossModelVerificationService: CrossModelVerifying {
     static let shared = CrossModelVerificationService()
+
+    /// Mirrors `ClaudeAPIService.resolved`: the stub under `--uitesting --stub-ai`, the
+    /// real singleton otherwise. Stripped to `shared` in release.
+    static var resolved: CrossModelVerifying {
+        #if DEBUG
+        if TestDataSeeder.isUITesting && TestDataSeeder.shouldStubAI {
+            return StubCrossModelVerificationService.shared
+        }
+        #endif
+        return shared
+    }
 
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.pthelper", category: "crossModel")
     private let crossVerifyURL = "https://us-central1-pt-helper-dev.cloudfunctions.net/crossVerify"

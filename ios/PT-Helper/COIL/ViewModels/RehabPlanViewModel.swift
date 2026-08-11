@@ -97,10 +97,17 @@ class RehabPlanViewModel: ObservableObject {
     var totalExerciseCount: Int { rehabPlan?.exercises.count ?? 0 }
 
     let apiService: ClaudeAPIServiceProtocol
+    /// Tier-2 safety check. Injected rather than reached via `.shared` so UI tests can
+    /// drive the cross-model failure path (which surfaces `SeriousWarningModal`).
+    private let crossModelService: CrossModelVerifying
     private let db = Firestore.firestore()
 
-    init(apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.shared) {
+    init(
+        apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.resolved,
+        crossModelService: CrossModelVerifying = CrossModelVerificationService.resolved
+    ) {
         self.apiService = apiService
+        self.crossModelService = crossModelService
     }
 
     // Fallback exercise database organized by condition name
@@ -338,7 +345,7 @@ class RehabPlanViewModel: ObservableObject {
         let patientContext = "\(profile.age)-year-old \(profile.sex.lowercased()), \(profile.activityLevel.lowercased()) activity level"
 
         do {
-            let results = try await CrossModelVerificationService.shared.verify(
+            let results = try await crossModelService.verify(
                 exercises: exercisePairs,
                 patientContext: patientContext
             )

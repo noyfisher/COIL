@@ -247,6 +247,11 @@ extension PainDetailView {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        // Every wizard step builds its choices through this one card, so a single
+        // label-derived identifier makes all 8 steps addressable from XCUITest. Without
+        // it the wizard carried only two identifiers total and the assessment journey —
+        // the app's primary flow — could not be driven end to end at all.
+        .accessibilityIdentifier("painDetail.option.\(label)")
         .animation(AppAnimations.springy, value: isSelected)
     }
 

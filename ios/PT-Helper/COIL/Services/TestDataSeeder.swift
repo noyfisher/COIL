@@ -42,6 +42,32 @@ enum TestDataSeeder {
         #endif
     }
 
+    /// Routes every AI call through `StubClaudeAPIService` instead of the real Cloud
+    /// Function proxy. Without this, a UI test that walks into an assessment or plan
+    /// generation hits the live Claude API over the network — which is why the E2E suite
+    /// avoided those journeys entirely rather than testing them flakily.
+    static var shouldStubAI: Bool {
+        #if DEBUG
+        ProcessInfo.processInfo.arguments.contains("--stub-ai")
+        #else
+        false
+        #endif
+    }
+
+    /// Selects which canned scenario `AIScenarioLoader` serves, via `--ai-scenario <name>`.
+    /// Defaults to the happy path so `--stub-ai` alone is useful.
+    static var aiScenario: String {
+        #if DEBUG
+        let args = ProcessInfo.processInfo.arguments
+        guard let index = args.firstIndex(of: "--ai-scenario"), index + 1 < args.count else {
+            return "default"
+        }
+        return args[index + 1]
+        #else
+        return "default"
+        #endif
+    }
+
     static var shouldClearCoachMark: Bool {
         #if DEBUG
         ProcessInfo.processInfo.arguments.contains("--clear-coach-mark")

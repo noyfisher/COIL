@@ -18,7 +18,7 @@ class InjuryAnalysisViewModel: ObservableObject {
     private let apiService: ClaudeAPIServiceProtocol
     private(set) var analysisTask: Task<Void, Never>?
 
-    init(userProfile: UserProfile, selectedRegions: [BodyRegion], apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.shared) {
+    init(userProfile: UserProfile, selectedRegions: [BodyRegion], apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.resolved) {
         self.userProfile = userProfile
         self.selectedRegions = selectedRegions
         self.apiService = apiService

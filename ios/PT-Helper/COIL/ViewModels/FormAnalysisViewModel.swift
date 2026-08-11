@@ -68,7 +68,7 @@ class FormAnalysisViewModel: ObservableObject {
     var userConditions: [String] = []
 
     init(
-        apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.shared,
+        apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.resolved,
         poseDetector: PoseDetectionService = .shared,
         analysisEngine: PoseAnalysisEngine = .shared,
         qualityScorer: DataQualityScorer = .shared,

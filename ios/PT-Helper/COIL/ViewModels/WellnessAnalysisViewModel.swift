@@ -25,7 +25,7 @@ class WellnessAnalysisViewModel: ObservableObject {
     private let apiService: ClaudeAPIServiceProtocol
     private(set) var analysisTask: Task<Void, Never>?
 
-    init(userProfile: UserProfile, selectedGoals: [GoalSelection], apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.shared) {
+    init(userProfile: UserProfile, selectedGoals: [GoalSelection], apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.resolved) {
         self.userProfile = userProfile
         self.selectedGoals = selectedGoals
         self.apiService = apiService

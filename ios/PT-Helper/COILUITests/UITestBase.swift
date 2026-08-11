@@ -87,4 +87,28 @@ class UITestBase: XCTestCase {
     func staticText(_ text: String) -> XCUIElement {
         app.staticTexts[text]
     }
+
+    // MARK: - One-time gates
+
+    /// Clears the MHMDA health-data consent cover if it is showing. It appears the first
+    /// time health data is collected, so whether a test sees it depends on the simulator's
+    /// persisted state — always call this before driving an assessment rather than
+    /// assuming either outcome.
+    @MainActor
+    func dismissHealthConsentIfPresent() {
+        let collection = app.buttons["healthConsent.collectionCheckbox"]
+        guard collection.waitForExistence(timeout: 2) else { return }
+        collection.tap()
+        app.buttons["healthConsent.sharingCheckbox"].tap()
+        let cont = app.buttons["healthConsent.continueButton"]
+        if cont.waitForExistence(timeout: 2) { cont.tap() }
+    }
+
+    /// Clears the "Before You Begin" medical disclaimer, which gates the pain wizard on
+    /// first run. Same persisted-state caveat as the consent cover above.
+    @MainActor
+    func dismissDisclaimerIfPresent() {
+        let cta = app.buttons["I Understand, Continue"]
+        if cta.waitForExistence(timeout: 2) { cta.tap() }
+    }
 }

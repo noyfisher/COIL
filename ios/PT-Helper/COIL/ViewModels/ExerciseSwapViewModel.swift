@@ -90,7 +90,7 @@ class ExerciseSwapViewModel: ObservableObject {
     let apiService: ClaudeAPIServiceProtocol
 
     init(exercise: RehabExercise, plan: RehabPlan,
-         apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.shared) {
+         apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.resolved) {
         self.exercise = exercise
         self.plan = plan
         self.apiService = apiService

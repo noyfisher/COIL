@@ -8,19 +8,8 @@ final class OnboardingUITests: UITestBase {
     override var seedMockData: Bool { false }
     override var additionalLaunchArguments: [String] { ["--prefill-weight"] }
 
-    /// The MHMDA health-data consent cover is presented on top of onboarding the
-    /// first time it's shown (before any health data is collected). Dismiss it if
-    /// present so the onboarding flow is reachable regardless of persisted consent
-    /// state (a freshly erased simulator shows it; a reused one may not).
-    @MainActor
-    private func dismissHealthConsentIfPresent() {
-        let collection = app.buttons["healthConsent.collectionCheckbox"]
-        guard collection.waitForExistence(timeout: 2) else { return }
-        collection.tap()
-        app.buttons["healthConsent.sharingCheckbox"].tap()
-        let cont = app.buttons["healthConsent.continueButton"]
-        if cont.waitForExistence(timeout: 2) { cont.tap() }
-    }
+    // `dismissHealthConsentIfPresent` now lives on `UITestBase` — the assessment journey
+    // hits the same MHMDA cover, so both suites share one implementation.
 
     /// Wait until the step indicator reads "N/6" (the header shows a compact
     /// "\(currentStep)/6", not "Step N of 6").

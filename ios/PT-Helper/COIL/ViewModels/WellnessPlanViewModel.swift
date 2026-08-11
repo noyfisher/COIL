@@ -55,7 +55,7 @@ class WellnessPlanViewModel: ObservableObject {
     let apiService: ClaudeAPIServiceProtocol
     private let db = Firestore.firestore()
 
-    init(apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.shared) {
+    init(apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.resolved) {
         self.apiService = apiService
     }
 
