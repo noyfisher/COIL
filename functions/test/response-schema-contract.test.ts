@@ -46,22 +46,56 @@ function deepStrict(schema: z.ZodTypeAny): z.ZodTypeAny {
   return schema;
 }
 
-const FIXTURE_DIR = resolve(__dirname, "../../contracts/response-schemas");
+const REPO_ROOT = resolve(__dirname, "../..");
+const FIXTURE_DIR = resolve(REPO_ROOT, "contracts/response-schemas");
+const IOS_FIXTURE_DIR = resolve(REPO_ROOT, "ios/PT-Helper/COILTests/Fixtures");
 
-function fixture(name: string): unknown {
-  return JSON.parse(readFileSync(resolve(FIXTURE_DIR, `${name}.json`), "utf8"));
+/**
+ * Paths are resolved from string literals rather than interpolated at call time. The
+ * names are all internal constants, but building them from a variable trips static
+ * analysis for path traversal, and an explicit table is clearer anyway: this is the
+ * complete set of shapes under contract, and `keyof` makes a typo a compile error.
+ */
+const FIXTURES = {
+  analysis: {
+    schema: analysisSchema,
+    canonical: resolve(FIXTURE_DIR, "analysis.json"),
+    mirrored: resolve(IOS_FIXTURE_DIR, "contract-analysis.json"),
+  },
+  rehab_plan: {
+    schema: rehabPlanSchema,
+    canonical: resolve(FIXTURE_DIR, "rehab_plan.json"),
+    mirrored: resolve(IOS_FIXTURE_DIR, "contract-rehab_plan.json"),
+  },
+  exercise_substitute: {
+    schema: exerciseSubstituteSchema,
+    canonical: resolve(FIXTURE_DIR, "exercise_substitute.json"),
+    mirrored: resolve(IOS_FIXTURE_DIR, "contract-exercise_substitute.json"),
+  },
+  form_analysis: {
+    schema: formAnalysisSchema,
+    canonical: resolve(FIXTURE_DIR, "form_analysis.json"),
+    mirrored: resolve(IOS_FIXTURE_DIR, "contract-form_analysis.json"),
+  },
+  wellness_analysis: {
+    schema: wellnessAnalysisSchema,
+    canonical: resolve(FIXTURE_DIR, "wellness_analysis.json"),
+    mirrored: resolve(IOS_FIXTURE_DIR, "contract-wellness_analysis.json"),
+  },
+} as const;
+
+type FixtureName = keyof typeof FIXTURES;
+
+const CASES = Object.entries(FIXTURES) as Array<
+  [FixtureName, (typeof FIXTURES)[FixtureName]]
+>;
+
+function fixture(name: FixtureName): unknown {
+  return JSON.parse(readFileSync(FIXTURES[name].canonical, "utf8"));
 }
 
-const CASES: Array<[string, z.ZodTypeAny]> = [
-  ["analysis", analysisSchema],
-  ["rehab_plan", rehabPlanSchema],
-  ["exercise_substitute", exerciseSubstituteSchema],
-  ["form_analysis", formAnalysisSchema],
-  ["wellness_analysis", wellnessAnalysisSchema],
-];
-
 describe("response-schema contract (server side)", () => {
-  for (const [name, schema] of CASES) {
+  for (const [name, { schema }] of CASES) {
     it(`${name}.json matches its schema exactly`, () => {
       const result = deepStrict(schema).safeParse(fixture(name));
 
@@ -82,7 +116,7 @@ describe("response-schema contract (server side)", () => {
    * The fixtures must be complete. An optional field left out of a fixture is a field
    * neither stack is checking, which would let it drift unnoticed.
    */
-  for (const [name, schema] of CASES) {
+  for (const [name, { schema }] of CASES) {
     it(`${name}.json populates every optional field`, () => {
       const data = fixture(name) as Record<string, unknown>;
 
@@ -123,13 +157,10 @@ describe("response-schema contract (server side)", () => {
    * file would quietly break the whole point of a shared artifact, so pin them byte for
    * byte here — Node can see both paths.
    */
-  for (const [name] of CASES) {
+  for (const [name, paths] of CASES) {
     it(`${name}.json is mirrored verbatim into the iOS test bundle`, () => {
-      const canonical = readFileSync(resolve(FIXTURE_DIR, `${name}.json`), "utf8");
-      const mirrored = readFileSync(
-        resolve(__dirname, `../../ios/PT-Helper/COILTests/Fixtures/contract-${name}.json`),
-        "utf8",
-      );
+      const canonical = readFileSync(paths.canonical, "utf8");
+      const mirrored = readFileSync(paths.mirrored, "utf8");
 
       expect(mirrored).toBe(canonical);
     });
@@ -141,7 +172,7 @@ describe("response-schema contract (server side)", () => {
       wellness_verify: "wellness_analysis",
       wellness_plan: "rehab_plan",
     };
-    const covered = new Set(CASES.map(([name]) => name));
+    const covered = new Set<string>(CASES.map(([name]) => name));
 
     const uncovered = Object.keys(RESPONSE_SCHEMAS).filter(
       (type) => !covered.has(aliases[type] ?? type),
