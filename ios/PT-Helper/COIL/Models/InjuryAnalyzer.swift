@@ -5,13 +5,13 @@ private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "COIL", c
 
 // MARK: - Intermediate Decodable Types for AI Response
 
-private struct AIAnalysisResponse: Decodable {
+struct AIAnalysisResponse: Decodable {
     let conditions: [AIConditionResult]
     let overallSummary: String
     let disclaimerText: String
 }
 
-private struct AIConditionResult: Decodable {
+struct AIConditionResult: Decodable {
     let conditionName: String
     let commonName: String
     let confidence: Double

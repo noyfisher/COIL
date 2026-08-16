@@ -32,11 +32,11 @@ enum SwapReason: String, CaseIterable, Identifiable {
 
 // MARK: - AI Response Types
 
-private struct AISubstituteResponse: Decodable {
+struct AISubstituteResponse: Decodable {
     let substitutes: [AISubstituteExercise]
 }
 
-private struct AISubstituteExercise: Decodable {
+struct AISubstituteExercise: Decodable {
     let name: String
     let targetArea: String
     let description: String

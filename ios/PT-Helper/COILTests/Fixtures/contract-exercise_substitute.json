@@ -1,0 +1,24 @@
+{
+  "substitutes": [
+    {
+      "name": "Straight Leg Raises",
+      "targetArea": "Knee",
+      "description": "Lift the straight leg to about 45 degrees and lower with control.",
+      "sets": 3,
+      "reps": "10-12",
+      "restSeconds": 30,
+      "difficulty": "beginner",
+      "demonstrationIcon": "figure.strengthtraining.traditional",
+      "tips": ["Keep the core engaged", "Lift slowly"],
+      "contraindications": ["Avoid if hip pain worsens"],
+      "startPosition": "Lie on your back with one knee bent, the other leg straight",
+      "movement": "Tighten the quad and raise the straight leg to about 45 degrees",
+      "endPosition": "Lower the leg slowly back to the floor",
+      "exerciseCategory": "strength",
+      "imageFileName": "straight-leg-raises",
+      "catalogSubstitution": false,
+      "notes": "",
+      "whyItHelps": "Loads the quadriceps without the deep knee flexion that provokes symptoms."
+    }
+  ]
+}

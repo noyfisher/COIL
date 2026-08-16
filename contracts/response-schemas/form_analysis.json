@@ -1,0 +1,16 @@
+{
+  "overallScore": 82.5,
+  "verdict": "good",
+  "corrections": [
+    {
+      "bodyPart": "knees",
+      "issue": "Knees drift inward at the bottom of the squat",
+      "howToFix": "Push the knees out over the toes as you descend",
+      "severity": "moderate",
+      "dataReference": "Rep 3: knee valgus angle 14 degrees"
+    }
+  ],
+  "positivePoints": ["Consistent depth across reps", "Controlled tempo"],
+  "safetyNotes": ["Stop if you feel sharp knee pain"],
+  "dataLimitations": ["Left hip was occluded for part of the recording"]
+}

@@ -1,0 +1,16 @@
+{
+  "recommendations": [
+    {
+      "goalCategory": "improve_posture",
+      "title": "Desk Posture Reset",
+      "currentStateAssessment": "Mild postural fatigue from prolonged seated work.",
+      "rootCauses": ["Prolonged sitting", "Weak deep core"],
+      "expectedTimeline": "4-6 weeks",
+      "keyInsight": "Frequent movement breaks help more than any single stretch.",
+      "priorityLevel": "high",
+      "relatedGoals": ["reduce_back_tension"]
+    }
+  ],
+  "overallSummary": "Small daily habits will steadily improve your posture.",
+  "disclaimerText": "This is educational wellness guidance, not medical advice."
+}

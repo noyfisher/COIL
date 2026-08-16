@@ -5,14 +5,14 @@ import FirebaseAuth
 
 // MARK: - Intermediate Decodable Types for AI Rehab Response
 
-private struct AIRehabResponse: Decodable {
+struct AIRehabResponse: Decodable {
     let planName: String
     let exercises: [AIRehabExercise]
     let totalWeeks: Int
     let notes: String?
 }
 
-private struct AIRehabExercise: Decodable {
+struct AIRehabExercise: Decodable {
     let name: String
     let targetArea: String
     let description: String

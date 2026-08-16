@@ -5,7 +5,7 @@ import Foundation
 /// Decodable wrapper for the Claude form analysis JSON response.
 /// Cross-session fields are optional so one decoder handles both the agent
 /// payload (which includes them) and the single-call Haiku payload (which doesn't).
-private struct AIFormFeedbackResponse: Decodable {
+struct AIFormFeedbackResponse: Decodable {
     /// `Double`, not `Int`, to match the server contract: `formAnalysisSchema.overallScore`
     /// in `functions/src/response-schemas.ts` is `z.number().min(0).max(100)`, which accepts
     /// fractional values. Decoding a fractional score into `Int` threw and failed the whole
