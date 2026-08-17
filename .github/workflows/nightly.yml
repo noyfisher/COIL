@@ -49,10 +49,12 @@ jobs:
           sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
           xcodebuild -version
 
-      - name: Cache SPM packages
+      # See the note in ci.yml: cache the checkouts, never the directory holding the
+      # git-tracked Package.resolved.
+      - name: Cache SPM checkouts
         uses: actions/cache@v4
         with:
-          path: ios/PT-Helper/COIL.xcodeproj/project.xcworkspace/xcshareddata/swiftpm
+          path: ios/PT-Helper/SourcePackages
           key: spm-${{ runner.os }}-${{ hashFiles('ios/PT-Helper/COIL.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: spm-${{ runner.os }}-
 
@@ -63,6 +65,7 @@ jobs:
             -scheme COIL \
             -testPlan FullPlan \
             -destination 'platform=iOS Simulator,name=${{ matrix.simulator }},OS=latest' \
+            -clonedSourcePackagesDirPath SourcePackages \
             clean test
 
       - name: Upload test results

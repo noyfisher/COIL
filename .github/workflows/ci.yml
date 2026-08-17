@@ -44,10 +44,17 @@ jobs:
           bundler-cache: true
           working-directory: ios/PT-Helper
 
-      - name: Cache SPM packages
+      # Caches the resolved package *checkouts*, via -clonedSourcePackagesDirPath on the
+      # xcodebuild calls below. Do NOT cache
+      # COIL.xcodeproj/project.xcworkspace/xcshareddata/swiftpm: that directory holds the
+      # git-tracked Package.resolved, so a restore-keys fallback would write a stale copy
+      # over the checked-out one and silently build against different pinned versions
+      # (this repo has a hard Firebase >= 12.12.1 floor). It would also cache almost
+      # nothing useful, since `clean test` puts the real checkouts elsewhere.
+      - name: Cache SPM checkouts
         uses: actions/cache@v4
         with:
-          path: ios/PT-Helper/COIL.xcodeproj/project.xcworkspace/xcshareddata/swiftpm
+          path: ios/PT-Helper/SourcePackages
           key: spm-${{ runner.os }}-${{ hashFiles('ios/PT-Helper/COIL.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: spm-${{ runner.os }}-
 
@@ -64,6 +71,7 @@ jobs:
             -scheme COIL \
             -testPlan UnitPlan \
             -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest' \
+            -clonedSourcePackagesDirPath SourcePackages \
             clean test
 
       - name: Upload test results
@@ -180,10 +188,17 @@ jobs:
           fi
           sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
 
-      - name: Cache SPM packages
+      # Caches the resolved package *checkouts*, via -clonedSourcePackagesDirPath on the
+      # xcodebuild calls below. Do NOT cache
+      # COIL.xcodeproj/project.xcworkspace/xcshareddata/swiftpm: that directory holds the
+      # git-tracked Package.resolved, so a restore-keys fallback would write a stale copy
+      # over the checked-out one and silently build against different pinned versions
+      # (this repo has a hard Firebase >= 12.12.1 floor). It would also cache almost
+      # nothing useful, since `clean test` puts the real checkouts elsewhere.
+      - name: Cache SPM checkouts
         uses: actions/cache@v4
         with:
-          path: ios/PT-Helper/COIL.xcodeproj/project.xcworkspace/xcshareddata/swiftpm
+          path: ios/PT-Helper/SourcePackages
           key: spm-${{ runner.os }}-${{ hashFiles('ios/PT-Helper/COIL.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: spm-${{ runner.os }}-
 
@@ -195,6 +210,7 @@ jobs:
             -testPlan PreReleasePlan \
             -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest' \
             -resultBundlePath TestResults.xcresult \
+            -clonedSourcePackagesDirPath SourcePackages \
             clean test
 
       # Report-only. There is no historical coverage data for this repo yet, so any

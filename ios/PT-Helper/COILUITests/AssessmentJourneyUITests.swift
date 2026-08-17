@@ -89,12 +89,31 @@ class AssessmentJourneyTestCase: UITestBase {
             if cont.exists && !cont.isEnabled {
                 let options = app.descendants(matching: .any)
                     .matching(NSPredicate(format: "identifier BEGINSWITH %@", "painDetail.option."))
-                let first = options.element(boundBy: 0)
-                guard first.waitForExistence(timeout: 3), first.isHittable else {
+                guard options.element(boundBy: 0).waitForExistence(timeout: 3) else {
                     XCTFail("Step \(step + 1): Continue is disabled and no option was tappable")
                     return false
                 }
-                first.tap()
+
+                // Try options in order until Continue enables, rather than assuming index
+                // 0 always satisfies the step. Some steps are multi-select ("select all
+                // that apply"), where re-tapping an already-chosen option toggles it back
+                // OFF and leaves Continue disabled; others gate on a particular answer.
+                //
+                // The wait after each tap matters on its own: SwiftUI re-evaluates
+                // `canContinue` asynchronously, so reading `isEnabled` immediately can see
+                // the pre-tap state and fail a perfectly healthy app. Same wait
+                // `selectRegionFromList` uses above.
+                let candidateCount = min(options.count, 8)
+                for index in 0..<max(candidateCount, 1) {
+                    let option = options.element(boundBy: index)
+                    guard option.exists, option.isHittable else { continue }
+                    option.tap()
+
+                    let enabled = XCTNSPredicateExpectation(
+                        predicate: NSPredicate(format: "isEnabled == true"), object: cont
+                    )
+                    if XCTWaiter.wait(for: [enabled], timeout: 3) == .completed { break }
+                }
             }
 
             guard cont.exists, cont.isEnabled else {

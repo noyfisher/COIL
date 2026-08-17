@@ -39,7 +39,12 @@ enum AIScenarioFixtures {
         isRedFlag: Bool = false,
         redFlagMessage: String? = nil
     ) -> String {
-        let redFlagValue = redFlagMessage.map { "\"\($0)\"" } ?? "null"
+        // Empty string, never null. `conditionSchema.redFlagMessage` is a required
+        // `z.string()` server-side (it may be "", but not absent or null), so a null here
+        // would be rejected by `validateClaudeResponse` with a 502 before the client ever
+        // saw it — meaning these tests would be exercising a shape production cannot
+        // deliver. Matches `contracts/response-schemas/analysis.json`.
+        let redFlagValue = "\"\(redFlagMessage ?? "")\""
         return """
         {
             "conditions": [{
@@ -189,9 +194,17 @@ enum AIScenarioLoader {
             .rehab_plan: [.json(AIScenarioFixtures.rehabPlan())],
         ],
 
-        // Server-flagged emergency: the condition carries isRedFlag, which
-        // ResponseValidationPipeline promotes to an .emergency warning and AnalyzingView
-        // routes to EmergencyRedirectView.
+        // An AI response that flags itself as a red flag.
+        //
+        // This does NOT reach EmergencyRedirectView, despite what the name suggests.
+        // `EmergencyRedirectView` fires only on an `.emergency` entry in
+        // `redFlagAlerts`, and those come solely from
+        // `MedicalRedFlagDetector.check(assessments:)` — a scan of what the *user*
+        // typed. The response-side path, `checkConditions`, only ever emits `.urgent`,
+        // and only when `isRedFlag` is false (it exists to catch conditions the AI
+        // failed to flag, not to act on ones it did). See
+        // `testAIDeclaredRedFlag_doesNotTriggerEmergencyTakeover_currentBehaviour`,
+        // which pins that and fails if it changes.
         "emergency_red_flag": [
             .analysis: [.json(AIScenarioFixtures.analysis(
                 conditionName: "Acute Coronary Syndrome",
@@ -229,6 +242,16 @@ enum AIScenarioLoader {
             .wellness_verify: [.json(AIScenarioFixtures.wellnessAnalysis(title: "Verified Posture Plan"))],
             .wellness_plan: [.json(AIScenarioFixtures.rehabPlan(planName: "Posture Wellness Plan"))],
         ],
+
+        // Cross-model verification fails, so unverified exercises cannot be cleared and
+        // `SeriousWarningModal` becomes reachable. The AI calls themselves succeed — the
+        // failure is injected by `StubCrossModelVerificationService`, which keys off this
+        // scenario name. Declared here so the name is registered, not just referenced.
+        "crossmodel_failure": [
+            .analysis: [.json(AIScenarioFixtures.analysis())],
+            .analysis_verify: [.json(AIScenarioFixtures.analysis(confidence: 82))],
+            .rehab_plan: [.json(AIScenarioFixtures.rehabPlan())],
+        ],
     ]
 
     /// FIFO cursor per request type. Guarded because AI calls are made from concurrent
@@ -237,7 +260,20 @@ enum AIScenarioLoader {
     private static var consumed: [AIRequestType: Int] = [:]
 
     static func next(for requestType: AIRequestType) throws -> String {
-        let queue = scenarios[TestDataSeeder.aiScenario]?[requestType] ?? []
+        // Fail loudly on an unregistered scenario name. Falling through to the generic
+        // happy-path body would let a typo'd `--ai-scenario` silently turn a degradation
+        // test into a success test that passes while asserting nothing.
+        guard let scenario = scenarios[TestDataSeeder.aiScenario] else {
+            fatalError("""
+                Unknown --ai-scenario '\(TestDataSeeder.aiScenario)'. \
+                Known scenarios: \(scenarios.keys.sorted().joined(separator: ", ")). \
+                Add it to AIScenarioLoader.scenarios or fix the launch argument.
+                """)
+        }
+
+        // A request type the scenario doesn't define still gets a valid generic body —
+        // an unrelated call shouldn't derail a test that isn't about it.
+        let queue = scenario[requestType] ?? []
 
         lock.lock()
         let index = consumed[requestType, default: 0]

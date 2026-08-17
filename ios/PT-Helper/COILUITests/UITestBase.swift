@@ -94,21 +94,28 @@ class UITestBase: XCTestCase {
     /// time health data is collected, so whether a test sees it depends on the simulator's
     /// persisted state — always call this before driving an assessment rather than
     /// assuming either outcome.
+    /// `timeout` is how long to wait for the cover to *appear*. It defaults high enough to
+    /// cover a slow sheet animation on a loaded runner: if this returns before the sheet
+    /// arrives, the sheet then covers whatever the test does next, and the failure surfaces
+    /// much later as "the next screen never appeared" rather than "the gate was missed".
     @MainActor
-    func dismissHealthConsentIfPresent() {
+    func dismissHealthConsentIfPresent(timeout: TimeInterval = 5) {
         let collection = app.buttons["healthConsent.collectionCheckbox"]
-        guard collection.waitForExistence(timeout: 2) else { return }
+        guard collection.waitForExistence(timeout: timeout) else { return }
         collection.tap()
         app.buttons["healthConsent.sharingCheckbox"].tap()
         let cont = app.buttons["healthConsent.continueButton"]
-        if cont.waitForExistence(timeout: 2) { cont.tap() }
+        if cont.waitForExistence(timeout: 5) { cont.tap() }
+        _ = collection.waitForNonExistence(timeout: 5)
     }
 
     /// Clears the "Before You Begin" medical disclaimer, which gates the pain wizard on
     /// first run. Same persisted-state caveat as the consent cover above.
     @MainActor
-    func dismissDisclaimerIfPresent() {
+    func dismissDisclaimerIfPresent(timeout: TimeInterval = 5) {
         let cta = app.buttons["I Understand, Continue"]
-        if cta.waitForExistence(timeout: 2) { cta.tap() }
+        guard cta.waitForExistence(timeout: timeout) else { return }
+        cta.tap()
+        _ = cta.waitForNonExistence(timeout: 5)
     }
 }
