@@ -12,10 +12,13 @@ Run the PT Helper iOS test suite using the specified test plan.
 
 | Argument | Test Plan | What it covers | Timeout |
 |----------|-----------|----------------|---------|
-| `smoke` | SmokePlan | 11 key tests — quick sanity check | 60s |
-| `unit` (default) | UnitPlan | All unit tests | 120s |
-| `full` | FullPlan | All unit + collision + UI tests | 300s |
-| `prerelease` | PreReleasePlan | All unit + UI tests + code coverage | 600s |
+| `smoke` | SmokePlan | 11 key tests — quick local sanity check only | 60s |
+| `unit` (default) | UnitPlan | All unit tests — this is what CI gates PRs on | 120s |
+| `full` | FullPlan | All unit + collision + UI tests — runs nightly in CI | 300s |
+| `prerelease` | PreReleasePlan | All unit + UI tests + code coverage — gates TestFlight | 600s |
+
+`smoke` is an 11-test allow-list, not a meaningful gate. Use it for a fast local
+pulse check; never treat a green `smoke` run as evidence a change is safe.
 
 ## Instructions
 

@@ -109,6 +109,22 @@ protocol ClaudeAPIServiceProtocol {
 class ClaudeAPIService: ClaudeAPIServiceProtocol {
     static let shared = ClaudeAPIService()
 
+    /// The service every ViewModel resolves by default. Returns the in-process stub under
+    /// `--uitesting --stub-ai`, and the real singleton otherwise.
+    ///
+    /// This exists because UI tests run the app as a separate process and cannot reach the
+    /// `MockClaudeAPIService` that unit tests inject — so without a seam here, any UI test
+    /// touching an AI flow would call the live Cloud Function. In release builds the
+    /// `#if DEBUG` branch is stripped and this is simply `shared`.
+    static var resolved: ClaudeAPIServiceProtocol {
+        #if DEBUG
+        if TestDataSeeder.isUITesting && TestDataSeeder.shouldStubAI {
+            return StubClaudeAPIService.shared
+        }
+        #endif
+        return shared
+    }
+
     /// Build the telemetry metadata dict logged with each API call event so we can
     /// diagnose cellular vs. wifi latency. Pure for testability — caller passes
     /// in the interface type rather than reading NetworkMonitor here.

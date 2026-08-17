@@ -1,0 +1,20 @@
+{
+  "conditions": [
+    {
+      "conditionName": "Patellofemoral Pain Syndrome",
+      "commonName": "Runner's Knee",
+      "confidence": 78,
+      "explanation": "Pain around the front of the kneecap that worsens with stairs and prolonged sitting.",
+      "whatItMeans": "The kneecap is not tracking cleanly through its groove during knee bend.",
+      "howToManage": "Strengthen the quadriceps and hip abductors; reduce deep-flexion loading for now.",
+      "isRedFlag": false,
+      "redFlagMessage": "",
+      "nextSteps": [
+        "See a physical therapist if symptoms persist beyond two weeks",
+        "Avoid deep squats and stair descent while symptomatic"
+      ]
+    }
+  ],
+  "overallSummary": "Findings are most consistent with patellofemoral pain syndrome.",
+  "disclaimerText": "This is educational information, not medical advice."
+}

@@ -5,13 +5,13 @@ private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "COIL", c
 
 // MARK: - Intermediate Decodable Types for AI Response
 
-private struct AIWellnessResponse: Decodable {
+struct AIWellnessResponse: Decodable {
     let recommendations: [AIWellnessRecommendation]
     let overallSummary: String
     let disclaimerText: String
 }
 
-private struct AIWellnessRecommendation: Decodable {
+struct AIWellnessRecommendation: Decodable {
     let goalCategory: String
     let title: String
     let currentStateAssessment: String
@@ -44,7 +44,7 @@ class WellnessAnalyzer {
     /// Call 1 (Primary Analysis): Personalized wellness recommendations.
     /// Call 2 (Verification): Feasibility, personalization, and safety review.
     /// If Call 2 fails, gracefully falls back to Call 1's result.
-    static func analyze(assessments: [WellnessAssessment], profile: UserProfile, apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.shared) async throws -> ValidatedWellnessAnalysis {
+    static func analyze(assessments: [WellnessAssessment], profile: UserProfile, apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.resolved) async throws -> ValidatedWellnessAnalysis {
 
         // --- Call 1: Primary Analysis ---
         logger.info("Building primary wellness analysis prompt for \(assessments.count) goal(s)")

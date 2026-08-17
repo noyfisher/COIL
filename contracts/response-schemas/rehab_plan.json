@@ -1,0 +1,26 @@
+{
+  "planName": "Knee Rehabilitation Plan",
+  "exercises": [
+    {
+      "name": "Quad Sets",
+      "targetArea": "Knee",
+      "description": "Tighten the muscle on top of the thigh and hold.",
+      "sets": 3,
+      "reps": "10-15",
+      "restSeconds": 30,
+      "difficulty": "beginner",
+      "demonstrationIcon": "figure.flexibility",
+      "tips": ["Keep the leg straight", "Press the knee into the floor"],
+      "contraindications": ["Avoid if acute knee swelling is present"],
+      "startPosition": "Sit with the affected leg straight out in front of you",
+      "movement": "Tighten the thigh, pressing the back of the knee down. Hold 5 seconds",
+      "endPosition": "Release and let the leg rest flat",
+      "exerciseCategory": "strength",
+      "imageFileName": "quad-sets",
+      "catalogSubstitution": false,
+      "notes": ""
+    }
+  ],
+  "totalWeeks": 6,
+  "notes": "Progress gradually; stop any movement that sharpens pain."
+}

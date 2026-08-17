@@ -32,11 +32,11 @@ enum SwapReason: String, CaseIterable, Identifiable {
 
 // MARK: - AI Response Types
 
-private struct AISubstituteResponse: Decodable {
+struct AISubstituteResponse: Decodable {
     let substitutes: [AISubstituteExercise]
 }
 
-private struct AISubstituteExercise: Decodable {
+struct AISubstituteExercise: Decodable {
     let name: String
     let targetArea: String
     let description: String
@@ -90,7 +90,7 @@ class ExerciseSwapViewModel: ObservableObject {
     let apiService: ClaudeAPIServiceProtocol
 
     init(exercise: RehabExercise, plan: RehabPlan,
-         apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.shared) {
+         apiService: ClaudeAPIServiceProtocol = ClaudeAPIService.resolved) {
         self.exercise = exercise
         self.plan = plan
         self.apiService = apiService

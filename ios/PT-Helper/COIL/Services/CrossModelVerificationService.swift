@@ -48,8 +48,29 @@ extension URLSession: HTTPSession {}
 
 // MARK: - Cross-Model Verification Service
 
-class CrossModelVerificationService {
+/// The one behaviour callers depend on. Extracted so UI tests can substitute an
+/// in-process implementation — this service is reached via `.shared` rather than
+/// constructor injection, so there was previously no seam at all.
+protocol CrossModelVerifying {
+    func verify(
+        exercises: [(name: String, condition: String)],
+        patientContext: String
+    ) async throws -> [CrossModelResult]
+}
+
+class CrossModelVerificationService: CrossModelVerifying {
     static let shared = CrossModelVerificationService()
+
+    /// Mirrors `ClaudeAPIService.resolved`: the stub under `--uitesting --stub-ai`, the
+    /// real singleton otherwise. Stripped to `shared` in release.
+    static var resolved: CrossModelVerifying {
+        #if DEBUG
+        if TestDataSeeder.isUITesting && TestDataSeeder.shouldStubAI {
+            return StubCrossModelVerificationService.shared
+        }
+        #endif
+        return shared
+    }
 
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.pthelper", category: "crossModel")
     private let crossVerifyURL = "https://us-central1-pt-helper-dev.cloudfunctions.net/crossVerify"
@@ -271,7 +292,11 @@ class CrossModelVerificationService {
 
     // MARK: - Response Parsing
 
-    private func parseCrossModelResponse(_ data: Data, exercises: [(name: String, condition: String)]) throws -> [CrossModelResult] {
+    /// Internal rather than private so the response-mapping logic is testable. `verify` and
+    /// `sendBatch` require a signed-in Firebase user before any network call, so they throw
+    /// `.authenticationRequired` in a unit-test process — this is the only reachable seam
+    /// for asserting on how the two response shapes are decoded.
+    func parseCrossModelResponse(_ data: Data, exercises: [(name: String, condition: String)]) throws -> [CrossModelResult] {
         guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             throw CrossModelError.decodingError
         }

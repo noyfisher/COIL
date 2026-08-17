@@ -1,0 +1,70 @@
+name: Nightly
+
+# FullPlan (unit + BodyMapCollisionTests + COILUITests) is too slow for the PR path,
+# but until now it ran only when a developer remembered to invoke it manually — so UI
+# and RealityKit collision regressions could sit undetected indefinitely. This runs it
+# every night across two device sizes.
+#
+# Non-blocking by design: it gates nothing, but a failure here should be triaged the
+# next morning. The PR gate stays UnitPlan (see ci.yml).
+
+on:
+  schedule:
+    - cron: "0 9 * * *" # 09:00 UTC daily
+  workflow_dispatch:
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+jobs:
+  full-ios:
+    name: FullPlan (${{ matrix.simulator }})
+    runs-on: macos-15
+    timeout-minutes: 45
+    strategy:
+      # Report both legs even when one fails — a failure that reproduces on only one
+      # device size is the interesting signal, and fail-fast would hide it.
+      fail-fast: false
+      matrix:
+        # Device size is the axis that matters here: it stresses BodyMap3DView's
+        # collision geometry and the pinned-footer layouts. An OS-version axis adds
+        # little, since the deployment target is 18.2.
+        simulator:
+          - "iPhone 16 Pro"
+          - "iPhone SE (3rd generation)"
+    defaults:
+      run:
+        working-directory: ios/PT-Helper
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          XCODE_PATH=$(ls -d /Applications/Xcode_16*.app 2>/dev/null | sort -V | tail -1)
+          if [ -z "$XCODE_PATH" ]; then
+            XCODE_PATH=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)
+          fi
+          echo "Using Xcode at: $XCODE_PATH"
+          sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
+          xcodebuild -version
+
+      # No SPM cache here either — see the note in ci.yml for why both approaches were
+      # rejected (unsafe over the tracked Package.resolved; relocating the checkouts
+      # breaks the Crashlytics run-script phase).
+
+      - name: Run FullPlan
+        run: |
+          xcodebuild test \
+            -project COIL.xcodeproj \
+            -scheme COIL \
+            -testPlan FullPlan \
+            -destination 'platform=iOS Simulator,name=${{ matrix.simulator }},OS=latest' \
+            clean test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-results-${{ matrix.simulator }}
+          path: ios/PT-Helper/fastlane/test_output

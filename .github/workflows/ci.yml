@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   test:
-    name: Smoke Tests
+    name: Unit Tests
     runs-on: macos-15
     timeout-minutes: 30
     defaults:
@@ -44,14 +44,34 @@ jobs:
           bundler-cache: true
           working-directory: ios/PT-Helper
 
-      - name: Run SmokePlan
+      # Deliberately no SPM cache. Two attempts both made things worse:
+      #
+      # 1. Caching COIL.xcodeproj/project.xcworkspace/xcshareddata/swiftpm is unsafe —
+      #    that directory holds the git-tracked Package.resolved, so a `restore-keys`
+      #    fallback writes a stale copy over the checked-out one and the build silently
+      #    uses different pinned versions (this repo has a hard Firebase >= 12.12.1
+      #    floor). It also caches nothing useful: `clean test` puts the real checkouts in
+      #    DerivedData, not there.
+      # 2. Relocating them with -clonedSourcePackagesDirPath so they *could* be cached
+      #    breaks the build: the Crashlytics run-script phase resolves its `run` binary
+      #    from the default DerivedData/SourcePackages path, so moving the checkouts makes
+      #    that phase fail with "No such file or directory".
+      #
+      # Fixing (2) means editing the Crashlytics build phase, which is not worth it for a
+      # cache whose benefit was never measured. Revisit only with numbers.
+      # UnitPlan, not SmokePlan. SmokePlan is an 11-test allow-list; the suite has
+      # ~1,140 methods, so the old gate let a change to red-flag detection,
+      # contraindication checking, or the prompt-injection sanitizer merge green.
+      # UnitPlan runs the whole COILTests target in a few seconds of test time —
+      # the extra coverage is effectively free. UI and collision tests stay out of
+      # the PR path; they run nightly (FullPlan) and pre-release (PreReleasePlan).
+      - name: Run UnitPlan
         run: |
           xcodebuild test \
             -project COIL.xcodeproj \
             -scheme COIL \
-            -testPlan SmokePlan \
+            -testPlan UnitPlan \
             -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest' \
-            -only-testing:COILTests \
             clean test
 
       - name: Upload test results
@@ -81,9 +101,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Lint (eslint)
+        run: npm run lint
+
       - name: Build (catalog + tsc)
         run: npm run build
 
+      # Note: jest.config.js excludes test/rules/ and test/integration/ — those need
+      # the Firestore emulator and run in the `functions-emulator` job below.
       - name: Unit tests (jest)
         run: npm test
 
@@ -94,9 +119,117 @@ jobs:
       - name: Security audit gate (runtime deps, fail on high/critical)
         run: npm audit --omit=dev --audit-level=high
 
+  # The Firestore security rules suite and the account-deletion integration test are
+  # excluded from `npm test` (they need the emulator), so until now nothing ran them —
+  # not in CI, and not as a documented manual step. They cover authorization boundaries
+  # and account-deletion completeness, which is data-leak severity, so they gate PRs.
+  # No secrets required: the npm scripts target `--project demo-coil`, and the `demo-`
+  # prefix is Firebase's convention for a credential-free emulator-only project.
+  functions-emulator:
+    name: Cloud Functions (rules + integration, emulator)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: functions
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+
+      # The Firestore emulator is a JVM process; pin the JDK rather than relying on
+      # whatever the runner image ships.
+      - name: Set up Java (Firestore emulator runtime)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Installed here rather than as a devDependency: it is a ~100MB CLI that no
+      # source file imports, and adding it to package.json would make every other
+      # job's `npm ci` pay for it. Pinned to the version the emulator scripts are
+      # validated against locally.
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools@15.7.0
+
+      - name: Firestore security rules tests
+        run: npm run test:rules
+
+      - name: Integration tests
+        run: npm run test:integration
+
+  # Runs only on the manual dispatch that can reach `beta`, and gates it. Without this,
+  # a TestFlight build was gated on unit tests alone — UI and collision regressions
+  # could ship to testers untested, because FullPlan/PreReleasePlan never ran in CI.
+  prerelease-tests:
+    name: Pre-release gate (unit + UI + coverage)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: macos-15
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: ios/PT-Helper
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          XCODE_PATH=$(ls -d /Applications/Xcode_16*.app 2>/dev/null | sort -V | tail -1)
+          if [ -z "$XCODE_PATH" ]; then
+            XCODE_PATH=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)
+          fi
+          sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
+
+      # Deliberately no SPM cache. Two attempts both made things worse:
+      #
+      # 1. Caching COIL.xcodeproj/project.xcworkspace/xcshareddata/swiftpm is unsafe —
+      #    that directory holds the git-tracked Package.resolved, so a `restore-keys`
+      #    fallback writes a stale copy over the checked-out one and the build silently
+      #    uses different pinned versions (this repo has a hard Firebase >= 12.12.1
+      #    floor). It also caches nothing useful: `clean test` puts the real checkouts in
+      #    DerivedData, not there.
+      # 2. Relocating them with -clonedSourcePackagesDirPath so they *could* be cached
+      #    breaks the build: the Crashlytics run-script phase resolves its `run` binary
+      #    from the default DerivedData/SourcePackages path, so moving the checkouts makes
+      #    that phase fail with "No such file or directory".
+      #
+      # Fixing (2) means editing the Crashlytics build phase, which is not worth it for a
+      # cache whose benefit was never measured. Revisit only with numbers.
+      - name: Run PreReleasePlan
+        run: |
+          xcodebuild test \
+            -project COIL.xcodeproj \
+            -scheme COIL \
+            -testPlan PreReleasePlan \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest' \
+            -resultBundlePath TestResults.xcresult \
+            clean test
+
+      # Report-only. There is no historical coverage data for this repo yet, so any
+      # threshold picked today would be a guess. Collect a baseline first, then decide
+      # whether to ratchet.
+      - name: Coverage summary (report only)
+        if: always()
+        run: xcrun xccov view --report --json TestResults.xcresult > coverage.json || true
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prerelease-coverage
+          path: ios/PT-Helper/coverage.json
+
   beta:
     name: TestFlight Upload
-    needs: test
+    needs: [test, prerelease-tests]
     # Manual dispatch only. This job signs a real build and submits it to Apple,
     # and `changelog_from_git_commits` publishes the last 10 commit subjects
     # verbatim to testers — so it must never fire as a side effect of a merge or

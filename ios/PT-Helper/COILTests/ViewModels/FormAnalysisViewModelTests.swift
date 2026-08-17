@@ -172,6 +172,47 @@ final class FormAnalysisViewModelTests: XCTestCase {
         XCTAssertEqual(feedback.positivePoints, ["Good depth"])
     }
 
+    // MARK: - AI response decode (wire format)
+
+    /// Regression: the wire struct declared `overallScore` as `Int`, but the server
+    /// contract (`formAnalysisSchema.overallScore` in `functions/src/response-schemas.ts`)
+    /// is `z.number().min(0).max(100)` and permits fractional values. A score of 87.5
+    /// threw on decode and failed the entire form analysis.
+    func testParseFormFeedback_fractionalOverallScore_decodesAndRounds() throws {
+        let vm = FormAnalysisViewModel(apiService: mockAPI)
+        let json = """
+        {"overallScore":87.5,"verdict":"good","corrections":[],"positivePoints":["Good depth"],"safetyNotes":[]}
+        """
+
+        let feedback = try vm.parseFormFeedback(from: json, exerciseName: "Squat")
+
+        XCTAssertEqual(feedback.overallScore, 88, "87.5 should round to 88, not throw")
+    }
+
+    func testParseFormFeedback_integerOverallScore_stillDecodes() throws {
+        let vm = FormAnalysisViewModel(apiService: mockAPI)
+        let json = """
+        {"overallScore":80,"verdict":"good","corrections":[],"positivePoints":["Good form"],"safetyNotes":[]}
+        """
+
+        let feedback = try vm.parseFormFeedback(from: json, exerciseName: "Squat")
+
+        XCTAssertEqual(feedback.overallScore, 80)
+    }
+
+    func testParseFormFeedback_outOfRangeScore_clampedToBounds() throws {
+        let vm = FormAnalysisViewModel(apiService: mockAPI)
+        let high = """
+        {"overallScore":143.2,"verdict":"good","corrections":[],"positivePoints":[],"safetyNotes":[]}
+        """
+        let low = """
+        {"overallScore":-12.7,"verdict":"needs_work","corrections":[],"positivePoints":[],"safetyNotes":[]}
+        """
+
+        XCTAssertEqual(try vm.parseFormFeedback(from: high, exerciseName: "Squat").overallScore, 100)
+        XCTAssertEqual(try vm.parseFormFeedback(from: low, exerciseName: "Squat").overallScore, 0)
+    }
+
     // MARK: - buildUserMessage with Data Quality
 
     func testBuildUserMessage_withDataQuality_includesSection() {
