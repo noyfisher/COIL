@@ -44,20 +44,21 @@ jobs:
           bundler-cache: true
           working-directory: ios/PT-Helper
 
-      # Caches the resolved package *checkouts*, via -clonedSourcePackagesDirPath on the
-      # xcodebuild calls below. Do NOT cache
-      # COIL.xcodeproj/project.xcworkspace/xcshareddata/swiftpm: that directory holds the
-      # git-tracked Package.resolved, so a restore-keys fallback would write a stale copy
-      # over the checked-out one and silently build against different pinned versions
-      # (this repo has a hard Firebase >= 12.12.1 floor). It would also cache almost
-      # nothing useful, since `clean test` puts the real checkouts elsewhere.
-      - name: Cache SPM checkouts
-        uses: actions/cache@v4
-        with:
-          path: ios/PT-Helper/SourcePackages
-          key: spm-${{ runner.os }}-${{ hashFiles('ios/PT-Helper/COIL.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
-          restore-keys: spm-${{ runner.os }}-
-
+      # Deliberately no SPM cache. Two attempts both made things worse:
+      #
+      # 1. Caching COIL.xcodeproj/project.xcworkspace/xcshareddata/swiftpm is unsafe —
+      #    that directory holds the git-tracked Package.resolved, so a `restore-keys`
+      #    fallback writes a stale copy over the checked-out one and the build silently
+      #    uses different pinned versions (this repo has a hard Firebase >= 12.12.1
+      #    floor). It also caches nothing useful: `clean test` puts the real checkouts in
+      #    DerivedData, not there.
+      # 2. Relocating them with -clonedSourcePackagesDirPath so they *could* be cached
+      #    breaks the build: the Crashlytics run-script phase resolves its `run` binary
+      #    from the default DerivedData/SourcePackages path, so moving the checkouts makes
+      #    that phase fail with "No such file or directory".
+      #
+      # Fixing (2) means editing the Crashlytics build phase, which is not worth it for a
+      # cache whose benefit was never measured. Revisit only with numbers.
       # UnitPlan, not SmokePlan. SmokePlan is an 11-test allow-list; the suite has
       # ~1,140 methods, so the old gate let a change to red-flag detection,
       # contraindication checking, or the prompt-injection sanitizer merge green.
@@ -71,7 +72,6 @@ jobs:
             -scheme COIL \
             -testPlan UnitPlan \
             -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest' \
-            -clonedSourcePackagesDirPath SourcePackages \
             clean test
 
       - name: Upload test results
@@ -188,20 +188,21 @@ jobs:
           fi
           sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
 
-      # Caches the resolved package *checkouts*, via -clonedSourcePackagesDirPath on the
-      # xcodebuild calls below. Do NOT cache
-      # COIL.xcodeproj/project.xcworkspace/xcshareddata/swiftpm: that directory holds the
-      # git-tracked Package.resolved, so a restore-keys fallback would write a stale copy
-      # over the checked-out one and silently build against different pinned versions
-      # (this repo has a hard Firebase >= 12.12.1 floor). It would also cache almost
-      # nothing useful, since `clean test` puts the real checkouts elsewhere.
-      - name: Cache SPM checkouts
-        uses: actions/cache@v4
-        with:
-          path: ios/PT-Helper/SourcePackages
-          key: spm-${{ runner.os }}-${{ hashFiles('ios/PT-Helper/COIL.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
-          restore-keys: spm-${{ runner.os }}-
-
+      # Deliberately no SPM cache. Two attempts both made things worse:
+      #
+      # 1. Caching COIL.xcodeproj/project.xcworkspace/xcshareddata/swiftpm is unsafe —
+      #    that directory holds the git-tracked Package.resolved, so a `restore-keys`
+      #    fallback writes a stale copy over the checked-out one and the build silently
+      #    uses different pinned versions (this repo has a hard Firebase >= 12.12.1
+      #    floor). It also caches nothing useful: `clean test` puts the real checkouts in
+      #    DerivedData, not there.
+      # 2. Relocating them with -clonedSourcePackagesDirPath so they *could* be cached
+      #    breaks the build: the Crashlytics run-script phase resolves its `run` binary
+      #    from the default DerivedData/SourcePackages path, so moving the checkouts makes
+      #    that phase fail with "No such file or directory".
+      #
+      # Fixing (2) means editing the Crashlytics build phase, which is not worth it for a
+      # cache whose benefit was never measured. Revisit only with numbers.
       - name: Run PreReleasePlan
         run: |
           xcodebuild test \
@@ -210,7 +211,6 @@ jobs:
             -testPlan PreReleasePlan \
             -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest' \
             -resultBundlePath TestResults.xcresult \
-            -clonedSourcePackagesDirPath SourcePackages \
             clean test
 
       # Report-only. There is no historical coverage data for this repo yet, so any
