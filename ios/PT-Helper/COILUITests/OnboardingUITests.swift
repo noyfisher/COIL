@@ -218,9 +218,12 @@ final class OnboardingUITests: UITestBase {
         dismissHealthConsentIfPresent()
         XCTAssertTrue(waitForStep(1), "Should be on step 1")
 
-        // The Terms checkbox announced as "Square" (the SF Symbol name).
-        let checkbox = app.buttons["I agree to the Terms of Service and Privacy Policy"]
-        XCTAssertTrue(checkbox.waitForExistence(timeout: 5), "Terms checkbox should be named")
+        // The Terms checkbox announced as "Square" (the SF Symbol name). Query by its
+        // identifier (the file's convention), then check the spoken name and state.
+        let checkbox = app.buttons["onboarding.termsCheckbox"]
+        XCTAssertTrue(checkbox.waitForExistence(timeout: 5), "Terms checkbox should exist")
+        XCTAssertEqual(checkbox.label, "I agree to the Terms of Service and Privacy Policy",
+                       "Terms checkbox should be named")
         XCTAssertEqual(checkbox.value as? String, "Unchecked")
 
         // Both height menus exposed an unlabeled inner button.
@@ -228,6 +231,7 @@ final class OnboardingUITests: UITestBase {
         XCTAssertEqual(heightMenus.count, 2, "Feet and inches menus should both be named")
 
         // The compact date picker announced as "Date Picker".
-        XCTAssertTrue(app.descendants(matching: .any)["Date of birth"].exists, "DOB picker should be named")
+        XCTAssertTrue(app.descendants(matching: .any)["Date of birth"].waitForExistence(timeout: 3),
+                      "DOB picker should be named")
     }
 }
