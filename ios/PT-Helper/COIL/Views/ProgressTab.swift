@@ -171,6 +171,7 @@ struct ProgressTabContent: View {
                         StreakToolbarBadge(streakService: streakService)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel("\(streakService.streakData.currentStreak) day streak, view achievements")
                     .accessibilityIdentifier("progress.streakBadge")
 
                     Button(action: onSettingsTapped) {
