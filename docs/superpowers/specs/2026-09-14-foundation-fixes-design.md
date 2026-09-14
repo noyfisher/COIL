@@ -85,6 +85,8 @@ static func preferredPlan(from plans: [RehabPlan]) -> RehabPlan?
 
 Day index = `calendar.component(.weekday, from: date) - 1` (Sunday = 0), matching `RehabPlanView.swift:547` (`dayNames` starts at "Sun") and `RehabPlanViewModel.createWeeklySchedule` (comments "1 = Mon"). A schedule entry matches an exercise when it equals `exercise.id.uuidString` (generator, `RehabPlanViewModel.swift:723`) **or** `exercise.name` case-insensitively (test seeder, `TestDataSeeder.swift:291`). Entries that match nothing are ignored. `weeklySchedule.count != 7` or all-empty → return nil.
 
+**Stale schedule entries (audit finding):** `ExerciseSwapViewModel.selectSubstitute` replaces an exercise with a new UUID and never rewrites `weeklySchedule`, so on a generated (id-keyed) plan a swapped exercise's day resolves to nothing. `todaysExercises` therefore returns nil (show everything) when a day's entries are non-empty but none resolve — a false "rest day" is never shown. `nextSession` counts resolved exercises and falls back to the raw entry count. Keeping `weeklySchedule` in sync on swap is a follow-up (below), not part of this workstream.
+
 `ProgramDayView` (`HomeTab.swift:207-281`):
 - `nil` → unchanged rendering.
 - non-empty → rows show only today's exercises; the count label reads "N exercises today"; the CTA is unchanged and still passes the full plan to `GuidedWorkoutView` (the workout screen owns skipping).
@@ -118,4 +120,6 @@ Acceptance: Profile tab shows no Done button; Progress gear → sheet still show
 ## Out of scope but noted
 
 - `TestDataSeeder` schedules use names while the generator uses ids; `HomeProgramLogic` tolerates both. A follow-up could make the seeder use ids.
+- `ExerciseSwapViewModel.selectSubstitute` (and `AdaptiveProgressionAnalyzer.applyProgression` if it replaces exercises) should rewrite matching `weeklySchedule` entries to the substitute's id so schedules stay resolvable; until then Home falls back to showing all exercises for that day.
+- `WellnessPlanView`, `ExerciseSwapSheet` and `EditRehabPlanView` also render "sets × reps" and are migrated to `dosageText` in F2.1 (found by the plan audit).
 - The seeded streak (3 / 7) versus "Earned 0" on Achievements is a seeding gap (`seedStreakData` does not seed `StreakService.achievements`); not fixed here.

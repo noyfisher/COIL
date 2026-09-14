@@ -32,6 +32,7 @@ xcodebuild test -project ios/PT-Helper/COIL.xcodeproj -scheme COIL \
 ```
 
 - **UI test command** (one method): same as above with `-only-testing:COILUITests/<ClassName>/<methodName>`. UI tests launch the app with `--uitesting --skip-onboarding --seed-mock-data` via `UITestBase`; the seeded data is in `Services/TestDataSeeder.swift` (plans "Knee Rehab Plan" started 10 days ago, 6 weeks, schedule Sun/Tue/Thu; "Shoulder Mobility Plan" never started; streak 3; three sessions).
+- **Line numbers are anchors, not addresses.** They refer to the files as of commit `33ace5d`. Tasks 5, 11 and 13 all insert code into `HomeTab.swift`, and Task 6 inserts a line into `RehabPlanView.swift` above Task 9's anchor, so later tasks' cited lines drift; per CLAUDE.md R1, grep for the quoted code before editing and never edit by line number alone.
 - **Never `git add .`** — stage the files named in each task.
 - Commit messages: imperative sentence, no prefix (repo convention), ending with the trailer `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`.
 
@@ -47,6 +48,7 @@ xcodebuild test -project ios/PT-Helper/COIL.xcodeproj -scheme COIL \
 | `ios/PT-Helper/COIL/Views/ProgressTab.swift` | Streak badge label, Settings sheet host wraps in `NavigationStack` | 3, 15 |
 | `ios/PT-Helper/COIL/Views/RehabPlanView.swift` | Exercise-name identifiers, `dosageText`, PDF `initial: true` | 6, 9, 14 |
 | `ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift` | `repsText` / `dosageText` call sites | 9 |
+| `ios/PT-Helper/COIL/Views/WellnessPlanView.swift`, `ExerciseSwapSheet.swift`, `EditRehabPlanView.swift` | `dosageText` call sites (found by the audit) | 9 |
 | `ios/PT-Helper/COIL/Views/SettingsView.swift` | Toggle/date-picker labels; drop inner `NavigationStack`; `showsDoneButton` | 1, 15 |
 | `ios/PT-Helper/COIL/Views/OnboardingSteps/BasicInfoStepView.swift` | Checkbox, height menu and DOB labels | 2 |
 | `ios/PT-Helper/COILTests/RehabExerciseDosageTests.swift` (new) | Unit tests for dosage copy | 8 |
@@ -75,7 +77,7 @@ cd .claude/worktrees/ux-foundation-fixes
 ls functions/.env >/dev/null && echo "worktreeinclude ok"
 git log --oneline -1
 ```
-Expected: `worktreeinclude ok` and the top commit `e080c55 Add design specs for the three UX workstreams`. (If `functions/.env` is missing, copy it from the main checkout: `cp ../../../functions/.env functions/.env`.)
+Expected: `worktreeinclude ok` and the top commit `33ace5d Add the Foundation fixes implementation plan` (or a later commit on `ux/design-specs` if the audit revisions were committed after this line was written — anything at or after `33ace5d` is fine). If `functions/.env` is missing, copy it from the main checkout: `cp ../../../functions/.env functions/.env`.
 
 - [ ] **Step 2: Baseline build**
 
@@ -260,7 +262,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ### Task 3: Streak badge announces what it is
 
 **Files:**
-- Modify: `ios/PT-Helper/COIL/Views/ProgressTab.swift:171-175`
+- Modify: `ios/PT-Helper/COIL/Views/ProgressTab.swift:170-174` (the `NavigationLink(destination: AchievementsView(...))` in the toolbar)
 - Create: `ios/PT-Helper/COILUITests/ProgressTabUITests.swift`
 
 - [ ] **Step 1: Write the failing UI test**
@@ -288,7 +290,7 @@ Run: `-only-testing:COILUITests/ProgressTabUITests/testStreakBadge_hasDescriptiv
 
 - [ ] **Step 3: Add the label**
 
-`ProgressTab.swift` lines 171-175 become:
+`ProgressTab.swift` lines 170-174 become:
 ```swift
                     NavigationLink(destination: AchievementsView(streakService: streakService)) {
                         StreakToolbarBadge(streakService: streakService)
@@ -682,7 +684,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ### Task 9: Use `dosageText` on Home, Guided Workout and Rehab Plan
 
 **Files:**
-- Modify: `ios/PT-Helper/COIL/Views/HomeTab.swift:298`, `ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift:229, 463`, `ios/PT-Helper/COIL/Views/RehabPlanView.swift:665`
+- Modify: `ios/PT-Helper/COIL/Views/HomeTab.swift:298`, `ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift:229, 463`, `ios/PT-Helper/COIL/Views/RehabPlanView.swift:665`, `ios/PT-Helper/COIL/Views/WellnessPlanView.swift:133-135`, `ios/PT-Helper/COIL/Views/ExerciseSwapSheet.swift:266`, `ios/PT-Helper/COIL/Views/EditRehabPlanView.swift:31`
 - Test: `ios/PT-Helper/COILUITests/GuidedWorkoutUITests.swift`
 
 - [ ] **Step 1: Write the failing UI test**
@@ -705,9 +707,9 @@ Append inside `GuidedWorkoutUITests` (`navigateToWorkout()` is a private helper 
 
 Run: `-only-testing:COILUITests/GuidedWorkoutUITests/testInfoBadges_useDosageText` → `failed`.
 
-- [ ] **Step 3: Swap the four call sites**
+- [ ] **Step 3: Swap the seven call sites**
 
-`HomeTab.swift:298`:
+`HomeTab.swift:298` (`Text("\(exercise.sets) sets · \(exercise.reps) reps")`):
 ```swift
                 Text(exercise.dosageText)
 ```
@@ -719,20 +721,40 @@ Run: `-only-testing:COILUITests/GuidedWorkoutUITests/testInfoBadges_useDosageTex
 ```swift
                 upNextCard(exercise: next, subtitle: next.dosageText)
 ```
-`RehabPlanView.swift:665`:
+`RehabPlanView.swift:665` (`Text("\(exercise.sets) sets \u{00D7} \(exercise.reps)")`):
 ```swift
                     Text(exercise.dosageText)
 ```
+`WellnessPlanView.swift:133-135` — the three children `Text("\(exercise.sets) sets")`, `Text("·")`, `Text("\(exercise.reps) reps")` collapse into one, so the row reads "3 sets × 12 reps · Beginner":
+```swift
+                    HStack(spacing: AppSpacing.sm) {
+                        Text(exercise.dosageText)
+                        Text("·")
+                        Text(exercise.difficulty.rawValue.capitalized)
+                            .foregroundColor(difficultyColor(exercise.difficulty))
+                    }
+```
+`ExerciseSwapSheet.swift:266` (`Text("\(substitute.sets) sets \u{00D7} \(substitute.reps)")`):
+```swift
+                        Text(substitute.dosageText)
+```
+`EditRehabPlanView.swift:31`:
+```swift
+                                    Text("\(exercise.dosageText) \u{2022} \(exercise.difficulty.rawValue.capitalized)")
+```
 
-Then `grep -rn 'sets) sets' ios/PT-Helper/COIL/Views` must return nothing.
+Then this gate must print nothing:
+```bash
+grep -rnE '\.sets\) sets|\.reps\) reps' ios/PT-Helper/COIL/Views
+```
 
 - [ ] **Step 4: Build and run the test** → succeeded, `passed`.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add ios/PT-Helper/COIL/Views/HomeTab.swift ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift ios/PT-Helper/COIL/Views/RehabPlanView.swift ios/PT-Helper/COILUITests/GuidedWorkoutUITests.swift
-git commit -m "Render exercise dosage through dosageText on Home, the workout and the plan
+git add ios/PT-Helper/COIL/Views/HomeTab.swift ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift ios/PT-Helper/COIL/Views/RehabPlanView.swift ios/PT-Helper/COIL/Views/WellnessPlanView.swift ios/PT-Helper/COIL/Views/ExerciseSwapSheet.swift ios/PT-Helper/COIL/Views/EditRehabPlanView.swift ios/PT-Helper/COILUITests/GuidedWorkoutUITests.swift
+git commit -m "Render exercise dosage through dosageText on every screen that shows sets and reps
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ```
@@ -885,6 +907,23 @@ final class HomeProgramLogicTests: XCTestCase {
         XCTAssertNil(HomeProgramLogic.todaysExercises(for: plan, on: monday, calendar: calendar))
     }
 
+    /// After an exercise swap the schedule still holds the OLD exercise id (ExerciseSwapViewModel
+    /// never rewrites weeklySchedule), so a scheduled day can resolve to nothing. That must
+    /// fall back to "show everything" (nil), never to a false rest day ([]).
+    func testTodaysExercises_entriesResolveToNothing_fallsBackToNil() {
+        let staleId = UUID().uuidString
+        let plan = TestFixtures.makePlan(exercises: [wallSits], weeklySchedule: [[staleId], [], [], [], [], [], []])
+        XCTAssertNil(HomeProgramLogic.todaysExercises(for: plan, on: sundayDate, calendar: calendar))
+    }
+
+    func testNextSession_unresolvedEntries_countsRawEntries() {
+        let staleId = UUID().uuidString
+        let plan = TestFixtures.makePlan(exercises: [wallSits], weeklySchedule: [[], [staleId, staleId], [], [], [], [], []])
+        let next = HomeProgramLogic.nextSession(for: plan, after: sundayDate, calendar: calendar)
+        XCTAssertEqual(next?.weekdayName, "Mon")
+        XCTAssertEqual(next?.exerciseCount, 2)
+    }
+
     func testNextSession_fromMonday_isTuesdayWithOneExercise() {
         let next = HomeProgramLogic.nextSession(for: seededPlan(), after: monday, calendar: calendar)
         XCTAssertEqual(next?.weekdayName, "Tue")
@@ -936,17 +975,23 @@ Insert into `HomeTab.swift` directly after the `HomeStripLogic` enum (after line
 /// exercise names (test seeder), so both are accepted, case-insensitively.
 enum HomeProgramLogic {
 
-    /// nil = the plan has no usable schedule (show every exercise, today's behaviour);
-    /// []  = a scheduled rest day; otherwise today's exercises in plan order.
+    /// nil = no usable schedule, OR today's entries resolve to no current exercise (e.g. the
+    ///       schedule still names an exercise id that was swapped out) → show every exercise;
+    /// []  = a scheduled rest day (today's entry is genuinely empty);
+    /// otherwise today's exercises in plan order.
     static func todaysExercises(for plan: RehabPlan, on date: Date,
                                 calendar: Calendar = .current) -> [RehabExercise]? {
         let schedule = plan.weeklySchedule
         guard schedule.count == 7, schedule.contains(where: { !$0.isEmpty }) else { return nil }
         let dayIndex = calendar.component(.weekday, from: date) - 1
-        return exercises(in: plan, matching: schedule[dayIndex])
+        let entries = schedule[dayIndex]
+        if entries.isEmpty { return [] }
+        let resolved = exercises(in: plan, matching: entries)
+        return resolved.isEmpty ? nil : resolved
     }
 
-    /// The next scheduled day strictly after `date`, within the following 7 days.
+    /// The next scheduled day strictly after `date`, within the following 7 days. Counts
+    /// resolved exercises, falling back to the raw entry count when none resolve.
     static func nextSession(for plan: RehabPlan, after date: Date,
                             calendar: Calendar = .current) -> (weekdayName: String, exerciseCount: Int)? {
         let schedule = plan.weeklySchedule
@@ -954,10 +999,10 @@ enum HomeProgramLogic {
         let today = calendar.component(.weekday, from: date) - 1
         for offset in 1...7 {
             let index = (today + offset) % 7
-            let count = exercises(in: plan, matching: schedule[index]).count
-            if count > 0 {
-                return (calendar.shortWeekdaySymbols[index], count)
-            }
+            let entries = schedule[index]
+            if entries.isEmpty { continue }
+            let resolved = exercises(in: plan, matching: entries).count
+            return (calendar.shortWeekdaySymbols[index], resolved > 0 ? resolved : entries.count)
         }
         return nil
     }
@@ -983,7 +1028,7 @@ enum HomeProgramLogic {
 }
 ```
 
-- [ ] **Step 4: Run the tests** → 11 `passed`.
+- [ ] **Step 4: Run the tests** → 13 `passed`.
 
 - [ ] **Step 5: Commit**
 
@@ -1010,17 +1055,39 @@ Append inside `MyPlanTabUITests`:
     @MainActor
     func testPlanCards_showRealStatus() throws {
         tapTab("Plan")
+        // The card's info block is ONE combined accessibility element (Task 4), so its
+        // children are not queryable as static texts — assert on the combined label.
         // Seeded "Shoulder Mobility Plan" has no start date; it used to say ACTIVE.
-        XCTAssertTrue(staticText("Not started").waitForExistence(timeout: 10),
+        let notStarted = app.buttons.matching(
+            NSPredicate(format: "label CONTAINS %@", "Shoulder Mobility Plan, 4 weeks, Not started")).firstMatch
+        XCTAssertTrue(notStarted.waitForExistence(timeout: 10),
                       "A plan without a start date should read Not started")
+        let active = app.buttons.matching(
+            NSPredicate(format: "label CONTAINS %@", "Knee Rehab Plan, 6 weeks, Active")).firstMatch
+        XCTAssertTrue(active.waitForExistence(timeout: 5), "The started plan should read Active")
     }
 ```
 
-- [ ] **Step 2: Run it to verify it fails** → `failed`.
+- [ ] **Step 2: Run it to verify it fails** → `failed` (the Task 4 label ends at "…weeks" with no status).
 
 - [ ] **Step 3: Implement**
 
-`MyPlanTab.swift` lines 159-162 become:
+`MyPlanTab.swift`: the accessibility label added in Task 4 on the info `HStack` now includes the status, so VoiceOver hears it even though the badge text is inside the combined element:
+```swift
+                .accessibilityLabel("\(plan.planName), \(plan.totalWeeks) weeks, \(statusText(for: plan))")
+```
+with this helper inside `struct MyPlanTab`:
+```swift
+    private func statusText(for plan: RehabPlan) -> String {
+        switch plan.status {
+        case .active(let week): return "Active, week \(week)"
+        case .notStarted: return "Not started"
+        case .completed: return "Completed"
+        }
+    }
+```
+
+Lines 159-162 become:
 ```swift
                         HStack(spacing: AppSpacing.sm) {
                             statusBadge(for: plan)
@@ -1115,9 +1182,12 @@ struct ProgramDayView: View {
             VStack(alignment: .leading, spacing: AppSpacing.md) {
                 CoilDividerHeader(title: "Today's Program")
 
-                // Plan name badge
+                // Plan name badge — only a started plan is "Active" (preferredPlan can
+                // fall back to a not-started plan when nothing has been started yet).
                 HStack(spacing: AppSpacing.sm) {
-                    CoilBadge(text: "Active")
+                    if case .active = plan.status {
+                        CoilBadge(text: "Active")
+                    }
                     Text(plan.planName)
                         .font(AppFonts.smallSemiBold)
                         .foregroundColor(AppColors.secondaryText)
@@ -1313,12 +1383,12 @@ Run: `-only-testing:COILUITests/ShellNavigationUITests/testProfileTab_hasNoDoneB
 
 `SettingsView.swift`:
 
-Add the parameter (after line 8):
+Insert the new property directly after the existing `var onEditProfile: () -> Void` (line 8); lines 7-8 already exist and are shown only for position:
 ```swift
-    let userName: String
-    var onEditProfile: () -> Void
+    let userName: String                       // existing
+    var onEditProfile: () -> Void              // existing
     /// True only when a sheet hosts this view; the tab host has nothing to dismiss.
-    var showsDoneButton: Bool = false
+    var showsDoneButton: Bool = false          // NEW
 ```
 
 Remove the `NavigationStack {` opener at line 32 and its matching closing `}` at line 161 (the one immediately before `.trackScreen("Settings")`), de-indenting the block by one level. The `ZStack` becomes the root of `body`, and every modifier previously attached to the `NavigationStack` (`.navigationTitle`, `.toolbar`, the `.confirmationDialog`/`.alert` chain, `.overlay`) now attaches to the `ZStack` — keep them in the same order.
@@ -1371,7 +1441,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 
 ### Task 16: PR F2
 
-- [ ] **Step 1: Full unit run** → `-only-testing:COILTests` → `** TEST SUCCEEDED **` (baseline 1311 + 23 new).
+- [ ] **Step 1: Full unit run** → `-only-testing:COILTests` → `** TEST SUCCEEDED **` (baseline 1311 + 25 new).
 
 - [ ] **Step 2: FullPlan** (nightly gate, includes collision + UI tests; 300 s timeouts):
 
@@ -1390,13 +1460,13 @@ git push
 gh pr create --base ux/design-specs --title "Foundation fixes F2: functional P1s" --body "$(cat <<'EOF'
 Implements PR F2 of docs/superpowers/specs/2026-09-14-foundation-fixes-design.md.
 
-- RehabExercise.dosageText / repsText replace "30 seconds reps" on Home, the workout and the plan
+- RehabExercise.dosageText / repsText replace "30 seconds reps" on Home, the workout, the plan, the wellness plan, the swap sheet and the plan editor
 - RehabPlan.status drives the My Plan badge (Active / Not started / Completed); Home prefers the active plan
-- Home's Today's Program follows weeklySchedule (index 0 = Sunday) with a rest-day card that keeps home.startWorkoutButton
+- Home's Today's Program follows weeklySchedule (index 0 = Sunday) with a rest-day card that keeps home.startWorkoutButton; a day whose entries no longer resolve (swapped exercise) falls back to showing everything
 - Saved plans generate their PDF on first appearance so the share button exists
 - SettingsView no longer nests a NavigationStack; Done shows only when sheet-hosted
 
-23 new unit tests (dosage, status, HomeProgramLogic) + 4 UI tests; UnitPlan and FullPlan green.
+25 new unit tests (dosage, status, HomeProgramLogic) + 4 UI tests; UnitPlan and FullPlan green.
 Stacked on the F1 PR; retarget to main once ux/design-specs merges.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
@@ -1411,3 +1481,38 @@ EOF
 - **Spec coverage:** F1 items 1-10 → Tasks 1-6 (items 1-3 Task 1; 4-6 Task 2; 7 Task 3; 8 Task 4; 9 Task 5; 10 Task 6). F2.1 → Tasks 8-9; F2.2 → Tasks 10, 12; F2.3 → Tasks 11, 13; F2.4 → Task 14; F2.5 → Task 15. Verification section → Tasks 7, 16.
 - **Type consistency:** `HomeProgramLogic.todaysExercises(for:on:calendar:)`, `nextSession(for:after:calendar:)` returning `(weekdayName: String, exerciseCount: Int)?`, `preferredPlan(from:)`; `RehabPlan.PlanStatus` / `.status`; `RehabExercise.repsText` / `.dosageText`; `SettingsView.showsDoneButton`; identifiers `myPlan.planCard`, `rehabPlan.exerciseName.N`, `home.startWorkoutButton` — used identically across tasks.
 - **Known judgement calls:** Task 6 documents the fallback if the NavigationLink still inherits the swap identifier; Task 13's UI test branches on the weekday because the seeded schedule is fixed to Sun/Tue/Thu.
+
+---
+
+## Audit Results
+
+### Structural Review
+1. FILE COMPLETENESS — FAIL. Task 9's closing gate (`grep -rn 'sets) sets' ios/PT-Helper/COIL/Views` empty) is already false: `WellnessPlanView.swift:133`, `ExerciseSwapSheet.swift:266` and `EditRehabPlanView.swift:31` render the same "N sets × reps" pattern and are not migrated. Fix: migrate those call sites in Task 9 or scope the grep. Secondary: Task 3 cites `ProgressTab.swift:171-175` (actual 170-174); Tasks 9 and 13 cite `HomeTab.swift` line numbers that drift after Tasks 5 and 11 insert code above them — anchors are identifiable by content, and R1 requires grepping before editing.
+2. DEPENDENCY ORDER — PASS.
+3. MISSING STEPS — WARN. Task 0's expected baseline commit (`e080c55`) is stale; `ux/design-specs` HEAD is `33ace5d`. Test-target auto-discovery confirmed (PBXFileSystemSynchronizedRootGroup).
+4. API/FUNCTION VERIFICATION — PASS (fixtures, UITestBase helpers, private helpers, identifiers, `onChange(of:initial:)` on iOS 18.2 all confirmed).
+5. SCOPE CALIBRATION — PASS.
+6. TESTABILITY — WARN. Fail-first claims hold; the Task 9 grep is a false completion gate (see 1).
+7. INTEGRATION RISK — PASS (two `SettingsView` call sites both handled; `exerciseCard(for:)` has one caller; no identifier collisions with existing tests).
+OVERALL: NEEDS REVISION
+
+### Adversarial Review
+1. FATAL FLAW — `HomeProgramLogic.todaysExercises` assumes every `weeklySchedule` entry resolves to a current exercise. `ExerciseSwapViewModel.selectSubstitute` replaces `exercises[index]` with a new UUID and never updates `weeklySchedule`; on a generated (id-keyed) plan, a swapped training day resolves to zero matches and renders as "Rest day".
+2. HIDDEN ASSUMPTION — that `weeklySchedule` stays in sync with `plan.exercises`. True for generated and seeded plans, false after any substitution.
+3. SIMPLER ALTERNATIVE — distinguish "entries present but nothing resolves" from "entries empty": fall back to all exercises (today's behaviour) instead of the rest card.
+4. WHAT BREAKS — `HomeTab.swift` `ProgramDayView`/`RestDayCard`: any user who swapped an exercise on a scheduled day sees a false rest day on the most-viewed screen.
+5. FIRST HOUR TEST — Task 0's "Expected" commit is one behind the branch head.
+VERDICT: REVISE BEFORE BUILDING
+
+**Overall: NEEDS REVISION** → revised (below) and re-audited once.
+
+### Audit revisions (applied 2026-09-14)
+- Task 11: `todaysExercises` returns nil (show everything) when a day's entries are non-empty but resolve to no current exercise; `nextSession` falls back to the raw entry count. Two tests added (`testTodaysExercises_entriesResolveToNothing_fallsBackToNil`, `testNextSession_unresolvedEntries_countsRawEntries`). Spec updated with the swap/schedule gap and a follow-up.
+- Task 9: `WellnessPlanView.swift:133-135`, `ExerciseSwapSheet.swift:266`, `EditRehabPlanView.swift:31` migrated to `dosageText`; the completion gate is now `grep -rnE '\.sets\) sets|\.reps\) reps' ios/PT-Helper/COIL/Views` (empty).
+- Task 0: expected baseline commit corrected to `33ace5d` or later. Task 3: anchor corrected to `ProgressTab.swift:170-174`. Ground rules: line numbers are anchors as of `33ace5d`; grep before editing (R1).
+
+### Re-audit (one pass, per protocol)
+**Structural — MINOR CONCERNS.** All seven `dosageText` call sites verified against the code; the new grep gate is empty after them. WARN: drift note should also cover `RehabPlanView.swift` (Task 6 → 9) — fixed; Task 15's property snippet re-quoted existing lines — reworded as insert-after. Noted: `ProgramDayView` hardcoded "Active" badge — fixed in Task 13 (badge only when `.active`).
+**Adversarial — REVISE BEFORE BUILDING.** Task 4's `.accessibilityElement(children: .combine)` on the info block hides Task 12's status text from VoiceOver and from `staticText(...)`. Fixed: Task 12 folds the status into the combined label ("Knee Rehab Plan, 6 weeks, Active, week 2" / "…, Not started") and its test asserts on `app.buttons` labels instead of static texts.
+
+**Overall after revisions: MINOR CONCERNS** — proceed to execution.
