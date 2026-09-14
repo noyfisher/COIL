@@ -87,4 +87,13 @@ final class SettingsUITests: UITestBase {
 
         captureScreenshot(name: "Settings-DeleteConfirmation")
     }
+
+    @MainActor
+    func testReminderToggle_hasAccessibleName() throws {
+        navigateToSettings()
+        // Toggle("", …).labelsHidden() had no name at all; VoiceOver read an unnamed switch.
+        let toggle = app.switches["Reminders"]
+        XCTAssertTrue(toggle.waitForExistence(timeout: 5),
+                      "The Reminders toggle should be named for VoiceOver")
+    }
 }

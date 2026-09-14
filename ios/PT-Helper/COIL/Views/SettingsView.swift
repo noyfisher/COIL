@@ -556,6 +556,7 @@ struct SettingsView: View {
 
                 Toggle("", isOn: $notificationService.isEnabled)
                     .labelsHidden()
+                    .accessibilityLabel("Reminders")
                     .accessibilityIdentifier("settings.reminderToggle")
                     .onChange(of: notificationService.isEnabled) { _, enabled in
                         AnalyticsService.shared.log(.settingChanged,
@@ -594,6 +595,7 @@ struct SettingsView: View {
 
                     DatePicker("", selection: $reminderDate, displayedComponents: .hourAndMinute)
                         .labelsHidden()
+                        .accessibilityLabel("Reminder time")
                         .onChange(of: reminderDate) { _, newDate in
                             let components = Calendar.current.dateComponents([.hour, .minute], from: newDate)
                             notificationService.updateReminderTime(hour: components.hour ?? 9, minute: components.minute ?? 0)
@@ -629,6 +631,7 @@ struct SettingsView: View {
                     Spacer()
                     Toggle("", isOn: $notificationService.workoutRemindersEnabled)
                         .labelsHidden()
+                        .accessibilityLabel("Workout reminders")
                         .onChange(of: notificationService.workoutRemindersEnabled) { _, enabled in
                             AnalyticsService.shared.log(.settingChanged,
                                 parameters: ["key": "workout_reminders",
@@ -653,6 +656,7 @@ struct SettingsView: View {
                     Spacer()
                     Toggle("", isOn: $notificationService.reassessmentRemindersEnabled)
                         .labelsHidden()
+                        .accessibilityLabel("Re-assessment prompts")
                         .onChange(of: notificationService.reassessmentRemindersEnabled) { _, enabled in
                             AnalyticsService.shared.log(.settingChanged,
                                 parameters: ["key": "reassessment_reminders",
@@ -677,6 +681,7 @@ struct SettingsView: View {
                     Spacer()
                     Toggle("", isOn: $notificationService.inactivityNudgesEnabled)
                         .labelsHidden()
+                        .accessibilityLabel("Inactivity nudges")
                         .onChange(of: notificationService.inactivityNudgesEnabled) { _, enabled in
                             AnalyticsService.shared.log(.settingChanged,
                                 parameters: ["key": "inactivity_nudges",
