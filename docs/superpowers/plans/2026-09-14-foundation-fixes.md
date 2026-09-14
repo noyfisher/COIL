@@ -32,6 +32,7 @@ xcodebuild test -project ios/PT-Helper/COIL.xcodeproj -scheme COIL \
 ```
 
 - **UI test command** (one method): same as above **plus `-testPlan FullPlan`** (the scheme's default UnitPlan excludes the `COILUITests` target, so without it xcodebuild refuses to run) with `-only-testing:COILUITests/<ClassName>/<methodName>`. FullPlan retries failures, so a fail-first run prints the failure up to three times. UI tests launch the app with `--uitesting --skip-onboarding --seed-mock-data` via `UITestBase`; the seeded data is in `Services/TestDataSeeder.swift` (plans "Knee Rehab Plan" started 10 days ago, 6 weeks, schedule Sun/Tue/Thu; "Shoulder Mobility Plan" never started; streak 3; three sessions).
+- **UI-test query convention:** when a control has an `accessibilityIdentifier`, query by the identifier and assert `.label` / `.value` (Tasks 1-3 do this). Label-based subscripts also work in practice (XCUI matches identifier or label), but identifier-first is the file convention and reads unambiguously. Predicates on `label` (Tasks 5, 12) are fine for elements without identifiers.
 - **Line numbers are anchors, not addresses.** They refer to the files as of commit `33ace5d`. Tasks 5, 11 and 13 all insert code into `HomeTab.swift`, and Task 6 inserts a line into `RehabPlanView.swift` above Task 9's anchor, so later tasks' cited lines drift; per CLAUDE.md R1, grep for the quoted code before editing and never edit by line number alone.
 - **Never `git add .`** — stage the files named in each task.
 - Commit messages: imperative sentence, no prefix (repo convention), ending with the trailer `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`.
@@ -106,9 +107,10 @@ Append inside `final class SettingsUITests: UITestBase { … }` (after the exist
     func testReminderToggle_hasAccessibleName() throws {
         navigateToSettings()
         // Toggle("", …).labelsHidden() had no name at all; VoiceOver read an unnamed switch.
-        let toggle = app.switches["Reminders"]
-        XCTAssertTrue(toggle.waitForExistence(timeout: 5),
-                      "The Reminders toggle should be named for VoiceOver")
+        // Query by the toggle's identifier (the file's convention), then check its spoken name.
+        let toggle = app.switches["settings.reminderToggle"]
+        XCTAssertTrue(toggle.waitForExistence(timeout: 5), "Reminders toggle should exist")
+        XCTAssertEqual(toggle.label, "Reminders", "The Reminders toggle should be named for VoiceOver")
     }
 ```
 
@@ -189,9 +191,12 @@ Append inside `final class OnboardingUITests: UITestBase { … }` (`waitForStep(
         dismissHealthConsentIfPresent()
         XCTAssertTrue(waitForStep(1), "Should be on step 1")
 
-        // The Terms checkbox announced as "Square" (the SF Symbol name).
-        let checkbox = app.buttons["I agree to the Terms of Service and Privacy Policy"]
-        XCTAssertTrue(checkbox.waitForExistence(timeout: 5), "Terms checkbox should be named")
+        // The Terms checkbox announced as "Square" (the SF Symbol name). Query by its
+        // identifier (the file's convention), then check the spoken name and state.
+        let checkbox = app.buttons["onboarding.termsCheckbox"]
+        XCTAssertTrue(checkbox.waitForExistence(timeout: 5), "Terms checkbox should exist")
+        XCTAssertEqual(checkbox.label, "I agree to the Terms of Service and Privacy Policy",
+                       "Terms checkbox should be named")
         XCTAssertEqual(checkbox.value as? String, "Unchecked")
 
         // Both height menus exposed an unlabeled inner button.
@@ -199,7 +204,8 @@ Append inside `final class OnboardingUITests: UITestBase { … }` (`waitForStep(
         XCTAssertEqual(heightMenus.count, 2, "Feet and inches menus should both be named")
 
         // The compact date picker announced as "Date Picker".
-        XCTAssertTrue(app.descendants(matching: .any)["Date of birth"].exists, "DOB picker should be named")
+        XCTAssertTrue(app.descendants(matching: .any)["Date of birth"].waitForExistence(timeout: 3),
+                      "DOB picker should be named")
     }
 ```
 
@@ -276,10 +282,12 @@ final class ProgressTabUITests: UITestBase {
     @MainActor
     func testStreakBadge_hasDescriptiveLabel() throws {
         tapTab("Progress")
-        // Seeded streak is 3; the badge used to announce just "3".
-        let badge = app.buttons["3 day streak, view achievements"]
-        XCTAssertTrue(badge.waitForExistence(timeout: 10),
-                      "Streak badge should say what the number means and where it goes")
+        // Seeded streak is 3; the badge used to announce just "3". Query by identifier
+        // (file convention), then check the spoken name.
+        let badge = app.descendants(matching: .any)["progress.streakBadge"].firstMatch
+        XCTAssertTrue(badge.waitForExistence(timeout: 10), "Streak badge should exist")
+        XCTAssertEqual(badge.label, "3 day streak, view achievements",
+                       "Streak badge should say what the number means and where it goes")
     }
 }
 ```
