@@ -41,7 +41,7 @@ If no argument provided, default to `full`.
    ```
    session_set_defaults:
      projectPath: ios/PT-Helper/COIL.xcodeproj
-     scheme: PT-Helper
+     scheme: COIL
      simulatorName: iPhone 16
    ```
 
