@@ -168,6 +168,7 @@ struct MyPlanTab: View {
                             .foregroundColor(AppColors.primaryText)
                             .multilineTextAlignment(.leading)
                             .fixedSize(horizontal: false, vertical: true)
+                            .accessibilityIdentifier("myPlan.planCard")
 
                         if !plan.conditions.isEmpty {
                             Text(plan.conditions.prefix(2).joined(separator: " · "))
@@ -195,6 +196,11 @@ struct MyPlanTab: View {
                             .foregroundColor(AppColors.mutedText)
                     }
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityAddTraits(.isButton)
+                .accessibilityLabel("\(plan.planName), \(plan.totalWeeks) weeks")
+                .accessibilityHint("Opens plan")
+                .accessibilityAction { route = .detail(plan.id) }
 
                 // Red CTA — explicit button so only this region starts the workout.
                 Button {

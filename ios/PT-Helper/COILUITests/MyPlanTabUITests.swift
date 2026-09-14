@@ -66,4 +66,22 @@ final class MyPlanTabUITests: UITestBase {
 
         captureScreenshot(name: "MyPlan-EmptyState")
     }
+
+    @MainActor
+    func testPlanCard_isExposedAsButtonAndOpensPlan() throws {
+        tapTab("Plan")
+
+        // The card's open action was an onTapGesture with no accessibility trait, so
+        // VoiceOver had no way to open a plan.
+        let cardButton = app.buttons.matching(
+            NSPredicate(format: "label BEGINSWITH %@", "Knee Rehab Plan, 6 weeks")).firstMatch
+        XCTAssertTrue(cardButton.waitForExistence(timeout: 10), "Plan card should be exposed as a button")
+
+        let name = app.descendants(matching: .any)["myPlan.planCard"].firstMatch
+        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        name.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+
+        assertExists("rehabPlan.editButton", timeout: 10)
+        captureScreenshot(name: "MyPlan-CardOpensPlan")
+    }
 }
