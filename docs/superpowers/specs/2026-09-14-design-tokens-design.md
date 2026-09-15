@@ -90,7 +90,7 @@ static let onDarkMuted      = textOnDarkTertiary            // was muted 0.35 �
 
 ### T8 — `DarkTextField` placeholder
 
-`DarkTextField` uses `TextField(placeholder, text: $text, prompt: Text(placeholder).foregroundColor(AppColors.onDarkLabel))` so placeholders render at 6.0:1 instead of the system placeholder grey.
+`DarkTextField` uses `TextField(placeholder, text: $text, prompt: Text(placeholder).foregroundColor(AppColors.onDarkLabel))` so placeholders render at 8.97:1 (the 0.70 caption tier) instead of the system placeholder grey.
 
 ## Tests — `COILTests/DesignTokenContrastTests.swift`
 
