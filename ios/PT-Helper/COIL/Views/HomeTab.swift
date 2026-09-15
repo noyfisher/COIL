@@ -276,58 +276,74 @@ struct ProgramDayView: View {
 
     var body: some View {
         if let plan = plan {
+            let todays = HomeProgramLogic.todaysExercises(for: plan, on: Date())
             VStack(alignment: .leading, spacing: AppSpacing.md) {
                 CoilDividerHeader(title: "Today's Program")
 
-                // Plan name badge
+                // Plan name badge — only a started plan is "Active" (preferredPlan can
+                // fall back to a not-started plan when nothing has been started yet).
                 HStack(spacing: AppSpacing.sm) {
-                    CoilBadge(text: "Active Plan")
+                    if case .active = plan.status {
+                        CoilBadge(text: "Active")
+                    }
                     Text(plan.planName)
                         .font(AppFonts.smallSemiBold)
                         .foregroundColor(AppColors.secondaryText)
                         .lineLimit(1)
                     Spacer()
-                    Text("\(plan.exercises.count) exercises")
+                    Text(countLabel(plan: plan, todays: todays))
                         .font(AppFonts.micro)
                         .foregroundColor(AppColors.mutedText)
                 }
 
-                // Exercise rows
-                ForEach(plan.exercises.prefix(8)) { exercise in
-                    ExerciseProgramRow(exercise: exercise)
-                }
+                if let todays, todays.isEmpty {
+                    RestDayCard(plan: plan, next: HomeProgramLogic.nextSession(for: plan, after: Date()))
+                } else {
+                    let shown = todays ?? plan.exercises
 
-                if plan.exercises.count > 8 {
-                    Text("+ \(plan.exercises.count - 8) more exercises")
-                        .font(AppFonts.caption)
-                        .foregroundColor(AppColors.mutedText)
-                        .padding(.leading, AppSpacing.xs)
-                }
-
-                // Start workout CTA
-                NavigationLink(destination: GuidedWorkoutView(plan: plan)) {
-                    HStack(spacing: AppSpacing.sm) {
-                        Image(systemName: "play.fill")
-                            .font(.system(size: 12, weight: .bold))
-                        Text("Start Guided Workout")
-                            .font(AppFonts.cardTitle)
-                            .textCase(.uppercase)
-                            .kerning(1.0)
+                    // Exercise rows
+                    ForEach(shown.prefix(8)) { exercise in
+                        ExerciseProgramRow(exercise: exercise)
                     }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, AppSpacing.md)
-                    .background(AppColors.ctaBackground)
-                    .clipShape(Capsule())
-                    .shadow(color: AppColors.ctaBackground.opacity(0.30), radius: 8, y: 4)
+
+                    if shown.count > 8 {
+                        Text("+ \(shown.count - 8) more exercises")
+                            .font(AppFonts.caption)
+                            .foregroundColor(AppColors.mutedText)
+                            .padding(.leading, AppSpacing.xs)
+                    }
+
+                    // Start workout CTA
+                    NavigationLink(destination: GuidedWorkoutView(plan: plan)) {
+                        HStack(spacing: AppSpacing.sm) {
+                            Image(systemName: "play.fill")
+                                .font(.system(size: 12, weight: .bold))
+                            Text("Start Guided Workout")
+                                .font(AppFonts.cardTitle)
+                                .textCase(.uppercase)
+                                .kerning(1.0)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, AppSpacing.md)
+                        .background(AppColors.ctaBackground)
+                        .clipShape(Capsule())
+                        .shadow(color: AppColors.ctaBackground.opacity(0.30), radius: 8, y: 4)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.top, AppSpacing.xs)
+                    .accessibilityIdentifier("home.startWorkoutButton")
                 }
-                .buttonStyle(.plain)
-                .padding(.top, AppSpacing.xs)
-                .accessibilityIdentifier("home.startWorkoutButton")
             }
         } else {
             noPlanState
         }
+    }
+
+    private func countLabel(plan: RehabPlan, todays: [RehabExercise]?) -> String {
+        guard let todays else { return "\(plan.exercises.count) exercises" }
+        if todays.isEmpty { return "Rest day" }
+        return todays.count == 1 ? "1 exercise today" : "\(todays.count) exercises today"
     }
 
     private var noPlanState: some View {
@@ -342,6 +358,36 @@ struct ProgramDayView: View {
             )
             Spacer(minLength: AppSpacing.xl)
         }
+    }
+}
+
+// MARK: - Rest Day Card
+
+/// Shown when today's `weeklySchedule` entry is empty. Keeps the Start identifier so
+/// the workout is one tap away on every day of the week.
+private struct RestDayCard: View {
+    let plan: RehabPlan
+    let next: (weekdayName: String, exerciseCount: Int)?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
+            Text("Rest day")
+                .font(AppFonts.cardTitle)
+                .foregroundColor(AppColors.primaryText)
+
+            if let next {
+                Text("Next session: \(next.weekdayName) · \(next.exerciseCount) \(next.exerciseCount == 1 ? "exercise" : "exercises")")
+                    .font(AppFonts.small)
+                    .foregroundColor(AppColors.secondaryText)
+            }
+
+            NavigationLink(destination: GuidedWorkoutView(plan: plan)) {
+                Text("Start a workout anyway")
+            }
+            .buttonStyle(SecondaryButtonStyle())
+            .accessibilityIdentifier("home.startWorkoutButton")
+        }
+        .cardStyle()
     }
 }
 
