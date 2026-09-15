@@ -101,4 +101,19 @@ final class MyPlanTabUITests: UITestBase {
         let swapButtons = app.buttons.matching(identifier: "rehabPlan.swapExerciseButton")
         XCTAssertEqual(swapButtons.count, 3, "Only the three swap buttons should carry the swap identifier")
     }
+
+    @MainActor
+    func testPlanCards_showRealStatus() throws {
+        tapTab("Plan")
+        // The card's info block is ONE combined accessibility element (Task 4), so its
+        // children are not queryable as static texts — assert on the combined label.
+        // Seeded "Shoulder Mobility Plan" has no start date; it used to say ACTIVE.
+        let notStarted = app.buttons.matching(
+            NSPredicate(format: "label CONTAINS %@", "Shoulder Mobility Plan, 4 weeks, Not started")).firstMatch
+        XCTAssertTrue(notStarted.waitForExistence(timeout: 10),
+                      "A plan without a start date should read Not started")
+        let active = app.buttons.matching(
+            NSPredicate(format: "label CONTAINS %@", "Knee Rehab Plan, 6 weeks, Active")).firstMatch
+        XCTAssertTrue(active.waitForExistence(timeout: 5), "The started plan should read Active")
+    }
 }

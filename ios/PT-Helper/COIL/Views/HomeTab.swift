@@ -78,8 +78,7 @@ struct HomeTab: View {
     enum HomeContentTab { case program, preventative }
 
     private var activePlan: RehabPlan? {
-        savedPlansViewModel.rehabPlans.first(where: { $0.planType == .rehab })
-            ?? savedPlansViewModel.rehabPlans.first
+        HomeProgramLogic.preferredPlan(from: savedPlansViewModel.rehabPlans)
     }
 
     var body: some View {
