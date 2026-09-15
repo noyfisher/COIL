@@ -166,4 +166,14 @@ final class GuidedWorkoutUITests: UITestBase {
 
         captureScreenshot(name: "Workout-SwapSheet")
     }
+
+    @MainActor
+    func testInfoBadges_useDosageText() throws {
+        navigateToWorkout()
+        assertExists("workout.exerciseName", timeout: 10)
+
+        // Seeded "Wall Sits" has reps "30 seconds"; the badge read "30 seconds reps".
+        XCTAssertTrue(staticText("30 seconds").waitForExistence(timeout: 5))
+        XCTAssertFalse(staticText("30 seconds reps").exists)
+    }
 }

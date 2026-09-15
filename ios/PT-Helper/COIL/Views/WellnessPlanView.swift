@@ -130,9 +130,7 @@ struct WellnessPlanView: View {
                         .font(AppFonts.caption)
                         .foregroundColor(AppColors.secondaryText)
                     HStack(spacing: AppSpacing.sm) {
-                        Text("\(exercise.sets) sets")
-                        Text("·")
-                        Text("\(exercise.reps) reps")
+                        Text(exercise.dosageText)
                         Text("·")
                         Text(exercise.difficulty.rawValue.capitalized)
                             .foregroundColor(difficultyColor(exercise.difficulty))

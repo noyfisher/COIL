@@ -263,7 +263,7 @@ struct ExerciseSwapSheet: View {
                     }
 
                     HStack(spacing: AppSpacing.sm) {
-                        Text("\(substitute.sets) sets \u{00D7} \(substitute.reps)")
+                        Text(substitute.dosageText)
                             .font(AppFonts.captionMedium)
                             .foregroundColor(AppColors.secondaryText)
 

@@ -29,6 +29,7 @@ struct BasicInfoStepView: View {
                     DatePicker("", selection: $viewModel.userProfile.dateOfBirth, in: ...Date(), displayedComponents: .date)
                         .datePickerStyle(.compact)
                         .labelsHidden()
+                        .accessibilityLabel("Date of birth")
                         .tint(AppColors.accent)
                         .colorScheme(.dark)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -87,6 +88,7 @@ struct BasicInfoStepView: View {
                             .cornerRadius(AppCorners.medium)
                             .overlay(RoundedRectangle(cornerRadius: AppCorners.medium).stroke(OnboardingColors.cardBorder, lineWidth: 1))
                         }
+                        .accessibilityLabel("Height, \(viewModel.userProfile.heightFeet) feet")
 
                         Menu {
                             ForEach(0..<12, id: \.self) { inches in
@@ -107,6 +109,7 @@ struct BasicInfoStepView: View {
                             .cornerRadius(AppCorners.medium)
                             .overlay(RoundedRectangle(cornerRadius: AppCorners.medium).stroke(OnboardingColors.cardBorder, lineWidth: 1))
                         }
+                        .accessibilityLabel("Height, \(viewModel.userProfile.heightInches) inches")
                     }
                 }
 
@@ -155,6 +158,8 @@ struct BasicInfoStepView: View {
                                 .font(.title3)
                                 .foregroundColor(viewModel.hasAcceptedTerms ? AppColors.accent : OnboardingColors.muted)
                         }
+                        .accessibilityLabel("I agree to the Terms of Service and Privacy Policy")
+                        .accessibilityValue(viewModel.hasAcceptedTerms ? "Checked" : "Unchecked")
                         .accessibilityIdentifier("onboarding.termsCheckbox")
 
                         VStack(alignment: .leading, spacing: AppSpacing.nano) {

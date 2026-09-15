@@ -148,7 +148,7 @@ struct MyPlanTab: View {
 
     private func planCard(_ plan: RehabPlan) -> some View {
         VStack(spacing: 0) {
-            // Red top stripe for active feel
+            // Teal top stripe for active feel
             AppColors.accent.frame(height: 3)
 
             VStack(spacing: AppSpacing.md) {
@@ -157,7 +157,7 @@ struct MyPlanTab: View {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: AppSpacing.sm) {
                         HStack(spacing: AppSpacing.sm) {
-                            CoilBadge(text: "Active")
+                            statusBadge(for: plan)
                             Spacer()
                         }
 
@@ -168,6 +168,7 @@ struct MyPlanTab: View {
                             .foregroundColor(AppColors.primaryText)
                             .multilineTextAlignment(.leading)
                             .fixedSize(horizontal: false, vertical: true)
+                            .accessibilityIdentifier("myPlan.planCard")
 
                         if !plan.conditions.isEmpty {
                             Text(plan.conditions.prefix(2).joined(separator: " · "))
@@ -195,8 +196,13 @@ struct MyPlanTab: View {
                             .foregroundColor(AppColors.mutedText)
                     }
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityAddTraits(.isButton)
+                .accessibilityLabel("\(plan.planName), \(plan.totalWeeks) weeks, \(statusText(for: plan))")
+                .accessibilityHint("Opens plan")
+                .accessibilityAction { route = .detail(plan.id) }
 
-                // Red CTA — explicit button so only this region starts the workout.
+                // Teal CTA — explicit button so only this region starts the workout.
                 Button {
                     route = .workout(plan.id)
                 } label: {
@@ -227,6 +233,30 @@ struct MyPlanTab: View {
         .clipShape(RoundedRectangle(cornerRadius: AppCorners.card))
         .contentShape(Rectangle())
         .onTapGesture { route = .detail(plan.id) }
+    }
+
+    @ViewBuilder
+    private func statusBadge(for plan: RehabPlan) -> some View {
+        switch plan.status {
+        case .active:
+            CoilBadge(text: "Active")
+        case .notStarted:
+            Text("Not started")
+                .font(AppFonts.captionMedium)
+                .foregroundColor(AppColors.secondaryText)
+        case .completed:
+            Text("Completed")
+                .font(AppFonts.captionMedium)
+                .foregroundColor(AppColors.success)
+        }
+    }
+
+    private func statusText(for plan: RehabPlan) -> String {
+        switch plan.status {
+        case .active(let week): return "Active, week \(week)"
+        case .notStarted: return "Not started"
+        case .completed: return "Completed"
+        }
     }
 
     // MARK: - Empty State

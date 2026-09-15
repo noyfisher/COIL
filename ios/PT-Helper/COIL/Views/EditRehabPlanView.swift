@@ -28,7 +28,7 @@ struct EditRehabPlanView: View {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(exercise.name)
                                         .font(.subheadline.weight(.medium))
-                                    Text("\(exercise.sets) sets \u{00D7} \(exercise.reps) \u{2022} \(exercise.difficulty.rawValue.capitalized)")
+                                    Text("\(exercise.dosageText) \u{2022} \(exercise.difficulty.rawValue.capitalized)")
                                         .font(.caption)
                                         .foregroundColor(AppColors.secondaryText)
                                 }

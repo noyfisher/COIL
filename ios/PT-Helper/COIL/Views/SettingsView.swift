@@ -6,6 +6,8 @@ import StoreKit
 struct SettingsView: View {
     let userName: String
     var onEditProfile: () -> Void
+    /// True only when a sheet hosts this view; the tab host has nothing to dismiss.
+    var showsDoneButton: Bool = false
     @Environment(\.dismiss) private var dismiss
     @StateObject private var notificationService = NotificationService.shared
     @StateObject private var consentService = ConsentService.shared
@@ -29,133 +31,133 @@ struct SettingsView: View {
     @AppStorage(AppAppearance.storageKey) private var appearanceRaw = AppAppearance.system.rawValue
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                AppColors.bgGradient
-                    .ignoresSafeArea()
+        ZStack {
+            AppColors.bgGradient
+                .ignoresSafeArea()
 
-                ScrollView {
-                    VStack(spacing: AppSpacing.lg) {
-                        // Profile card
-                        profileCard
+            ScrollView {
+                VStack(spacing: AppSpacing.lg) {
+                    // Profile card
+                    profileCard
 
-                        // Appearance
-                        appearanceCard
+                    // Appearance
+                    appearanceCard
 
-                        // Notifications
-                        notificationsCard
+                    // Notifications
+                    notificationsCard
 
-                        // Debug & Feedback
-                        debugFeedbackCard
+                    // Debug & Feedback
+                    debugFeedbackCard
 
-                        // Help & Support (audit #84)
-                        helpSupportCard
+                    // Help & Support (audit #84)
+                    helpSupportCard
 
-                        // Legal
-                        legalCard
+                    // Legal
+                    legalCard
 
-                        // Actions
-                        actionsCard
+                    // Actions
+                    actionsCard
 
-                        // Danger zone
-                        dangerZoneCard
+                    // Danger zone
+                    dangerZoneCard
 
-                        // App version
-                        Text(appVersionText)
-                            .font(AppFonts.micro)
-                            .foregroundColor(Color.white.opacity(0.5))
-                            .padding(.top, AppSpacing.lg)
-                    }
-                    .padding(.horizontal, AppSpacing.xl)
-                    .padding(.vertical, AppSpacing.md)
-                    .floatingTabBarClearance()
+                    // App version
+                    Text(appVersionText)
+                        .font(AppFonts.micro)
+                        .foregroundColor(Color.white.opacity(0.5))
+                        .padding(.top, AppSpacing.lg)
                 }
+                .padding(.horizontal, AppSpacing.xl)
+                .padding(.vertical, AppSpacing.md)
+                .floatingTabBarClearance()
             }
-            .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
+        }
+        .navigationTitle("Settings")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if showsDoneButton {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }
                 }
             }
-            .confirmationDialog("Sign Out", isPresented: $showSignOutConfirmation, titleVisibility: .visible) {
-                Button("Sign Out", role: .destructive) {
-                    AnalyticsService.shared.log(.signedOut)
-                    SessionLogger.shared.logUserAction(.buttonTapped, action: "signOut")
-                    Task {
-                        // Clear the FCM token while STILL authenticated — after
-                        // signOut the client can't write Firestore and the token
-                        // would linger on this (possibly shared) device under the
-                        // former account (P2-01).
-                        await NotificationService.shared.clearFCMToken()
-                        do {
-                            try Auth.auth().signOut()
-                        } catch {
-                            SessionLogger.shared.logError(error, context: "Auth.signOut",
-                                                           metadata: ["screen": "SettingsView"])
-                            AnalyticsService.shared.log(.errorShown, parameters: [
-                                "screen": "SettingsView",
-                                "error_type": "sign_out_failed"
-                            ])
-                            signOutErrorMessage = error.localizedDescription
-                            showSignOutError = true
-                        }
+        }
+        .confirmationDialog("Sign Out", isPresented: $showSignOutConfirmation, titleVisibility: .visible) {
+            Button("Sign Out", role: .destructive) {
+                AnalyticsService.shared.log(.signedOut)
+                SessionLogger.shared.logUserAction(.buttonTapped, action: "signOut")
+                Task {
+                    // Clear the FCM token while STILL authenticated — after
+                    // signOut the client can't write Firestore and the token
+                    // would linger on this (possibly shared) device under the
+                    // former account (P2-01).
+                    await NotificationService.shared.clearFCMToken()
+                    do {
+                        try Auth.auth().signOut()
+                    } catch {
+                        SessionLogger.shared.logError(error, context: "Auth.signOut",
+                                                       metadata: ["screen": "SettingsView"])
+                        AnalyticsService.shared.log(.errorShown, parameters: [
+                            "screen": "SettingsView",
+                            "error_type": "sign_out_failed"
+                        ])
+                        signOutErrorMessage = error.localizedDescription
+                        showSignOutError = true
                     }
                 }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("Are you sure you want to sign out?")
             }
-            .alert("Couldn't sign you out", isPresented: $showSignOutError) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(signOutErrorMessage)
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Are you sure you want to sign out?")
+        }
+        .alert("Couldn't sign you out", isPresented: $showSignOutError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(signOutErrorMessage)
+        }
+        .confirmationDialog("Delete Account", isPresented: $showDeleteConfirmation, titleVisibility: .visible) {
+            Button("Delete Everything", role: .destructive) {
+                AnalyticsService.shared.log(.accountDeleteAttempted)
+                SessionLogger.shared.logUserAction(.buttonTapped, action: "accountDeleteAttempted")
+                deleteAccount()
             }
-            .confirmationDialog("Delete Account", isPresented: $showDeleteConfirmation, titleVisibility: .visible) {
-                Button("Delete Everything", role: .destructive) {
-                    AnalyticsService.shared.log(.accountDeleteAttempted)
-                    SessionLogger.shared.logUserAction(.buttonTapped, action: "accountDeleteAttempted")
-                    deleteAccount()
-                }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("This will permanently delete your account, all health data, rehab plans, and workout history. This cannot be undone.")
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This will permanently delete your account, all health data, rehab plans, and workout history. This cannot be undone.")
+        }
+        .alert("Couldn't delete your account", isPresented: $showDeleteError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(deleteError ?? "An unknown error occurred.")
+        }
+        .confirmationDialog("Withdraw Health Data Consent", isPresented: $showWithdrawConsentConfirmation, titleVisibility: .visible) {
+            Button("Withdraw Consent", role: .destructive) {
+                ConsentService.shared.revokeHealthDataConsent()
+                showWithdrawDone = true
             }
-            .alert("Couldn't delete your account", isPresented: $showDeleteError) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(deleteError ?? "An unknown error occurred.")
-            }
-            .confirmationDialog("Withdraw Health Data Consent", isPresented: $showWithdrawConsentConfirmation, titleVisibility: .visible) {
-                Button("Withdraw Consent", role: .destructive) {
-                    ConsentService.shared.revokeHealthDataConsent()
-                    showWithdrawDone = true
-                }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("COIL will stop collecting and using your health data. You'll need to consent again before starting new assessments or using health features. Your existing data is kept until you delete your account.")
-            }
-            .alert("Consent Withdrawn", isPresented: $showWithdrawDone) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text("New health-data features are paused until you consent again. To erase your data entirely, use Delete Account.")
-            }
-            .overlay {
-                if isDeletingAccount {
-                    ZStack {
-                        AppColors.primaryText.opacity(0.4).ignoresSafeArea()
-                        VStack(spacing: AppSpacing.md) {
-                            ProgressView()
-                                .scaleEffect(1.3)
-                                .tint(AppColors.ctaText)
-                            Text("Deleting account...")
-                                .font(AppFonts.body)
-                                .foregroundColor(AppColors.primaryText)
-                        }
-                        .padding(AppSpacing.xxl)
-                        .background(.ultraThinMaterial)
-                        .cornerRadius(AppCorners.large)
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("COIL will stop collecting and using your health data. You'll need to consent again before starting new assessments or using health features. Your existing data is kept until you delete your account.")
+        }
+        .alert("Consent Withdrawn", isPresented: $showWithdrawDone) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("New health-data features are paused until you consent again. To erase your data entirely, use Delete Account.")
+        }
+        .overlay {
+            if isDeletingAccount {
+                ZStack {
+                    AppColors.primaryText.opacity(0.4).ignoresSafeArea()
+                    VStack(spacing: AppSpacing.md) {
+                        ProgressView()
+                            .scaleEffect(1.3)
+                            .tint(AppColors.ctaText)
+                        Text("Deleting account...")
+                            .font(AppFonts.body)
+                            .foregroundColor(AppColors.primaryText)
                     }
+                    .padding(AppSpacing.xxl)
+                    .background(.ultraThinMaterial)
+                    .cornerRadius(AppCorners.large)
                 }
             }
         }
@@ -556,6 +558,7 @@ struct SettingsView: View {
 
                 Toggle("", isOn: $notificationService.isEnabled)
                     .labelsHidden()
+                    .accessibilityLabel("Reminders")
                     .accessibilityIdentifier("settings.reminderToggle")
                     .onChange(of: notificationService.isEnabled) { _, enabled in
                         AnalyticsService.shared.log(.settingChanged,
@@ -594,6 +597,7 @@ struct SettingsView: View {
 
                     DatePicker("", selection: $reminderDate, displayedComponents: .hourAndMinute)
                         .labelsHidden()
+                        .accessibilityLabel("Reminder time")
                         .onChange(of: reminderDate) { _, newDate in
                             let components = Calendar.current.dateComponents([.hour, .minute], from: newDate)
                             notificationService.updateReminderTime(hour: components.hour ?? 9, minute: components.minute ?? 0)
@@ -629,6 +633,7 @@ struct SettingsView: View {
                     Spacer()
                     Toggle("", isOn: $notificationService.workoutRemindersEnabled)
                         .labelsHidden()
+                        .accessibilityLabel("Workout reminders")
                         .onChange(of: notificationService.workoutRemindersEnabled) { _, enabled in
                             AnalyticsService.shared.log(.settingChanged,
                                 parameters: ["key": "workout_reminders",
@@ -653,6 +658,7 @@ struct SettingsView: View {
                     Spacer()
                     Toggle("", isOn: $notificationService.reassessmentRemindersEnabled)
                         .labelsHidden()
+                        .accessibilityLabel("Re-assessment prompts")
                         .onChange(of: notificationService.reassessmentRemindersEnabled) { _, enabled in
                             AnalyticsService.shared.log(.settingChanged,
                                 parameters: ["key": "reassessment_reminders",
@@ -677,6 +683,7 @@ struct SettingsView: View {
                     Spacer()
                     Toggle("", isOn: $notificationService.inactivityNudgesEnabled)
                         .labelsHidden()
+                        .accessibilityLabel("Inactivity nudges")
                         .onChange(of: notificationService.inactivityNudgesEnabled) { _, enabled in
                             AnalyticsService.shared.log(.settingChanged,
                                 parameters: ["key": "inactivity_nudges",

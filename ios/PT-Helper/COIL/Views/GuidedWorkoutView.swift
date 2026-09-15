@@ -226,7 +226,7 @@ struct GuidedWorkoutView: View {
                         // Info badges
                         HStack(spacing: AppSpacing.md) {
                             infoBadge(icon: "arrow.triangle.2.circlepath", text: "Set \(vm.currentSet)/\(exercise.sets)")
-                            infoBadge(icon: "repeat", text: "\(exercise.reps) reps")
+                            infoBadge(icon: "repeat", text: exercise.repsText)
                             infoBadge(icon: "timer", text: "\(exercise.restSeconds)s rest")
                         }
 
@@ -460,7 +460,7 @@ struct GuidedWorkoutView: View {
                 upNextCard(exercise: current, subtitle: "Set \(vm.currentSet) of \(current.sets)")
             } else if vm.currentExerciseIndex + 1 < vm.totalExercises {
                 let next = vm.plan.exercises[vm.currentExerciseIndex + 1]
-                upNextCard(exercise: next, subtitle: "\(next.sets) sets \u{00D7} \(next.reps)")
+                upNextCard(exercise: next, subtitle: next.dosageText)
             }
 
             Spacer()

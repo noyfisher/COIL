@@ -45,11 +45,11 @@ var repsText: String
 var dosageText: String
 ```
 
-Parsing: trim whitespace; `Int(trimmed)` non-nil → `"\(n) reps"` (`"1 rep"` when n == 1); else the trimmed string. `sets` renders as `"\(sets) sets"` (`"1 set"` when 1). Separator is the multiplication sign `\u{00D7}` with spaces, matching `RehabPlanView.swift:665` today.
+Parsing: trim whitespace; `Int(trimmed)` non-nil and ≥ 0 → `"\(n) reps"` (`"1 rep"` when n == 1); a unit-less range matching `^\d+\s*(?:-|–|—|to)\s*\d+$` ("10-12", "10–12", "8 to 10") → `"\(trimmed) reps"` (the most common AI-emitted shape, and the `TestFixtures.makeExercise` default; found by the code review, the workout badge would otherwise lose its unit); else the trimmed string verbatim ("30 seconds", "10 each side", "-3"). `sets` renders as `"\(sets) sets"` (`"1 set"` when 1). Separator is the multiplication sign `\u{00D7}` with spaces, matching `RehabPlanView.swift:665` today.
 
 Call sites: `HomeTab.swift:298` → `dosageText`; `GuidedWorkoutView.swift:229` → `repsText`; `GuidedWorkoutView.swift:463` (up-next subtitle) → `dosageText`; `RehabPlanView.swift:665` → `dosageText`. `MyPlanTab` and `ExerciseDetailView` untouched unless they render the same pair (grep `sets) sets` before finishing).
 
-Tests (`COILTests/RehabExerciseDosageTests.swift`): numeric reps → "3 sets × 12 reps"; timed → "3 sets × 30 seconds"; free text → "2 sets × 10 each side"; `sets == 1` → "1 set × 12 reps"; `reps == "1"` → "1 rep"; whitespace-padded `" 15 "` → "15 reps".
+Tests (`COILTests/RehabExerciseDosageTests.swift`): numeric reps → "3 sets × 12 reps"; timed → "3 sets × 30 seconds"; free text → "2 sets × 10 each side"; `sets == 1` → "1 set × 12 reps"; `reps == "1"` → "1 rep"; whitespace-padded `" 15 "` → "15 reps"; ranges "10-12" / "10–12" / "8 to 10" → "… reps"; "-3" → verbatim; "3 sets × 10-12 reps".
 
 ### F2.2 `RehabPlan.status`
 
@@ -122,4 +122,5 @@ Acceptance: Profile tab shows no Done button; Progress gear → sheet still show
 - `TestDataSeeder` schedules use names while the generator uses ids; `HomeProgramLogic` tolerates both. A follow-up could make the seeder use ids.
 - `ExerciseSwapViewModel.selectSubstitute` (and `AdaptiveProgressionAnalyzer.applyProgression` if it replaces exercises) should rewrite matching `weeklySchedule` entries to the substitute's id so schedules stay resolvable; until then Home falls back to showing all exercises for that day.
 - `WellnessPlanView`, `ExerciseSwapSheet` and `EditRehabPlanView` also render "sets × reps" and are migrated to `dosageText` in F2.1 (found by the plan audit).
+- On a training day Home says "2 exercises today" but "Start Guided Workout" still launches the full plan (`GuidedWorkoutViewModel` has no schedule awareness). Follow-up: pass today's subset to the workout, or add a one-line note in the workout header (found by the Task 13 code review).
 - The seeded streak (3 / 7) versus "Earned 0" on Achievements is a seeding gap (`seedStreakData` does not seed `StreakService.achievements`); not fixed here.

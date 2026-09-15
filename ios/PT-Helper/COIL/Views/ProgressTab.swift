@@ -23,15 +23,18 @@ struct ProgressTab: View {
             .coilNavBar()
         }
         .sheet(isPresented: $showSettings) {
-            SettingsView(
-                userName: UserProfileService.shared.profile?.firstName ?? "User",
-                onEditProfile: {
-                    showSettings = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        showProfileEdit = true
-                    }
-                }
-            )
+            NavigationStack {
+                SettingsView(
+                    userName: UserProfileService.shared.profile?.firstName ?? "User",
+                    onEditProfile: {
+                        showSettings = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            showProfileEdit = true
+                        }
+                    },
+                    showsDoneButton: true
+                )
+            }
         }
         .fullScreenCover(isPresented: $showProfileEdit) {
             OnboardingEditView()
@@ -171,6 +174,7 @@ struct ProgressTabContent: View {
                         StreakToolbarBadge(streakService: streakService)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel("\(streakService.streakData.currentStreak) day streak, view achievements")
                     .accessibilityIdentifier("progress.streakBadge")
 
                     Button(action: onSettingsTapped) {
