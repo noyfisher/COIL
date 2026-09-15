@@ -51,6 +51,7 @@ enum CoilPalette {
     // Darkened for AA at the 11–13pt sizes it labels (meta lines, stat labels):
     // light was #7A8A8D at 3.59:1 on white / 3.28:1 on page, now 5.30:1 / 4.84:1;
     // dark was #6E8285 at 3.97:1 on the dark card, now 4.97:1 (5.71:1 on the page).
+    // Never on the fixed-dark surfaces: the light value is 3.28:1 on ink (same trap as accentText).
     static let textMuted     = dyn(hex(0x5F6E72), hex(0x7E9396))
 
     // Semantics — decoupled from the brand hue
@@ -83,7 +84,7 @@ enum AppColors {
     /// this rather than reaching into `CoilPalette`; the other `pop` uses (wellness
     /// motivation icons, Progress tab) get their own token in the design pass.
     static let streak     = Color(CoilPalette.pop)
-    static let streakTint = Color(CoilPalette.pop).opacity(0.12)   // follows the existing pop tint in GuidedWorkoutSummaryView; accentTint is 0.10
+    static let streakTint = Color(CoilPalette.pop).opacity(0.12)   // the stronger (0.12) of GuidedWorkoutSummaryView's two pop tints; accentTint is 0.10
 
     // MARK: Text
     static let primaryText    = Color(CoilPalette.textPrimary)
@@ -100,7 +101,7 @@ enum AppColors {
     static let textOnDarkTertiary  = Color.white.opacity(0.55)
     // Two tiers on purpose: field captions above helper text (was 0.45 / 0.35, both under AA).
     static let onDarkLabel      = textOnDarkSecondary  // 0.70 → 8.97:1: uppercase field captions
-    static let onDarkMuted      = textOnDarkTertiary   // 0.55 → 6.01:1: helper copy, chevrons, units
+    static let onDarkMuted      = textOnDarkTertiary   // 0.55 → 6.01:1: helper copy, placeholders, chevrons, units
     /// On-color for the FIXED teal surfaces (coolGradient / healingGradient /
     /// accent fills). Those gradients stay teal in both appearances, so their
     /// on-color must be fixed too. It is near-black rather than white because
@@ -353,7 +354,7 @@ enum AppFonts {
 
     // MARK: Icons — SF Symbol glyph sizes for standalone chrome glyphs (tab bar, chips,
     // badges, chevrons, stat icons) that are laid out at a fixed size, replacing ad-hoc
-    // `.font(.system(size: N, weight:))` calls; the sweep quantises 13 → S and 18 → M/L.
+    // `.font(.system(size: N, weight:))` calls; the sweep quantises 10–11 → XS, 13 → S, 18 → M/L.
     // Fixed on purpose: these do not scale with Dynamic Type. A symbol set inline with
     // text must take the text's `AppFonts` token instead so the pair scales together.
     static let iconXS = Font.system(size: 12, weight: .semibold)
@@ -447,9 +448,10 @@ struct PrimaryButtonStyle: ButtonStyle {
             .foregroundColor(.white)
             // Disabled = the same capsule at 35% with a dimmed label and no lift (the HIG fade;
             // WCAG exempts inactive controls). The old solid mutedText fill read as an enabled
-            // grey button on the fixed-dark onboarding pages, where 3 of the 4 call sites live.
-            // Measured label-vs-capsule: 6.7:1 on ink; a faint 1.5:1 on the light page
-            // (PainDetailView), the same class of faintness as the system's disabled buttons.
+            // grey button on the fixed-dark onboarding forms (OnboardingView, OnboardingEditView).
+            // Measured label-vs-capsule: 6.7:1 on ink; a faint 1.5–1.7:1 on the light grounds of
+            // the other two callers (PainDetailView page, NotesView card), the same class of
+            // faintness as the system's disabled buttons. A ground-aware variant is a follow-up.
             .opacity(isDisabled ? 0.7 : 1.0)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 13)
@@ -920,7 +922,8 @@ extension View {
 // MARK: - Onboarding Dark Surface
 
 /// Deprecated: use `AppColors.onDark*`. Kept as forwarding aliases so the 53 call
-/// sites in the onboarding views compile until they are swept in a later PR.
+/// sites (onboarding views, BodyAreaChipPicker, and the dark field/chip components
+/// below) compile until they are swept in a later PR.
 enum OnboardingColors {
     static let cardBg     = AppColors.onDarkCard
     static let cardBorder = AppColors.onDarkBorder
