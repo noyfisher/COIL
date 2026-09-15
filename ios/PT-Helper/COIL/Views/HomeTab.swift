@@ -276,7 +276,8 @@ struct ProgramDayView: View {
 
     var body: some View {
         if let plan = plan {
-            let todays = HomeProgramLogic.todaysExercises(for: plan, on: Date())
+            let now = Date()
+            let todays = HomeProgramLogic.todaysExercises(for: plan, on: now)
             VStack(alignment: .leading, spacing: AppSpacing.md) {
                 CoilDividerHeader(title: "Today's Program")
 
@@ -297,7 +298,7 @@ struct ProgramDayView: View {
                 }
 
                 if let todays, todays.isEmpty {
-                    RestDayCard(plan: plan, next: HomeProgramLogic.nextSession(for: plan, after: Date()))
+                    RestDayCard(plan: plan, next: HomeProgramLogic.nextSession(for: plan, after: now))
                 } else {
                     let shown = todays ?? plan.exercises
 
