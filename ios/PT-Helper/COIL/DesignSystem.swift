@@ -83,6 +83,16 @@ enum AppColors {
     static let mutedText      = Color(CoilPalette.textMuted)
     static let textOnDark      = Color.white
     static let textOnDarkMuted = Color.white.opacity(0.6)
+    /// On-dark text tiers for the fixed-dark ink surfaces (`darkSurface`,
+    /// `navBackground`, `bgGradient`). Measured on ink: 0.70 → 8.97:1, 0.55 → 6.01:1.
+    /// Nothing below 0.55 alpha may be used for text on ink (0.45 was 4.45:1, 0.30 was 2.70:1).
+    /// `textOnDarkMuted` (0.6) predates this ladder and sits between the two; treat it as
+    /// Tertiary and prefer Secondary/Tertiary in new code.
+    static let textOnDarkSecondary = Color.white.opacity(0.70)
+    static let textOnDarkTertiary  = Color.white.opacity(0.55)
+    // Two tiers on purpose: field captions above helper text (was 0.45 / 0.35, both under AA).
+    static let onDarkLabel      = textOnDarkSecondary  // 0.70 → 8.97:1: uppercase field captions
+    static let onDarkMuted      = textOnDarkTertiary   // 0.55 → 6.01:1: helper copy, chevrons, units
     /// On-color for the FIXED teal surfaces (coolGradient / healingGradient /
     /// accent fills). Those gradients stay teal in both appearances, so their
     /// on-color must be fixed too. It is near-black rather than white because
@@ -104,9 +114,17 @@ enum AppColors {
     static let navBackground       = Color(CoilPalette.ink)
     static let navBorder           = Color.white.opacity(0.08)
 
+    /// Onboarding / hero-card surfaces on the fixed-dark ground (`OnboardingColors`
+    /// forwards to these until its call sites are swept).
+    static let onDarkCard       = Color.white.opacity(0.06)
+    static let onDarkBorder     = Color.white.opacity(0.10)
+    static let onDarkInput      = Color.white.opacity(0.08)
+    static let onDarkChip       = Color.white.opacity(0.10)
+    static let onDarkChipBorder = Color.white.opacity(0.14)
+
     // MARK: Tab bar
     static let tabActive   = Color(CoilPalette.accent)
-    static let tabInactive = Color.white.opacity(0.45)
+    static let tabInactive = Color.white.opacity(0.55)   // 6.0:1 on ink; 0.45 was 4.45:1 at 10pt
 
     // MARK: CTA
     static let ctaBackground = Color(CoilPalette.accentDeep)
