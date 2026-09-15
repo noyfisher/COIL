@@ -445,12 +445,19 @@ struct PrimaryButtonStyle: ButtonStyle {
             .textCase(.uppercase)
             .kerning(1.2)
             .foregroundColor(.white)
+            // Disabled = the same capsule at 35% with a dimmed label and no lift (the HIG fade;
+            // WCAG exempts inactive controls). The old solid mutedText fill read as an enabled
+            // grey button on the fixed-dark onboarding pages, where 3 of the 4 call sites live.
+            // Measured label-vs-capsule: 6.7:1 on ink; a faint 1.5:1 on the light page
+            // (PainDetailView), the same class of faintness as the system's disabled buttons.
+            .opacity(isDisabled ? 0.7 : 1.0)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 13)
             .padding(.horizontal, AppSpacing.xl)
-            .background(isDisabled ? AnyShapeStyle(AppColors.mutedText) : AnyShapeStyle(AppColors.ctaBackground))
+            .background(isDisabled ? AnyShapeStyle(AppColors.ctaBackground.opacity(0.35))
+                                   : AnyShapeStyle(AppColors.ctaBackground))
             .clipShape(Capsule())
-            .shadow(color: AppColors.ctaBackground.opacity(0.30), radius: 8, y: 4)
+            .shadow(color: isDisabled ? .clear : AppColors.ctaBackground.opacity(0.30), radius: 8, y: 4)
             .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
             .animation(AppAnimations.press, value: configuration.isPressed)
     }
