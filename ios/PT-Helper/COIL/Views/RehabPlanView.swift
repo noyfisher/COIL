@@ -665,7 +665,7 @@ struct RehabPlanView: View {
                 }
 
                 HStack(spacing: AppSpacing.sm) {
-                    Text("\(exercise.sets) sets \u{00D7} \(exercise.reps)")
+                    Text(exercise.dosageText)
                         .font(AppFonts.captionMedium)
                         .foregroundColor(AppColors.secondaryText)
 

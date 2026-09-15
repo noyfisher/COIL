@@ -303,7 +303,7 @@ private struct ExerciseProgramRow: View {
                     .foregroundColor(AppColors.primaryText)
                     .lineLimit(1)
 
-                Text("\(exercise.sets) sets · \(exercise.reps) reps")
+                Text(exercise.dosageText)
                     .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
 
