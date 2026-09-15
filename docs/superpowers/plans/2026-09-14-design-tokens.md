@@ -397,7 +397,7 @@ enum OnboardingColors {
 Line 894 `TextField(placeholder, text: $text)` becomes:
 ```swift
         TextField(placeholder, text: $text,
-                  prompt: Text(placeholder).foregroundColor(AppColors.onDarkLabel))
+                  prompt: Text(placeholder).foregroundColor(AppColors.onDarkMuted))
 ```
 (the modifier chain below it is unchanged).
 
@@ -425,7 +425,7 @@ git diff --stat ux/design-specs..HEAD -- ios/
 ```
 Expected: exactly `ios/PT-Helper/COIL/DesignSystem.swift` and `ios/PT-Helper/COILTests/DesignTokenContrastTests.swift`.
 
-- [ ] **Step 3: Before/after screenshots** on the simulator, launched with `--uitesting --skip-onboarding --seed-mock-data` (and once with `--uitesting` alone for onboarding): Home (week-strip day names brighter; "3 exercises" meta darker), Onboarding step 1 (field captions at 0.70 clearly above helper copy at 0.55; Skip and "1/6" brighter; placeholders visible; Continue visibly dimmed while disabled), Settings/Profile (row meta and version footer), Progress (stat labels, "Personal best" line, and the pain-chart dashed grid lines which use `mutedText.opacity(0.3)`), and Achievements (locked rows: the `mutedText`-tinted circle fill and lock icon get slightly darker — they must still read as locked, not as enabled). `mutedText` also tints dots in `RecoveryInsightsCardView` and `ReAssessmentComparisonView`; those are reachable only with live data, so they are checked by reading the code, not screenshots. Expected differences are exactly those; anything else is a regression. Save to `/tmp/coil-tokens-qa/`.
+- [ ] **Step 3: Before/after screenshots** on the simulator, launched with `--uitesting --skip-onboarding --seed-mock-data` (and once with `--uitesting` alone for onboarding): Home (week-strip day names brighter; "3 exercises" meta darker), Onboarding step 1 (field captions at 0.70 clearly above helper copy at 0.55; placeholders visible at 0.55; Continue visibly dimmed while disabled; the Skip control keeps its own alpha and must not change), Settings/Profile (row meta and version footer), Progress (stat labels, "Personal best" line, and the pain-chart dashed grid lines which use `mutedText.opacity(0.3)`), and Achievements (locked rows: the `mutedText`-tinted circle fill and lock icon get slightly darker — they must still read as locked, not as enabled). `mutedText` also tints dots in `RecoveryInsightsCardView` and `ReAssessmentComparisonView`; those are reachable only with live data, so they are checked by reading the code, not screenshots. Expected differences are exactly those; anything else is a regression. Save to `/tmp/coil-tokens-qa/`.
 
 - [ ] **Step 4: Push and open the PR**
 ```bash
@@ -437,7 +437,7 @@ Implements docs/superpowers/specs/2026-09-14-design-tokens-design.md. DesignSyst
 - textOnDarkSecondary (0.70, 8.97:1) and textOnDarkTertiary (0.55, 6.01:1); onDark* surface tokens; tabInactive 0.45 → 0.55
 - AppFonts.iconXS/S/M/L/XL; AppColors.streak / streakTint
 - PrimaryButtonStyle disabled: 35% capsule, 70% label, no shadow (was a solid grey that read as enabled)
-- DarkTextField prompt uses onDarkLabel (placeholders were the system grey on ink)
+- DarkTextField prompt uses onDarkMuted, the 0.55 helper tier (placeholders were the system grey on ink; review found 0.70 read too close to typed text)
 - DesignTokenContrastTests: alpha-aware WCAG floors for the changed pairs plus the documented accentText-on-ink trap
 
 Verification: UnitPlan green; before/after screenshots of Home, Onboarding step 1, Profile, Progress attached.

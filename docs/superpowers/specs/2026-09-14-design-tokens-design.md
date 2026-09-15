@@ -90,7 +90,7 @@ static let onDarkMuted      = textOnDarkTertiary            // was muted 0.35 �
 
 ### T8 — `DarkTextField` placeholder
 
-`DarkTextField` uses `TextField(placeholder, text: $text, prompt: Text(placeholder).foregroundColor(AppColors.onDarkLabel))` so placeholders render at 8.97:1 (the 0.70 caption tier) instead of the system placeholder grey.
+`DarkTextField` uses `TextField(placeholder, text: $text, prompt: Text(placeholder).foregroundColor(AppColors.onDarkMuted))` so placeholders render at 6.01:1 (the 0.55 helper tier) instead of the system placeholder grey. Code review moved this down from the 0.70 caption tier: a placeholder shares the field's font with typed white text, and at 0.70 it sat only 1.9:1 from a typed value (2.9:1 at 0.55) and was identical to the `OnboardingFieldLabel` caption above it.
 
 ## Tests — `COILTests/DesignTokenContrastTests.swift`
 
@@ -120,3 +120,12 @@ The file goes in the UnitPlan (auto-discovered).
 - **Dark-mode pairs found by the plan audit:** white on the dark CTA (`accentDeep` dark `#17A6A2`) is 2.99:1 and the dark danger red (`#CB4238`) on the dark card is 3.35:1. Both predate this PR and are gated light-only in `DesignTokenContrastTests`; fixing them means darkening `accentDeep`'s dark variant (or switching the CTA on-colour to `textOnAccent` in dark) and lightening `errorRed`'s dark variant — a separate token PR with its own screenshots.
 - Sweep views to `AppFonts.icon*`, `AppColors.streak`, `AppColors.onDark*`, `textOnDarkSecondary/Tertiary` (IA workstream for the screens it touches; design pass for the rest), then delete the `OnboardingColors` aliases.
 - Consider `AppFonts.nano` (10pt Inter) only if the design pass keeps a 10pt "weeks" label; otherwise `MyPlanTab.swift:194` moves to `micro`.
+
+### Raised in code review during implementation (decide before the sweep)
+
+- **Icon tokens and Dynamic Type.** `AppFonts.icon*` are fixed `Font.system(size:)` fonts and do not scale with Dynamic Type, unlike every other `AppFonts` token. They codify the app's existing fixed-size glyphs, and the comment scopes them to standalone chrome glyphs (symbols inline with text take the text's token). Alternatives are text-style glyph fonts (`.caption`/`.footnote`/`.callout`/`.title3`) or `@ScaledMetric` at the call site. The ladder also skips 18pt (8 glyph sites, more than 20pt's 3), has nothing below 12pt (9 sites at 10–11pt), and about a third of glyph sites use `.regular` weight, which the `.semibold` tokens would thicken.
+- **Disabled primary button on light grounds.** The 35% capsule with a 70% label measures 6.7:1 label-vs-capsule on ink but 1.5:1 on the light page (`PainDetailView`, the one light-ground caller of four). A ground-unaware `ButtonStyle` cannot do better with a white label; the design pass should add an `onDark:` parameter or an opaque neutral disabled fill for light call sites. The `isDisabled` flip also snaps (only `isPressed` is animated).
+- **`mutedText` light on fixed-dark grounds** dropped from 4.84:1 to 3.28:1 on ink (2.61:1 on `inkElevated`). No call site paints it there today, but the token now belongs to the same trap class as `accentText` and its doc comment should say so. `Models/BodyMapConstants.swift:151` `paletteMuted` is a hand-copied `0x7A8A8D` that has drifted from the new value.
+- **Retire `textOnDarkMuted` (0.6)** into the Secondary/Tertiary ladder (8 call sites), and consolidate the alpha-blind `ContrastRegressionTests` harness with `DesignTokenContrastTests`.
+- **Streak / `pop`.** `AppColors.streak`/`streakTint` have no consumers yet; 14 direct `Color(CoilPalette.pop)` uses across 6 views at three tint alphas (0.08 / 0.10 / 0.12), some not streak-related (wellness motivation, Progress), need their own token or the sweep.
+- **Onboarding tiers are lopsided.** `OnboardingColors.subLabel` (0.70) has one consumer (`OnboardingFieldLabel`) and `muted` (0.55) fourteen; the sweep decides which copy earns the caption tier. `DarkTextField`, `OnboardingFieldLabel` and `DarkChipButton` inside `DesignSystem.swift` can move to `AppColors.onDark*` without touching a view.
