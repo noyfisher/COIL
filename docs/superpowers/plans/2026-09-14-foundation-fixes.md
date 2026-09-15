@@ -1463,7 +1463,7 @@ Toolbar (lines 76-80) becomes:
 
 - [ ] **Step 4: Build and run**
 
-Build → succeeded. Run `-only-testing:COILUITests/ShellNavigationUITests -only-testing:COILUITests/SettingsUITests` → all `passed` (the gear path still shows Done and dismisses; the Profile path shows none).
+Build → succeeded. Run `-only-testing:COILUITests/ShellNavigationUITests -only-testing:COILUITests/SettingsUITests` → all `passed` (the gear path still shows Done and dismisses; the Profile path shows none). Also add the positive case to `SettingsUITests` (found in code review): `testGearSheet_showsDoneAndDismisses` — `navigateToSettings()`, assert `app.buttons["Done"]` exists, tap it, assert `settings.signOutButton` disappears.
 
 - [ ] **Step 5: Commit**
 
