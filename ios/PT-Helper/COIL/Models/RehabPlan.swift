@@ -121,3 +121,23 @@ struct RehabExercise: Codable, Identifiable {
         self.originalAIName = originalAIName
     }
 }
+
+// MARK: - Dosage copy
+
+extension RehabExercise {
+    /// "12 reps" when `reps` is an integer, otherwise the value verbatim ("30 seconds",
+    /// "10 each side"). Timed exercises used to render as "30 seconds reps".
+    var repsText: String {
+        let trimmed = reps.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let count = Int(trimmed) {
+            return count == 1 ? "1 rep" : "\(count) reps"
+        }
+        return trimmed
+    }
+
+    /// "3 sets × 12 reps" — the single dosage string every screen uses.
+    var dosageText: String {
+        let setsText = sets == 1 ? "1 set" : "\(sets) sets"
+        return "\(setsText) \u{00D7} \(repsText)"
+    }
+}
