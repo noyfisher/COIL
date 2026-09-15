@@ -919,14 +919,16 @@ extension View {
 
 // MARK: - Onboarding Dark Surface
 
+/// Deprecated: use `AppColors.onDark*`. Kept as forwarding aliases so the 53 call
+/// sites in the onboarding views compile until they are swept in a later PR.
 enum OnboardingColors {
-    static let cardBg     = Color.white.opacity(0.06)
-    static let cardBorder = Color.white.opacity(0.10)
-    static let inputBg    = Color.white.opacity(0.08)
-    static let chipIdle   = Color.white.opacity(0.10)
-    static let chipBorder = Color.white.opacity(0.14)
-    static let subLabel   = Color.white.opacity(0.45)
-    static let muted      = Color.white.opacity(0.35)
+    static let cardBg     = AppColors.onDarkCard
+    static let cardBorder = AppColors.onDarkBorder
+    static let inputBg    = AppColors.onDarkInput
+    static let chipIdle   = AppColors.onDarkChip
+    static let chipBorder = AppColors.onDarkChipBorder
+    static let subLabel   = AppColors.onDarkLabel      // 0.45 → 0.70: field captions now 8.97:1
+    static let muted      = AppColors.onDarkMuted      // 0.35 → 0.55: helper text now 6.0:1
 }
 
 struct DarkTextField: View {
@@ -935,7 +937,8 @@ struct DarkTextField: View {
     var keyboardType: UIKeyboardType = .default
 
     var body: some View {
-        TextField(placeholder, text: $text)
+        TextField(placeholder, text: $text,
+                  prompt: Text(placeholder).foregroundColor(AppColors.onDarkMuted))
             .keyboardType(keyboardType)
             .font(AppFonts.body)
             .foregroundColor(.white)
