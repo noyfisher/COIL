@@ -105,4 +105,12 @@ final class ShellNavigationUITests: UITestBase {
         assertExists("offlineBanner", timeout: 10)
         captureScreenshot(name: "Shell-OfflineBanner")
     }
+
+    @MainActor
+    func testProfileTab_hasNoDoneButton() throws {
+        tapTab("Profile")
+        XCTAssertTrue(app.descendants(matching: .any)["settings.signOutButton"].waitForExistence(timeout: 10))
+        // As a tab root there is nothing to dismiss; the inert Done button must go.
+        XCTAssertFalse(app.buttons["Done"].exists, "Profile tab should not show a Done button")
+    }
 }
