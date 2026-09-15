@@ -79,6 +79,11 @@ enum AppColors {
     static let warning = Color(CoilPalette.warning)
     static let danger  = Color(CoilPalette.errorRed)   // decoupled from brand
     static let info    = Color(CoilPalette.infoBlue)   // decoupled from brand
+    /// Streak / achievement accent (Tier-0 `pop`). Streak and achievement views must use
+    /// this rather than reaching into `CoilPalette`; the other `pop` uses (wellness
+    /// motivation icons, Progress tab) get their own token in the design pass.
+    static let streak     = Color(CoilPalette.pop)
+    static let streakTint = Color(CoilPalette.pop).opacity(0.12)   // follows the existing pop tint in GuidedWorkoutSummaryView; accentTint is 0.10
 
     // MARK: Text
     static let primaryText    = Color(CoilPalette.textPrimary)
@@ -345,6 +350,17 @@ enum AppFonts {
     static let dataMedium = Font.system(.body,     design: .monospaced).weight(.semibold)
     static let dataSmall  = Font.system(.footnote, design: .monospaced).weight(.medium)
     static let dashLabel  = Font.system(.caption2).weight(.semibold)
+
+    // MARK: Icons — SF Symbol glyph sizes for standalone chrome glyphs (tab bar, chips,
+    // badges, chevrons, stat icons) that are laid out at a fixed size, replacing ad-hoc
+    // `.font(.system(size: N, weight:))` calls; the sweep quantises 13 → S and 18 → M/L.
+    // Fixed on purpose: these do not scale with Dynamic Type. A symbol set inline with
+    // text must take the text's `AppFonts` token instead so the pair scales together.
+    static let iconXS = Font.system(size: 12, weight: .semibold)
+    static let iconS  = Font.system(size: 14, weight: .semibold)
+    static let iconM  = Font.system(size: 16, weight: .semibold)
+    static let iconL  = Font.system(size: 20, weight: .semibold)
+    static let iconXL = Font.system(size: 24, weight: .bold)      // the tab bar "+"
 }
 
 // MARK: - Animation Presets
