@@ -84,4 +84,21 @@ final class MyPlanTabUITests: UITestBase {
         assertExists("rehabPlan.editButton", timeout: 10)
         captureScreenshot(name: "MyPlan-CardOpensPlan")
     }
+
+    @MainActor
+    func testRehabPlan_exerciseCardsHaveUniqueIdentifiers() throws {
+        tapTab("Plan")
+        let name = app.descendants(matching: .any)["myPlan.planCard"].firstMatch
+        XCTAssertTrue(name.waitForExistence(timeout: 10))
+        name.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+
+        // Seeded Knee plan has three exercises.
+        assertExists("rehabPlan.exerciseName.0", timeout: 10)
+        assertExists("rehabPlan.exerciseName.2")
+
+        // The whole card used to inherit the swap button's identifier, so the id
+        // matched six elements (three cards + three buttons) instead of three.
+        let swapButtons = app.buttons.matching(identifier: "rehabPlan.swapExerciseButton")
+        XCTAssertEqual(swapButtons.count, 3, "Only the three swap buttons should carry the swap identifier")
+    }
 }
