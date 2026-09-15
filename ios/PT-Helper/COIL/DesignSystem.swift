@@ -48,7 +48,10 @@ enum CoilPalette {
     // Text
     static let textPrimary   = dyn(hex(0x111A1D), hex(0xEAF2F1))
     static let textSecondary = dyn(hex(0x4B5A5E), hex(0x9DB2B3))
-    static let textMuted     = dyn(hex(0x7A8A8D), hex(0x6E8285))
+    // Darkened for AA at the 11–13pt sizes it labels (meta lines, stat labels):
+    // light was #7A8A8D at 3.59:1 on white / 3.28:1 on page, now 5.30:1 / 4.84:1;
+    // dark was #6E8285 at 3.97:1 on the dark card, now 4.97:1 (5.71:1 on the page).
+    static let textMuted     = dyn(hex(0x5F6E72), hex(0x7E9396))
 
     // Semantics — decoupled from the brand hue
     // Both variants darkened for AA against the FIXED-white `ctaText` they are
