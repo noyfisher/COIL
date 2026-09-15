@@ -42,4 +42,24 @@ final class RehabExerciseDosageTests: XCTestCase {
     func testDosageText_singleSet_singular() {
         XCTAssertEqual(exercise(sets: 1, reps: "12").dosageText, "1 set \u{00D7} 12 reps")
     }
+
+    func testRepsText_rangeReps_appendsReps() {
+        XCTAssertEqual(exercise(sets: 3, reps: "10-12").repsText, "10-12 reps")
+    }
+
+    func testRepsText_enDashRange_appendsReps() {
+        XCTAssertEqual(exercise(sets: 3, reps: "10–12").repsText, "10–12 reps")
+    }
+
+    func testRepsText_wordRange_appendsReps() {
+        XCTAssertEqual(exercise(sets: 3, reps: "8 to 10").repsText, "8 to 10 reps")
+    }
+
+    func testRepsText_negativeInteger_verbatim() {
+        XCTAssertEqual(exercise(sets: 3, reps: "-3").repsText, "-3")
+    }
+
+    func testDosageText_range() {
+        XCTAssertEqual(exercise(sets: 3, reps: "10-12").dosageText, "3 sets \u{00D7} 10-12 reps")
+    }
 }
