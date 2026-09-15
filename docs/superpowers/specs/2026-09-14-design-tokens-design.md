@@ -129,3 +129,10 @@ The file goes in the UnitPlan (auto-discovered).
 - **Retire `textOnDarkMuted` (0.6)** into the Secondary/Tertiary ladder (8 call sites), and consolidate the alpha-blind `ContrastRegressionTests` harness with `DesignTokenContrastTests`.
 - **Streak / `pop`.** `AppColors.streak`/`streakTint` have no consumers yet; 14 direct `Color(CoilPalette.pop)` uses across 6 views at three tint alphas (0.08 / 0.10 / 0.12), some not streak-related (wellness motivation, Progress), need their own token or the sweep.
 - **Onboarding tiers are lopsided.** `OnboardingColors.subLabel` (0.70) has one consumer (`OnboardingFieldLabel`) and `muted` (0.55) fourteen; the sweep decides which copy earns the caption tier. `DarkTextField`, `OnboardingFieldLabel` and `DarkChipButton` inside `DesignSystem.swift` can move to `AppColors.onDark*` without touching a view.
+
+### Found by the screenshot QA
+
+- **Two of the four disabled-CTA callers are on light grounds**, not one: `NotesView` puts its button on a white card (measured 1.66:1 label-vs-capsule) alongside `PainDetailView` (1.5:1). The ground-aware variant above should cover both.
+- **Settings version footer** (`SettingsView.swift:66`) is a hardcoded `Color.white.opacity(0.5)` on ink, under the 0.55 floor this PR documents; it did not change and belongs in the sweep.
+- **Appearance = System did not follow the simulator's dark appearance** during QA (SpringBoard dark, COIL light) while the app's explicit Dark setting worked. Possibly a simulator quirk; check on a device before treating it as a bug.
+- The real onboarding step 1 is behind the health-data consent gate (no launch flag bypasses it), so the "after" captures use the identical form reached via Settings → Update Health Info.
