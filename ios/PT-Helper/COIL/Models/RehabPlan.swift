@@ -42,6 +42,19 @@ struct RehabPlan: Codable, Identifiable {
         let days = Calendar.current.dateComponents([.day], from: start, to: Date()).day ?? 0
         return days >= totalWeeks * 7
     }
+
+    /// Lifecycle state derived from `startDate`: drives the My Plan badge and Home's plan choice.
+    enum PlanStatus: Equatable {
+        case notStarted
+        case active(week: Int)
+        case completed
+    }
+
+    var status: PlanStatus {
+        guard startDate != nil else { return .notStarted }
+        if isCompleted { return .completed }
+        return .active(week: currentWeek ?? 1)
+    }
 }
 
 struct RehabExercise: Codable, Identifiable {
