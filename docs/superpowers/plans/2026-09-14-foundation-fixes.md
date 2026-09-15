@@ -1279,8 +1279,9 @@ struct ProgramDayView: View {
     }
 
     private func countLabel(plan: RehabPlan, todays: [RehabExercise]?) -> String {
-        guard let todays else { return "\(plan.exercises.count) exercises" }
-        if todays.isEmpty { return "Rest day" }
+        // nil and rest day both show the plan total; the rest-day card carries "Rest day"
+        // itself (showing it here too read as a duplicate in the simulator).
+        guard let todays, !todays.isEmpty else { return "\(plan.exercises.count) exercises" }
         return todays.count == 1 ? "1 exercise today" : "\(todays.count) exercises today"
     }
 
