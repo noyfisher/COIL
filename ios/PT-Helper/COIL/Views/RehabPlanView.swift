@@ -639,6 +639,8 @@ struct RehabPlanView: View {
                         .font(AppFonts.bodySemiBold)
                         .foregroundColor(AppColors.primaryText)
                         .lineLimit(2)
+                        // Also inherited by the enclosing NavigationLink (SwiftUI propagates the
+                        // first identified descendant), so this id matches the row AND the label.
                         .accessibilityIdentifier("rehabPlan.exerciseName.\(index)")
 
                     Spacer()
