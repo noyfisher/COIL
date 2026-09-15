@@ -122,4 +122,5 @@ Acceptance: Profile tab shows no Done button; Progress gear → sheet still show
 - `TestDataSeeder` schedules use names while the generator uses ids; `HomeProgramLogic` tolerates both. A follow-up could make the seeder use ids.
 - `ExerciseSwapViewModel.selectSubstitute` (and `AdaptiveProgressionAnalyzer.applyProgression` if it replaces exercises) should rewrite matching `weeklySchedule` entries to the substitute's id so schedules stay resolvable; until then Home falls back to showing all exercises for that day.
 - `WellnessPlanView`, `ExerciseSwapSheet` and `EditRehabPlanView` also render "sets × reps" and are migrated to `dosageText` in F2.1 (found by the plan audit).
+- On a training day Home says "2 exercises today" but "Start Guided Workout" still launches the full plan (`GuidedWorkoutViewModel` has no schedule awareness). Follow-up: pass today's subset to the workout, or add a one-line note in the workout header (found by the Task 13 code review).
 - The seeded streak (3 / 7) versus "Earned 0" on Achievements is a seeding gap (`seedStreakData` does not seed `StreakService.achievements`); not fixed here.
