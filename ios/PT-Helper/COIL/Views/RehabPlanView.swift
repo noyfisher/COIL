@@ -293,7 +293,7 @@ struct RehabPlanView: View {
                 )
             }
         }
-        .onChange(of: viewModel.rehabPlan?.id) { _, _ in
+        .onChange(of: viewModel.rehabPlan?.id, initial: true) { _, _ in
             // Generate PDF once when plan becomes available (not on every render)
             if analysisResult == nil, let plan = viewModel.rehabPlan {
                 cachedPDFData = PDFExportService.generatePDF(for: plan)
