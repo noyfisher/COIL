@@ -341,8 +341,7 @@ struct ProgramDayView: View {
     }
 
     private func countLabel(plan: RehabPlan, todays: [RehabExercise]?) -> String {
-        guard let todays else { return "\(plan.exercises.count) exercises" }
-        if todays.isEmpty { return "Rest day" }
+        guard let todays, !todays.isEmpty else { return "\(plan.exercises.count) exercises" }
         return todays.count == 1 ? "1 exercise today" : "\(todays.count) exercises today"
     }
 
