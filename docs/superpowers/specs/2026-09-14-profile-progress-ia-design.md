@@ -115,3 +115,11 @@ Acceptance: no tab bar during exercise, rest and summary; bottom bar sits on the
 ## Deferred (design pass, not this workstream)
 
 Unifying page chrome on Rehab Plan / Achievements, one primary CTA style, `CoilSegmentedControl`, `ChipButton` on the Progress filter, `.cardStyle()` everywhere, the always-visible trash icons.
+
+## Follow-ups raised during IA-1 implementation (2026-09-16)
+
+- `HomeProgramLogic` (pure logic) lives in `Views/HomeTab.swift` and is now consumed from `Models/ProfileSummary.swift`; move it to `Models/`. `isActive(_:)` is duplicated there and in `ProfileSummaryBuilder`; a computed `RehabPlan.PlanStatus.isActive` would replace both. `preferredPlan`'s "rehab over wellness" preference has no test.
+- `OnboardingEditView` → `OnboardingViewModel.loadProfile` performs a live `Firestore.getDocument()` under `--uitesting` whenever a persisted Auth session exists; `SettingsUITests.testEditHealthInfo_opensTheEditor` is the first UI test on that path. Short-circuit under `TestDataSeeder.isUITesting` from the seeded `UserProfileService.shared.profile`. The same root cause leaves the editor's name and weight fields empty for the seeded profile, and its pinned Continue button overlaps the weight field (both pre-existing).
+- In dark mode the masthead (`darkSurface`) is nearly indistinguishable from the dark page; decide between `darkSurfaceElevated` or a visible edge. The masthead scrolls with the content, so a rubber-band pull shows the light page above it (accepted). `ProfileHeroCard` uses `textOnDarkMuted` per this spec while `DesignSystem.swift` asks new code for `textOnDarkSecondary/Tertiary` — decide before IA-2 repeats it.
+- `SettingsView`: `@ViewBuilder` on the single-expression card properties is vestigial; `import FirebaseFirestore` is unused; the DEBUG card has no `CoilDividerHeader`. `SettingsUITests.testSettings_AllOptions_Displayed` now duplicates `ShellNavigationUITests.testProfileTab_ShowsSettings`; `testGearSheet_showsDoneAndDismisses` was deleted (its intent lives in `testProfileTab_hasNoDoneButton`).
+- The workstream token-audit grep lists `ProgressTab.swift` with the IA-1 files; its sweep is IA-2 §5's job, so read the grep per PR. `docs/archive/ux-audits/ux-audit-2026-04-05.md` #16 (deep link "profile" landing on a tab with no profile view) is resolved by IA-1.
