@@ -18,8 +18,17 @@
 4. **`.trackScreen("Settings")` becomes `.trackScreen("ProfileTab")` on the tab**; the settings body is no longer a screen.
 5. **`Export Debug Log` stays available in release builds** (it moves into the Help card, under "Report a Concern") — testers use it to report problems. Only "Session Events" and "Image Diagnostics" are `#if DEBUG`.
 6. **`settingsRow` gets an `isDestructive:` flag** replacing the `title == "Sign Out"` string check.
-7. **PR bases (user chose "stack now"):** IA-1 → `ux/ia-base` (the integration merge of `ux/design-specs` + `origin/ux/foundation-fixes-f2` + `ux/design-tokens`, commit `d78ceae`, pushed to origin); IA-2 → the IA-1 branch; IA-3 → the IA-2 branch. When #75–#77 merge, rebase all three onto `main`.
+7. **PR bases (user chose "stack now"):** IA-1 → `ux/ia-base` (the integration merge of `ux/design-specs` + `origin/ux/foundation-fixes-f2` + `ux/design-tokens`, commit `d78ceae`, pushed to origin); IA-2 → the IA-1 branch; IA-3 → the IA-2 branch. `ux/ia-base` is a frozen snapshot of three PRs that are still open, and `main` merges by squash, so the IA commits must be replayed with `--onto` (which excludes the snapshot's own commits) rather than a plain rebase:
+   ```bash
+   # once #75–#77 are on main, in this order (each rebase replays ONLY that branch's own commits):
+   git fetch origin
+   git rebase --onto origin/main ux/ia-base ux/profile-progress-ia
+   git rebase --onto ux/profile-progress-ia <IA-1 head before its rebase> ux/ia-2-progress
+   git rebase --onto ux/ia-2-progress <IA-2 head before its rebase> ux/ia-3-workout
+   ```
+   Record each branch's pre-rebase head with `git rev-parse` first. The repo rule is never force-push, so push each rebased branch under a new name (`ux/ia-1-profile-v2`, …), open the PRs from those against `main`, and close the stacked ones. If #75–#77 change under review before IA lands, fast-forward those branches into `ux/ia-base` (`git merge --ff-only` each) and run the same `--onto` recipe against the new base; the token names this plan hardcodes are exactly the ones the Tokens PR exposes, so a rename there is a find-and-replace here.
 8. **`MainTabView` is touched only for the bar wrap, and `GuidedWorkoutSummaryView` only for its spacer**, per the spec's file lists; their remaining raw glyph sizes and `CoilPalette.pop` uses stay for the design pass.
+9. **The Progress empty/error-state spacers are `AppSpacing.xxxl` above and below**, not `FloatingTabBarMetrics.clearance` for the bottom pair as the spec's IA-2 §5 says: the actions row now follows the state view (deviation 3), and the content container's `.floatingTabBarClearance()` already clears the bar.
 
 ## Ground rules for every task
 
@@ -67,9 +76,9 @@ xcodebuild test -project ios/PT-Helper/COIL.xcodeproj -scheme COIL -testPlan Ful
 | `ios/PT-Helper/COILUITests/ProgressTabUITests.swift` | Tiles + banner tests | 10 |
 | `ios/PT-Helper/COIL/Views/TabSelection.swift` | `isTabBarHidden` | 12 |
 | `ios/PT-Helper/COILTests/TabSelectionTests.swift` (new) | Flag tests (2) | 12 |
-| `ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift` | Hide/show, paddings, badge, tokens | 14 |
-| `ios/PT-Helper/COIL/Views/GuidedWorkoutSummaryView.swift` | Bottom spacer | 14 |
-| `ios/PT-Helper/COIL/Views/Components/ExerciseImageView.swift` | `showsDifficultyBadge` | 15 |
+| `ios/PT-Helper/COIL/Views/Components/ExerciseImageView.swift` | `showsDifficultyBadge` | 14 |
+| `ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift` | Hide/show, paddings, badge, tokens | 15 |
+| `ios/PT-Helper/COIL/Views/GuidedWorkoutSummaryView.swift` | Bottom spacer | 15 |
 | `ios/PT-Helper/COILUITests/GuidedWorkoutUITests.swift` | Tab-bar hidden test | 16 |
 
 ---
@@ -968,24 +977,194 @@ Replace `actionsCard` (`:468-520`) AND `dangerZoneCard` (`:522-538`) together wi
 
             rowDivider
 
-            settingsRow(icon: "trash", color: AppColors.danger, title: "Delete Account", isDestructive: true) {
+            settingsRow(icon: "trash", color: AppColors.danger, title: "Delete Account") {
                 showDeleteConfirmation = true
             }
             .accessibilityIdentifier("settings.deleteAccountButton")
         }
     }
 ```
-In `notificationsCard` (`:540-705`): wrap the outer `VStack(spacing: 0) { … }` in `groupCard { … }` and delete its trailing `.background(AppColors.cardBackground) .cornerRadius(AppCorners.large) .overlay(…) .shadow(…)` (four modifiers, `:698-704`); replace each of the five inline icon blocks of the form
+(Only Sign Out gets the danger title, as the spec says; Delete Account keeps its red icon and primary title, exactly as today.)
+
+Replace `notificationsCard` (`:540-705`) with — every toggle, picker, label, identifier and `onChange` handler is byte-identical to today; only the card chrome, icons, dividers and title colours change:
 ```swift
-                Image(systemName: "bell.badge")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(AppColors.warning)
-                    .frame(width: 32, height: 32)
-                    .background(AppColors.warning.opacity(0.12))
-                    .cornerRadius(AppCorners.small)
+    /// Extracted from `body` to keep the type-checker's per-expression work bounded
+    /// (adding the conditional withdraw row inline pushed the main VStack over the
+    /// compiler's reasonable-time threshold).
+    @ViewBuilder
+    private var notificationsCard: some View {
+        groupCard {
+            HStack(spacing: AppSpacing.md) {
+                rowIcon("bell.badge", color: AppColors.warning)
+
+                Text("Reminders")
+                    .font(AppFonts.body)
+                    .foregroundColor(AppColors.primaryText)
+
+                Spacer()
+
+                Toggle("", isOn: $notificationService.isEnabled)
+                    .labelsHidden()
+                    .accessibilityLabel("Reminders")
+                    .accessibilityIdentifier("settings.reminderToggle")
+                    .onChange(of: notificationService.isEnabled) { _, enabled in
+                        AnalyticsService.shared.log(.settingChanged,
+                            parameters: ["key": "reminders_enabled",
+                                         "value": enabled ? "true" : "false"])
+                        if enabled {
+                            Task {
+                                if !notificationService.isAuthorized {
+                                    _ = await notificationService.requestPermission()
+                                }
+                                await notificationService.resyncReminders()
+                            }
+                        } else {
+                            notificationService.cancelAllReminders()
+                        }
+                    }
+            }
+            .padding(.horizontal, AppSpacing.lg)
+            .padding(.vertical, AppSpacing.md)
+
+            if notificationService.isEnabled {
+                rowDivider
+
+                HStack(spacing: AppSpacing.md) {
+                    rowIcon("clock", color: AppColors.accent)
+
+                    Text("Reminder Time")
+                        .font(AppFonts.body)
+                        .foregroundColor(AppColors.primaryText)
+
+                    Spacer()
+
+                    DatePicker("", selection: $reminderDate, displayedComponents: .hourAndMinute)
+                        .labelsHidden()
+                        .accessibilityLabel("Reminder time")
+                        .onChange(of: reminderDate) { _, newDate in
+                            let components = Calendar.current.dateComponents([.hour, .minute], from: newDate)
+                            notificationService.updateReminderTime(hour: components.hour ?? 9, minute: components.minute ?? 0)
+                            let timeString = String(format: "%02d:%02d", components.hour ?? 9, components.minute ?? 0)
+                            AnalyticsService.shared.log(.settingChanged,
+                                parameters: ["key": "reminder_time", "value": timeString])
+                        }
+                        .onAppear {
+                            // Seed the picker from the SAVED time so a glance or an
+                            // accidental tap can't silently overwrite it (audit #81).
+                            var comps = DateComponents()
+                            comps.hour = notificationService.reminderHour
+                            comps.minute = notificationService.reminderMinute
+                            if let seeded = Calendar.current.date(from: comps) {
+                                reminderDate = seeded
+                            }
+                        }
+                }
+                .padding(.horizontal, AppSpacing.lg)
+                .padding(.vertical, AppSpacing.md)
+
+                rowDivider
+
+                HStack(spacing: AppSpacing.md) {
+                    rowIcon("dumbbell", color: AppColors.success)
+                    Text("Workout Reminders")
+                        .font(AppFonts.body)
+                        .foregroundColor(AppColors.primaryText)
+                    Spacer()
+                    Toggle("", isOn: $notificationService.workoutRemindersEnabled)
+                        .labelsHidden()
+                        .accessibilityLabel("Workout reminders")
+                        .onChange(of: notificationService.workoutRemindersEnabled) { _, enabled in
+                            AnalyticsService.shared.log(.settingChanged,
+                                parameters: ["key": "workout_reminders",
+                                             "value": enabled ? "true" : "false"])
+                            Task { await notificationService.resyncReminders() }
+                        }
+                }
+                .padding(.horizontal, AppSpacing.lg)
+                .padding(.vertical, AppSpacing.md)
+
+                rowDivider
+
+                HStack(spacing: AppSpacing.md) {
+                    rowIcon("arrow.triangle.2.circlepath", color: AppColors.accent)
+                    Text("Re-Assessment Prompts")
+                        .font(AppFonts.body)
+                        .foregroundColor(AppColors.primaryText)
+                    Spacer()
+                    Toggle("", isOn: $notificationService.reassessmentRemindersEnabled)
+                        .labelsHidden()
+                        .accessibilityLabel("Re-assessment prompts")
+                        .onChange(of: notificationService.reassessmentRemindersEnabled) { _, enabled in
+                            AnalyticsService.shared.log(.settingChanged,
+                                parameters: ["key": "reassessment_reminders",
+                                             "value": enabled ? "true" : "false"])
+                            Task { await notificationService.resyncReminders() }
+                        }
+                }
+                .padding(.horizontal, AppSpacing.lg)
+                .padding(.vertical, AppSpacing.md)
+
+                rowDivider
+
+                HStack(spacing: AppSpacing.md) {
+                    rowIcon("bell.badge.waveform", color: AppColors.warning)
+                    Text("Inactivity Nudges")
+                        .font(AppFonts.body)
+                        .foregroundColor(AppColors.primaryText)
+                    Spacer()
+                    Toggle("", isOn: $notificationService.inactivityNudgesEnabled)
+                        .labelsHidden()
+                        .accessibilityLabel("Inactivity nudges")
+                        .onChange(of: notificationService.inactivityNudgesEnabled) { _, enabled in
+                            AnalyticsService.shared.log(.settingChanged,
+                                parameters: ["key": "inactivity_nudges",
+                                             "value": enabled ? "true" : "false"])
+                            if !enabled { notificationService.cancelInactivityNudge() }
+                        }
+                }
+                .padding(.horizontal, AppSpacing.lg)
+                .padding(.vertical, AppSpacing.md)
+            }
+        }
+    }
 ```
-with `rowIcon("bell.badge", color: AppColors.warning)` (likewise `"clock"`/`accent`, `"dumbbell"`/`success`, `"arrow.triangle.2.circlepath"`/`accent`, `"bell.badge.waveform"`/`warning`); replace every `Divider().padding(.leading, 52)` with `rowDivider`; give each row title `Text(...)` `.foregroundColor(AppColors.primaryText)`. Toggles, pickers, identifiers, labels and `onChange` handlers are untouched.
-In `legalCard` (`:707-747`): same treatment — `groupCard { … }` around the rows, `rowDivider` for the four dividers, drop the four trailing chrome modifiers. Rows and identifiers unchanged.
+Replace `legalCard` (`:707-747`) with:
+```swift
+    /// Extracted from `body` to keep the type-checker's per-expression work bounded
+    /// (adding the conditional withdraw row inline pushed the main VStack over the
+    /// compiler's reasonable-time threshold).
+    @ViewBuilder
+    private var legalCard: some View {
+        groupCard {
+            settingsRow(icon: "hand.raised", color: AppColors.accent, title: "Privacy Policy") {
+                showPrivacyPolicy = true
+            }
+            .accessibilityIdentifier("settings.privacyPolicyButton")
+
+            rowDivider
+
+            settingsRow(icon: "doc.text", color: AppColors.accent, title: "Terms of Service") {
+                showTermsOfService = true
+            }
+            .accessibilityIdentifier("settings.termsOfServiceButton")
+
+            rowDivider
+
+            settingsRow(icon: "heart.text.square", color: AppColors.accent, title: "Consumer Health Data Policy") {
+                showConsumerHealthDataPolicy = true
+            }
+            .accessibilityIdentifier("settings.consumerHealthDataPolicyButton")
+
+            if consentService.hasHealthDataConsent {
+                rowDivider
+                settingsRow(icon: "heart.slash", color: AppColors.danger, title: "Withdraw Health Data Consent") {
+                    showWithdrawConsentConfirmation = true
+                }
+                .accessibilityIdentifier("settings.withdrawHealthConsentButton")
+            }
+        }
+    }
+```
 Replace `settingsRow` (`:749-772`) with:
 ```swift
     private func settingsRow(icon: String, color: Color, title: String,
@@ -1818,7 +1997,67 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 
 ---
 
-### Task 14: `GuidedWorkoutView` hides the bar, sits on the safe area, and drops raw values
+### Task 14: `ExerciseImageView.showsDifficultyBadge`
+
+**Files:**
+- Modify: `ios/PT-Helper/COIL/Views/Components/ExerciseImageView.swift:5-7`, `:141-145`, `:165-168`
+
+- [ ] **Step 1: Add the flag.** After `var isCompact: Bool = false` (`:7`) add:
+```swift
+    /// The full-size image shows a `DifficultyBadge` under the frame by default; the
+    /// guided workout passes `false` because its header already states the difficulty
+    /// and the badge clipped inside the 200pt image container.
+    var showsDifficultyBadge: Bool = true
+```
+
+- [ ] **Step 2: Honour it in `fullImageView`.** Replace
+```swift
+            // Difficulty badge
+            DifficultyBadge(difficulty: exercise.difficulty)
+        }
+        .padding(.vertical, AppSpacing.lg)
+    }
+```
+with
+```swift
+            if showsDifficultyBadge {
+                DifficultyBadge(difficulty: exercise.difficulty)
+            }
+        }
+        .padding(.vertical, showsDifficultyBadge ? AppSpacing.lg : 0)
+    }
+```
+and in `generatingContent` replace
+```swift
+            DifficultyBadge(difficulty: exercise.difficulty)
+        }
+        .padding(.vertical, AppSpacing.lg)
+    }
+```
+with
+```swift
+            if showsDifficultyBadge {
+                DifficultyBadge(difficulty: exercise.difficulty)
+            }
+        }
+        .padding(.vertical, showsDifficultyBadge ? AppSpacing.lg : 0)
+    }
+```
+Every existing caller omits the argument, so nothing else changes.
+
+- [ ] **Step 3: Build** → `** BUILD SUCCEEDED **`.
+
+- [ ] **Step 4: Commit**
+```bash
+git add ios/PT-Helper/COIL/Views/Components/ExerciseImageView.swift
+git commit -m "Let ExerciseImageView omit the difficulty badge
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+```
+
+---
+
+### Task 15: `GuidedWorkoutView` hides the bar, sits on the safe area, and drops raw values
 
 **Files:**
 - Modify: `ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift` (anchors at `d78ceae`: `:5-10`, `:65-74`, `:177`, `:253`, `:330-336`, `:352`, `:384`, `:479`, `:570`, `:631`)
@@ -1873,7 +2112,7 @@ with
 ```
 In `restPhaseView`, the Skip Rest button's `.padding(.bottom, FloatingTabBarMetrics.clearance)` (`:479`) becomes `.padding(.bottom, AppSpacing.lg)`.
 
-- [ ] **Step 3: No difficulty badge in the workout image.** `:177` `ExerciseImageView(exercise: exercise, isCompact: false)` becomes `ExerciseImageView(exercise: exercise, isCompact: false, showsDifficultyBadge: false)` (the parameter arrives in Task 15; do Task 15 before building, or build after both).
+- [ ] **Step 3: No difficulty badge in the workout image.** `:177` `ExerciseImageView(exercise: exercise, isCompact: false)` becomes `ExerciseImageView(exercise: exercise, isCompact: false, showsDifficultyBadge: false)` (the parameter was added in Task 14).
 
 - [ ] **Step 4: Token sweep** (grep each "before"):
 
@@ -1889,76 +2128,16 @@ The empty-state hero glyph `.font(.system(size: 50))` (`:524`) is outside the ic
 
 - [ ] **Step 5: Summary spacer.** `GuidedWorkoutSummaryView.swift:113` `Spacer(minLength: FloatingTabBarMetrics.clearance)` becomes `Spacer(minLength: AppSpacing.xxl)` (the summary shows while the bar is still hidden).
 
-- [ ] **Step 6: Build** (after Task 15) → `** BUILD SUCCEEDED **`; then
+- [ ] **Step 6: Build** → `** BUILD SUCCEEDED **`; then
 ```bash
 grep -n "\.font(\.system(size\|Color\.white\.opacity\|Color(CoilPalette\|cornerRadius: [0-9]\|spacing: [0-9]\|FloatingTabBarMetrics" ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift
 ```
 Expected: exactly one match, the `size: 50` hero glyph.
 
-- [ ] **Step 7: Commit** (together with Task 15's file if you built once):
+- [ ] **Step 7: Commit**
 ```bash
 git add ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift ios/PT-Helper/COIL/Views/GuidedWorkoutSummaryView.swift
 git commit -m "Hide the tab bar during a guided workout and sit its bar on the safe area
-
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
-```
-
----
-
-### Task 15: `ExerciseImageView.showsDifficultyBadge`
-
-**Files:**
-- Modify: `ios/PT-Helper/COIL/Views/Components/ExerciseImageView.swift:5-7`, `:141-145`, `:165-168`
-
-- [ ] **Step 1: Add the flag.** After `var isCompact: Bool = false` (`:7`) add:
-```swift
-    /// The full-size image shows a `DifficultyBadge` under the frame by default; the
-    /// guided workout passes `false` because its header already states the difficulty
-    /// and the badge clipped inside the 200pt image container.
-    var showsDifficultyBadge: Bool = true
-```
-
-- [ ] **Step 2: Honour it in `fullImageView`.** Replace
-```swift
-            // Difficulty badge
-            DifficultyBadge(difficulty: exercise.difficulty)
-        }
-        .padding(.vertical, AppSpacing.lg)
-    }
-```
-with
-```swift
-            if showsDifficultyBadge {
-                DifficultyBadge(difficulty: exercise.difficulty)
-            }
-        }
-        .padding(.vertical, showsDifficultyBadge ? AppSpacing.lg : 0)
-    }
-```
-and in `generatingContent` replace
-```swift
-            DifficultyBadge(difficulty: exercise.difficulty)
-        }
-        .padding(.vertical, AppSpacing.lg)
-    }
-```
-with
-```swift
-            if showsDifficultyBadge {
-                DifficultyBadge(difficulty: exercise.difficulty)
-            }
-        }
-        .padding(.vertical, showsDifficultyBadge ? AppSpacing.lg : 0)
-    }
-```
-Every existing caller omits the argument, so nothing else changes.
-
-- [ ] **Step 3: Build** → `** BUILD SUCCEEDED **`.
-
-- [ ] **Step 4: Commit**
-```bash
-git add ios/PT-Helper/COIL/Views/Components/ExerciseImageView.swift
-git commit -m "Let ExerciseImageView omit the difficulty badge
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ```
@@ -2037,6 +2216,30 @@ EOF
 ## Self-review notes
 
 - **Spec coverage:** IA-1 Structure table → Tasks 2–5 (`ProfileSummary` Task 2, `ProfileHeroCard` Task 3, `ProfileTab` Task 4, `SettingsView` + `ProgressTab` + `MainTabView` Task 5); `ProfileSummary` tests → Task 1; hero anatomy incl. reveal/Reduce Motion → Tasks 3–4; settings groups 1–5, `.cardStyle()` question (answered: bespoke `groupCard` with zero padding, radius unified to `AppCorners.card`), `iconS` icons and the 52pt inset → Task 5; deletions (`profileCard`, `initials`, `showsDoneButton`, inner NavigationStack, `dismiss`) → Task 5; UI tests → Task 6; acceptance → Task 7. IA-2 items 1–5 → Tasks 8–9; acceptance → Tasks 10–11. IA-3 items 1–6 → Tasks 12–15 (item 6 is the note in Task 13); tests → Tasks 12 and 16; acceptance → Task 17. Workstream verification (token audit, FullPlan per touched class, screenshots) → Tasks 7, 11, 17.
-- **Type consistency:** `ProfileSummary.ActivePlan(name:statusText:isActive:)`, `PlanWeek(current:total:)`, `Stats(streak:planWeek:sessions:)` are used identically in Tasks 1, 2, 3; `ProfileSummaryBuilder.build(profile:plans:streak:sessionCount:)` in Tasks 1, 2, 4; `RevealOnAppear(index:)` defined in Task 4, used in Tasks 4–5; `OutcomePromptView.Style.banner` defined in Task 8, passed in Task 9; `showsDifficultyBadge` defined in Task 15, passed in Task 14; `isTabBarHidden` defined in Task 12, read in Task 13, written in Task 14.
-- **Build order:** Task 4 keeps the old `SettingsView` signature so each commit builds; Task 5 changes the signature and all callers in one commit; Tasks 14 and 15 may be built together (Task 14's call site needs Task 15's parameter).
+- **Type consistency:** `ProfileSummary.ActivePlan(name:statusText:isActive:)`, `PlanWeek(current:total:)`, `Stats(streak:planWeek:sessions:)` are used identically in Tasks 1, 2, 3; `ProfileSummaryBuilder.build(profile:plans:streak:sessionCount:)` in Tasks 1, 2, 4; `RevealOnAppear(index:)` defined in Task 4, used in Tasks 4–5; `OutcomePromptView.Style.banner` defined in Task 8, passed in Task 9; `showsDifficultyBadge` defined in Task 14, passed in Task 15; `isTabBarHidden` defined in Task 12, read in Task 13, written in Task 14.
+- **Build order:** Task 4 keeps the old `SettingsView` signature so each commit builds; Task 5 changes the signature and all callers in one commit; Task 14 adds the `showsDifficultyBadge` flag before Task 15 passes it, so every commit builds on its own.
 - **Known judgement calls** are the eight deviations at the top; the bounce-past-the-top of the Profile scroll view shows the light page (the nav bar is opaque ink, so the seam is only visible on over-scroll).
+
+---
+
+## Audit Results
+
+### Structural Review
+1. FILE COMPLETENESS — PASS. 2. DEPENDENCY ORDER — WARN: Tasks 14 and 15 are not independently buildable (Task 14 passes `showsDifficultyBadge:` before Task 15 defines it); merge them into one task/commit. 3. MISSING STEPS — WARN: Task 9 replaces the error/empty-state spacers with `AppSpacing.xxxl` top and bottom where the spec said `FloatingTabBarMetrics.clearance` for the bottom pair; functionally fine now that the actions row follows the state view, but log it as a deviation. 4. API/FUNCTION VERIFICATION — PASS: every symbol exists with the claimed signature; every quoted "before" block matched byte-for-byte at `d78ceae`; `WorkoutSessionView`/`NotesView` titles match the UI-test assertions. 5. SCOPE CALIBRATION — WARN: Task 5 Step 6 gives `notificationsCard` and `legalCard` as prose ("same treatment") instead of quoted diffs. 6. TESTABILITY — PASS: test counts (SettingsUITests 5→6, ShellNavigation 7, UnitPlan 1350→1360→1362) and seeded data (Test User, streak 3, Knee Rehab Plan 6 weeks started 10 days ago → Week 2 of 6) verified. 7. INTEGRATION RISK — PASS: all callers of `SettingsView(`, `OutcomePromptView(`, `ExerciseImageView(`, `GuidedWorkoutView(plan:`, `FloatingTabBarMetrics.clearance` and every UI-test query enumerated; nothing outside the plan's edits is affected.
+OVERALL: MINOR CONCERNS
+
+### Adversarial Review
+1. FATAL FLAW — The stack is cut from `d78ceae`, a frozen snapshot of PRs #75/#76/#77, all still open; `main` looks squash-merged, and #76 touches `ProgressTab.swift`, `SettingsView.swift`, `GuidedWorkoutView.swift` and `SettingsUITests.swift` at the lines this plan rewrites, so review changes or the squash-merge could turn "rebase onto main" into a multi-branch conflict slog.
+2. HIDDEN ASSUMPTION — That the merged copies of Foundation-F2 and Tokens are final; review feedback could still reshape the tokens (`textOnDark*`, `onDark*`, `streak`, `icon*`) the plan hardcodes.
+3. SIMPLER ALTERNATIVE — One PR against `ux/ia-base` instead of three stacked branches; the areas are nearly file-disjoint (only `TabSelection.isTabBarHidden` crosses), so one PR keeps the task list and removes two rebase points.
+4. WHAT BREAKS — `SettingsView.notificationsCard` (five toggles/pickers with live `onChange` handlers scheduling notifications) is edited by prose with no test asserting the toggles still round-trip; a dropped binding would build green.
+5. FIRST HOUR TEST — Task 0's push of `ux/ia-base` and `gh pr create --base ux/ia-base` need push rights; and the worktree HEAD is now one commit past `d78ceae` (the plan doc), so the base must stay pinned to `d78ceae` (it is).
+VERDICT: REVISE BEFORE BUILDING
+
+### Revisions applied (2026-09-15)
+- Tasks 14 and 15 swapped: the `ExerciseImageView` flag now lands (Task 14) before `GuidedWorkoutView` passes it (Task 15), so each commit builds alone.
+- Task 5 Step 6 now gives `notificationsCard` and `legalCard` verbatim (handlers, identifiers and labels byte-identical to today); the Delete Account row keeps its primary title per the spec.
+- Deviation 9 records the `AppSpacing.xxxl` state spacers; deviation 7 now carries the `--onto` rebase recipe (only the IA commits replay), the no-force-push republish route, and the fast-forward-the-base procedure if #75–#77 change under review.
+- The user chose to keep the spec's three stacked PRs over the single-PR alternative.
+
+**Overall after revisions: pending re-audit** (one re-audit, per protocol).
