@@ -1786,9 +1786,11 @@ private struct ActionTile: View {
 - [ ] **Step 4: Build and audit**
 Build → `** BUILD SUCCEEDED **`. Then
 ```bash
-grep -n "\.font(\.system(size\|Color\.white\.opacity\|Color(CoilPalette\|cornerRadius: [0-9]\|spacing: [0-9]\|minLength: 100\|navLinkRow" ios/PT-Helper/COIL/Views/ProgressTab.swift
+grep -n "\.font(\.system(size\|Color\.white\.opacity\|Color(CoilPalette\|cornerRadius: [0-9]\|spacing: [1-9]\|minLength: 100\|navLinkRow" ios/PT-Helper/COIL/Views/ProgressTab.swift
 ```
 Expected: no matches.
+
+> **Changed at Task 9 code review (2026-09-16):** `ActionTile` uses `.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)` so the two tiles stay equal-height when a title wraps; its glyph is `.accessibilityHidden(true)` so the combined element reads "Log Workout, Add a session"; the file comment also names the last-analysis section. The audit grep now uses `spacing: [1-9]` — `spacing: 0` is the codebase's no-spacing idiom, not a raw design value.
 
 - [ ] **Step 5: Commit**
 ```bash
@@ -2148,7 +2150,7 @@ The empty-state hero glyph `.font(.system(size: 50))` (`:524`) is outside the ic
 
 - [ ] **Step 6: Build** → `** BUILD SUCCEEDED **`; then
 ```bash
-grep -n "\.font(\.system(size\|Color\.white\.opacity\|Color(CoilPalette\|cornerRadius: [0-9]\|spacing: [0-9]\|FloatingTabBarMetrics" ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift
+grep -n "\.font(\.system(size\|Color\.white\.opacity\|Color(CoilPalette\|cornerRadius: [0-9]\|spacing: [1-9]\|FloatingTabBarMetrics" ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift
 ```
 Expected: exactly one match, the `size: 50` hero glyph.
 
