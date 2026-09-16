@@ -8,12 +8,35 @@ struct ProfileTab: View {
     @ObservedObject private var profileService = UserProfileService.shared
     @ObservedObject private var streakService = StreakService.shared
     @State private var showEditProfile = false
+    @State private var isDeletingAccount = false
 
     private var summary: ProfileSummary {
         ProfileSummaryBuilder.build(profile: profileService.profile,
                                     plans: savedPlansVM.rehabPlans,
                                     streak: streakService.streakData,
                                     sessionCount: workoutViewModel.sessions.count)
+    }
+
+    /// Full-viewport shield while the server deletes the account. Lives here, outside the
+    /// scroll view, so it covers the screen wherever Delete Account was tapped and blocks
+    /// every touch beneath it.
+    private var deletingAccountOverlay: some View {
+        ZStack {
+            AppColors.primaryText.opacity(0.4).ignoresSafeArea()
+            VStack(spacing: AppSpacing.md) {
+                ProgressView()
+                    .scaleEffect(1.3)
+                    .tint(AppColors.ctaText)
+                Text("Deleting account...")
+                    .font(AppFonts.body)
+                    .foregroundColor(AppColors.primaryText)
+            }
+            .padding(AppSpacing.xxl)
+            .background(.ultraThinMaterial)
+            .cornerRadius(AppCorners.large)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Deleting account")
     }
 
     var body: some View {
@@ -26,12 +49,18 @@ struct ProfileTab: View {
                         ProfileHeroCard(summary: summary) { showEditProfile = true }
                             .modifier(RevealOnAppear(index: 0))
 
-                        SettingsView()
+                        SettingsView(isDeletingAccount: $isDeletingAccount)
                             .padding(.top, AppSpacing.lg)
                     }
                     .floatingTabBarClearance()
                 }
+
+                if isDeletingAccount {
+                    deletingAccountOverlay
+                        .transition(.opacity)
+                }
             }
+            .animation(AppAnimations.smooth, value: isDeletingAccount)
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .coilNavBar()

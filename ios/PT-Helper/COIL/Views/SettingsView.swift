@@ -16,7 +16,9 @@ struct SettingsView: View {
     @State private var showSignOutError = false
     @State private var signOutErrorMessage = ""
     @State private var showDeleteConfirmation = false
-    @State private var isDeletingAccount = false
+    /// Owned by `ProfileTab`, which draws the full-viewport "Deleting account…" overlay
+    /// outside the scroll view so it is visible wherever the user tapped Delete Account.
+    @Binding var isDeletingAccount: Bool
     @State private var deleteError: String?
     @State private var showDeleteError = false
     @State private var reminderDate = Date()
@@ -119,24 +121,6 @@ struct SettingsView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text("New health-data features are paused until you consent again. To erase your data entirely, use Delete Account.")
-        }
-        .overlay {
-            if isDeletingAccount {
-                ZStack {
-                    AppColors.primaryText.opacity(0.4).ignoresSafeArea()
-                    VStack(spacing: AppSpacing.md) {
-                        ProgressView()
-                            .scaleEffect(1.3)
-                            .tint(AppColors.ctaText)
-                        Text("Deleting account...")
-                            .font(AppFonts.body)
-                            .foregroundColor(AppColors.primaryText)
-                    }
-                    .padding(AppSpacing.xxl)
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(AppCorners.large)
-                }
-            }
         }
         .sheet(isPresented: $showShareSheet) {
             if let url = shareURL {
