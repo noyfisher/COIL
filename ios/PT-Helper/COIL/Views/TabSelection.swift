@@ -12,6 +12,11 @@ enum AssessmentRoute: Int, Identifiable {
 class TabSelection: ObservableObject {
     @Published var selectedTab: Int = 0
 
+    /// True while a guided workout is on screen. `MainTabView` drops the floating
+    /// bar when this is set; `GuidedWorkoutView` sets it on appear and clears it on
+    /// disappear. Nothing else may write it.
+    @Published var isTabBarHidden = false
+
     /// Set by any child tab / CTA to request an assessment entry point.
     /// `MainTabView` observes this and presents the matching full-screen cover,
     /// so buttons no longer dead-end on `selectedTab = 0` (the Home tab, which has
