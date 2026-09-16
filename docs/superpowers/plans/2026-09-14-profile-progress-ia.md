@@ -1604,7 +1604,9 @@ struct OutcomePromptView_Previews: PreviewProvider {
 }
 #endif
 ```
-The only behavioural change for `.card` callers is the dismiss glyph moving from `.font(.caption)` to `AppFonts.iconXS` (12pt semibold) with a 44pt hit area. Existing call sites pass no `style`, so they keep `.card`.
+The only behavioural change for `.card` callers is the dismiss glyph moving from `.font(.caption)` to `AppFonts.iconXS` (12pt semibold) with a 44pt hit area (which also makes the card header 44pt tall). Existing call sites pass no `style`, so they keep `.card`.
+
+> **Changed at Task 8 code review (2026-09-16):** the banner's sparkles glyph uses `AppFonts.small` (inline with scaling text, per the icon-token rule) instead of `iconS`; the collapsed banner's vertical padding is `AppSpacing.xs`; the question string is a single `bannerQuestion` constant used for the text and the accessibility label; the confirmation line stays visible after submitting even if the row is collapsed; the card MARK comment states the header-height change. The committed file is the source of truth.
 
 - [ ] **Step 2: Build** → `** BUILD SUCCEEDED **`. `grep -rn "OutcomePromptView(" ios/PT-Helper/COIL` must show only `ProgressTab.swift` and the preview.
 
