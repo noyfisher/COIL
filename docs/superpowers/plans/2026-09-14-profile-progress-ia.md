@@ -1867,6 +1867,8 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
     }
 ```
 
+> **Changed at Task 10 execution (2026-09-16):** at the default scroll offset the action tiles sit partly under the floating tab bar; XCUI still reports them hittable and then taps the covered part (the Recovery Notes tile failed 3/3 with the tap landing in the bar's dead zone). The helper is now `scrollClearOfTabBar(_:)`: it swipes until `element.frame.maxY <= app.buttons["Home"].frame.minY` and returns `isHittable && clear`. The three call sites use it; the assertions are unchanged. The committed file is the source of truth.
+
 - [ ] **Step 2: Run** the FullPlan command with `-only-testing:COILUITests/ProgressTabUITests`. Expected: 3 `passed` (or 2 passed + 1 skipped), `** TEST SUCCEEDED **`.
 
 - [ ] **Step 3: Commit**
