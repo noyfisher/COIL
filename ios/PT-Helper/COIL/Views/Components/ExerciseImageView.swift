@@ -5,6 +5,10 @@ import SwiftUI
 struct ExerciseImageView: View {
     let exercise: RehabExercise
     var isCompact: Bool = false
+    /// The full-size image shows a `DifficultyBadge` under the frame by default; the
+    /// guided workout passes `false` because its header already states the difficulty
+    /// and the badge clipped inside the 200pt image container.
+    var showsDifficultyBadge: Bool = true
 
     @State private var startImage: UIImage?
     @State private var endImage: UIImage?
@@ -139,9 +143,11 @@ struct ExerciseImageView: View {
                                  : "Start position for \(exercise.name)")
 
             // Difficulty badge
-            DifficultyBadge(difficulty: exercise.difficulty)
+            if showsDifficultyBadge {
+                DifficultyBadge(difficulty: exercise.difficulty)
+            }
         }
-        .padding(.vertical, AppSpacing.lg)
+        .padding(.vertical, showsDifficultyBadge ? AppSpacing.lg : 0)
     }
 
     // MARK: - Generating State
@@ -162,9 +168,11 @@ struct ExerciseImageView: View {
                 )
                 .modifier(ShimmerModifier())
 
-            DifficultyBadge(difficulty: exercise.difficulty)
+            if showsDifficultyBadge {
+                DifficultyBadge(difficulty: exercise.difficulty)
+            }
         }
-        .padding(.vertical, AppSpacing.lg)
+        .padding(.vertical, showsDifficultyBadge ? AppSpacing.lg : 0)
     }
 
     // MARK: - Fallback (SF Symbol)
@@ -173,7 +181,8 @@ struct ExerciseImageView: View {
         ExerciseIllustrationView(
             iconName: ExerciseIconMapper.icon(for: exercise),
             difficulty: exercise.difficulty,
-            isCompact: isCompact
+            isCompact: isCompact,
+            showsDifficultyBadge: showsDifficultyBadge
         )
     }
 
