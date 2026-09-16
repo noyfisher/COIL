@@ -1254,7 +1254,7 @@ Build → `** BUILD SUCCEEDED **`. Then:
 grep -n "showsDoneButton\|onEditProfile\|progress.settingsButton\|userName\|dismiss()" ios/PT-Helper/COIL/Views/SettingsView.swift ios/PT-Helper/COIL/Views/ProgressTab.swift ios/PT-Helper/COIL/Views/ProfileTab.swift
 grep -rn "settings.editProfileButton" ios/PT-Helper/COIL
 ```
-Expected: the first grep has no matches; the second matches exactly once (`ProfileHeroCard.swift`) — the old "Update Health Info" row is gone with `actionsCard`, so the identifier is unique again. Run `-only-testing:COILTests/AccountDeletionOutcomeTests` → 5 passed (the nested enum is untouched).
+Expected: the first grep has no matches; the second matches exactly once (`ProfileHeroCard.swift`) — the old "Update Health Info" row is gone with `actionsCard`, so the identifier is unique again. Run `-only-testing:COILTests/AccountDeletionOutcomeTests` → 4 passed (the nested enum is untouched).
 
 - [ ] **Step 10: Commit**
 ```bash
@@ -1620,6 +1620,8 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 
 **Files:**
 - Modify: `ios/PT-Helper/COIL/Views/ProgressTab.swift` (anchors below are post-Task-5 line numbers; grep the quoted code)
+
+- [ ] **Step 0: Fix the stale file comment.** Line 5 of `ProgressTab.swift` reads `/// Wraps progress content with settings access and re-assessment prompt.` (Task 5 removed the settings access). Replace it with `/// Chart, stats, actions, insights, outcome banner, recent workouts and the re-assessment prompt.`
 
 - [ ] **Step 1: Replace the scroll content.** The `ScrollView { VStack(spacing: AppSpacing.lg) { … } .padding(…) .floatingTabBarClearance() }` block inside `ProgressTabContent.body` becomes:
 ```swift
