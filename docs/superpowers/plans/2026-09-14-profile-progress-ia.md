@@ -686,6 +686,8 @@ struct ProfileTab_Previews: PreviewProvider {
 #endif
 ```
 
+> **Changed at Task 4 code review (2026-09-16):** the `#if DEBUG` preview was dropped — `SavedPlansViewModel()`/`WorkoutViewModel()` open Firestore in `init` and `FirebaseApp.configure()` never runs in the Canvas; the other tabs have no preview and `ProfileHeroCard` keeps its own. The reviewer also noted that, between Task 4 and Task 5, `settings.editProfileButton` exists twice on the Profile tab (hero + the old "Update Health Info" row); Task 5 removes that row with the whole `actionsCard`, and its Step 9 grep now confirms the identifier is unique.
+
 - [ ] **Step 2: Delete the inline tab from `MainTabView.swift`.** Lines 201–218 currently read:
 ```swift
 // MARK: - Profile Tab
@@ -1250,8 +1252,9 @@ In `ProgressTabContent` delete `var onSettingsTapped: () -> Void` (`:55`), and i
 Build → `** BUILD SUCCEEDED **`. Then:
 ```bash
 grep -n "showsDoneButton\|onEditProfile\|progress.settingsButton\|userName\|dismiss()" ios/PT-Helper/COIL/Views/SettingsView.swift ios/PT-Helper/COIL/Views/ProgressTab.swift ios/PT-Helper/COIL/Views/ProfileTab.swift
+grep -rn "settings.editProfileButton" ios/PT-Helper/COIL
 ```
-Expected: no matches. Run `-only-testing:COILTests/AccountDeletionOutcomeTests` → 5 passed (the nested enum is untouched).
+Expected: the first grep has no matches; the second matches exactly once (`ProfileHeroCard.swift`) — the old "Update Health Info" row is gone with `actionsCard`, so the identifier is unique again. Run `-only-testing:COILTests/AccountDeletionOutcomeTests` → 5 passed (the nested enum is untouched).
 
 - [ ] **Step 10: Commit**
 ```bash
