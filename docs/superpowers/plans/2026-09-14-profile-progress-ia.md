@@ -582,6 +582,8 @@ struct ProfileHeroCard_Previews: PreviewProvider {
 #endif
 ```
 
+> **Added at Task 3 code review (2026-09-16):** `statColumn` gained `isPlaceholder: Bool = false` (last parameter) so the "—" plan-week placeholder renders in `textOnDarkMuted`, not the accent used for live values; `identityRow` is `HStack(alignment: .top, …)` so a wrapped name keeps the avatar at the top; the name carries `.accessibilityAddTraits(.isHeader)`; the preview shows a second, empty-state card. The committed file is the source of truth.
+
 - [ ] **Step 2: Build** → `** BUILD SUCCEEDED **`. (`FlowLayout`, `CoilBadge`, `SecondaryButtonStyle`, `AppColors.onDarkChip/onDarkChipBorder/textOnDarkMuted/darkSurface/primaryGradient` all exist in `DesignSystem.swift`; grep them if the build says otherwise.)
 
 - [ ] **Step 3: Commit**
