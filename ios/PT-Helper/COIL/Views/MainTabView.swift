@@ -198,25 +198,6 @@ struct MainTabView: View {
     }
 }
 
-// MARK: - Profile Tab
-
-struct ProfileTab: View {
-    @State private var showEditProfile = false
-
-    var body: some View {
-        NavigationStack {
-            SettingsView(
-                userName: UserProfileService.shared.profile?.firstName ?? "User",
-                onEditProfile: { showEditProfile = true }
-            )
-        }
-        .sheet(isPresented: $showEditProfile) {
-            // Real editor (matches the ProgressTab path) — was a placeholder stub.
-            OnboardingEditView()
-        }
-    }
-}
-
 // MARK: - Tab Bar
 
 /// Layout metrics for the custom `FloatingTabBar`.
