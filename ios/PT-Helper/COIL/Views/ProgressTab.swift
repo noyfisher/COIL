@@ -8,8 +8,6 @@ struct ProgressTab: View {
     @EnvironmentObject private var workoutViewModel: WorkoutViewModel
     @EnvironmentObject private var insightsVM: RecoveryInsightsViewModel
     @EnvironmentObject private var savedPlansVM: SavedPlansViewModel
-    @State private var showSettings = false
-    @State private var showProfileEdit = false
 
     var body: some View {
         NavigationStack {
@@ -17,27 +15,9 @@ struct ProgressTab: View {
                 tabSelection: tabSelection,
                 workoutViewModel: workoutViewModel,
                 insightsVM: insightsVM,
-                savedPlansVM: savedPlansVM,
-                onSettingsTapped: { showSettings = true }
+                savedPlansVM: savedPlansVM
             )
             .coilNavBar()
-        }
-        .sheet(isPresented: $showSettings) {
-            NavigationStack {
-                SettingsView(
-                    userName: UserProfileService.shared.profile?.firstName ?? "User",
-                    onEditProfile: {
-                        showSettings = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            showProfileEdit = true
-                        }
-                    },
-                    showsDoneButton: true
-                )
-            }
-        }
-        .fullScreenCover(isPresented: $showProfileEdit) {
-            OnboardingEditView()
         }
         .trackScreen("ProgressTab")
     }
@@ -52,7 +32,6 @@ struct ProgressTabContent: View {
     @ObservedObject var savedPlansVM: SavedPlansViewModel
     @ObservedObject private var streakService = StreakService.shared
     @ObservedObject private var analysisStore = AnalysisResultStore.shared
-    var onSettingsTapped: () -> Void
 
     @State private var selectedRegion: String? = nil
     @State private var sessionToDelete: WorkoutSession?
@@ -169,21 +148,12 @@ struct ProgressTabContent: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                HStack(spacing: AppSpacing.sm) {
-                    NavigationLink(destination: AchievementsView(streakService: streakService)) {
-                        StreakToolbarBadge(streakService: streakService)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("\(streakService.streakData.currentStreak) day streak, view achievements")
-                    .accessibilityIdentifier("progress.streakBadge")
-
-                    Button(action: onSettingsTapped) {
-                        Image(systemName: "gearshape.fill")
-                            .foregroundColor(AppColors.accent)
-                    }
-                    .accessibilityIdentifier("progress.settingsButton")
-                    .accessibilityLabel("Settings")
+                NavigationLink(destination: AchievementsView(streakService: streakService)) {
+                    StreakToolbarBadge(streakService: streakService)
                 }
+                .buttonStyle(.plain)
+                .accessibilityLabel("\(streakService.streakData.currentStreak) day streak, view achievements")
+                .accessibilityIdentifier("progress.streakBadge")
             }
         }
     }

@@ -26,11 +26,8 @@ struct ProfileTab: View {
                         ProfileHeroCard(summary: summary) { showEditProfile = true }
                             .modifier(RevealOnAppear(index: 0))
 
-                        SettingsView(
-                            userName: profileService.profile?.firstName ?? "User",
-                            onEditProfile: { showEditProfile = true }
-                        )
-                        .padding(.top, AppSpacing.lg)
+                        SettingsView()
+                            .padding(.top, AppSpacing.lg)
                     }
                     .floatingTabBarClearance()
                 }
