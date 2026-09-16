@@ -65,7 +65,7 @@ xcodebuild test -project ios/PT-Helper/COIL.xcodeproj -scheme COIL -testPlan Ful
 | File | Responsibility | Tasks |
 |---|---|---|
 | `ios/PT-Helper/COIL/Models/ProfileSummary.swift` (new) | `ProfileSummary` value type + `ProfileSummaryBuilder` (pure) | 1–2 |
-| `ios/PT-Helper/COILTests/ProfileSummaryBuilderTests.swift` (new) | Builder unit tests (10) | 1–2 |
+| `ios/PT-Helper/COILTests/ProfileSummaryBuilderTests.swift` (new) | Builder unit tests (14) | 1–2 |
 | `ios/PT-Helper/COIL/Views/Components/ProfileHeroCard.swift` (new) | The masthead; input `ProfileSummary` + `onEditHealthInfo` | 3 |
 | `ios/PT-Helper/COIL/Views/ProfileTab.swift` (new) | Tab root: hero + settings body, edit sheet, `RevealOnAppear` | 4 |
 | `ios/PT-Helper/COIL/Views/MainTabView.swift` | Loses the inline `ProfileTab`; IA-3 wraps the bar | 4, 13 |
@@ -230,6 +230,8 @@ final class ProfileSummaryBuilderTests: XCTestCase {
 }
 ```
 
+> **Added at Task 1 code review (2026-09-15):** three more tests pin rules the builder implements — `testBuild_lastNameOnly_usesLastTwoLetters` (firstName "", lastName "Nguyen" → "NG"), `testBuild_ageBelowOne_dropsAgeFromDetailLine` (age 0, "Sedentary" → "Sedentary"), and `testBuild_completedPlan_reportsCompletedAndNoPlanWeek` (4-week plan started 30 days ago → `ActivePlan(name:, statusText: "Completed", isActive: false)`, `planWeek == nil`). The committed file (14 tests) is the source of truth.
+
 - [ ] **Step 2: Run to verify it fails**
 
 Run: `-only-testing:COILTests/ProfileSummaryBuilderTests`. Expected: build errors `cannot find 'ProfileSummaryBuilder' in scope` / `cannot find type 'ProfileSummary' in scope`. Do not stub anything.
@@ -389,7 +391,7 @@ enum ProfileSummaryBuilder {
 }
 ```
 
-- [ ] **Step 2: Run the tests** → `-only-testing:COILTests/ProfileSummaryBuilderTests` → 10 `passed`, `** TEST SUCCEEDED **`. Also run `-only-testing:COILTests/HomeProgramLogicTests` (13 passed) since `preferredPlan` now has a second consumer.
+- [ ] **Step 2: Run the tests** → `-only-testing:COILTests/ProfileSummaryBuilderTests` → 14 `passed`, `** TEST SUCCEEDED **`. Also run `-only-testing:COILTests/HomeProgramLogicTests` (13 passed) since `preferredPlan` now has a second consumer.
 
 - [ ] **Step 3: Commit**
 ```bash
@@ -1339,7 +1341,7 @@ grep -n "\.font(\.system(size\|Color\.white\.opacity\|Color(CoilPalette\|cornerR
 ```
 Expected: no matches.
 
-- [ ] **Step 2: Full UnitPlan** (detached, poll the log) → `Executed 1360 tests, with 1 test skipped and 0 failures`, `** TEST SUCCEEDED **`.
+- [ ] **Step 2: Full UnitPlan** (detached, poll the log) → `Executed 1364 tests, with 1 test skipped and 0 failures`, `** TEST SUCCEEDED **` (baseline 1350 + the 14 builder tests).
 
 - [ ] **Step 3: Screenshots.** The test action leaves `/tmp/coil-dd-ia/Build/Products/Debug-iphonesimulator/COIL.app`. Install and launch with launch args via simctl (the MCP launcher drops them):
 ```bash
@@ -1866,7 +1868,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 
 ### Task 11: IA-2 verification and PR
 
-- [ ] **Step 1: Full UnitPlan** → `Executed 1360 tests … 0 failures`, `** TEST SUCCEEDED **`.
+- [ ] **Step 1: Full UnitPlan** → `Executed 1364 tests … 0 failures`, `** TEST SUCCEEDED **`.
 - [ ] **Step 2: Screenshots** (same recipe as Task 7): Progress top and scrolled — actions row under the stats, banner collapsed, then expanded; recent workouts with abbreviated dates.
 - [ ] **Step 3: Push and open the PR**
 ```bash
@@ -2194,7 +2196,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 
 ### Task 17: IA-3 verification and PR
 
-- [ ] **Step 1: Full UnitPlan** → `Executed 1362 tests, with 1 test skipped and 0 failures`, `** TEST SUCCEEDED **`.
+- [ ] **Step 1: Full UnitPlan** → `Executed 1366 tests, with 1 test skipped and 0 failures`, `** TEST SUCCEEDED **`.
 - [ ] **Step 2: Screenshots** (Task 7 recipe): workout exercise phase (no tab bar; bottom bar on the safe area; no clipped Beginner badge), rest phase (no tab bar), summary (no tab bar), then back on the Plan tab (bar restored).
 - [ ] **Step 3: Push and open the PR**
 ```bash
