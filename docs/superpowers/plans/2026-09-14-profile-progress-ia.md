@@ -1256,6 +1256,8 @@ grep -rn "settings.editProfileButton" ios/PT-Helper/COIL
 ```
 Expected: the first grep has no matches; the second matches exactly once (`ProfileHeroCard.swift`) — the old "Update Health Info" row is gone with `actionsCard`, so the identifier is unique again. Run `-only-testing:COILTests/AccountDeletionOutcomeTests` → 4 passed (the nested enum is untouched).
 
+> **Changed at Task 5 code review (2026-09-16):** the "Deleting account…" overlay could sit off-screen once `SettingsView` became scrollable content (an `.overlay` on the body centres on the whole content height). It now lives in `ProfileTab`, outside the scroll view, driven by `SettingsView(isDeletingAccount: Binding<Bool>)`; `deleteAccount()` writes through the binding. A `fullScreenCover` was rejected because dismissing it in the failure path would race the error alert. Landed as a separate commit after Step 10.
+
 - [ ] **Step 10: Commit**
 ```bash
 git add ios/PT-Helper/COIL/Views/SettingsView.swift ios/PT-Helper/COIL/Views/ProfileTab.swift ios/PT-Helper/COIL/Views/ProgressTab.swift
