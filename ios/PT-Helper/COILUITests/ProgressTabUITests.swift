@@ -1,6 +1,6 @@
 import XCTest
 
-/// Covers the Progress tab's toolbar and top-of-page content.
+/// Covers the Progress tab's toolbar, action tiles and outcome banner.
 final class ProgressTabUITests: UITestBase {
 
     @MainActor
@@ -21,11 +21,17 @@ final class ProgressTabUITests: UITestBase {
     @discardableResult
     private func scrollClearOfTabBar(_ element: XCUIElement, maxSwipes: Int = 8) -> Bool {
         guard element.waitForExistence(timeout: 5) else { return false }
-        let barTop = app.buttons["Home"].frame.minY
+        // The centre "+" button lifts above the bar's background, so its top edge is a
+        // conservative upper bound for the bar (the Home button's frame starts 10pt below it).
+        let barTop = app.buttons["New Assessment"].frame.minY
         var swipes = 0
         while element.frame.maxY > barTop && swipes < maxSwipes {
             app.swipeUp()
             swipes += 1
+        }
+        // A swipe can carry the element above the viewport; bring it back once.
+        if element.frame.minY < 0 {
+            app.swipeDown()
         }
         return element.isHittable && element.frame.maxY <= barTop
     }
@@ -44,6 +50,8 @@ final class ProgressTabUITests: UITestBase {
         let workoutBar = app.navigationBars["Workout Session"]
         XCTAssertTrue(workoutBar.waitForExistence(timeout: 5),
                       "Log Workout tile should push the workout session screen")
+        XCTAssertEqual(workoutBar.buttons.count, 1,
+                       "Workout Session should show only the back button; index 0 must be Back")
         workoutBar.buttons.element(boundBy: 0).tap()
 
         let notesTile = app.descendants(matching: .any)["progress.notesTile"].firstMatch
@@ -61,15 +69,18 @@ final class ProgressTabUITests: UITestBase {
         // The seeded Knee plan started 10 days ago, so the prompt is eligible unless
         // this simulator already recorded a rating (persisted UserDefaults state).
         let expand = app.buttons["outcomePrompt.expand"]
-        guard scrollClearOfTabBar(expand) else {
+        guard expand.waitForExistence(timeout: 5) else {
             throw XCTSkip("Outcome prompt already answered in this simulator's persisted state")
         }
+        XCTAssertTrue(scrollClearOfTabBar(expand), "Outcome banner should scroll clear of the tab bar")
         XCTAssertFalse(app.buttons["outcomePrompt.accurate"].exists,
                        "Rating options stay collapsed until the row is tapped")
         expand.tap()
         XCTAssertTrue(app.buttons["outcomePrompt.accurate"].waitForExistence(timeout: 3),
                       "Tapping the banner row should reveal the rating options")
 
+        // Deliberately neither submits nor dismisses: both record a rating and would hide
+        // the prompt for every later run on this simulator.
         captureScreenshot(name: "Progress-OutcomeBannerExpanded")
     }
 }
