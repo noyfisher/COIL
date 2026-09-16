@@ -87,12 +87,14 @@ xcodebuild test -project ios/PT-Helper/COIL.xcodeproj -scheme COIL -testPlan Ful
 
 - [x] Worktree `.claude/worktrees/ux-profile-progress-ia` on `ux/profile-progress-ia` from `origin/ux/design-specs` (`e0e1d09`), merged `origin/ux/foundation-fixes-f2` (`aafd13a`) and `ux/design-tokens` (`d78ceae`); no conflicts (Foundation touches views/models/tests, Tokens touches `DesignSystem.swift` + one test).
 - [x] Baseline UnitPlan on the merge: `Executed 1350 tests, with 1 test skipped and 0 failures`, `** TEST SUCCEEDED **`.
-- [ ] **Push the PR base** (from the worktree):
+- [x] **Push the PR base** (done 2026-09-15 from the worktree, pinned to the SHA — the worktree HEAD is already past it):
 ```bash
 git branch ux/ia-base d78ceae
 git push -u origin ux/ia-base
 ```
-Expected: `* [new branch] ux/ia-base -> ux/ia-base`. The IA-1 PR targets this branch.
+Result: `* [new branch] ux/ia-base -> ux/ia-base`, `git rev-parse --short ux/ia-base` = `d78ceae`. The IA-1 PR targets this branch.
+
+> **Toolchain note (2026-09-15):** Xcode auto-updated to 27.0 (27A266a) during planning. Until `sudo xcodebuild -license accept` is run, `/usr/bin/git` and every `xcodebuild`/`xcrun` fail with exit 69; `/opt/homebrew/bin/git` works meanwhile. Before Task 1, re-run the baseline build + `-only-testing:COILTests/RehabPlanStatusTests` under Xcode 27 (the compiler jump may surface new warnings under the warnings-as-errors gate) and confirm `xcrun simctl list runtimes` still lists iOS 18.2.
 
 ---
 
@@ -1810,16 +1812,19 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
     func testActionTiles_navigateToLogWorkoutAndNotes() throws {
         tapTab("Progress")
 
-        let logTile = app.buttons["progress.logWorkoutTile"]
+        // Identifier on a NavigationLink: query `.any`, the file convention for
+        // container identifiers (see `progress.streakBadge` above).
+        let logTile = app.descendants(matching: .any)["progress.logWorkoutTile"].firstMatch
         XCTAssertTrue(scrollToHittable(logTile), "Log Workout tile should scroll into view")
-        XCTAssertTrue(app.buttons["progress.notesTile"].exists, "Recovery Notes tile should exist")
+        XCTAssertTrue(app.descendants(matching: .any)["progress.notesTile"].firstMatch.exists,
+                      "Recovery Notes tile should exist")
         logTile.tap()
         let workoutBar = app.navigationBars["Workout Session"]
         XCTAssertTrue(workoutBar.waitForExistence(timeout: 5),
                       "Log Workout tile should push the workout session screen")
         workoutBar.buttons.element(boundBy: 0).tap()
 
-        let notesTile = app.buttons["progress.notesTile"]
+        let notesTile = app.descendants(matching: .any)["progress.notesTile"].firstMatch
         XCTAssertTrue(scrollToHittable(notesTile), "Recovery Notes tile should scroll into view")
         notesTile.tap()
         XCTAssertTrue(app.navigationBars["Recovery Notes"].waitForExistence(timeout: 5),
@@ -2242,4 +2247,8 @@ VERDICT: REVISE BEFORE BUILDING
 - Deviation 9 records the `AppSpacing.xxxl` state spacers; deviation 7 now carries the `--onto` rebase recipe (only the IA commits replay), the no-force-push republish route, and the fast-forward-the-base procedure if #75–#77 change under review.
 - The user chose to keep the spec's three stacked PRs over the single-PR alternative.
 
-**Overall after revisions: pending re-audit** (one re-audit, per protocol).
+### Re-audit (2026-09-15, the one permitted pass)
+- **Structural:** all seven criteria PASS — file map matches the renumbered tasks; Task 14's trailing default parameter builds alone; the verbatim `notificationsCard`/`legalCard` diff byte-for-byte against `SettingsView.swift:540-747` except chrome/icons/dividers/title colour; no prose-only edit instruction remains; test counts consistent; `git rebase --onto origin/main ux/ia-base <branch>` is correct because `--onto` replays by reachability, so the merge commit's ancestors are excluded.
+- **Adversarial:** MINOR CONCERNS — round-1 fatal flaw adequately mitigated for the stack-now decision; `ProfileTab`'s new environment objects are already injected by `MainTabView`; `notificationsCard` verified byte-identical; Task 10 should query the tile identifiers via `app.descendants(matching: .any)` like the rest of the suite rather than `app.buttons` (applied above); "Session Events" becoming DEBUG-only is deviation 5, intentional.
+
+**Overall after re-audit: MINOR CONCERNS** — proceed to execution (subagent-driven, per the user).
