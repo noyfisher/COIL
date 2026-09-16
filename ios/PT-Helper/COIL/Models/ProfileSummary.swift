@@ -31,7 +31,7 @@ struct ProfileSummary: Equatable {
     var initials: String
     /// "34 · Moderately Active" — age omitted below 1, activity omitted when empty, nil when both are.
     var detailLine: String?
-    /// Current injuries as "Body area · description (≤ 24 chars)", then medical
+    /// Current injuries as "Body area · description (≤ 24 chars, ellipsised)", then medical
     /// conditions; de-duplicated case-insensitively; at most four.
     var conditionChips: [String]
     var activePlan: ActivePlan?
@@ -107,8 +107,7 @@ enum ProfileSummaryBuilder {
         var chips: [String] = []
         for injury in profile.injuries where injury.isCurrent {
             let area = injury.bodyArea.trimmingCharacters(in: .whitespaces)
-            let description = String(
-                injury.description.trimmingCharacters(in: .whitespaces).prefix(chipDescriptionLimit))
+            let description = clipped(injury.description.trimmingCharacters(in: .whitespaces))
             let chip = [area, description].filter { !$0.isEmpty }.joined(separator: " · ")
             if !chip.isEmpty { chips.append(chip) }
         }
@@ -118,6 +117,13 @@ enum ProfileSummaryBuilder {
         var seen = Set<String>()
         let unique = chips.filter { seen.insert($0.lowercased()).inserted }
         return Array(unique.prefix(maxChips))
+    }
+
+    /// Keeps a chip's description within `chipDescriptionLimit` characters, ending it
+    /// with an ellipsis rather than a mid-word cut when it had to be shortened.
+    static func clipped(_ text: String) -> String {
+        guard text.count > chipDescriptionLimit else { return text }
+        return String(text.prefix(chipDescriptionLimit - 1)) + "…"
     }
 
     static func statusText(for plan: RehabPlan) -> String {

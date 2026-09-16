@@ -2,7 +2,7 @@
 
 Run through this checklist before every release. Estimated time: ~25 minutes.
 
-**App structure (for orientation):** 4-tab shell — **Home**, **Plan**, **Progress**, **Profile** — plus a floating center **"Assess" (+)** button that opens the assessment gateway (pain analysis *or* wellness goals). Settings and session history live under the **Progress** tab.
+**App structure (for orientation):** 4-tab shell — **Home**, **Plan**, **Progress**, **Profile** — plus a floating center **"Assess" (+)** button that opens the assessment gateway (pain analysis *or* wellness goals). Session history lives under the **Progress** tab; Settings live under the **Profile** tab, below the masthead.
 
 Backend note: verify which Firebase project this build points at before testing (`ios/PT-Helper/COIL/Services/APIConfig.swift` + `GoogleService-Info.plist`). A dev-targeted build exercises the dev AI budget and rate limits.
 
@@ -12,7 +12,7 @@ Backend note: verify which Firebase project this build points at before testing 
 - [ ] Fresh launch (no account): Login screen appears (dark hero, intentional in both appearances)
 - [ ] Sign in with Apple completes successfully
 - [ ] Sign in with Google completes successfully
-- [ ] Sign out (Progress → Settings), sign back in — returns to the main app, profile intact
+- [ ] Sign out (Profile → Account → Sign Out), sign back in — returns to the main app, profile intact
 
 ### Legal & consent gate (new — MHMDA/WS3)
 - [ ] First-run after sign-in: legal acceptance gate appears (Terms + Privacy + Consumer Health Data policy, version 2026.07)
@@ -91,7 +91,7 @@ Backend note: verify which Firebase project this build points at before testing 
 
 ## Notifications (2 min — new/WS2)
 
-- [ ] Progress → Settings: reminders toggle + time picker; enabling actually schedules (reminders are no longer a no-op)
+- [ ] Profile → Preferences: reminders toggle + time picker; enabling actually schedules (reminders are no longer a no-op)
 - [ ] Starting a fresh plan schedules a first-workout activation nudge
 - [ ] Re-assessment reminders exist at plan midpoint and completion
 - [ ] Toggling reminders off cancels pending notifications; sign-out clears them

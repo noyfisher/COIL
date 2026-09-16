@@ -83,7 +83,7 @@ final class ProfileSummaryBuilderTests: XCTestCase {
         let profile = TestFixtures.makeProfile(medicalConditions: ["Asthma"], injuries: injuries)
         XCTAssertEqual(build(profile: profile).conditionChips, [
             "Right Knee · Patellar tendinopathy",
-            "Lower Back · Disc irritation from lif",
+            "Lower Back · Disc irritation from li…",
             "Asthma",
         ])
     }

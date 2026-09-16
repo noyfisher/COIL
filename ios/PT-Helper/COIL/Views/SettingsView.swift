@@ -292,7 +292,7 @@ struct SettingsView: View {
             .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 
-    /// Inset so the rule starts under the row text, past the 32pt icon tile.
+    /// Inset past the 32pt icon tile so the rule does not cut under the icons.
     private var rowDivider: some View {
         Divider().padding(.leading, AppSpacing.huge + AppSpacing.xl)
     }

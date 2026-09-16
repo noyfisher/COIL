@@ -17,9 +17,9 @@ struct ProfileTab: View {
                                     sessionCount: workoutViewModel.sessions.count)
     }
 
-    /// Full-viewport shield while the server deletes the account. Lives here, outside the
-    /// scroll view, so it covers the screen wherever Delete Account was tapped and blocks
-    /// every touch beneath it.
+    /// Shield while the server deletes the account. Lives here, outside the scroll view,
+    /// so it covers the tab's viewport wherever Delete Account was tapped (the floating
+    /// tab bar is a sibling in `MainTabView` and stays live, as before).
     private var deletingAccountOverlay: some View {
         ZStack {
             AppColors.primaryText.opacity(0.4).ignoresSafeArea()

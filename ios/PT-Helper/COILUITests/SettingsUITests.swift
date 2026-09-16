@@ -35,7 +35,7 @@ final class SettingsUITests: UITestBase {
             "Appearance picker should be visible in Settings"
         )
 
-        // Sign Out lives further down the sheet but is in the tree from the start.
+        // Sign Out lives further down the Profile tab but is in the tree from the start.
         XCTAssertTrue(
             app.descendants(matching: .any)["settings.signOutButton"].waitForExistence(timeout: 5),
             "Sign Out option should be present"
@@ -65,7 +65,7 @@ final class SettingsUITests: UITestBase {
     func testSettings_DeleteAccount_ShowsConfirmation() throws {
         navigateToProfile()
 
-        // The delete button sits in the "Danger zone" at the very bottom of the sheet.
+        // The delete button sits in the Account group near the bottom of the Profile tab.
         let deleteAccount = app.descendants(matching: .any)["settings.deleteAccountButton"]
         XCTAssertTrue(scrollToHittable(deleteAccount), "Delete Account button should scroll into view")
         deleteAccount.tap()
@@ -122,5 +122,6 @@ final class SettingsUITests: UITestBase {
         edit.tap()
         XCTAssertTrue(staticText("Update Profile").waitForExistence(timeout: 5),
                       "Edit Health Info should present the profile editor")
+        captureScreenshot(name: "Profile-EditHealthInfo")
     }
 }
