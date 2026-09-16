@@ -2,7 +2,7 @@ import SwiftUI
 import Charts
 
 /// Tab 2: Progress — "How am I doing?"
-/// Wraps progress content with settings access and re-assessment prompt.
+/// Last analysis, chart, stats, actions, insights, outcome banner, recent workouts and the re-assessment prompt.
 struct ProgressTab: View {
     @EnvironmentObject private var tabSelection: TabSelection
     @EnvironmentObject private var workoutViewModel: WorkoutViewModel
@@ -53,15 +53,16 @@ struct ProgressTabContent: View {
                     // A fetch failure must not masquerade as "No Data Yet" — that's
                     // the brand-new-user message and makes a longtime user fear their
                     // data vanished (audit #62).
-                    Spacer(minLength: 100)
+                    Spacer(minLength: AppSpacing.xxxl)
                     ErrorStateView(
                         title: "Couldn't load your progress",
                         message: loadError,
                         onRetry: { workoutViewModel.fetchSessions() }
                     )
-                    Spacer(minLength: 100)
+                    Spacer(minLength: AppSpacing.xxxl)
+                    actionsRow
                 } else if workoutViewModel.sessions.isEmpty {
-                    Spacer(minLength: 100)
+                    Spacer(minLength: AppSpacing.xxxl)
                     EmptyStateView(
                         icon: "chart.line.uptrend.xyaxis",
                         title: "No Data Yet",
@@ -69,7 +70,8 @@ struct ProgressTabContent: View {
                         actionTitle: "Start an Assessment",
                         action: { tabSelection.assessmentRequest = .gateway }
                     )
-                    Spacer(minLength: 100)
+                    Spacer(minLength: AppSpacing.xxxl)
+                    actionsRow
                 } else {
                     let chartData = filteredChartData
 
@@ -81,6 +83,9 @@ struct ProgressTabContent: View {
 
                     // Summary stats + streak
                     summaryStats
+
+                    // Log Workout · Recovery Notes
+                    actionsRow
 
                     // AI Recovery Insights
                     RecoveryInsightsCardView(vm: insightsVM)
@@ -94,7 +99,8 @@ struct ProgressTabContent: View {
                         OutcomePromptView(
                             analysisId: target.analysisId,
                             planId: target.plan.id,
-                            planAgeDays: OutcomeRecorder.planAgeDays(planStartDate: target.plan.startDate)
+                            planAgeDays: OutcomeRecorder.planAgeDays(planStartDate: target.plan.startDate),
+                            style: .banner
                         ) {
                             outcomePromptRefreshTick &+= 1
                         }
@@ -105,24 +111,8 @@ struct ProgressTabContent: View {
                     recentWorkoutsSection
                 }
 
-                // Log Workout card
-                NavigationLink(destination: WorkoutSessionView()) {
-                    navLinkRow(icon: "figure.strengthtraining.traditional",
-                               iconColor: AppColors.accent,
-                               title: "Log Workout")
-                }
-                .buttonStyle(.plain)
-
                 // Re-assessment prompt
                 reassessmentCard
-
-                // Notes link
-                NavigationLink(destination: NotesView()) {
-                    navLinkRow(icon: "note.text",
-                               iconColor: AppColors.accent,
-                               title: "Recovery Notes")
-                }
-                .buttonStyle(.plain)
             }
             .padding(.horizontal, AppSpacing.xl)
             .padding(.vertical, AppSpacing.md)
@@ -217,13 +207,13 @@ struct ProgressTabContent: View {
 
         return HStack(spacing: AppSpacing.md) {
             Image(systemName: "stethoscope")
-                .font(.system(size: 18, weight: .semibold))
+                .font(AppFonts.iconM)
                 .foregroundColor(AppColors.accent)
                 .frame(width: 40, height: 40)
                 .background(AppColors.accent.opacity(0.12))
                 .cornerRadius(AppCorners.small)
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: AppSpacing.xs) {
                 Text(topCondition?.commonName ?? "Analysis Results")
                     .font(AppFonts.bodySemiBold)
                     .foregroundColor(AppColors.primaryText)
@@ -250,7 +240,7 @@ struct ProgressTabContent: View {
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 13, weight: .semibold))
+                .font(AppFonts.iconS)
                 .foregroundColor(AppColors.accent)
         }
         .padding(.horizontal, AppSpacing.lg)
@@ -269,29 +259,24 @@ struct ProgressTabContent: View {
         }
     }
 
-    // MARK: - Navigation Link Row
+    // MARK: - Actions Row
 
-    private func navLinkRow(icon: String, iconColor: Color, title: String) -> some View {
+    private var actionsRow: some View {
         HStack(spacing: AppSpacing.md) {
-            Image(systemName: icon)
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundColor(iconColor)
-                .frame(width: 36, height: 36)
-                .background(iconColor.opacity(0.12))
-                .cornerRadius(AppCorners.small)
-            Text(title)
-                .font(AppFonts.bodySemiBold)
-                .foregroundColor(AppColors.primaryText)
-            Spacer()
-            Image(systemName: "chevron.right")
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(AppColors.mutedText)
+            NavigationLink(destination: WorkoutSessionView()) {
+                ActionTile(icon: "figure.strengthtraining.traditional",
+                           title: "Log Workout", subtitle: "Add a session")
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("progress.logWorkoutTile")
+
+            NavigationLink(destination: NotesView()) {
+                ActionTile(icon: "note.text",
+                           title: "Recovery Notes", subtitle: "Your observations")
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("progress.notesTile")
         }
-        .padding(AppSpacing.md)
-        .background(AppColors.cardBackground)
-        .cornerRadius(AppCorners.card)
-        .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
-        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 
     // MARK: - Recent Workouts
@@ -348,7 +333,7 @@ struct ProgressTabContent: View {
                     )
 
                 VStack(alignment: .leading, spacing: AppSpacing.nano) {
-                    Text(session.date, style: .date)
+                    Text(session.date.formatted(date: .abbreviated, time: .omitted))
                         .font(AppFonts.bodyMedium)
                         .foregroundColor(AppColors.primaryText)
                     Text("\(Int(session.duration / 60)) min")
@@ -372,7 +357,7 @@ struct ProgressTabContent: View {
                 showDeleteConfirmation = true
             } label: {
                 Image(systemName: "trash")
-                    .font(.system(size: 12))
+                    .font(AppFonts.iconXS)
                     .foregroundColor(AppColors.danger.opacity(0.6))
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
@@ -568,21 +553,21 @@ struct ProgressTabContent: View {
                 // Promote the day streak — the number users actually build toward —
                 // over "Total Min", which nobody opens the app to check (audit #38).
                 statCard(icon: streakService.streakData.isActive ? "flame.fill" : "flame",
-                         color: Color(CoilPalette.pop),
+                         color: AppColors.streak,
                          value: "\(streakService.streakData.currentStreak)",
                          label: "Day Streak")
             }
             if let personalBest = personalBestText {
                 HStack(spacing: AppSpacing.xs) {
                     Image(systemName: "rosette")
-                        .foregroundColor(Color(CoilPalette.pop))
+                        .foregroundColor(AppColors.streak)
                     Text(personalBest)
                         .font(AppFonts.captionMedium)
                         .foregroundColor(AppColors.secondaryText)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, AppSpacing.sm)
-                .background(Color(CoilPalette.pop).opacity(0.08))
+                .background(AppColors.streakTint)
                 .cornerRadius(AppCorners.medium)
             }
         }
@@ -605,7 +590,7 @@ struct ProgressTabContent: View {
     private func statCard(icon: String, color: Color, value: String, label: String) -> some View {
         VStack(spacing: AppSpacing.sm) {
             Image(systemName: icon)
-                .font(.system(size: 16, weight: .semibold))
+                .font(AppFonts.iconM)
                 .foregroundColor(color)
                 .frame(width: 32, height: 32)
                 .background(color.opacity(0.12))
@@ -644,7 +629,7 @@ struct ProgressTabContent: View {
             HStack(spacing: AppSpacing.sm) {
                 Image(systemName: "arrow.triangle.2.circlepath")
                     .foregroundColor(AppColors.accent)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(AppFonts.iconM)
                 Text("Time for a Re-Assessment?")
                     .font(AppFonts.cardTitle)
                     .foregroundColor(AppColors.primaryText)
@@ -666,7 +651,7 @@ struct ProgressTabContent: View {
                         .textCase(.uppercase)
                         .kerning(0.8)
                     Image(systemName: "arrow.right")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(AppFonts.iconXS)
                 }
                 .foregroundColor(AppColors.accentText)
                 .frame(maxWidth: .infinity)
@@ -687,6 +672,42 @@ struct ProgressTabContent: View {
     }
 }
 
+// MARK: - Action Tile
+
+/// Icon tile + title + fixed subtitle, the two-up "what can I do here" row under the stats.
+private struct ActionTile: View {
+    let icon: String
+    let title: String
+    let subtitle: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.sm) {
+            Image(systemName: icon)
+                .font(AppFonts.iconM)
+                .foregroundColor(AppColors.accent)
+                .frame(width: 40, height: 40)
+                .background(AppColors.accentTint)
+                .cornerRadius(AppCorners.small)
+                .accessibilityHidden(true)
+
+            Text(title)
+                .font(AppFonts.bodySemiBold)
+                .foregroundColor(AppColors.primaryText)
+
+            Text(subtitle)
+                .font(AppFonts.caption)
+                .foregroundColor(AppColors.secondaryText)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .padding(AppSpacing.lg)
+        .background(AppColors.cardBackground)
+        .cornerRadius(AppCorners.card)
+        .overlay(RoundedRectangle(cornerRadius: AppCorners.card).stroke(AppColors.cardBorder, lineWidth: 1))
+        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+        .accessibilityElement(children: .combine)
+    }
+}
+
 // MARK: - Streak Toolbar Badge
 
 /// Compact streak indicator for the toolbar — shows flame icon + count inline.
@@ -694,9 +715,9 @@ private struct StreakToolbarBadge: View {
     @ObservedObject var streakService: StreakService
 
     var body: some View {
-        HStack(spacing: 3) {
+        HStack(spacing: AppSpacing.xs) {
             Image(systemName: streakService.streakData.isActive ? "flame.fill" : "flame")
-                .font(.system(size: 14, weight: .semibold))
+                .font(AppFonts.iconS)
                 .foregroundColor(streakColor)
             Text("\(streakService.streakData.currentStreak)")
                 .font(AppFonts.bodySemiBold)
