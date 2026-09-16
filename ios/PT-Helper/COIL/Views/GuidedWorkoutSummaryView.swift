@@ -110,7 +110,7 @@ struct GuidedWorkoutSummaryView: View {
                     .accessibilityIdentifier("workoutSummary.saveButton")
                 }
 
-                Spacer(minLength: FloatingTabBarMetrics.clearance)
+                Spacer(minLength: AppSpacing.xxl)
             }
             .padding(.horizontal, AppSpacing.xl)
             .padding(.vertical, AppSpacing.md)
