@@ -14,7 +14,8 @@ class TabSelection: ObservableObject {
 
     /// True while a guided workout is on screen. `MainTabView` drops the floating
     /// bar when this is set; `GuidedWorkoutView` sets it on appear and clears it on
-    /// disappear. Nothing else may write it.
+    /// disappear. The pop-to-root resets below also clear it, because a pushed
+    /// workout is gone once its stack is reset. Nothing else may write it.
     @Published var isTabBarHidden = false
 
     /// Set by any child tab / CTA to request an assessment entry point.
@@ -32,6 +33,7 @@ class TabSelection: ObservableObject {
     @Published var myPlanNavigationId = UUID()
 
     func popToRootAndGoHome() {
+        isTabBarHidden = false
         if selectedTab == 0 {
             assessNavigationId = UUID()
             return
@@ -54,5 +56,6 @@ class TabSelection: ObservableObject {
         case 3: profileNavigationId = UUID()
         default: break
         }
+        isTabBarHidden = false
     }
 }

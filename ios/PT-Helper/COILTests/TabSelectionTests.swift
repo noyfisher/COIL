@@ -8,22 +8,31 @@ final class TabSelectionTests: XCTestCase {
         XCTAssertFalse(TabSelection().isTabBarHidden)
     }
 
-    func testPopToRootAndGoHome_doesNotTouchTabBarHidden() {
+    func testPopToRootAndGoHome_restoresTabBar() {
         let selection = TabSelection()
         selection.selectedTab = 2
         selection.isTabBarHidden = true
         selection.popToRootAndGoHome()
         XCTAssertEqual(selection.selectedTab, 0)
-        XCTAssertTrue(selection.isTabBarHidden,
-                      "Only the workout's onDisappear restores the bar; navigation must not")
+        XCTAssertFalse(selection.isTabBarHidden,
+                      "Pop-to-root leaves no workout on screen, so the bar must come back")
     }
 
-    func testPopToRootCurrentTab_doesNotTouchTabBarHidden() {
+    func testPopToRootCurrentTab_restoresTabBar() {
         let selection = TabSelection()
         selection.selectedTab = 2
         selection.isTabBarHidden = true
         selection.popToRootCurrentTab()
-        XCTAssertTrue(selection.isTabBarHidden,
-                      "Only the workout's onDisappear restores the bar; navigation must not")
+        XCTAssertFalse(selection.isTabBarHidden,
+                      "Pop-to-root leaves no workout on screen, so the bar must come back")
+    }
+
+    func testPopToRootAndGoHome_onHome_restoresTabBar() {
+        let selection = TabSelection()
+        selection.selectedTab = 0
+        selection.isTabBarHidden = true
+        selection.popToRootAndGoHome()
+        XCTAssertFalse(selection.isTabBarHidden,
+                      "A workout pushed from Home is torn down by the Home stack reset")
     }
 }
