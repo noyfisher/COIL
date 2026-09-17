@@ -241,7 +241,7 @@ Use this mapping to find the view file. If the screen name is not listed, STOP a
    ```
    session_set_defaults:
      projectPath: ios/PT-Helper/COIL.xcodeproj
-     scheme: PT-Helper
+     scheme: COIL
      simulatorName: iPhone 16
    ```
 
