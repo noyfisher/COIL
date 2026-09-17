@@ -75,7 +75,7 @@ xcodebuild test -project ios/PT-Helper/COIL.xcodeproj -scheme COIL -testPlan Ful
 | `ios/PT-Helper/COIL/Views/Components/OutcomePromptView.swift` | `.banner` style | 8 |
 | `ios/PT-Helper/COILUITests/ProgressTabUITests.swift` | Tiles + banner tests | 10 |
 | `ios/PT-Helper/COIL/Views/TabSelection.swift` | `isTabBarHidden` | 12 |
-| `ios/PT-Helper/COILTests/TabSelectionTests.swift` (new) | Flag tests (2) | 12 |
+| `ios/PT-Helper/COILTests/TabSelectionTests.swift` (new) | Flag tests (3) | 12 |
 | `ios/PT-Helper/COIL/Views/Components/ExerciseImageView.swift` | `showsDifficultyBadge` | 14 |
 | `ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift` | Hide/show, paddings, badge, tokens | 15 |
 | `ios/PT-Helper/COIL/Views/GuidedWorkoutSummaryView.swift` | Bottom spacer | 15 |
@@ -1912,6 +1912,8 @@ EOF
 
 **Files:**
 - Create: `ios/PT-Helper/COILTests/TabSelectionTests.swift`
+
+> **Changed at Task 12 code review (2026-09-16):** a third test, `testPopToRootCurrentTab_doesNotTouchTabBarHidden`, covers the other navigation reset the same way `popToRootAndGoHome` is covered, so the "nothing else may write it" rule is documented for both. UnitPlan lands on 1367, not 1366.
 - Modify: `ios/PT-Helper/COIL/Views/TabSelection.swift:13` (after `selectedTab`)
 
 - [ ] **Step 0: Branch for IA-3** (from the IA-2 head):
@@ -2023,6 +2025,9 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 
 **Files:**
 - Modify: `ios/PT-Helper/COIL/Views/Components/ExerciseImageView.swift:5-7`, `:141-145`, `:165-168`
+- Modify: `ios/PT-Helper/COIL/Views/Components/ExerciseIllustration.swift` (added at code review, see below)
+
+> **Changed at Task 14 code review (2026-09-16):** `ExerciseImageView.fallbackContent` delegates to `ExerciseIllustrationView`, whose `fullView` drew its own difficulty pill and `AppSpacing.lg` padding unconditionally, so the flag was ignored whenever the image failed to load (which is exactly what the workout shows under `--uitesting`). `ExerciseIllustrationView` gained the same `showsDifficultyBadge: Bool = true`, guarded the same way, and `fallbackContent` threads it through; it has a single caller.
 
 - [ ] **Step 1: Add the flag.** After `var isCompact: Bool = false` (`:7`) add:
 ```swift
@@ -2211,7 +2216,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 
 ### Task 17: IA-3 verification and PR
 
-- [ ] **Step 1: Full UnitPlan** → `Executed 1366 tests, with 1 test skipped and 0 failures`, `** TEST SUCCEEDED **`.
+- [x] **Step 1: Full UnitPlan** → `Executed 1367 tests, with 1 test skipped and 0 failures`, `** TEST SUCCEEDED **` (1364 + the three Task 12 tests; the plan said 1366 before the review added the third).
 - [ ] **Step 2: Screenshots** (Task 7 recipe): workout exercise phase (no tab bar; bottom bar on the safe area; no clipped Beginner badge), rest phase (no tab bar), summary (no tab bar), then back on the Plan tab (bar restored).
 - [ ] **Step 3: Push and open the PR**
 ```bash
