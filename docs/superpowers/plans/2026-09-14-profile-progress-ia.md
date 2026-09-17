@@ -1604,7 +1604,9 @@ struct OutcomePromptView_Previews: PreviewProvider {
 }
 #endif
 ```
-The only behavioural change for `.card` callers is the dismiss glyph moving from `.font(.caption)` to `AppFonts.iconXS` (12pt semibold) with a 44pt hit area. Existing call sites pass no `style`, so they keep `.card`.
+The only behavioural change for `.card` callers is the dismiss glyph moving from `.font(.caption)` to `AppFonts.iconXS` (12pt semibold) with a 44pt hit area (which also makes the card header 44pt tall). Existing call sites pass no `style`, so they keep `.card`.
+
+> **Changed at Task 8 code review (2026-09-16):** the banner's sparkles glyph uses `AppFonts.small` (inline with scaling text, per the icon-token rule) instead of `iconS`; the collapsed banner's vertical padding is `AppSpacing.xs`; the question string is a single `bannerQuestion` constant used for the text and the accessibility label; the confirmation line stays visible after submitting even if the row is collapsed; the card MARK comment states the header-height change. The committed file is the source of truth.
 
 - [ ] **Step 2: Build** → `** BUILD SUCCEEDED **`. `grep -rn "OutcomePromptView(" ios/PT-Helper/COIL` must show only `ProgressTab.swift` and the preview.
 
@@ -1784,9 +1786,11 @@ private struct ActionTile: View {
 - [ ] **Step 4: Build and audit**
 Build → `** BUILD SUCCEEDED **`. Then
 ```bash
-grep -n "\.font(\.system(size\|Color\.white\.opacity\|Color(CoilPalette\|cornerRadius: [0-9]\|spacing: [0-9]\|minLength: 100\|navLinkRow" ios/PT-Helper/COIL/Views/ProgressTab.swift
+grep -n "\.font(\.system(size\|Color\.white\.opacity\|Color(CoilPalette\|cornerRadius: [0-9]\|spacing: [1-9]\|minLength: 100\|navLinkRow" ios/PT-Helper/COIL/Views/ProgressTab.swift
 ```
 Expected: no matches.
+
+> **Changed at Task 9 code review (2026-09-16):** `ActionTile` uses `.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)` so the two tiles stay equal-height when a title wraps; its glyph is `.accessibilityHidden(true)` so the combined element reads "Log Workout, Add a session"; the file comment also names the last-analysis section. The audit grep now uses `spacing: [1-9]` — `spacing: 0` is the codebase's no-spacing idiom, not a raw design value.
 
 - [ ] **Step 5: Commit**
 ```bash
@@ -1862,6 +1866,8 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
         captureScreenshot(name: "Progress-OutcomeBannerExpanded")
     }
 ```
+
+> **Changed at Task 10 execution (2026-09-16):** at the default scroll offset the action tiles sit partly under the floating tab bar; XCUI still reports them hittable and then taps the covered part (the Recovery Notes tile failed 3/3 with the tap landing in the bar's dead zone). The helper is now `scrollClearOfTabBar(_:)`: it swipes until `element.frame.maxY <= app.buttons["Home"].frame.minY` and returns `isHittable && clear`. The three call sites use it; the assertions are unchanged. At code review the helper was hardened in a follow-up commit: the bar's top edge is taken from the lifted "New Assessment" button (measured: its frame starts 20pt above the Home button's, itself 10pt below the bar background, so the bound is conservative), an overshoot above the viewport swipes down once, the Workout Session back-button tap asserts the nav bar holds exactly one button, and the banner test skips only when the prompt does not exist (a prompt that exists but cannot be brought clear of the bar now fails). The committed file is the source of truth.
 
 - [ ] **Step 2: Run** the FullPlan command with `-only-testing:COILUITests/ProgressTabUITests`. Expected: 3 `passed` (or 2 passed + 1 skipped), `** TEST SUCCEEDED **`.
 
@@ -2146,7 +2152,7 @@ The empty-state hero glyph `.font(.system(size: 50))` (`:524`) is outside the ic
 
 - [ ] **Step 6: Build** → `** BUILD SUCCEEDED **`; then
 ```bash
-grep -n "\.font(\.system(size\|Color\.white\.opacity\|Color(CoilPalette\|cornerRadius: [0-9]\|spacing: [0-9]\|FloatingTabBarMetrics" ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift
+grep -n "\.font(\.system(size\|Color\.white\.opacity\|Color(CoilPalette\|cornerRadius: [0-9]\|spacing: [1-9]\|FloatingTabBarMetrics" ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift
 ```
 Expected: exactly one match, the `size: 50` hero glyph.
 
