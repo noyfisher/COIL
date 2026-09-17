@@ -176,4 +176,27 @@ final class GuidedWorkoutUITests: UITestBase {
         XCTAssertTrue(staticText("30 seconds").waitForExistence(timeout: 5))
         XCTAssertFalse(staticText("30 seconds reps").exists)
     }
+
+    @MainActor
+    func testWorkout_hidesTabBarUntilDiscarded() throws {
+        XCTAssertTrue(app.buttons["Home"].waitForExistence(timeout: 10),
+                      "Tab bar should be visible before the workout")
+        navigateToWorkout()
+        assertExists("workout.completeSetButton", timeout: 10)
+
+        // The bar is removed from the hierarchy, not just covered.
+        XCTAssertTrue(app.buttons["Home"].waitForNonExistence(timeout: 5),
+                      "The floating tab bar should hide during a guided workout")
+
+        let endButton = app.buttons["workout.endButton"]
+        XCTAssertTrue(endButton.waitForExistence(timeout: 5))
+        endButton.tap()
+        let discard = button("Discard Without Saving")
+        XCTAssertTrue(discard.waitForExistence(timeout: 3))
+        discard.tap()
+
+        XCTAssertTrue(app.buttons["Home"].waitForExistence(timeout: 5),
+                      "Leaving the workout should restore the tab bar")
+        captureScreenshot(name: "Workout-TabBarRestored")
+    }
 }

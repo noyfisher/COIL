@@ -6,6 +6,7 @@ struct GuidedWorkoutView: View {
     @StateObject private var vm: GuidedWorkoutViewModel
     @EnvironmentObject private var workoutViewModel: WorkoutViewModel
     @EnvironmentObject private var savedPlansVM: SavedPlansViewModel
+    @EnvironmentObject private var tabSelection: TabSelection
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @State private var showSwapSheet = false
@@ -63,6 +64,9 @@ struct GuidedWorkoutView: View {
         }
         .trackScreen("GuidedWorkout")
         .onAppear {
+            // Focus mode: the floating tab bar leaves for the whole workout, including
+            // the summary; `onDisappear` restores it when the workout is popped.
+            tabSelection.isTabBarHidden = true
             AnalyticsService.shared.log(.workoutStarted, parameters: ["exercise_count": vm.totalExercises])
             if let checkpoint = GuidedWorkoutViewModel.savedCheckpoint(forPlanId: vm.plan.id.uuidString) {
                 savedCheckpoint = checkpoint
@@ -71,6 +75,9 @@ struct GuidedWorkoutView: View {
             }
             // Auto-expand instructions for first encounter with exercise
             showInstructions = currentFamiliarity == .new
+        }
+        .onDisappear {
+            tabSelection.isTabBarHidden = false
         }
         .alert("Resume Workout?", isPresented: $showResumePrompt) {
             Button("Resume") {
@@ -174,7 +181,7 @@ struct GuidedWorkoutView: View {
 
                     if let exercise = vm.currentExercise {
                         // Exercise image with mastery badge
-                        ExerciseImageView(exercise: exercise, isCompact: false)
+                        ExerciseImageView(exercise: exercise, isCompact: false, showsDifficultyBadge: false)
                             .frame(height: 200)
                             .frame(maxWidth: .infinity)
                             .background(AppColors.elevatedSurface)
@@ -250,7 +257,7 @@ struct GuidedWorkoutView: View {
                                     HStack(alignment: .top, spacing: AppSpacing.xs) {
                                         Image(systemName: "lightbulb.fill")
                                             .font(.caption2)
-                                            .foregroundColor(Color(CoilPalette.pop))
+                                            .foregroundColor(AppColors.streak)
                                         Text(tip)
                                             .font(AppFonts.caption)
                                             .foregroundColor(AppColors.secondaryText)
@@ -329,10 +336,11 @@ struct GuidedWorkoutView: View {
         }
         .padding(.horizontal, AppSpacing.xl)
         .padding(.top, AppSpacing.md)
-        .padding(.bottom, FloatingTabBarMetrics.clearance)
+        .padding(.bottom, AppSpacing.lg)
         .background(
             AppColors.cardBackground
                 .shadow(color: AppColors.cardShadowColor, radius: 12, y: -4)
+                .ignoresSafeArea(edges: .bottom)   // the card colour fills under the home indicator
         )
         .overlay(alignment: .top) {
             Rectangle()
@@ -349,7 +357,7 @@ struct GuidedWorkoutView: View {
     // MARK: - Compact Secondary Actions
 
     private var secondaryActionsRow: some View {
-        HStack(spacing: 32) {
+        HStack(spacing: AppSpacing.huge) {
             compactActionButton(
                 icon: "video.fill",
                 label: "Form",
@@ -381,7 +389,7 @@ struct GuidedWorkoutView: View {
         Button(action: action) {
             VStack(spacing: AppSpacing.xs) {
                 Image(systemName: icon)
-                    .font(.system(size: 16, weight: .medium))
+                    .font(AppFonts.iconM)
                     .foregroundColor(AppColors.secondaryText)
                     .frame(width: 44, height: 44)
                     .background(AppColors.cardBackground)
@@ -476,7 +484,7 @@ struct GuidedWorkoutView: View {
             .buttonStyle(SecondaryButtonStyle())
             .accessibilityIdentifier("workout.skipRestButton")
             .padding(.horizontal, AppSpacing.xl)
-            .padding(.bottom, FloatingTabBarMetrics.clearance)
+            .padding(.bottom, AppSpacing.lg)
         }
     }
 
@@ -567,7 +575,7 @@ struct GuidedWorkoutView: View {
 
             HStack(spacing: AppSpacing.xs) {
                 ForEach(0..<vm.totalExercises, id: \.self) { index in
-                    RoundedRectangle(cornerRadius: 3)
+                    Capsule()
                         .fill(segmentColor(for: index))
                         .frame(height: 6)
                         .scaleEffect(y: completedSegmentIndex == index ? 1.8 : 1.0)
@@ -628,7 +636,7 @@ struct GuidedWorkoutView: View {
                 .first {
                 HStack(spacing: AppSpacing.sm) {
                     Image(systemName: "chart.bar.fill")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(AppFonts.iconS)
                         .foregroundColor(AppColors.accent)
                         .frame(width: 28, height: 28)
                         .background(AppColors.accent.opacity(0.10))

@@ -63,18 +63,22 @@ struct MainTabView: View {
                 }
             }
 
-            // Full-width tab bar pinned to bottom
+            // Full-width tab bar pinned to bottom; slides away during a guided workout.
             VStack(spacing: 0) {
                 Spacer()
-                FloatingTabBar(selectedTab: $tabSelection.selectedTab, onTabTapped: { tapped in
-                    if tabSelection.selectedTab == tapped {
-                        tabSelection.popToRootCurrentTab()
-                    }
-                }, onAssessmentTapped: {
-                    tabSelection.assessmentRequest = .gateway
-                })
-                .ignoresSafeArea(edges: .bottom)
+                if !tabSelection.isTabBarHidden {
+                    FloatingTabBar(selectedTab: $tabSelection.selectedTab, onTabTapped: { tapped in
+                        if tabSelection.selectedTab == tapped {
+                            tabSelection.popToRootCurrentTab()
+                        }
+                    }, onAssessmentTapped: {
+                        tabSelection.assessmentRequest = .gateway
+                    })
+                    .ignoresSafeArea(edges: .bottom)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
             }
+            .animation(AppAnimations.smooth, value: tabSelection.isTabBarHidden)
         }
         .environmentObject(tabSelection)
         .environmentObject(savedPlansViewModel)

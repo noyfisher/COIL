@@ -8,6 +8,8 @@ struct ExerciseIllustrationView: View {
     let iconName: String
     let difficulty: RehabExercise.Difficulty
     var isCompact: Bool = false
+    /// Mirrors `ExerciseImageView.showsDifficultyBadge` for the fallback illustration.
+    var showsDifficultyBadge: Bool = true
 
     private var iconSize: CGFloat { isCompact ? 28 : 60 }
     private var circleSize: CGFloat { isCompact ? 50 : 140 }
@@ -108,15 +110,17 @@ struct ExerciseIllustrationView: View {
             }
 
             // Difficulty badge
-            Text(difficultyLabel)
-                .font(AppFonts.captionSemiBold)
-                .foregroundColor(difficultyColor)
-                .padding(.horizontal, AppSpacing.md)
-                .padding(.vertical, AppSpacing.xs)
-                .background(difficultyColor.opacity(0.12))
-                .cornerRadius(AppCorners.small)
+            if showsDifficultyBadge {
+                Text(difficultyLabel)
+                    .font(AppFonts.captionSemiBold)
+                    .foregroundColor(difficultyColor)
+                    .padding(.horizontal, AppSpacing.md)
+                    .padding(.vertical, AppSpacing.xs)
+                    .background(difficultyColor.opacity(0.12))
+                    .cornerRadius(AppCorners.small)
+            }
         }
-        .padding(.vertical, AppSpacing.lg)
+        .padding(.vertical, showsDifficultyBadge ? AppSpacing.lg : 0)
     }
 
     // MARK: - Compact View (Exercise Card)
