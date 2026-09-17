@@ -131,6 +131,9 @@ private struct DayCell: View {
     private static let numFmt: DateFormatter = {
         let f = DateFormatter(); f.dateFormat = "d"; return f
     }()
+    private static let fullDayFmt: DateFormatter = {
+        let f = DateFormatter(); f.dateFormat = "EEEE"; return f
+    }()
 
     var body: some View {
         VStack(spacing: 3) {
@@ -160,6 +163,11 @@ private struct DayCell: View {
                     isToday ? AppColors.accent.opacity(0.55) : Color.clear,
                     lineWidth: 1.5
                 )
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(
+            "\(Self.fullDayFmt.string(from: date)) \(Self.numFmt.string(from: date)), "
+            + (isCompleted ? "workout completed" : "no workout")
         )
     }
 }

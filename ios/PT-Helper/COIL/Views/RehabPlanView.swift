@@ -610,9 +610,9 @@ struct RehabPlanView: View {
                 verificationSummaryBanner
             }
 
-            ForEach(plan.exercises) { exercise in
+            ForEach(Array(plan.exercises.enumerated()), id: \.element.id) { index, exercise in
                 NavigationLink(destination: ExerciseDetailView(exercise: exercise)) {
-                    exerciseCard(for: exercise)
+                    exerciseCard(for: exercise, index: index)
                 }
                 .buttonStyle(.plain)
                 .contextMenu {
@@ -627,7 +627,7 @@ struct RehabPlanView: View {
         }
     }
 
-    private func exerciseCard(for exercise: RehabExercise) -> some View {
+    private func exerciseCard(for exercise: RehabExercise, index: Int) -> some View {
         HStack(spacing: AppSpacing.lg) {
             // Compact exercise image with SF Symbol fallback
             ExerciseImageView(exercise: exercise, isCompact: true)
@@ -639,6 +639,9 @@ struct RehabPlanView: View {
                         .font(AppFonts.bodySemiBold)
                         .foregroundColor(AppColors.primaryText)
                         .lineLimit(2)
+                        // Also inherited by the enclosing NavigationLink (SwiftUI propagates the
+                        // first identified descendant), so this id matches the row AND the label.
+                        .accessibilityIdentifier("rehabPlan.exerciseName.\(index)")
 
                     Spacer()
 
