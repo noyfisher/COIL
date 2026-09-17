@@ -3,12 +3,11 @@ import FirebaseAuth
 import FirebaseFirestore
 import StoreKit
 
+/// The grouped settings body shown under the Profile masthead (Preferences ·
+/// Help & Legal · Account, then the DEBUG card and the version footer). It owns
+/// every confirmation dialog, the account-deletion flow and the legal sheets;
+/// `ProfileTab` owns the scroll view, the nav bar and the Edit Health Info sheet.
 struct SettingsView: View {
-    let userName: String
-    var onEditProfile: () -> Void
-    /// True only when a sheet hosts this view; the tab host has nothing to dismiss.
-    var showsDoneButton: Bool = false
-    @Environment(\.dismiss) private var dismiss
     @StateObject private var notificationService = NotificationService.shared
     @StateObject private var consentService = ConsentService.shared
     @State private var showWithdrawConsentConfirmation = false
@@ -17,7 +16,9 @@ struct SettingsView: View {
     @State private var showSignOutError = false
     @State private var signOutErrorMessage = ""
     @State private var showDeleteConfirmation = false
-    @State private var isDeletingAccount = false
+    /// Owned by `ProfileTab`, which draws the full-viewport "Deleting account…" overlay
+    /// outside the scroll view so it is visible wherever the user tapped Delete Account.
+    @Binding var isDeletingAccount: Bool
     @State private var deleteError: String?
     @State private var showDeleteError = false
     @State private var reminderDate = Date()
@@ -31,56 +32,34 @@ struct SettingsView: View {
     @AppStorage(AppAppearance.storageKey) private var appearanceRaw = AppAppearance.system.rawValue
 
     var body: some View {
-        ZStack {
-            AppColors.bgGradient
-                .ignoresSafeArea()
-
-            ScrollView {
-                VStack(spacing: AppSpacing.lg) {
-                    // Profile card
-                    profileCard
-
-                    // Appearance
-                    appearanceCard
-
-                    // Notifications
-                    notificationsCard
-
-                    // Debug & Feedback
-                    debugFeedbackCard
-
-                    // Help & Support (audit #84)
-                    helpSupportCard
-
-                    // Legal
-                    legalCard
-
-                    // Actions
-                    actionsCard
-
-                    // Danger zone
-                    dangerZoneCard
-
-                    // App version
-                    Text(appVersionText)
-                        .font(AppFonts.micro)
-                        .foregroundColor(Color.white.opacity(0.5))
-                        .padding(.top, AppSpacing.lg)
-                }
-                .padding(.horizontal, AppSpacing.xl)
-                .padding(.vertical, AppSpacing.md)
-                .floatingTabBarClearance()
+        VStack(alignment: .leading, spacing: AppSpacing.xl) {
+            settingsGroup(title: "Preferences", index: 1) {
+                appearanceCard
+                notificationsCard
             }
-        }
-        .navigationTitle("Settings")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            if showsDoneButton {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                }
+
+            settingsGroup(title: "Help & Legal", index: 2) {
+                helpSupportCard
+                legalCard
             }
+
+            settingsGroup(title: "Account", index: 3) {
+                accountCard
+            }
+
+            #if DEBUG
+            debugCard
+                .modifier(RevealOnAppear(index: 4))
+            #endif
+
+            Text(appVersionText)
+                .font(AppFonts.micro)
+                .foregroundColor(AppColors.mutedText)
+                .frame(maxWidth: .infinity)
+                .padding(.top, AppSpacing.sm)
+                .accessibilityIdentifier("settings.versionFooter")
         }
+        .padding(.horizontal, AppSpacing.xl)
         .confirmationDialog("Sign Out", isPresented: $showSignOutConfirmation, titleVisibility: .visible) {
             Button("Sign Out", role: .destructive) {
                 AnalyticsService.shared.log(.signedOut)
@@ -143,25 +122,6 @@ struct SettingsView: View {
         } message: {
             Text("New health-data features are paused until you consent again. To erase your data entirely, use Delete Account.")
         }
-        .overlay {
-            if isDeletingAccount {
-                ZStack {
-                    AppColors.primaryText.opacity(0.4).ignoresSafeArea()
-                    VStack(spacing: AppSpacing.md) {
-                        ProgressView()
-                            .scaleEffect(1.3)
-                            .tint(AppColors.ctaText)
-                        Text("Deleting account...")
-                            .font(AppFonts.body)
-                            .foregroundColor(AppColors.primaryText)
-                    }
-                    .padding(AppSpacing.xxl)
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(AppCorners.large)
-                }
-            }
-        }
-        .trackScreen("Settings")
         .sheet(isPresented: $showShareSheet) {
             if let url = shareURL {
                 ShareSheet(activityItems: [url])
@@ -217,7 +177,8 @@ struct SettingsView: View {
                 await MainActor.run {
                     AnalyticsService.shared.log(.accountDeleted)
                     isDeletingAccount = false
-                    dismiss()
+                    // Nothing to dismiss: the tab hosts this body, and the sign-out
+                    // above already routes RootView back to the auth screen.
                 }
             } catch {
                 await MainActor.run {
@@ -280,14 +241,6 @@ struct SettingsView: View {
 
     // MARK: - Helpers
 
-    private var initials: String {
-        let parts = userName.split(separator: " ")
-        if parts.count >= 2 {
-            return String(parts[0].prefix(1) + parts[1].prefix(1)).uppercased()
-        }
-        return String(userName.prefix(2)).uppercased()
-    }
-
     /// Opens the mail composer prefilled with the app version for faster debugging (audit #84).
     private func contactSupport() {
         let subject = "COIL Support"
@@ -314,99 +267,87 @@ struct SettingsView: View {
         return "COIL v\(version) (\(build))"
     }
 
-    /// Extracted from `body` to keep the type-checker's per-expression work bounded.
-    @ViewBuilder
-    private var profileCard: some View {
-        VStack(spacing: AppSpacing.lg) {
-            // Avatar
-            Text(initials)
-                .font(AppFonts.heroTitle)
-                .foregroundColor(AppColors.ctaText)
-                .frame(width: 72, height: 72)
-                .background(
-                    Circle()
-                        .fill(AppColors.primaryGradient)
-                )
+    // MARK: - Layout helpers
 
-            Text(userName.isEmpty ? "User" : userName)
-                .font(AppFonts.sectionTitle)
-                .foregroundColor(AppColors.primaryText)
+    /// A titled group: teal divider header above one or more cards.
+    private func settingsGroup<Content: View>(title: String, index: Int,
+                                              @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
+            CoilDividerHeader(title: title)
+            content()
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, AppSpacing.xl)
-        .background(AppColors.cardBackground)
-        .cornerRadius(AppCorners.xl)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppCorners.xl)
-                .stroke(AppColors.cardBorder, lineWidth: 1)
-        )
-        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+        .modifier(RevealOnAppear(index: index))
+    }
+
+    /// The card chrome every group card shares. Rows carry their own padding, so
+    /// the card itself has none (`.cardStyle()` would add `AppSpacing.lg`).
+    private func groupCard<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+        VStack(spacing: 0) { content() }
+            .background(AppColors.cardBackground)
+            .cornerRadius(AppCorners.card)
+            .overlay(
+                RoundedRectangle(cornerRadius: AppCorners.card)
+                    .stroke(AppColors.cardBorder, lineWidth: 1)
+            )
+            .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
+    }
+
+    /// Inset past the 32pt icon tile so the rule does not cut under the icons.
+    private var rowDivider: some View {
+        Divider().padding(.leading, AppSpacing.huge + AppSpacing.xl)
+    }
+
+    private func rowIcon(_ systemName: String, color: Color) -> some View {
+        Image(systemName: systemName)
+            .font(AppFonts.iconS)
+            .foregroundColor(color)
+            .frame(width: 32, height: 32)
+            .background(color.opacity(0.12))
+            .cornerRadius(AppCorners.small)
     }
 
     /// Extracted from `body` to keep the type-checker's per-expression work bounded.
     @ViewBuilder
     private var appearanceCard: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            HStack(spacing: AppSpacing.md) {
-                Image(systemName: "circle.lefthalf.filled")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(AppColors.accent)
-                    .frame(width: 32, height: 32)
-                    .background(AppColors.accentTint)
-                    .cornerRadius(AppCorners.small)
+        groupCard {
+            VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                HStack(spacing: AppSpacing.md) {
+                    rowIcon("circle.lefthalf.filled", color: AppColors.accent)
+                    Text("Appearance")
+                        .font(AppFonts.body)
+                        .foregroundColor(AppColors.primaryText)
+                    Spacer()
+                }
 
-                Text("Appearance")
-                    .font(AppFonts.body)
-
-                Spacer()
-            }
-
-            Picker("Appearance", selection: $appearanceRaw) {
-                ForEach(AppAppearance.allCases) { mode in
-                    Text(mode.label).tag(mode.rawValue)
+                Picker("Appearance", selection: $appearanceRaw) {
+                    ForEach(AppAppearance.allCases) { mode in
+                        Text(mode.label).tag(mode.rawValue)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .accessibilityIdentifier("settings.appearancePicker")
+                .onChange(of: appearanceRaw) { _, newValue in
+                    AnalyticsService.shared.log(.settingChanged,
+                        parameters: ["key": "appearance", "value": newValue])
                 }
             }
-            .pickerStyle(.segmented)
-            .accessibilityIdentifier("settings.appearancePicker")
-            .onChange(of: appearanceRaw) { _, newValue in
-                AnalyticsService.shared.log(.settingChanged,
-                    parameters: ["key": "appearance", "value": newValue])
-            }
+            .padding(AppSpacing.lg)
         }
-        .padding(AppSpacing.lg)
-        .background(AppColors.cardBackground)
-        .cornerRadius(AppCorners.xl)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppCorners.xl)
-                .stroke(AppColors.cardBorder, lineWidth: 1)
-        )
-        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 
-    /// Extracted from `body` to keep the type-checker's per-expression work bounded.
+    #if DEBUG
+    /// Developer tooling; release builds never show it (deviation 5 keeps
+    /// "Export Debug Log" available to testers in the Help card instead).
     @ViewBuilder
-    private var debugFeedbackCard: some View {
-        VStack(spacing: 0) {
-            settingsRow(icon: "ladybug", color: AppColors.accent, title: "Export Debug Log") {
-                if let url = SessionLogger.shared.exportAsShareableFile() {
-                    shareURL = url
-                    showShareSheet = true
-                }
-            }
-
-            Divider().padding(.leading, 52)
-
+    private var debugCard: some View {
+        groupCard {
             HStack(spacing: AppSpacing.md) {
-                Image(systemName: "doc.text.magnifyingglass")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(AppColors.accentLight)
-                    .frame(width: 32, height: 32)
-                    .background(AppColors.accentTint)
-                    .cornerRadius(AppCorners.small)
+                rowIcon("doc.text.magnifyingglass", color: AppColors.accentLight)
 
                 VStack(alignment: .leading, spacing: AppSpacing.nano) {
                     Text("Session Events")
                         .font(AppFonts.body)
+                        .foregroundColor(AppColors.primaryText)
                     Text("\(SessionLogger.shared.eventCount) events this session")
                         .font(AppFonts.micro)
                         .foregroundColor(AppColors.secondaryText)
@@ -416,125 +357,88 @@ struct SettingsView: View {
             }
             .padding(.horizontal, AppSpacing.lg)
             .padding(.vertical, AppSpacing.md)
+
+            rowDivider
+
+            NavigationLink(destination: MissingImagesDebugView()) {
+                HStack(spacing: AppSpacing.md) {
+                    rowIcon("photo.badge.exclamationmark", color: AppColors.warning)
+                    Text("Image Diagnostics")
+                        .font(AppFonts.body)
+                        .foregroundColor(AppColors.primaryText)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(AppFonts.iconXS)
+                        .foregroundColor(AppColors.mutedText)
+                }
+                .padding(.horizontal, AppSpacing.lg)
+                .padding(.vertical, AppSpacing.md)
+            }
+            .accessibilityIdentifier("settings.imageDiagnosticsButton")
         }
-        .background(AppColors.cardBackground)
-        .cornerRadius(AppCorners.large)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppCorners.large)
-                .stroke(AppColors.cardBorder, lineWidth: 1)
-        )
-        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
+    #endif
 
     /// Extracted from `body` to keep the type-checker's per-expression work bounded.
     @ViewBuilder
     private var helpSupportCard: some View {
-        VStack(spacing: 0) {
+        groupCard {
             settingsRow(icon: "envelope", color: AppColors.accent, title: "Contact Support") {
                 contactSupport()
             }
             .accessibilityIdentifier("settings.contactSupportButton")
 
-            Divider().padding(.leading, 52)
+            rowDivider
 
             settingsRow(icon: "flag", color: AppColors.warning, title: "Report a Concern") {
                 showReportConcern = true
             }
             .accessibilityIdentifier("settings.reportConcernButton")
 
-            Divider().padding(.leading, 52)
+            rowDivider
+
+            settingsRow(icon: "ladybug", color: AppColors.accent, title: "Export Debug Log") {
+                if let url = SessionLogger.shared.exportAsShareableFile() {
+                    shareURL = url
+                    showShareSheet = true
+                }
+            }
+            .accessibilityIdentifier("settings.exportDebugLogButton")
+
+            rowDivider
 
             settingsRow(icon: "shield.checkered", color: AppColors.accent, title: "Safety Resources") {
                 showSafetyResources = true
             }
             .accessibilityIdentifier("settings.safetyResourcesButton")
 
-            Divider().padding(.leading, 52)
+            rowDivider
 
             settingsRow(icon: "star", color: AppColors.accent, title: "Rate COIL") {
                 requestAppReview()
             }
             .accessibilityIdentifier("settings.rateAppButton")
         }
-        .background(AppColors.cardBackground)
-        .cornerRadius(AppCorners.large)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppCorners.large)
-                .stroke(AppColors.cardBorder, lineWidth: 1)
-        )
-        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 
-    /// Extracted from `body` to keep the type-checker's per-expression work bounded
-    /// (adding the conditional withdraw row inline pushed the main VStack over the
-    /// compiler's reasonable-time threshold).
+    /// Sign Out and Delete Account, formerly the "actions" and "danger zone" cards.
+    /// "Update Health Info" now lives in the masthead.
     @ViewBuilder
-    private var actionsCard: some View {
-        VStack(spacing: 0) {
-            settingsRow(icon: "heart.text.clipboard", color: AppColors.accent, title: "Update Health Info") {
-                dismiss()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    onEditProfile()
-                }
-            }
-            .accessibilityIdentifier("settings.editProfileButton")
-
-            #if DEBUG
-            Divider().padding(.leading, 52)
-
-            NavigationLink(destination: MissingImagesDebugView()) {
-                HStack(spacing: AppSpacing.md) {
-                    Image(systemName: "photo.badge.exclamationmark")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(AppColors.warning)
-                        .frame(width: 32, height: 32)
-                        .background(AppColors.warning.opacity(0.12))
-                        .cornerRadius(AppCorners.small)
-                    Text("Image Diagnostics (DEBUG)")
-                        .font(AppFonts.body)
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(AppColors.secondaryText)
-                }
-                .padding(.horizontal, AppSpacing.lg)
-                .padding(.vertical, AppSpacing.md)
-            }
-            .accessibilityIdentifier("settings.imageDiagnosticsButton")
-            #endif
-
-            Divider().padding(.leading, 52)
-
-            settingsRow(icon: "rectangle.portrait.and.arrow.right", color: AppColors.danger, title: "Sign Out") {
+    private var accountCard: some View {
+        groupCard {
+            settingsRow(icon: "rectangle.portrait.and.arrow.right", color: AppColors.danger,
+                        title: "Sign Out", isDestructive: true) {
                 showSignOutConfirmation = true
             }
             .accessibilityIdentifier("settings.signOutButton")
-        }
-        .background(AppColors.cardBackground)
-        .cornerRadius(AppCorners.large)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppCorners.large)
-                .stroke(AppColors.cardBorder, lineWidth: 1)
-        )
-        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
-    }
 
-    /// Extracted from `body` to keep the type-checker's per-expression work bounded.
-    @ViewBuilder
-    private var dangerZoneCard: some View {
-        VStack(spacing: 0) {
+            rowDivider
+
             settingsRow(icon: "trash", color: AppColors.danger, title: "Delete Account") {
                 showDeleteConfirmation = true
             }
             .accessibilityIdentifier("settings.deleteAccountButton")
         }
-        .background(AppColors.cardBackground)
-        .cornerRadius(AppCorners.large)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppCorners.large)
-                .stroke(AppColors.cardBorder, lineWidth: 1)
-        )
-        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 
     /// Extracted from `body` to keep the type-checker's per-expression work bounded
@@ -542,17 +446,13 @@ struct SettingsView: View {
     /// compiler's reasonable-time threshold).
     @ViewBuilder
     private var notificationsCard: some View {
-        VStack(spacing: 0) {
+        groupCard {
             HStack(spacing: AppSpacing.md) {
-                Image(systemName: "bell.badge")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(AppColors.warning)
-                    .frame(width: 32, height: 32)
-                    .background(AppColors.warning.opacity(0.12))
-                    .cornerRadius(AppCorners.small)
+                rowIcon("bell.badge", color: AppColors.warning)
 
                 Text("Reminders")
                     .font(AppFonts.body)
+                    .foregroundColor(AppColors.primaryText)
 
                 Spacer()
 
@@ -580,18 +480,14 @@ struct SettingsView: View {
             .padding(.vertical, AppSpacing.md)
 
             if notificationService.isEnabled {
-                Divider().padding(.leading, 52)
+                rowDivider
 
                 HStack(spacing: AppSpacing.md) {
-                    Image(systemName: "clock")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(AppColors.accent)
-                        .frame(width: 32, height: 32)
-                        .background(AppColors.accentTint)
-                        .cornerRadius(AppCorners.small)
+                    rowIcon("clock", color: AppColors.accent)
 
                     Text("Reminder Time")
                         .font(AppFonts.body)
+                        .foregroundColor(AppColors.primaryText)
 
                     Spacer()
 
@@ -619,17 +515,13 @@ struct SettingsView: View {
                 .padding(.horizontal, AppSpacing.lg)
                 .padding(.vertical, AppSpacing.md)
 
-                Divider().padding(.leading, 52)
+                rowDivider
 
                 HStack(spacing: AppSpacing.md) {
-                    Image(systemName: "dumbbell")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(AppColors.success)
-                        .frame(width: 32, height: 32)
-                        .background(AppColors.success.opacity(0.12))
-                        .cornerRadius(AppCorners.small)
+                    rowIcon("dumbbell", color: AppColors.success)
                     Text("Workout Reminders")
                         .font(AppFonts.body)
+                        .foregroundColor(AppColors.primaryText)
                     Spacer()
                     Toggle("", isOn: $notificationService.workoutRemindersEnabled)
                         .labelsHidden()
@@ -644,17 +536,13 @@ struct SettingsView: View {
                 .padding(.horizontal, AppSpacing.lg)
                 .padding(.vertical, AppSpacing.md)
 
-                Divider().padding(.leading, 52)
+                rowDivider
 
                 HStack(spacing: AppSpacing.md) {
-                    Image(systemName: "arrow.triangle.2.circlepath")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(AppColors.accent)
-                        .frame(width: 32, height: 32)
-                        .background(AppColors.accentTint)
-                        .cornerRadius(AppCorners.small)
+                    rowIcon("arrow.triangle.2.circlepath", color: AppColors.accent)
                     Text("Re-Assessment Prompts")
                         .font(AppFonts.body)
+                        .foregroundColor(AppColors.primaryText)
                     Spacer()
                     Toggle("", isOn: $notificationService.reassessmentRemindersEnabled)
                         .labelsHidden()
@@ -669,17 +557,13 @@ struct SettingsView: View {
                 .padding(.horizontal, AppSpacing.lg)
                 .padding(.vertical, AppSpacing.md)
 
-                Divider().padding(.leading, 52)
+                rowDivider
 
                 HStack(spacing: AppSpacing.md) {
-                    Image(systemName: "bell.badge.waveform")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(AppColors.warning)
-                        .frame(width: 32, height: 32)
-                        .background(AppColors.warning.opacity(0.12))
-                        .cornerRadius(AppCorners.small)
+                    rowIcon("bell.badge.waveform", color: AppColors.warning)
                     Text("Inactivity Nudges")
                         .font(AppFonts.body)
+                        .foregroundColor(AppColors.primaryText)
                     Spacer()
                     Toggle("", isOn: $notificationService.inactivityNudgesEnabled)
                         .labelsHidden()
@@ -695,13 +579,6 @@ struct SettingsView: View {
                 .padding(.vertical, AppSpacing.md)
             }
         }
-        .background(AppColors.cardBackground)
-        .cornerRadius(AppCorners.large)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppCorners.large)
-                .stroke(AppColors.cardBorder, lineWidth: 1)
-        )
-        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 
     /// Extracted from `body` to keep the type-checker's per-expression work bounded
@@ -709,20 +586,20 @@ struct SettingsView: View {
     /// compiler's reasonable-time threshold).
     @ViewBuilder
     private var legalCard: some View {
-        VStack(spacing: 0) {
+        groupCard {
             settingsRow(icon: "hand.raised", color: AppColors.accent, title: "Privacy Policy") {
                 showPrivacyPolicy = true
             }
             .accessibilityIdentifier("settings.privacyPolicyButton")
 
-            Divider().padding(.leading, 52)
+            rowDivider
 
             settingsRow(icon: "doc.text", color: AppColors.accent, title: "Terms of Service") {
                 showTermsOfService = true
             }
             .accessibilityIdentifier("settings.termsOfServiceButton")
 
-            Divider().padding(.leading, 52)
+            rowDivider
 
             settingsRow(icon: "heart.text.square", color: AppColors.accent, title: "Consumer Health Data Policy") {
                 showConsumerHealthDataPolicy = true
@@ -730,40 +607,30 @@ struct SettingsView: View {
             .accessibilityIdentifier("settings.consumerHealthDataPolicyButton")
 
             if consentService.hasHealthDataConsent {
-                Divider().padding(.leading, 52)
+                rowDivider
                 settingsRow(icon: "heart.slash", color: AppColors.danger, title: "Withdraw Health Data Consent") {
                     showWithdrawConsentConfirmation = true
                 }
                 .accessibilityIdentifier("settings.withdrawHealthConsentButton")
             }
         }
-        .background(AppColors.cardBackground)
-        .cornerRadius(AppCorners.large)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppCorners.large)
-                .stroke(AppColors.cardBorder, lineWidth: 1)
-        )
-        .shadow(color: AppColors.cardShadowColor, radius: 8, y: 2)
     }
 
-    private func settingsRow(icon: String, color: Color, title: String, action: @escaping () -> Void) -> some View {
+    private func settingsRow(icon: String, color: Color, title: String,
+                             isDestructive: Bool = false,
+                             action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack(spacing: AppSpacing.md) {
-                Image(systemName: icon)
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(color)
-                    .frame(width: 32, height: 32)
-                    .background(color.opacity(0.12))
-                    .cornerRadius(AppCorners.small)
+                rowIcon(icon, color: color)
 
                 Text(title)
                     .font(AppFonts.body)
-                    .foregroundColor(title == "Sign Out" ? AppColors.danger : AppColors.primaryText)
+                    .foregroundColor(isDestructive ? AppColors.danger : AppColors.primaryText)
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(AppFonts.iconXS)
                     .foregroundColor(AppColors.mutedText)
             }
             .padding(.horizontal, AppSpacing.lg)

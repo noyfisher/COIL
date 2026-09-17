@@ -250,8 +250,8 @@ Supporting modules:
 `MainTabView` is the primary navigation shell with 4 tabs plus a floating "+"; `TabSelection.swift` hosts the shared `TabSelection` class and `AssessmentRoute` enum:
 - **Tab 0: Home** — weekly date strip, today's program + preventative tasks
 - **Tab 1: My Plan** — active plan hero card + saved plans list
-- **Tab 2: Progress** — charts, recovery insights, settings, session history
-- **Tab 3: Profile** — profile summary + edit (`OnboardingEditView`)
+- **Tab 2: Progress** — charts, recovery insights, session history
+- **Tab 3: Profile** — masthead summary (`ProfileHeroCard`) + grouped settings (`SettingsView`) + edit (`OnboardingEditView`)
 - **Floating "+"** — sets `TabSelection.assessmentRequest = .gateway`, presenting `AssessmentGatewayView` in a full-screen cover (dual gateway: pain analysis or wellness goals)
 
 `MainTabView` injects shared state via `@EnvironmentObject`:
