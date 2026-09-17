@@ -48,7 +48,11 @@ enum CoilPalette {
     // Text
     static let textPrimary   = dyn(hex(0x111A1D), hex(0xEAF2F1))
     static let textSecondary = dyn(hex(0x4B5A5E), hex(0x9DB2B3))
-    static let textMuted     = dyn(hex(0x7A8A8D), hex(0x6E8285))
+    // Darkened for AA at the 11–13pt sizes it labels (meta lines, stat labels):
+    // light was #7A8A8D at 3.59:1 on white / 3.28:1 on page, now 5.30:1 / 4.84:1;
+    // dark was #6E8285 at 3.97:1 on the dark card, now 4.97:1 (5.71:1 on the page).
+    // Never on the fixed-dark surfaces: the light value is 3.28:1 on ink (same trap as accentText).
+    static let textMuted     = dyn(hex(0x5F6E72), hex(0x7E9396))
 
     // Semantics — decoupled from the brand hue
     // Both variants darkened for AA against the FIXED-white `ctaText` they are
@@ -76,6 +80,11 @@ enum AppColors {
     static let warning = Color(CoilPalette.warning)
     static let danger  = Color(CoilPalette.errorRed)   // decoupled from brand
     static let info    = Color(CoilPalette.infoBlue)   // decoupled from brand
+    /// Streak / achievement accent (Tier-0 `pop`). Streak and achievement views must use
+    /// this rather than reaching into `CoilPalette`; the other `pop` uses (wellness
+    /// motivation icons, Progress tab) get their own token in the design pass.
+    static let streak     = Color(CoilPalette.pop)
+    static let streakTint = Color(CoilPalette.pop).opacity(0.12)   // the stronger (0.12) of GuidedWorkoutSummaryView's two pop tints; accentTint is 0.10
 
     // MARK: Text
     static let primaryText    = Color(CoilPalette.textPrimary)
@@ -83,6 +92,16 @@ enum AppColors {
     static let mutedText      = Color(CoilPalette.textMuted)
     static let textOnDark      = Color.white
     static let textOnDarkMuted = Color.white.opacity(0.6)
+    /// On-dark text tiers for the fixed-dark ink surfaces (`darkSurface`,
+    /// `navBackground`, `bgGradient`). Measured on ink: 0.70 → 8.97:1, 0.55 → 6.01:1.
+    /// Nothing below 0.55 alpha may be used for text on ink (0.45 was 4.45:1, 0.30 was 2.70:1).
+    /// `textOnDarkMuted` (0.6) predates this ladder and sits between the two; treat it as
+    /// Tertiary and prefer Secondary/Tertiary in new code.
+    static let textOnDarkSecondary = Color.white.opacity(0.70)
+    static let textOnDarkTertiary  = Color.white.opacity(0.55)
+    // Two tiers on purpose: field captions above helper text (was 0.45 / 0.35, both under AA).
+    static let onDarkLabel      = textOnDarkSecondary  // 0.70 → 8.97:1: uppercase field captions
+    static let onDarkMuted      = textOnDarkTertiary   // 0.55 → 6.01:1: helper copy, placeholders, chevrons, units
     /// On-color for the FIXED teal surfaces (coolGradient / healingGradient /
     /// accent fills). Those gradients stay teal in both appearances, so their
     /// on-color must be fixed too. It is near-black rather than white because
@@ -104,9 +123,17 @@ enum AppColors {
     static let navBackground       = Color(CoilPalette.ink)
     static let navBorder           = Color.white.opacity(0.08)
 
+    /// Onboarding / hero-card surfaces on the fixed-dark ground (`OnboardingColors`
+    /// forwards to these until its call sites are swept).
+    static let onDarkCard       = Color.white.opacity(0.06)
+    static let onDarkBorder     = Color.white.opacity(0.10)
+    static let onDarkInput      = Color.white.opacity(0.08)
+    static let onDarkChip       = Color.white.opacity(0.10)
+    static let onDarkChipBorder = Color.white.opacity(0.14)
+
     // MARK: Tab bar
     static let tabActive   = Color(CoilPalette.accent)
-    static let tabInactive = Color.white.opacity(0.45)
+    static let tabInactive = Color.white.opacity(0.55)   // 6.0:1 on ink; 0.45 was 4.45:1 at 10pt
 
     // MARK: CTA
     static let ctaBackground = Color(CoilPalette.accentDeep)
@@ -324,6 +351,17 @@ enum AppFonts {
     static let dataMedium = Font.system(.body,     design: .monospaced).weight(.semibold)
     static let dataSmall  = Font.system(.footnote, design: .monospaced).weight(.medium)
     static let dashLabel  = Font.system(.caption2).weight(.semibold)
+
+    // MARK: Icons — SF Symbol glyph sizes for standalone chrome glyphs (tab bar, chips,
+    // badges, chevrons, stat icons) that are laid out at a fixed size, replacing ad-hoc
+    // `.font(.system(size: N, weight:))` calls; the sweep quantises 10–11 → XS, 13 → S, 18 → M/L.
+    // Fixed on purpose: these do not scale with Dynamic Type. A symbol set inline with
+    // text must take the text's `AppFonts` token instead so the pair scales together.
+    static let iconXS = Font.system(size: 12, weight: .semibold)
+    static let iconS  = Font.system(size: 14, weight: .semibold)
+    static let iconM  = Font.system(size: 16, weight: .semibold)
+    static let iconL  = Font.system(size: 20, weight: .semibold)
+    static let iconXL = Font.system(size: 24, weight: .bold)      // the tab bar "+"
 }
 
 // MARK: - Animation Presets
@@ -408,12 +446,20 @@ struct PrimaryButtonStyle: ButtonStyle {
             .textCase(.uppercase)
             .kerning(1.2)
             .foregroundColor(.white)
+            // Disabled = the same capsule at 35% with a dimmed label and no lift (the HIG fade;
+            // WCAG exempts inactive controls). The old solid mutedText fill read as an enabled
+            // grey button on the fixed-dark onboarding forms (OnboardingView, OnboardingEditView).
+            // Measured label-vs-capsule: 6.7:1 on ink; a faint 1.5–1.7:1 on the light grounds of
+            // the other two callers (PainDetailView page, NotesView card), the same class of
+            // faintness as the system's disabled buttons. A ground-aware variant is a follow-up.
+            .opacity(isDisabled ? 0.7 : 1.0)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 13)
             .padding(.horizontal, AppSpacing.xl)
-            .background(isDisabled ? AnyShapeStyle(AppColors.mutedText) : AnyShapeStyle(AppColors.ctaBackground))
+            .background(isDisabled ? AnyShapeStyle(AppColors.ctaBackground.opacity(0.35))
+                                   : AnyShapeStyle(AppColors.ctaBackground))
             .clipShape(Capsule())
-            .shadow(color: AppColors.ctaBackground.opacity(0.30), radius: 8, y: 4)
+            .shadow(color: isDisabled ? .clear : AppColors.ctaBackground.opacity(0.30), radius: 8, y: 4)
             .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
             .animation(AppAnimations.press, value: configuration.isPressed)
     }
@@ -875,14 +921,17 @@ extension View {
 
 // MARK: - Onboarding Dark Surface
 
+/// Deprecated: use `AppColors.onDark*`. Kept as forwarding aliases so the 53 call
+/// sites (onboarding views, BodyAreaChipPicker, and the dark field/chip components
+/// below) compile until they are swept in a later PR.
 enum OnboardingColors {
-    static let cardBg     = Color.white.opacity(0.06)
-    static let cardBorder = Color.white.opacity(0.10)
-    static let inputBg    = Color.white.opacity(0.08)
-    static let chipIdle   = Color.white.opacity(0.10)
-    static let chipBorder = Color.white.opacity(0.14)
-    static let subLabel   = Color.white.opacity(0.45)
-    static let muted      = Color.white.opacity(0.35)
+    static let cardBg     = AppColors.onDarkCard
+    static let cardBorder = AppColors.onDarkBorder
+    static let inputBg    = AppColors.onDarkInput
+    static let chipIdle   = AppColors.onDarkChip
+    static let chipBorder = AppColors.onDarkChipBorder
+    static let subLabel   = AppColors.onDarkLabel      // 0.45 → 0.70: field captions now 8.97:1
+    static let muted      = AppColors.onDarkMuted      // 0.35 → 0.55: helper text now 6.0:1
 }
 
 struct DarkTextField: View {
@@ -891,7 +940,8 @@ struct DarkTextField: View {
     var keyboardType: UIKeyboardType = .default
 
     var body: some View {
-        TextField(placeholder, text: $text)
+        TextField(placeholder, text: $text,
+                  prompt: Text(placeholder).foregroundColor(AppColors.onDarkMuted))
             .keyboardType(keyboardType)
             .font(AppFonts.body)
             .foregroundColor(.white)
