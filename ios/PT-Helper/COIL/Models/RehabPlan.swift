@@ -42,6 +42,19 @@ struct RehabPlan: Codable, Identifiable {
         let days = Calendar.current.dateComponents([.day], from: start, to: Date()).day ?? 0
         return days >= totalWeeks * 7
     }
+
+    /// Lifecycle state derived from `startDate`: drives the My Plan badge and Home's plan choice.
+    enum PlanStatus: Equatable {
+        case notStarted
+        case active(week: Int)
+        case completed
+    }
+
+    var status: PlanStatus {
+        guard startDate != nil else { return .notStarted }
+        if isCompleted { return .completed }
+        return .active(week: currentWeek ?? 1)
+    }
 }
 
 struct RehabExercise: Codable, Identifiable {
@@ -119,5 +132,31 @@ struct RehabExercise: Codable, Identifiable {
         self.catalogSubstitution = catalogSubstitution
         self.notes = notes
         self.originalAIName = originalAIName
+    }
+}
+
+// MARK: - Dosage copy
+
+extension RehabExercise {
+    /// Matches a unit-less rep range: "10-12", "10–12", "8 to 10".
+    private static let repRangePattern = #"^\d+\s*(?:-|–|—|to)\s*\d+$"#
+
+    /// "12 reps" for an integer, "10-12 reps" for a range, otherwise the value verbatim
+    /// ("30 seconds", "10 each side"). Timed exercises used to render as "30 seconds reps".
+    var repsText: String {
+        let trimmed = reps.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let count = Int(trimmed), count >= 0 {
+            return count == 1 ? "1 rep" : "\(count) reps"
+        }
+        if trimmed.range(of: Self.repRangePattern, options: .regularExpression) != nil {
+            return "\(trimmed) reps"
+        }
+        return trimmed
+    }
+
+    /// "3 sets × 12 reps" — the single dosage string every screen uses.
+    var dosageText: String {
+        let setsText = sets == 1 ? "1 set" : "\(sets) sets"
+        return "\(setsText) \u{00D7} \(repsText)"
     }
 }

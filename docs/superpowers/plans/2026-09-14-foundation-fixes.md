@@ -642,6 +642,28 @@ final class RehabExerciseDosageTests: XCTestCase {
     func testDosageText_singleSet_singular() {
         XCTAssertEqual(exercise(sets: 1, reps: "12").dosageText, "1 set \u{00D7} 12 reps")
     }
+
+    // Rep ranges are the most common AI-emitted shape (and the TestFixtures default);
+    // without the unit the workout badge would regress from "10-12 reps" to "10-12".
+    func testRepsText_rangeReps_appendsReps() {
+        XCTAssertEqual(exercise(sets: 3, reps: "10-12").repsText, "10-12 reps")
+    }
+
+    func testRepsText_enDashRange_appendsReps() {
+        XCTAssertEqual(exercise(sets: 3, reps: "10–12").repsText, "10–12 reps")
+    }
+
+    func testRepsText_wordRange_appendsReps() {
+        XCTAssertEqual(exercise(sets: 3, reps: "8 to 10").repsText, "8 to 10 reps")
+    }
+
+    func testRepsText_negativeInteger_verbatim() {
+        XCTAssertEqual(exercise(sets: 3, reps: "-3").repsText, "-3")
+    }
+
+    func testDosageText_range() {
+        XCTAssertEqual(exercise(sets: 3, reps: "10-12").dosageText, "3 sets \u{00D7} 10-12 reps")
+    }
 }
 ```
 
@@ -658,12 +680,18 @@ Append to `ios/PT-Helper/COIL/Models/RehabPlan.swift`:
 // MARK: - Dosage copy
 
 extension RehabExercise {
-    /// "12 reps" when `reps` is an integer, otherwise the value verbatim ("30 seconds",
-    /// "10 each side"). Timed exercises used to render as "30 seconds reps".
+    /// Matches a unit-less rep range: "10-12", "10–12", "8 to 10".
+    private static let repRangePattern = #"^\d+\s*(?:-|–|—|to)\s*\d+$"#
+
+    /// "12 reps" for an integer, "10-12 reps" for a range, otherwise the value verbatim
+    /// ("30 seconds", "10 each side"). Timed exercises used to render as "30 seconds reps".
     var repsText: String {
         let trimmed = reps.trimmingCharacters(in: .whitespacesAndNewlines)
-        if let count = Int(trimmed) {
+        if let count = Int(trimmed), count >= 0 {
             return count == 1 ? "1 rep" : "\(count) reps"
+        }
+        if trimmed.range(of: Self.repRangePattern, options: .regularExpression) != nil {
+            return "\(trimmed) reps"
         }
         return trimmed
     }
@@ -676,7 +704,7 @@ extension RehabExercise {
 }
 ```
 
-- [ ] **Step 4: Run the tests** → 8 `passed`, `** TEST SUCCEEDED **`.
+- [ ] **Step 4: Run the tests** → 13 `passed`, `** TEST SUCCEEDED **`.
 
 - [ ] **Step 5: Commit**
 
@@ -1251,8 +1279,9 @@ struct ProgramDayView: View {
     }
 
     private func countLabel(plan: RehabPlan, todays: [RehabExercise]?) -> String {
-        guard let todays else { return "\(plan.exercises.count) exercises" }
-        if todays.isEmpty { return "Rest day" }
+        // nil and rest day both show the plan total; the rest-day card carries "Rest day"
+        // itself (showing it here too read as a duplicate in the simulator).
+        guard let todays, !todays.isEmpty else { return "\(plan.exercises.count) exercises" }
         return todays.count == 1 ? "1 exercise today" : "\(todays.count) exercises today"
     }
 
@@ -1434,7 +1463,7 @@ Toolbar (lines 76-80) becomes:
 
 - [ ] **Step 4: Build and run**
 
-Build → succeeded. Run `-only-testing:COILUITests/ShellNavigationUITests -only-testing:COILUITests/SettingsUITests` → all `passed` (the gear path still shows Done and dismisses; the Profile path shows none).
+Build → succeeded. Run `-only-testing:COILUITests/ShellNavigationUITests -only-testing:COILUITests/SettingsUITests` → all `passed` (the gear path still shows Done and dismisses; the Profile path shows none). Also add the positive case to `SettingsUITests` (found in code review): `testGearSheet_showsDoneAndDismisses` — `navigateToSettings()`, assert `app.buttons["Done"]` exists, tap it, assert `settings.signOutButton` disappears.
 
 - [ ] **Step 5: Commit**
 
@@ -1449,7 +1478,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 
 ### Task 16: PR F2
 
-- [ ] **Step 1: Full unit run** → `-only-testing:COILTests` → `** TEST SUCCEEDED **` (baseline 1311 + 25 new).
+- [ ] **Step 1: Full unit run** → `-only-testing:COILTests` → `** TEST SUCCEEDED **` (baseline 1311 + 30 new).
 
 - [ ] **Step 2: FullPlan** (nightly gate, includes collision + UI tests; 300 s timeouts):
 

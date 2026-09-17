@@ -97,4 +97,15 @@ final class SettingsUITests: UITestBase {
         XCTAssertTrue(toggle.waitForExistence(timeout: 5), "Reminders toggle should exist")
         XCTAssertEqual(toggle.label, "Reminders", "The Reminders toggle should be named for VoiceOver")
     }
+
+    @MainActor
+    func testGearSheet_showsDoneAndDismisses() throws {
+        navigateToSettings()
+        // The sheet host supplies the navigation stack and asks for the Done button.
+        let done = app.buttons["Done"]
+        XCTAssertTrue(done.waitForExistence(timeout: 5), "Sheet-hosted Settings should show Done")
+        done.tap()
+        XCTAssertTrue(app.buttons["settings.signOutButton"].waitForNonExistence(timeout: 5),
+                      "Done should dismiss the Settings sheet")
+    }
 }

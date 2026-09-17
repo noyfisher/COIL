@@ -10,6 +10,64 @@ enum HomeStripLogic {
     }
 }
 
+/// Pure schedule logic for the Home tab's "Today's Program".
+/// `weeklySchedule` is indexed 0 = Sunday … 6 = Saturday (see `RehabPlanView.weeklyCalendar`
+/// and `RehabPlanViewModel.createWeeklySchedule`); entries are exercise ids (generator) or
+/// exercise names (test seeder), so both are accepted, case-insensitively.
+enum HomeProgramLogic {
+
+    /// nil = no usable schedule, OR today's entries resolve to no current exercise (e.g. the
+    ///       schedule still names an exercise id that was swapped out) → show every exercise;
+    /// []  = a scheduled rest day (today's entry is genuinely empty);
+    /// otherwise today's exercises in plan order.
+    static func todaysExercises(for plan: RehabPlan, on date: Date,
+                                calendar: Calendar = .current) -> [RehabExercise]? {
+        let schedule = plan.weeklySchedule
+        guard schedule.count == 7, schedule.contains(where: { !$0.isEmpty }) else { return nil }
+        let dayIndex = calendar.component(.weekday, from: date) - 1
+        let entries = schedule[dayIndex]
+        if entries.isEmpty { return [] }
+        let resolved = exercises(in: plan, matching: entries)
+        return resolved.isEmpty ? nil : resolved
+    }
+
+    /// The next scheduled day strictly after `date`, within the following 7 days. Counts
+    /// resolved exercises, falling back to the raw entry count when none resolve.
+    static func nextSession(for plan: RehabPlan, after date: Date,
+                            calendar: Calendar = .current) -> (weekdayName: String, exerciseCount: Int)? {
+        let schedule = plan.weeklySchedule
+        guard schedule.count == 7 else { return nil }
+        let today = calendar.component(.weekday, from: date) - 1
+        for offset in 1...7 {
+            let index = (today + offset) % 7
+            let entries = schedule[index]
+            if entries.isEmpty { continue }
+            let resolved = exercises(in: plan, matching: entries).count
+            return (calendar.shortWeekdaySymbols[index], resolved > 0 ? resolved : entries.count)
+        }
+        return nil
+    }
+
+    /// The plan Home should show: the first active rehab plan, else the first rehab plan, else any plan.
+    static func preferredPlan(from plans: [RehabPlan]) -> RehabPlan? {
+        let rehab = plans.filter { $0.planType == .rehab }
+        if let active = rehab.first(where: { isActive($0) }) { return active }
+        return rehab.first ?? plans.first
+    }
+
+    private static func isActive(_ plan: RehabPlan) -> Bool {
+        if case .active = plan.status { return true }
+        return false
+    }
+
+    private static func exercises(in plan: RehabPlan, matching entries: [String]) -> [RehabExercise] {
+        let keys = Set(entries.map { $0.lowercased() })
+        return plan.exercises.filter {
+            keys.contains($0.id.uuidString.lowercased()) || keys.contains($0.name.lowercased())
+        }
+    }
+}
+
 struct HomeTab: View {
     @EnvironmentObject private var savedPlansViewModel: SavedPlansViewModel
     @EnvironmentObject private var tabSelection: TabSelection
@@ -20,8 +78,7 @@ struct HomeTab: View {
     enum HomeContentTab { case program, preventative }
 
     private var activePlan: RehabPlan? {
-        savedPlansViewModel.rehabPlans.first(where: { $0.planType == .rehab })
-            ?? savedPlansViewModel.rehabPlans.first
+        HomeProgramLogic.preferredPlan(from: savedPlansViewModel.rehabPlans)
     }
 
     var body: some View {
@@ -219,58 +276,74 @@ struct ProgramDayView: View {
 
     var body: some View {
         if let plan = plan {
+            let now = Date()
+            let todays = HomeProgramLogic.todaysExercises(for: plan, on: now)
             VStack(alignment: .leading, spacing: AppSpacing.md) {
                 CoilDividerHeader(title: "Today's Program")
 
-                // Plan name badge
+                // Plan name badge — only a started plan is "Active" (preferredPlan can
+                // fall back to a not-started plan when nothing has been started yet).
                 HStack(spacing: AppSpacing.sm) {
-                    CoilBadge(text: "Active Plan")
+                    if case .active = plan.status {
+                        CoilBadge(text: "Active")
+                    }
                     Text(plan.planName)
                         .font(AppFonts.smallSemiBold)
                         .foregroundColor(AppColors.secondaryText)
                         .lineLimit(1)
                     Spacer()
-                    Text("\(plan.exercises.count) exercises")
+                    Text(countLabel(plan: plan, todays: todays))
                         .font(AppFonts.micro)
                         .foregroundColor(AppColors.mutedText)
                 }
 
-                // Exercise rows
-                ForEach(plan.exercises.prefix(8)) { exercise in
-                    ExerciseProgramRow(exercise: exercise)
-                }
+                if let todays, todays.isEmpty {
+                    RestDayCard(plan: plan, next: HomeProgramLogic.nextSession(for: plan, after: now))
+                } else {
+                    let shown = todays ?? plan.exercises
 
-                if plan.exercises.count > 8 {
-                    Text("+ \(plan.exercises.count - 8) more exercises")
-                        .font(AppFonts.caption)
-                        .foregroundColor(AppColors.mutedText)
-                        .padding(.leading, AppSpacing.xs)
-                }
-
-                // Start workout CTA
-                NavigationLink(destination: GuidedWorkoutView(plan: plan)) {
-                    HStack(spacing: AppSpacing.sm) {
-                        Image(systemName: "play.fill")
-                            .font(.system(size: 12, weight: .bold))
-                        Text("Start Guided Workout")
-                            .font(AppFonts.cardTitle)
-                            .textCase(.uppercase)
-                            .kerning(1.0)
+                    // Exercise rows
+                    ForEach(shown.prefix(8)) { exercise in
+                        ExerciseProgramRow(exercise: exercise)
                     }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, AppSpacing.md)
-                    .background(AppColors.ctaBackground)
-                    .clipShape(Capsule())
-                    .shadow(color: AppColors.ctaBackground.opacity(0.30), radius: 8, y: 4)
+
+                    if shown.count > 8 {
+                        Text("+ \(shown.count - 8) more exercises")
+                            .font(AppFonts.caption)
+                            .foregroundColor(AppColors.mutedText)
+                            .padding(.leading, AppSpacing.xs)
+                    }
+
+                    // Start workout CTA
+                    NavigationLink(destination: GuidedWorkoutView(plan: plan)) {
+                        HStack(spacing: AppSpacing.sm) {
+                            Image(systemName: "play.fill")
+                                .font(.system(size: 12, weight: .bold))
+                            Text("Start Guided Workout")
+                                .font(AppFonts.cardTitle)
+                                .textCase(.uppercase)
+                                .kerning(1.0)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, AppSpacing.md)
+                        .background(AppColors.ctaBackground)
+                        .clipShape(Capsule())
+                        .shadow(color: AppColors.ctaBackground.opacity(0.30), radius: 8, y: 4)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.top, AppSpacing.xs)
+                    .accessibilityIdentifier("home.startWorkoutButton")
                 }
-                .buttonStyle(.plain)
-                .padding(.top, AppSpacing.xs)
-                .accessibilityIdentifier("home.startWorkoutButton")
             }
         } else {
             noPlanState
         }
+    }
+
+    private func countLabel(plan: RehabPlan, todays: [RehabExercise]?) -> String {
+        guard let todays, !todays.isEmpty else { return "\(plan.exercises.count) exercises" }
+        return todays.count == 1 ? "1 exercise today" : "\(todays.count) exercises today"
     }
 
     private var noPlanState: some View {
@@ -285,6 +358,36 @@ struct ProgramDayView: View {
             )
             Spacer(minLength: AppSpacing.xl)
         }
+    }
+}
+
+// MARK: - Rest Day Card
+
+/// Shown when today's `weeklySchedule` entry is empty. Keeps the Start identifier so
+/// the workout is one tap away on every day of the week.
+private struct RestDayCard: View {
+    let plan: RehabPlan
+    let next: (weekdayName: String, exerciseCount: Int)?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
+            Text("Rest day")
+                .font(AppFonts.cardTitle)
+                .foregroundColor(AppColors.primaryText)
+
+            if let next {
+                Text("Next session: \(next.weekdayName) · \(next.exerciseCount) \(next.exerciseCount == 1 ? "exercise" : "exercises")")
+                    .font(AppFonts.small)
+                    .foregroundColor(AppColors.secondaryText)
+            }
+
+            NavigationLink(destination: GuidedWorkoutView(plan: plan)) {
+                Text("Start a workout anyway")
+            }
+            .buttonStyle(SecondaryButtonStyle())
+            .accessibilityIdentifier("home.startWorkoutButton")
+        }
+        .cardStyle()
     }
 }
 
@@ -303,7 +406,7 @@ private struct ExerciseProgramRow: View {
                     .foregroundColor(AppColors.primaryText)
                     .lineLimit(1)
 
-                Text("\(exercise.sets) sets · \(exercise.reps) reps")
+                Text(exercise.dosageText)
                     .font(AppFonts.caption)
                     .foregroundColor(AppColors.secondaryText)
 
