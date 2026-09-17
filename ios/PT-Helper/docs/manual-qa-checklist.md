@@ -60,7 +60,8 @@ Backend note: verify which Firebase project this build points at before testing 
 ## Guided Workout (4 min)
 
 - [ ] Tap "Start Guided Workout" — exercise phase loads
-- [ ] Exercise name, image, set counter visible
+- [ ] The floating tab bar is gone for the whole workout (exercise, rest and summary phases); the bottom action bar sits on the home indicator
+- [ ] Exercise name, image, set counter visible (no difficulty badge under the image — the header states it)
 - [ ] New/unfamiliar exercise auto-expands the 3-phase stepper (Start → Movement → Return)
 - [ ] "Complete Set" advances the **set** counter (stays on the same exercise between sets)
 - [ ] Inter-set rest returns to the **same** exercise at the next set (regression guard for the "rest advances exercise" bug)
@@ -71,7 +72,7 @@ Backend note: verify which Firebase project this build points at before testing 
 - [ ] "End" shows a confirmation dialog before ending early
 - [ ] Complete all exercises — summary view appears
 - [ ] Pain slider works (0–10)
-- [ ] "Save & Done" saves and returns to plan
+- [ ] "Save & Done" saves and returns to plan; the floating tab bar is back (also after "End" → "Discard Without Saving")
 - [ ] Kill the app mid-workout, relaunch — "Resume Workout?" prompt appears; resuming does **not** double-count completed sets
 
 ## Wellness Flow (2 min)

@@ -255,7 +255,7 @@ Supporting modules:
 - **Floating "+"** — sets `TabSelection.assessmentRequest = .gateway`, presenting `AssessmentGatewayView` in a full-screen cover (dual gateway: pain analysis or wellness goals)
 
 `MainTabView` injects shared state via `@EnvironmentObject`:
-- `TabSelection` — Cross-tab navigation + assessment routing
+- `TabSelection` — Cross-tab navigation + assessment routing + `isTabBarHidden` (the guided workout hides the floating bar; pop-to-root resets clear it)
 - `SavedPlansViewModel` — Rehab plans (real-time Firestore listener)
 - `WorkoutViewModel` — Workout session tracking
 - `NetworkMonitor` — Connectivity status
