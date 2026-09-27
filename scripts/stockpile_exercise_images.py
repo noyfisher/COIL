@@ -42,8 +42,8 @@ MAPPING_FILE = OUTPUT_DIR / "exercise_image_mapping.json"
 IOS_MAPPING_FILE = (
     SCRIPT_DIR.parent
     / "ios"
-    / "PT-Helper"
-    / "PT-Helper"
+    / "COIL"
+    / "COIL"
     / "Resources"
     / "exercise_image_mapping.json"
 )

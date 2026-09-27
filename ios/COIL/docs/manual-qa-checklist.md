@@ -4,7 +4,7 @@ Run through this checklist before every release. Estimated time: ~25 minutes.
 
 **App structure (for orientation):** 4-tab shell — **Home**, **Plan**, **Progress**, **Profile** — plus a floating center **"Assess" (+)** button that opens the assessment gateway (pain analysis *or* wellness goals). Session history lives under the **Progress** tab; Settings live under the **Profile** tab, below the masthead.
 
-Backend note: verify which Firebase project this build points at before testing (`ios/PT-Helper/COIL/Services/APIConfig.swift` + `GoogleService-Info.plist`). A dev-targeted build exercises the dev AI budget and rate limits.
+Backend note: verify which Firebase project this build points at before testing (`ios/COIL/COIL/Services/APIConfig.swift` + `GoogleService-Info.plist`). A dev-targeted build exercises the dev AI budget and rate limits.
 
 ## Login & Onboarding (5 min)
 
@@ -23,7 +23,7 @@ Backend note: verify which Firebase project this build points at before testing 
 ### Onboarding
 - [ ] 3-screen intro carousel appears before onboarding on first launch (and not on re-launch)
 - [ ] Intro carousel swipe + "Get Started" advance to onboarding correctly
-- [ ] Intro carousel shows COIL branding (teal, no red/"PT Helper" leftovers)
+- [ ] Intro carousel shows COIL branding (teal, no red/"COIL" leftovers)
 - [ ] Onboarding shows all 6 steps with correct titles
 - [ ] Fill basic info (name, DOB, sex, height, weight) — Continue enables
 - [ ] Skip through remaining steps — main app loads

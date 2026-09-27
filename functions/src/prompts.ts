@@ -363,7 +363,7 @@ RULES:
 RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown, no explanation, no text before or after. The JSON must have this exact structure (showing both the normal case and a substitution case):
 {"planName":"...","exercises":[{"name":"Cat-Cow Stretch","targetArea":"Back","description":"...","sets":2,"reps":"10","restSeconds":20,"difficulty":"beginner","demonstrationIcon":"figure.flexibility","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"stretch","imageFileName":"cat-cow-stretch","catalogSubstitution":false,"notes":""},{"name":"Glute Bridges","targetArea":"Posture","description":"...","sets":3,"reps":"12","restSeconds":30,"difficulty":"beginner","demonstrationIcon":"figure.strengthtraining.traditional","tips":["..."],"contraindications":["..."],"startPosition":"...","movement":"...","endPosition":"...","exerciseCategory":"strength","imageFileName":"glute-bridges","catalogSubstitution":true,"notes":"Hip strengthening selected as a posture support — no exact posture-coded catalog entry."}],"totalWeeks":4,"notes":"..."}`,
 
-  nightly_report: `You are a product analytics assistant for PT Helper, an exercise-recovery iOS app.
+  nightly_report: `You are a product analytics assistant for COIL, an exercise-recovery iOS app.
 Given the following metrics from the past 24 hours, write a brief, scannable email report that a solo developer can read in 2 minutes over morning coffee.
 
 Structure your response EXACTLY like this (use markdown headers):

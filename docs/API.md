@@ -1,6 +1,6 @@
 # API Reference
 
-PT Helper uses Firebase Cloud Functions as a secure proxy between the iOS app and the Anthropic Claude API. The API key, system prompts, and model configuration are all stored server-side.
+COIL uses Firebase Cloud Functions as a secure proxy between the iOS app and the Anthropic Claude API. The API key, system prompts, and model configuration are all stored server-side.
 
 ## Cloud Functions
 

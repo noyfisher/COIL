@@ -47,7 +47,7 @@ jobs:
           - "iPhone SE (3rd generation)"
     defaults:
       run:
-        working-directory: ios/PT-Helper
+        working-directory: ios/COIL
     steps:
       - uses: actions/checkout@v4
         with:
@@ -84,7 +84,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nightly-results-${{ matrix.simulator }}
-          path: ios/PT-Helper/FullPlan.xcresult
+          path: ios/COIL/FullPlan.xcresult
           # A FullPlan bundle with failing UI tests carries their screen
           # recordings and weighed 778 MB per leg on 2026-09-02; two legs a
           # night at the 90-day default is tens of GB for nothing. Two weeks

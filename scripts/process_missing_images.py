@@ -35,8 +35,8 @@ MAPPING_FILE = OUTPUT_DIR / "exercise_image_mapping.json"
 IOS_MAPPING_FILE = (
     SCRIPT_DIR.parent
     / "ios"
-    / "PT-Helper"
-    / "PT-Helper"
+    / "COIL"
+    / "COIL"
     / "Resources"
     / "exercise_image_mapping.json"
 )
@@ -273,7 +273,7 @@ def update_mapping(mapping: dict, succeeded: list[dict]) -> dict:
     """
     Add new entries to the mapping and write to both locations:
     - scripts/output/exercise_image_mapping.json
-    - ios/PT-Helper/COIL/Resources/exercise_image_mapping.json
+    - ios/COIL/COIL/Resources/exercise_image_mapping.json
 
     Returns the updated mapping.
     """

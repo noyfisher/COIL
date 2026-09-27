@@ -29,6 +29,6 @@ enum APIConfig {
     /// the case's pinned model differs from this constant.
     ///
     /// Cross-reference grep before any model change:
-    ///   grep -rn "claude-haiku-4-5-20251001" functions/src/ ios/PT-Helper/
+    ///   grep -rn "claude-haiku-4-5-20251001" functions/src/ ios/COIL/
     static let currentModel = "claude-haiku-4-5-20251001"
 }

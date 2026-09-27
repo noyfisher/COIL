@@ -57,7 +57,7 @@ except ImportError:
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-CASES_PATH = REPO_ROOT / "ios/PT-Helper/COILTests/GroundTruth/cases.json"
+CASES_PATH = REPO_ROOT / "ios/COIL/COILTests/GroundTruth/cases.json"
 # Kept so the resolver below stays a two-candidate search; both now point at the
 # same real location, so the fallback is inert rather than load-bearing.
 ALT_CASES_PATH = CASES_PATH

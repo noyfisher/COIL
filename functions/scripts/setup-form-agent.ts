@@ -185,7 +185,7 @@ async function main() {
   const agent = await client.beta.agents.create({
     name: "pt-helper-form-agent",
     model: "claude-sonnet-4-6",
-    description: "Cross-session biomechanical form analyst for PT Helper app",
+    description: "Cross-session biomechanical form analyst for COIL app",
     system: FORM_ANALYSIS_AGENT_SYSTEM_PROMPT,
     tools: [
       {

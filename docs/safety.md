@@ -1,6 +1,6 @@
 # Safety Documentation
 
-PT Helper provides wellness guidance, not medical diagnosis. This document describes the safety systems that protect users from harmful AI output.
+COIL provides wellness guidance, not medical diagnosis. This document describes the safety systems that protect users from harmful AI output.
 
 ## Disclaimer
 

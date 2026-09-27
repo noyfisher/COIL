@@ -313,7 +313,7 @@ class SessionLogger: ObservableObject {
         dateFormatter.dateFormat = "yyyy-MM-dd_HHmm"
         let dateString = dateFormatter.string(from: Date())
         let sessionPrefix = currentLog.sessionId.uuidString.prefix(8)
-        let fileName = "pt-helper-session-\(sessionPrefix)-\(dateString).json"
+        let fileName = "coil-session-\(sessionPrefix)-\(dateString).json"
         let tempURL = fileManager.temporaryDirectory.appendingPathComponent(fileName)
         do {
             try data.write(to: tempURL, options: [.atomic, .completeFileProtection])
