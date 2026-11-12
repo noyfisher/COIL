@@ -26,7 +26,7 @@ jobs:
     timeout-minutes: 30
     defaults:
       run:
-        working-directory: ios/PT-Helper
+        working-directory: ios/COIL
     steps:
       - uses: actions/checkout@v4
         with:
@@ -53,7 +53,7 @@ jobs:
         with:
           ruby-version: "3.3"
           bundler-cache: true
-          working-directory: ios/PT-Helper
+          working-directory: ios/COIL
 
       # Deliberately no SPM cache. Two attempts both made things worse:
       #
@@ -91,7 +91,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: ios/PT-Helper/UnitPlan.xcresult
+          path: ios/COIL/UnitPlan.xcresult
 
   functions:
     name: Cloud Functions (build, test, audit)
@@ -196,7 +196,7 @@ jobs:
     timeout-minutes: 45
     defaults:
       run:
-        working-directory: ios/PT-Helper
+        working-directory: ios/COIL
     steps:
       - uses: actions/checkout@v4
         with:
@@ -249,7 +249,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: prerelease-coverage
-          path: ios/PT-Helper/coverage.json
+          path: ios/COIL/coverage.json
 
   beta:
     name: TestFlight Upload
@@ -264,7 +264,7 @@ jobs:
     timeout-minutes: 45
     defaults:
       run:
-        working-directory: ios/PT-Helper
+        working-directory: ios/COIL
     steps:
       - uses: actions/checkout@v4
         with:
@@ -286,7 +286,7 @@ jobs:
         with:
           ruby-version: "3.3"
           bundler-cache: true
-          working-directory: ios/PT-Helper
+          working-directory: ios/COIL
 
       - name: Install signing certificate
         env:

@@ -1,5 +1,5 @@
 /**
- * Managed Agents API client for PT Helper.
+ * Managed Agents API client for COIL.
  * Creates ephemeral sessions, sends recovery data, and extracts structured results
  * from the agent's custom tool call.
  */

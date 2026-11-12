@@ -19,7 +19,7 @@ What it does
      Fields: { feedback, recordedAt, planId, planAgeDays }
   2. Pull the matching analysis result from local export OR Firestore
      (whichever surface persists confidence per condition):
-     For PT Helper today, AnalysisResultStore is UserDefaults-only —
+     For COIL today, AnalysisResultStore is UserDefaults-only —
      so this script accepts a `--analyses-export` flag pointing at a
      JSON dump from a developer's device. Once analyses persist to
      Firestore (separate Tier 3B work), the script can pull both
@@ -275,7 +275,7 @@ def main() -> int:
         if delta > 5:
             print(f"DELTA: {delta} pts — worth updating the cap.")
             print("Edit ConfidenceCalibrator.maxDisplayConfidence in")
-            print("ios/PT-Helper/COIL/Services/ResponseValidationPipeline.swift")
+            print("ios/COIL/COIL/Services/ResponseValidationPipeline.swift")
         else:
             print(f"DELTA: {delta} pts — too small to justify a code change.")
 

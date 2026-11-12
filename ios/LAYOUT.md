@@ -7,7 +7,7 @@ Profile) plus a floating "+" that presents `AssessmentGatewayView` in a full-scr
 cover.
 
 ```
-ios/PT-Helper/COIL/ (4 files at root)
+ios/COIL/COIL/ (4 files at root)
   COILApp.swift                   # App entry point (@main), Firebase init, scene-phase session handling, AppDelegate
   RootView.swift                  # Navigation root (auth check, legal gate, onboarding gate)
   LoginView.swift                 # Sign-in screen (Google / Apple / anonymous)
@@ -196,7 +196,7 @@ ios/PT-Helper/COIL/ (4 files at root)
 
   Assets.xcassets, Preview Content/, COIL.entitlements, PrivacyInfo.xcprivacy
 
-ios/PT-Helper/COILTests/ (103 files)
+ios/COIL/COILTests/ (103 files)
   TestFixtures.swift              # Shared factory methods for test data (makeProfile/makeAssessment/makePlan…)
   AIRequestTypeContractTests.swift  # Pins the client side of the AI request-type contract
   ResponseSchemaContractTests.swift # Client half of the cross-stack AI response contract
@@ -319,7 +319,7 @@ ios/PT-Helper/COILTests/ (103 files)
   Views/ (1 file)
     RegionPainInputViewTests.swift  # Post-workout region-pain list stays in lockstep with the plan
 
-ios/PT-Helper/COILUITests/ (8 files)
+ios/COIL/COILUITests/ (8 files)
   UITestBase.swift                # Shared launch-argument / consent-dismissal harness
   OnboardingUITests.swift         # Onboarding wizard flow
   AssessmentJourneyUITests.swift  # Body map → pain detail → analysis journey
@@ -329,7 +329,7 @@ ios/PT-Helper/COILUITests/ (8 files)
   SettingsUITests.swift           # Settings navigation
   COILUITestsLaunchTests.swift    # Launch screenshot test
 
-ios/PT-Helper/
+ios/COIL/
   COIL.xcodeproj                  # Xcode 16 project (PBXFileSystemSynchronizedRootGroup — new files auto-discovered)
   UnitPlan / SmokePlan / FullPlan / PreReleasePlan .xctestplan
   vendor/, build/                 # gitignored local directories (fastlane gems, build products)

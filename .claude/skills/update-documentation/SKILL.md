@@ -1,6 +1,6 @@
 ---
 name: update-documentation
-description: Audit the PT-Helper codebase and sync all project documentation to current reality — CLAUDE.md, memory files, docs/ folder, and setup READMEs. Code is the source of truth; docs get rewritten to match. Triggers when the user says "update documentation", "update the docs", "sync the docs", "refresh documentation", or invokes /update-documentation.
+description: Audit the COIL codebase and sync all project documentation to current reality — CLAUDE.md, memory files, docs/ folder, and setup READMEs. Code is the source of truth; docs get rewritten to match. Triggers when the user says "update documentation", "update the docs", "sync the docs", "refresh documentation", or invokes /update-documentation.
 argument-hint: [all|claude|memory|docs|setup|dry-run]
 ---
 
@@ -23,7 +23,7 @@ Emit a single status line before and after each phase:
 
 1. **Working tree must be clean before starting.** If `git status --porcelain` shows uncommitted changes, STOP and ask the user to commit or stash first. The checkpoint commit only works on a clean tree.
 2. **Checkpoint before writing** — always create the snapshot commit first (per the user's version-control-safety memory). The user can revert the entire sync with `git reset --hard HEAD~1`.
-3. **Memory files live outside the repo** at `~/.claude/projects/-Users-noyfisher-IOS-Projects-PT-Helper-Agent-v1/memory/`. Git checkpoint does NOT cover them — back them up separately to `/tmp/memory-backup-<timestamp>/` before rewriting.
+3. **Memory files live outside the repo** at `~/.claude/projects/-Users-noyfisher-IOS-Projects-COIL/memory/`. Git checkpoint does NOT cover them — back them up separately to `/tmp/memory-backup-<timestamp>/` before rewriting.
 4. **R1 applies — grep before rewriting any specific fact.** Never trust an old number, file count, or enum name from the doc itself. Always read the current source.
 5. **Skip historical artifacts.** Do not touch point-in-time records: anything under `docs/archive/` or `scripts/archive/`, `virtual-users/results/**`, or anything under `vendor/`, `node_modules/`, `build/`, `DerivedData/`. Dated filenames (`*-YYYY-MM-DD.*`) are a reliable tell.
 6. **Do not auto-commit the rewrites.** Leave them uncommitted so the user can review the diff before deciding to commit.
@@ -69,7 +69,7 @@ Skip this entire phase if `$ARGUMENTS` is `dry-run`.
 2. **Memory backup** (only if scope includes `memory` or `all`):
    ```bash
    TS=$(date +%Y%m%d-%H%M%S)
-   cp -r ~/.claude/projects/-Users-noyfisher-IOS-Projects-PT-Helper-Agent-v1/memory \
+   cp -r ~/.claude/projects/-Users-noyfisher-IOS-Projects-COIL/memory \
          /tmp/memory-backup-$TS
    echo "Memory backup at /tmp/memory-backup-$TS"
    ```
@@ -86,32 +86,32 @@ Run these surveys in parallel:
 ### Survey A — File Inventory
 Spawn `Explore` agent:
 > Count Swift files in each top-level iOS directory and list the names. Run these and report each as a count plus a one-line names list:
-> - `find ios/PT-Helper/COIL/Models -maxdepth 1 -name "*.swift" -type f`
-> - `find ios/PT-Helper/COIL/ViewModels -maxdepth 1 -name "*.swift" -type f`
-> - `find ios/PT-Helper/COIL/Views -name "*.swift" -type f` (and subfolders Components, Dashboard, OnboardingSteps separately)
-> - `find ios/PT-Helper/COIL/Services -maxdepth 1 -name "*.swift" -type f`
+> - `find ios/COIL/COIL/Models -maxdepth 1 -name "*.swift" -type f`
+> - `find ios/COIL/COIL/ViewModels -maxdepth 1 -name "*.swift" -type f`
+> - `find ios/COIL/COIL/Views -name "*.swift" -type f` (and subfolders Components, Dashboard, OnboardingSteps separately)
+> - `find ios/COIL/COIL/Services -maxdepth 1 -name "*.swift" -type f`
 >
 > Report under 300 words.
 
 ### Survey B — AI Pipeline State
 Spawn `Explore` agent:
-> In `ios/PT-Helper/COIL/Services/ClaudeAPIService.swift`, list every `case ` in the `AIRequestType` enum with its raw value and a 1-line purpose comment if present. Also in `functions/src/prompts.ts`, list every key in `SYSTEM_PROMPTS` and every key in `MODEL_CONFIG`. Also list every `export const ` in `functions/src/index.ts` (Cloud Functions). Report as three short tables. Under 300 words.
+> In `ios/COIL/COIL/Services/ClaudeAPIService.swift`, list every `case ` in the `AIRequestType` enum with its raw value and a 1-line purpose comment if present. Also in `functions/src/prompts.ts`, list every key in `SYSTEM_PROMPTS` and every key in `MODEL_CONFIG`. Also list every `export const ` in `functions/src/index.ts` (Cloud Functions). Report as three short tables. Under 300 words.
 
 ### Survey C — Validation & Pipelines
 Spawn `Explore` agent:
-> In `ios/PT-Helper/COIL/Services/ResponseValidationPipeline.swift`, list the steps in `validateAnalysis()` and `validateRehabPlan()` in order, with one line each. Same for `WellnessAnalyzer.swift` (call sequence) and `InjuryAnalyzer.swift` (call sequence). Also list every public method in `HistoryRelevanceFilter.swift`. Report as ordered lists. Under 250 words.
+> In `ios/COIL/COIL/Services/ResponseValidationPipeline.swift`, list the steps in `validateAnalysis()` and `validateRehabPlan()` in order, with one line each. Same for `WellnessAnalyzer.swift` (call sequence) and `InjuryAnalyzer.swift` (call sequence). Also list every public method in `HistoryRelevanceFilter.swift`. Report as ordered lists. Under 250 words.
 
 ### Survey D — Navigation & Tabs
 Spawn `Explore` agent:
-> In `ios/PT-Helper/COIL/Views/MainTabView.swift` (or whatever the current root tab view is), list the tabs in order with the tab index and the view name shown. List every `@EnvironmentObject` injected at the root. Also identify any legacy nav wrappers and the launch arg that activates them. Under 200 words.
+> In `ios/COIL/COIL/Views/MainTabView.swift` (or whatever the current root tab view is), list the tabs in order with the tab index and the view name shown. List every `@EnvironmentObject` injected at the root. Also identify any legacy nav wrappers and the launch arg that activates them. Under 200 words.
 
 ### Survey E — Test Plans & Launch Args
 Spawn `Explore` agent:
-> Find all `*.xctestplan` files under `ios/PT-Helper/` and list each one's name + the test classes it includes (read the JSON). In `ios/PT-Helper/COIL/Services/TestDataSeeder.swift`, list every launch argument the seeder reads via `CommandLine.arguments.contains(...)` with a 1-line behavior summary. Under 250 words.
+> Find all `*.xctestplan` files under `ios/COIL/` and list each one's name + the test classes it includes (read the JSON). In `ios/COIL/COIL/Services/TestDataSeeder.swift`, list every launch argument the seeder reads via `CommandLine.arguments.contains(...)` with a 1-line behavior summary. Under 250 words.
 
 ### Survey F — Memory Drift Check
 Spawn `Explore` agent:
-> Read every file in `~/.claude/projects/-Users-noyfisher-IOS-Projects-PT-Helper-Agent-v1/memory/`. For each one, list:
+> Read every file in `~/.claude/projects/-Users-noyfisher-IOS-Projects-COIL/memory/`. For each one, list:
 > (a) the date-stamped facts it contains (e.g., "681/833 images done", "as of 2026-03-05"),
 > (b) any concrete file paths or symbol names it references,
 > (c) the date the file was last updated (use `stat -f %Sm` or check for date strings in the content).
@@ -125,7 +125,7 @@ Spawn `Explore` agent:
 > - `scripts/README.md`
 > - `functions/README.md`
 > - `ios/LAYOUT.md`
-> - `ios/PT-Helper/docs/manual-qa-checklist.md`
+> - `ios/COIL/docs/manual-qa-checklist.md`
 >
 > Group by file, list each verifiable claim as a bullet. Do NOT verify yet — just inventory. Under 500 words.
 
@@ -152,7 +152,7 @@ Run the buckets in scope **in parallel** via Agent (general-purpose, foreground)
 
 ### Bucket: CLAUDE.md
 Agent prompt skeleton:
-> Update `/Users/noyfisher/IOS-Projects/PT-Helper-Agent-v1/CLAUDE.md` to match these current facts: [paste Surveys A, B, C, D, E].
+> Update `/Users/noyfisher/IOS-Projects/COIL/CLAUDE.md` to match these current facts: [paste Surveys A, B, C, D, E].
 >
 > Focus on these sections that drift fastest:
 > - "## Architecture" — file counts in each MVVM bucket
@@ -172,7 +172,7 @@ Agent prompt skeleton:
 
 ### Bucket: Memory files
 Agent prompt skeleton:
-> Update memory files in `~/.claude/projects/-Users-noyfisher-IOS-Projects-PT-Helper-Agent-v1/memory/` using these survey facts: [paste Survey F + relevant slices of A-E].
+> Update memory files in `~/.claude/projects/-Users-noyfisher-IOS-Projects-COIL/memory/` using these survey facts: [paste Survey F + relevant slices of A-E].
 >
 > Per-file rules:
 > - `MEMORY.md` — index only. Verify every `- [...](file.md)` line points to a file that exists. Remove orphan links. Add links for any memory file not yet indexed. Keep entries to one line, under 150 chars.
@@ -190,7 +190,7 @@ Agent prompt skeleton:
 Agent prompt skeleton:
 > Update these files using the survey facts:
 > - `docs/API.md` — must match Cloud Functions list from Survey B
-> - `docs/data_models.md` — must match Codable structs in `ios/PT-Helper/COIL/Models/`. Read each model file briefly. Update field lists where structs have changed.
+> - `docs/data_models.md` — must match Codable structs in `ios/COIL/COIL/Models/`. Read each model file briefly. Update field lists where structs have changed.
 > - `docs/ux_flows.md` — must match navigation structure from Survey D
 > - `docs/safety.md` — must match validation pipelines from Survey C
 > - `docs/brief.md` — typically stable, but update any feature claims that no longer match the code
@@ -207,7 +207,7 @@ Agent prompt skeleton:
 > - `scripts/README.md`
 > - `functions/README.md`
 > - `ios/LAYOUT.md`
-> - `ios/PT-Helper/docs/manual-qa-checklist.md`
+> - `ios/COIL/docs/manual-qa-checklist.md`
 >
 > For each verifiable claim from Survey G:
 > 1. Verify it (run the command, check the path, read the version)
@@ -228,16 +228,16 @@ Sequential sanity checks after all buckets have written:
 
 1. **MEMORY.md ↔ memory files** — every `- [...](file.md)` link in MEMORY.md must resolve:
    ```bash
-   cd ~/.claude/projects/-Users-noyfisher-IOS-Projects-PT-Helper-Agent-v1/memory && \
+   cd ~/.claude/projects/-Users-noyfisher-IOS-Projects-COIL/memory && \
      grep -oE '\(([a-z_-]+\.md)\)' MEMORY.md | tr -d '()' | while read f; do
        [ -f "$f" ] || echo "ORPHAN LINK: $f"
      done
    ```
 
-2. **CLAUDE.md cross-refs** — any path mentioned with backticks (e.g., `` `ios/PT-Helper/docs/manual-qa-checklist.md` ``) must exist:
+2. **CLAUDE.md cross-refs** — any path mentioned with backticks (e.g., `` `ios/COIL/docs/manual-qa-checklist.md` ``) must exist:
    ```bash
-   grep -oE '`[a-zA-Z0-9_/.-]+\.(md|swift|ts|json|py)`' /Users/noyfisher/IOS-Projects/PT-Helper-Agent-v1/CLAUDE.md | tr -d '`' | sort -u | while read p; do
-     [ -f "/Users/noyfisher/IOS-Projects/PT-Helper-Agent-v1/$p" ] || echo "MISSING: $p"
+   grep -oE '`[a-zA-Z0-9_/.-]+\.(md|swift|ts|json|py)`' /Users/noyfisher/IOS-Projects/COIL/CLAUDE.md | tr -d '`' | sort -u | while read p; do
+     [ -f "/Users/noyfisher/IOS-Projects/COIL/$p" ] || echo "MISSING: $p"
    done
    ```
 
@@ -285,8 +285,8 @@ Print a structured report:
     # Then optionally drop the empty checkpoint commit:
     git reset --hard HEAD~1
     # And restore memory from backup if you also rewrote memory files:
-    rm -rf ~/.claude/projects/-Users-noyfisher-IOS-Projects-PT-Helper-Agent-v1/memory
-    cp -r /tmp/memory-backup-<TS> ~/.claude/projects/-Users-noyfisher-IOS-Projects-PT-Helper-Agent-v1/memory
+    rm -rf ~/.claude/projects/-Users-noyfisher-IOS-Projects-COIL/memory
+    cp -r /tmp/memory-backup-<TS> ~/.claude/projects/-Users-noyfisher-IOS-Projects-COIL/memory
 ```
 
 ---

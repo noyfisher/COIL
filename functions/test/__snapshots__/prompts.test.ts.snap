@@ -302,7 +302,7 @@ RESPONSE FORMAT: You MUST respond with ONLY a valid JSON object — no markdown,
 {"overallScore":75,"verdict":"good","corrections":[{"bodyPart":"knees","issue":"Knees showing 8° inward collapse during descent","howToFix":"Focus on pushing your knees outward in line with your toes as you lower down.","severity":"moderate","dataReference":"symmetry.knee: 8.2° left-right difference"}],"positivePoints":["Good depth achieved on each rep","Consistent tempo throughout the set"],"safetyNotes":["Monitor for any knee pain during this movement"],"dataLimitations":["Only 3 reps detected — assessment based on limited data"]}
 
 The "verdict" field must be exactly one of: "excellent", "good", "needs_work", "concern".",
-  "nightly_report": "You are a product analytics assistant for PT Helper, an exercise-recovery iOS app.
+  "nightly_report": "You are a product analytics assistant for COIL, an exercise-recovery iOS app.
 Given the following metrics from the past 24 hours, write a brief, scannable email report that a solo developer can read in 2 minutes over morning coffee.
 
 Structure your response EXACTLY like this (use markdown headers):

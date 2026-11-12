@@ -2,39 +2,39 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**Docs map:** `README.md` (overview) → this file (engineering rules + architecture reference) → `CONTRIBUTING.md` (setup + workflow) → `ios/LAYOUT.md` (iOS file map) → `functions/README.md` → `scripts/README.md` → `docs/` (product brief, UX flows, data models, API, safety, legal texts) → `docs/archive/` (history) → `ios/PT-Helper/docs/tester-welcome-note.md` (TestFlight testers).
+**Docs map:** `README.md` (overview) → this file (engineering rules + architecture reference) → `CONTRIBUTING.md` (setup + workflow) → `ios/LAYOUT.md` (iOS file map) → `functions/README.md` → `scripts/README.md` → `docs/` (product brief, UX flows, data models, API, safety, legal texts) → `docs/archive/` (history) → `ios/COIL/docs/tester-welcome-note.md` (TestFlight testers).
 
 ## Build & Test Commands
 
 ### iOS App
 ```bash
 # Build
-xcodebuild build -project ios/PT-Helper/COIL.xcodeproj \
+xcodebuild build -project ios/COIL/COIL.xcodeproj \
   -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Run all unit tests (default: UnitPlan)
-xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+xcodebuild test -project ios/COIL/COIL.xcodeproj \
   -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Run smoke tests only (11 key tests, 60s timeout)
-xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+xcodebuild test -project ios/COIL/COIL.xcodeproj \
   -scheme COIL -testPlan SmokePlan -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Run full suite including collision tests (300s timeout)
-xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+xcodebuild test -project ios/COIL/COIL.xcodeproj \
   -scheme COIL -testPlan FullPlan -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Run pre-release suite: all unit + UI tests with code coverage (600s timeout)
-xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+xcodebuild test -project ios/COIL/COIL.xcodeproj \
   -scheme COIL -testPlan PreReleasePlan -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Run a single test class
-xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+xcodebuild test -project ios/COIL/COIL.xcodeproj \
   -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16' \
   -only-testing:COILTests/UserProfileTests
 
 # Run a single test method
-xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+xcodebuild test -project ios/COIL/COIL.xcodeproj \
   -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16' \
   -only-testing:COILTests/UserProfileTests/testDefaultUserProfile
 ```
@@ -68,7 +68,7 @@ Follow these 5 rules on every code task. They minimize hallucinations and regres
 
 **R5 — Anti-momentum checkpoint.** On unexpected error, mental-model contradiction, or second failed attempt at the same approach → stop and re-read actual code. No "slightly different version of the same idea."
 
-Full rules: `~/.claude/projects/-Users-noyfisher-IOS-Projects-PT-Helper-Agent-v1/memory/feedback_engineering_protocol.md`
+Full rules: `~/.claude/projects/-Users-noyfisher-IOS-Projects-COIL-Agent-v1/memory/feedback_engineering_protocol.md`
 
 ## Parallel Sessions
 
@@ -82,12 +82,12 @@ Multiple Claude Code sessions may run against this repo concurrently. Rules:
 - **Untracked essentials** (`functions/.env`, `scripts/archive/pilots/animation-pilot/.env`) are copied into new worktrees via `.worktreeinclude` — add new gitignored-but-required files there.
 - **Merges**: small branches, rebase on `main` often, FullPlan before merge.
 
-Full recipes (starting sessions, simulator assignment table, cross-session messaging, lead+agents pattern): `ios/PT-Helper/docs/parallel-sessions.md`.
+Full recipes (starting sessions, simulator assignment table, cross-session messaging, lead+agents pattern): `ios/COIL/docs/parallel-sessions.md`.
 
 ## Architecture
 
 ### MVVM + Services Pattern
-The iOS app (`ios/PT-Helper/COIL/`) uses MVVM with a singleton service layer:
+The iOS app (`ios/COIL/COIL/`) uses MVVM with a singleton service layer:
 
 - **Models/** (~22 files) — Codable structs and analyzers:
   - Core: `UserProfile`, `PainAssessment`, `RehabPlan`, `BodyRegion`, `BodyZone`, `BodyMapConstants`
@@ -276,7 +276,7 @@ The app supports UI testing via launch arguments handled by `TestDataSeeder`:
 Accessibility identifiers follow `screenName.elementName` convention (e.g., `workout.completeSetButton`).
 
 ### Pre-Release Process
-See `ios/PT-Helper/docs/manual-qa-checklist.md` for the full manual QA checklist.
+See `ios/COIL/docs/manual-qa-checklist.md` for the full manual QA checklist.
 
 Test plans: SmokePlan (11 tests), UnitPlan (all unit), FullPlan (all + collision + UI), PreReleasePlan (all + UI + coverage). FullPlan and PreReleasePlan run identical test targets — they intentionally aren't merged: FullPlan is the nightly gate (no coverage, 300s timeout) and PreReleasePlan is the release gate (same tests + code coverage, 600s timeout).
 

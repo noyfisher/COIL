@@ -4,7 +4,7 @@ An iOS app that uses AI to deliver personalized physical therapy guidance — fr
 
 Users tap where it hurts on a 3D body model, answer targeted questions, and receive a PT-style analysis with a structured exercise plan they can follow with built-in workout guidance.
 
-> The app was formerly called **PT Helper**. The old name survives in two places that are expensive to change: the `ios/PT-Helper/` directory path and the `pt-helper-dev` Firebase project id. Everything else is COIL.
+> The app was formerly called **PT Helper**. The old name survives in one place that's expensive to change: the `pt-helper-dev` Firebase project id (Firebase project ids are permanent — changing it means migrating to a brand-new project). Everything else is COIL.
 
 ## Start here
 
@@ -20,7 +20,7 @@ Read in this order:
 | `scripts/README.md` | The exercise-image pipeline |
 | `docs/` | Product brief, UX flows, data models, API, safety, and the legal texts |
 | `docs/archive/` | Historical, point-in-time records — not maintained, not a source of truth |
-| `ios/PT-Helper/docs/tester-welcome-note.md` | What TestFlight testers are told |
+| `ios/COIL/docs/tester-welcome-note.md` | What TestFlight testers are told |
 
 ## Features
 
@@ -76,7 +76,7 @@ The iOS client never talks to a model provider directly and never holds a provid
 ```
 ├── ios/
 │   ├── LAYOUT.md                   # Full iOS file map
-│   └── PT-Helper/
+│   └── COIL/
 │       ├── COIL/                   # The app target
 │       │   ├── COILApp.swift       # @main entry point (Firebase init, scene phase)
 │       │   ├── RootView.swift      # Auth / legal / onboarding gate
@@ -135,13 +135,13 @@ Full setup, conventions, and the git workflow are in `CONTRIBUTING.md`.
 1. **Clone and open in Xcode**
    ```bash
    git clone <repo-url>
-   open ios/PT-Helper/COIL.xcodeproj
+   open ios/COIL/COIL.xcodeproj
    ```
 
 2. **Firebase configuration**
    - Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
    - Enable Firestore and Authentication (Apple Sign-In, Google Sign-In)
-   - Download `GoogleService-Info.plist` and add it to `ios/PT-Helper/COIL/`
+   - Download `GoogleService-Info.plist` and add it to `ios/COIL/COIL/`
 
 3. **Deploy Cloud Functions**
    ```bash
@@ -151,7 +151,7 @@ Full setup, conventions, and the git workflow are in `CONTRIBUTING.md`.
    ```
 
 4. **Configure API endpoint**
-   - Update `ios/PT-Helper/COIL/Services/APIConfig.swift` with your Cloud Functions URL
+   - Update `ios/COIL/COIL/Services/APIConfig.swift` with your Cloud Functions URL
 
 5. **Deploy Firestore rules**
    ```bash
@@ -188,7 +188,7 @@ This produces focused AI prompts with detailed relevant history and condensed ba
 
 ```bash
 # All unit tests (UnitPlan — the PR gate)
-xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+xcodebuild test -project ios/COIL/COIL.xcodeproj \
   -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 

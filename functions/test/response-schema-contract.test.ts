@@ -48,7 +48,7 @@ function deepStrict(schema: z.ZodTypeAny): z.ZodTypeAny {
 
 const REPO_ROOT = resolve(__dirname, "../..");
 const FIXTURE_DIR = resolve(REPO_ROOT, "contracts/response-schemas");
-const IOS_FIXTURE_DIR = resolve(REPO_ROOT, "ios/PT-Helper/COILTests/Fixtures");
+const IOS_FIXTURE_DIR = resolve(REPO_ROOT, "ios/COIL/COILTests/Fixtures");
 
 /**
  * Paths are resolved from string literals rather than interpolated at call time. The

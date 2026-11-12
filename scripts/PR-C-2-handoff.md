@@ -3,7 +3,7 @@
 > **STATUS (2026-09-02):** This work is paused, not finished. The PT review
 > stalled at **1,238 of 1,582** decisions in `scripts/output/kg_review_decisions.json`;
 > `merge_kg_review.py` has never been run, so
-> `ios/PT-Helper/COIL/Resources/medical_knowledge_graph_v2.json` does not exist and
+> `ios/COIL/COIL/Resources/medical_knowledge_graph_v2.json` does not exist and
 > the `knowledgeGraphV2Enabled` flag in `KnowledgeGraphService.swift` is still off —
 > the app runs on v1 alone. The three scripts this document describes
 > (`expand_knowledge_graph.py`, `review_kg_candidates.py`, `merge_kg_review.py`) are
@@ -109,7 +109,7 @@ The script:
 - Refuses to ship if any contraindicated/unclear verdict is still PENDING
   (override with `--allow-pending` only if you accept the risk)
 - Applies decisions: APPROVE keeps, REJECT drops, FLIP inverts, EDIT overrides reason
-- Outputs `ios/PT-Helper/COIL/Resources/medical_knowledge_graph_v2.json`
+- Outputs `ios/COIL/COIL/Resources/medical_knowledge_graph_v2.json`
 
 Note: **the v2 file contains only the NEW pairs** — the in-app
 `KnowledgeGraphService.merge(v1:v2:)` unions v1 + v2 at runtime. So v1's expert
@@ -127,7 +127,7 @@ build picks it up (Xcode auto-syncs new resources via
 `PBXFileSystemSynchronizedRootGroup`), enable v2 by default:
 
 ```swift
-// ios/PT-Helper/COIL/Services/KnowledgeGraphService.swift
+// ios/COIL/COIL/Services/KnowledgeGraphService.swift
 enum KnowledgeGraphFeatureFlag {
     static let key = "knowledgeGraphV2Enabled"
     static var isEnabled: Bool {
@@ -143,7 +143,7 @@ graph still satisfies all v1 invariants:
 
 ```bash
 xcodebuild test \
-    -project ios/PT-Helper/COIL.xcodeproj \
+    -project ios/COIL/COIL.xcodeproj \
     -scheme COIL \
     -destination 'platform=iOS Simulator,name=iPhone 16' \
     -only-testing:COILTests/KnowledgeGraphExpansionTests

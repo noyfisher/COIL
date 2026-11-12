@@ -8,13 +8,13 @@
   reference device
 - **Node 22** for the Cloud Functions (`functions/package.json` `engines`)
 - **Firebase CLI** (`npm install -g firebase-tools`)
-- **Ruby + bundler** — only for fastlane (`ios/PT-Helper/Gemfile`); not needed to
+- **Ruby + bundler** — only for fastlane (`ios/COIL/Gemfile`); not needed to
   build or test the app
 - **Python 3** for the exercise-image pipeline in `scripts/`
   (`scripts/requirements.txt`)
 
-Getting the app running: clone, open `ios/PT-Helper/COIL.xcodeproj`, drop your
-`GoogleService-Info.plist` into `ios/PT-Helper/COIL/`, build and run.
+Getting the app running: clone, open `ios/COIL/COIL.xcodeproj`, drop your
+`GoogleService-Info.plist` into `ios/COIL/COIL/`, build and run.
 
 ## Where things live
 
@@ -29,23 +29,23 @@ Getting the app running: clone, open `ios/PT-Helper/COIL.xcodeproj`, drop your
 
 ```bash
 # Build
-xcodebuild build -project ios/PT-Helper/COIL.xcodeproj \
+xcodebuild build -project ios/COIL/COIL.xcodeproj \
   -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Run all unit tests (default: UnitPlan)
-xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+xcodebuild test -project ios/COIL/COIL.xcodeproj \
   -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Full suite including collision tests (300s timeout)
-xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+xcodebuild test -project ios/COIL/COIL.xcodeproj \
   -scheme COIL -testPlan FullPlan -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Pre-release suite: all unit + UI tests with code coverage (600s timeout)
-xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+xcodebuild test -project ios/COIL/COIL.xcodeproj \
   -scheme COIL -testPlan PreReleasePlan -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # A single test class or method
-xcodebuild test -project ios/PT-Helper/COIL.xcodeproj \
+xcodebuild test -project ios/COIL/COIL.xcodeproj \
   -scheme COIL -destination 'platform=iOS Simulator,name=iPhone 16' \
   -only-testing:COILTests/UserProfileTests/testDefaultUserProfile
 ```
@@ -85,7 +85,7 @@ npm run test:integration  # integration suite (Firebase emulator + Java 21)
   elevation, `ChipButton` for selectable tags.
 - **Test naming:** `test<What>_<Condition>_<Expected>`, e.g.
   `testClassifySurgery_sameRegion_recentWithRestrictions`. Fixtures come from
-  `ios/PT-Helper/COILTests/TestFixtures.swift`; ViewModels need `@MainActor` in tests.
+  `ios/COIL/COILTests/TestFixtures.swift`; ViewModels need `@MainActor` in tests.
 - **Accessibility identifiers:** `screenName.elementName`, e.g.
   `workout.completeSetButton`. Identify the leaf control, not the wrapper — an
   identifier on a container can hide its children from XCUI.
@@ -104,7 +104,7 @@ npm run test:integration  # integration suite (Firebase emulator + Java 21)
    sessions share one git index in the main checkout.
 5. Running more than one session at a time? One git worktree per session, one
    simulator per session, and never two Firebase deploys at once. Recipes are in
-   `ios/PT-Helper/docs/parallel-sessions.md`.
+   `ios/COIL/docs/parallel-sessions.md`.
 
 Before submitting: tests pass, the build is warning-free (warnings are errors in
 this project), new behavior has tests, and no hardcoded design values.

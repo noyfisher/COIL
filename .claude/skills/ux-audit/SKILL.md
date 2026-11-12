@@ -6,7 +6,7 @@ argument-hint: [full|dashboard|onboarding|workout|plans|settings]
 
 # UX Audit
 
-Navigate the PT Helper app on the iOS Simulator, capture screenshots and accessibility trees for each screen, and generate a prioritized UX issue report. **This skill is read-only — DO NOT edit any files, create branches, or make commits.**
+Navigate the COIL app on the iOS Simulator, capture screenshots and accessibility trees for each screen, and generate a prioritized UX issue report. **This skill is read-only — DO NOT edit any files, create branches, or make commits.**
 
 ## Status Protocol
 
@@ -40,7 +40,7 @@ If no argument provided, default to `full`.
 1. Call `session_show_defaults` to check XcodeBuildMCP configuration. If not configured:
    ```
    session_set_defaults:
-     projectPath: ios/PT-Helper/COIL.xcodeproj
+     projectPath: ios/COIL/COIL.xcodeproj
      scheme: COIL
      simulatorName: iPhone 16
    ```
@@ -71,17 +71,17 @@ Execute in this order to minimize backtracking:
 
 | Step | Screen | Navigation Action | View File |
 |------|--------|------------------|-----------|
-| 1 | Home | Already visible after launch (tab index 0) | `ios/PT-Helper/COIL/Views/MainTabView.swift` (HomeTab) |
-| 2 | Assessment Gateway | Tap the floating "+" | `ios/PT-Helper/COIL/Views/AssessmentGatewayView.swift` |
-| 3 | My Plan | Tap "My Plan" tab (tab index 1) | `ios/PT-Helper/COIL/Views/MyPlanTab.swift` |
-| 4 | Progress | Tap "Progress" tab (tab index 2) | `ios/PT-Helper/COIL/Views/ProgressTab.swift` |
-| 5 | Profile | Tap "Profile" tab (tab index 3) | `ios/PT-Helper/COIL/Views/MainTabView.swift` (ProfileTab) |
-| 6 | Settings | From Progress, tap the settings/gear button | `ios/PT-Helper/COIL/Views/SettingsView.swift` |
-| 7 | Rehab Plan | From My Plan, tap a plan card | `ios/PT-Helper/COIL/Views/RehabPlanView.swift` |
-| 8 | Guided Workout | From Rehab Plan, tap "Start Workout" button | `ios/PT-Helper/COIL/Views/GuidedWorkoutView.swift` |
-| 9 | Recovery Insights | From Progress, tap recovery insights card | `ios/PT-Helper/COIL/Views/RecoveryInsightsDetailView.swift` |
-| 10 | Achievements | Look for achievements entry in Progress or Profile | `ios/PT-Helper/COIL/Views/AchievementsView.swift` |
-| 11 | Onboarding | Stop app, relaunch with `["--uitesting"]` only (no --skip-onboarding) | `ios/PT-Helper/COIL/Views/OnboardingView.swift` |
+| 1 | Home | Already visible after launch (tab index 0) | `ios/COIL/COIL/Views/MainTabView.swift` (HomeTab) |
+| 2 | Assessment Gateway | Tap the floating "+" | `ios/COIL/COIL/Views/AssessmentGatewayView.swift` |
+| 3 | My Plan | Tap "My Plan" tab (tab index 1) | `ios/COIL/COIL/Views/MyPlanTab.swift` |
+| 4 | Progress | Tap "Progress" tab (tab index 2) | `ios/COIL/COIL/Views/ProgressTab.swift` |
+| 5 | Profile | Tap "Profile" tab (tab index 3) | `ios/COIL/COIL/Views/MainTabView.swift` (ProfileTab) |
+| 6 | Settings | From Progress, tap the settings/gear button | `ios/COIL/COIL/Views/SettingsView.swift` |
+| 7 | Rehab Plan | From My Plan, tap a plan card | `ios/COIL/COIL/Views/RehabPlanView.swift` |
+| 8 | Guided Workout | From Rehab Plan, tap "Start Workout" button | `ios/COIL/COIL/Views/GuidedWorkoutView.swift` |
+| 9 | Recovery Insights | From Progress, tap recovery insights card | `ios/COIL/COIL/Views/RecoveryInsightsDetailView.swift` |
+| 10 | Achievements | Look for achievements entry in Progress or Profile | `ios/COIL/COIL/Views/AchievementsView.swift` |
+| 11 | Onboarding | Stop app, relaunch with `["--uitesting"]` only (no --skip-onboarding) | `ios/COIL/COIL/Views/OnboardingView.swift` |
 
 **Navigation tips:**
 - Use `snapshot_ui` to find element labels/IDs before tapping

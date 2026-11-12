@@ -7,7 +7,7 @@ against these same files**, which is the entire point:
   recursively-`.strict()` version of the Zod schema in `functions/src/response-schemas.ts`.
   Strict at every level means a field added, removed, renamed, or retyped on the server
   fails the test.
-- `ios/PT-Helper/COILTests/ResponseSchemaContractTests.swift` decodes each fixture into the
+- `ios/COIL/COILTests/ResponseSchemaContractTests.swift` decodes each fixture into the
   production `Decodable` type the app actually uses, and separately compares the fixture's
   key set against the type's stored properties.
 

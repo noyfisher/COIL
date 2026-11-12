@@ -39,7 +39,7 @@ Run `scripts/process_missing_images.py` with `--dry-run` to fetch the `missingEx
 
 For each exercise name from the missing log:
 
-1. **Normalize the name** — match `ExerciseImageService.normalizeName()` logic at `ios/PT-Helper/COIL/Services/ExerciseImageService.swift:474`:
+1. **Normalize the name** — match `ExerciseImageService.normalizeName()` logic at `ios/COIL/COIL/Services/ExerciseImageService.swift:474`:
    - Lowercase
    - Replace spaces and underscores with hyphens
    - Strip content in parentheses
@@ -59,7 +59,7 @@ For each exercise name from the missing log:
 
 **For mapping issues:**
 - Identify the closest existing mapping key (the PNG that matches)
-- Suggest the exact alias to add to `ExerciseImageService.aliasMap` at `ios/PT-Helper/COIL/Services/ExerciseImageService.swift:128`
+- Suggest the exact alias to add to `ExerciseImageService.aliasMap` at `ios/COIL/COIL/Services/ExerciseImageService.swift:128`
 - Follow the existing alias pattern, e.g.:
   ```swift
   "ai-generated-exercise-name": "existing-mapping-key",
@@ -140,13 +140,13 @@ Exercise Images Status:
 
 ## `sync` — Publish Images and the Mapping
 
-**PNGs do not go into the app bundle.** `ios/PT-Helper/COIL/Resources/` contains no
+**PNGs do not go into the app bundle.** `ios/COIL/COIL/Resources/` contains no
 exercise images at all — the app downloads every illustration from Firebase Storage at
 runtime. Only the mapping JSON ships inside the app.
 
 1. Run `python3 scripts/rebuild_image_mapping.py` — it rebuilds
    `scripts/output/exercise_image_mapping.json` from the PNGs on disk and copies **that
-   JSON only** to `ios/PT-Helper/COIL/Resources/exercise_image_mapping.json`
+   JSON only** to `ios/COIL/COIL/Resources/exercise_image_mapping.json`
 2. Upload the PNGs: `./scripts/upload_to_firebase.sh` (needs `gcloud auth login`)
 3. Regenerate the functions catalog: `cd functions && npm run build`
 4. Verify with `python3 scripts/check_image_mapping_integrity.py` — it fails if the two
@@ -159,11 +159,11 @@ runtime. Only the mapping JSON ships inside the app.
 
 | File | Purpose |
 |------|---------|
-| `ios/PT-Helper/COIL/Services/ExerciseImageService.swift` | 7-layer image resolution + `aliasMap` (line ~128) + `normalizeName()` (line ~474) |
-| `ios/PT-Helper/COIL/ViewModels/RehabPlanViewModel.swift` | `logMissingImages()` (line ~664) |
+| `ios/COIL/COIL/Services/ExerciseImageService.swift` | 7-layer image resolution + `aliasMap` (line ~128) + `normalizeName()` (line ~474) |
+| `ios/COIL/COIL/ViewModels/RehabPlanViewModel.swift` | `logMissingImages()` (line ~664) |
 | `scripts/process_missing_images.py` | Firestore fetch → generate → map → upload |
 | `scripts/generate_exercise_images.py` | FLUX 2 Pro image generation |
 | `scripts/qa_exercise_images.py` | Gemini 2.5 Flash vision QA |
 | `scripts/output/exercise_image_mapping.json` | Source of truth mapping |
-| `ios/PT-Helper/COIL/Resources/exercise_image_mapping.json` | Bundled app copy |
+| `ios/COIL/COIL/Resources/exercise_image_mapping.json` | Bundled app copy |
 | `scripts/exercise_list.json` | Master exercise metadata |

@@ -24,7 +24,7 @@ output/all_exercises_metadata.json ──▶ generate_missing_images.py ──�
 output/<slug>.png ──▶ generate_end_frames_nb.py ──▶ output/<slug>_end.png ──▶ qa_consistency.py
 
 output/*.png ──▶ rebuild_image_mapping.py ──▶ output/exercise_image_mapping.json
-                                                  ├─▶ ios/PT-Helper/COIL/Resources/ (copied)
+                                                  ├─▶ ios/COIL/COIL/Resources/ (copied)
                                                   └─▶ functions/src/generated/ (npm run build)
 output/*.png ──▶ upload_to_firebase.sh ──▶ Firebase Storage  (this is how the app gets images)
 ```
@@ -61,7 +61,7 @@ output/*.png ──▶ upload_to_firebase.sh ──▶ Firebase Storage  (this i
 
 | Script | Purpose |
 |---|---|
-| `rebuild_image_mapping.py` | Rebuilds `output/exercise_image_mapping.json` from the PNGs actually on disk (one entry per start image), merging in metadata, then copies **the JSON only** to `ios/PT-Helper/COIL/Resources/`. It does **not** copy PNGs. Run after any generation batch. |
+| `rebuild_image_mapping.py` | Rebuilds `output/exercise_image_mapping.json` from the PNGs actually on disk (one entry per start image), merging in metadata, then copies **the JSON only** to `ios/COIL/COIL/Resources/`. It does **not** copy PNGs. Run after any generation batch. |
 | `check_image_mapping_integrity.py` | Read-only CI check: every mapping key has a PNG, every start PNG has an entry, the iOS copy is byte-identical, aliases are unique, ≥95% of entries carry `body_position`. Exits 1 with a diff on any mismatch. |
 | `upload_to_firebase.sh` | Uploads the PNGs to Firebase Storage. **This is the real deploy path for images** — the app downloads them at runtime. Needs `gcloud auth login`. |
 
@@ -78,8 +78,8 @@ output/*.png ──▶ upload_to_firebase.sh ──▶ Firebase Storage  (this i
 |---|---|
 | `expand_knowledge_graph.py` | Asks Claude Haiku, for every (condition, exercise) pair in the seed lists, whether the exercise is safe, contraindicated, or unclear. Batched, prompt-cached, checkpointed. Writes `output/knowledge_graph_v2_draft.json`. |
 | `review_kg_candidates.py` | Local review UI that walks a human through every `contraindicated` verdict plus a 10% sample of `safe` ones. A hard gate before anything ships. Saves to `output/kg_review_decisions.json`. |
-| `merge_kg_review.py` | Applies the review decisions to the draft and writes the production `ios/PT-Helper/COIL/Resources/medical_knowledge_graph_v2.json`. Unreviewed verdicts are dropped. **Not yet run** — see status below. |
-| `capture_kg_regression_goldens.py` | Replaces the hand-authored goldens in the analysis regression fixtures at `ios/PT-Helper/COILTests/GroundTruth/cases.json` with real Claude responses, so the fixtures detect model drift and not just validator changes. |
+| `merge_kg_review.py` | Applies the review decisions to the draft and writes the production `ios/COIL/COIL/Resources/medical_knowledge_graph_v2.json`. Unreviewed verdicts are dropped. **Not yet run** — see status below. |
+| `capture_kg_regression_goldens.py` | Replaces the hand-authored goldens in the analysis regression fixtures at `ios/COIL/COILTests/GroundTruth/cases.json` with real Claude responses, so the fixtures detect model drift and not just validator changes. |
 
 ### Analysis / misc
 
@@ -112,7 +112,7 @@ Those stay on your disk and never enter a commit.
 | File | Role |
 |---|---|
 | `output/all_exercises_metadata.json` | **Canonical.** One entry per exercise: name, `normalized_filename`, category, target area, `body_position`, `pose_description`, `end_pose_description`, aliases. Everything generative reads this. |
-| `output/exercise_image_mapping.json` | **Canonical, and a cross-system dependency — do not move or hand-edit.** `functions/scripts/build_catalog.ts` reads it on every Cloud Functions build, and a byte-identical copy is bundled at `ios/PT-Helper/COIL/Resources/exercise_image_mapping.json`. Regenerate it with `rebuild_image_mapping.py`. |
+| `output/exercise_image_mapping.json` | **Canonical, and a cross-system dependency — do not move or hand-edit.** `functions/scripts/build_catalog.ts` reads it on every Cloud Functions build, and a byte-identical copy is bundled at `ios/COIL/COIL/Resources/exercise_image_mapping.json`. Regenerate it with `rebuild_image_mapping.py`. |
 | `output/qa_all_starts_report.json` | **Canonical** QA report for start images. Latest sweep: 1,295 at score 5, 62 at 4, 9 at 3, one each at 2 and 1. |
 | `output/consistency_report.json` | Pair QA results from `qa_consistency.py`; the input `regen_end_frames_with_corrections.py` corrects from. |
 | `output/stockpile_progress.json` | The stockpile agent's resume checkpoint — but also a *secondary metadata source*: `rebuild_image_mapping.py`, `generate_missing_images.py`, `regen_with_auto_prompts.py`, and `triage_failures.py` all merge it at runtime. Don't delete it. |
@@ -158,7 +158,7 @@ Those stay on your disk and never enter a commit.
 
 ## Deploying
 
-There are **no exercise PNGs in the app bundle** — `ios/PT-Helper/COIL/Resources/` holds
+There are **no exercise PNGs in the app bundle** — `ios/COIL/COIL/Resources/` holds
 only fonts, the body model, and three JSON files. The app fetches every illustration from
 Firebase Storage at runtime and caches it. So deploying images means two separate things:
 
@@ -166,7 +166,7 @@ Firebase Storage at runtime and caches it. So deploying images means two separat
   into the iOS project.
 - **The mapping JSON** is what ships in the app and in the functions bundle.
   `rebuild_image_mapping.py` writes `output/exercise_image_mapping.json` and copies it to
-  `ios/PT-Helper/COIL/Resources/`; `cd functions && npm run build` regenerates
+  `ios/COIL/COIL/Resources/`; `cd functions && npm run build` regenerates
   `src/generated/exerciseCatalog.ts` from the same file. Run
   `check_image_mapping_integrity.py` afterwards — it fails loudly if the two copies drift.
 
@@ -206,6 +206,6 @@ The scripts insert no sleeps; they rely on the daily quota plus per-call SIGALRM
 
 Paused mid-review. `expand_knowledge_graph.py` produced the draft, and
 `output/kg_review_decisions.json` holds **1,238 of 1,582** decisions.
-`merge_kg_review.py` has never been run, so `ios/PT-Helper/COIL/Resources/medical_knowledge_graph_v2.json` does not exist, and the `knowledgeGraphV2Enabled` flag in `KnowledgeGraphService.swift`
+`merge_kg_review.py` has never been run, so `ios/COIL/COIL/Resources/medical_knowledge_graph_v2.json` does not exist, and the `knowledgeGraphV2Enabled` flag in `KnowledgeGraphService.swift`
 is still off. The app runs on v1 alone. Full context in
 [`PR-C-2-handoff.md`](PR-C-2-handoff.md).

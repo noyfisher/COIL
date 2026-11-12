@@ -146,7 +146,7 @@ async function main() {
   const agent = await client.beta.agents.create({
     name: "pt-helper-recovery-agent",
     model: "claude-sonnet-4-6",
-    description: "Multi-step recovery insights analyst for PT Helper app",
+    description: "Multi-step recovery insights analyst for COIL app",
     system: RECOVERY_INSIGHTS_SYSTEM_PROMPT,
     tools: [
       {
@@ -173,7 +173,7 @@ async function main() {
 
   const environment = await client.beta.environments.create({
     name: "pt-helper-env",
-    description: "Minimal environment for PT Helper recovery analysis — no outbound network access",
+    description: "Minimal environment for COIL recovery analysis — no outbound network access",
     config: {
       type: "cloud",
       networking: {

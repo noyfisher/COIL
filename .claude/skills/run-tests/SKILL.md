@@ -6,7 +6,7 @@ argument-hint: [smoke|unit|full|prerelease|TestClass/testMethod]
 
 # Run Tests
 
-Run the PT Helper iOS test suite using the specified test plan.
+Run the COIL iOS test suite using the specified test plan.
 
 ## Test Plan Mapping
 
@@ -39,7 +39,7 @@ Parse `$ARGUMENTS` to determine what to run:
 
 ```bash
 xcodebuild test \
-  -project ios/PT-Helper/COIL.xcodeproj \
+  -project ios/COIL/COIL.xcodeproj \
   -scheme COIL \
   -destination 'platform=iOS Simulator,name=iPhone 16' \
   -testPlan <PlanName>
@@ -48,7 +48,7 @@ xcodebuild test \
 For a specific test class/method:
 ```bash
 xcodebuild test \
-  -project ios/PT-Helper/COIL.xcodeproj \
+  -project ios/COIL/COIL.xcodeproj \
   -scheme COIL \
   -destination 'platform=iOS Simulator,name=iPhone 16' \
   -only-testing:COILTests/<TestClass>/<testMethod>

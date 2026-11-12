@@ -25,11 +25,11 @@ final class AnalyticsHealthDataContractTests: XCTestCase {
     ]
 
     private func appSourceFiles() throws -> [URL] {
-        // .../COILTests/Services/<this file> -> up 3 -> ios/PT-Helper
+        // .../COILTests/Services/<this file> -> up 3 -> ios/COIL
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()   // Services
             .deletingLastPathComponent()   // COILTests
-            .deletingLastPathComponent()   // PT-Helper
+            .deletingLastPathComponent()   // COIL
             .appendingPathComponent("COIL")
 
         guard let walker = FileManager.default.enumerator(at: root, includingPropertiesForKeys: nil) else {

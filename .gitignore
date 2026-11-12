@@ -13,13 +13,13 @@ xcuserdata/
 *.xcuserstate
 
 # Fastlane
-ios/PT-Helper/vendor/
-ios/PT-Helper/fastlane/report.xml
-ios/PT-Helper/fastlane/Preview.html
-ios/PT-Helper/fastlane/screenshots
-ios/PT-Helper/fastlane/test_output
-ios/PT-Helper/fastlane/AuthKey*.p8
-ios/PT-Helper/build/
+ios/COIL/vendor/
+ios/COIL/fastlane/report.xml
+ios/COIL/fastlane/Preview.html
+ios/COIL/fastlane/screenshots
+ios/COIL/fastlane/test_output
+ios/COIL/fastlane/AuthKey*.p8
+ios/COIL/build/
 .env
 
 # Office temp/lock files
