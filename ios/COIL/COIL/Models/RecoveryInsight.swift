@@ -26,7 +26,7 @@ struct RecoveryInsight: Codable, Identifiable {
     }
 
     struct AdherenceAnalysis: Codable {
-        let score: Int                 // 0-100
+        let score: Double              // 0-100; server computes (completed/expected)*100, which is often fractional
         let sessionsCompleted: Int
         let sessionsExpected: Int
         let description: String

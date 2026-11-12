@@ -666,7 +666,9 @@ struct ExerciseContraindicationChecker {
 
     /// Exercises that should NEVER be recommended for certain conditions.
     /// Key: lowercased keyword in condition name. Value: lowercased keywords in exercise name.
-    private static let contraindicatedExercises: [String: Set<String>] = [
+    /// `fileprivate` so the medical-condition safety checks in `validateRehabPlan` (same file)
+    /// can reuse these keyword lists instead of maintaining their own, divergent copies.
+    fileprivate static let contraindicatedExercises: [String: Set<String>] = [
         "herniated disc": ["deadlift", "sit-up", "crunch", "good morning", "toe touch", "leg press"],
         "disc": ["deadlift", "sit-up", "crunch", "good morning"],
         "acl": ["deep squat", "plyometric", "cutting", "pivot", "jump squat", "box jump"],
@@ -1729,9 +1731,14 @@ struct ResponseValidationPipeline {
         let medConditionsLower = userProfile.medicalConditions.map { $0.lowercased() }
 
         if medConditionsLower.contains(where: { $0.contains("osteoporosis") }) {
-            let hasImpact = workingPlan.exercises.contains(where: {
-                let nameLower = $0.name.lowercased()
-                return nameLower.contains("jump") || nameLower.contains("plyometric") || nameLower.contains("impact") || nameLower.contains("running")
+            // Reuse the canonical osteoporosis keyword list from ExerciseContraindicationChecker
+            // (step 2/9) instead of a second, independently-maintained list — the two had
+            // drifted apart (this used to miss "heavy deadlift"/"twisting under load" and
+            // over-match on bare "impact").
+            let osteoporosisKeywords = ExerciseContraindicationChecker.contraindicatedExercises["osteoporosis"] ?? []
+            let hasImpact = workingPlan.exercises.contains(where: { exercise in
+                let nameLower = exercise.name.lowercased()
+                return osteoporosisKeywords.contains { nameLower.contains($0) }
             })
             if hasImpact {
                 // Tier 1 severity: osteoporosis + impact is a well-documented contraindication
