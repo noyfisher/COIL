@@ -87,6 +87,12 @@ struct FormFeedbackValidationPipeline {
         }
         modifiedFeedback.corrections = deduplicatedCorrections
 
+        // Cap corrections at 4 (after filtering/dedup, so we trim the final set, not the raw AI output)
+        if modifiedFeedback.corrections.count > 4 {
+            fixes.append("Trimmed corrections from \(modifiedFeedback.corrections.count) to 4")
+            modifiedFeedback.corrections = Array(modifiedFeedback.corrections.prefix(4))
+        }
+
         // Layer 7: Data quality gating
         let confidenceLevel = determineConfidenceLevel(
             dataQuality: dataQuality,
@@ -124,11 +130,6 @@ struct FormFeedbackValidationPipeline {
         // Score in valid range
         if feedback.overallScore < 0 || feedback.overallScore > 100 {
             fixes.append("Score \(feedback.overallScore) clamped to 0-100 range")
-        }
-
-        // Corrections count
-        if feedback.corrections.count > 4 {
-            fixes.append("Trimmed corrections from \(feedback.corrections.count) to 4")
         }
 
         // Must have at least one positive point

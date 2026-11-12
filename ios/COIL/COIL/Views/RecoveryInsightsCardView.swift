@@ -99,9 +99,9 @@ struct RecoveryInsightsCardView: View {
                     )
                     miniStat(
                         icon: "checkmark.circle.fill",
-                        color: adherenceColor(insight.adherenceAnalysis.score),
+                        color: adherenceColor(Int(insight.adherenceAnalysis.score.rounded())),
                         label: "Adherence",
-                        value: "\(insight.adherenceAnalysis.score)%"
+                        value: "\(Int(insight.adherenceAnalysis.score.rounded()))%"
                     )
                     miniStat(
                         icon: "star.fill",

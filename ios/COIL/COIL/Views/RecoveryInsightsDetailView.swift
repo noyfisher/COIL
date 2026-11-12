@@ -128,12 +128,12 @@ struct RecoveryInsightsDetailView: View {
     // MARK: - Adherence
 
     private func adherenceSection(_ adherence: RecoveryInsight.AdherenceAnalysis) -> some View {
-        CardSection(icon: "checkmark.circle", color: adherenceColor(adherence.score), title: "Workout Adherence") {
+        CardSection(icon: "checkmark.circle", color: adherenceColor(Int(adherence.score.rounded())), title: "Workout Adherence") {
             VStack(alignment: .leading, spacing: AppSpacing.md) {
                 HStack {
-                    Text("\(adherence.score)")
+                    Text("\(Int(adherence.score.rounded()))")
                         .font(AppFonts.display)
-                        .foregroundColor(adherenceColor(adherence.score))
+                        .foregroundColor(adherenceColor(Int(adherence.score.rounded())))
                     Text("/ 100")
                         .font(AppFonts.sectionTitle)
                         .foregroundColor(AppColors.secondaryText)
@@ -154,7 +154,7 @@ struct RecoveryInsightsDetailView: View {
                             .fill(AppColors.mutedText.opacity(0.15))
                             .frame(height: 8)
                         RoundedRectangle(cornerRadius: 4)
-                            .fill(adherenceColor(adherence.score))
+                            .fill(adherenceColor(Int(adherence.score.rounded())))
                             .frame(width: geometry.size.width * min(CGFloat(adherence.score) / 100.0, 1.0), height: 8)
                     }
                 }
